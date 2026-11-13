@@ -218,6 +218,8 @@ export const pickSchema = z.strictObject({
   safe: z.literal(true).optional(),
   // A card with at least this many damage tokens on it ("while it has 3 or more damage on it", 10075:A:1). Read by the angmar family.
   minDamage: z.number().int().positive().optional(),
+  // A card with at most this many hit points remaining: its hit points as modified now less the damage on it ("an Undead enemy with 2 or less remaining hit points", 10187:A:3). Read by the angmar family.
+  maxHitPointsLeft: z.number().int().min(0).optional(),
   onPicked: z.boolean().optional(),
   // A player card (`false`: an encounter card, "all encounter cards are immune", 12172:A:2).
   playerCard: z.boolean().optional(),

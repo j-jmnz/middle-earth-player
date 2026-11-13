@@ -18,6 +18,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
 import { headOf, inAreaOf } from "../families/breaking/areas.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
+import { defendingAgainst } from "../families/angmar/combat.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { committedWillpower, stagingThreat } from "../quest/quest.ts";
@@ -204,6 +205,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return (state.stagesReached ?? []).includes(condition.code) === condition.is;
     case "inPlay":
       return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
+    case "defendingAgainst": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && defendingAgainst(state, holder, condition.trait, ctx.cards);
+    }
     case "versusDefender": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusDefender(state, holder, condition, ctx.cards);

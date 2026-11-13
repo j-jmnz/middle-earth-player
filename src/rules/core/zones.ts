@@ -377,6 +377,8 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
+  // A card that holds the sponge (Forbidden Descent, 10101:A:2) leaves play from the staging area: announced to its own Forced effect (destroyCard takes it back when the location was explored).
+  if (current.zone === "staging" && !inPlay(dest.zone) && flagged(state, id, "progressSponge")) moved = queueEvent(moved, { trigger: "leftStagingArea", seat: null, cardId: id });
   // An enemy that guards a hero (Carried Away, 18074:B:2) is announced when it leaves play in any way; only a game that holds such a hero asks.
   if ((current.zone === "engaged" || current.zone === "staging") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => heldHero(card) && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
   // A card a player card put out of play under itself "while ~ is in play" comes back to the staging area when it leaves (07003:A:3).

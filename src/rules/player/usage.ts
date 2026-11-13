@@ -40,6 +40,7 @@ const LIMITS: Readonly<Record<Limit, LimitRule>> = {
   oncePerRoundEachPlayer: { times: 1, per: "round", eachPlayer: true },
   twicePerPhase: { times: 2, per: "phase" },
   twicePerRound: { times: 2, per: "round" },
+  thricePerRound: { times: 3, per: "round" },
   thricePerPhase: { times: 3, per: "phase" },
   fivePerPhase: { times: 5, per: "phase" },
   oncePerAttack: { times: 1, per: "attack" },

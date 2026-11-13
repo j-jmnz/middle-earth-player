@@ -1,4 +1,4 @@
-// Rules: rr.the-word-choose, rr.effects, rr.printed-threat (data/rules/entries.json); ledger lines 10107:A:1, 10100:A:1. Dark Covenant's X and its first option: X is the total printed Threat of the cards the effect discarded from the encounter deck, and the first player removes X progress from among the quests in
+// Rules: rr.the-word-choose, rr.effects, rr.printed (data/rules/entries.json); ledger lines 10107:A:1, 10100:A:1. Dark Covenant's X and its first option: X is the total printed Threat of the cards the effect discarded from the encounter deck, and the first player removes X progress from among the quests in
 // play, one token at a time from the quest card they choose; with fewer than X on them all of it comes off. Traitorous Wight's removal comes off every quest card in play.
 import type { Amount, Instruction } from "../../../catalog/boundary.ts";
 

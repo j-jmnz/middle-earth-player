@@ -7,6 +7,7 @@ import { constantVerbCodes } from "../../interpret/constant-records.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { flagged, type ScenarioState } from "../../core/state.ts";
+import { hitPointsOf } from "./quest.ts";
 
 /** Whether the card is one that prints the Safe keyword (its code has a constant `Safe` record). */
 export function isSafeLocation(state: ScenarioState, id: string | null | undefined, ctx: Pick<ReduceContext, "effects">): boolean {
@@ -35,11 +36,12 @@ export function setAsideHasHolds(state: ScenarioState, condition: Condition): bo
   return condition.kind === "setAsideHas" ? state.setAside.some((id) => state.cards[id]?.code === condition.code) : null;
 }
 
-/** False for a card the filters `safe` and `minDamage` rule out; true when the pick asks neither. */
+/** False for a card the filters `safe`, `minDamage` and `maxHitPointsLeft` rule out; true when the pick asks neither. */
 export function safePickMatches(state: ScenarioState, id: string, spec: PickSpec, ctx: ReduceContext): boolean {
   if (spec.safe === true && !isSafeLocation(state, id, ctx)) return false;
   if (spec.minDamage != null && (state.cards[id]?.damage ?? 0) < spec.minDamage) return false;
-  return true;
+  const card = state.cards[id];
+  return spec.maxHitPointsLeft == null || (card != null && hitPointsOf(state, card, ctx) - card.damage <= spec.maxHitPointsLeft);
 }
 
 /** Whether the card's "when revealed" effects are ignored: it is a treachery and the table holds `treacheryRevealIgnored` (a safe location is active). */

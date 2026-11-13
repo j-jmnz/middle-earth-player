@@ -95,6 +95,8 @@ const TRIGGERS = [
   "becameNight",
   // About a hero: resources were spent from its pool in a payment (a card played, an ability or a Response paid for), once for each hero whose pool paid ("After 1 or more resources are spent from a hero's resource pool", 10082:A:1). Resources moved or removed by an effect are not spent.
   "heroResourcesSpent",
+  // About a card that holds `progressSponge`: it left play from the staging area, discarded, shuffled away or removed, but neither explored nor travelled to ("If Forbidden Descent leaves play from the staging area", 10101:A:2).
+  "leftStagingArea",
 ] as const;
 
 const FLAGS = [
@@ -136,6 +138,8 @@ const FLAGS = [
   "gainsDoomed",
   // On a location in the staging area: the first 2 progress that would be placed on a quest card each round are placed on it instead ("the first 2 progress that would be placed on a quest each round must be placed on Forbidden Descent, instead", 10101:A:1; families/angmar/sponge.ts).
   // Each copy takes 2 a round; `spongeTaken` is the progress it took this round (engine use, until the end of the round).
+  // On a character the attack in progress damaged, until the end of the phase: its Willpower then, kept for an effect that reads the destroyed character's Willpower (engine use, families/angmar/last-known.ts).
+  "lastWillpower",
   "progressSponge",
   // On the table, while a card in play says so (Ghostly Ruins, staged or active): whenever the encounter deck runs out of cards in the quest phase, the topmost Undead enemy in the encounter discard pile returns to the staging area before the deck is reset ("Any time the encounter deck runs out of cards", 10103:A:1; families/angmar/run-out.ts).
   "returnsUndeadOnRunOut",

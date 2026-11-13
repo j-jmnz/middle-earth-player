@@ -301,6 +301,11 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
   return next;
 }
 
+/** The seat controls a claimed objective with this code: a Clue attached to one of its characters (10184:B:1). */
+function controlsObjective(state: ScenarioState, seat: number, code: string): boolean {
+  return Object.values(state.cards).some((card) => card.code === code && card.claimed === true && card.controller === seat && inPlay(card.zone));
+}
+
 function remainingCodes(state: ScenarioState, instruction: Extract<Instruction, { verb: "ChooseCards" }>, step: number): string[] {
   const taken = new Set(state.resolutionLog.earned.filter((item) => item.step === step).map((item) => item.code));
   return instruction.codes.filter((code) => !taken.has(code));
@@ -328,7 +333,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
   }
   const step = state.window?.kind === "resolution" ? state.window.step : state.resolutionAt;
   const codes = remainingCodes(state, instruction, step);
-  if (codes.length === 0) return [];
+  if (codes.length === 0 || (instruction.ifControls != null && !controlsObjective(state, seat, instruction.ifControls))) return [];
   const options = instruction.to === "hero" ? codes.flatMap((code) => boonHeroes(state, ctx, code, heroesOf(state, seat, instruction.anyHero)).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? playerOptions(state, codes) : codes;
   return instruction.optional ? [...options, SKIP] : options;
 }

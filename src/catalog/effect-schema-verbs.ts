@@ -430,6 +430,8 @@ export const simpleVerbs = [
     afterMulligan: z.boolean().optional(),
     // With `to: hero` at a Resolution: the hero may be any player's, not only the chooser's ("record which hero you attach it to", 11182:B:1).
     anyHero: z.boolean().optional(),
+    // A Resolution's offer only to a player who controls the objective with this code (a Clue attached to one of their characters, claimed): the card is offered to that seat alone, or to nobody ("For each Clue a player controls, that player may add the boon with the same name to the Campaign Pool and their deck", 10184:B:1).
+    ifControls: z.string().min(1).optional(),
     // With `to: pool` and `who: firstPlayer`: the first player chooses one of the named cards for the group, and the others do not join the pool ("Gundabad Hunter or Gundabad Stalker", 12189:B:5); the resolution screen says so.
     only: z.literal(true).optional(),
     ...when,

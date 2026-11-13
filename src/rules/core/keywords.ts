@@ -4,6 +4,7 @@ import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 import type { Cause } from "./cause.ts";
 import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
 import { keywordsKept } from "../families/angmar/blank.ts";
+import { defendingAgainst } from "../families/angmar/combat.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -61,6 +62,7 @@ export function modifiedStat(
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
     if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when, cards)) continue;
+    if (modifier.when?.kind === "defendingAgainst" && !defendingAgainst(state, instance, modifier.when.trait, cards)) continue;
     if (modifier.when?.kind === "versusVictoryTrait" && !versusVictoryTrait(state, instance, cards, against)) continue;
     if (modifier.when?.kind === "inArea" && !inAreaOf(state, instance, modifier.when.seat)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
@@ -405,6 +407,8 @@ export function destroyCard(
   // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
   next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious), instance.attachments);
+  // A location explored in the staging area did not leave it by being discarded or removed: `leftStagingArea` (10101:A:2) is not heard.
+  if (explored && instance.zone === "staging" && next.pendingEvents?.some((event) => event.trigger === "leftStagingArea" && event.cardId === id)) next = { ...next, pendingEvents: next.pendingEvents.filter((event) => !(event.trigger === "leftStagingArea" && event.cardId === id)) };
   steps.push({ kind: "destroy", targetId: id });
   if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   next = discardedFromPlay(next, instance, byDamage);

@@ -258,6 +258,7 @@ export const limitSchema = z.enum([
   "oncePerRoundEachPlayer",
   "twicePerPhase",
   "twicePerRound",
+  "thricePerRound",
   "thricePerPhase",
   "fivePerPhase",
   "oncePerAttack",

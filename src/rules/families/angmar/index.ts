@@ -17,6 +17,7 @@ import { placeHandUnderSelf } from "./cards-under.ts";
 import { determinedMatches } from "./determined.ts";
 import { flipTimeObjective, timeOfDayHolds } from "./day-night.ts";
 import { discardedThreatAmount, removeProgressAmong } from "./dark-covenant.ts";
+import { destroyedWillpowerAmount } from "./last-known.ts";
 import { placeLoggedDamageOn } from "./logged.ts";
 import { endPhase } from "./phase.ts";
 import { travelUnpayable } from "./travel.ts";
@@ -99,5 +100,5 @@ export const manifest: RulesFamily = {
   combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerFacing(state, enemyId, attackerId), defense: (state, defender, _cards, defenderId) => defenderFacing(state, defender, defenderId) },
   condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx) ?? safeActiveHolds(state, condition, ctx) ?? setAsideHasHolds(state, condition),
   settle: { sweep: advanceWhenFlagged },
-  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx) ?? discardedThreatAmount(state, found, ctx),
+  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx) ?? discardedThreatAmount(state, found, ctx) ?? destroyedWillpowerAmount(state, found, scope),
 };

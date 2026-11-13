@@ -175,6 +175,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // and the attacking enemy's engagement cost is higher than its controller's threat. `attacking`: the holder is
   // attacking an enemy whose engagement cost is higher than the holder's controller's threat.
   z.strictObject({ kind: z.literal("versusHighEngagement"), role: z.enum(["defending", "attacking"]) }),
+  // The holder is the declared defender of the attack in progress and the attacking enemy has this Trait ("+1 Defense while defending against an Undead enemy", 10114:A:2, 10187:A:2). Read while a stat is read, like versusDefender (src/rules/core/keywords.ts).
+  z.strictObject({ kind: z.literal("defendingAgainst"), trait: z.string().min(1) }),
   // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
   // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/core/keywords.ts).
   // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2).
@@ -360,8 +362,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" }> {
-  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" | "defendingAgainst" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "defendingAgainst" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [

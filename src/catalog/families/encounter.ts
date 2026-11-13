@@ -36,6 +36,8 @@ const VERBS = [
     // Not of this printed type ("a non-objective card"), and worth no victory points (the sidequests family's: 04036:A:2).
     notType: encounterType.optional(),
     noVictory: z.boolean().optional(),
+    // A card with this Trait ("a Sorcery treachery", 10185:A:3).
+    trait: z.string().min(1).optional(),
     ...when,
   }),
   // The actor puts the cards LookAtTop showed that are still on top of the encounter deck back in the order they choose.
