@@ -6,8 +6,7 @@ import { describe, expect, it } from "vitest";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard, shadowCards } from "../../../rules/core/zones.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
-import { runInstruction } from "../../../rules/interpret/interpret.ts";
-import { finish, idOf, idsOf, legalIntents, resolveRecords, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, legalIntents, resolveRecords, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-battle-of-carn-dum";
 const CHAMPION_BOON = "10189";
