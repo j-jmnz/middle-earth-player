@@ -25,6 +25,7 @@ import { snapshotOf } from "../engine/undo.ts";
 import { attachTo, moveCard, spawn } from "../core/zones.ts";
 import { stampRoutes } from "../families/sea/routes.ts";
 import { markSideQuests } from "../families/wilderland/night-quest.ts";
+import { markProgressNoted } from "../families/angmar/progress.ts";
 import { markCapture } from "../families/captured/entry.ts";
 import { dealDoubleSided, dealUnchartedDeck, type DoubleSidedCard } from "../families/uncharted/deal.ts";
 
@@ -132,6 +133,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   if (input.doubleSided && input.doubleSided.length > 0) state = dealDoubleSided(state, input.doubleSided, ctx);
   // A game that deals encounter side quests in its encounter deck reads the side quest rules (families/wilderland/night-quest.ts).
   state = markSideQuests(state, ctx.cards);
+  state = markProgressNoted(state, ctx);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   state = markCapture(state, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/brief.md, Nightmare).

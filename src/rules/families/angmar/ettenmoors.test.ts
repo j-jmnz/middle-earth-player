@@ -211,6 +211,11 @@ describe("the flags the Ettenmoors cards hold", () => {
     expect(flagged(noteProgressPlaced(placed, quest, 1), quest, "progressPlacedHere")).toBe(true);
     expect(noteProgressPlaced(placed, quest, 1).modifiers).toHaveLength(placed.modifiers.length);
     expect(flagged(noteProgressPlaced(t.state, quest, 0), quest, "progressPlacedHere")).toBe(false);
+    // A game with no card that reads it notes nothing.
+    const other = tableFromLayout("intruders-in-chetwood", {});
+    expect(other.state.progressNoted).toBeUndefined();
+    expect(noteProgressPlaced(other.state, idOf(other.state, "dh1"), 2)).toBe(other.state);
+    expect(t.state.progressNoted).toBe(true);
   });
 
   it("10075:A:2 sets the guards of a card free, staying in the staging area and no longer guarding it", () => {
