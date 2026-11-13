@@ -35,7 +35,7 @@ export function reanimatedPreviewWords(stats: DeadStats, owner: string, where: {
 
 /** The Wraith of Carn Dûm lying on a character: the attachment's text and what happens when the character leaves play. */
 export const wraithAttachedWords = (host: string): string =>
-  `Attached to ${host} as a Sorcery attachment: ${host} has -1 Willpower, -1 Attack and -1 Defense. When ${host} leaves play it returns to the staging area as an enemy.`;
+  `Attached to ${host} as a Sorcery attachment: ${host} has -1 Willpower, -1 Attack and -1 Defense. When ${host} leaves play the Wraith returns to the staging area as an enemy.`;
 
 /** Possession on its Reanimated Dead. */
 export const possessionAttachedWords = (owner: string): string =>

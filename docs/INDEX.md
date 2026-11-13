@@ -147,7 +147,7 @@ Read the sections your task touches.
   - 1831–1856 Persistence and shipping (~2.6K) ← 6
   - 1857–1898 Screens (~4.9K) ← 1
     - 1883–1898 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~57.0K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~57.1K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -155,10 +155,10 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–106 Cards (~20.4K) ← 27
+  - 59–106 Cards (~20.5K) ← 27
   - 107–112 The Sailing test (~690) ← 5
   - 113–126 The Island Map (~1.8K) ← 8
-  - 127–130 Tokens and effects (~320)
+  - 127–130 Tokens and effects (~360)
   - 131–145 Piles (~2.0K) ← 7
   - 146–151 Marks of the open moment (~400) ← 1
   - 152–220 Motion (~3.2K) ← 7

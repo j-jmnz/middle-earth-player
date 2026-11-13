@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 
 import type { PictureSource } from "../../play/canvas/table-canvas-types";
-import { pictureCode, pictureKey } from "../../play/canvas/picture-key";
+import { nameOfCard, pictureCode } from "../../play/canvas/picture-key";
 import { ledgerLine } from "../../play/cards/ledger";
 import { notAppliedCodes } from "../../play/cards/not-applied";
 import { shownName } from "../../play/cards/shown-name";
@@ -52,10 +52,7 @@ export function useCardLookups(session: OpenedTable, store: TableStore) {
   const pictureOf = useCallback((key: string) => picture(key, ownSide(key)), [ownSide]);
   const names: SheetNames = useMemo(
     () => ({
-      card: (cardId: string) => {
-        const card = store.getState().game.cards[cardId];
-        return nameOf(card ? pictureKey(card) : cardId);
-      },
+      card: (cardId: string) => nameOfCard(store.getState().game.cards, cardId, nameOf),
       // The real name of a Lost Island whose facedown side a look shows.
       facedown: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId),
       line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null, pack: (code: string) => session.facts.get(code)?.pack ?? null }),

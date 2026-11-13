@@ -2,7 +2,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../../../rules/core/test-fixture.ts";
+import { destroyCard } from "../../../rules/core/keywords.ts";
+import { printedOf } from "../../../rules/core/printed.ts";
 import { updateCard } from "../../../rules/core/state.ts";
+import { reanimateCard } from "../../../rules/families/angmar/reanimate/reanimate.ts";
 import { advanceResolution } from "../../../rules/setup/resolution.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import { recordInstructions } from "../../../catalog/scenario-data.ts";
@@ -19,6 +22,8 @@ import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenar
 
 import { heroBansOf } from "../../loadout.ts";
 import { applyResolution, poolCard, type CampaignLog } from "../../log.ts";
+import { gameReport } from "../../report.ts";
+import { scoreParts } from "../../score.ts";
 import { campaignPath, nextStep } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
@@ -188,5 +193,23 @@ describe("The Dread Realm in the angmar-awakened campaign", () => {
     expect(path.every((node) => node.status === "completed")).toBe(true);
     expect(nextStep(path, null).kind).toBe("finished");
     // The screen's words for it ("Angmar Awakened won. The players win the campaign!", 9 of 9) are read from the printed line by src/screens/campaign/campaign-end.test.ts.
+  });
+
+  // A hero destroyed and then reanimated (Dwimmerlaik, Unholy Crypt's shadow) lies engaged as `<code>~dead` when the players win: it is in no discard pile, and is still a destroyed hero (mec108.reanimated-dead, ltp.scoring).
+  it("mec108.reanimated-dead counts a destroyed hero lying reanimated and engaged as destroyed in the score, the report and the log when the players win", () => {
+    const log = dumLog(2);
+    const started = opened(2, log);
+    const hero0 = started.seats[0]?.heroes[0] ?? "";
+    const code = started.cards[hero0]?.code ?? "";
+    const cost = printedOf(world.cards, code).threat ?? 0;
+    const lived: ScenarioState = { ...started, window: null, stageCleared: true, resolution: recordInstructions(EFFECTS, "10193", "resolution"), resolutionAt: 0, resolutionSeat: 0 };
+    const dead = reanimateCard(destroyCard(lived, hero0, ctx.cards, []), hero0, 0, "engaged", []);
+    expect(dead.cards[hero0]?.code).toBe(`${code}~dead`);
+    expect(dead.seats[0]?.engaged).toContain(hero0);
+    expect(scoreParts(dead, world.cards).destroyed - scoreParts(lived, world.cards).destroyed).toBe(cost);
+    expect(gameReport(dead, world.cards).seats[0]?.heroes).toContainEqual({ name: printedOf(world.cards, code).name, words: "Destroyed", destroyed: true });
+    const written = applyResolution(log, "the-dread-realm", advanceResolution(dead, ctx), world.cards, NO_COPY_LIMITS);
+    expect(written.fallenHeroesBySeat.flat()).toContain(code);
+    expect(applyResolution(log, "the-dread-realm", advanceResolution(lived, ctx), world.cards, NO_COPY_LIMITS).fallenHeroesBySeat.flat()).not.toContain(code);
   });
 });

@@ -36,11 +36,11 @@ export function returnAttachedEnemy(state: ScenarioState, id: string): ScenarioS
   return updateCard(moved, id, { asAttachment: undefined, face: "up", controller: null, host: null });
 }
 
-/** A card that leaves its role as an attachment, called as `moveCard` moves it (`current` is the card as it was, `dest` where it goes): an enemy lying as an attachment (Wraith of Carn Dûm) is no attachment once it leaves that role, and an attachment that takes its host with it (Possession, the flag `discardsHost`) leaves any way but the game's own removal, so its host's card hears it and is discarded (rr.removed-from-game). */
-export function attachmentLeaves(state: ScenarioState, id: string, current: CardInstance, dest: Destination): ScenarioState {
+/** A card that leaves its role as an attachment, called as `moveCard` moves it (`current` is the card as it was, `dest` where it goes, `before` the state it left: the flag is read there, while the attachment was still in play): an enemy lying as an attachment (Wraith of Carn Dûm) is no attachment once it leaves that role, and an attachment that takes its host with it (Possession, the flag `discardsHost`) leaves any way but the game's own removal, so its host's card hears it and is discarded (rr.removed-from-game). */
+export function attachmentLeaves(state: ScenarioState, id: string, current: CardInstance, dest: Destination, before: ScenarioState): ScenarioState {
   let next = state;
   if (current.asAttachment === true && dest.zone !== "attached") next = updateCard(next, id, { asAttachment: undefined });
-  if (current.zone === "attached" && current.host != null && dest.zone !== "removed" && dest.zone !== "attached" && flagged(next, id, "discardsHost")) {
+  if (current.zone === "attached" && current.host != null && dest.zone !== "removed" && dest.zone !== "attached" && flagged(before, id, "discardsHost")) {
     next = queueEvent(next, { trigger: "attachmentLeft", seat: null, cardId: id, subject: id, other: current.host });
   }
   return next;

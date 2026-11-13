@@ -152,14 +152,14 @@ export function raiseThreatToAttach(state: ScenarioState, instruction: Verb<"Rai
   return queueFront(raised, [{ instruction: { ...instruction, seat, accepted: true }, seat, chosen: null, cause }]);
 }
 
-/** PlaceProgressInStaging: the first player chooses a location in the staging area that can take progress and it takes all it can of what is left, again and again, until none is left or they keep the rest. With `required` they divide it as they choose: a location, then how much of what is left goes on it (an amount from 1 up to what it can take), again until none is left or no location can take more. */
+/** PlaceProgressInStaging: the first player chooses a location in the staging area that can take progress and it takes all it can of what is left, again and again, until none is left or they keep the rest. With `divided` they divide it as they choose: a location, then how much of what is left goes on it (an amount from 1 up to what it can take), again until none is left or no location can take more (progress no location can take is lost); with one location open all it can take goes on it without asking. */
 export function placeProgressInStaging(state: ScenarioState, instruction: Verb<"PlaceProgressInStaging">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const left = instruction.left ?? frameScope(state, focus.seat, focus.sourceId).x ?? 0;
   if (left <= 0) return state;
   const cause = currentCause(steps, UNATTRIBUTED);
   const open = stagingLocations(state, ctx.cards).filter((id) => progressRoom(state, id, ctx.cards) > 0);
   const again = (rest: number, at?: string): ScenarioState => queueFront(state, [{ instruction: { ...instruction, left: rest, ...(at ? { at } : { at: undefined }) }, seat: state.firstPlayer, chosen: null, cause }]);
-  if (instruction.required === true && instruction.at != null) {
+  if (instruction.divided === true && instruction.at != null) {
     const room = open.includes(instruction.at) ? Math.min(left, progressRoom(state, instruction.at, ctx.cards)) : 0;
     if (room === 0) return open.length > 0 ? again(left) : state;
     if (focus.chosen == null) return askTarget(state, { instruction: { ...instruction, left }, seat: state.firstPlayer, chosen: null, cause }, Array.from({ length: room }, (_, index) => String(index + 1)));
@@ -168,15 +168,21 @@ export function placeProgressInStaging(state: ScenarioState, instruction: Verb<"
     const placed = placeProgress(state, instruction.at, amount, ctx, steps);
     return left - amount > 0 ? queueFront(placed, [{ instruction: { ...instruction, left: left - amount, at: undefined }, seat: state.firstPlayer, chosen: null, cause }]) : placed;
   }
+  // Dividing with one location open: it is the only place any of it can go, so all it can take goes on it without asking.
+  if (instruction.divided === true && focus.chosen == null && open.length === 1 && open[0]) {
+    const only = Math.min(left, progressRoom(state, open[0], ctx.cards));
+    const next = placeProgress(state, open[0], only, ctx, steps);
+    return left - only > 0 ? queueFront(next, [{ instruction: { ...instruction, left: left - only, at: undefined }, seat: state.firstPlayer, chosen: null, cause }]) : next;
+  }
   if (focus.chosen == null) {
     if (open.length === 0) return state;
     if (!effectData(state)) return { ...state, failure: "Placing progress in the staging area needs a choice, and no effect is asking" };
-    return askTarget(state, { instruction: { ...instruction, left }, seat: state.firstPlayer, chosen: null, cause }, instruction.required === true ? open : [...open, KEEP]);
+    return askTarget(state, { instruction: { ...instruction, left }, seat: state.firstPlayer, chosen: null, cause }, instruction.divided === true ? open : [...open, KEEP]);
   }
   if (focus.chosen === KEEP || !open.includes(focus.chosen)) return state;
   const room = Math.min(left, progressRoom(state, focus.chosen, ctx.cards));
   // Dividing: a location that can take only one asks nothing more; otherwise the amount is asked next.
-  if (instruction.required === true && room > 1) return again(left, focus.chosen);
+  if (instruction.divided === true && room > 1) return again(left, focus.chosen);
   const next = placeProgress(state, focus.chosen, room, ctx, steps);
   return left - room > 0 ? queueFront(next, [{ instruction: { ...instruction, left: left - room, at: undefined }, seat: state.firstPlayer, chosen: null, cause }]) : next;
 }

@@ -94,7 +94,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
   101162:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the ally with the highest printed cost among every player's allies in play (no printed cost or X counts 0; the first player chooses among ties) is destroyed, and is the picked card in its owner's discard pile
-    - the acting player reanimates the picked card, if it lies in a discard pile: each is placed facedown in the staging area and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+    - that ally's controller reanimates the picked card, if it lies in a discard pile: each is placed facedown in the staging area and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
     - this card attaches to the picked card (nowhere if that card carries one of its title already)
   101162:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -238,7 +238,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
   10155:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player reanimates the card the event is about, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+    - the defending player reanimates the card the event is about, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
     - the picked card is dealt 1 shadow card from the encounter deck, wherever it is
 
 10155:A:2 (shadow): Shadow: If this attack destroys a character, reanimate that character and deal it 1 shadow card.

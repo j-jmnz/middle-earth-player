@@ -57,7 +57,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     ],
   },
   { id: "10152:constant:1", cardCode: "10152", lines: ["10152:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "progressToStaging", amount: 1, until: "whileSourceInPlay", target: "self" }] },
-  { id: "10152:forced:1", cardCode: "10152", lines: ["10152:B:2"], timing: "forced", trigger: "progressReplaced", instructions: [{ verb: "PlaceProgressInStaging", required: true }] },
+  { id: "10152:forced:1", cardCode: "10152", lines: ["10152:B:2"], timing: "forced", trigger: "progressReplaced", instructions: [{ verb: "PlaceProgressInStaging", divided: true }] },
   { id: "10152:forced:2", cardCode: "10152", lines: ["10152:B:3"], timing: "forced", trigger: "endOfPhase", condition: { kind: "all", conditions: [PHASE_QUEST, { kind: "count", pick: LOCATIONS_IN_PLAY, min: 1 }] }, instructions: [{ verb: "DamageEach", amount: 1, pick: { type: "character", control: "any" } }] },
   { id: "10152:forced:3", cardCode: "10152", lines: ["10152:B:3"], timing: "forced", trigger: "endOfPhase", condition: { kind: "all", conditions: [PHASE_QUEST, { kind: "count", pick: LOCATIONS_IN_PLAY, max: 0 }] }, instructions: [{ verb: "WinGame" }] },
 

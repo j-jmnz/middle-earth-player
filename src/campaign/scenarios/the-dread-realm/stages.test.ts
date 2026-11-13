@@ -173,6 +173,22 @@ describe("stage 3", () => {
     expect(placed.state.cards[placed.state.questStage ?? ""]?.progress).toBe(0);
   });
 
+  it("10152:B:2 places everything a lone location can take on it without asking, and loses what it cannot take", () => {
+    const t = built({ stage: "10152", staging: ["place"] });
+    const synced = settled(t.state, t);
+    const asked: string[] = [];
+    const never = (state: ScenarioState): string => {
+      if (state.window?.kind === "choose") asked.push(...state.window.options);
+      return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+    };
+    const placed = finish({ state: settled(placeQuestProgress(synced, 3, t.cards, [], canAdvance), t), steps: [] }, t.ctx, never);
+    expect(asked).toEqual([]);
+    // Two quest points: it took 2 and was explored, the 3rd had nowhere to go and is lost, and none went on the stage.
+    expect(placed.state.staging.filter((id) => placed.state.cards[id]?.code === "place")).toHaveLength(0);
+    expect(placed.state.encounterDiscard.filter((id) => placed.state.cards[id]?.code === "place")).toHaveLength(1);
+    expect(placed.state.cards[placed.state.questStage ?? ""]?.progress).toBe(0);
+  });
+
   it("10152:B:3 deals 1 damage to every character in play at the end of the quest phase while a location is in play", () => {
     const t = built({ stage: "10152", staging: ["place"], play: ["10176"] });
     const run = resolveRecords(t.state, t.ctx, "10152", "forced", idOf(t.state, "10152"), undefined, false);

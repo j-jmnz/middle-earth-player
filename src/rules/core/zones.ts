@@ -375,7 +375,7 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if (current.zone === "captured" && dest.zone !== "captured") moved = updateCard(moved, id, { owner: undefined });
   if (moved.capture && !inPlay(current.zone) && inPlay(dest.zone)) moved = captureOnEntry(moved, id, dest);
   // An enemy lying as an attachment (Wraith of Carn Dûm) and an attachment that takes its host with it (Possession) change as they leave that role (families/angmar/reanimate/attached.ts).
-  moved = attachmentLeaves(moved, id, current, dest);
+  moved = attachmentLeaves(moved, id, current, dest, state);
   // A host that leaves play rescues every card captured underneath it (mec108.captured-cards).
   // A card captured with a hero that is itself put into a captured deck stays with it (the boons set aside with it, mec108.captured-deck).
   if (moved.capture && inPlay(current.zone) && !inPlay(dest.zone) && dest.zone !== "captured") moved = rescueUnder(moved, id, areaHeadOf(state, id));

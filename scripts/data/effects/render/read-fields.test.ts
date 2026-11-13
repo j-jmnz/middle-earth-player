@@ -155,7 +155,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   DealSourceAsShadow: [{ verb: "DealSourceAsShadow" }],
   AttachEnemyToPicked: [{ verb: "AttachEnemyToPicked" }],
   MakeSetAsideActive: [{ verb: "MakeSetAsideActive", code: "10154" }],
-  PlaceProgressInStaging: [{ verb: "PlaceProgressInStaging", required: true }],
+  PlaceProgressInStaging: [{ verb: "PlaceProgressInStaging", divided: true }],
   DestroyHighestCostAlly: [{ verb: "DestroyHighestCostAlly" }],
   DiscardOtherInPlay: [{ verb: "DiscardOtherInPlay" }],
   RemovePickedFromGame: [{ verb: "RemovePickedFromGame" }],

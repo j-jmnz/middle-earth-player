@@ -33,9 +33,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("EngageFromVictory"), name: z.string().min(1), ...when }),
   // "For each progress that would be placed on Searching the Island, you may place it on a location in the staging area, instead" (12067:B:2): the progress the stage heard (the effect's X) is placed by
   // the first player, who chooses a location in the staging area that can take progress and puts on it all that it can take, then chooses again for what is left, until none is left, no location can take
-  // any or the first player keeps the rest on the stage (where it does nothing). With `required` the first player may not keep it ("Progress that would be placed on this quest is instead placed on locations in the staging area, divided as you choose", 10152:B:2): they divide it freely: each time they choose a location, then
+  // any or the first player keeps the rest on the stage (where it does nothing). With `divided` the first player may not keep it ("Progress that would be placed on this quest is instead placed on locations in the staging area, divided as you choose", 10152:B:2): they divide it freely: each time they choose a location, then
   // how much of what is left goes on it (up to what it still needs), and the rest stays on the stage only when no location can take any more. `left` and `at` are engine use: the progress still to place and the location chosen, whose amount is asked next.
-  z.strictObject({ verb: z.literal("PlaceProgressInStaging"), left: z.number().int().min(0).optional(), required: z.literal(true).optional(), at: z.string().min(1).optional(), ...when }),
+  z.strictObject({ verb: z.literal("PlaceProgressInStaging"), left: z.number().int().min(0).optional(), divided: z.literal(true).optional(), at: z.string().min(1).optional(), ...when }),
   // "When Recurring Nightmare leaves play, shuffle it into any player's deck" (11199:A:2): the source card goes from the discard pile it went to into the deck of a player, shuffled in. The first player
   // chooses the player when there is more than one; `seat` is engine use: the seat chosen.
   z.strictObject({ verb: z.literal("ShuffleIntoPlayerDeck"), seat: z.number().int().min(0).optional(), ...when }),

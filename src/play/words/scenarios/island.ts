@@ -1,8 +1,9 @@
-// Rules: dcce.island-map, dcce.exploration, dcce.uncharted, rr.travel (data/rules/entries.json); ledger lines 12067:A:1, 12067:B:2, 12071:A:2, 110078:B:3, 11197:A:2, 11199:A:2, 12068:A:1, 12068:B:3. The words of the island family's
+// Rules: dcce.island-map, dcce.exploration, dcce.uncharted, rr.travel, rr.explored (data/rules/entries.json); ledger lines 12067:A:1, 12067:B:2, 12071:A:2, 110078:B:3, 11197:A:2, 11199:A:2, 12068:A:1, 12068:B:3. The words of the island family's
 // verbs inside a choice (src/catalog/families/island.ts): what a Pick or a question is for, the label of an option that is no card, and what a travel row on the map says. Every prompt names the card it is about and leads
 // with the decision; a travel row says what it leaves behind and what it brings back. Pure.
 import type { Instruction } from "../../../catalog/boundary.ts";
 import { cellOf, distance, exploring, islandOf, TEMPLE_COLUMN } from "../../../rules/families/island/map.ts";
+import { progressRoom } from "../../../rules/families/south/locations.ts";
 import { seatThreat } from "../../../rules/families/play/hooks.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
@@ -35,8 +36,8 @@ export function islandPickWords(pick: Instruction, next: Instruction | undefined
   const host = sourceId ? names.card(sourceId) : "This card";
   switch (pick.verb) {
     case "PlaceProgressInStaging":
-      if (pick.at != null) return { verb: "Place", prompt: `${host}: ${plural(pick.left ?? 0, "progress", "progress")} left to place. Choose how much goes on ${names.card(pick.at)}; the rest goes on other locations in the staging area.` };
-      if (pick.required === true) return { verb: "Place", prompt: `${host}: ${plural(pick.left ?? 0, "progress", "progress")} left to place, divided as you choose. Choose a location in the staging area to put some of it on.` };
+      if (pick.at != null) return { verb: "Place", prompt: `${host}: ${plural(pick.left ?? 0, "progress", "progress")} left to place. Choose how much goes on ${names.card(pick.at)}; the rest goes on other locations in the staging area, and anything no location can take is lost.` };
+      if (pick.divided === true) return { verb: "Place", prompt: `${host}: ${plural(pick.left ?? 0, "progress", "progress")} left to place, divided as you choose. Choose a location in the staging area to put some of it on; anything no location can take is lost.` };
       return { verb: "Place", prompt: `${host}: ${plural(pick.left ?? 0, "progress", "progress")} left to place. Choose a location in the staging area to put it on, or keep it on the quest, where it does nothing.` };
     case "RaiseThreatToAttach": {
       const card = names.code(pick.code);
@@ -59,9 +60,13 @@ export function islandPickWords(pick: Instruction, next: Instruction | undefined
 }
 
 /** The label of an option that is no card: keep the progress on the quest, raise threat to attach or keep it as it is. Null for a card (the sheet names it). */
-export function islandOptionLabel(instruction: Instruction, id: string, game: ScenarioState, names: ChoiceNames): string | null {
+export function islandOptionLabel(instruction: Instruction, id: string, game: ScenarioState, names: ChoiceNames, cards: ReduceContext["cards"]): string | null {
   if (instruction.verb === "PlaceProgressInStaging" && id === "keep") return "Keep the rest on the quest";
-  if (instruction.verb === "PlaceProgressInStaging" && instruction.at != null) return `${id} of the ${instruction.left ?? 0} progress`;
+  if (instruction.verb === "PlaceProgressInStaging" && instruction.at != null) {
+    // The amount that fills the location's quest points explores it (rr.explored).
+    const explores = Number(id) >= progressRoom(game, instruction.at, cards);
+    return `${id} of the ${instruction.left ?? 0} progress${explores ? " \u00b7 explores it" : ""}`;
+  }
   if (instruction.verb === "RaiseThreatToAttach" && !instruction.accepted) {
     const seat = instruction.seat ?? 0;
     if (id === "attach") return `Raise threat by ${instruction.amount} to ${seatThreat(game, seat) + instruction.amount} and attach ${names.code(instruction.code)} to a hero`;

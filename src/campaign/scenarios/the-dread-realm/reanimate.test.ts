@@ -60,6 +60,43 @@ describe("Dwimmerlaik's Forced names the defending player", () => {
   });
 });
 
+describe("a sentinel ally of another player that falls to the attack", () => {
+  // Player 2's sentinel ally defends an attack on Player 1: the defending player is Player 1, so the dead engages Player 1 and is still Player 2's card.
+  const sentinel = (made: ReturnType<typeof built>) => made.cards.set("ally", { ...made.cards.get("ally")!, defense: 0, keywords: { ...made.cards.get("ally")!.keywords, sentinel: true } });
+  const sentinelFight = (shadow: string, enemy: string) =>
+    fightEnemy(
+      (layout: Layout) => {
+        const made = built(layout);
+        sentinel(made);
+        return made;
+      },
+      shadow,
+      enemy,
+      { seats: 2, play: [{ code: "ally", seat: 1 }] },
+      { defender: (made) => idOf(made.state, "ally"), tweak: (state, made) => updateCard(state, idOf(made.state, "ally"), { damage: 1 }) },
+    );
+
+  it("10155:A:1 has the defending player, not the controller of the ally that fell, take the Reanimated Dead", () => {
+    const fight = sentinelFight("f0", DWIMMERLAIK);
+    const ally = idOf(fight.made.state, "ally");
+    expect(fight.run.state.cards[ally]?.code).toBe("ally~dead");
+    expect(fight.run.state.cards[ally]?.owner).toBe(1);
+    expect(fight.run.state.seats[0].engaged).toContain(ally);
+    expect(fight.run.state.seats[1].engaged).not.toContain(ally);
+    expect(shadowCards(fight.run.state.cards[ally])).toHaveLength(1);
+  });
+
+  it("101161:A:2 (and 10155:A:2) has the Unholy Crypt's shadow engage the defending player the same way", () => {
+    for (const shadowCard of [CRYPT, DWIMMERLAIK]) {
+      const fight = sentinelFight(shadowCard, "f0");
+      const ally = idOf(fight.made.state, "ally");
+      expect(fight.run.state.cards[ally]?.code, shadowCard).toBe("ally~dead");
+      expect(fight.run.state.seats[0].engaged, shadowCard).toContain(ally);
+      expect(fight.run.state.seats[1].engaged, shadowCard).not.toContain(ally);
+    }
+  });
+});
+
 describe("Unholy Crypt and Dark Halls", () => {
   it("101161:A:2 reanimates the character the attack destroyed (its shadow effect)", () => {
     const fight = fightEnemy(built, CRYPT, "f0", {}, { undefended: true, tweak: (state, made) => updateCard(state, made.hero, { damage: 5 }) });

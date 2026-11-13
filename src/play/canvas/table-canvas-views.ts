@@ -74,7 +74,8 @@ export function stripText(slot: CardSlot, questPoints: number | null, owner?: st
 // effect to come.
 export function marksText(slot: SlotInfo | null): string {
   if (!slot) return "";
-  const engagement = slot.engagement ? ` · engagement ${slot.engagement.cost}, ${slot.engagement.engages ? "engages" : "stays"}` : "";
+  // A Reanimated Dead names its engagement cost in its own sentence (`dead`), so the pill is not said twice.
+  const engagement = slot.engagement && !slot.dead ? ` · engagement ${slot.engagement.cost}, ${slot.engagement.engages ? "engages" : "stays"}` : "";
   const loss = slot.loss ? ` · ${slot.loss.speech}` : "";
   // A side quest in the staging area: the current quest, and Protect the Innocent's damage against the number that loses (the same words the native reader says, card-speech.ts).
   const current = slot.side?.current ? " · the current quest" : "";
