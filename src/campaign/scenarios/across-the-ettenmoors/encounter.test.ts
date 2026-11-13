@@ -264,6 +264,14 @@ describe("10083:A:1 and 10083:A:2 are Scavenge for Supplies", () => {
     const t = at({ staging: ["10083"], seats: 2, threat: [25, 31], deck: ["f0", "10074"], hand: ["ally"] });
     const run = resolveRecords(t.state, t.ctx, "10083", "forced", idOf(t.state, "10083"), choosing("skip"));
     expect(run.state.seats[1]?.engaged.map((id) => run.state.cards[id]?.code)).toContain("10074");
+    expect(run.state.seats[0]?.engaged ?? []).toEqual([]);
+  });
+
+  it("10083:A:2 lets each player play a card from their hand at no cost, the 1 more of 10083:A:1 included", () => {
+    const t = at({ staging: ["10083"], deck: ["f0"], hand: ["ally"], heroResources: 0 });
+    const run = resolveRecords(t.state, t.ctx, "10083", "forced", idOf(t.state, "10083"), choosing("play"));
+    expect(zoneOf(run.state, "ally")).toBe("play");
+    expect([run.state.cards[t.hero]?.resources, run.state.cards[t.hero2]?.resources]).toEqual([0, 0]);
   });
 });
 

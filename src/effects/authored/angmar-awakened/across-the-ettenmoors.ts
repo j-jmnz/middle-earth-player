@@ -139,7 +139,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // then each player in turn may play a card from their hand at no cost.
   { id: "10083:constant:1", cardCode: "10083", lines: ["10083:A:1"], timing: "constant", instructions: [{ verb: "IncreaseCost", amount: 1, pick: { type: "card", control: "any" } }] },
   { id: "10083:forced:1", cardCode: "10083", lines: ["10083:A:2"], timing: "forced", trigger: "questDefeated", subject: "self", instructions: [
-    { verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "SearchMove", trait: "Troll", type: "enemy", to: "engaged" }, { verb: "ShuffleEncounterDeck" },
+    { verb: "SearchMove", trait: "Troll", type: "enemy", to: "staging", remember: true }, { verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "previous" }, { verb: "ShuffleEncounterDeck" },
     EACH_PLAYER([{ verb: "Choose", who: "actor", options: [
       { id: "play", requires: { kind: "canPick", pick: { type: "card", control: "you", from: "hand" } }, instructions: [{ verb: "PlayFromHand", pick: { type: "card", control: "you" }, free: true }] },
       { id: "skip", instructions: [] },

@@ -368,9 +368,10 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 10083:A:2 (front): Forced: When this stage is defeated, search the encounter deck and discard pile for a Troll enemy and put it into play engaged with the player with the highest threat. Each player may play a card from his hand, at no cost.
   10083:forced:1: Forced on the event questDefeated (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one Troll enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - the player with the highest threat becomes the picked player (the first player chooses among a tie)
     - the effect goes on with the picked player as the acting player
-    - the acting player finds one Troll enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - engage the card picked before
     - shuffle the encounter deck
     - for each player, first player first:
       - the acting player chooses one of:
@@ -428,4 +429,4 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
       * option "defense":
         - the attacking enemy: stat defense 3, until the end of the phase
 
-(rendered pieces: 318 by template, 0 as JSON)
+(rendered pieces: 319 by template, 0 as JSON)
