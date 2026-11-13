@@ -3,6 +3,7 @@
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
+import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 import { cardsUnder, shadowCards } from "../../rules/core/zones.ts";
@@ -44,6 +45,11 @@ export type ZoneView = { zone: ZoneId; seat: number; entries: readonly ZoneEntry
 /** A card whose face the table hides: facedown, except the prisoner, whose owner knows the card and may still open it (01123:B:1). */
 export function hidesFace(card: Pick<CardInstance, "face" | "prisoner" | "zone" | "host"> | undefined): boolean {
   return card?.face === "down" && !isPrisoner(card);
+}
+
+/** A facedown Reanimated Dead (The Dread Realm): its owner knows the card, and a tap or a hold opens a preview that says what it is without naming or showing the face (realm-preview.ts). */
+export function isDead(card: Pick<CardInstance, "code"> | undefined): boolean {
+  return card != null && isReanimatedCode(card.code);
 }
 
 /** The hero that is the prisoner: facedown in the captive zone under no card (the cards held with it are not). */

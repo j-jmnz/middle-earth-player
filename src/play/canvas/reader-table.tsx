@@ -16,7 +16,7 @@ import { NO_HIGHLIGHT } from "../store/peek.ts";
 import { useReaderGateEnd } from "../spotlight/reader-gate.ts";
 import { tableVisibility } from "../choice/panel-visibility.ts";
 import { useReaderPanelOpen } from "../choice/reader-panel.ts";
-import { hidesFace, shownSeat } from "../store/selectors.ts";
+import { hidesFace, isDead, shownSeat } from "../store/selectors.ts";
 import type { ReaderSeed, TableCanvasProps } from "./table-canvas-types.ts";
 import { readerRows, type ReaderItem } from "./reader-table-rows.ts";
 import { useBannerHeight } from "../readouts/banner-height.ts";
@@ -105,7 +105,8 @@ function Item({ item, place, game, seat, deps, onTap, onPreview }: { item: Reade
     );
   }
   const card = game.cards[item.id];
-  const faceDown = hidesFace(card);
+  // A Reanimated Dead is facedown, but its owner knows it: it opens a preview that says what it is (realm-preview.ts).
+  const faceDown = hidesFace(card) && !isDead(card);
   const said = cardSpeech(game, seat, item.id, deps);
   const dimmed = highlight.dimOthers && !highlight.tappable.has(item.id);
   return (

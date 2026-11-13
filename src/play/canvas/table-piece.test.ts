@@ -22,7 +22,7 @@ const tokens: TokenImages = { resource: null, damage: null, progress: null, ques
 const clockOf = (at: number) => ({ progress: {}, epoch: {}, at, k: 1, span: 400 }) as unknown as Clock;
 const game = {} as ScenarioState;
 
-const numbersOf = (willpower: number | null): SlotNumbers => ({ effects: { stats: [], flags: [] }, willpower, questPoints: null, stageLoses: false, engagement: null, delayed: false, under: null, fire: null, loss: null, place: null, side: null, determined: null, combat: null });
+const numbersOf = (willpower: number | null): SlotNumbers => ({ effects: { stats: [], flags: [] }, willpower, questPoints: null, stageLoses: false, engagement: null, delayed: false, under: null, fire: null, loss: null, place: null, side: null, determined: null, dead: null, combat: null });
 
 type Change = { highlight?: TableHighlight; liftedId?: string | null; motions?: ReadonlyMap<string, Motion>; clock?: Clock; willpowerOf?: (id: string) => number | null };
 

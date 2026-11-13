@@ -7,14 +7,20 @@ import { copyLine, withCopies } from "../reprint.ts";
 // "Reanimate" is the box's own mechanic (mec108.reanimated-dead): a player card placed facedown in front of a player as if it had just engaged them, acting as an Undead enemy with 0 engagement cost, 2 Threat, 2 Attack, 2 Defense and 2 hit points until it leaves play for its owner's discard pile.
 // Rules: mec108.reanimated-dead, rr.engaged, rr.destroy, rr.setup, rr.shadow-effects, rr.step-6-2, rr.step-6-11, rr.first-player, rr.defending-player, rr.in-play-and-out-of-play, rr.attachment-cards, rr.removed-from-game, rr.explored, rr.search, rr.travel, rr.cost, rr.active-location, rr.effects,
 // rr.forced, rr.modifiers, rr.cancel, rr.reveal, rr.current-quest, rr.printed, rr.unique-cards, faq.enemy-attacks-outside-combat, faq.additional-attacks, faq.progress-without-advancing, faq.simultaneous-effects (data/rules/entries.json).
-const DAECHANAR = "10153";
+export const DAECHANAR = "10153";
+export const ALTAR_OF_MIDWINTER = "10154";
+/** Stage 3 of The Dread Realm: the quest card whose B side wins the game once no location is in play at the end of the quest phase. */
+export const ESCAPE_FROM_CARN_DUM = "10152";
+export const WRAITH_OF_CARN_DUM = "101157";
+export const POSSESSION = "101162";
+export const A_FELL_DREAD = "101163";
 const FIRST_PLAYER = { who: "firstPlayer" } as const;
 /** "Sorcery cards in play": the faceup cards with the Trait in play, attachments on heroes, allies, enemies and quest cards included; a shadow card lies out of play (rr.in-play-and-out-of-play). */
-const SORCERY_IN_PLAY: PickSpec = { type: "card", control: "any", trait: "Sorcery", allInPlay: true };
+export const SORCERY_IN_PLAY: PickSpec = { type: "card", control: "any", trait: "Sorcery", allInPlay: true };
 const AT_LEAST_ONE_SORCERY: Condition = { kind: "count", pick: SORCERY_IN_PLAY, min: 1 };
 /** Daechanar in play, in the staging area or engaged. */
 const DAECHANAR_IN_PLAY: Condition = { kind: "count", pick: { type: "enemy", control: "any", staging: true, names: ["Daechanar"] }, min: 1 };
-const LOCATIONS_IN_PLAY: PickSpec = { type: "location", control: "any" };
+export const LOCATIONS_IN_PLAY: PickSpec = { type: "location", control: "any" };
 const PHASE_QUEST: Condition = { kind: "phase", is: "Quest" };
 const ATTACHED = { kind: "sourceIn", zone: "attached" } as const;
 /** "Attached character", "attached hero": the host is that card type now (a host can change type, rr.then is not involved). */

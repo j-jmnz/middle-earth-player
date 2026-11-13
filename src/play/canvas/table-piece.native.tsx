@@ -35,7 +35,8 @@ export function drawBody(p: BodyProps, slot: CardSlot, dim: boolean) {
       pile
     );
   }
-  const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
+  // A Reanimated Dead is a player card lying facedown: its back is the player's.
+  const encounterBack = !slot.dead && (slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck");
   const picked = p.picked > 0;
   const glows = slot.kind === "card" && (picked || p.tappable);
   return (
@@ -80,7 +81,8 @@ function drawOverlay(p: PieceProps) {
         {p.stageMarks ? <StageMarks rect={rect} pill={p.stageMarks.pill} apart={p.stageMarks.apart} fonts={fonts} t={t} s={s} /> : null}
         <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(p.sphere, t) : null} contrast={contrast} />
         {p.inactive ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
-        {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} t={t} s={s} /> : null}
+        {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} icon="hero" t={t} s={s} /> : null}
+        {slot.kind === "card" && slot.faceDown && slot.dead ? <HeldMark rect={rect} icon="threat" t={t} s={s} /> : null}
         {slot.stack != null ? <StackMark slot={slot} fonts={fonts} t={t} s={s} /> : null}
       </Group>
       {slot.success != null && slot.success > 0 ? <SuccessMedallion slot={slot} fonts={fonts} t={t} s={s} /> : null}

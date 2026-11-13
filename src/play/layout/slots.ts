@@ -1,5 +1,6 @@
 // The pieces the table's layout places cards with (layout.ts, play-area.ts): a card's slot, its footprint in a row, a row's left
 // edges, and the cards peeking out under a host. Pure.
+import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { CardInstance } from "../../rules/core/state.ts";
 
 import type { CardSlot, Rect, SlotKind, SlotZone } from "./layout.ts";
@@ -36,6 +37,7 @@ export function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect:
     count: 0,
     committed: card.committed,
     ...(card.face === "down" && isPrisoner(card) ? { held: true as const } : {}),
+    ...(isReanimatedCode(card.code) ? { dead: true as const } : {}),
   };
 }
 

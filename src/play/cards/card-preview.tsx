@@ -63,6 +63,8 @@ export type PreviewCard = {
   turn?: number;
   // The card lies on its Lost Island side: the preview shows that side only, and Details (which opens the real card) is not offered.
   lostIsland?: boolean;
+  // The card is a facedown Reanimated Dead: the preview says what it is on paper and Details (which would open the card behind it) is not offered.
+  faceless?: boolean;
 };
 
 // The card's picture, or (while it is not on the phone) its name and text on paper. The quest advance screen draws its stage with it.
@@ -201,7 +203,7 @@ export function CardPreview({
       </Animated.View>
     </GestureDetector>
   );
-  const buttons = onDetails && shown.lostIsland !== true ? (
+  const buttons = onDetails && shown.lostIsland !== true && shown.faceless !== true ? (
     <SecondaryButton
       label="Details"
       testID="card-preview-details"

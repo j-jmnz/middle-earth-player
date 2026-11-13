@@ -31,6 +31,7 @@ import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
 import { stageDefeatLoses } from "../readouts/fortress.ts";
 import { determinedMark, type DeterminedMark } from "./determined-mark.ts";
+import { deadSpeech } from "./realm-preview.ts";
 import { sideQuestMark, stagedSideQuest, type SideQuestMark } from "./side-quest-mark.ts";
 
 export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "threat" | "questPoints" | "engagementCost";
@@ -40,7 +41,7 @@ export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "thre
 // round), so the pill shows it will go (rr.lasting-effects).
 export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
 
-export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage";
+export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit";
 
 // A "cannot" an effect put on the card, with the icon of the thing it cannot do.
 export type FlagBadge = { flag: FlagStat; icon: IconName; word: string };
@@ -76,6 +77,8 @@ const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "damageLimit", icon: "hitPoints", word: "Takes at most %n damage at a time" },
   // Dragon Scales (18059:A:2), the shield badge (the Defense icon, not the hit points icon of the damage-limit badges): all the damage the attached enemy would take is canceled, then the Scales are discarded.
   { flag: "cancelsDamage", icon: "defense", word: "Cancels all the damage it would take, once" },
+  // A Fell Dread (101163:A:1): the attached hero cannot be left out of the quest commitment while it is able to commit.
+  { flag: "mustCommit", icon: "willpower", word: "Must commit to the quest" },
 ];
 
 // A flag's words; "%n" is the amount the effect holds (a damage limit).
@@ -272,6 +275,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
     side: sideQuestMark(game, ctx, cardId),
     determined: determinedMark(game, ctx, cardId),
+    dead: deadSpeech(game, ctx.cards, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
   };
 }
@@ -344,6 +348,8 @@ export type SlotNumbers = {
   side: SideQuestMark | null;
   // A hero or ally the Campaign Log marks determined, or that carries a Determination (determined-mark.ts): a small pill with the word, and what it means in the preview and to the reader.
   determined: DeterminedMark | null;
+  // A facedown Reanimated Dead (The Dread Realm): what it is and whose card it is, drawn as the small mark on its back and said by the reader and the web list (realm-preview.ts). Null on every other card.
+  dead: string | null;
   // In the enemy attacks step: an engaged enemy's attack or a character's defense, drawn at the card's foot (combatNumber).
   combat: CombatNumber | null;
 };

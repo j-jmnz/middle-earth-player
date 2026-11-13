@@ -16,10 +16,11 @@ import type { SlotInfo, TableHighlight } from "../canvas/table-canvas-types.ts";
 import { controlSpeech, treasureSpeech } from "../cards/dungeon-preview.ts";
 import { shareHint, shareValue, wordOf } from "../choice/tray-logic.ts";
 import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
-import { actingSeat, hidesFace, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
+import { actingSeat, hidesFace, isDead, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
 import { areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
 import { plural } from "./list.ts";
 import { seatTag } from "./scenarios/area.ts";
+import { REANIMATED_DEAD } from "./scenarios/angmar/dread-realm-table.ts";
 import { grappleDetail } from "./scenarios/grapple.ts";
 import { areaTell } from "./scenarios/stormcaller.ts";
 import { islandTell } from "./scenarios/uncharted.ts";
@@ -126,6 +127,8 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
   // The same three facedown words the web list uses.
   if (isPrisoner(card)) return `Prisoner: ${deps.nameOf(card.code)}, face down`;
   if (card.prisoner === true) return "Face down, held with the prisoner";
+  // A Reanimated Dead says what it is and whose card it is, never the card behind it (realm-preview.ts).
+  if (isDead(card)) return `${REANIMATED_DEAD}, ${deps.info(game, seat, card.id).dead ?? "a facedown Undead enemy"}`;
   if (card.face === "down") return "Face down";
 
   const key = pictureKey(card);
@@ -194,7 +197,7 @@ const SHOW_HINT = "Double tap to show the card";
 // A face-up card the moment does not ask about opens large on a tap; a facedown one shows nothing.
 function previewHint(game: ScenarioState, cardId: string): string | null {
   const card = game.cards[cardId];
-  return card && hidesFace(card) && !isLooked(game, cardId) ? null : SHOW_HINT;
+  return card && hidesFace(card) && !isDead(card) && !isLooked(game, cardId) ? null : SHOW_HINT;
 }
 
 function hintOf(game: ScenarioState, cardId: string, deps: CardSpeechDeps): string | null {

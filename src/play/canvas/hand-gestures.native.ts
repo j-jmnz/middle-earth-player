@@ -251,7 +251,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
         if (!slot || swallow.get()) return;
         if (slot.kind === "pile") scheduleOnRN(onTap, slot.id);
-        else if (!slot.faceDown || slot.held) scheduleOnRN(onPreview, slot.id);
+        else if (!slot.faceDown || slot.held || slot.dead) scheduleOnRN(onPreview, slot.id);
       });
 
     // A press on the hand held still for 150 ms (a move of more than the slop before it fails this and is a drag) raises and

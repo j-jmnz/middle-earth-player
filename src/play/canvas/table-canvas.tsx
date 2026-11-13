@@ -21,9 +21,10 @@ import { stageFactsOf } from "../store/stormcaller-table.ts";
 import { areaTell } from "../words/scenarios/stormcaller.ts";
 import { headingStepOf, headingLook } from "../dream-chaser/heading.ts";
 import { headingLine, pileCountWords, secondSlotLine, shipsLine } from "../words/scenarios/sea.ts";
-import { PILE_WORDS, PILES, hidesFace, isPrisoner, pileIds, secondPilesOf, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "../store/selectors.ts";
+import { PILE_WORDS, PILES, hidesFace, isDead, isPrisoner, pileIds, secondPilesOf, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "../store/selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { marksText } from "./table-canvas-views.ts";
+import { REANIMATED_DEAD } from "../words/scenarios/angmar/dread-realm-table.ts";
 import type { TableTokens } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -88,8 +89,8 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, facts, onTap, onPr
           <CardButton
             key={card.id}
             id={card.id}
-            faceDown={hidesFace(card)}
-            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : card.face === "down" ? "Face down" : `${nameOf(pictureKey(card))}${card.exhausted ? " (exhausted)" : ""}${islandTell(game, card) ? ` · ${islandTell(game, card)}` : ""}${inactive(pictureKey(card)) ? " · Not applied" : ""}${grappleTell(game, card.id)}${treasureTell(game, card, facts, nameOf)}${area ? ` · ${areaTell(area, area === "stage" ? stageFactsOf(game, info(game, seat, card.id).questPoints) : null)}` : ""}${marksText(zone === "hand" ? null : info(game, seat, card.id))}`}
+            faceDown={hidesFace(card) && !isDead(card)}
+            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : isDead(card) ? `${REANIMATED_DEAD}${marksText(info(game, seat, card.id))}` : card.face === "down" ? "Face down" : `${nameOf(pictureKey(card))}${card.exhausted ? " (exhausted)" : ""}${islandTell(game, card) ? ` · ${islandTell(game, card)}` : ""}${inactive(pictureKey(card)) ? " · Not applied" : ""}${grappleTell(game, card.id)}${treasureTell(game, card, facts, nameOf)}${area ? ` · ${areaTell(area, area === "stage" ? stageFactsOf(game, info(game, seat, card.id).questPoints) : null)}` : ""}${marksText(zone === "hand" ? null : info(game, seat, card.id))}`}
             onTap={onTap}
             onPreview={onPreview}
             highlight={highlight}

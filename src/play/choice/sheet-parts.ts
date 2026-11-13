@@ -2,7 +2,7 @@
 // whether an intent type is legal now.
 import type { LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
-import { printedOf } from "../../rules/core/printed.ts";
+import { isReanimatedCode, printedOf } from "../../rules/core/printed.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
 import { islandTell } from "../words/scenarios/uncharted.ts";
@@ -60,6 +60,12 @@ function seatOfCard(game: ScenarioState, id: string): number | null {
   if (card.zone === "engaged") return game.seats.findIndex((seat) => seat.engaged.includes(id));
   // A card captured underneath another, or rescued into a hand, is its owner's (Escape from Mount Gram).
   if (card.zone === "captured" || card.zone === "hand") return card.owner ?? card.controller;
+  // An attachment is its host's player's: the player who controls the hero or ally, or the owner of a Reanimated Dead in the staging area (Possession).
+  if (card.zone === "attached" && card.host != null) {
+    const host = game.cards[card.host];
+    if (!host) return null;
+    return host.zone === "staging" && isReanimatedCode(host.code) ? (host.owner ?? null) : seatOfCard(game, host.id);
+  }
   return card.zone === "play" || card.zone === "heroes" ? card.controller : null;
 }
 
@@ -74,6 +80,12 @@ export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: Shee
   const seats = new Set(options.map((other) => seatOfCard(game, other)).filter((other) => other != null && other >= 0));
   if (seats.size < 2) return undefined;
   const type = printedOf(ctx.cards, game.cards[id]?.code ?? "").type;
+  // An attachment says whose card it lies on: "A Fell Dread · on Player 2's hero", "Possession · on Player 1's Reanimated Dead".
+  const host = game.cards[id]?.zone === "attached" ? game.cards[game.cards[id]?.host ?? ""] : undefined;
+  if (host) {
+    const hostType = isReanimatedCode(host.code) ? "Reanimated Dead" : printedOf(ctx.cards, host.code).type === "hero" ? "hero" : "ally";
+    return `${names.card(id)} \u00b7 on Player ${seat + 1}'s ${hostType}`;
+  }
   const kind = type === "hero" || type === "attachment" || type === "event" ? type : type === "player-side-quest" ? "side quest" : "ally";
   return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${kind}`;
 }

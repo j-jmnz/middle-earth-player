@@ -50,6 +50,8 @@ export type CardSlot = Rect & {
   committed: boolean;
   // The facedown prisoner of Escape from Dol Guldur (01123:B:1): its back wears a small hero mark and a tap still opens its preview.
   held?: true;
+  // A facedown Reanimated Dead (The Dread Realm): a player card back with a small mark, and a tap or a hold opens a preview that says what it is.
+  dead?: true;
   // A deck with an encounter card attached to it (Iron Shackles, 01105:A:1): a chain on its count strip.
   chained?: true;
   // The one peek of a staging card with more than one card under it (a grappled arm, Black Key on the Raider Flagship): how many are under it, drawn as "×2".

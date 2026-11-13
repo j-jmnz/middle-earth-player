@@ -12,6 +12,7 @@ import { huntLimit, thaurdirStagePoints } from "../readouts/angmar.ts";
 import { ettenmoorsDetail } from "./ettenmoors-preview.ts";
 import { gramDetail } from "./gram-preview.ts";
 import { dumDetail } from "./carn-dum-preview.ts";
+import { realmDetail } from "./realm-preview.ts";
 import { rhudaurDetail } from "./rhudaur-preview.ts";
 import { wastesDetail } from "./wastes-preview.ts";
 import { hitPointsOf } from "../../rules/families/angmar/quest.ts";
@@ -33,7 +34,7 @@ export function angmarDetail(game: ScenarioState, ctx: ReduceContext, cardId: st
   const card = game.cards[cardId];
   // The pieces of The Wastes of Eriador (the Time objective, Pack Leader's gate, Determination), Across the Ettenmoors (the campaign card clock, safe locations, guards, No Rest) and Escape from Mount Gram (captured cards, Loot the Dungeons, Stop the Executioners) hold
   // in a game whether or not a side quest has been seen yet. A card can carry two of them (a hero with Determination and No Rest), so the parts are joined; a side quest that is the current quest says so after them.
-  const parts = [wastesDetail(game, ctx, cardId), ettenmoorsDetail(game, ctx, cardId, name), gramDetail(game, ctx, cardId, name), rhudaurDetail(game, ctx, cardId, name), dumDetail(game, ctx, cardId, name)].filter((part): part is string => part != null);
+  const parts = [wastesDetail(game, ctx, cardId), ettenmoorsDetail(game, ctx, cardId, name), gramDetail(game, ctx, cardId, name), rhudaurDetail(game, ctx, cardId, name), dumDetail(game, ctx, cardId, name), realmDetail(game, ctx, cardId, name)].filter((part): part is string => part != null);
   if (parts.length > 0) {
     if (card && card.zone === "staging" && flagged(game, cardId, "currentQuest")) parts.push(CURRENT_QUEST_WORDS);
     return parts.join(" ");

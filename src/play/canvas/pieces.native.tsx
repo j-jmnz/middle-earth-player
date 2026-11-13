@@ -103,17 +103,17 @@ export function NotAppliedMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: 
 }
 
 /**
- * The facedown prisoner's back (01123:B:1): a small hero mark on a night disc in the middle of it, upright whatever the card does. Not accent, which marks
+ * The facedown prisoner's back (01123:B:1), and a facedown Reanimated Dead's (the Threat icon: an Undead enemy): a small mark on a night disc in the middle of it, upright whatever the card does. Not accent, which marks
  * the one action, and not danger, which marks a refusal: bone, the colour of a card that is only held.
  */
-export function HeldMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {
+export function HeldMark({ rect, icon, t, s }: { rect: Rect; icon: IconName; t: TableTokens; s: number }) {
   const cx = rect.x + rect.w / 2;
   const cy = rect.y + rect.h / 2;
   return (
     <Group>
       <Circle cx={cx} cy={cy} r={12 * s} color={t.night} />
       <Circle cx={cx} cy={cy} r={11 * s} color={t.bone} style="stroke" strokeWidth={1.25 * s} />
-      <CanvasIcon name="hero" x={cx - 6 * s} y={cy - 6 * s} size={12 * s} color={t.bone} />
+      <CanvasIcon name={icon} x={cx - 6 * s} y={cy - 6 * s} size={12 * s} color={t.bone} />
     </Group>
   );
 }

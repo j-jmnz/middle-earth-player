@@ -83,5 +83,7 @@ export function marksText(slot: SlotInfo | null): string {
   const determined = slot.determined ? ` · ${slot.determined.speech}` : "";
   // The cards held underneath a card (the captured cards of Escape from Mount Gram, the pill the canvas draws): the same sentence the native reader says.
   const under = slot.under ? ` · ${slot.under.speech}` : "";
-  return `${engagement}${loss}${current}${sideLoses}${determined}${under}${slot.delayed ? " · an effect comes later" : ""}`;
+  // A Reanimated Dead says what it is and whose card it is (the same sentence the native reader says, realm-preview.ts); it never names its face.
+  const dead = slot.dead ? ` · ${slot.dead}` : "";
+  return `${engagement}${loss}${current}${sideLoses}${determined}${dead}${under}${slot.delayed ? " · an effect comes later" : ""}`;
 }

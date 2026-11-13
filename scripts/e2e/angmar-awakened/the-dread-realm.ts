@@ -2,14 +2,14 @@
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `realm-won` is the first seed that wins, parked on the win (the Resolution waits); `realm-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
-// TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
+// The Campaign Setup offers each player a boon for their opening hand (`boonChoices`: both skip); the Resolution (10193:B:1) asks nothing and ends the campaign. The decklists are played with the scenario's golden policy (test/scenarios/the-dread-realm/game.ts) with card play on.
 import type { CampaignLog } from "../../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../../src/campaign/save.ts";
-import type { PlayerIntent, ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { DUM_GOLDENS, dumWorld, playGolden as playDum } from "../../../test/scenarios/the-battle-of-carn-dum/game.ts";
+import { boonChoices, DEFAULT_POLICY, REALM_POLICY, realmIntent } from "../../../test/scenarios/the-dread-realm/game.ts";
 import { rhudaurWonLog } from "./the-battle-of-carn-dum.ts";
-import { nextIntent } from "../../../test/harness/auto-player.ts";
 import { createLog } from "../../log.ts";
 import { firstSeed, wonLog } from "../seed-kit.ts";
 
@@ -20,14 +20,13 @@ export type RealmFixtureName = "realm-won" | "realm-lost";
 
 // The log of a playthrough whose first 8 parts were won: the log of the parts before The Battle of Carn Dûm (scripts/e2e/angmar-awakened/the-battle-of-carn-dum.ts), then the The Battle of Carn Dûm golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
 export async function dumWonLog(): Promise<CampaignLog> {
-  return wonLog({ title: "The Battle of Carn Dûm", goldens: DUM_GOLDENS, world: dumWorld, play: playDum }, await rhudaurWonLog());
+  return wonLog({ title: "The Battle of Carn Dûm", golden: "two-handed, won, Thaurdir destroyed on stage 2B", goldens: DUM_GOLDENS, world: dumWorld, play: playDum, scenarioId: "the-battle-of-carn-dum" }, await rhudaurWonLog());
 }
 
 export async function realmFixtures(): Promise<Partial<Record<RealmFixtureName, RealmFixture>>> {
   const log = await dumWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): RealmFixture | null => {
-    // TODO: the scenario's own answers in place of the saved decklists' policy, when the scenario needs them (scripts/e2e/temple-of-the-deceived.ts is the pattern).
-    const found = firstSeed(say, { campaignId: "angmar-awakened", scenarioId: "the-dread-realm", seatCount: 2, log, answer: (state: ScenarioState, ctx: Parameters<typeof nextIntent>[1], memory: Set<string>) => nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory) }, "REALM_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: "angmar-awakened", scenarioId: "the-dread-realm", seatCount: 2, log, choices: boonChoices(2), answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => realmIntent(state, ctx, memory, DEFAULT_POLICY, { ...REALM_POLICY, play: true, act: true }) }, "REALM_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "realm-won");
