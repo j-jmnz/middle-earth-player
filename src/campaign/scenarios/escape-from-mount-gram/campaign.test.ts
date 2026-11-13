@@ -148,7 +148,7 @@ describe("Escape from Mount Gram in the angmar-awakened campaign", () => {
     expect(log.campaignPool.find((card) => card.code === "10176")?.seat).toBe(1);
   });
 
-  it("10174:B:3 writes Determination's mark with the stolen cards: a Resolution that names the determined characters carries them into the log", () => {
+  it("10172:A:1 writes Determination's mark with the stolen cards (10174:B:3): a Resolution that names the determined characters carries them into the log", () => {
     const state = goldenState("escape-from-mount-gram", WON(1));
     const log = applyResolution(wastesLog(1), "escape-from-mount-gram", state, world.cards, NO_COPY_LIMITS);
     // RecordDetermined (10172) marks each character that carries a Determination: none in this golden, so the mark stays as it was.

@@ -29,7 +29,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10039:A:2 (front): When Revealed: Search the encounter deck for 1 copy of Prison Cell, reveal it, and add it to your staging area. Then, capture an additional 2 cards from the top of your captured deck underneath that copy of Prison Cell.
   10039:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player searches the encounter deck and discard pile for a card, reveals it and adds it to the staging area [also {"code":"10046"}]
+    - the acting player searches the encounter deck and discard pile for a card, reveals it and adds it to the staging area [also {"code":"10046","deckOnly":true}]
     - [json CaptureFromDeck {"verb":"CaptureFromDeck","amount":2,"end":"top","under":{"code":"10046"}}]
 
 10039:B:1 (back): Any time players would place progress tokens on this quest, rescue an equal number of captured cards at random from underneath it instead. (Progress is placed on the active location before triggering this effect.)
@@ -88,7 +88,8 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10042:A:3 (front): Forced: When Southern Gate becomes the active location, each player with less than 35 threat must raise his threat to 35.
   10042:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json RaiseThreatTo {"verb":"RaiseThreatTo","amount":35}]
+    - for each player, first player first:
+      - [json RaiseThreatTo {"verb":"RaiseThreatTo","amount":35}]
 
 ## 10043 Cruel Torturer
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -109,7 +110,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
     - [json Capture {"verb":"Capture","amount":1}]
 
 10044:A:2 (front): Response: After the captured card(s) underneath Dungeon Guard are rescued, the players may put 1 of them into play at no cost.
-  10044:response:1: Response on the event capturedRescued (heard about this card)
+  10044:response:1: Response on the event capturedRescued (heard about this card; answered by the player the event happened to)
     only if there is a card (any player controls) chosen by the first player [also {"captured":"rescued"}] to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (any player controls) chosen by the first player [also {"captured":"rescued"}]
@@ -188,8 +189,8 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10049:A:2 (front): When Revealed: Until the end of the round, each enemy gets -10 engagement cost and +1 Attack. If there are no enemies in play, search the encounter deck and discard pile for an enemy and add it to the staging area.
   10049:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) or in the staging area [also {"atStage":true}]: stat engagementCost -10, until the end of the round
-    - each enemy (any player controls) or in the staging area [also {"atStage":true}]: stat attack 1, until the end of the round
+    - every enemy in play: stat engagementCost -10, until the end of the round
+    - every enemy in play: stat attack 1, until the end of the round
     - then, if [json condition {"kind":"enemyInPlay","is":false}] (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 ## 10050 Feeble and Weary
@@ -237,9 +238,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10052:A:2 (shadow): Shadow: Discard a random card from your hand and raise your threat by its printed cost.
   10052:shadow:1: Shadow
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
-    - raise threat by the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0) (the acting player)
+    - the acting player discards 1 random card(s) from hand [also {"raiseByCost":true}]
 
 ## 10053 Stop the Executioners!
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -256,7 +255,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10053:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardCapturedUnder {"verb":"DiscardCapturedUnder","threat":3}]
-    - [json RemoveFromGame {"verb":"RemoveFromGame"}]
+    - [json RemoveFromGame {"verb":"RemoveFromGame","self":true}]
 
 ## 10174 Escape from Mount Gram
 
@@ -301,7 +300,9 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10176:A:1 (front): Response: After Berelind attacks and destroys an enemy, place 1 progress on a quest card in play.
   10176:response:1: Response after a player's attack destroys an enemy (heard about this card)
-    - [json ProgressQuest {"verb":"ProgressQuest","amount":1}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) [also {"questCard":true}]
+    - [json PlaceProgressOnQuestCard {"verb":"PlaceProgressOnQuestCard","amount":1}]
 
 ## 10177 Chieftain's Brooch
 
@@ -359,4 +360,4 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
     - [json AddToVictory {"verb":"AddToVictory","target":"other"}]
 
-(rendered pieces: 146 by template, 58 as JSON)
+(rendered pieces: 145 by template, 58 as JSON)
