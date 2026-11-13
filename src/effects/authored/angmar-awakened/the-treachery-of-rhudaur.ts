@@ -215,6 +215,17 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "currentQuest", is: "self" },
       instructions: [{ verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "subject" }, { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "endOfPhase", target: "subject" }],
     },
+    // The same line for an enemy a search put into play: a search announces no entry of its own.
+    {
+      id: "10109:forced:3",
+      cardCode: "10109",
+      lines: ["10109:A:1"],
+      timing: "forced",
+      trigger: "searchedIntoPlay",
+      subject: UNDEAD,
+      condition: { kind: "currentQuest", is: "self" },
+      instructions: [{ verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "subject" }, { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "endOfPhase", target: "subject" }],
+    },
     { id: "10109:forced:2", cardCode: "10109", lines: ["10109:A:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any" }, instructions: [...SELF_QUEST("Quiet the Spirits"), { verb: "PlaceProgressOnQuestCard", amount: 2 }] },
     flipsInto("10109", "10109:A:3", "10110", 1),
 

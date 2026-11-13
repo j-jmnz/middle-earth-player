@@ -97,6 +97,8 @@ const TRIGGERS = [
   "heroResourcesSpent",
   // About a card that holds `progressSponge`: it left play from the staging area, discarded, shuffled away or removed, but neither explored nor travelled to ("If Forbidden Descent leaves play from the staging area", 10101:A:2).
   "leftStagingArea",
+  // About a card a search put into play: an encounter card found in the encounter deck or discard pile and added to the staging area ("each Undead enemy that enters play", 10109:A:1, hears it beside `encounterEnteredPlay`, which a search does not announce). Queued only in a game whose records name it.
+  "searchedIntoPlay",
 ] as const;
 
 const FLAGS = [

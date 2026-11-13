@@ -236,6 +236,13 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - the effect goes on with the picked player as the acting player
     - engage the card the event is about
     - the card the event is about: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, until the end of the phase
+  10109:forced:3: Forced on the event searchedIntoPlay (heard about Undead enemy (any player controls) or in the staging area)
+    only if this card is the current quest
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the player with the highest threat becomes the picked player (the first player chooses among a tie)
+    - the effect goes on with the picked player as the acting player
+    - engage the card the event is about
+    - the card the event is about: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, until the end of the phase
 
 10109:A:2 (front): Forced: After an enemy is destroyed, place 2 progress on Quiet the Spirits.
   10109:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls))
@@ -404,4 +411,4 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - choose non-unique Undead enemy (any player controls) or in the staging area, with 2 or fewer hit points remaining
     - discard the picked card
 
-(rendered pieces: 278 by template, 0 as JSON)
+(rendered pieces: 285 by template, 0 as JSON)

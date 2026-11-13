@@ -10,7 +10,6 @@ import { startReveal } from "../windows/frames.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
-import { announceEntered } from "../families/encounter/reveal.ts";
 import { activeOf, stagingDest } from "../families/breaking/areas.ts";
 import { attachHeroHosts, attachHostChooser } from "../families/play/hooks.ts";
 import { lastPickedSeat } from "../families/play/refs.ts";
@@ -25,6 +24,7 @@ import { seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { gameReads } from "../core/game-reads.ts";
+import { listens } from "../families/encounter/reveal.ts";
 import { attachTo, inPlay, moveCard, turnedUp } from "../core/zones.ts";
 
 function hasEnemyType(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
@@ -183,8 +183,8 @@ function applyTargeted(
         const wasInPlay = inPlay(next.cards[id]?.zone ?? "removed");
         next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each || facedown) next = updateCard(next, id, { face: turnedUp(next, id) });
-        // A card found out of play enters play: the cards that hear an encounter card entering play hear it (Quiet the Spirits, 10109:A:1).
-        if (!wasInPlay) next = announceEntered(next, id, item.seat, ctx);
+        // A card found out of play enters play: the cards that hear a search put a card into play hear it (Quiet the Spirits, 10109:A:1); `encounterEnteredPlay` is left to the other ways in.
+        if (!wasInPlay && listens(next, ctx, "searchedIntoPlay")) next = queueEvent(next, { trigger: "searchedIntoPlay", seat: item.seat, subject: id });
       }
       // A `different` search tells the next one which titles are taken.
       const data = topFrame(next)?.data;
