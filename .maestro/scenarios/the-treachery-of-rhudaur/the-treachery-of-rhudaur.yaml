@@ -3,8 +3,7 @@ tags:
   - scenario
 ---
 # Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `rhudaur-won` (scripts/e2e/angmar-awakened/the-treachery-of-rhudaur.ts): a real two-handed game of The Treachery of Rhudaur (the One Deck and Defenders of Gondor
-# lists, Easy), played after Across the Ettenmoors' win and parked on its win (stage 2B defeated with Thaurdir's hit points gone). The fixture is OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds with the saved decklists' policy (docs/phases/STATUS.md; none wins in 300
-# seeds today), so this flow cannot run until a seed wins. The Campaign Setup asked nothing; the Resolution (10184:B:1) offers each player the boon of each Clue they control (a choice the flow does not name: which Clues were claimed depends on the seed), then marks the characters that carry
+# lists, Easy), played after Across the Ettenmoors' win and parked on its win (stage 2B defeated with Thaurdir's hit points gone). The fixture is OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds with the saved decklists' policy (docs/phases/STATUS.md), so this flow cannot run until a seed wins. The Campaign Setup asked nothing; the Resolution (10184:B:1) offers each player the boon of each Clue they control (a choice the flow does not name: which Clues were claimed depends on the seed), then marks the characters that carry
 # a Determination determined. The campaign has no XP. The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); the Clues dial is the scenario's own widget on stage 2B, read while the victory is on the table.
 - runFlow:
     file: ../../subflows/scenario-win.yaml

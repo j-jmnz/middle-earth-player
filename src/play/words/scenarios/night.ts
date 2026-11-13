@@ -84,7 +84,7 @@ export function nightChooseNote(choose: Choose, game: ScenarioState, ctx: Reduce
     const quests = choose.options.filter((option) => option.id !== MAIN_QUEST).length;
     const main = nightMainNow(game, ctx, choose);
     const side = quests === 1 ? "the side quest in the staging area" : `1 of the ${quests} side quests in the staging area`;
-    if (main?.barred) return say(`make ${side} the current quest until the end of the phase, or have no current quest this phase? ${main.name} cannot be the current quest. Progress goes on the active location first; progress beyond its quest points is lost.`);
+    if (main?.barred) return say(`make ${side} the current quest until the end of the phase, or have no current quest this phase? ${main.name} cannot be the current quest. Progress goes on the active location first, then on the side quest chosen; with no current quest, progress beyond the active location's quest points is discarded.`);
     const name = main?.name ?? HILL;
     return say(`make ${side} the current quest until the end of the phase, or keep ${name}? Progress goes on the active location first, then on the current quest instead of ${name}. Progress beyond its quest points is discarded.`);
   }

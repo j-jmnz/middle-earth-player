@@ -53,7 +53,7 @@ describe("Secrets of Rhudaur", () => {
 });
 
 describe("the side quests that flip over", () => {
-  it("10109:A:3 flips into its Clue objective in the staging area when defeated, not into the victory display, and the Fog on it goes", () => {
+  it("10109:A:3 flips into its Clue objective in the staging area when defeated, not into the victory display, and the Fog on it stays (it is still in play)", () => {
     const t = built({ phase: "Quest", staging: [{ code: "10109", progress: 22 }], attached: [{ code: "10108", to: "10109" }] });
     const side = idOf(t.state, "10109");
     const done = settle(setCurrentQuest(t.state, side, t.ctx), t.ctx, []);
@@ -63,7 +63,9 @@ describe("the side quests that flip over", () => {
     expect(card?.progress).toBe(0);
     expect(codesIn(done, "victory")).toEqual([]);
     expect(flagged(done, side, "currentQuest")).toBe(false);
-    expect(codesIn(done, "discard").concat(codesIn(done, "encounterDiscard"))).toContain("10108");
+    const fog = idOf(done, "10108");
+    expect(done.cards[fog]?.host).toBe(side);
+    expect(codesIn(done, "discard").concat(codesIn(done, "encounterDiscard"))).not.toContain("10108");
   });
 });
 

@@ -69,7 +69,7 @@ export function combatDamage(
   const targetId = damageGoesTo(state, assigned);
   const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);
   const landed = steps.slice(logged).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
-  const placed = noteHurt(noteLanded(noteWillpower(damaged, targetId, ctx), landed), targetId, state.cards[targetId]?.damage ?? 0, landed, ctx);
+  const placed = noteHurt(noteLanded(noteWillpower(damaged, state, targetId, ctx), landed), targetId, state.cards[targetId]?.damage ?? 0, landed, ctx);
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   const toShip = flagged(state, enemyId, "excessToShip");

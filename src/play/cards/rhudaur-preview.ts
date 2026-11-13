@@ -6,7 +6,7 @@ import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { questPointsOf } from "../../rules/quest/quest.ts";
 
-import { CLUE_CODES, FORBIDDEN_DESCENT, SECRETS_OF_RHUDAUR, SIDE_QUEST_CODES, THAURDIRS_PURSUIT, claimedClues, sideQuestsInPlay, spongeTaken } from "../readouts/rhudaur.ts";
+import { CLUE_CODES, FORBIDDEN_DESCENT, SECRETS_OF_RHUDAUR, SIDE_QUEST_CODES, THAURDIRS_PURSUIT, claimedClues, pursuitFog, sideQuestsInPlay, spongeTaken, sponges } from "../readouts/rhudaur.ts";
 import { CLUE_GIVES, FLIPS_WORDS, clueClaimedWords, clueStagingWords, descentPreviewWords, pursuitWords, secretsPreviewWords } from "../words/scenarios/angmar/rhudaur-table.ts";
 
 /** What a card of The Treachery of Rhudaur's says in its preview, or null for any other card. `name` is a card's title by instance id. */
@@ -14,8 +14,16 @@ export function rhudaurDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   const card = game.cards[cardId];
   if (!card) return null;
   if (card.code === SECRETS_OF_RHUDAUR && inPlay(card.zone)) return secretsPreviewWords(card.resources, sideQuestsInPlay(game));
-  if (card.code === THAURDIRS_PURSUIT && inPlay(card.zone)) return pursuitWords(questPointsOf(game, card, ctx.cards) ?? 0, printedOf(ctx.cards, card.code).questPoints ?? 0, claimedClues(game).length);
-  if (card.code === FORBIDDEN_DESCENT && card.zone === "staging") return descentPreviewWords(spongeTaken(game, card), card.progress, printedOf(ctx.cards, card.code).questPoints ?? 0);
+  if (card.code === THAURDIRS_PURSUIT && inPlay(card.zone)) {
+    const points = questPointsOf(game, card, ctx.cards) ?? 0;
+    const printed = printedOf(ctx.cards, card.code).questPoints ?? 0;
+    const claimed = claimedClues(game).length;
+    return pursuitWords(points, printed, claimed, pursuitFog(game, card, points, printed, claimed));
+  }
+  if (card.code === FORBIDDEN_DESCENT && card.zone === "staging") {
+    const copies = sponges(game);
+    return descentPreviewWords(spongeTaken(game, card), card.progress, questPointsOf(game, card, ctx.cards) ?? 0, { index: copies.findIndex((copy) => copy.id === card.id), copies: copies.length });
+  }
   if (SIDE_QUEST_CODES.includes(card.code) && card.zone === "staging") return FLIPS_WORDS;
   if (CLUE_CODES.includes(card.code) && inPlay(card.zone)) {
     const gives = CLUE_GIVES[card.code] ?? "";

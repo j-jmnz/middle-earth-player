@@ -86,7 +86,7 @@ describe("the words of the current-quest question where the main quest cannot be
     const t = tableFromLayout("the-treachery-of-rhudaur", { stage: "10094", phase: "Quest", staging: ["10109", "10111"] });
     const game = { ...t.state, window: { kind: "choose" as const, seat: 0, options: [], cardIds: [] } as never };
     const note = nightChooseNote(MANY, game, t.ctx, names);
-    expect(note).toBe("Make 1 of the 2 side quests in the staging area the current quest until the end of the phase, or have no current quest this phase? Secrets of Rhudaur cannot be the current quest. Progress goes on the active location first; progress beyond its quest points is lost.");
+    expect(note).toBe("Make 1 of the 2 side quests in the staging area the current quest until the end of the phase, or have no current quest this phase? Secrets of Rhudaur cannot be the current quest. Progress goes on the active location first, then on the side quest chosen; with no current quest, progress beyond the active location's quest points is discarded.");
     const main = nightMainNow(game, t.ctx, MANY);
     expect(main).toEqual({ name: "Secrets of Rhudaur", barred: true });
     expect(nightBranchWords(MANY, MAIN_QUEST, names, null, { main: main! })).toBe("Have no current quest this phase");

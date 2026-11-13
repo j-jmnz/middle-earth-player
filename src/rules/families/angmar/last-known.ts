@@ -8,13 +8,13 @@ import { heldAmount, type ScenarioState } from "../../core/state.ts";
 import { readsAmount, refCard, type AmountScope } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 
-/** The attack in progress damages the character `targetId`: when its effect for the end of the attack reads the destroyed character's Willpower, the character's Willpower now is kept (the latest value replaces an earlier one). */
-export function noteWillpower(state: ScenarioState, targetId: string, ctx: ReduceContext): ScenarioState {
-  const attack = state.pendingAttack;
-  const target = state.cards[targetId];
-  if (!attack?.after || !target || !readsAmount(attack.after, "destroyedWillpower") || !isCharacterType(printedOf(ctx.cards, target.code))) return state;
-  const kept = state.modifiers.filter((modifier) => !(modifier.instanceId === targetId && modifier.stat === "lastWillpower"));
-  return { ...state, modifiers: [...kept, { instanceId: targetId, sourceId: attack.enemyId, stat: "lastWillpower", amount: modifiedStat(state, target, "willpower", ctx.cards), until: "endOfPhase" }] };
+/** The attack in progress damages the character `targetId`: when its effect for the end of the attack reads the destroyed character's Willpower, the character's Willpower is kept on `damaged` (the latest value replaces an earlier one). `before` is the state ahead of the damage: a lethal hit has already destroyed the character in `damaged`, and a modifier that left with it must still count. */
+export function noteWillpower(damaged: ScenarioState, before: ScenarioState, targetId: string, ctx: ReduceContext): ScenarioState {
+  const attack = before.pendingAttack;
+  const target = before.cards[targetId];
+  if (!attack?.after || !target || !readsAmount(attack.after, "destroyedWillpower") || !isCharacterType(printedOf(ctx.cards, target.code))) return damaged;
+  const kept = damaged.modifiers.filter((modifier) => !(modifier.instanceId === targetId && modifier.stat === "lastWillpower"));
+  return { ...damaged, modifiers: [...kept, { instanceId: targetId, sourceId: attack.enemyId, stat: "lastWillpower", amount: modifiedStat(before, target, "willpower", ctx.cards), until: "endOfPhase" }] };
 }
 
 /** The amount `destroyedWillpower`: the Willpower kept for the other card of the effect (the character the attack destroyed), 0 when none was kept. Null for any other amount. */

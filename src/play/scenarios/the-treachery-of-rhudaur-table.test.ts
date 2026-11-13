@@ -63,11 +63,29 @@ describe("no current quest", () => {
     const t = at({ staging: ["10109"] });
     const none = dial(t, "angmar-current");
     expect(none).toMatchObject({ label: "Quest", word: "None", value: 0 });
-    expect(none?.note).toBe("Secrets of Rhudaur cannot be the current quest in the quest phase and no side quest was chosen, so there is no current quest. Progress beyond the active location's share is lost.");
+    expect(none?.note).toBe("Secrets of Rhudaur cannot be the current quest in the quest phase. There is no current quest now: progress beyond what the active location needs is discarded.");
     const chosen = syncConstants(settle(setCurrentQuest(t.state, idOf(t.state, "10109"), t.ctx), t.ctx, []), t.ctx);
     expect(dial(t, "angmar-current", chosen)).toBeUndefined();
     expect(dial(at({ staging: ["10109"], phase: "Planning" }), "angmar-current")).toBeUndefined();
     expect(dial(at({ stage: "10095", staging: ["10109"] }), "angmar-current")).toBeUndefined();
+  });
+
+  it("10094:B:3 waits out the first player's choice of a current quest, and stays in view ahead of the Time dial", () => {
+    const t = at({ staging: ["10109"] });
+    const asking = { ...t.state, window: { kind: "choose" as const, seat: 0, options: ["main", idOf(t.state, "10109")] } };
+    expect(dial(t, "angmar-current", asking)).toBeUndefined();
+    const ids = dials(t).map((one) => one.testID);
+    expect(ids.indexOf("angmar-current")).toBeGreaterThanOrEqual(0);
+    expect(ids.indexOf("angmar-current")).toBeLessThan(ids.findIndex((id) => id?.startsWith("angmar-time:")));
+  });
+
+  it("10094:B:3 says nothing false after a chosen side quest was defeated in the phase: the note does not claim none was chosen", () => {
+    const t = at({ staging: [{ code: "10109", progress: 22 }] });
+    const chosen = syncConstants(settle(setCurrentQuest(t.state, idOf(t.state, "10109"), t.ctx), t.ctx, []), t.ctx);
+    expect(chosen.cards[idOf(chosen, "10110")]?.zone).toBe("staging");
+    const none = dial(t, "angmar-current", chosen);
+    expect(none?.word).toBe("None");
+    expect(none?.note).not.toContain("no side quest was chosen");
   });
 });
 
@@ -75,7 +93,7 @@ describe("the Clue objectives and stage 2B", () => {
   it("10095:B:1 counts the Clues attached to characters against the 3, with the quest points left, and a Clue in the staging area counts for nothing", () => {
     const base = { stage: "10095", staging: ["10112"] } as const;
     const none = at(base);
-    expect(dial(none, "angmar-clues")).toMatchObject({ value: 0, limit: 3, goal: true, label: "Clues" });
+    expect(dial(none, "angmar-clues")).toMatchObject({ value: 0, limit: 3, goal: true, label: "Clues", name: "Clue objectives attached to characters:" });
     expect(dial(none, "angmar-clues")?.warn).toBeUndefined();
     expect(dial(none, "angmar-clues")?.note).toBe("0 Clue objectives attached to characters. Stage 2B has 5 fewer quest points for each, 30 now. A Clue in the staging area counts for nothing.");
     const one = at({ ...base, attached: [{ code: "10110", to: "dh1" }] });
@@ -88,9 +106,19 @@ describe("the Clue objectives and stage 2B", () => {
     expect(dial(at({ attached: [{ code: "10110", to: "dh1" }] }), "angmar-clues")).toBeUndefined();
   });
 
-  it("10095:B:1 says the stage's points in its preview", () => {
-    const t = at({ stage: "10095", attached: [{ code: "10110", to: "dh1" }] });
-    expect(detail(t, t.state, "10095")).toBe("25 quest points: 30, less 5 for each of the 1 Clue objective attached to a character. It is defeated with them and with no hit points left on Thaurdir, and then the players win.");
+  it("10095:B:1 says the stage's points in its preview: none, one or many Clues, and Haunting Fog's 6", () => {
+    const tail = "It is defeated with that much progress and no hit points left on Thaurdir, and then the players win.";
+    const words = (layout: Layout) => {
+      const t = at({ stage: "10095", ...layout });
+      return detail(t, t.state, "10095");
+    };
+    expect(words({})).toBe(`30 quest points: no Clue is attached to a character yet. ${tail}`);
+    expect(words({ attached: [{ code: "10110", to: "dh1" }] })).toBe(`25 quest points: 30, less 5 for the Clue attached to a character. ${tail}`);
+    expect(words({ attached: [{ code: "10110", to: "dh1" }, { code: "10114", to: "dh1" }] })).toBe(`20 quest points: 30, less 5 for each of the 2 Clues attached to characters. ${tail}`);
+    const fogged = at({ stage: "10095", attached: [{ code: "10108", to: "10095" }] });
+    expect(detail(fogged, fogged.state, "10095")).toBe(`36 quest points: 30, plus 6 for Haunting Fog; no Clue is attached to a character yet. ${tail}`);
+    const both = at({ stage: "10095", attached: [{ code: "10108", to: "10095" }, { code: "10110", to: "dh1" }] });
+    expect(detail(both, both.state, "10095")).toBe(`31 quest points: 30, less 5 for the Clue attached to a character, plus 6 for Haunting Fog. ${tail}`);
   });
 
   it("10110:A:1 draws a claimed Clue under its host, a hero or Amarthiúl, and an unclaimed one in the staging area", () => {
@@ -120,13 +148,46 @@ describe("Forbidden Descent's sponge", () => {
     const taken = absorbProgress(t.state, 3, t.ctx.cards, []);
     const [first, second] = dials(t, taken.state).filter((one) => one.testID?.startsWith("angmar-sponge:"));
     expect([first?.value, second?.value]).toEqual([2, 1]);
-    expect(first?.warn).toEqual({ level: "near", words: "It has taken its 2 progress this round. The next progress placed on a quest goes to a copy that has room, else goes on the quest." });
+    // A full sponge is good news: no warning.
+    expect(first?.warn).toBeUndefined();
     expect(second?.warn).toBeUndefined();
     expect(first?.note).toBe("2 of 2 progress taken this round. It takes the first 2 progress placed on a quest each round, 2 for each copy in the staging area. It holds 2 of 6 progress and is explored at 6.");
     expect(first?.limitWords).toBe("2 each round");
     // One copy is the plain "Descent"; none in the staging area, no dial.
     expect(dials(at({ staging: ["10101"] })).some((one) => one.label === "Descent")).toBe(true);
     expect(dials(at({ active: "10101" })).some((one) => one.testID?.startsWith("angmar-sponge:"))).toBe(false);
+  });
+
+  it("10101:A:2 warns near when the progress it can still take this round explores it, naming the threat raise of 2", () => {
+    const close = (progress: number, taken: number) => {
+      const t = at({ staging: [{ code: "10101", progress }] });
+      const id = idOf(t.state, "10101");
+      const state = taken > 0 ? absorbProgress(updateCard(t.state, id, { progress: progress - taken }), taken, t.ctx.cards, []).state : t.state;
+      return dial(t, `angmar-sponge:${id}`, state);
+    };
+    expect(close(4, 0)?.warn).toEqual({ level: "near", words: "It can still take 2 progress this round, which explores it: each player raises their threat by 2." });
+    expect(close(5, 1)?.warn?.words).toContain("It can still take 1 progress this round");
+    expect(close(3, 0)?.warn).toBeUndefined();
+    expect(close(6 - 1, 2)?.warn).toBeUndefined();
+  });
+
+  it("10101:A:1 reads the quest points as modified now, Decrepit Remains' +2 included", () => {
+    const t = at({ staging: [{ code: "10101", progress: 4 }, "10104"] });
+    const id = idOf(t.state, "10101");
+    expect(dial(t, `angmar-sponge:${id}`)?.warn).toBeUndefined();
+    expect(dial(t, `angmar-sponge:${id}`)?.note).toContain("It holds 4 of 8 progress and is explored at 8.");
+    expect(detail(t, t.state, "10101")).toContain("4 of 8 held");
+  });
+
+  it("10101:A:1 numbers the copies in staging order, and each preview leads with its number", () => {
+    const t = at({ staging: ["10101", "f3", "10101"] });
+    const [one, two] = t.state.staging.filter((id) => t.state.cards[id]?.code === "10101");
+    const reversed = { ...t.state, staging: [...t.state.staging].reverse() };
+    const labels = (state: ScenarioState) => dials(t, state).filter((d) => d.testID?.startsWith("angmar-sponge:")).map((d) => [d.testID, d.label]);
+    expect(labels(t.state)).toEqual([[`angmar-sponge:${one}`, "Descent · 1"], [`angmar-sponge:${two}`, "Descent · 2"]]);
+    expect(labels(reversed)).toEqual([[`angmar-sponge:${two}`, "Descent · 1"], [`angmar-sponge:${one}`, "Descent · 2"]]);
+    expect(angmarDetail(t.state, t.ctx, one ?? "", nameOf(t.state))).toMatch(/^Descent 1 of 2: /);
+    expect(angmarDetail(t.state, t.ctx, two ?? "", nameOf(t.state))).toMatch(/^Descent 2 of 2: /);
   });
 
   it("10101:A:2 says in its preview what leaving the staging area costs", () => {

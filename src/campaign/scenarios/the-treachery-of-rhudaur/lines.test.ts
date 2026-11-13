@@ -2,9 +2,11 @@
 // The cards of The Treachery of Rhudaur whose records use the angmar family's verbs, on tables built from data/ by the layout kit.
 import { describe, expect, it } from "vitest";
 
-import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, heldAmount, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
+import { combatDamage } from "../../../rules/families/defense/excess.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { limitSpent } from "../../../rules/player/usage.ts";
@@ -238,6 +240,27 @@ describe("Dark Covenant's shadow", () => {
     const survived = fightEnemy(table, "10107", "10100", {}, { undefended: true });
     expect(survived.run.state.cards[survived.made.hero]?.zone).toBe("heroes");
     expect(survived.run.state.seats[0]?.threat).toBe(30);
+  });
+
+  it("10107:A:2 reads the Willpower as it was before the damage: a hero with Heirloom of Iârchon (+1) counts 1 more than printed", () => {
+    const table = (layout: Layout) => tableFromLayout("the-treachery-of-rhudaur", { stage: "10094", threat: [30, 30], attached: [{ code: "10186", to: HERO }], ...layout });
+    const fought = fightEnemy(table, "10107", "10100", {}, { undefended: true, tweak: (state, made) => updateCard(state, made.hero, { damage: 5 }) });
+    expect(fought.run.state.cards[fought.made.hero]?.zone).not.toBe("heroes");
+    expect(fought.run.state.seats[0]?.threat).toBe(30 + (fought.ctx.cards.get(HERO)?.willpower ?? 0) + 1);
+  });
+
+  it("10107:A:2 reads an ally's Willpower with Decipher Ancient Texts' -2 still on it, not its printed Willpower", () => {
+    const table = (layout: Layout) => tableFromLayout("the-treachery-of-rhudaur", { stage: "10094", threat: [30, 30], staging: ["10113"], play: ["ally"], ...layout });
+    // The attack is in progress with its end effect; damage then lands on the ally and destroys it.
+    const fought = fightEnemy(table, "10107", "10100", {}, { undefended: true });
+    const state = syncConstants(settle(setCurrentQuest(fought.during, idOf(fought.during, "10113"), fought.ctx), fought.ctx, []), fought.ctx);
+    const ally = idOf(state, "ally");
+    const printed = fought.ctx.cards.get("ally")?.willpower ?? 0;
+    expect(printed).toBeGreaterThan(0);
+    expect(modifiedStat(state, state.cards[ally]!, "willpower", fought.ctx.cards)).toBe(Math.max(0, printed - 2));
+    const hit = combatDamage(state, state.pendingAttack?.enemyId ?? "", ally, 9, fought.ctx, []);
+    expect(hit.cards[ally]?.zone).not.toBe("play");
+    expect(heldAmount(hit, ally, "lastWillpower")).toBe(Math.max(0, printed - 2));
   });
 });
 
