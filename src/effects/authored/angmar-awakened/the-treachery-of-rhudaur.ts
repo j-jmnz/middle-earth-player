@@ -7,7 +7,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // Records for The Treachery of Rhudaur (Angmar Awakened part 7, campaign card 10184): the two quest stages, the Great Hall, Thaurdir and Amarthiúl, the encounter cards no template reads, the three side quests and their Clue objectives, the campaign card's Resolution and the three Clue boons.
 // Every line is read from the scan ledger (data/printed/angmar-awakened.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The three side quests lie in the staging area quest side up; their other side is the Clue objective each
 // flips into when defeated (families/angmar/stage.ts). The vocabulary the box added is in src/catalog/families/angmar.ts.
-// Rules: mec108.side-quests, mec108.side-quests-in-play, mec108.the-investigation, mec108.time-x, mec108.objective-allies, mec108.indestructible, mec108.campaign-mode, rr.attachment-cards, rr.condition, rr.travel, rr.first-player, rr.forced, rr.effects, rr.the-word-choose,
+// Rules: mec108.side-quests, mec108.side-quests-in-play, mec108.the-investigation, mec108.time-x, mec108.objective-allies, mec108.indestructible, mec108.campaign-mode, rr.attachment-cards, rr.travel, rr.first-player, rr.forced, rr.effects, rr.the-word-choose,
 // rr.running-out-of-cards, rr.surge, rr.doomed-x, rr.explored, rr.quest-advancement, rr.constant-ability, rr.campaign-pool, faq.last-encounter-card, faq.progress-without-advancing, faq.additional-attacks, faq.enemy-attacks-outside-combat, faq.simultaneous-effects (data/rules/entries.json).
 const THAURDIR = "10098";
 const DETERMINATION = "10172";
@@ -57,7 +57,7 @@ const claim = (code: string): Effect => ({
 });
 
 // A side quest's "When this quest is defeated, flip it over" (the marker families/sidequests/quest.ts reads).
-const flipsInto = (code: string, line: string, into: string): Effect => ({ id: `${code}:constant:flip`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "FlipWhenDefeated", into }] });
+const flipsInto = (code: string, line: string, into: string, n: number): Effect => ({ id: `${code}:constant:${n}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "FlipWhenDefeated", into }] });
 
 // Shadow of Eerie Halls, Centuries of Sorrow and Curse of the Years: the effect when the defending player controls no Clue.
 const ATTACKER_PLUS = (amount: number, when?: Condition): Instruction => ({ verb: "ModifyStat", stat: "attack", amount, until: "endOfAttack", target: "attacker", ...(when ? { when } : {}) });
@@ -215,7 +215,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "subject" }, { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "endOfPhase", target: "subject" }],
     },
     { id: "10109:forced:2", cardCode: "10109", lines: ["10109:A:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any" }, instructions: [...SELF_QUEST("Quiet the Spirits"), { verb: "PlaceProgressOnQuestCard", amount: 2 }] },
-    flipsInto("10109", "10109:A:3", "10110"),
+    flipsInto("10109", "10109:A:3", "10110", 1),
 
     // 10110 Daechanar's Brand, 10112 Heirloom of Iârchon, 10114 Orders from Angmar (Clue objectives). Action: exhaust Amarthiúl or a hero to claim the Clue and attach it to that character, which gets +1 Attack against Undead enemies, +1 Willpower, +1 Defense against Undead enemies.
     claim("10110"),
@@ -224,7 +224,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 10111 Sift through the Debris. While it is the current quest each location in the staging area gets +1 Threat. Forced: after a location is explored, 2 progress goes on it. When it is defeated it flips over.
     { id: "10111:constant:1", cardCode: "10111", lines: ["10111:A:1"], timing: "constant", condition: { kind: "currentQuest", is: "self" }, instructions: [{ verb: "ModifyStat", stat: "threat", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", stagingOnly: true } }] },
     { id: "10111:forced:1", cardCode: "10111", lines: ["10111:A:2"], timing: "forced", trigger: "locationExplored", subject: { type: "location", control: "any" }, instructions: [...SELF_QUEST("Sift through the Debris"), { verb: "PlaceProgressOnQuestCard", amount: 2 }] },
-    flipsInto("10111", "10111:A:3", "10112"),
+    flipsInto("10111", "10111:A:3", "10112", 2),
     claim("10112"),
     
     // 10113 Decipher Ancient Texts. While it is the current quest allies get -2 Willpower. Action (any player, 3 times a round together): pay 1 resource to place 1 progress on it. When it is defeated it flips over.
@@ -239,7 +239,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cost: { kind: "resources", amount: 1 },
       instructions: [...SELF_QUEST("Decipher Ancient Texts"), { verb: "PlaceProgressOnQuestCard", amount: 1 }],
     },
-    flipsInto("10113", "10113:A:3", "10114"),
+    flipsInto("10113", "10113:A:3", "10114", 2),
     claim("10114"),
     { id: "10114:constant:1", cardCode: "10114", lines: ["10114:A:2"], timing: "constant", instructions: [HOST_STAT("defense", 1, { kind: "defendingAgainst", trait: "Undead" })] },
 

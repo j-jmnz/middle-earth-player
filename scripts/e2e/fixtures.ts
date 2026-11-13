@@ -32,7 +32,6 @@
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 

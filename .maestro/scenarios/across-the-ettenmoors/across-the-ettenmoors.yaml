@@ -20,6 +20,9 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Determination.*"
-# The win unlocks The Treachery of Rhudaur, which the app cannot deal yet: the path says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks The Treachery of Rhudaur.
 - assertVisible:
+    id: node-the-treachery-of-rhudaur-status
+    text: "Next"
+- assertNotVisible:
     id: path-soon

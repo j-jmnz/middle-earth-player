@@ -1,4 +1,4 @@
-// Rules: mec108.campaign-setup-the-treachery-of-rhudaur, mec108.campaign-mode, mec108.campaign-log, mec108.the-investigation, mec108.objective-allies, rr.campaign-pool, rr.campaign-setup-checklist, rr.campaign-mode (data/rules/entries.json); ledger lines 10094:A:1, 10168:A:1, 10167:A:1, 10184:B:1, 10172:A:1, 100158:A:1, 10160:A:3.
+// Rules: mec108.campaign-setup-the-treachery-of-rhudaur, mec108.campaign-mode, mec108.campaign-log, mec108.the-investigation, mec108.objective-allies, rr.campaign-pool, rr.campaign-setup-checklist, rr.campaign-mode (data/rules/entries.json); ledger lines 10094:A:1, 10168:A:1, 10167:A:1, 10184:B:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../../../rules/core/test-fixture.ts";

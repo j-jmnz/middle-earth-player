@@ -244,7 +244,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - place 2 progress on the picked quest card, directly (the active location does not take it)
 
 10109:A:3 (front): When this quest is defeated, flip it over.
-  10109:constant:flip: Constant
+  10109:constant:1: Constant
     - when this side quest is defeated it is not added to the victory display: it flips over into the objective with code 10110 and stays in the staging area, faceup and unclaimed
 
 ## 10110 Daechanar's Brand
@@ -281,7 +281,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - place 2 progress on the picked quest card, directly (the active location does not take it)
 
 10111:A:3 (front): When this quest is defeated, flip it over.
-  10111:constant:flip: Constant
+  10111:constant:2: Constant
     - when this side quest is defeated it is not added to the victory display: it flips over into the objective with code 10112 and stays in the staging area, faceup and unclaimed
 
 ## 10112 Heirloom of Iârchon
@@ -318,7 +318,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - place 1 progress on the picked quest card, directly (the active location does not take it)
 
 10113:A:3 (front): When this quest is defeated, flip it over.
-  10113:constant:flip: Constant
+  10113:constant:2: Constant
     - when this side quest is defeated it is not added to the victory display: it flips over into the objective with code 10114 and stays in the staging area, faceup and unclaimed
 
 ## 10114 Orders from Angmar

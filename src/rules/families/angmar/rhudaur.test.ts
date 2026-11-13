@@ -31,9 +31,10 @@ describe("Secrets of Rhudaur", () => {
 
   it("10094:B:4 advances to stage 2 at once when no Treachery of Rhudaur side quest is in play, and not while one is", () => {
     const held = built({ phase: "Quest", staging: ["10111"] });
-    expect(stageCode(settle(held.state, held.ctx, []))).toBe("10094");
+    expect(stageCode(settle({ ...held.state, round: 1 }, held.ctx, []))).toBe("10094");
     const none = built({ phase: "Quest", staging: ["f0"], setAside: ["10098"] });
-    const run = finish({ state: settle({ ...none.state, window: null, mode: "stopped" }, none.ctx, []), steps: [] }, none.ctx);
+    // The first round (round 0 is the Setup, which the sweep waits out).
+    const run = finish({ state: settle({ ...none.state, round: 1, window: null, mode: "stopped" }, none.ctx, []), steps: [] }, none.ctx);
     expect(stageCode(run.state)).toBe("10095");
     // 2A's When Revealed resolved: Thaurdir is in the staging area.
     expect(codesIn(run.state, "staging")).toContain("10098");
