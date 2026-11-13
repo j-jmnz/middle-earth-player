@@ -60,7 +60,7 @@ Read the sections your task touches.
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
-    - 126–160 Repository map (~880) ← 1
+    - 126–160 Repository map (~890) ← 1
   - 161–186 State (~1.1K) ← 9
   - 187–208 Play loop (~250)
   - 209–234 Engine (~5.9K)

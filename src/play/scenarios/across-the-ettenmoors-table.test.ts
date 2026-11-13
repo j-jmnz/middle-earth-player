@@ -9,6 +9,7 @@ import { settle } from "../../rules/engine/machine.ts";
 import { pushCardEffects } from "../../rules/interpret/effect-frames.ts";
 import { queueEvent } from "../../rules/windows/queue.ts";
 import { guardWith } from "../../rules/families/objectives/guard.ts";
+import { zoneSelector } from "../store/selectors.ts";
 import { crowdedTable } from "../layout/crowded-table.ts";
 import { tableLayout } from "../layout/layout.ts";
 import { finish, idOf, legalIntents, resolveRecords, revealFromTop, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
@@ -144,16 +145,19 @@ describe("a guard over the objective it guards", () => {
     expect(detail("10077")).toBe("It guards Secluded Cave. When it leaves play, Secluded Cave returns to the staging area and the players may travel to it.");
   });
 
-  it("10077:A:2 lays a guard over its objective in the staging row whichever was staged first (Troll-fells is staged before the location it searches for)", () => {
-    const { views, piles } = crowdedTable();
-    const [first, second] = views.staging.entries;
-    const guard = { ...first!, card: { ...first!.card, guard: true as const, host: second!.card.id } };
-    const host = { ...second!, card: { ...second!.card, guard: undefined } };
-    const rest = views.staging.entries.slice(2);
-    for (const order of [[guard, host, ...rest], [host, guard, ...rest]]) {
-      const layout = tableLayout(591, 338, { ...views, staging: { ...views.staging, entries: order } }, piles, {});
-      const over = layout.slots.find((slot) => slot.id === guard.card.id);
-      const under = layout.slots.find((slot) => slot.id === host.card.id);
+  it("10077:A:2 lays a guard over its objective in the staging row wherever the engine staged it (the selector orders it right after the objective, adjacent or not)", () => {
+    // Troll-fells is staged before the location it searches for; Lie Low is staged between a guard and its objective.
+    const layouts = [["10077", "10068"], ["10068", "10081", "10077"], ["10077", "10081", "10068"]];
+    for (const staging of layouts) {
+      const t = at({ staging });
+      const guarded = guardWith(t.state, idOf(t.state, "10077"), idOf(t.state, "10068"));
+      const view = zoneSelector("staging", 0)(guarded);
+      const order = view.entries.map((entry) => entry.card.code);
+      expect(order.indexOf("10077")).toBe(order.indexOf("10068") + 1);
+      const { views, piles } = crowdedTable();
+      const layout = tableLayout(591, 338, { ...views, staging: view }, piles, {});
+      const over = layout.slots.find((slot) => slot.id === idOf(guarded, "10077"));
+      const under = layout.slots.find((slot) => slot.id === idOf(guarded, "10068"));
       expect(over?.x).toBeGreaterThan(under?.x ?? 0);
       expect(over?.x).toBeLessThan((under?.x ?? 0) + (under?.w ?? 0));
     }
