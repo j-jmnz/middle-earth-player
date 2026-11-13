@@ -103,8 +103,8 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18020:constant:2: Constant
     only if this card is engaged with the player
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each Goblin enemy (any player controls) engaged with you [also {"other":true}]: stat attack 1, while this card is in play
-    - each Goblin enemy (any player controls) engaged with you [also {"other":true}]: stat defense 1, while this card is in play
+    - each Goblin enemy (any player controls) engaged with you, other than this card: stat attack 1, while this card is in play
+    - each Goblin enemy (any player controls) engaged with you, other than this card: stat defense 1, while this card is in play
 
 18020:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
   18020:shadow:1: Shadow
@@ -119,7 +119,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
 
 18021:A:2 (front): While Stray Goblin is in the staging area, it gains: "Forced: After a player engages an enemy, Stray Goblin engages that player."
-  18021:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) [also {"other":true}])
+  18021:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) other than this card)
     only if this card is in the staging area
     - engage this card
 
@@ -214,10 +214,10 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - this card counts as a Condition attachment while it is attached
   18027:forced:1: Forced on the event readied (heard about the host)
     - the acting player chooses one of:
-      * option "other" (only if there is a card (any player controls) that is not an objective [also {"attachedTo":"host","other":true}] to choose):
-        - choose card (any player controls) [also {"attachedTo":"host","other":true}]
+      * option "other" (only if there is a card (any player controls) that is not an objective, other than this card [also {"attachedTo":"host"}] to choose):
+        - choose card (any player controls) other than this card [also {"attachedTo":"host"}]
         - discard the picked card
-      * option "self" (only if not (there is a card (any player controls) that is not an objective [also {"attachedTo":"host","other":true}] to choose)):
+      * option "self" (only if not (there is a card (any player controls) that is not an objective, other than this card [also {"attachedTo":"host"}] to choose)):
         - choose card (any player controls) [also {"attachedTo":"host"}]
         - discard the picked card
 
@@ -332,4 +332,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 198 by template, 27 as JSON)
+(rendered pieces: 201 by template, 24 as JSON)

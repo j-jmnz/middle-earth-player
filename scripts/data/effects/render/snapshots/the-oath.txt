@@ -143,7 +143,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
     - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
-    - then, if the number of card (any player controls) in the staging area only [also {"other":true}] is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the number of card (any player controls) in the staging area only, other than this card is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 41016:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
   41016:shadow:1: Shadow
@@ -194,8 +194,8 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41019:constant:2: Constant
     only if this card is engaged with the player
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each Goblin enemy (any player controls) engaged with you [also {"other":true}]: stat attack 1, while this card is in play
-    - each Goblin enemy (any player controls) engaged with you [also {"other":true}]: stat defense 1, while this card is in play
+    - each Goblin enemy (any player controls) engaged with you, other than this card: stat attack 1, while this card is in play
+    - each Goblin enemy (any player controls) engaged with you, other than this card: stat defense 1, while this card is in play
 
 41019:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
   41019:shadow:1: Shadow
@@ -206,7 +206,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41020:A:1 (front): During the encounter phase, players cannot optionally engage Goblin Sniper if there are other enemies in the staging area.
   41020:constant:1: Constant
-    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the number of enemy (any player controls) in the staging area only [also {"other":true}] is at least 1)
+    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the number of enemy (any player controls) in the staging area only, other than this card is at least 1)
     - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
 
 41020:A:2 (front): Forced: If Goblin Sniper is in the staging area at the end of the combat phase, each player deals 1 point of damage to 1 character he controls.
@@ -317,4 +317,4 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:resolution:1: Resolution
     - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
 
-(rendered pieces: 178 by template, 13 as JSON)
+(rendered pieces: 182 by template, 9 as JSON)

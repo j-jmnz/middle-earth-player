@@ -192,7 +192,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12044:A:1 (front): While Weather Deck is in the staging area, each other Deck location in play gains: "Travel: Each player must exhaust a character he controls to travel here."
   12044:constant:1: Constant
     only if this card is in the staging area
-    - each Deck location (any player controls) [also {"other":true}]: stat travelExhaust 1, while this card is in play
+    - each Deck location (any player controls) other than this card: stat travelExhaust 1, while this card is in play
 
 12044:A:2 (shadow): Shadow: Exhaust a character you control.
   12044:shadow:1: Shadow
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 168 by template, 34 as JSON)
+(rendered pieces: 169 by template, 33 as JSON)

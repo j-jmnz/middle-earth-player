@@ -371,6 +371,7 @@ describe("effects render read fields, picks", () => {
     names: ["Urdug"],
     exceptNames: ["Ufthak"],
     notTraits: ["Elite"],
+    other: true,
     nonObjective: true,
     objective: true,
     cardType: "hero",

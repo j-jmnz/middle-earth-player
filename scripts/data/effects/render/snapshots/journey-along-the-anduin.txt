@@ -22,7 +22,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01083:A:1 (front): During the encounter phase, players cannot optionally engage Goblin Sniper if there are other enemies in the staging area.
   01083:constant:1: Constant
-    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the number of enemy (any player controls) in the staging area only [also {"other":true}] is at least 1)
+    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the number of enemy (any player controls) in the staging area only, other than this card is at least 1)
     - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
 
 01083:A:2 (front): Forced: If Goblin Sniper is in the staging area at the end of the combat phase, each player deals 1 point of damage to 1 character he controls.
@@ -251,4 +251,4 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 129 by template, 13 as JSON)
+(rendered pieces: 130 by template, 12 as JSON)

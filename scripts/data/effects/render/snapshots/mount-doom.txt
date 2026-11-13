@@ -41,7 +41,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 146044:A:1 (front): While Orc-hold is in the staging area, progress cannot be placed on other locations in the staging area.
   146044:constant:1: Constant
     only if this card is in the staging area
-    - each location (any player controls) in the staging area only [also {"other":true}]: stat noProgressPlaced 1, while this card is in play
+    - each location (any player controls) in the staging area only, other than this card: stat noProgressPlaced 1, while this card is in play
 
 146044:A:2 (front): Forced: After Orc-hold becomes the active location, shuffle the encounter discard pile into the encounter deck. Discard cards from the top until an Orc enemy is discarded. Put that enemy into play engaged with the first player.
   146044:forced:1: Forced after this location becomes the active location (heard about this card)
@@ -354,4 +354,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 232 by template, 10 as JSON)
+(rendered pieces: 233 by template, 9 as JSON)

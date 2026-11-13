@@ -74,6 +74,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["safe"], pick.safe === true ? "with the safe keyword" : null);
   note(["minDamage"], typeof pick.minDamage === "number" ? `with at least ${pick.minDamage} damage on it` : null);
   note(["aboveThreat"], pick.aboveThreat === true ? "with an engagement cost higher than the chooser's threat" : null);
+  note(["other"], pick.other === true ? "other than this card" : null);
   note(["different"], pick.different === true ? "other than the cards this effect already picked" : null);
   note(["guardsObjectiveLocation"], pick.guardsObjectiveLocation === true ? "attached to an objective-location as its guard" : null);
   note(["copyInDiscard"], pick.copyInDiscard === true ? "with a copy of it (the same title) in its controller's discard pile" : pick.copyInDiscard === "owner" ? "with a card of its title in its owner's discard pile" : null);
