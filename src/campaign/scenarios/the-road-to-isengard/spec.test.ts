@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, defend, deckCount, exhausted, flag, handCount, progressOn, resolve, respond, reveal, revealedBy, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Road to Isengard (the-two-towers part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot hold is a titled test of
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold is a titled test of
 // lines.test.ts in this folder (the Wizardry shadow cards, the Staff, the elimination, Orthanc's order, the setup shuffle and the Palantír's attachment) or of verbs.test.ts (the new vocabulary). The wizardry family's own
 // tests are src/rules/families/wizardry/index.test.ts and the deck family's src/rules/families/deck/pressure.test.ts. scripts/checks/spec-coverage.test.ts fails a line with neither a row nor a titled test.
 const EXPLORED = { explored: true } as const;

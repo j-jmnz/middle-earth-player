@@ -2,7 +2,7 @@
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, flag, quest, reveal, resolve, resourcesOn, stagingThreat, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Black Gate Opens (the-return-of-the-king, part 5 of the box): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a bar on travel, a card
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a bar on travel, a card
 // that leaves the quest, a choice that needs a Fellowship hero) is in lines.test.ts, each test titled with its line; the scenario's end is in end.test.ts and the golden.
 // The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points and every seat starts at threat 28; f3 is an enemy with Threat 3, Attack 1, Defense 1 and 3 hit points, f0 the same with Threat 0.
 // Stage 1 (146072) has no quest points and skips nothing the rows need, but the rows that quest or attack are played at stage 2 (146073), whose Forced and reveal rules they do not touch.

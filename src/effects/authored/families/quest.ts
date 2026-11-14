@@ -1,6 +1,6 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
-// Authored records for the quest phase, locations, travel, progress, threat and engagement (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for the quest phase, locations, travel, progress, threat and engagement (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 // The vocabulary they use is src/catalog/families/quest.ts; the engine behind it is src/rules/families/quest/.
 
 const STAGING_ENEMY = { type: "enemy", control: "any", stagingOnly: true } as const;

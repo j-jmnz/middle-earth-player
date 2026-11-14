@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { cardSpecs, drew, endPhase, resolve, resourcesOn, respond, reveal, revealedBy, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Across the Ettenmoors (angmar-awakened part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot express (the Setup pair, a safe location over a whole round, a damage rule over several steps, a pool) is a test
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (the Setup pair, a safe location over a whole round, a damage rule over several steps, a pool) is a test
 // titled with its line id in safe.test.ts, behaviour.test.ts, encounter.test.ts, stages.test.ts and pool.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28.
 const SECLUDED_CAVE = "10068";
 const ABANDONED_CAMP = "10070";

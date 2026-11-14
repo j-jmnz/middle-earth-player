@@ -12,7 +12,7 @@ import * as sidequests from "./sidequests.ts";
 import * as misc from "./misc.ts";
 import * as sea from "./sea.ts";
 
-// Records written by mechanic family rather than by pack (docs/plans/effect-authoring.md).
+// Records written by mechanic family rather than by pack (docs/agents/effect-authoring.md).
 const FAMILIES = [attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, sea];
 
 export const FAMILY_AUTHORED_EFFECTS: readonly Effect[] = FAMILIES.flatMap((family) => family.RECORDS);

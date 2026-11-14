@@ -32,7 +32,7 @@ Every section keeps these. A task that cannot keep one stops and reports.
    - Clear the earlier drafts first (all but the vocabulary file), so a bundle holds only the batch asked for.
    - Group the batch's open lines whose text is the same once each card's own name is `{self}`: the draft names one line to write and the copies to take from it (`copyLine`, with the record ids).
    - For a twin owned in another file, print the `copyLine`, the id `withCopies` gives it and the `{ pool: ALIAS }` import (the file is the authored file that exports the twin's record, found by the record; a generated record needs no import; the alias is the file stem's first word that is not "the" or "a", or the whole stem when another file starts with the same word).
-2. **Copying a line's records.** Generalize `src/effects/authored/reprint.ts` so a card can take the records of another card's line with identical ledger text, rekeyed to its own line ids and numbering. `src/effects/copies.test.ts` checks every copied pair and refuses a source that names its own card (`docs/plans/effect-authoring.md`, Templates and copied lines). Then move the hand-numbered builders (`eliminated`, `lostIsland`, the Campaign Expansion reprint pairs) onto it.
+2. **Copying a line's records.** Generalize `src/effects/authored/reprint.ts` so a card can take the records of another card's line with identical ledger text, rekeyed to its own line ids and numbering. `src/effects/copies.test.ts` checks every copied pair and refuses a source that names its own card (`docs/agents/effect-authoring.md`, Templates and copied lines). Then move the hand-numbered builders (`eliminated`, `lostIsland`, the Campaign Expansion reprint pairs) onto it.
 3. **Constant-line numbering stays.** `generate.ts` reserves a number for a labelled line no template reads, but not for an unlabelled constant line; reserving one would renumber generated player-pool and Fellowship records. A new constant template that takes an authored record's id fails `scripts/checks/effect-coverage.test.ts` (the replacements must equal `REPLACES`), so the migration check (item 5) finds it.
 4. **Templates for sentences that repeat across scenarios**, in this order:
    - Campaign-card XP bullets: N XP for each surviving player; −N XP if Ominous Fate is in the victory display; N XP if a named card is in the victory display; each surviving player's threat is N or less. Settle on one record shape for "is in the victory display" first.
@@ -65,7 +65,7 @@ Exit: the plan's checks (Verification). Adding a fixture name is one registry li
 - Maestro: one win subflow and one loss subflow under `.maestro/`, run with `runFlow` and `env` (the fixture, the scenario id, an optional choice id). Each scenario's flows call them and keep their own extra assertions.
 - `pnpm scenario new <scenario-id>` (with `--dry-run`) writes the skeletons and the registry entries: the scene with its codes read from `data/scenarios/<id>.json`, the game, the golden test, the campaign test, the seed finder, both Maestro flows, `src/effects/authored/<id>.ts`, and the line in the fixture registry. It refuses an id that is not in `data/scenarios`.
 - Move every existing scenario onto the kit, one campaign at a time, with the goldens byte-identical after each step.
-- `docs/handover/agent-brief.md` (Approach, Scenario procedure) and `.claude/agents/effect-author.md` name the scaffold and the kit. The family list in the effect-author file points to `src/catalog/families/index.ts` instead of copying it.
+- `docs/agents/agent-brief.md` (Approach, Scenario procedure) and `.claude/agents/effect-author.md` name the scaffold and the kit. The family list in the effect-author file points to `src/catalog/families/index.ts` instead of copying it.
 
 Exit: the plan's checks (Verification), and `pnpm scenario new the-drowned-ruins --dry-run` lists the files and the entries it would write.
 
@@ -131,7 +131,7 @@ Sections A to D and F are built (E waits for a new campaign or pack). What each 
   - The box-wide check (`scripts/checks/box-dealt.test.ts`) finds a scenario's undealt card; the golden finds the rest.
 - **Fixtures and Maestro.** With real decks the seed finder finds a loss but no win, so the win flow cannot run (`docs/phases/STATUS.md`, Fixtures and Maestro).
 - **Review and fix.** The one fix pass is the largest single task of the phase. Its findings fall into classes the author can check before the review:
-  - card readings (`docs/plans/effect-authoring.md`, Readings the review catches);
+  - card readings (`docs/agents/effect-authoring.md`, Readings the review catches);
   - records with no test and no golden that reaches them;
   - a hand-written file past the size limit (`scripts/checks/file-size.test.ts` runs in `pnpm test scenario`);
   - choice words that name no number, side or owner (`docs/design-system-table.md`, Choice tray). This is the largest fix-pass class. `pnpm test scenario <id> --words` catches the bare and fallback sentences; the author checks each remaining sentence against Choice tray.

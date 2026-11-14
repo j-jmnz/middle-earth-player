@@ -1,6 +1,6 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
-// Authored records for constants and responses no other family takes, and the saga heroes and One Ring cards (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for constants and responses no other family takes, and the saga heroes and One Ring cards (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 export const RECORDS: readonly Effect[] = [
   // Healing, and Conditions: "choose a player. Heal ... each hero controlled by that player" is a Pick of a player and an Each over the
   // cards that player controls (Pick `controlledBy: "picked"`).

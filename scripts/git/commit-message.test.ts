@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { COMMIT_TYPES, SUBJECT_MAX, hookSubjects, subjectOf, subjectProblem } from "./commit-message.ts";
+import { COMMIT_TYPES, SUBJECT_MAX, bodyProblem, hookSubjects, subjectOf, subjectProblem } from "./commit-message.ts";
 
 describe("commit subjects (.claude/rules/commit-standards.md, Subject line)", () => {
   it("accepts every type followed by a summary", () => {
@@ -26,5 +26,14 @@ describe("commit subjects (.claude/rules/commit-standards.md, Subject line)", ()
     expect(hookSubjects("fixup! feat: Add the deck builder\n", false)).toEqual([]);
     expect(hookSubjects("Merge branch 'main' into topic\n", true)).toEqual([]);
     expect(hookSubjects("Add the deck builder\n", false)).toEqual(["Add the deck builder"]);
+  });
+
+  it("refuses a body that links a Claude Code session, outside comment lines", () => {
+    // Built from parts so this file holds no link (scripts/checks/private-data.test.ts).
+    const link = ["https://claude.ai", "code", "session_01abc"].join("/");
+    expect(bodyProblem("repo: Add the hook\n\nBody\n\nCo-Authored-By: Claude <noreply@anthropic.com>\n")).toBeUndefined();
+    expect(bodyProblem(`repo: Add the hook\n\nClaude-Session: ${link}\n`)).toContain("names a Claude Code session");
+    expect(bodyProblem(`repo: Add the hook\n\nSee ${link}\n`)).toContain("names a Claude Code session");
+    expect(bodyProblem(`repo: Add the hook\n# Claude-Session: ${link}\n`)).toBeUndefined();
   });
 });

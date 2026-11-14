@@ -30,4 +30,4 @@ Only the release workflow cuts releases ([docs/releasing.md](docs/releasing.md),
 - Never commit `assets/catalog.db`, card scans, card pictures, PDFs, a filled `src/screens/images/scan-map.ts`, secrets or signing keys.
 - Out of scope: playtest cards, accounts or a backend, online multiplayer, other card games. Full list in [docs/brief.md](docs/brief.md).
 
-Adding a scenario: [docs/handover/agent-brief.md](docs/handover/agent-brief.md). Authoring effect records: [docs/plans/effect-authoring.md](docs/plans/effect-authoring.md). The Claude Code files in `.claude/` are not needed to contribute.
+Adding a scenario: [docs/agents/agent-brief.md](docs/agents/agent-brief.md). Authoring effect records: [docs/agents/effect-authoring.md](docs/agents/effect-authoring.md). The Claude Code files in `.claude/` are not needed to contribute.

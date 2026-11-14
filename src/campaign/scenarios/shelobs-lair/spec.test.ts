@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, handCount, resolve, resourcesOn, reveal, stagingThreat, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Shelob's Lair (the-two-towers part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
 const ROWS: readonly Row[] = [
   { line: "144040:A:2", name: "+1 Threat for each resource on her", layout: { staging: [{ code: "144040", resources: 2 }] }, act: [], expect: stagingThreat(6) },
   { line: "144040:A:3", name: "or she makes an immediate attack against the first player", layout: { staging: ["144040"] }, act: [announce("beginningOfPhase", "144040"), answer("attack"), endPhase], expect: damageOn("dh1", 4) },

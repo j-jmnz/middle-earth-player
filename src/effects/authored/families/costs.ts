@@ -1,7 +1,7 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 import { PLAYS } from "./costs-plays.ts";
 
-// Authored records for costs: discounts, resource matches, who pays for what, icons, optional doomed (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for costs: discounts, resource matches, who pays for what, icons, optional doomed (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 const DISTINCT_THREE = { verb: "PayDistinctHeroes", min: 3 } as const;
 // "You may give ~ doomed N when you play it from your hand. If you do, it gains: Response: After you play ~, ...": the Response
 // is the choice; taking it gives the card its Doomed (each player raises their threat, rr.doomed-x).

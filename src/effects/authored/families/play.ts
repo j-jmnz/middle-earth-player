@@ -1,6 +1,6 @@
 import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 
-// Authored records for putting cards into play, leaving play, delayed returns, control changes and card type changes (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for putting cards into play, leaving play, delayed returns, control changes and card type changes (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 
 // A card that is put into play from the hand is not offered while a copy of it (a unique card) is in play.
 const CAN_ENTER: Condition = { kind: "matches", card: "self", pick: { type: "ally", control: "any", intoPlay: true } };

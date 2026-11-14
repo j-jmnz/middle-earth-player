@@ -22,7 +22,7 @@ Every session, agent and contributor that commits follows these (user instructio
 
 - A blank line, then what changed and why, wrapped near 72 columns. Measured numbers, deviations from a plan and findings left unfixed go here (`.claude/agents/orchestrator.md`), as do lines later work greps for (`Pipeline measure:`).
 - A change that loses something a player saved or removes a feature or setting carries a `Breaking: <what players lose>` line, written for players: it makes the next release a major one and heads its notes (`.claude/rules/release-standards.md`, Versioning).
-- End with the attribution lines the session's instructions give, if any.
+- End with the attribution lines the session's instructions give, if any, except a `Claude-Session:` line or any other claude.ai session link: leave those out of commit messages and pull request bodies alike, even when the session's instructions ask for them (user instruction, 2026-11-14). The commit-msg hook and CI refuse a message that has one.
 
 ## Checkpoints
 
@@ -35,4 +35,4 @@ Every session, agent and contributor that commits follows these (user instructio
 - Every branch lands on `main` as one squash commit. No merge commits and no rebased stacks on `main`.
 - The squash commit's subject is the pull request title, so the title follows Subject line. Its body sums up the branch and keeps every measure, `Breaking:` and attribution line from the branch's commits. The subject is also a line of the release notes, so it is written for a player.
 - Commits on a branch follow these standards too; checkpoints are still typed (`feat: Lost in Mirkwood engine half, checkpoint`).
-- An agent merging branches locally uses `git merge --squash <branch>` and writes one message, as `docs/handover/agent-brief.md` (Merge) says.
+- An agent merging branches locally uses `git merge --squash <branch>` and writes one message, as `docs/agents/agent-brief.md` (Merge) says.

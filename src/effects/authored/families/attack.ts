@@ -1,6 +1,6 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
-// Authored records for player attacks: attack modifiers and targets, immediate attacks, attacks into the staging area (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for player attacks: attack modifiers and targets, immediate attacks, attacks into the staging area (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 
 const ENEMY = { type: "enemy", control: "any" } as const;
 const IN_STAGING = { ...ENEMY, stagingOnly: true } as const;

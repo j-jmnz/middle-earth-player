@@ -4,7 +4,7 @@ tags:
 ---
 # Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `fields-lost` (scripts/e2e/the-battle-of-the-pelennor-fields.ts): a real two-handed game of The Battle of the Pelennor Fields (The One Deck and
 # the Defenders of Gondor list, after The Siege of Gondor's win), parked on its loss (a loss of the scenario's own is Minas Tirith destroyed, the players' threat at 50 or every hero destroyed).
-# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/handover/agent-brief.md, Scenario procedure).
+# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/agents/agent-brief.md, Scenario procedure).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:

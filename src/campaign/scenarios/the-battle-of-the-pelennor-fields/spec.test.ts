@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, defend, endPhase, flag, progressOn, quest, resolve, resourcesOn, reveal, revealedBy, stagingThreat, stat, threat, travel, zone, lost, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Battle of the Pelennor Fields (the-return-of-the-king part 15): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a joint attack, a bar seen only in what is refused,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a joint attack, a bar seen only in what is refused,
 // the campaign card's Setup, damage that overflows City Wall) is in lines.test.ts and campaign.test.ts, each test titled with its line. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28.
 // The stand-in ally has cost 1 and 2 hit points; `treachery` is a card with no shadow effect.
 const CITY = "145043";

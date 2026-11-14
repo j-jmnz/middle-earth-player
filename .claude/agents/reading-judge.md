@@ -12,7 +12,7 @@ You are the reading judge. You start with a fresh context and you only read: you
 The caller gives you the render (`pnpm effects render <scenario-id | codes>`, written to a file) and the campaign's ledger (`data/printed/<campaign>.json`, the text printed on each card side). Read, in this order:
 
 1. The render, line by line. Each ledger line is followed by the records that name it, in English; a line with no record says so, and a piece the renderer has no template for is `[json ...]` or `[also {...}]`.
-2. `docs/plans/effect-authoring.md`, section "Readings the review catches" (`pnpm doc section docs/plans/effect-authoring.md "Readings the review catches"`). Check every line against each reading it lists, and every optional ability (Response, Action) against the one on a barred effect: read the render's `note:` line on it, and call the line `wrong` when the note says the record is offered while its whole effect is barred.
+2. `docs/agents/effect-authoring.md`, section "Readings the review catches" (`pnpm doc section docs/agents/effect-authoring.md "Readings the review catches"`). Check every line against each reading it lists, and every optional ability (Response, Action) against the one on a barred effect: read the render's `note:` line on it, and call the line `wrong` when the note says the record is offered while its whole effect is barred.
 3. The rule spans the records cite: the rule ids in the authored file's header and in the lines you judge, read with `pnpm data query "select id, title, text from rules where id like '<id>%'"`. Rule wording is taken from there, never from memory. The ledger line wins over any source's transcription (`.claude/rules/authority.md`). Where the record follows a reading the hand-off note marks `researched` or `recommended`, judge it against that reading's source in the order `.claude/rules/authority.md` (Open points) gives; a reading you think a source of higher authority overturns is `ambiguous`, with that source.
 
 ## What you judge
@@ -22,7 +22,7 @@ For each ledger line, read the printed words first, then the English, and compar
 - `ok`: every clause of the printed line is in the English and nothing is added.
 - `wrong`: a clause is missing, extra, reversed or mis-scoped. Name the clause and what it should say.
 - `ambiguous`: the printed words, or a rule they lean on, allow two readings and the English picks one. A line with no record, or with `[json ...]` you cannot read, is `ambiguous` unless the ledger marks it inert.
-- `render-gap`: the record may be right, but the English cannot show whether a clause holds (a stat's engine name, a flag, a field the template leaves out). Name the clause. It is not `ambiguous`, which is two readings of the card: the orchestrator files it (`docs/handover/agent-brief.md`, Scenario procedure, Judge).
+- `render-gap`: the record may be right, but the English cannot show whether a clause holds (a stat's engine name, a flag, a field the template leaves out). Name the clause. It is not `ambiguous`, which is two readings of the card: the orchestrator files it (`docs/agents/agent-brief.md`, Scenario procedure, Judge).
 
 ## Output
 

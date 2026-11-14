@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { attack, attackersOf, cardSpecs, damageOn, endPhase, notWon, progressOn, quest, resolve, reveal, stat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Treachery of Rhudaur (angmar-awakened part 7): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a card in a discard pile, a count over several steps, a cost, a pool entry, a tie) is a test
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a card in a discard pile, a count over several steps, a cost, a pool entry, a tie) is a test
 // titled with its line id in lines.test.ts, stages.test.ts, clues.test.ts and campaign.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; a layout's current stage is on its B side.
 const STAGE2 = "10095";
 const THAURDIR = "10098";

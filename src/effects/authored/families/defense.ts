@@ -1,6 +1,6 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
-// Authored records for enemy attacks: defenders, the damage window (cancel, prevent, reduce, redirect), shadow cards (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for enemy attacks: defenders, the damage window (cancel, prevent, reduce, redirect), shadow cards (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 export const RECORDS: readonly Effect[] = [
   // The damage window: damage just dealt to a character is canceled, reduced or moved before it can destroy it (rr.cancel).
   {"id":"10004:response:1","cardCode":"10004","lines":["10004:A:1"],"timing":"response","trigger":"damageDealt","subject":{"type":"character","control":"any"},"cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"CancelDamage","amount":1}]},

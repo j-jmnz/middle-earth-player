@@ -4,115 +4,28 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ## Rules
 
-- If nothing is active, the only legal start is the lowest-numbered phase whose dependencies are completed. Dependencies live in the phase file, not in this table.
+- A phase is a file in `docs/phases/` with its spec, dependencies and exit, and a row in the table below. If nothing is active, the only legal start is the lowest-numbered phase whose dependencies are completed.
 - When you start a phase, set it to `active` with a one-line note. Do not mark the next phase active. More than one phase may be active only when their files say they can run beside each other.
-- A phase is `completed` when its exit is green and `/reviewer` reports no blocks. A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Write the date.
-- A scenario phase has an engine half and a screen half (`docs/handover/agent-brief.md`, Scenario procedure). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active`. The phase is completed when both halves are.
-- Phases 27 to 33, 37 to 60 and 77 to 87 (Mirkwood Paths, Dream-chaser, Ered Mithrin and Angmar Awakened) have one review round per phase, as `.claude/agents/orchestrator.md` "One review round" says, in place of "`/reviewer` reports no blocks" (user instructions, 2026-10-27, 2026-10-30, 2026-11-05, 2026-11-12). A block the fix pass leaves open goes in the phase's note.
+- A phase is completed when its exit is green and `/reviewer` reports no blocks (one review round when `orchestrator` runs it: `.claude/agents/orchestrator.md`, One review round). A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Then delete its row and its file; what is still open goes under Open items.
+- A scenario phase has an engine half and a screen half (`docs/agents/agent-brief.md`, Scenario procedure). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active`. The phase is completed when both halves are.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - Phone and tablet checks are not tracked: no phase waits on one, and none is listed here (user instruction, 2026-11-06).
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects open`).
 
 ## Phases
 
+No phase is open.
+
 | Phase | Work | Status | Note |
 | --- | --- | --- | --- |
-| 0 | Correct the brief | completed | 2026-10-23. |
-| 1 | Tooling shell | completed | 2026-10-23. |
-| 2 | Catalog build | completed | 2026-10-23. |
-| 3 | Phone databases | completed | 2026-10-23. The open-card Maestro flow runs with the suite. |
-| 4 | Scenario 1 fixture | completed | 2026-10-23. |
-| 5 | Image cache | completed | 2026-10-23. |
-| 6 | Deck builder | completed | Redesigned 2026-10-25. |
-| 7 | Round engine | completed | Review fixes not re-reviewed. |
-| 8 | Scenario 1 effects | completed | 2026-10-24. |
-| 8b | Data store | completed | 2026-10-24. |
-| 8c | Printed text and rule spans | completed | 2026-10-24. Scoring wording differs between the Rules Reference and the Learn to Play; the brief follows the Learn to Play. |
-| 8d | Campaign from cards | completed | 2026-10-24. Deferred: the no-replacement case of the fellowship-of-heroes rule. |
-| 9 | Starter effects | completed | 2026-10-24. Marked completed by the user without a second review; review fixes not re-reviewed. |
-| 10 | Campaign shell | completed | 2026-11-06. Review fixes not re-reviewed. |
-| 11 | Scenario 1 table | completed | 2026-11-06. Review fixes not re-reviewed. |
-| 12 | A Knife in the Dark | completed | 2026-11-06. Review fixes not re-reviewed. |
-| 13 | Flight to the Ford | completed | 2026-11-06. Marked completed by the user; `/ux` not run. |
-| 14 | The Ring Goes South | completed | 2026-11-06. Marked completed by the user; `/reviewer` and `/ux` not run. |
-| 15 | Journey in the Dark | completed | 2026-11-06. Review round done. Not on Nightmare. |
-| 16 | Breaking of the Fellowship | completed | 2026-11-06. Review round done. Not on Nightmare. |
-| 17 | Design system | completed | 2026-10-23. |
-| 18 | Card frames follow the card | completed | 2026-10-26. ux fix not re-reviewed. |
-| 19 | Top bar and table menu | completed | 2026-10-26. |
-| 20 | Phase carousel | completed | 2026-10-26. |
-| 21 | Choice tray | completed | 2026-10-26. |
-| 22 | Declutter the board | completed | 2026-10-26. |
-| 23 | Motion pass | completed | 2026-10-26. |
-| 24 | Combat spotlight | completed | 2026-10-27. |
-| 25 | Hold and slide through the hand | completed | 2026-10-27. |
-| 26 | Peek at the other seat | completed | 2026-10-27. |
-| 27 | Multi-campaign data | completed | 2026-10-27. |
-| 28 | Campaign registry, saga gating, log, booklets | completed | 2026-10-27. |
-| 28b | Collapsible sections and run history | completed | 2026-10-28. Open review notes below. |
-| 29 | Passage Through Mirkwood | completed | 2026-11-06. Review round done. |
-| 30 | Journey Along the Anduin | completed | 2026-11-06. Review round done. |
-| 31 | Escape from Dol Guldur | completed | 2026-11-06. Review round done. |
-| 32 | The Oath | completed | 2026-11-06. Review round done. |
-| 33 | The Caves of Nibin-Dûm | completed | 2026-11-06. Review round done. |
-| 34 | Nightmare data and pictures | completed | 2026-11-06. |
-| 35 | Nightmare difficulty | completed | 2026-11-06. Review rounds done. |
-| 36 | Nightmare effects | completed | 2026-11-06. Review round done; known limits under Open items. |
-| 37 | Dream-chaser data | completed | 2026-10-30. Review round done. Open: A Storm on Cobas Haven Easy counts follow Hall of Beorn, not a printed mark. |
-| 38 | Dream-chaser campaign shell and XP | completed | 2026-10-31. Review round done. |
-| 39 | Sea mechanics family | completed | 2026-10-31. Engine only; review round done. Open: Upgraded-side ship stats; face-aware records; Sailing events. |
-| 39b | Ships on the table | completed | 2026-10-31. Review round done. |
-| 40 | Voyage Across Belegaer | completed | 2026-10-31. Review round done. |
-| 41 | The Fate of Númenor | completed | 2026-10-31. Review round done. |
-| 42 | Raid on the Grey Havens | completed | 2026-10-31. Review round done. |
-| 43 | Flight of the Stormcaller | completed | 2026-10-31. Review round done. |
-| 44 | The Thing in the Depths | completed | 2026-10-31. Review round done. |
-| 45 | Temple of the Deceived | completed | 2026-11-01. Review round done. |
-| 46 | The Drowned Ruins | completed | 2026-11-04. Review round done. |
-| 47 | A Storm on Cobas Haven | completed | 2026-11-04. Review round done. |
-| 48 | The City of Corsairs | completed | 2026-11-05. Review round done. |
-| 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Crypt Stalker Easy count unconfirmed. |
-| 50 | Ered Mithrin campaign shell, treasures and the pool | completed | 2026-11-05. Review round done. Open: a discovered treasure cannot be put in a deck from the app. |
-| 51 | Wilderland mechanics family | completed | 2026-11-05. Engine only; review round done. Not built: Caves-deck bottom and arrange (18055, 18079), Crypt Key's Discover modifiers, a look window for Discover. |
-| 51b | Wilderland on the table | completed | 2026-11-05. Review round done. |
-| 52 | Journey Up the Anduin | completed | 2026-11-06. Review round done. |
-| 53 | Lost in Mirkwood | completed | 2026-11-06. Review round done. |
-| 54 | The King's Quest | completed | 2026-11-06. Review round done. |
-| 55 | The Withered Heath | completed | 2026-11-06. Review round done. |
-| 56 | Roam Across Rhovanion | completed | 2026-11-06. Review round done. |
-| 57 | Fire in the Night | completed | 2026-11-06. Review round done. Marked completed by the user; the side-quest area is under Open items. |
-| 58 | The Ghost of Framsburg | completed | 2026-11-06. Review round done. |
-| 59 | Mount Gundabad | completed | 2026-11-06. Review round done. |
-| 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
-| 61 | The Two Towers data | completed | 2026-11-07. Review round done. Open: MEC112 2023 wording unverified. |
-| 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. |
-| 63 | The Uruk-hai | completed | 2026-11-10. Review round done. Open: `hai-won`. |
-| 64 | Helm's Deep | completed | 2026-11-11. Review round done. Open: `deep-won`. |
-| 65 | The Road to Isengard | completed | 2026-11-11. Review round done. Open: `isengard-won`. |
-| 66 | The Passage of the Marshes | completed | 2026-11-11. Review round done. Open: `marshes-won`. |
-| 67 | Journey to the Cross-roads | completed | 2026-11-11. Review round done. Open: `roads-won`. |
-| 68 | Shelob's Lair | completed | 2026-11-11. Review round done. Open: `lair-won`. |
-| 69 | The Return of the King data | completed | 2026-11-11. Review round done (with phase 70). |
-| 70 | The Return of the King campaign shell | completed | 2026-11-11. Review round done. Open: six campaign-card lines left to their scenarios. |
-| 71 | The Passing of the Grey Company | completed | 2026-11-11. Review round done. Open: `company-won`. |
-| 72 | The Siege of Gondor | completed | 2026-11-11. Review round done. Open: `gondor-won`. |
-| 73 | The Battle of the Pelennor Fields | completed | 2026-11-12. Review round done. Open: `fields-won`. |
-| 74 | The Tower of Cirith Ungol | completed | 2026-11-12. Review round done. Open: `ungol-won`. |
-| 75 | The Black Gate Opens | completed | 2026-11-12. Review round done. |
-| 76 | Mount Doom | completed | 2026-11-12. Review round done. Open: `doom-won`. |
-| 77 | Angmar Awakened data | completed | 2026-11-12. Review round done. Open: Easy counts and MEC108 wording not user-confirmed. |
-| 78 | Angmar Awakened campaign shell | completed | 2026-11-12. Review round done. Open: campaign-card lines left to their scenarios. |
-| 79 | Intruders in Chetwood | completed | 2026-11-12. Review round done. Open: `chetwood-won`. |
-| 80 | The Weather Hills | completed | 2026-11-12. Review round done. Open: `hills-won`. |
-| 81 | Deadmen's Dike | completed | 2026-11-12. Review round done. Open: `dike-won`. |
-| 82 | The Wastes of Eriador | completed | 2026-11-12. Review round done. Open: `eriador-won`. |
-| 83 | Escape from Mount Gram | completed | 2026-11-13. Review round done. Open: `gram-won`. |
-| 84 | Across the Ettenmoors | completed | 2026-11-13. Review round done. Open: `ettenmoors-won`. |
-| 85 | The Treachery of Rhudaur | completed | 2026-11-13. Review round done. Open: `rhudaur-won`. |
-| 86 | The Battle of Carn Dûm | completed | 2026-11-13. Review round done. Open: `dum-won`. |
-| 87 | The Dread Realm | completed | 2026-11-13. Review round done. Open: `realm-won`. |
 
 ## Open items
+
+### Reviews
+- Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, and the card frames' ux fix. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
+
+### README
+- The README showcase (`docs/showcase.md`): a first full capture run on a Mac or the showcase workflow, its contact sheet checked and failed flows fixed; then a Screens section, each shot a `<picture>` (Rivendell capture for GitHub's light theme, Ringwraiths otherwise) with the captions and alt text of `scripts/showcase/shots.ts`.
 
 ### Releases
 - The Android release key is not set up (`docs/releasing.md`, Android key), so no release has been cut; the release workflow has not run yet, dry run first. TestFlight (optional) is not set up.
@@ -162,6 +75,9 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
 
 ### Rules and engine
+- Dream-chaser data: A Storm on Cobas Haven's Easy counts follow Hall of Beorn, not a printed mark.
+- Sea family, not built: Upgraded-side ship stats, face-aware records, Sailing events.
+- Wilderland family, not built: the Caves deck's bottom and arrange (18055, 18079), Crypt Key's Discover modifiers, a look window for Discover.
 - A Shadow of the Past: the encounter smoke (`scripts/card-smoke/encounter.ts`, `KNOWN`) finds Escape to Buckland's Response (141024:response:1, hideSucceeded) offered during a travel's Hide test and refused with "Travel was refused". Not fixed.
 - Lost in the Wild: a player-card `canPick` condition knows a hand pick is a discard only when its record says `discarded: true` (Jewels of Wilderland, Glittering Lute); other campaigns' records are not marked.
 - Treasures cannot be played from a hand (no path for type `treasure`); only the claim puts one into play.
@@ -382,5 +298,5 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The screen reader path is independent of ordinary play: with no phone screen reader on, nothing drawn, touched, heard or timed changes, the web build included; new reader behaviour is gated on `useReaderMode()`, which the Table as a list setting set to Always also turns on (user, 2026-11-05, 2026-11-07).
 - The Black Gate Opens ends when the last player is eliminated, and that end runs 146074's Resolution and unlocks Mount Doom; every other scenario's loss writes nothing (user, 2026-11-12).
 - A rule reading no official ruling, rule span or agreed community answer settles takes the agent's recommendation, recorded in `docs/brief.md` as "agent recommendation (no ruling found)"; it is not an open item (user, 2026-11-12).
-- One scenario pipeline; no more A/B tests (user decision, 2026-11-08). The procedure is in `docs/handover/agent-brief.md` (Scenario procedure).
+- One scenario pipeline; no more A/B tests (user decision, 2026-11-08). The procedure is in `docs/agents/agent-brief.md` (Scenario procedure).
 - An open game is never dropped by the app: after an update the player chooses Continue (from the saved table, checked against the engine) or Restart (user decision, 2026-11-11).

@@ -1,6 +1,6 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
-// Authored records for cards played from the hand during an effect, and Frodo Baggins's ready: the last records of the costs family, which costs.ts appends to its own (docs/plans/effect-authoring.md).
+// Authored records for cards played from the hand during an effect, and Frodo Baggins's ready: the last records of the costs family, which costs.ts appends to its own (docs/agents/effect-authoring.md).
 export const PLAYS: readonly Effect[] = [
   // Plays from the hand during an effect.
   {

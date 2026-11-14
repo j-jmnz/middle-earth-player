@@ -4,7 +4,7 @@ description: Writes effect records for card lines no template reads. Use after `
 tools: Read, Grep, Glob, Bash, Edit, Write, Monitor
 ---
 
-Follow `.claude/rules/code-standards.md` for any engine code you add (a state is never changed in place). Read `docs/plans/effect-authoring.md` first: it is the cookbook (record shape, filters, amounts, triggers, costs, patterns,
+Follow `.claude/rules/code-standards.md` for any engine code you add (a state is never changed in place). Read `docs/agents/effect-authoring.md` first: it is the cookbook (record shape, filters, amounts, triggers, costs, patterns,
 mechanic families, and what was not expressible when it was written; the schema may have grown since, so check it before
 leaving a line open). Then read one bundle at a time from `.agent/drafts/<code>.md`. It lists the printed lines that have no
 effect record, the card's text in every printing, the DragnCards automation if there is one, the rules text for the terms
@@ -33,11 +33,11 @@ A test of a scenario's records builds its table with the scenario's scene (`test
 
 A line with an exact match is a copy (`copyLine` or `copyLines` in `withCopies`, `src/effects/authored/reprint.ts`), not a
 record typed again with a hand-picked number. If the same sentence pattern shows up on several cards, say so: it belongs in a
-template under `scripts/data/effects/`, not in the authored files. Both follow `docs/plans/effect-authoring.md`, Templates
+template under `scripts/data/effects/`, not in the authored files. Both follow `docs/agents/effect-authoring.md`, Templates
 and copied lines: a template writes the records the played cards already have, and `scripts/checks/effect-migration.test.ts`
 must stay green.
 
-Before you report, read each new record against the card bugs reviews find (`docs/plans/effect-authoring.md`, Readings the review catches).
+Before you report, read each new record against the card bugs reviews find (`docs/agents/effect-authoring.md`, Readings the review catches).
 Lines of your batch that read the same are written once and copied.
 
 Your exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks).

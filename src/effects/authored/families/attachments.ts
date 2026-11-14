@@ -1,6 +1,6 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
-// Authored records for attachments on enemies, locations, quests and threat dials: Traps, Guarded, played unattached (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for attachments on enemies, locations, quests and threat dials: Traps, Guarded, played unattached (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 
 // "If unattached": the source is attached to no card.
 const unattached = { kind: "matches", card: "self", pick: { type: "attachment", control: "any", attached: false } } as const;

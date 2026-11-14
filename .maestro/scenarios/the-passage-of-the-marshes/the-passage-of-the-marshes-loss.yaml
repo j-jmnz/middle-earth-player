@@ -4,7 +4,7 @@ tags:
 ---
 # Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `marshes-lost` (scripts/e2e/the-passage-of-the-marshes.ts): a real two-handed game of The Passage of the Marshes
 # (The One Deck and the Defenders of Gondor lists, Easy, after The Road to Isengard's win), parked on its loss (a loss of the scenario's own is the players' threat at 50, every hero destroyed or Sméagol destroyed).
-# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/handover/agent-brief.md, Scenario procedure).
+# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/agents/agent-brief.md, Scenario procedure).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:

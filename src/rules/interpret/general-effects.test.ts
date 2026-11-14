@@ -14,7 +14,7 @@ import { ruleCause } from "../core/cause.ts";
 import { spawn } from "../core/zones.ts";
 
 // Rules: rr.response, rr.cancel, rr.constant-ability, rr.modifiers, rr.limits (data/rules/entries.json).
-// The general effect vocabulary the player pool's records use (docs/plans/effect-authoring.md): filters and read amounts,
+// The general effect vocabulary the player pool's records use (docs/agents/effect-authoring.md): filters and read amounts,
 // subjects on triggers, the damage window, host-less constants, play rules, cost lists and flags.
 
 const lead = hero("lead", "leadership", 9, 2);

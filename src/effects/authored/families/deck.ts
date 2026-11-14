@@ -1,6 +1,6 @@
 import type { Condition, Effect, Instruction, PickSpec, SimpleInstruction } from "../../../catalog/boundary.ts";
 
-// Authored records for the player's deck, hand and discard pile: look, arrange, search, return, play from the discard pile (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for the player's deck, hand and discard pile: look, arrange, search, return, play from the discard pile (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 //
 // Conventions: "look at the top N cards" is LookAtTop (deck `own`, or `picked` for another player's deck), "add 1 of those
 // cards" a Pick with `looked`, "return them in any order" ArrangeTop. "Search the top N cards for a card" is a Pick from the

@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `deep-lost` (scripts/e2e/helms-deep.ts): a real two-handed game of Helm's Deep (The One Deck and the Defenders of Gondor lists, Easy), parked on its loss (seed 1: Aragorn left play in round 3; a loss of the scenario's own is the players' threat at 50 or The Wall is Breached! defeated). A loss writes nothing, so the
-# subflow's own assertions on the log screen are all it checks (docs/handover/agent-brief.md, Scenario procedure).
+# subflow's own assertions on the log screen are all it checks (docs/agents/agent-brief.md, Scenario procedure).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:

@@ -37,7 +37,9 @@ function listFiles(dir: string, keep: (name: string) => boolean): string[] {
   return found;
 }
 
+// A folder that holds nothing yet (docs/handover between handovers) lists no files.
 function markdownIn(dir: string, skip: (name: string) => boolean = () => false): string[] {
+  if (!existsSync(path.join(ROOT, dir))) return [];
   return readdirSync(path.join(ROOT, dir))
     .filter((name) => name.endsWith(".md") && !skip(name))
     .sort()
@@ -49,6 +51,7 @@ export function groups(): Group[] {
     { title: "Every session", note: "Read whole.", files: ["CLAUDE.md", ...markdownIn(".claude/rules")] },
     { title: "Agents", note: "Each agent reads its own file.", files: markdownIn(".claude/agents") },
     { title: "Product, code and design", note: "Read the sections your task touches.", files: ["README.md", ...markdownIn("docs", (name) => name === "INDEX.md")] },
+    { title: "Agent procedures", note: "The scenario procedure and the effect-authoring cookbook; read when a task names one.", files: markdownIn("docs/agents") },
     { title: "Phases", note: "STATUS.md, then the active phase file.", files: ["docs/phases/STATUS.md", ...markdownIn("docs/phases", (name) => name === "STATUS.md")] },
     { title: "Live plans", note: "Read when a task names the plan.", files: markdownIn("docs/plans") },
     { title: "Handovers", note: "Open work; read when a task names it.", files: markdownIn("docs/handover") },

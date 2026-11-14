@@ -11,7 +11,7 @@ Read whole.
 - `CLAUDE.md` — Claude Code (~2.6K tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~890 tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~960 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
 - `.claude/rules/release-standards.md` — Release standards (~1.0K tok)
 
@@ -223,27 +223,22 @@ Read the sections your task touches.
 - `docs/releasing.md` — Releasing (~2.4K tok)
 - `docs/showcase.md` — README showcase (~1.9K tok)
 
-## Phases
+## Agent procedures
 
-STATUS.md, then the active phase file.
+The scenario procedure and the effect-authoring cookbook; read when a task names one.
 
-- `docs/phases/STATUS.md` — Phase status (~15.4K tok)
-  - 5–15 Rules (~420)
-  - 16–114 Phases (~2.1K)
-  - 115–366 Open items (~12.2K)
-    - 117–121 Releases (~150)
-    - 122–163 Fixtures and Maestro (~2.3K)
-    - 164–200 Rules and engine (~1.5K)
-    - 201–321 Rules and engine (Angmar Awakened) (~5.3K)
-    - 322–346 Screens and code (~1.6K)
-    - 347–366 Rules and engine (The Two Towers) (~1.4K)
-  - 367–387 Standing decisions (~700)
-
-## Live plans
-
-Read when a task names the plan.
-
-- `docs/plans/effect-authoring.md` — Authoring effect records (~7.6K tok)
+- `docs/agents/agent-brief.md` — Brief for a mechanic-family or scenario agent (~5.1K tok)
+  - 19–37 Setup (~440)
+  - 38–56 Files you own (edit freely) (~490)
+  - 57–70 Shared files (~300)
+  - 71–85 Approach (~680) ← 1
+  - 86–124 Scenario procedure (~1.9K) ← 31
+  - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
+  - 135–149 Checks before committing (~310)
+  - 150–156 Merge (~140) ← 1
+  - 157–163 Commit (~140)
+  - 164–171 Report (your final message) (~90) ← 1
+- `docs/agents/effect-authoring.md` — Authoring effect records (~7.6K tok)
   - 12–33 Workflow (~460)
   - 34–50 Where records live (~390)
   - 51–75 Templates and copied lines (~690) ← 5
@@ -257,7 +252,29 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–289 Readings the review catches (~630) ← 4
   - 290–309 Not expressible yet: leave open, report (~390)
-- `docs/plans/readme-showcase.md` — README showcase (~170 tok)
+
+## Phases
+
+STATUS.md, then the active phase file.
+
+- `docs/phases/STATUS.md` — Phase status (~13.5K tok)
+  - 5–14 Rules (~380)
+  - 15–21 Phases (~20)
+  - 22–282 Open items (~12.4K)
+    - 24–26 Reviews (~70)
+    - 27–29 README (~90)
+    - 30–34 Releases (~150)
+    - 35–76 Fixtures and Maestro (~2.3K)
+    - 77–116 Rules and engine (~1.6K)
+    - 117–237 Rules and engine (Angmar Awakened) (~5.3K)
+    - 238–262 Screens and code (~1.6K)
+    - 263–282 Rules and engine (The Two Towers) (~1.4K)
+  - 283–303 Standing decisions (~700)
+
+## Live plans
+
+Read when a task names the plan.
+
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -277,17 +294,6 @@ Read when a task names the plan.
 
 Open work; read when a task names it.
 
-- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~5.1K tok)
-  - 19–37 Setup (~440)
-  - 38–56 Files you own (edit freely) (~490)
-  - 57–70 Shared files (~300)
-  - 71–85 Approach (~680) ← 1
-  - 86–124 Scenario procedure (~1.9K) ← 31
-  - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
-  - 135–149 Checks before committing (~310)
-  - 150–156 Merge (~140) ← 1
-  - 157–163 Commit (~130)
-  - 164–171 Report (your final message) (~90) ← 1
 
 ## Code to docs
 
@@ -299,11 +305,11 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: showcase.md, Saves and decks (4); .claude/rules/code-standards.md, Test cost (1)
-- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
+- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1)
 - `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/showcase`: design-system.md, Color (1); showcase.md, Capture flows (1); showcase.md, Post-process (1); showcase.md, Publish (1); showcase.md, Shot list (1)
-- `scripts/tools`: handover/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
-- `src/campaign`: handover/agent-brief.md, Scenario procedure (21); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1); showcase.md, Saves and decks (1)
+- `scripts/tools`: agents/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
+- `src/campaign`: agents/agent-brief.md, Scenario procedure (21); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1); showcase.md, Saves and decks (1)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Return of the King (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Angmar Awakened (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)
 - `src/play`: design-system-table.md, Choice tray (41); design-system-table.md, Spotlight (29); design-system-table.md, Cards (26); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)

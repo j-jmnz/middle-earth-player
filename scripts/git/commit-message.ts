@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 import { runScript, type Log } from "../log.ts";
 
 // Checks commit subjects against .claude/rules/commit-standards.md (Subject line): "<type>: <summary>", one of the
-// types below, at most 72 characters, no closing period.
+// types below, at most 72 characters, no closing period. A message file and a range also have their bodies checked for a
+// Claude Code session link, which the repository is public enough to keep out (commit-standards.md, Body).
 // Usage: pnpm commit:check "<subject>"... checks the subjects given; --range <base>..<head> checks every non-merge
 // commit in the range (CI checks a pull request's commits and its title, which becomes the squash commit's subject);
 // --file <path> checks a message file (the commit-msg hook, .githooks/commit-msg); --install points this checkout's
@@ -41,6 +42,15 @@ export function hookSubjects(message: string, merging: boolean): string[] {
   return merging || AUTOSQUASH.test(subject) ? [] : [subject];
 }
 
+// A `Claude-Session:` trailer or any link to a claude.ai Claude Code session, outside git's "#" comment lines.
+const SESSION_LINK = /^claude-session:|claude\.ai\/code\/session/i;
+
+/** What is wrong with a commit message's body, or undefined when it names no Claude Code session. */
+export function bodyProblem(message: string): string | undefined {
+  const line = message.split("\n").find((text) => !text.startsWith("#") && SESSION_LINK.test(text.trim()));
+  return line === undefined ? undefined : `"${subjectOf(message)}" names a Claude Code session ("${line.trim()}"); leave the link out`;
+}
+
 function git(args: string[]): string {
   return execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
 }
@@ -73,24 +83,31 @@ function flag(args: string[], name: string): string | undefined {
   return value;
 }
 
-function subjects(args: string[]): string[] {
+/** The subjects to check, and the whole messages whose bodies are checked too (none for subjects given on the command line). */
+function messages(args: string[]): { subjects: string[]; bodies: string[] } {
   const file = flag(args, "--file");
-  if (file) return hookSubjects(readFileSync(file, "utf8"), merging());
+  if (file) {
+    const message = readFileSync(file, "utf8");
+    return { subjects: hookSubjects(message, merging()), bodies: [message] };
+  }
   const range = flag(args, "--range");
-  if (range) return git(["log", "--no-merges", "--format=%s", range]).split("\n").filter((line) => line !== "");
+  if (range) {
+    const bodies = git(["log", "--no-merges", "--format=%B%x00", range]).split("\0").map((text) => text.trim()).filter((text) => text !== "");
+    return { subjects: bodies.map(subjectOf), bodies };
+  }
   const given = args.filter((arg) => !arg.startsWith("--"));
   if (given.length === 0) throw new Error('usage: pnpm commit:check "<subject>"... | --range <base>..<head> | --file <path>');
-  return given;
+  return { subjects: given, bodies: [] };
 }
 
 function main(log: Log): void {
   const args = process.argv.slice(2);
   if (args.includes("--install")) return install(log);
-  const checked = subjects(args);
-  const problems = checked.map(subjectProblem).filter((problem) => problem !== undefined);
-  if (problems.length === 0) return log.debug(`${checked.length} subjects follow .claude/rules/commit-standards.md`);
+  const { subjects, bodies } = messages(args);
+  const problems = [...subjects.map(subjectProblem), ...bodies.map(bodyProblem)].filter((problem) => problem !== undefined);
+  if (problems.length === 0) return log.debug(`${subjects.length} commits follow .claude/rules/commit-standards.md`);
   for (const problem of problems) log.error(problem);
-  throw new Error(`${problems.length} of ${checked.length} subjects break .claude/rules/commit-standards.md (Subject line)`);
+  throw new Error(`${problems.length} problems in ${subjects.length} commits break .claude/rules/commit-standards.md (Subject line, Body)`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) void runScript("commit:check", main, { done: false });
