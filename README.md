@@ -257,4 +257,4 @@ Picture source order: `scripts/data/sources/pictures.ts`.
 
 ## License
 
-Code and documentation: [MIT License](LICENSE). Game content, `data/raw/`, the fonts and the Expo template images keep their owners' terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Code and documentation: [MIT License](LICENSE). Game content, `data/raw/` and the fonts keep their owners' terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

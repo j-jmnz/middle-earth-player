@@ -17,7 +17,7 @@ At build time only `pnpm data sync` uses the network. It fetches the sources in 
 - `pnpm-lock.yaml` is committed; CI installs with `--frozen-lockfile`.
 - CI (`.github/workflows/test.yml`) has a read-only token, so fork pull requests cannot write to the repository. Every action in it and in `.github/workflows/release.yml` (which holds the signing keys) is pinned to a commit SHA.
 - Dependabot (`.github/dependabot.yml`) opens weekly updates for npm packages and actions; they pass the same CI.
-- No secret, signing key or keystore is committed.
+- No secret, signing key or keystore is committed. `scripts/checks/private-data.test.ts` fails on a tracked file that holds a credential, a personal email address or a Claude Code session id.
 
 ## Reporting a vulnerability
 
