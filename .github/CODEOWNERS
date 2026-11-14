@@ -1,0 +1,3 @@
+# The maintainer reviews every pull request. With "Require review from Code Owners" on in the branch protection for main, a change to
+# the workflows, the release scripts or the signing setup cannot land without that review (SECURITY.md, Supply chain).
+* @j-jmnz

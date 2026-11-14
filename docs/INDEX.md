@@ -295,7 +295,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); architecture.md, Modules (1); architecture.md, Repository map (1); showcase.md, Capture flows (1)
+- `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Modules (1); architecture.md, Repository map (1); showcase.md, Capture flows (1)
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: showcase.md, Saves and decks (4); .claude/rules/code-standards.md, Test cost (1)

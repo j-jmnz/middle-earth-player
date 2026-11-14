@@ -16,6 +16,8 @@ At build time only `pnpm data sync` uses the network. It fetches the sources in 
 
 - `pnpm-lock.yaml` is committed; CI installs with `--frozen-lockfile`.
 - CI (`.github/workflows/test.yml`) has a read-only token, so fork pull requests cannot write to the repository. Every action in it and in `.github/workflows/release.yml` (which holds the signing keys) is pinned to a commit SHA.
+- Releases are started by hand only: `.github/workflows/release.yml` and `.eas/workflows/e2e.yml` run on `workflow_dispatch` alone, which needs write access to the repository (or, for EAS, a login to the project's Expo account), and a real release refuses any branch but `main` or `release/v<major>.<minor>`. `scripts/checks/release-trigger.test.ts` fails if either gains another trigger or another workflow makes a tag or a release.
+- `.github/CODEOWNERS` makes the maintainer the reviewer of every pull request.
 - Dependabot (`.github/dependabot.yml`) opens weekly updates for npm packages and actions; they pass the same CI.
 - No secret, signing key or keystore is committed. `scripts/checks/private-data.test.ts` fails on a tracked file that holds a credential, a personal email address or a Claude Code session id.
 
