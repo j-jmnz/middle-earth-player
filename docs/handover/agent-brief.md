@@ -21,7 +21,7 @@ cards have no file under `src/effects/authored/families/`.
 - You are in your own git worktree. Start from the base: `git fetch origin <BASE> && git checkout -B wip-<F> origin/<BASE>`.
   Your base commit is the tip of `<BASE>` at that moment; `git log -1 --format=%h` says which.
 - If `node_modules` is missing, run `pnpm install --frozen-lockfile --offline` (without `--offline` if that fails).
-- Find docs through `docs/INDEX.md` and read sections (`pnpm docs section <file> "<heading>"`), not whole files.
+- Find docs through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`), not whole files.
 - Read first: `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md`, `.claude/rules/docs-standards.md`, `docs/plans/effect-authoring.md` (the cookbook; its "Mechanic
   families" section describes the files you own), `docs/architecture.md`, the phase file for a scenario phase
   (`docs/phases/phase-NN-*.md`) and `docs/phases/STATUS.md`, and the schema files `src/catalog/effect-schema*.ts`. Skim

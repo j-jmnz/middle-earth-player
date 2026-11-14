@@ -214,7 +214,7 @@ Scripts are grouped: `pnpm <group> <command> [args]`, and `pnpm <group>` alone l
 | `pnpm assets scans` / `pnpm assets booklets` | Packs card pictures / booklet PDFs into `assets/`. |
 | `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators (macOS, Xcode and Maestro; [docs/showcase.md](docs/showcase.md)). |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet; `--publish` replaces the `showcase` branch with them. |
-| `pnpm docs index` / `pnpm docs section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
+| `pnpm doc index` / `pnpm doc section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
 | `pnpm release plan --dry-run` | Prints the next tag and its notes (`git fetch --tags` first). Changes nothing. |
 | `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source; run by the release workflow. |
 | `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`; `--range <base>..<head>` for a range. Installed as the `commit-msg` hook. |

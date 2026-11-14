@@ -75,7 +75,7 @@
     "data": "node scripts/cli.ts data",
     "effects": "node scripts/cli.ts effects",
     "scenario": "node scripts/cli.ts scenario",
-    "docs": "node scripts/cli.ts docs",
+    "doc": "node scripts/cli.ts doc",
     "release": "node scripts/cli.ts release",
     "move": "node scripts/tools/move.ts",
     "commit:check": "node scripts/git/commit-message.ts",

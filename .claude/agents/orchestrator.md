@@ -7,7 +7,7 @@ You orchestrate. You do not write product code, tests or docs yourself. You brie
 
 A subagent cannot start agents of its own. Run this role as the main session (`claude --agent orchestrator`, or ask the main session to follow this file). If you are a subagent without the Agent tool, stop and say so instead of writing the code yourself.
 
-Read the plan in full first, then `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md`, `.claude/rules/docs-standards.md` and the parts of `docs/architecture.md` and `docs/brief.md` the plan names (`docs/INDEX.md` gives their line ranges; `pnpm docs section` prints one). Name sections, not whole files, in each brief. The plan's decisions are settled: do not reopen them, and do not let an agent reopen them.
+Read the plan in full first, then `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md`, `.claude/rules/docs-standards.md` and the parts of `docs/architecture.md` and `docs/brief.md` the plan names (`docs/INDEX.md` gives their line ranges; `pnpm doc section` prints one). Name sections, not whole files, in each brief. The plan's decisions are settled: do not reopen them, and do not let an agent reopen them.
 
 ## Models
 

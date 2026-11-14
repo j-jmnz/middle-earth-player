@@ -16,7 +16,7 @@ The app applies the rules. Keywords, phases, effects, damage, resources, threat,
 
 ## Sections
 
-Read the sections your task touches, not the whole file: `docs/INDEX.md` gives each one's line range, and `pnpm docs section brief "<heading>"` prints one.
+Read the sections your task touches, not the whole file: `docs/INDEX.md` gives each one's line range, and `pnpm doc section brief "<heading>"` prints one.
 
 - Product: what the app is (offline, one human, one or two seats), the root dock, standalone play.
 - Non-goals: what not to build, port or commit.

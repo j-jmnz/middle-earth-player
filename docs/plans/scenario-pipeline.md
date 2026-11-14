@@ -173,6 +173,6 @@ E waits until a new campaign or pack is added. The next steps run between scenar
 
 After each section:
 
-- `pnpm data build`, `pnpm data check`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm docs index`.
+- `pnpm data build`, `pnpm data check`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm doc index`.
 - `git diff --stat` shows no change under `src/campaign/scenarios/*/golden.json` or `src/campaign/fixtures/*.json`, and none to `src/rules/engine/version.ts`.
 - `pnpm effects open` leaves `src/effects/open-lines.ts` as the section allows (What does not move).

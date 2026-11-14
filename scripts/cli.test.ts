@@ -26,7 +26,7 @@ describe("scripts/cli.ts", () => {
 
   it("picks the named command and passes the rest on", () => {
     expect(resolve("data", ["build", "--verbose"])).toEqual({ command: GROUPS["data"]?.["build"], rest: ["--verbose"] });
-    expect(resolve("docs", ["section", "brief", "Core round"])?.rest).toEqual(["brief", "Core round"]);
+    expect(resolve("doc", ["section", "brief", "Core round"])?.rest).toEqual(["brief", "Core round"]);
   });
 
   it("falls back to the group's all, with every argument, and has nothing for a group without one", () => {

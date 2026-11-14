@@ -53,7 +53,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     encounter: { steps: [{ script: "card-smoke/encounter.ts" }], about: "plays a scenario's encounter cards and seeded games" },
     a11y: { steps: [catalog, { script: "checks/a11y-web.ts" }], about: "audits the web screens with axe-core in Chromium" },
   },
-  docs: {
+  doc: {
     index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },
     section: { steps: [{ script: "docs/index.ts", args: ["section"] }], about: 'prints one doc section: <file> "<heading>"' },
   },

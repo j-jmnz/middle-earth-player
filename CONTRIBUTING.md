@@ -25,7 +25,7 @@ Only the release workflow cuts releases ([docs/releasing.md](docs/releasing.md),
 - Code: [.claude/rules/code-standards.md](./.claude/rules/code-standards.md). Docs: [.claude/rules/docs-standards.md](./.claude/rules/docs-standards.md) (current state only; history is in git).
 - Rules come from the printed sources. Cite the rule id from `data/rules/entries.json` in the implementing code. A rule change also updates [docs/brief.md](docs/brief.md). Source precedence: [.claude/rules/authority.md](./.claude/rules/authority.md).
 - Edit `data/` by hand only in the hand-checked inputs (`data/printed/`, `data/rules/index.json`, `data/rules/columns.json`, `data/overrides.json`, `data/prebuilt-decks.json`, `data/starter-decks.json`). Otherwise change `scripts/data/` and run `pnpm data build`.
-- After changing effect records, run `pnpm effects open`; after changing doc headings or doc citations, `pnpm docs index`. Tests fail on stale output.
+- After changing effect records, run `pnpm effects open`; after changing doc headings or doc citations, `pnpm doc index`. Tests fail on stale output.
 - Move files with `pnpm move`.
 - Never commit `assets/catalog.db`, card scans, card pictures, PDFs, a filled `src/screens/images/scan-map.ts`, secrets or signing keys.
 - Out of scope: playtest cards, accounts or a backend, online multiplayer, other card games. Full list in [docs/brief.md](docs/brief.md).
