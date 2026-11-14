@@ -185,7 +185,7 @@ export function nightFade(from: number, to: number, base?: string, t: TableToken
   return { backgroundColor: "transparent", backgroundImage: linear(`${withAlphaHex(edge, 0)} ${at(from)}, ${withAlphaHex(edge, 0.72)} ${at((from + to) / 2)}, ${edge} ${at(to)}`) };
 }
 
-/** A soft night at the top of a picture, so a back button and a status bar read over a bright sky. */
+/** A soft night at the top of a picture, so a back button reads over a bright sky. */
 export function topShade(to = 0.3, t: TableTokens = dark): Surface {
   return { backgroundColor: "transparent", backgroundImage: linear(`${withAlphaHex(t.night, 0.55)} 0%, ${withAlphaHex(t.night, 0)} ${Math.round(to * 100)}%`) };
 }

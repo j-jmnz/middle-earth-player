@@ -1,11 +1,11 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
 # Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `roads-lost` (scripts/e2e/journey-to-the-cross-roads.ts): a real two-handed game of Journey to the Cross-roads
 # (The One Deck and the Defenders of Gondor lists, Easy, the saga Frodo as the Ring-bearer with The One Ring, after The Passage of the Marshes' win), parked on its loss (a loss of the scenario's own is the players' threat at 50, every
 # hero destroyed, the Ring-bearer's One Ring leaving play, or the enemies facedown under The Black Gate reaching the players + 3).
-# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/handover/agent-brief.md, Scenario procedure).
+# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/agents/agent-brief.md, Scenario procedure).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:

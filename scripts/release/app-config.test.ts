@@ -19,7 +19,7 @@ describe("app.config.js", () => {
   it("stamps the version and a versionCode that grows with every release", () => {
     const stamped = appConfig.stamp(app.expo, "1.2.3") as { version: string; android: { versionCode: number; package: string }; ios: { buildNumber: string } };
     expect(stamped.version).toBe("1.2.3");
-    expect(stamped.android).toMatchObject({ versionCode: 1_002_003, package: "com.middleearth.lcg" });
+    expect(stamped.android).toMatchObject({ versionCode: 1_002_003, package: "com.middleearth.player" });
     expect(stamped.ios.buildNumber).toBe("1002003");
     const order = ["0.1.0", "0.1.1", "0.2.0", "0.999.999", "1.0.0", "1.0.1"].map(appConfig.versionCodeOf);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
@@ -27,7 +27,7 @@ describe("app.config.js", () => {
 
   it("sets the iOS signing team only when one is given", () => {
     const stamped = appConfig.stamp(app.expo, "0.2.0", "ABCDE12345") as { ios: { appleTeamId: string; bundleIdentifier: string } };
-    expect(stamped.ios).toMatchObject({ appleTeamId: "ABCDE12345", bundleIdentifier: "com.middleearth.lcg" });
+    expect(stamped.ios).toMatchObject({ appleTeamId: "ABCDE12345", bundleIdentifier: "com.middleearth.player" });
     expect((appConfig.stamp(app.expo, "0.2.0") as { ios: { appleTeamId?: string } }).ios.appleTeamId).toBeUndefined();
   });
 

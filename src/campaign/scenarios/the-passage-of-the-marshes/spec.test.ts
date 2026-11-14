@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, defend, endPhase, exhausted, flag, quest, resolve, resourcesOn, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Passage of the Marshes (the-two-towers part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot hold is a titled test of
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold is a titled test of
 // lines.test.ts in this folder (the Mire keyword's refresh step and discards, the gates on the first player's Sméagol, the first player of a stage Forced effect, the Gollum flips) or of verbs.test.ts (the new vocabulary). The mire and
 // gollum families' own tests are src/rules/families/mire/index.test.ts and src/rules/families/gollum/index.test.ts. scripts/checks/spec-coverage.test.ts fails a line with neither a row nor a titled test.
 const TWO = { seats: 2 } as const;

@@ -2,7 +2,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 
 import { ALWAYS } from "../conditions.ts";
 
-// Authored records for player side quests, contracts, encounter-keyword player cards and the victory display (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for player side quests, contracts, encounter-keyword player cards and the victory display (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 
 // "While this side quest is in the victory display": the quest's constants work from there, for every seat.
 const IN_VICTORY = { kind: "sourceIn", zone: "victory" } as const;

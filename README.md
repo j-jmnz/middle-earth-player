@@ -1,4 +1,4 @@
-# Middle Earth LCG
+# Middle Earth Player
 
 [![Accessibility: WCAG 2.2 AA](https://img.shields.io/badge/accessibility-WCAG%202.2%20AA-3E5A48)](ACCESSIBILITY.md)
 [![Screen readers: VoiceOver and TalkBack](https://img.shields.io/badge/screen%20readers-VoiceOver%20%7C%20TalkBack-3E5A48)](ACCESSIBILITY.md#what-the-app-supports)
@@ -85,7 +85,7 @@ Stack: Expo SDK 58, Expo Router, Skia, Reanimated, NativeWind, SQLite with Drizz
 
 ## Install
 
-Not on the Play Store or App Store. Android installs the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-lcg/releases); iPhone and iPad install the IPA with SideStore or AltStore, signed with your own Apple ID. Free, and no network needed once installed.
+Not on the Play Store or App Store. Android installs the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-player/releases); iPhone and iPad install the IPA with SideStore or AltStore, signed with your own Apple ID. Free, and no network needed once installed.
 
 ### What you need
 
@@ -95,11 +95,11 @@ Not on the Play Store or App Store. Android installs the APK from the [Releases 
 
 ### Android
 
-1. Open the [latest release](https://github.com/j-jmnz/middle-earth-lcg/releases/latest) on your phone and, under Assets, tap `middle-earth-lcg-v<version>.apk`. Ignore the `.sha256` file.
+1. Open the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest) on your phone and, under Assets, tap `middle-earth-player-v<version>.apk`. Ignore the `.sha256` file.
 2. Open the download from the browser or your Files app.
 3. If asked, allow that app to install unknown apps (Settings, Allow from this source), then go back.
 4. Tap Install. If Play Protect warns, tap More details, then Install anyway.
-5. Open Middle Earth LCG.
+5. Open Middle Earth Player.
 
 To update, install the newer `.apk` the same way; saves are kept. Don't uninstall first: that deletes your saves.
 
@@ -107,10 +107,10 @@ To update, install the newer `.apk` the same way; saves are kept. Don't uninstal
 
 1. Set up [SideStore](https://sidestore.io) (refreshes on the phone) or [AltStore Classic](https://altstore.io) (refreshes through AltServer on a computer on the same Wi-Fi). Not AltStore PAL, which installs only from its own marketplace.
 2. On iOS 16 and later, turn on Developer Mode (Settings, Privacy & Security) and restart.
-3. In SideStore or AltStore, open Sources, tap +, and add `https://github.com/j-jmnz/middle-earth-lcg/releases/latest/download/source.json`.
-4. Open the Middle Earth LCG source and tap Free or Get.
+3. In SideStore or AltStore, open Sources, tap +, and add `https://github.com/j-jmnz/middle-earth-player/releases/latest/download/source.json`.
+4. Open the Middle Earth Player source and tap Free or Get.
 
-Or download the `.ipa` from the [latest release](https://github.com/j-jmnz/middle-earth-lcg/releases/latest) in Safari and add it under My Apps, +.
+Or download the `.ipa` from the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest) in Safari and add it under My Apps, +.
 
 A free Apple ID signature lasts 7 days. SideStore and AltStore refresh it in the background, or tap Refresh All in My Apps. A free Apple ID allows 3 sideloaded apps, SideStore or AltStore included. Updates appear in the source and keep your saves. Deleting the app deletes them.
 
@@ -127,7 +127,7 @@ The release notes give the APK's SHA-256 and its signing certificate fingerprint
 - App won't open on iOS after a few days: the signature expired. Refresh it in SideStore or AltStore (AltServer running, same Wi-Fi).
 - App limit reached: remove a sideloaded app you don't use.
 - TestFlight beta full: use SideStore or AltStore.
-- Anything else: [open an issue](https://github.com/j-jmnz/middle-earth-lcg/issues) with your device, OS version and the app version from Settings.
+- Anything else: [open an issue](https://github.com/j-jmnz/middle-earth-player/issues) with your device, OS version and the app version from Settings.
 
 ### Privacy
 
@@ -142,8 +142,8 @@ No personal data collected; saves stay on your device. See [PRIVACY.md](PRIVACY.
 - Optional: `poppler` (`pdftoppm`) to render campaign, boon and burden cards from FFG's PDFs. Without it those cards use their scans and the build warns.
 
 ```bash
-git clone https://github.com/j-jmnz/middle-earth-lcg.git
-cd middle-earth-lcg
+git clone https://github.com/j-jmnz/middle-earth-player.git
+cd middle-earth-player
 pnpm install
 pnpm test
 ```
@@ -162,7 +162,7 @@ A Codespaces devcontainer (`.devcontainer/devcontainer.json`) installs dependenc
 
 ### On a phone
 
-iOS needs macOS and Xcode. Android needs Android Studio, SDK Platform 36 and `ANDROID_HOME`. App id `com.middleearth.lcg`; uses `expo-dev-client`, so not Expo Go.
+iOS needs macOS and Xcode. Android needs Android Studio, SDK Platform 36 and `ANDROID_HOME`. App id `com.middleearth.player`; uses `expo-dev-client`, so not Expo Go.
 
 ```bash
 pnpm assets
@@ -183,7 +183,7 @@ A free Apple ID build stops opening after 7 days; rerun the command to reinstall
 
 ### Maestro
 
-Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `maestro test .maestro` against an installed build. Flows that open a save fixture need `EXPO_PUBLIC_E2E_SEED` set (the `e2e-test` profile in `eas.json`). The screen-reader flow (`.maestro/features/screen-reader.yaml`, tag `reader`) needs a development build with `EXPO_PUBLIC_E2E_SEED=1 EXPO_PUBLIC_FORCE_READER=1`; run `maestro test --include-tags=reader .maestro`. `.eas/workflows/e2e.yml` runs the flows on EAS.
+Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `maestro test .maestro` against an installed build. Flows that open a save fixture need `EXPO_PUBLIC_E2E_SEED` set (the `e2e-test` profile in `eas.json`). The screen-reader flow (`.maestro/features/screen-reader.yaml`, tag `reader`) needs a development build with `EXPO_PUBLIC_E2E_SEED=1 EXPO_PUBLIC_FORCE_READER=1`; run `maestro test --include-tags=reader .maestro`. `.eas/workflows/e2e.yml` runs the flows on EAS. It is started by hand only (`eas workflow:run .eas/workflows/e2e.yml`), by someone signed in to the Expo account that owns the project; no push or pull request runs it.
 
 ## Commands
 
@@ -214,7 +214,7 @@ Scripts are grouped: `pnpm <group> <command> [args]`, and `pnpm <group>` alone l
 | `pnpm assets scans` / `pnpm assets booklets` | Packs card pictures / booklet PDFs into `assets/`. |
 | `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators (macOS, Xcode and Maestro; [docs/showcase.md](docs/showcase.md)). |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet; `--publish` replaces the `showcase` branch with them. |
-| `pnpm docs index` / `pnpm docs section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
+| `pnpm doc index` / `pnpm doc section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
 | `pnpm release plan --dry-run` | Prints the next tag and its notes (`git fetch --tags` first). Changes nothing. |
 | `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source; run by the release workflow. |
 | `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`; `--range <base>..<head>` for a range. Installed as the `commit-msg` hook. |
@@ -257,4 +257,4 @@ Picture source order: `scripts/data/sources/pictures.ts`.
 
 ## License
 
-Code and documentation: [MIT License](LICENSE). Game content, `data/raw/`, the fonts and the Expo template images keep their owners' terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Code and documentation: [MIT License](LICENSE). Game content, `data/raw/` and the fonts keep their owners' terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -10,7 +10,7 @@ tags:
 # A loss has no reward screen and writes nothing to the log.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/knife-lost"
+- openLink: "middleearthplayer://e2e/knife-lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

@@ -26,6 +26,7 @@ import { MEDIUM_ACTION_GROUP } from "../../../ui/size-class";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
 import { Text } from "../../../ui/text";
+import { useTopInset } from "../../nav/use-top-inset";
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
 // The deck's head in an expanded window, in Medium's points (docs/design-system.md, Deck builder); its cards take the rest.
@@ -48,6 +49,7 @@ export default function DeckEditor() {
   const { size, width: windowWidth } = useSizeClass();
   const expanded = size === "expanded";
   const insets = useSafeAreaInsets();
+  const top = useTopInset();
   const s = useUiScale();
   const draft = useDeckDraft();
   const list = useRef<FlashListRef<EditorRow>>(null);
@@ -186,9 +188,9 @@ export default function DeckEditor() {
   const base = { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right };
   const gutter = size === "medium" ? 8 * s : 0;
   const side = expanded ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s } : { paddingLeft: base.paddingLeft + gutter, paddingRight: base.paddingRight + gutter };
-  // FlashList v2 adds viewOffset to the row's offset (FlatList subtracts it): a negative one leaves the heading below the status bar
+  // FlashList v2 adds viewOffset to the row's offset (FlatList subtracts it): a negative one leaves the heading below the top inset
   // and the floating Back.
-  const jumpTo = (jump: Jump) => list.current?.scrollToIndex({ index: jump.index, animated: true, viewOffset: -(insets.top + (56 + 8) * s) });
+  const jumpTo = (jump: Jump) => list.current?.scrollToIndex({ index: jump.index, animated: true, viewOffset: -(top + (56 + 8) * s) });
 
   const header = (
     <DeckGlance
@@ -205,7 +207,7 @@ export default function DeckEditor() {
       starterNote={isStarterDeck(draft.id) ? STARTER_NOTE : null}
       jumps={expanded ? [] : jumps}
       onJump={jumpTo}
-      top={insets.top}
+      top={top}
       side={expanded ? { paddingLeft: 0, paddingRight: 0 } : side}
       wide={size !== "compact"}
     />
@@ -294,8 +296,8 @@ export default function DeckEditor() {
   // Back floats over the fan and stays in reach as the list scrolls; its shade and padding belong to its pane.
   const navBar = (sidePad: { paddingLeft: number; paddingRight: number }) => (
     <>
-      <FloatingBarShade shown={past} top={insets.top} />
-      <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, ...sidePad }}>
+      <FloatingBarShade shown={past} top={top} />
+      <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top, ...sidePad }}>
         <NavBar backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
       </View>
     </>
@@ -324,7 +326,7 @@ export default function DeckEditor() {
             </>
           }
           end={
-            <View className="min-h-0 flex-1" style={{ paddingTop: insets.top + 12 * s, paddingRight: 24 * s + insets.right, paddingBottom: insets.bottom, overflow: "hidden" }}>
+            <View className="min-h-0 flex-1" style={{ paddingTop: top + 12 * s, paddingRight: 24 * s + insets.right, paddingBottom: insets.bottom, overflow: "hidden" }}>
               <View className="flex-row items-center" style={{ gap: 8 * s }}>
                 <View className="min-w-0 flex-1 flex-row flex-wrap" style={{ columnGap: 6 * s }}>
                   {adding ? null : <JumpChips jumps={jumps} onJump={jumpTo} />}

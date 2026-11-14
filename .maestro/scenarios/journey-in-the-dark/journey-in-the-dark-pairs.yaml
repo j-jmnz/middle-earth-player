@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # objective (Grievous Wound or Overcome by Grief), each confirmed before the next is asked. Confirming writes the two and unlocks Breaking of the Fellowship.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/moria-pairs"
+- openLink: "middleearthplayer://e2e/moria-pairs"
 - extendedWaitUntil:
     visible:
       id: campaign-path

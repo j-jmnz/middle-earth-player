@@ -1,6 +1,6 @@
 import type { Condition, Effect, Instruction, SimpleInstruction } from "../../../catalog/boundary.ts";
 
-// Authored records for the encounter deck: look, move, discard, search, cancel and replace revealed cards, reveal triggers (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
+// Authored records for the encounter deck: look, move, discard, search, cancel and replace revealed cards, reveal triggers (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 //
 // Conventions: "look at the top card" is LookAtTop, which picks that card, so "that card" / "the looked at card" is `picked`;
 // "you may ..." is a Choose with an empty option; "search the top 5 cards for an X" is PickEncounter, and "if no X enters play"

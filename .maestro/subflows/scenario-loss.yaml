@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # The loss of a scenario, played from a save fixture: open the fixture, begin, read the defeat on the table, open the Resolution (a loss has no reward
 # screen and writes nothing), go back, and read the scenario as not completed in the log. A scenario flow runs it with `runFlow` and keeps its own
@@ -7,7 +7,7 @@ appId: com.middleearth.lcg
 # Env: FIXTURE (the fixture name, src/campaign/fixtures/registry.ts), SCENARIO_ID (the scenario's id, data/scenarios).
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/${FIXTURE}"
+- openLink: "middleearthplayer://e2e/${FIXTURE}"
 - extendedWaitUntil:
     visible:
       id: campaign-path

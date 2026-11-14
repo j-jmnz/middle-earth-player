@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -10,7 +10,7 @@ tags:
 # at); `table-area` says whose area, which stage and how many cards. The peek changes only what is drawn: the dock stays Player 1's.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/breaking-pair"
+- openLink: "middleearthplayer://e2e/breaking-pair"
 - extendedWaitUntil:
     visible:
       id: campaign-path

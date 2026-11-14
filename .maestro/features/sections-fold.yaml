@@ -1,10 +1,10 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # Phase 28b. Written in a cloud session: it has not run. A folded section stays folded after a relaunch, on each tab. Needs the e2e-test build for the fixture save.
 - launchApp:
     clearState: true
 # Campaigns: a fresh install has no playthrough, so the e2e-test build's fixture (EXPO_PUBLIC_E2E_SEED=1) writes one first.
-- openLink: "middleearthlcg://e2e/lost"
+- openLink: "middleearthplayer://e2e/lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

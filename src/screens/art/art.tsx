@@ -142,8 +142,8 @@ function useSceneBand(scenarioId: string | null | undefined, width: number, heig
 }
 
 /**
- * A scenario's scene, cropped from its first quest card (or its bundled scene), filling a box. `shade` lays a soft night over its top (for Back and the
- * status bar, or chips), `fade` night rising from that fraction of its height to solid at its foot, in `fadeTo` (the surface the
+ * A scenario's scene, cropped from its first quest card (or its bundled scene), filling a box. `shade` lays a soft night over its top (for Back,
+ * or chips), `fade` night rising from that fraction of its height to solid at its foot, in `fadeTo` (the surface the
  * words below it sit on).
  */
 export function SceneArt({
@@ -318,7 +318,7 @@ export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId
     shown < width ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 64 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(color, 0)}, ${color})` }} /> : null;
   return (
     <>
-      {/* The picture in three bands (user request, 2026-10-29): the top falls to the ground under the status bar and the head, the
+      {/* The picture in three bands (user request, 2026-10-29): the top falls to the ground under the top inset and the head, the
           middle is the picture alone with nothing over it, and from under the title down it falls to the ground. */}
       <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ ...box, ...blend }}>
         <View style={{ width, height: band }}>

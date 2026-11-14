@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # Phase 38. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and a catalog in which
 # `dream-chaser` is marked playable (the first Dream-chaser scenario in PLAYABLE_SCENARIOS, phase 40; its briefing also needs the sea

@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -10,7 +10,7 @@ tags:
 # (src/play/words/scenarios/area.ts): "Staging area · Stage <stage 3A> · <n> cards · <active location>". No peek: there is no second dial and no second area.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/breaking-solo"
+- openLink: "middleearthplayer://e2e/breaking-solo"
 - extendedWaitUntil:
     visible:
       id: campaign-path

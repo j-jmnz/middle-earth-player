@@ -10,7 +10,7 @@ import { runScript, type Log } from "../log.ts";
 import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, seedFinderFile, specTestFile, winFlowFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
-// (docs/handover/agent-brief.md, Scenario procedure):
+// (docs/agents/agent-brief.md, Scenario procedure):
 //
 //   pnpm scenario new <scenario-id> [--short <name>] [--dry-run]
 //
@@ -266,7 +266,7 @@ function addedLines(before: readonly string[], after: readonly string[]): string
 }
 
 function nextSteps(facts: Facts, log: Log): void {
-  log.info("next (docs/handover/agent-brief.md, Scenario procedure):");
+  log.info("next (docs/agents/agent-brief.md, Scenario procedure):");
   log.info("  pnpm data build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
   log.info(`  pnpm scenario pack ${facts.id}   runs effects draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
   log.info("  pnpm effects open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");

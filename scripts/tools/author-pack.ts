@@ -8,7 +8,7 @@ import { dealtCodes, loadCampaigns, loadScenario } from "../data/load-scenarios.
 import { ROOT } from "../data/paths.ts";
 import { sectionText } from "../docs/index.ts";
 
-// The context a scenario author reads in place of the brief's full list (docs/handover/agent-brief.md, Scenario procedure):
+// The context a scenario author reads in place of the brief's full list (docs/agents/agent-brief.md, Scenario procedure):
 //
 //   pnpm scenario pack <scenario-id> [--no-draft]
 //
@@ -16,11 +16,11 @@ import { sectionText } from "../docs/index.ts";
 //   - the vocabulary file the drafts link to (.agent/drafts/vocabulary.md);
 //   - the schema entries (and the comment on each) of the verbs the drafts' nearest records and exact matches use, from the core schema files and the family manifests (src/catalog/families/<family>.ts)
 //     that declare them: an entry, not the whole manifest, since one manifest is tens of KB;
-//   - the sections of docs/plans/effect-authoring.md those records need: a fixed set every author reads, and the ones for picks, amounts, conditions and triggers when a record uses them;
+//   - the sections of docs/agents/effect-authoring.md those records need: a fixed set every author reads, and the ones for picks, amounts, conditions and triggers when a record uses them;
 //   - the engine files of the families those records use, as paths with line counts;
 //   - the rules text the drafts cite, each span once, then the drafts, one section each, each citing its spans by rule id.
 
-const COOKBOOK = "docs/plans/effect-authoring.md";
+const COOKBOOK = "docs/agents/effect-authoring.md";
 const FAMILIES_DIR = "src/catalog/families";
 // Where the core verbs are declared, beside the families' manifests.
 const CORE_FILES = ["src/catalog/effect-schema-verbs.ts", "src/catalog/effect-schema.ts"] as const;
@@ -181,7 +181,7 @@ export function renderPack(parts: PackParts): string {
   const out = [
     `# Author pack for ${parts.id}`,
     ``,
-    `Written by \`pnpm scenario pack ${parts.id}\`; not committed. It replaces the brief's full reading list (docs/handover/agent-brief.md, Scenario procedure): the vocabulary, the schema entries of the verbs the drafts' records use (from ${parts.plan.families.join(", ") || "no file"}), the cookbook sections those records need, and the ${parts.drafts.length} draft${parts.drafts.length === 1 ? "" : "s"}.`,
+    `Written by \`pnpm scenario pack ${parts.id}\`; not committed. It replaces the brief's full reading list (docs/agents/agent-brief.md, Scenario procedure): the vocabulary, the schema entries of the verbs the drafts' records use (from ${parts.plan.families.join(", ") || "no file"}), the cookbook sections those records need, and the ${parts.drafts.length} draft${parts.drafts.length === 1 ? "" : "s"}.`,
     `An entry is cut from its file: a helper it names (\`code\`, \`pile\`, \`when\`) is declared higher in that file. The fields a verb takes are the entry's.`,
     ``,
     `# Part 1: the vocabulary`,

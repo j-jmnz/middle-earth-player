@@ -2,7 +2,7 @@
 
 The rules for every session are in `.claude/rules/authority.md`. Read it. Any session or agent that changes code also reads `.claude/rules/code-standards.md` and follows it; one that changes a doc, `docs/phases/STATUS.md` or an agent file follows `.claude/rules/docs-standards.md` (current state only, no history logs). Every commit follows `.claude/rules/commit-standards.md` (`<type>: <summary>` with type fix, feat, refactor, style or repo; branches land on `main` squashed). Branches, versions, tags and releases follow `.claude/rules/release-standards.md`: a release is only ever cut by `.github/workflows/release.yml`, a real one only when the user asks (`docs/releasing.md`, Start a release). The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
 
-Find docs through `docs/INDEX.md`: every file an agent reads, its size, the heading tree of the long ones with line ranges, and the sections each code area cites. Read a section, not a whole file: `pnpm docs section <file> "<heading>"` (for example `pnpm docs section brief "Core round"`). After changing a doc's headings or a doc citation in code, run `pnpm docs index`; a test fails while the index is stale or a citation names no heading.
+Find docs through `docs/INDEX.md`: every file an agent reads, its size, the heading tree of the long ones with line ranges, and the sections each code area cites. Read a section, not a whole file: `pnpm doc section <file> "<heading>"` (for example `pnpm doc section brief "Core round"`). After changing a doc's headings or a doc citation in code, run `pnpm doc index`; a test fails while the index is stale or a citation names no heading.
 
 ## Data
 
@@ -25,14 +25,14 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 
 ## Commands
 
-Scripts are grouped as `pnpm <group> <command> [args]` (`test`, `data`, `effects`, `scenario`, `assets`, `docs`, `release`); `pnpm <group>` alone lists its commands, except `test` and `assets`, which run everything (`scripts/cli.ts`).
+Scripts are grouped as `pnpm <group> <command> [args]` (`test`, `data`, `effects`, `scenario`, `assets`, `doc`, `release`); `pnpm <group>` alone lists its commands, except `test` and `assets`, which run everything (`scripts/cli.ts`).
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
 - `pnpm test changed` runs the tests that import a file changed since the last commit; `pnpm test fast` runs everything but the slow files (`slowFiles` in `vitest.config.mts`). `.claude/rules/code-standards.md` (Checking a change) says when to run which.
 - `pnpm lint` runs Oxlint (`.oxlintrc.json`): the import boundaries and the React and Expo rules.
 - `pnpm typecheck` type-checks with tsrs (the Rust port of TypeScript 7). The `typescript` package stays for the editor and the tests that parse source.
 - `pnpm test scenario <scenario-id>` (`--list` first; `--quick` skips the goldens and the reader check while authoring) runs the tests that belong to one scenario (held to a time budget on a full run), its goldens, the coverage checks, the file-size, test-cost, rule-id and words checks (`--words` runs only the words tests, the asks checks too for a scenario with an asks file), the card smoke on its player cards and the encounter smoke, plus the family and manifest tests when pool, family or manifest files changed since the merge base with origin/main (README.md, Commands). Use it while authoring.
-- `pnpm scenario new <scenario-id>` (`--dry-run` first) writes a scenario's skeletons (game, golden, campaign and spec tests, asks file, seed finder, Maestro flows, authored effects file) and registers it in the fixture and golden registries; it refuses a scenario that has files. The procedure around it is in `docs/handover/agent-brief.md` (Scenario procedure).
+- `pnpm scenario new <scenario-id>` (`--dry-run` first) writes a scenario's skeletons (game, golden, campaign and spec tests, asks file, seed finder, Maestro flows, authored effects file) and registers it in the fixture and golden registries; it refuses a scenario that has files. The procedure around it is in `docs/agents/agent-brief.md` (Scenario procedure).
 - `pnpm scenario pack <scenario-id>` writes `.agent/pack/<id>.md` (not committed): the vocabulary, the schema entries the drafts' nearest records use, the cookbook sections they need and the drafts, which the scenario author reads in place of the brief's reading list.
 - `pnpm move <old> <new>` (or `pnpm move <map.json>`, `--dry-run` first) moves tracked files and folders and rewrites every relative import and every root-written path in code, docs and configs that names them; a file's `.native` variants and its test go with it. It lists what it cannot follow (paths built at run time). Move files with it, not by hand.
 - `pnpm scenario fixtures` rewrites the Maestro save fixtures (`src/campaign/fixtures/`) when `fixtures.test.ts` says a fixture no longer reaches its moment. `--won` also searches for scenario 1's won game, which is open (`docs/phases/STATUS.md`). `pnpm scenario fixtures <scenario-id>` writes only that scenario's file, taking the earlier parts' won games from their committed files.
@@ -42,7 +42,7 @@ Scripts are grouped as `pnpm <group> <command> [args]` (`test`, `data`, `effects
 
 ## Agents
 
-`implementer`, `reviewer`, `ux`, `orchestrator`, `effect-author`, `reading-judge` (reads each rendered record from `pnpm effects render` against its printed line; read-only) and `scenario-author` (one scenario, run by the orchestrator as the tasks of `docs/handover/agent-brief.md`, Scenario procedure) are in `.claude/agents`. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. A plan with several sections is run by `orchestrator` (`.claude/agents/orchestrator.md` sets the models and the one review round).
+`implementer`, `reviewer`, `ux`, `orchestrator`, `effect-author`, `reading-judge` (reads each rendered record from `pnpm effects render` against its printed line; read-only) and `scenario-author` (one scenario, run by the orchestrator as the tasks of `docs/agents/agent-brief.md`, Scenario procedure) are in `.claude/agents`. `docs/agents/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/agents/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. A plan with several sections is run by `orchestrator` (`.claude/agents/orchestrator.md` sets the models and the one review round).
 
 ## Cloud sessions
 

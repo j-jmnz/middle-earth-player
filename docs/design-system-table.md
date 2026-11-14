@@ -4,7 +4,7 @@ The table screen's design. The rest of the design system (`docs/design-system.md
 
 ## Overview
 
-The table is played in landscape only (`orientation` on its stack screen), with the status bar hidden and the stack's edge swipe off (a drag from the hand's edge must not leave the table; Leave the table in the menu does). Scene `table`: the canvas is transparent over its fog, with no felt and no zone boxes. Under the top bar, the canvas at the left and the command column at the right (30% of the width, 210 to 280 pt), both inside the side safe-area insets. The web build lists the zones instead of drawing them.
+The table is played in landscape only (`orientation` on its stack screen), with the status bar hidden (as on every screen: `docs/design-system.md`, Navigation) and the stack's edge swipe off (a drag from the hand's edge must not leave the table; Leave the table in the menu does). Scene `table`: the canvas is transparent over its fog, with no felt and no zone boxes. Under the top bar, the canvas at the left and the command column at the right (30% of the width, 210 to 280 pt), both inside the side safe-area insets. The web build lists the zones instead of drawing them.
 
 ## Top bar
 

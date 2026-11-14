@@ -103,8 +103,8 @@ describe("headingsIn and renderPack", () => {
 
   it("writes the four parts in order, with only the entries the drafts' verbs need", () => {
     const plan = { verbs: ["First"], families: ["south"], sections: ["The record"] };
-    const text = renderPack({ id: "the-x", vocabulary: "# Vocabulary\nVerbs: A", plan, sources: new Map([["south", MANIFEST]]), sections: ["docs/plans/effect-authoring.md:1-2\n## The record\nbody"], engine: [{ family: "south", files: [{ path: "src/rules/families/south/index.ts", lines: 12 }] }], drafts: [{ name: "1.md", text: "# 1 Card" }] });
-    const at = ["# Part 1: the vocabulary", "# Part 2: verb entries", "# Part 3: docs/plans/effect-authoring.md", "# Part 4: the drafts"].map((part) => text.indexOf(part));
+    const text = renderPack({ id: "the-x", vocabulary: "# Vocabulary\nVerbs: A", plan, sources: new Map([["south", MANIFEST]]), sections: ["docs/agents/effect-authoring.md:1-2\n## The record\nbody"], engine: [{ family: "south", files: [{ path: "src/rules/families/south/index.ts", lines: 12 }] }], drafts: [{ name: "1.md", text: "# 1 Card" }] });
+    const at = ["# Part 1: the vocabulary", "# Part 2: verb entries", "# Part 3: docs/agents/effect-authoring.md", "# Part 4: the drafts"].map((part) => text.indexOf(part));
     expect([...at].sort((a, b) => a - b)).toEqual(at);
     expect(at.every((index) => index >= 0)).toBe(true);
     expect(text).toContain('verb: z.literal("First")');

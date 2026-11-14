@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -10,7 +10,7 @@ tags:
 # `dol-guldur-won` fixture exists (it needs `anduin-won`, docs/phases/STATUS.md). The path screen has no table-menu: the log is opened from `log-open`.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/oath-won"
+- openLink: "middleearthplayer://e2e/oath-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

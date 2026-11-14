@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -8,7 +8,7 @@ tags:
 # a real game parked on a loss (Doors of Durin held 9 damage, 142030:A:3). A loss has no reward screen and writes nothing.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/south-lost"
+- openLink: "middleearthplayer://e2e/south-lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

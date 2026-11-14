@@ -1,4 +1,4 @@
-# Middle Earth LCG — decisions and implementer brief
+# Middle Earth Player — decisions and implementer brief
 
 This is the source of truth for the app. It records what was decided and how to build it. Read the sections your task touches before writing code.
 
@@ -16,7 +16,7 @@ The app applies the rules. Keywords, phases, effects, damage, resources, threat,
 
 ## Sections
 
-Read the sections your task touches, not the whole file: `docs/INDEX.md` gives each one's line range, and `pnpm docs section brief "<heading>"` prints one.
+Read the sections your task touches, not the whole file: `docs/INDEX.md` gives each one's line range, and `pnpm doc section brief "<heading>"` prints one.
 
 - Product: what the app is (offline, one human, one or two seats), the root dock, standalone play.
 - Non-goals: what not to build, port or commit.
@@ -1754,7 +1754,7 @@ type Effect = {
 
 `constant` is a while-in-play modifier. It appends a record to the modifier list. The engine rebuilds those records from the effect list after every intent, so they follow the source card and its condition. Hide numbers (the X, the discarded threat, the committed willpower) are held by the table or by a seat in the same list. A constant that forbids something (`Restrict`: advance, travel, attach, hero limit, defend) is checked where the thing happens; a bar that falls on other cards (cannot attack, take damage, take non-combat damage, be engaged, be optionally engaged) is a flag on the modifier list of each card it bars. A card's stat below 0 counts as 0, and a stat set to a value (`SetStat`) overrides every other modifier (`rr.modifiers`). A constant whose condition is "while this card is in the victory display" works from there (141046:A:2, `rr.in-play-and-out-of-play`). A lasting effect of an encounter card on "each ally" also holds for allies that enter play later (`rr.lasting-effects`). A response names the event it answers in `trigger`.
 
-An Action or Response may name a `cost` (exhaust or discard the card, add it to the victory display, or pay resources from the heroes the player names) and a `limit`. The cost is paid when the effect is triggered, and the use is recorded for the limit. A Response window offers each Response a seat may use after an event; a pass gives up all of that seat's offers for it. Peril limits who is offered. Instructions are engine verbs. The vocabulary (verbs, triggers, stat flags) is split by mechanic family: `src/catalog/families/<family>.ts` declares each family's share and `index.ts` composes and lists them; `src/rules/families/<family>/` runs them and `src/effects/authored/families/<family>.ts` holds their records (`docs/plans/effect-authoring.md`). The verb list grows when a dealt card or a starter card needs a verb. That growth stays inside this interpreter. There is no second language.
+An Action or Response may name a `cost` (exhaust or discard the card, add it to the victory display, or pay resources from the heroes the player names) and a `limit`. The cost is paid when the effect is triggered, and the use is recorded for the limit. A Response window offers each Response a seat may use after an event; a pass gives up all of that seat's offers for it. Peril limits who is offered. Instructions are engine verbs. The vocabulary (verbs, triggers, stat flags) is split by mechanic family: `src/catalog/families/<family>.ts` declares each family's share and `index.ts` composes and lists them; `src/rules/families/<family>/` runs them and `src/effects/authored/families/<family>.ts` holds their records (`docs/agents/effect-authoring.md`). The verb list grows when a dealt card or a starter card needs a verb. That growth stays inside this interpreter. There is no second language.
 
 The Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects` exports the generated records plus the authored ones, an authored id replacing a generated one. The interpreter takes the effect list as an argument and does not import `src/effects`; `src/campaign`, `src/play` and `src/screens` import it and pass it in. There is no effects table in `catalog.db`.
 

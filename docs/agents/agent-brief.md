@@ -1,6 +1,6 @@
 # Brief for a mechanic-family or scenario agent
 
-Repository: middle-earth-lcg, a TypeScript/Expo app for The Lord of the Rings: The Card Game with an offline, deterministic
+Repository: middle-earth-player, a TypeScript/Expo app for The Lord of the Rings: The Card Game with an offline, deterministic
 rules engine (`src/rules`) that runs effect records (`src/effects`) written in a Zod vocabulary (`src/catalog/effect-schema*.ts`
 and `src/catalog/families/`).
 
@@ -21,8 +21,8 @@ cards have no file under `src/effects/authored/families/`.
 - You are in your own git worktree. Start from the base: `git fetch origin <BASE> && git checkout -B wip-<F> origin/<BASE>`.
   Your base commit is the tip of `<BASE>` at that moment; `git log -1 --format=%h` says which.
 - If `node_modules` is missing, run `pnpm install --frozen-lockfile --offline` (without `--offline` if that fails).
-- Find docs through `docs/INDEX.md` and read sections (`pnpm docs section <file> "<heading>"`), not whole files.
-- Read first: `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md`, `.claude/rules/docs-standards.md`, `docs/plans/effect-authoring.md` (the cookbook; its "Mechanic
+- Find docs through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`), not whole files.
+- Read first: `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md`, `.claude/rules/docs-standards.md`, `docs/agents/effect-authoring.md` (the cookbook; its "Mechanic
   families" section describes the files you own), `docs/architecture.md`, the phase file for a scenario phase
   (`docs/phases/phase-NN-*.md`) and `docs/phases/STATUS.md`, and the schema files `src/catalog/effect-schema*.ts`. Skim
   `src/rules/interpret/interpret.ts`, `src/rules/interpret/effect-frames.ts`, `src/rules/windows/triggers.ts`, `src/rules/windows/responses.ts` and
@@ -89,12 +89,12 @@ The one way to build a scenario. A subagent cannot start agents, so the orchestr
 
 1. **Read**, by a fresh `scenario-author`.
    - The data cross-check: `data/scenarios/<id>.json` is built by `pnpm data build`; re-read its report with `pnpm data build -- --verbose`. Every card it deals has a ledger entry. A scan the author cannot read is a question for the user, not a guess. Then `pnpm scenario new <id>` (`--dry-run` first), `pnpm data build` (it adds the authored file and the asks file to their barrels) and `pnpm scenario pack <id>`, which runs `pnpm effects draft <id>` and writes `.agent/pack/<id>.md`: the vocabulary, the schema entries the drafts' nearest records use, the cookbook sections they need, the rule spans and the drafts. Read it in place of Setup's reading list; read a file beyond it only when a verb's fields or a rule are in question. Rule text comes from `pnpm data query`, never from memory; the authority order is `.claude/rules/authority.md`.
-   - A readings pass over every draft line, against `docs/plans/effect-authoring.md` (Readings the review catches), with each line's `faq.*` spans checked (`pnpm data query "select id, title, text from rules where id like 'faq.%' and text like '%<word>%'"`). Group the lines by mechanic.
+   - A readings pass over every draft line, against `docs/agents/effect-authoring.md` (Readings the review catches), with each line's `faq.*` spans checked (`pnpm data query "select id, title, text from rules where id like 'faq.%' and text like '%<word>%'"`). Group the lines by mechanic.
    - **Open points are researched, not asked.** For every reading that `data/rules/` does not settle, and for any other open point about a card, a ruling or an effect, the author researches online in the order `.claude/rules/authority.md` (Open points) gives and marks each reading `researched` or `recommended`.
    - It hands back the Readings list (`.claude/agents/orchestrator.md`, Implementer tasks) and the mechanics that need a new verb, trigger or flag, each with its family. No engine code and no records. The orchestrator does not wait on the user: every reading is applied as researched or recommended. Each goes to `docs/brief.md` under its scenario, with its source URL or "agent recommendation", and each `recommended` reading, or one settled only by a community discussion, also goes to Open items in `docs/phases/STATUS.md` as not user-confirmed.
 2. **Build**, by a fresh `scenario-author` handed the Read note and the rulings, applied as given (a ruling that conflicts with a line goes back, it is not worked around).
    - Verbs in their families, each with its own test: a new verb is engine work in the mechanic family it belongs to (`src/catalog/families/<family>.ts` for the schema, `src/rules/families/<family>/` for the engine), cites a ledger line or a rule span, and reuses the keyword framework and the existing verbs where they fit.
-   - The records in the scenario's authored file (`docs/architecture.md`, Effects; `pnpm scenario new` writes it), a repeated sentence as a template and a line printed the same as another card's as a copy (`docs/plans/effect-authoring.md`, Templates and copied lines); `pnpm effects open`; the scenario in `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open, until ownership coverage is green for every line of every dealt card, the campaign card's Setup and Resolution included.
+   - The records in the scenario's authored file (`docs/architecture.md`, Effects; `pnpm scenario new` writes it), a repeated sentence as a template and a line printed the same as another card's as a copy (`docs/agents/effect-authoring.md`, Templates and copied lines); `pnpm effects open`; the scenario in `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open, until ownership coverage is green for every line of every dealt card, the campaign card's Setup and Resolution included.
    - Then the render, `pnpm effects render <id> --out .agent/render/<id>.md` (a piece printed as `[json ...]` or `[also {...}]` has no template yet), and the scenario's snapshot, `pnpm effects render --all --out scripts/data/effects/render/snapshots`, which `snapshots.test.ts` compares for every playable scenario.
 3. **Judge.** The orchestrator runs `reading-judge` on the render and the ledger, with a fresh context. A `render-gap` row (`.claude/agents/reading-judge.md`) is filed as a renderer open item in `docs/phases/STATUS.md`, not sent to the author.
 4. **Finish**, by a fresh `scenario-author` handed the Build note and the judge's rows. It writes:
@@ -157,8 +157,8 @@ say in your report exactly what you changed in each shared file, so the merge ca
 ## Commit
 
 - Before committing, restore the burn-down list: `git checkout src/effects/open-lines.ts` (the main session regenerates it).
-- Commit on your worktree branch with a message that follows `.claude/rules/commit-standards.md` and describes the mechanics added. End the message with exactly the attribution
-  lines your session's instructions give (`Co-Authored-By` and `Claude-Session`). Do not put model names elsewhere in the message.
+- Commit on your worktree branch with a message that follows `.claude/rules/commit-standards.md` and describes the mechanics added. End the message with the attribution
+  lines your session's instructions give, as `.claude/rules/commit-standards.md` (Body) says: `Co-Authored-By`, never a `Claude-Session` link. Do not put model names elsewhere in the message.
 - Push to `wip/<F>` as above. Do not push to `<BASE>` or `main`.
 
 ## Report (your final message)

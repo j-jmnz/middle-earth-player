@@ -21,7 +21,7 @@ import { chromium, type Browser, type BrowserContext } from "playwright";
 import { runScript, type Log } from "../log.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
-const DIST = path.join(tmpdir(), "middle-earth-lcg-a11y-web");
+const DIST = path.join(tmpdir(), "middle-earth-player-a11y-web");
 
 // No rule is disabled: every rule axe runs applies to react-native-web's output, which is plain HTML.
 //

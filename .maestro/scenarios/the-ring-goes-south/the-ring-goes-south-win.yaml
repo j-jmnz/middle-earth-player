@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # writes the log and unlocks Journey in the Dark.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/south-won"
+- openLink: "middleearthplayer://e2e/south-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

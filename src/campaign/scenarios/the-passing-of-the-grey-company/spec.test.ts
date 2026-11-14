@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, defend, endPhase, flag, handCount, progressOn, quest, resolve, resourcesOn, reveal, revealedBy, stagingThreat, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Passing of the Grey Company (the-return-of-the-king part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). Phantom is a keyword, so its lines are tested in src/rules/families/grey-company/index.test.ts.
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). Phantom is a keyword, so its lines are tested in src/rules/families/grey-company/index.test.ts.
 // The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28.
 const FEAR = "145016";
 const STONE = "145017";

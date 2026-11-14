@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, counter, damageOn, deckCount, drew, endPhase, endRound, flag, handCount, heldBy, lost, resolve, resourcesOn, respond, reveal, stat, travel, quest, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Uruk-hai (the-two-towers part 1): one row for each record whose behaviour a game moment shows (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure). The pursuit value is read through the quest points X of the
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure). The pursuit value is read through the quest points X of the
 // current stage (143069:B:1) or the `counter` reader; a row that needs the tracker gives the layout `pursuit: 10`, what the quest card's Setup sets (the 143069:A:1 row resolves it). A row cannot hurt a hero
 // before the attack, give a hero a trait, or declare an attacker, so the lines that need those are tests of verbs.test.ts in this folder, whose titles start with the line id (the traits of 143015:A:2 to 143018:A:2,
 // the Responses of 143015:A:3 and 143017:A:3, the quest room of 143032:A:1, what 143028:A:2, 143032:A:2, 143064:A:2 and 143067:A:2 do when the attack destroys a character, the Responses of 143070:B:2 and the Restrict of

@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { answer, attack, cardSpecs, damageOn, deckCount, flag, resolve, stat, won, zone, announce, notWon, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Dread Realm (angmar-awakened part 9): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a Reanimated Dead on the table, a choice by several seats, a count over several steps, a
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a Reanimated Dead on the table, a choice by several seats, a count over several steps, a
 // divided placement) is a test titled with its line id in reanimate.test.ts, stages.test.ts and campaign.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; the filler enemy f3 has 1 Attack and an engagement cost of 50.
 const STAGE1 = "10150";
 const STAGE2 = "10151";

@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # show depends on the deal, so the flow keeps the heading for every symbol and ends on the Done every look has; its assertions hold whatever the cards are.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/sea-solo"
+- openLink: "middleearthplayer://e2e/sea-solo"
 - extendedWaitUntil:
     visible:
       id: campaign-path

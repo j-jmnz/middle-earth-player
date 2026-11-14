@@ -33,13 +33,17 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
+# local env files and credentials
+.env
 .env*.local
+*.keystore
+google-services.json
+GoogleService-Info.plist
+credentials.json
+.claude/settings.local.json
 
 # typescript
 *.tsbuildinfo
-
-example
 
 # generated native folders
 /ios

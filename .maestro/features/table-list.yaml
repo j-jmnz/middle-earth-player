@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # Table as a list set to Always (docs/design-system-table.md, Screen reader). Written in a cloud session: it has not run. With no screen reader on, the setting puts the phone on
 # the list table, the way Switch Control, Voice Control and Switch Access players use it (src/ui/screen-reader.ts, useReaderMode), so unlike
@@ -25,7 +25,7 @@ appId: com.middleearth.lcg
     selected: true
 - tapOn:
     id: app-settings-back
-- openLink: "middleearthlcg://e2e/duo"
+- openLink: "middleearthplayer://e2e/duo"
 - extendedWaitUntil:
     visible:
       id: campaign-path

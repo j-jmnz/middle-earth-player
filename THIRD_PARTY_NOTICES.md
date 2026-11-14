@@ -30,11 +30,7 @@ All sources are pinned by URL and sha256 in `data/sources.json`.
 
 ## Fonts
 
-`assets/fonts/`: Barlow Semi Condensed (Copyright 2017 The Barlow Project Authors) and Marcellus SC (Copyright 2012 Brian J. Bonislawsky DBA Astigmatic), SIL Open Font License 1.1. License texts: `assets/fonts/BarlowSemiCondensed-OFL.txt`, `assets/fonts/MarcellusSC-OFL.txt`.
-
-## Expo template
-
-`expo-logo.png`, `expo-badge*.png`, `react-logo*.png`, `tutorial-web.png` and `tabIcons/` in `assets/images/`: from the Expo app template, MIT License, Copyright (c) 2015-present 650 Industries, Inc. (aka Expo).
+`assets/fonts/` (and the web build's copies in `public/fonts/`): Barlow Semi Condensed (Copyright 2017 The Barlow Project Authors) and Marcellus SC (Copyright 2012 Brian J. Bonislawsky DBA Astigmatic), SIL Open Font License 1.1. License texts: `assets/fonts/BarlowSemiCondensed-OFL.txt`, `assets/fonts/MarcellusSC-OFL.txt`.
 
 ## Dependencies
 

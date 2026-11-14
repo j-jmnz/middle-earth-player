@@ -1,6 +1,6 @@
 # Privacy policy
 
-Middle Earth LCG collects no personal data. No accounts, analytics, advertising, crash reporting of its own or server; the maintainers receive nothing from the app. This applies to every Android, iPhone, iPad and web build this repository publishes.
+Middle Earth Player collects no personal data. No accounts, analytics, advertising, crash reporting of its own or server; the maintainers receive nothing from the app. This applies to every Android, iPhone, iPad and web build this repository publishes.
 
 ## What stays on your device
 
@@ -34,4 +34,4 @@ The code is open; [SECURITY.md](SECURITY.md) names the files behind each point. 
 
 ## Changes and contact
 
-Changes to this policy are made in this file; its history is in the commits. Questions: [issues](https://github.com/j-jmnz/middle-earth-lcg/issues). Security problems: report privately as [SECURITY.md](SECURITY.md) says.
+Changes to this policy are made in this file; its history is in the commits. Questions: [issues](https://github.com/j-jmnz/middle-earth-player/issues). Security problems: report privately as [SECURITY.md](SECURITY.md) says.

@@ -152,8 +152,10 @@ export default function RootLayout() {
   // is compiled without NativeWind's JSX, so on a phone every inset would read 0 without this one.
   // On a phone the View under the providers sets the active theme's color variables for every class below it, a Modal's content
   // included, because variables travel by context there and not by the view tree. On the web a Modal is portaled into document.body,
-  // outside that View, so the effect above writes the same variables (and the color scheme) onto the page's root. The status bar's
-  // icons go light on Dark and dark on Light.
+  // outside that View, so the effect above writes the same variables (and the color scheme) onto the page's root.
+  // The status bar is hidden on every screen, from launch (app.json, UIStatusBarHidden) and here twice over: StatusBar for the app's
+  // window (and an Android Modal, which copies its flag) and the stack's statusBarHidden for each screen's view controller, so it stays
+  // hidden whichever way iOS reads it. Screens keep their head clear of a notch with useTopInset (docs/design-system.md, Navigation).
   return (
     <ThemeContext.Provider value={resolved}>
     <UiScaleContext.Provider value={scale}>
@@ -162,10 +164,10 @@ export default function RootLayout() {
           Head publishes a Handoff activity whose URL needs an origin in the router config, and without one it raises an alert. */}
       {Platform.OS === "web" ? (
         <Head>
-          <title>Middle Earth LCG</title>
+          <title>Middle Earth Player</title>
         </Head>
       ) : null}
-      <StatusBar barStyle={resolved === "dark" ? "light-content" : "dark-content"} />
+      <StatusBar hidden />
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <View className="flex-1" style={themeStyle}>
           {failure ? (
@@ -184,12 +186,13 @@ export default function RootLayout() {
                     headerShown: false,
                     contentStyle: { backgroundColor: palette.night },
                     orientation: tablet ? "all" : "portrait",
+                    statusBarHidden: true,
                   }}
                 >
-                  {/* The table hides the status bar for room, and turns off the edge swipe back: a drag from the hand's edge
+                  {/* The table turns off the edge swipe back: a drag from the hand's edge
                       must not leave the table. ‹ Path (‹ Scenarios for a standalone game) leaves it. */}
-                  <Stack.Screen name="table/[saveId]" options={{ orientation: "landscape", statusBarHidden: true, gestureEnabled: false }} />
-                  <Stack.Screen name="standalone/table/[gameId]" options={{ orientation: "landscape", statusBarHidden: true, gestureEnabled: false }} />
+                  <Stack.Screen name="table/[saveId]" options={{ orientation: "landscape", gestureEnabled: false }} />
+                  <Stack.Screen name="standalone/table/[gameId]" options={{ orientation: "landscape", gestureEnabled: false }} />
                   <Stack.Screen name="card/[code]" options={{ orientation: "all" }} />
                   <Stack.Screen name="booklet/[id]" options={{ orientation: "all" }} />
                   {/* The table's Rules opens the glossary, so it and a rule are "all" too. */}

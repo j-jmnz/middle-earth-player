@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, defend, damageOn, endPhase, exhausted, handCount, lost, progressOn, quest, resolve, resourcesOn, reveal, revealedBy, stagingThreat, stat, threat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Helm's Deep (the-two-towers part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure). A row cannot ask who revealed a card
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure). A row cannot ask who revealed a card
 // when the first player is not the first seat, hold a negative case (it would pass without its records), look at the archery total, a sphere or a trait: those lines are the tests of verbs.test.ts in this folder,
 // whose titles start with the line id (143021:A:1, 143037:A:1, 143040:A:2, 143043:A:1 for the Traits, 143072:A:1 and 143072:B:1 to B:2, 143076:B:1, and the negative cases and the first player of 143041:A:1, 143042:A:3,
 // 143073:B:1, 143073:B:2 and 143074:B:2). The fortress family's own tests are src/rules/families/fortress/index.test.ts. scripts/checks/spec-coverage.test.ts fails a line with neither a row nor a titled test.

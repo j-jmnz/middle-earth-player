@@ -17,7 +17,7 @@ const require = createRequire(import.meta.url);
 const { versionCodeOf } = require("../../app.config.js") as { versionCodeOf: (version: string) => number };
 
 export const SOURCE_NAME = "source.json";
-export const BUNDLE_ID = "com.middleearth.lcg";
+export const BUNDLE_ID = "com.middleearth.player";
 // React Native's iOS minimum (react-native/scripts/cocoapods/helpers.rb); the README's Install section says the same.
 export const MIN_IOS = "15.1";
 const DESCRIPTION = "An offline app for playing The Lord of the Rings: The Card Game solo or two-handed, with its campaigns. Fan-made, not affiliated with Fantasy Flight Games.";
@@ -35,16 +35,16 @@ export function sourceOf(input: SourceInput): Record<string, unknown> {
   const site = `https://github.com/${input.repository}`;
   const iconURL = `https://raw.githubusercontent.com/${input.repository}/${input.tag}/assets/images/icon.png`;
   return {
-    name: "Middle Earth LCG",
+    name: "Middle Earth Player",
     identifier: `${BUNDLE_ID}.source`,
-    subtitle: "Releases of the Middle Earth LCG app",
+    subtitle: "Releases of the Middle Earth Player app",
     website: site,
     iconURL,
     apps: [
       {
-        name: "Middle Earth LCG",
+        name: "Middle Earth Player",
         bundleIdentifier: BUNDLE_ID,
-        developerName: "Middle Earth LCG contributors",
+        developerName: "Middle Earth Player contributors",
         subtitle: "The Lord of the Rings: The Card Game, offline",
         localizedDescription: DESCRIPTION,
         iconURL,

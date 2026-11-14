@@ -1,10 +1,10 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The `lost`
 # fixture is a real solo game of A Shadow of the Past parked on its loss; closing the loss on the Resolution screen writes the run.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/lost"
+- openLink: "middleearthplayer://e2e/lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

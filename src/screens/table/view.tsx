@@ -306,7 +306,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   }
 
   return (
-    // Bleed: the view below insets itself (barTop), so the status bar's inset is not added twice (user report, 2026-10-30).
+    // Bleed: the view below insets itself (barTop), so the top inset is not added twice (user report, 2026-10-30).
     <Screen testID="table" scene="table" bleed onKeyDown={onKeyDown}>
       {/* Never flattened: with "auto" alone this view is layout-only and the renderer drops it, so the menu or a popover turning
           it to "no-hide-descendants" would add a native view and move the canvas into it, and the canvas would flash. */}

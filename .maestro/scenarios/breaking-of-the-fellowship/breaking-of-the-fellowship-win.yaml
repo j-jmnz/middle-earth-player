@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # offered), each confirmed before the next is asked. Confirming records the burden and the captives, completes the Fellowship of the Ring and shows its six nodes won.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/breaking-won"
+- openLink: "middleearthplayer://e2e/breaking-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

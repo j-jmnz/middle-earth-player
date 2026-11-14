@@ -10,11 +10,11 @@ import { duration, runScript, type Log } from "../log.ts";
 import { smokeCodes } from "../card-smoke/world.ts";
 import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 
-// The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/handover/agent-brief.md, Scenario procedure):
+// The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/agents/agent-brief.md, Scenario procedure):
 //
 //   pnpm test scenario <scenario-id> [--list]
 //   pnpm test scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader
-//                                                 check; the full run, once before the hand-back, runs them (docs/handover/agent-brief.md, Scenario procedure)
+//                                                 check; the full run, once before the hand-back, runs them (docs/agents/agent-brief.md, Scenario procedure)
 //   pnpm test scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, and src/play/words/asks.test.ts when it has an asks file
 //                                                 (src/play/words/asks/<id>.ts), with WORDS_DUMP=<id>: it prints every sentence the scenario's choices say (the
 //                                                 check for a bare "Choose a player." or a fallback sentence, and for a scenario with an asks file every asks entry rendered)

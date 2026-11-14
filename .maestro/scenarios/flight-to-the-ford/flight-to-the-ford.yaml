@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -12,7 +12,7 @@ tags:
 # mec109.burden-deck): scenario-1.yaml asserts neither is on a scenario 1 table. Maestro reads text and testIDs.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/ford-start"
+- openLink: "middleearthplayer://e2e/ford-start"
 - extendedWaitUntil:
     visible:
       id: campaign-path

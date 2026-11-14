@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -7,7 +7,7 @@ tags:
 # A peek at the seat without the Dream-chaser keeps the Heading dial; a tap on the dial opens the Heading card's preview.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/sea-duo"
+- openLink: "middleearthplayer://e2e/sea-duo"
 - extendedWaitUntil:
     visible:
       id: campaign-path

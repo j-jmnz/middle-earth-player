@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # Settings and UI scale (user request, 2026-10-28). Written in a cloud session: it has not run. Settings (the gear) applies a change at
 # once and keeps it in user.db, so Large is still chosen after the app is closed and opened again. The accessibility settings (Extra large, Strong

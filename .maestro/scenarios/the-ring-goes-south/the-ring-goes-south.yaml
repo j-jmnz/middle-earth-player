@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -12,7 +12,7 @@ tags:
 # (mec109.stage-4). The table names both active locations and the card holding the Ring-bearer; the engine wrote what they say.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/south-stage-4"
+- openLink: "middleearthplayer://e2e/south-stage-4"
 - extendedWaitUntil:
     visible:
       id: campaign-path

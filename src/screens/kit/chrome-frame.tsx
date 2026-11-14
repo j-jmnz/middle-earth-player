@@ -7,6 +7,7 @@ import { vars } from "nativewind";
 
 import { Backdrop } from "../art/backdrop";
 import { useBottomInset } from "../nav/use-bottom-inset";
+import { useTopInset } from "../nav/use-top-inset";
 import { useOverrun } from "../nav/use-overrun";
 import type { SceneName } from "../art/backdrop-scenes";
 import { IconButton } from "./chrome-buttons";
@@ -29,9 +30,9 @@ import { Text } from "../../ui/text";
 import { ThemeContext, useResolvedTheme } from "../../ui/theme";
 
 /**
- * The page: the ground and its fog (the scene), an optional art layer, then the content, inset 24 and starting under the status bar; in landscape (the card and booklet
+ * The page: the ground and its fog (the scene), an optional art layer, then the content, inset 24 and starting under the top inset (useTopInset: the status bar is hidden, a notch or cutout is not); in landscape (the card and booklet
  * screens can turn with the phone) it is inset past the side safe areas too. `bleed` drops both, for a screen that opens on a
- * picture running under the status bar (the briefing, the deck editor): it insets its own words.
+ * picture running to the screen's top edge (the briefing, the deck editor): it insets its own words.
  *
  * The page provides the theme again, read from the setting itself, with its color variables. A screen the stack or the dock hides is
  * held by React Activity, and a theme change from above reaches its memoized parts only on their next own render, so a hub came back
@@ -54,10 +55,11 @@ export function Screen({
   scene?: SceneName;
   inset?: boolean;
   bleed?: boolean;
-  // The art layer between the fog and the content (HeroArt): a scene behind the hero words, under the status bar.
+  // The art layer between the fog and the content (HeroArt): a scene behind the hero words, up to the top edge.
   art?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const top = useTopInset();
   const s = useUiScale();
   const theme = useResolvedTheme();
   // NativeWind knows a vars() style by its identity, so it is the whole style of a View of its own, and the page under it reads it.
@@ -69,7 +71,7 @@ export function Screen({
           <Backdrop scene={scene} />
           {art}
           {/* The top inset is a style, not NativeWind's pt-safe: one source of insets for the whole screen. */}
-          <View className="flex-1" style={bleed ? undefined : { paddingTop: insets.top, ...(inset ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : {}) }}>
+          <View className="flex-1" style={bleed ? undefined : { paddingTop: top, ...(inset ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : {}) }}>
             {children}
           </View>
         </View>

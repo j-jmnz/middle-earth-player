@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # Phase 10, moved onto the real resolution screen in phase 11 (the dev-only control is deleted). Written in a cloud session:
 # it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which opens the fixture route: a real
@@ -6,7 +6,7 @@ appId: com.middleearth.lcg
 # .maestro/scenarios/a-shadow-of-the-past/scenario-1-loss.yaml.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/won"
+- openLink: "middleearthplayer://e2e/won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

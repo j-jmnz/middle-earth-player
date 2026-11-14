@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # Phase 10. Written in a cloud session: it has not run. Asserts the empty state and the close control by testID; it needs
 # no PDF (a smoke file, if a later flow wants one, is a one-page PDF written for the test, not a page of MEC109).

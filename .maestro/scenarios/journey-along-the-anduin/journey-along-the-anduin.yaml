@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -12,7 +12,7 @@ tags:
 # no burden deck on this table.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/anduin-won"
+- openLink: "middleearthplayer://e2e/anduin-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

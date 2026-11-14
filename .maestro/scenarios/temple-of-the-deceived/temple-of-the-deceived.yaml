@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -11,7 +11,7 @@ tags:
 # goldens' wins write), so the path opens on Temple of the Deceived and resumes it; its node reads Won.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/temple-won"
+- openLink: "middleearthplayer://e2e/temple-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

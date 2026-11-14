@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # The win of a scenario, played from a save fixture: open the fixture, begin, read the victory on the table, open the Resolution, answer its choice
 # when it asks one, confirm, and read the scenario's node as Won with its XP written. A scenario flow runs it with `runFlow` and keeps its own extra
@@ -15,7 +15,7 @@ appId: com.middleearth.lcg
 # Optional env: LAST_PART (any value: the scenario is the last of its campaign). The campaign is then complete, so the XP total stays on the path and Spend XP is gone; the flow asserts only the total.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/${FIXTURE}"
+- openLink: "middleearthplayer://e2e/${FIXTURE}"
 - extendedWaitUntil:
     visible:
       id: campaign-path

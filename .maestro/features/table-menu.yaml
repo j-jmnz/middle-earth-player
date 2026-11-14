@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -8,7 +8,7 @@ tags:
 # settings are rows of the menu. A tap on the rail opens the phase carousel (phase 20).
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/lost"
+- openLink: "middleearthplayer://e2e/lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

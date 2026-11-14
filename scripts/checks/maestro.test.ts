@@ -185,7 +185,7 @@ function fragments(id: string): string[] {
 describe("the Maestro flows", () => {
   it("parse, each with the app id and its commands", () => {
     expect(FLOWS.length).toBeGreaterThan(0);
-    for (const flow of FLOWS) expect(flow.config.appId, flow.rel).toBe("com.middleearth.lcg");
+    for (const flow of FLOWS) expect(flow.config.appId, flow.rel).toBe("com.middleearth.player");
   });
 
   // showcase/ holds the README's capture flows (docs/showcase.md, Capture flows): scripts/showcase/capture.ts runs them by name, never config.yaml.
@@ -233,7 +233,7 @@ describe("the Maestro flows", () => {
   it("open only fixtures in src/campaign/fixtures/registry.ts", () => {
     for (const flow of FLOWS) {
       for (const link of uses(flow, "openLink")) {
-        const found = /^middleearthlcg:\/\/e2e\/(.+)$/.exec(String(link));
+        const found = /^middleearthplayer:\/\/e2e\/(.+)$/.exec(String(link));
         if (!found) continue;
         const name = found[1] as string;
         if (name === "${FIXTURE}") continue;

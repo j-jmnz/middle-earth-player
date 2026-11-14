@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, exhausted, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Wastes of Eriador (angmar-awakened part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot express (the flags of a side, a count of Wargs discarded, a pool entry, a cap
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (the flags of a side, a count of Wargs discarded, a pool entry, a cap
 // tallied over a round, the log) is a test titled with its line id in lines.test.ts, cards.test.ts, encounter.test.ts and pool.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; a layout's current stage is on its B side.
 const DAYBREAK = "10011";
 const NIGHTFALL = "10012";

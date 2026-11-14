@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, drew, endPhase, exhausted, flag, lost, resolve, reveal, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Journey to the Cross-roads (the-two-towers part 5): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a bar that is
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a bar that is
 // only checked by what is refused, a Forced effect that must not fire, a search of the deck alone, an effect that reaches the enemies arriving later) is a titled test of lines.test.ts in this folder.
 // The Harad deck is the pile `haradDeck`, The Black Gate is a card in the staging area and the cards under it are the layout's `under`. scripts/checks/spec-coverage.test.ts fails a line with neither a row nor a titled test.
 const TWO = { seats: 2 } as const;

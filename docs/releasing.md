@@ -23,8 +23,8 @@ Preview with `git fetch --tags && pnpm release plan --dry-run` (prints the tag a
 2. `checks` runs `test.yml` on the same commit: `data check`, lint, typecheck and the full test suite.
 3. `android` and `ios` build beside the checks, from the same packed assets (`.github/actions/pack-assets` runs `pnpm assets`: `assets catalog`, `assets booklets` and `assets scans`, which fetch each pinned file and check its sha256; `assets/scans` is cached between runs so unchanged pictures are not fetched again). Both set `APP_VERSION`, which `app.config.js` turns into the version and the build number (`versionCode` on Android, `CFBundleVersion` on iOS).
    - `android` generates `android/` with `expo prebuild` and runs `./gradlew assembleRelease` for `arm64-v8a`, signed with the release key. It checks the signature with `apksigner`, refuses an APK over GitHub's 2 GiB asset limit, and uploads the APK, its `.sha256` and the certificate fingerprint as the `android` artifact.
-   - `ios` runs on macOS with the latest stable Xcode: `expo prebuild --platform ios`, then one `xcodebuild archive`. Its app, zipped in `Payload/`, is `middle-earth-lcg-v<version>.ipa`, uploaded with its `.sha256` as the `ios` artifact; it is unsigned, since SideStore and AltStore sign it on the player's device. The IPA must stay under the 2 GiB asset limit too. With TestFlight set up, the archive is signed automatically through the App Store Connect API key and also exported for App Store Connect, as the `testflight` artifact.
-4. `publish` (not on a dry run) needs the checks and both builds. It plans again with `--expect` (so the tag cannot have moved), writes the notes with the APK's and the IPA's SHA-256 and the APK's signing certificate fingerprint, writes the SideStore and AltStore source (`pnpm release source`, `scripts/release/sideload-source.ts`), and runs `gh release create`, which makes the tag on the built commit and attaches the APK, the IPA, their `.sha256` files and `source.json`. Players add the source once, at `https://github.com/j-jmnz/middle-earth-lcg/releases/latest/download/source.json`; GitHub sends that URL to the newest release's file, so SideStore and AltStore offer each release as an update. A patch from a release branch is not marked Latest.
+   - `ios` runs on macOS with the latest stable Xcode: `expo prebuild --platform ios`, then one `xcodebuild archive`. Its app, zipped in `Payload/`, is `middle-earth-player-v<version>.ipa`, uploaded with its `.sha256` as the `ios` artifact; it is unsigned, since SideStore and AltStore sign it on the player's device. The IPA must stay under the 2 GiB asset limit too. With TestFlight set up, the archive is signed automatically through the App Store Connect API key and also exported for App Store Connect, as the `testflight` artifact.
+4. `publish` (not on a dry run) needs the checks and both builds. It plans again with `--expect` (so the tag cannot have moved), writes the notes with the APK's and the IPA's SHA-256 and the APK's signing certificate fingerprint, writes the SideStore and AltStore source (`pnpm release source`, `scripts/release/sideload-source.ts`), and runs `gh release create`, which makes the tag on the built commit and attaches the APK, the IPA, their `.sha256` files and `source.json`. Players add the source once, at `https://github.com/j-jmnz/middle-earth-player/releases/latest/download/source.json`; GitHub sends that URL to the newest release's file, so SideStore and AltStore offer each release as an update. A patch from a release branch is not marked Latest.
 5. `testflight` (only with TestFlight set up) follows `publish`. fastlane's `pilot` uploads the IPA, waits for Apple to process it, sets What to Test from the release notes, and gives the build to the external TestFlight group, which sends the first build of each version to Apple's Beta App Review (usually within a day). Testers get the build when the review passes.
 
 One release runs at a time; a second start waits.
@@ -38,9 +38,9 @@ A release needs the Android key; `plan` refuses without it. The IPA needs no pro
 Android updates in place only when both builds share a key, so one key signs every release permanently. Losing it forces players to uninstall, losing their saves. The owner creates it once:
 
 ```bash
-keytool -genkeypair -v -keystore middle-earth-lcg-release.jks -alias release \
+keytool -genkeypair -v -keystore middle-earth-player-release.jks -alias release \
   -keyalg RSA -keysize 4096 -validity 36500
-base64 -w0 middle-earth-lcg-release.jks > keystore.b64
+base64 -w0 middle-earth-player-release.jks > keystore.b64
 ```
 
 Secrets: `ANDROID_KEYSTORE_BASE64` (the contents of `keystore.b64`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` (`release`) and `ANDROID_KEY_PASSWORD`. Delete `keystore.b64` afterwards. Without them a dry run signs with the debug key and says so.
@@ -49,9 +49,9 @@ Secrets: `ANDROID_KEYSTORE_BASE64` (the contents of `keystore.b64`), `ANDROID_KE
 
 Needs a paid Apple Developer Program membership. Each version goes through Beta App Review, which applies the App Review Guidelines (intellectual property included) and can refuse a build. The GitHub release does not wait for it; a refusal only means TestFlight testers miss that release. One-time setup by the owner:
 
-1. In the developer account, register the bundle id `com.middleearth.lcg`. In App Store Connect, create the app with that bundle id.
+1. In the developer account, register the bundle id `com.middleearth.player`. In App Store Connect, create the app with that bundle id.
 2. In App Store Connect, Users and Access, Integrations, make an App Store Connect API key with the Admin role (so Xcode can make the distribution certificate and profile itself), and download its `.p8` once.
-3. In the app's TestFlight tab, fill in the Test Information (beta description, feedback email, contact for Beta App Review), make an external group named `Players`, and turn on its public link. In App Information, set the Privacy Policy URL to `https://github.com/j-jmnz/middle-earth-lcg/blob/main/PRIVACY.md`, the page Settings, About links to.
+3. In the app's TestFlight tab, fill in the Test Information (beta description, feedback email, contact for Beta App Review), make an external group named `Players`, and turn on its public link. In App Information, set the Privacy Policy URL to `https://github.com/j-jmnz/middle-earth-player/blob/main/PRIVACY.md`, the page Settings, About links to.
 4. Secrets: `APP_STORE_CONNECT_KEY_BASE64` (`base64 -i AuthKey_<id>.p8`), `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`. Variables: `APPLE_TEAM_ID` (the ten-character team id), `TESTFLIGHT_URL` (the group's public link, which the notes give players while it is set) and, for a group with another name, `TESTFLIGHT_GROUP`.
 
 To turn TestFlight off, delete `APPLE_TEAM_ID` and `TESTFLIGHT_URL`; the next release skips the job and its notes leave the link out.
