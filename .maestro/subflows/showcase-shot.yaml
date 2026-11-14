@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # One still of the README showcase (docs/showcase.md, Capture flows): once the screen is still and every picture on it has drawn
 # (pictures-ready), the screenshot is taken as <DEVICE>-<THEME>-<SHOT>.png in the folder scripts/showcase/capture.ts runs Maestro from.

@@ -31,7 +31,7 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~5.3K tok)
+- `README.md` — Middle Earth Player (~5.3K tok)
   - 12–27 Contents (~190)
   - 28–33 Privacy and security (~120)
   - 34–39 How the code is written (~120)
@@ -39,18 +39,18 @@ Read the sections your task touches.
   - 49–71 Roadmap (~710)
   - 72–75 Accessibility (~90)
   - 76–85 Architecture (~200)
-  - 86–135 Install (~850)
+  - 86–135 Install (~860)
     - 90–95 What you need (~70)
-    - 96–105 Android (~140)
+    - 96–105 Android (~150)
     - 106–118 iPhone and iPad (~310)
     - 119–122 Check a download (optional) (~60)
-    - 123–131 If something goes wrong (~160)
+    - 123–131 If something goes wrong (~170)
     - 132–135 Privacy (~30)
-  - 136–187 Local setup (~650)
+  - 136–187 Local setup (~700)
     - 138–152 Requirements (~130)
     - 153–162 In a browser (~100)
     - 163–183 On a phone (~290)
-    - 184–187 Maestro (~130)
+    - 184–187 Maestro (~170)
   - 188–224 Commands (~1.1K)
   - 225–228 Contributing (~80)
   - 229–239 Documentation (~190)
@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~198.9K tok)
+- `docs/brief.md` — Middle Earth Player — decisions and implementer brief (~198.9K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~540)

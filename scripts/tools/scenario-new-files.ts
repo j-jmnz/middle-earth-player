@@ -264,7 +264,7 @@ ${withLog ? `  const log = await ${logName}();\n` : ""}  const find = (wanted: (
 }
 
 const TODO_FLOW = (kind: "win" | "loss", facts: Facts): string =>
-  `appId: com.middleearth.lcg
+  `appId: com.middleearth.player
 tags:
   - scenario
 ---

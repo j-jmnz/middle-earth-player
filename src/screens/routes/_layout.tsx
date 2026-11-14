@@ -162,7 +162,7 @@ export default function RootLayout() {
           Head publishes a Handoff activity whose URL needs an origin in the router config, and without one it raises an alert. */}
       {Platform.OS === "web" ? (
         <Head>
-          <title>Middle Earth LCG</title>
+          <title>Middle Earth Player</title>
         </Head>
       ) : null}
       <StatusBar barStyle={resolved === "dark" ? "light-content" : "dark-content"} />

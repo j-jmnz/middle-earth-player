@@ -86,7 +86,7 @@ jobs:
     env:
       # app.config.js stamps the version and versionCode from this.
       APP_VERSION: ${{ needs.plan.outputs.version }}
-      APK_NAME: middle-earth-lcg-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.apk
+      APK_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.apk
     steps:
       # The packed pictures and the native build need more room than the runner leaves free.
       - name: Free disk space
@@ -149,7 +149,7 @@ jobs:
       APP_VERSION: ${{ needs.plan.outputs.version }}
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       SIGNED: ${{ needs.plan.outputs.ios_signed }}
-      IPA_NAME: middle-earth-lcg-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
+      IPA_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
@@ -201,7 +201,7 @@ jobs:
           xcodebuild -exportArchive -archivePath "$archive" -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             -exportPath "$RUNNER_TEMP/export" "${signing[@]}"
           mkdir -p "$RUNNER_TEMP/testflight"
-          mv "$RUNNER_TEMP"/export/*.ipa "$RUNNER_TEMP/testflight/middle-earth-lcg-${{ needs.plan.outputs.tag }}-testflight.ipa"
+          mv "$RUNNER_TEMP"/export/*.ipa "$RUNNER_TEMP/testflight/middle-earth-player-${{ needs.plan.outputs.tag }}-testflight.ipa"
           rm -f "$RUNNER_TEMP/AuthKey.p8"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # has no reward screen and writes nothing to the log.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/ford-lost"
+- openLink: "middleearthplayer://e2e/ford-lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

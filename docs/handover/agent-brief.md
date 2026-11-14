@@ -1,6 +1,6 @@
 # Brief for a mechanic-family or scenario agent
 
-Repository: middle-earth-lcg, a TypeScript/Expo app for The Lord of the Rings: The Card Game with an offline, deterministic
+Repository: middle-earth-player, a TypeScript/Expo app for The Lord of the Rings: The Card Game with an offline, deterministic
 rules engine (`src/rules`) that runs effect records (`src/effects`) written in a Zod vocabulary (`src/catalog/effect-schema*.ts`
 and `src/catalog/families/`).
 

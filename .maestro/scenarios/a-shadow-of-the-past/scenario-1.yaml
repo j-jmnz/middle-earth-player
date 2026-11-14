@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # OPEN (2026-10-25): its fixture is not committed. No legal win of the two starter decks has been found on this engine, so
 # the e2e route opens nothing for it (docs/phases/STATUS.md). Run scripts/e2e/fixtures.ts --won when one is found.
@@ -7,7 +7,7 @@ appId: com.middleearth.lcg
 # choice (src/campaign/fixtures). Maestro reads text and testIDs; it does not address card pictures or judge a drag.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/won"
+- openLink: "middleearthplayer://e2e/won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

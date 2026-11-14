@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -10,7 +10,7 @@ tags:
 # and unlocks The Ring Goes South.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/ford-won"
+- openLink: "middleearthplayer://e2e/ford-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

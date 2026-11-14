@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -8,7 +8,7 @@ tags:
 # nothing: the log is as it was, Breaking of the Fellowship stays locked.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/moria-lost"
+- openLink: "middleearthplayer://e2e/moria-lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

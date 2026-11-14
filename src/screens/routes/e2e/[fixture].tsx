@@ -1,5 +1,5 @@
 // E2E ONLY. A Maestro flow that needs a finished scenario opens a save parked on that moment instead of playing fifty rounds
-// (docs/architecture.md, Tests): `openLink: middleearthlcg://e2e/<fixture name>` (the names are in src/campaign/fixtures/registry.ts) writes a new save from the
+// (docs/architecture.md, Tests): `openLink: middleearthplayer://e2e/<fixture name>` (the names are in src/campaign/fixtures/registry.ts) writes a new save from the
 // fixture and opens its path; a name with no committed fixture (`hasFixture`) opens nothing. A fixture is
 // a real game of saved deck cards that the reducer replays; `knife-lost` starts
 // from the log scenario 1's `won` game writes (src/campaign/fixtures.ts).

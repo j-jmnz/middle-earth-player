@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # no XP. The win unlocks The Wastes of Eriador, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/dike-won"
+- openLink: "middleearthplayer://e2e/dike-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

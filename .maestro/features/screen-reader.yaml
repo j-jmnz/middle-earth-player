@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
   - reader
@@ -14,7 +14,7 @@ tags:
 # and committed to the quest from the dock.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/duo"
+- openLink: "middleearthplayer://e2e/duo"
 - extendedWaitUntil:
     visible:
       id: campaign-path

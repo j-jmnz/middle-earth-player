@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # the log and unlocks Journey Along the Anduin. Mirkwood Paths is not a saga: no life tracker, no burden deck on this table.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/mirkwood-won"
+- openLink: "middleearthplayer://e2e/mirkwood-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

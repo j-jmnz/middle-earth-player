@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -11,7 +11,7 @@ tags:
 # Doom, Doom and the resource tokens on stage 2 are drawn on their cards, and the stage's tokens are on the top bar (142041:B:3).
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/moria-won"
+- openLink: "middleearthplayer://e2e/moria-won"
 - extendedWaitUntil:
     visible:
       id: campaign-path

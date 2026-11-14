@@ -1,15 +1,15 @@
 {
-  "name": "middle-earth-lcg",
+  "name": "middle-earth-player",
   "main": "expo-router/entry",
   "version": "0.0.0",
   "description": "An offline app for playing The Lord of the Rings: The Card Game solo. Fan-made, not affiliated with Fantasy Flight Games.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/j-jmnz/middle-earth-lcg.git"
+    "url": "git+https://github.com/j-jmnz/middle-earth-player.git"
   },
-  "homepage": "https://github.com/j-jmnz/middle-earth-lcg#readme",
-  "bugs": "https://github.com/j-jmnz/middle-earth-lcg/issues",
+  "homepage": "https://github.com/j-jmnz/middle-earth-player#readme",
+  "bugs": "https://github.com/j-jmnz/middle-earth-player/issues",
   "dependencies": {
     "@shopify/flash-list": "2.3.2",
     "@shopify/react-native-skia": "2.14.0",

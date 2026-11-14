@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -8,7 +8,7 @@ tags:
 # nothing: no burden, no captive, no fallen hero; the log is as it was and the scenario stays the next one.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/breaking-lost"
+- openLink: "middleearthplayer://e2e/breaking-lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

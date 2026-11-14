@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -7,7 +7,7 @@ tags:
 # nothing, so Passage Through Mirkwood stays current and Journey Along the Anduin stays locked.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/mirkwood-lost"
+- openLink: "middleearthplayer://e2e/mirkwood-lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

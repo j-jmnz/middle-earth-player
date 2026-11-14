@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # and asks each seat for one of Sting, Mithril Shirt, Glamdring and Andúril (rr.campaign-setup-checklist).
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/south-start"
+- openLink: "middleearthplayer://e2e/south-start"
 - extendedWaitUntil:
     visible:
       id: campaign-path

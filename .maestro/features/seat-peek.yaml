@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -9,7 +9,7 @@ tags:
 # plain view (not an accessibility element), so the flow asserts its text and its button.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/duo"
+- openLink: "middleearthplayer://e2e/duo"
 - extendedWaitUntil:
     visible:
       id: campaign-path

@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 tags:
   - scenario
 ---
@@ -7,7 +7,7 @@ tags:
 # A loss has no reward screen and writes nothing: the scenario stays current, no XP reaches the log. The path screen has no table-menu: the log is opened from `log-open`.
 - launchApp:
     clearState: true
-- openLink: "middleearthlcg://e2e/voyage-lost"
+- openLink: "middleearthplayer://e2e/voyage-lost"
 - extendedWaitUntil:
     visible:
       id: campaign-path

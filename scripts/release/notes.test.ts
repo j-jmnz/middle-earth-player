@@ -13,7 +13,7 @@ const base: NotesInput = {
     parseCommit("repo: Refresh the card data (#43)", ""),
     parseCommit("repo: Tidy the brief (#44)", ""),
   ],
-  repository: "j-jmnz/middle-earth-lcg",
+  repository: "j-jmnz/middle-earth-player",
   catalogVersion: 123,
   engineVersion: 25,
   reach: undefined,
@@ -29,7 +29,7 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes).not.toContain("Under the hood");
     expect(notes).not.toContain("Refresh the card data");
     expect(notes).toContain("Plus 2 project changes");
-    expect(notes).toContain("https://github.com/j-jmnz/middle-earth-lcg/compare/v0.3.2...v0.4.0");
+    expect(notes).toContain("https://github.com/j-jmnz/middle-earth-player/compare/v0.3.2...v0.4.0");
     expect(notes.indexOf("Before you update")).toBeLessThan(notes.indexOf("## New"));
   });
 
@@ -41,19 +41,19 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
   });
 
   it("adds the APK's checksums, and marks the first release without a project count or comparison", () => {
-    const apk = { name: "middle-earth-lcg-v0.1.0.apk", sha256: "ab12", certificateSha256: "cd34" };
+    const apk = { name: "middle-earth-player-v0.1.0.apk", sha256: "ab12", certificateSha256: "cd34" };
     const notes = renderNotes({ ...base, tag: "v0.1.0", previousTag: undefined, reach: undefined, apk });
     expect(notes.startsWith("The first release.\n")).toBe(true);
     expect(notes).not.toContain("Plus ");
     expect(notes).not.toContain("compare/");
-    expect(notes).toContain("`middle-earth-lcg-v0.1.0.apk` SHA-256: `ab12`");
+    expect(notes).toContain("`middle-earth-player-v0.1.0.apk` SHA-256: `ab12`");
     expect(notes).toContain("Signing certificate SHA-256: `cd34`");
   });
 
   it("gives the SideStore and AltStore source, and the TestFlight beta only while its link is set", () => {
-    const notes = renderNotes({ ...base, ipa: { name: "middle-earth-lcg-v0.4.0.ipa", sha256: "ef56" } });
-    expect(notes).toContain("add the source `https://github.com/j-jmnz/middle-earth-lcg/releases/latest/download/source.json`");
-    expect(notes).toContain("`middle-earth-lcg-v0.4.0.ipa` SHA-256: `ef56`");
+    const notes = renderNotes({ ...base, ipa: { name: "middle-earth-player-v0.4.0.ipa", sha256: "ef56" } });
+    expect(notes).toContain("add the source `https://github.com/j-jmnz/middle-earth-player/releases/latest/download/source.json`");
+    expect(notes).toContain("`middle-earth-player-v0.4.0.ipa` SHA-256: `ef56`");
     expect(notes).not.toContain("TestFlight");
     expect(renderNotes({ ...base, testflightUrl: "https://testflight.apple.com/join/abc" })).toContain("[its public link](https://testflight.apple.com/join/abc)");
   });

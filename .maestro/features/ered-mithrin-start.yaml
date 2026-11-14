@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # Phase 50. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and a catalog in which
 # `ered-mithrin` is marked playable (the first Ered Mithrin scenario in PLAYABLE_SCENARIOS, phase 52; until then the campaign tile is locked and

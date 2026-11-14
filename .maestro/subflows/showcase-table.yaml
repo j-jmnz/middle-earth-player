@@ -1,4 +1,4 @@
-appId: com.middleearth.lcg
+appId: com.middleearth.player
 ---
 # A showcase save opened on the table (docs/showcase.md, Capture flows): the fixture route writes it and opens its campaign path,
 # Begin resumes it on the table, and the quest stage the table opens on is closed once it has shown. Then every picture on it has drawn (pictures-ready).
