@@ -13,7 +13,8 @@
       "requireFullScreen": true,
       "bundleIdentifier": "com.middleearth.player",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIStatusBarHidden": true
       }
     },
     "android": {

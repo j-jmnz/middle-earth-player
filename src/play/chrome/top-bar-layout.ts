@@ -9,7 +9,7 @@ import { touch, UI_SCALES } from "../../ui/ui-scale.ts";
 // The bar's height: the 46 pt threat dial with 3 pt above and below; its pop (1.22) and the peek's bone ring may reach past the bar
 // over the canvas's own top gutter. The rail's two lines (phase, ticks) fit in it.
 export const TOP_BAR = 52;
-// The room above the bar when the screen gives none (the table hides the status bar, so the top inset is 0 in landscape): the dial
+// The room above the bar when the screen gives none (no screen shows the status bar, so the top inset is 0 in landscape): the dial
 // stands 3 pt under the bar's top edge and its pop (1.22) reaches 5 pt above the dial, off the screen and into a phone's rounded
 // corner (user report, 2026-10-29).
 export const BAR_TOP = 8;

@@ -29,6 +29,7 @@ import { capWidth } from "../../ui/size-class";
 import { useTheme } from "../../ui/theme";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
+import { useTopInset } from "../nav/use-top-inset";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
 
@@ -115,7 +116,7 @@ export function useBriefingDecks(saga: boolean): BriefingDecks {
 export const OpenCardContext = createContext<(code: string) => void>(() => {});
 
 /**
- * The briefing's frame. The scenario's scene runs under the status bar at the top, with Back and Booklet floating over it so
+ * The briefing's frame. The scenario's scene runs to the screen's top edge (useTopInset clears a notch), with Back and Booklet floating over it so
  * they stay in reach as the page scrolls; the content scrolls under them; the Deal bar is pinned at the foot in thumb reach.
  */
 export function BriefingScreen({
@@ -153,6 +154,7 @@ export function BriefingScreen({
   stages?: readonly string[];
 }) {
   const insets = useSafeAreaInsets();
+  const top = useTopInset();
   const preview = useListPreview();
   const reference = (
     <>
@@ -177,14 +179,14 @@ export function BriefingScreen({
   const column = cap == null || expanded ? undefined : ({ width: "100%", maxWidth: cap, alignSelf: "center" } as const);
   const scene = (
     // Faded out at its foot, and in two panes at its right edge too, so it ends in the fog with no line (GroundedScene).
-    <GroundedScene scenarioId={scenarioId} height={(expanded ? 560 : BANNER_HEIGHT) * s + insets.top} shade={0.4} fade={0.25} edge={expanded}>
+    <GroundedScene scenarioId={scenarioId} height={(expanded ? 560 : BANNER_HEIGHT) * s + top} shade={0.4} fade={0.25} edge={expanded}>
       <View className="absolute bottom-0 left-0 right-0 pb-2" style={expanded ? { ...side, paddingRight: 24 * s } : side}>
         {column ? <View style={column}>{banner}</View> : banner}
       </View>
     </GroundedScene>
   );
   const navBar = (
-    <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: expanded ? 16 * s : 16 * s + insets.right }}>
+    <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top, paddingLeft: 16 * s + insets.left, paddingRight: expanded ? 16 * s : 16 * s + insets.right }}>
       <NavBar onBack={onBack} backTestID={backTestID} backLabel={backLabel} right={onBooklet ? <IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
     </View>
   );
@@ -205,13 +207,13 @@ export function BriefingScreen({
                 {scene}
                 {aside || campaignCard || stages ? <View style={{ paddingLeft: side.paddingLeft, paddingRight: 24 * s }}>{reference}</View> : null}
               </ScrollView>
-              <FloatingBarShade shown={past} top={insets.top} />
+              <FloatingBarShade shown={past} top={top} />
               {navBar}
             </>
           }
           end={
             <>
-              <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingTop: insets.top + 8 * s, paddingBottom: 24 * s, paddingRight: trailing }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+              <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingTop: top + 8 * s, paddingBottom: 24 * s, paddingRight: trailing }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                 <Column>{children}</Column>
               </ScrollView>
               {bar ? (
@@ -254,7 +256,7 @@ export function BriefingScreen({
           <ActionBar testID={barTestID}>{bar}</ActionBar>
         </View>
       ) : null}
-      <FloatingBarShade shown={past} top={insets.top} />
+      <FloatingBarShade shown={past} top={top} />
       {navBar}
       {preview.overlay}
     </Screen>

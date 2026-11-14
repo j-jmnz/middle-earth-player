@@ -25,7 +25,7 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 
 ## Commands
 
-Scripts are grouped as `pnpm <group> <command> [args]` (`test`, `data`, `effects`, `scenario`, `assets`, `docs`, `release`); `pnpm <group>` alone lists its commands, except `test` and `assets`, which run everything (`scripts/cli.ts`).
+Scripts are grouped as `pnpm <group> <command> [args]` (`test`, `data`, `effects`, `scenario`, `assets`, `doc`, `release`); `pnpm <group>` alone lists its commands, except `test` and `assets`, which run everything (`scripts/cli.ts`).
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
 - `pnpm test changed` runs the tests that import a file changed since the last commit; `pnpm test fast` runs everything but the slow files (`slowFiles` in `vitest.config.mts`). `.claude/rules/code-standards.md` (Checking a change) says when to run which.

@@ -189,7 +189,7 @@ export function DeckGlance({
   starterNote: string | null;
   jumps: readonly Jump[];
   onJump: (jump: Jump) => void;
-  // The status bar's inset, and the page's side padding.
+  // The top inset (useTopInset), and the page's side padding.
   top: number;
   side: { paddingLeft: number; paddingRight: number };
   // The larger fan of a tablet.
