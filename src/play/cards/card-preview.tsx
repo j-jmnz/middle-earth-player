@@ -319,7 +319,9 @@ export function CardPreview({
             ) : null}
             {all.length > 1 ? (
               <Animated.View testID="card-preview-attached" style={[{ marginTop: 16 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 * s }}>
+                {/* No grow: a horizontal ScrollView grows by default, and on a phone it stretched the column past the screen's height, so the
+                    centred card went off the top and Details off the foot. The strip is one chip tall, as previewStrip counts it. */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 6 * s }}>
                   {all.map((item, index) => (
                     <RelatedChip key={`${item.code}:${index}`} item={item} index={index} selected={index === at} onPress={() => setAt(index)} />
                   ))}
