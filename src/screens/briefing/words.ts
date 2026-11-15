@@ -28,11 +28,16 @@ export function actionLine(text: string | null | undefined): string | null {
   return text?.split("\n").find((line) => line.startsWith("Action:")) ?? null;
 }
 
+/** What a boon gives the hero it is attached to ("Attached hero gains the Lore resource icon."), or null when its text says nothing of the kind. */
+export function gainLine(text: string | null | undefined): string | null {
+  return text?.split("\n").find((line) => line.startsWith("Attached hero gains")) ?? null;
+}
+
 /**
  * What a campaign card's Setup choice says at the briefing: the sentence under "Seat N chooses" and the line the Deal bar gives while the choice
  * is unanswered. The Oath's choice (41050:A:2) is of Adaptation boons, which join the Campaign Pool; any other choice is a card.
  */
-export function needWords(seat: number, options: readonly string[], traitsOf: (code: string) => readonly string[], nameOf?: (code: string) => string): { intro: string | null; waiting: string } {
+export function needWords(seat: number, options: readonly string[], traitsOf: (code: string) => readonly string[], nameOf?: (code: string) => string): { intro: string | null; waiting: string; cardWord: string } {
   const codes = options.filter((option) => option !== "skip").map((option) => option.split(">")[0] ?? "");
   const adaptation = codes.length > 0 && codes.every((code) => traitsOf(code).includes("Adaptation"));
   // Raid on the Grey Havens (11182:A:2): each player may take one Galdor's Counsel into hand; it joins the Campaign Pool only if the scenario is won.
@@ -40,6 +45,8 @@ export function needWords(seat: number, options: readonly string[], traitsOf: (c
   return {
     intro: adaptation ? "Choose 1 Adaptation boon and the hero who carries it. It joins your Campaign Pool." : counsel ? `Choose 1 ${COUNSEL} to add to your hand, or skip. It joins your Campaign Pool if you win the scenario.` : null,
     waiting: `Choose ${adaptation ? "an Adaptation" : counsel ? COUNSEL : "a card"} for seat ${seat + 1} above.`,
+    // The heading over the cards when the choice is of a card for a hero.
+    cardWord: adaptation ? "Boon" : "Card",
   };
 }
 

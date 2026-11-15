@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { sphereTell } from "../../play/words/scenarios/aflame.ts";
 
-import { actionLine, dealSentence, needWords, problemWords } from "./words.ts";
+import { actionLine, dealSentence, gainLine, needWords, problemWords } from "./words.ts";
 
 describe("briefing words", () => {
   it("words a missing Ring-bearer as the seat that needs one", () => {
@@ -31,16 +31,23 @@ describe("campaign choice words (41050:A:2)", () => {
     const words = needWords(1, ["41044>02116", "41045>02116"], adaptation);
     expect(words.intro).toBe("Choose 1 Adaptation boon and the hero who carries it. It joins your Campaign Pool.");
     expect(words.waiting).toBe("Choose an Adaptation for seat 2 above.");
+    expect(words.cardWord).toBe("Boon");
   });
 
   it("says a card for any other choice and adds no explanation", () => {
-    expect(needWords(0, ["02001", "skip"], adaptation)).toEqual({ intro: null, waiting: "Choose a card for seat 1 above." });
+    expect(needWords(0, ["02001", "skip"], adaptation)).toEqual({ intro: null, waiting: "Choose a card for seat 1 above.", cardWord: "Card" });
   });
 
   it("reads the Action line of a card's printed text, or nothing", () => {
     expect(actionLine("Setup. Attach to a hero.\nAttached hero gains the Lore resource icon.\nAction: Exhaust the attached hero to place 3 progress on a location. (Limit once per campaign.)")).toBe("Action: Exhaust the attached hero to place 3 progress on a location. (Limit once per campaign.)");
     expect(actionLine("Forced: something")).toBeNull();
     expect(actionLine(null)).toBeNull();
+  });
+
+  it("reads what a boon gives the hero it is attached to, or nothing", () => {
+    expect(gainLine("Setup. Attach to a hero.\nAttached hero gains the Lore resource icon.\nAction: Heal.")).toBe("Attached hero gains the Lore resource icon.");
+    expect(gainLine("Action: Heal.")).toBeNull();
+    expect(gainLine(undefined)).toBeNull();
   });
 });
 
