@@ -9,6 +9,13 @@ An offline app for playing The Lord of the Rings: The Card Game solo, on iOS and
 > [!IMPORTANT]
 > This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
 
+SHOWCASE
+
+
+https://github.com/user-attachments/assets/6e01b9a1-ac99-44ea-ae78-fe406d3f8d35
+
+
+
 ## Contents
 
 - [Privacy and security](#privacy-and-security)
