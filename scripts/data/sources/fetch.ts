@@ -24,8 +24,10 @@ const fetchLog = createLog("fetch");
 
 // A response that came back with an error status: its message is already the whole story.
 class HttpError extends Error {
-  constructor(message: string, readonly status: number) {
+  readonly status: number;
+  constructor(message: string, status: number) {
     super(message);
+    this.status = status;
   }
 }
 
