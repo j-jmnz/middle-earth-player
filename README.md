@@ -223,7 +223,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm assets` | Runs `catalog`, `booklets` and `scans` in that order. `start`, `android`, `ios` and the native release builds run it for you (`start` with `--optional`). |
 | `pnpm assets catalog` | Writes `assets/catalog.db`, which is never committed, and `src/catalog/version.ts`, which is. |
 | `pnpm assets scans` / `pnpm assets booklets` | Packs the card pictures or the booklet PDFs into `assets/`. |
-| `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators. It needs macOS, Xcode and Maestro ([docs/showcase.md](docs/showcase.md)). |
+| `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators. It needs macOS, Xcode and Maestro. |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet. `--publish` replaces the `showcase` branch with them. |
 | `pnpm doc index` / `pnpm doc section <file> "<heading>"` | Regenerates `docs/INDEX.md`, or prints one section of a doc. |
 | `pnpm release plan --dry-run` | Prints the next tag and its release notes without changing anything. Run `git fetch --tags` first. |
@@ -242,7 +242,6 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_
 - [docs/brief.md](docs/brief.md) records the product decisions and the rules as implemented.
 - [docs/architecture.md](docs/architecture.md) covers the code layout, state, the engine and the tests.
 - [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md) describe the screens and the game table.
-- [docs/showcase.md](docs/showcase.md) explains the README's screenshots and how to take them again on a Mac.
 - [docs/releasing.md](docs/releasing.md) walks through the release pipeline; its rules are in [.claude/rules/release-standards.md](./.claude/rules/release-standards.md).
 - [docs/phases/STATUS.md](docs/phases/STATUS.md) tracks the open work.
 - [ACCESSIBILITY.md](ACCESSIBILITY.md) covers what is supported, the known gaps, and how to report a barrier.

@@ -1,8 +1,8 @@
 // `pnpm assets showcase`: turns the README showcase's captures (capture.ts, default .cache/showcase/raw) into the images the README shows
-// (docs/showcase.md, Post-process), in --out (default .cache/showcase/out): each still as WebP with the device's rounded corners,
+// in --out (default .cache/showcase/out): each still as WebP with the device's rounded corners,
 // a contact sheet of them all (contact.png) to look at before they are published, and manifest.json naming each file's
 // shot, device, theme and the commit it was taken from. `--publish` then replaces the one commit of the `showcase` branch
-// on origin with these files (docs/showcase.md, Publish), and refuses while a capture is missing.
+// on origin with these files, and refuses while a capture is missing.
 //
 // A shot stands as orientationOf (shots.ts) says: a capture that comes out the other way (a simulator's framebuffer can keep the device's own
 // orientation) is turned a quarter turn, clockwise unless --turn ccw.

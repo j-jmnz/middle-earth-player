@@ -2,7 +2,7 @@ appId: com.middleearth.player
 tags:
   - showcase
 ---
-# The README showcase's deck builder on the Stealth and Steadfastness starter deck (docs/showcase.md, Shot list), on the iPhone (portrait) and the iPad (landscape). scripts/showcase/capture.ts runs it with THEME and DEVICE.
+# The README showcase's deck builder on the Stealth and Steadfastness starter deck, on the iPhone (portrait) and the iPad (landscape). scripts/showcase/capture.ts runs it with THEME and DEVICE.
 - runFlow:
     file: ../subflows/showcase-start.yaml
     env:

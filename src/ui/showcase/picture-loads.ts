@@ -1,4 +1,4 @@
-// The pictures still loading on screen, for the README showcase's captures (docs/showcase.md, Every picture drawn). Only the
+// The pictures still loading on screen, for the README showcase's captures. Only the
 // showcase build (EXPO_PUBLIC_SHOWCASE=1, inlined by Expo at build time) counts them; every other build holds nothing and never renders the
 // marker. A picture holds a key while it has not drawn (its file not loaded, or not yet decoded for the canvas) and lets it go once it has,
 // or when it leaves the screen. The marker (pictures-ready.tsx) shows once nothing has been held for a moment.

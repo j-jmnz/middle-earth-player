@@ -1,4 +1,4 @@
-// The README showcase's shots (docs/showcase.md, Shot list): one per flow in .maestro/showcase/, the devices it is taken on, and the
+// The README showcase's shots: one per flow in .maestro/showcase/, the devices it is taken on, and the
 // caption and alt text the README gives it. Every shot is a still (no GIFs, user decision, 2026-11-12). The iPad takes every shot in landscape; the iPhone takes the table in landscape and the rest in
 // portrait (user decision, 2026-11-11). capture.ts runs the flows, build.ts turns what they write into the images, and the README links them.
 

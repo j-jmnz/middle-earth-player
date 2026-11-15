@@ -24,7 +24,7 @@ export async function haiWonLog(): Promise<CampaignLog> {
   return wonLog({ title: "The Uruk-hai", golden: "two-handed, won, Normal", goldens: HAI_GOLDENS, world: haiWorld, play: playHai, scenarioId: "the-uruk-hai" });
 }
 
-// The README showcase's Helm's Deep table (docs/showcase.md, Saves and decks): the first player's planning window from round 3 on, with both seats' characters in
+// The README showcase's Helm's Deep table: the first player's planning window from round 3 on, with both seats' characters in
 // play, enemies engaged and the staging row holding cards.
 const atBoard = (state: ScenarioState): boolean => seatsStanding(state, 2) && state.round >= 3 && state.mode === "planning" && state.activeSeat === 0 && !state.lost && boardHolds(state, { play: 8, engaged: 2, staging: 2 });
 

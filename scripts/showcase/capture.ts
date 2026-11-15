@@ -1,4 +1,4 @@
-// `pnpm assets capture`: takes the README showcase's captures (docs/showcase.md, Capture flows) on the iOS simulators, on macOS with Xcode and
+// `pnpm assets capture`: takes the README showcase's captures on the iOS simulators, on macOS with Xcode and
 // Maestro. The app is a Release simulator build with EXPO_PUBLIC_SHOWCASE=1 and EXPO_PUBLIC_E2E_SEED=1 and every picture packed: `--build` makes it
 // (expo prebuild, then xcodebuild into .cache/showcase/build; run `pnpm assets` first), `--app <App.app>` takes one already built. For each device
 // (shots.ts) it boots the newest simulator of that kind, sets a clean status bar, installs the app, and runs each of the device's flows in

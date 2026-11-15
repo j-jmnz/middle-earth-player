@@ -15,7 +15,7 @@ import { fixture, fixtureSave, hasFixture, type FixtureName } from "./fixtures.t
 import { resume } from "./session.ts";
 import { loadWorld, logCodes } from "./world.ts";
 
-// The README showcase's saves (docs/showcase.md, Saves and decks) replay to the moment the capture flows open: a full table on the first player's
+// The README showcase's saves replay to the moment the capture flows open: a full table on the first player's
 // planning window, with both players in.
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 
