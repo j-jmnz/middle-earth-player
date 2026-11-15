@@ -62,7 +62,7 @@ Next:
 - The Two Towers campaign (The Two Towers Saga Expansion): Shelob's Lair.
 - The Return of the King campaign (The Return of the King Saga Expansion): The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
 
-Then the other official campaign, and the cycles: the groupings of scenarios that are part of no campaign, which play standalone only. Each waits under Coming later until one of its scenarios is playable (`data/overrides.json`, campaigns). In release order (the US release of the product that starts each), as the app lists them:
+Then the remaining official campaign and the cycles. A cycle groups scenarios that belong to no campaign; they play standalone only. Each waits under Coming later until one of its scenarios is playable (`data/overrides.json`, campaigns). In release order (the US release of the product that starts each), as the app lists them:
 
 - The Shadows of Mirkwood cycle: The Hunt for Gollum, Conflict at the Carrock, A Journey to Rhosgobel, The Hills of Emyn Muil, The Dead Marshes, Return to Mirkwood.
 - The Standalone scenarios cycle: The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
@@ -163,7 +163,7 @@ Tests need no network and no prebuilt database. "Ignored build scripts: sharp" i
 pnpm web
 ```
 
-Builds the catalog and opens the app through Metro; narrow the window to phone width. Good for screen work (campaigns, briefing, log, deck builder). No card pictures or booklet reader; SQLite uses browser storage.
+Builds the catalog and opens the app through Metro; narrow the window to phone width. Use it for screen work (campaigns, briefing, log, deck builder). It has no card pictures or booklet reader, and SQLite uses browser storage.
 
 A Codespaces devcontainer (`.devcontainer/devcontainer.json`) installs dependencies and builds the catalog. Run `pnpm web` and open port 8081.
 
