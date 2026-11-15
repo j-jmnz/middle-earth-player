@@ -1,7 +1,10 @@
 name: test
 
 on:
+  # A pull request runs once, on its merge with main; push runs only on the branches that release, so a push to a
+  # pull request's branch does not start a second, identical run.
   push:
+    branches: [main, "release/**"]
   pull_request:
   # The release workflow runs the same checks on the commit it releases.
   workflow_call:
