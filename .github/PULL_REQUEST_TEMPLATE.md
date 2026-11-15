@@ -10,6 +10,7 @@
 
 ## Checks
 
+- [ ] Tests added for new behaviour, or a test that fails without the fix
 - [ ] `pnpm lint`
 - [ ] `pnpm typecheck`
 - [ ] `pnpm test`

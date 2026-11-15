@@ -18,11 +18,11 @@ At build time, `pnpm data sync` is the only command that uses the network. It fe
 - CI (`.github/workflows/test.yml`) runs with a read-only token, so pull requests from forks can't write to the repository. Every action used there and in `.github/workflows/release.yml`, which holds the signing keys, is pinned to a commit SHA.
 - Releases are only ever started by hand. `.github/workflows/release.yml` and `.eas/workflows/e2e.yml` run on `workflow_dispatch` alone, which needs write access to the repository, or for EAS a login to the project's Expo account. A real release refuses to run from any branch other than `main` or `release/v<major>.<minor>`. `scripts/checks/release-trigger.test.ts` fails if either workflow gains another trigger, or if any other workflow creates a tag or a release.
 - `.github/CODEOWNERS` makes the maintainer the reviewer of every pull request.
-- Dependabot (`.github/dependabot.yml`) opens weekly updates for npm packages and actions, and those updates go through the same CI.
+- Dependabot (`.github/dependabot.yml`) opens weekly updates for npm packages and actions, and those updates go through the same CI. When a vulnerable transitive dependency's parents still allow an old release, `overrides` in `pnpm-workspace.yaml` sets a patched floor until they catch up.
 - No secret, signing key or keystore is committed. `scripts/checks/private-data.test.ts` fails if a tracked file holds a credential, a personal email address or a Claude Code session id.
 
 ## Reporting a vulnerability
 
 Use "Report a vulnerability" on the repository's Security tab, and please don't open a public issue. Say what is affected (the app, a build script or a dependency), how to reproduce the problem and what it allows an attacker to do.
 
-This is a volunteer project, so there is no fixed response time. Fixes go to `main`, and older releases are not maintained.
+This is a volunteer project, but you can expect a first reply within 14 days. A confirmed vulnerability is fixed in a release within 60 days of the report, and the release notes say what it fixed. Fixes go to `main`, and older releases are not maintained.

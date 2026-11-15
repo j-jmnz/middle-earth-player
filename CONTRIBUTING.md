@@ -12,9 +12,10 @@ Anything you contribute is released under the [MIT License](LICENSE). Contributi
 ## Making a change
 
 1. Fork the repository and branch from `main`. Name the branch `<type>/<short-slug>`, for example `fix/staging-attacks`. The Branches section of [.claude/rules/release-standards.md](./.claude/rules/release-standards.md) has the details.
-2. Before you push, run `pnpm data check`, `pnpm lint`, `pnpm typecheck` and `pnpm test`. CI (`.github/workflows/test.yml`) runs the same checks. While you work, `pnpm test changed` or `pnpm test scenario <id>` give faster feedback; [docs/development.md](docs/development.md) lists every command.
-3. Write commit subjects as `<type>: <summary>`, where the type is `fix`, `feat`, `refactor`, `style` or `repo` ([.claude/rules/commit-standards.md](./.claude/rules/commit-standards.md)). The `commit-msg` hook that `pnpm install` sets up (`.githooks/`) enforces this, and `pnpm commit:check "<subject>"` lets you check a subject by hand.
-4. Give the pull request a title in the same format. Pull requests are squash-merged, so the title becomes the commit on `main` and a line in the release notes; write it for a player. If the change makes players lose saved data or a feature, add a `Breaking: <what players lose>` line to the squash commit's body. CI checks the title and every commit subject, and the pull request template lists the other checks.
+2. Add tests with the change: a new feature, card effect or rule gets tests in the automated suite (`pnpm test`), and a bug fix gets a test that fails without it.
+3. Before you push, run `pnpm data check`, `pnpm lint`, `pnpm typecheck` and `pnpm test`. CI (`.github/workflows/test.yml`) runs the same checks. While you work, `pnpm test changed` or `pnpm test scenario <id>` give faster feedback; [docs/development.md](docs/development.md) lists every command.
+4. Write commit subjects as `<type>: <summary>`, where the type is `fix`, `feat`, `refactor`, `style` or `repo` ([.claude/rules/commit-standards.md](./.claude/rules/commit-standards.md)). The `commit-msg` hook that `pnpm install` sets up (`.githooks/`) enforces this, and `pnpm commit:check "<subject>"` lets you check a subject by hand.
+5. Give the pull request a title in the same format. Pull requests are squash-merged, so the title becomes the commit on `main` and a line in the release notes; write it for a player. If the change makes players lose saved data or a feature, add a `Breaking: <what players lose>` line to the squash commit's body. CI checks the title and every commit subject, and the pull request template lists the other checks.
 
 ## Releases
 
