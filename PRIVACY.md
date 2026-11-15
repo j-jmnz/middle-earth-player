@@ -34,4 +34,4 @@ The code is open, and [SECURITY.md](SECURITY.md) names the files behind each poi
 
 ## Changes and contact
 
-Any change to this policy is made in this file, and its history is in the commits. Send questions through the [issues](https://github.com/j-jmnz/middle-earth-lcg/issues). Report security problems privately, as [SECURITY.md](SECURITY.md) explains.
+Any change to this policy is made in this file, and its history is in the commits. Send questions through the [issues](https://github.com/j-jmnz/middle-earth-player/issues). Report security problems privately, as [SECURITY.md](SECURITY.md) explains.

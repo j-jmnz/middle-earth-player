@@ -1,8 +1,8 @@
 # Middle Earth Player
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-3E5A48)](LICENSE)
-[![Latest release](https://img.shields.io/github/v/release/j-jmnz/middle-earth-lcg?color=3E5A48&label=release)](https://github.com/j-jmnz/middle-earth-lcg/releases/latest)
-[![Tests](https://github.com/j-jmnz/middle-earth-lcg/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/j-jmnz/middle-earth-lcg/actions/workflows/test.yml)
+[![Latest release](https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release)](https://github.com/j-jmnz/middle-earth-player/releases/latest)
+[![Tests](https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml)
 [![Accessibility: VoiceOver, TalkBack, Table as a list](https://img.shields.io/badge/accessibility-VoiceOver%20%7C%20TalkBack%20%7C%20Table%20as%20a%20list-3E5A48)](ACCESSIBILITY.md#what-the-app-supports)
 
 Middle Earth Player lets you play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android phone. The app handles the rules, the encounter deck and the bookkeeping, so you can concentrate on your decisions. It works fully offline, collects nothing about you, and is free and open source.
@@ -52,7 +52,7 @@ You can play a full game with VoiceOver or TalkBack: with a screen reader on, th
 
 ## Install
 
-The app isn't on the Play Store or the App Store. On Android you install the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-lcg/releases). On an iPhone or iPad you install the IPA through SideStore or AltStore, which sign it with your own Apple ID. It's free, and once it's installed it never needs a network connection.
+The app isn't on the Play Store or the App Store. On Android you install the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-player/releases). On an iPhone or iPad you install the IPA through SideStore or AltStore, which sign it with your own Apple ID. It's free, and once it's installed it never needs a network connection.
 
 ### What you need
 
@@ -62,7 +62,7 @@ The app isn't on the Play Store or the App Store. On Android you install the APK
 
 ### Android
 
-1. On your phone, open the [latest release](https://github.com/j-jmnz/middle-earth-lcg/releases/latest), and under Assets tap `middle-earth-player-v<version>.apk`. You can ignore the `.sha256` file.
+1. On your phone, open the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest), and under Assets tap `middle-earth-player-v<version>.apk`. You can ignore the `.sha256` file.
 2. Open the download from your browser or your Files app.
 3. If the phone asks, allow that app to install unknown apps (Settings, Allow from this source), then go back.
 4. Tap Install. If Play Protect warns you, tap More details, then Install anyway.
@@ -74,10 +74,10 @@ To update, install the newer `.apk` the same way and your saves carry over. Don'
 
 1. Set up [SideStore](https://sidestore.io), which refreshes the app on the phone itself, or [AltStore Classic](https://altstore.io), which refreshes it through AltServer on a computer on the same Wi-Fi. AltStore PAL won't work, because it only installs apps from its own marketplace.
 2. On iOS 16 and later, turn on Developer Mode (Settings, Privacy & Security) and restart.
-3. In SideStore or AltStore, open Sources, tap +, and add `https://github.com/j-jmnz/middle-earth-lcg/releases/latest/download/source.json`.
+3. In SideStore or AltStore, open Sources, tap +, and add `https://github.com/j-jmnz/middle-earth-player/releases/latest/download/source.json`.
 4. Open the Middle Earth Player source and tap Free or Get.
 
-You can also download the `.ipa` from the [latest release](https://github.com/j-jmnz/middle-earth-lcg/releases/latest) in Safari and add it under My Apps, +.
+You can also download the `.ipa` from the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest) in Safari and add it under My Apps, +.
 
 An app signed with a free Apple ID stays valid for 7 days. SideStore and AltStore refresh it in the background, or you can tap Refresh All in My Apps. A free Apple ID allows 3 sideloaded apps at once, and SideStore or AltStore counts as one of them. Updates show up in the source and keep your saves, but deleting the app deletes them.
 
@@ -94,7 +94,7 @@ Each release's notes give the APK's SHA-256 and the fingerprint of its signing c
 - On iOS, the app stops opening after a few days: its signature has expired. Refresh it in SideStore or AltStore, with AltServer running on the same Wi-Fi if you use AltStore.
 - You've hit the app limit: remove a sideloaded app you no longer use.
 - The TestFlight beta is full: use SideStore or AltStore instead.
-- For anything else, [open an issue](https://github.com/j-jmnz/middle-earth-lcg/issues/new/choose) and include your device, its OS version and the app version shown in Settings.
+- For anything else, [open an issue](https://github.com/j-jmnz/middle-earth-player/issues/new/choose) and include your device, its OS version and the app version shown in Settings.
 
 ## Roadmap
 
@@ -122,9 +122,9 @@ ALeP's content comes after all of these. [docs/phases/STATUS.md](docs/phases/STA
 
 Middle Earth Player is open source under the MIT License, and you don't need to write code to help.
 
-- **Report a rules or card bug.** If a card or a ruling plays wrongly, the [Rules or card bug form](https://github.com/j-jmnz/middle-earth-lcg/issues/new?template=rules-bug.yml) asks for the card or rule and the printed source it comes from. These reports are the most useful thing a player can send.
-- **Report an accessibility barrier.** The [accessibility form](https://github.com/j-jmnz/middle-earth-lcg/issues/new?template=accessibility.yml) asks for your device, assistive technology and what got in the way. Barriers are treated as bugs.
-- **Report a bug or suggest a feature** through the [other issue forms](https://github.com/j-jmnz/middle-earth-lcg/issues/new/choose).
+- **Report a rules or card bug.** If a card or a ruling plays wrongly, the [Rules or card bug form](https://github.com/j-jmnz/middle-earth-player/issues/new?template=rules-bug.yml) asks for the card or rule and the printed source it comes from. These reports are the most useful thing a player can send.
+- **Report an accessibility barrier.** The [accessibility form](https://github.com/j-jmnz/middle-earth-player/issues/new?template=accessibility.yml) asks for your device, assistive technology and what got in the way. Barriers are treated as bugs.
+- **Report a bug or suggest a feature** through the [other issue forms](https://github.com/j-jmnz/middle-earth-player/issues/new/choose).
 - **Contribute code or docs.** [CONTRIBUTING.md](CONTRIBUTING.md) explains how to get started and how a change lands, and everyone follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 Report security problems privately, as [SECURITY.md](SECURITY.md) describes, rather than in a public issue.
@@ -150,8 +150,8 @@ The stack is Expo SDK 58, Expo Router, Skia, Reanimated, NativeWind, SQLite with
 You need Node 22.18 or later and pnpm 10.34.1 (`corepack enable` installs the pinned version). `poppler` is optional: it renders the campaign, boon and burden cards from FFG's PDFs, and without it those cards fall back to their scans.
 
 ```bash
-git clone https://github.com/j-jmnz/middle-earth-lcg.git
-cd middle-earth-lcg
+git clone https://github.com/j-jmnz/middle-earth-player.git
+cd middle-earth-player
 pnpm install
 pnpm test        # no network or prebuilt database needed
 pnpm web         # opens the app in a browser; narrow the window to phone width
