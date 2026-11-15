@@ -8,8 +8,6 @@ import { notAppliedWords } from "../../play/cards/not-applied";
 import { longPressA11y } from "../../ui/long-press-action";
 import { rowSurface } from "../../ui/surfaces";
 import { useTableTokens } from "../../ui/use-table-tokens";
-import { CroppedArt } from "../art/art";
-import { PAINTING } from "../art/crop";
 import { usePalette } from "../kit/palette-hook";
 import { OpenCardContext, type BriefingDecks } from "./parts";
 import { BodyText, Chevron, Label, Section, TextButton } from "../kit/chrome";
@@ -19,6 +17,7 @@ import { FoldHeader, useFolds } from "../kit/fold-section";
 import { DeckListBar } from "../deck/list-bar";
 import { deckCountLine, deckShortLine, notAppliedCards, notAppliedLine } from "../deck/status";
 import { DeckCover, DeckRow, HeroTile, heroFace, PARTY_TILE_HEIGHT, type HeroFace } from "../art/hero-tile";
+import { HeroPainting } from "./card-thumb";
 import { seatFolded, seatState } from "./seat-state";
 import { COVER_GAP, coverColumns, coverWidth } from "./layout";
 import { useUiScale } from "../../ui/ui-scale";
@@ -247,10 +246,7 @@ export function SeatPicker({
                 >
                   {({ pressed }) => (
                     <View className="min-h-14 flex-row items-center gap-3 rounded-item px-3 py-2" style={rowSurface(pressed, t)}>
-                      {/* The hero tile's painting, square-cornered like the tiles above: no circle, no sphere ring. */}
-                      <View className="overflow-hidden rounded-control" importantForAccessibility="no-hide-descendants">
-                        <CroppedArt card={faceOf(candidate.code)} region={PAINTING} width={56 * s} height={40 * s} />
-                      </View>
+                      <HeroPainting face={faceOf(candidate.code)} />
                       <View className="flex-1">
                         <Text className="font-display text-heading text-bone">{candidate.name}</Text>
                         {candidate.packName ? <Text className="text-label text-muted">{candidate.packName}</Text> : null}

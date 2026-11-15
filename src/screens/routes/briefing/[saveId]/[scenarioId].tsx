@@ -1,4 +1,3 @@
-import { inArray } from "drizzle-orm";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
@@ -10,7 +9,6 @@ import { printedScenarioName } from "../../../../campaign/printed-name";
 import { logCodes, loadWorld } from "../../../../campaign/world";
 import { xpUnspentOf, type ModeCard } from "../../../../campaign/xp";
 import type { Difficulty } from "../../../../catalog/scenario-data";
-import { cards } from "../../../../catalog/schema";
 import { EFFECTS } from "../../../../effects";
 import { BodyText, Label, Section, TextButton } from "../../../kit/chrome";
 import { bookletParams, campaignOf, scenarioOf } from "../../../data/campaign-data";
@@ -23,6 +21,7 @@ import { needWords } from "../../../briefing/words";
 import { NeedChoices } from "../../../briefing/need-choices";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
 import { SeatPicker } from "../../../briefing/seat-picker";
+import { heroFace } from "../../../art/hero-tile";
 import { routeCode } from "../../../nav/route-code";
 import { useSave } from "../../../data/use-save";
 
@@ -34,6 +33,8 @@ function attempt(run: () => string | null): string | null {
     return error instanceof Error ? error.message : "The scenario could not be dealt.";
   }
 }
+
+type Made = { seat: number; option: string; label: string };
 
 // What a scenario the app cannot deal yet says in place of its briefing.
 function comingSoonLine(scenarioId: string): string {
@@ -52,7 +53,10 @@ export default function Briefing() {
   const [difficulty, setDifficulty] = useState<Difficulty>("Normal");
   const [picked, setPicked] = useState<readonly (string | null)[]>([null, null]);
   const [ringBearer, setRingBearer] = useState<string | null>(null);
-  const [choices, setChoices] = useState<readonly string[]>([]);
+  // The answers to the campaign card's Setup choices, in the order they were asked, each with its seat and what it is called (the line the
+  // seat keeps, with Change). The checklist reads the options alone.
+  const [made, setMade] = useState<readonly Made[]>([]);
+  const choices = useMemo(() => made.map((answer) => answer.option), [made]);
   const [accepted, setAccepted] = useState(false);
   const [dealError, setDealError] = useState<string | null>(null);
   // The Hard/Expert Mode card (a campaign with XP, dcce.hard-expert): until the players change it, the one the campaign setup offered.
@@ -92,13 +96,6 @@ export default function Briefing() {
   );
   const result = useMemo(() => (input ? briefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty) : null), [world, difficulty]);
-  // The printed text of the cards a campaign choice offers, for the Action line under each option.
-  const offered = useMemo(() => (result?.needs ? result.needs.options.flatMap((option) => (option === "skip" ? [] : [option.split(">")[0] ?? ""])) : []), [result]);
-  const printedText = useMemo<Record<string, string | null>>(
-    () => (offered.length === 0 ? {} : Object.fromEntries(catalog.select({ code: cards.code, text: cards.text }).from(cards).where(inArray(cards.code, offered)).all().map((row) => [row.code, row.text]))),
-    [catalog, offered],
-  );
-
   const frame = {
     testID: "briefing",
     scenarioId,
@@ -135,6 +132,7 @@ export default function Briefing() {
   }
 
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
+  const faceOf = (code: string) => heroFace(briefingDecks.faces, code, nameOf(code));
   const asked = result.needs ? needWords(result.needs.seat, result.needs.options, (code) => world.cards.get(code)?.traits ?? [], nameOf) : null;
   // What the choice is, when the options alone do not say (a search of the encounter deck for cards the log's line removes).
   const intro = asked?.intro ?? result.needs?.note ?? null;
@@ -144,7 +142,7 @@ export default function Briefing() {
   function pick(seat: number, deckId: string): void {
     setPicked((current) => current.map((item, index) => (index === seat ? deckId : item)));
     setAccepted(false);
-    setChoices([]);
+    setMade([]);
   }
 
   function onDeal(): void {
@@ -244,16 +242,37 @@ export default function Briefing() {
         />
       ))}
 
+      {made.map((answer, index) => (
+        <View key={`${index}-${answer.option}`} testID={`briefing-chosen-${index}`} className="mt-4 flex-row items-center gap-3">
+          <View className="min-w-0 flex-1">
+            <Section title={`Seat ${answer.seat + 1} chose`} />
+            <BodyText>{answer.label}</BodyText>
+          </View>
+          {/* Changing an answer asks again from it: a later seat's options can depend on it (a boon one seat took is not offered to the next). */}
+          <TextButton label="Change" testID={`choice-change-${index}`} tone="accent" accessibilityLabel={`Change seat ${answer.seat + 1}'s choice, now ${answer.label}`} onPress={() => setMade((current) => current.slice(0, index))} />
+        </View>
+      ))}
+
       {result.needs ? (
         <View testID="briefing-choice" className="mt-5">
           <Section title={`Seat ${result.needs.seat + 1} chooses`} />
           {intro ? (
-            <Label tone="muted" testID="briefing-choice-intro">
+            <Label tone="muted" testID="briefing-choice-intro" className="mb-2">
               {intro}
             </Label>
           ) : null}
-          {choices.length > 0 ? <TextButton label="Undo last choice" testID="choice-undo" onPress={() => setChoices((current) => current.slice(0, -1))} /> : null}
-          <NeedChoices options={result.needs.options} {...(result.needs.words ? { words: result.needs.words } : {})} nameOf={nameOf} printedText={printedText} onChoose={(option) => setChoices((current) => [...current, option])} />
+          <NeedChoices
+            key={`${result.needs.seat}-${made.length}`}
+            options={result.needs.options}
+            {...(result.needs.words ? { words: result.needs.words } : {})}
+            {...(asked ? { cardWord: asked.cardWord } : {})}
+            nameOf={nameOf}
+            faceOf={faceOf}
+            onChoose={(option, label) => {
+              const seat = result.needs?.seat ?? 0;
+              setMade((current) => [...current, { seat, option, label }]);
+            }}
+          />
         </View>
       ) : null}
 
