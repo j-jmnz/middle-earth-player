@@ -65,7 +65,7 @@ To turn TestFlight off, delete `APPLE_TEAM_ID` and `TESTFLIGHT_URL`; the next re
 
 The players' guide is the README's Install section; keep it in line with what the pipeline ships. While TestFlight is on, its 90-day expiry means a release at least every 90 days (`.claude/rules/release-standards.md`, Tags and releases).
 
-## When it fails
+## Troubleshooting
 
 - `plan` says only `repo` commits came in: run again with `bump: patch` if the change should ship.
 - `plan` says the tag exists or the commit is released: nothing to do, or a tag was made by hand; do not delete it (`.claude/rules/release-standards.md`, Tags and releases).

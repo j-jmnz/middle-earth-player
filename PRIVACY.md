@@ -2,13 +2,13 @@
 
 Middle-earth Player collects no personal data. It has no accounts, analytics, advertising, server or crash reporting of its own, and the maintainers receive nothing from the app. This policy covers every Android, iPhone, iPad and web build this repository publishes.
 
-## What stays on your device
+## Data on your device
 
 Your campaigns, games, logs, decks, notes and settings are saved only in the app's own storage, a SQLite database called `user.db`. An open game also keeps a checkpoint there: a copy of its table (the cards and where they lie), taken at the start of each phase and whenever you leave the table. That way the game can continue from where you were even after an update changes the rules. When you open a booklet or a deck file with the system file picker, the app copies it into the same storage, and it reads only the file you pick.
 
 Your phone's backup (iCloud or Google) may include these saves. That copy goes to your Apple or Google account, not to this project. Uninstalling the app deletes everything it saved.
 
-## When the app uses the network
+## Network connections
 
 The phone app works offline and makes only one kind of connection. When you import a deck from a RingsDB link, it sends [ringsdb.com](https://ringsdb.com), over HTTPS, the deck's id and the code of any card the app doesn't recognise. RingsDB sees your IP address and a standard user agent, and handles them under its own privacy policy. The app adds no identifier, cookie, account or game data to that request. If you never import a deck from RingsDB, the phone app never connects at all.
 

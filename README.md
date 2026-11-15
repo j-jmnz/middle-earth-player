@@ -6,12 +6,12 @@
     <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3E5A48"></a>
     <a href="https://github.com/j-jmnz/middle-earth-player/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release"></a>
     <a href="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml/badge.svg?branch=main"></a>
-    <a href="ACCESSIBILITY.md#what-the-app-supports"><img alt="Accessibility: VoiceOver, TalkBack, Table as a list" src="https://img.shields.io/badge/accessibility-VoiceOver%20%7C%20TalkBack%20%7C%20Table%20as%20a%20list-3E5A48"></a>
+    <a href="ACCESSIBILITY.md#supported-features"><img alt="Accessibility: VoiceOver, TalkBack, Table as a list" src="https://img.shields.io/badge/accessibility-VoiceOver%20%7C%20TalkBack%20%7C%20Table%20as%20a%20list-3E5A48"></a>
     <a href="ACCESSIBILITY.md#target"><img alt="Accessibility target: WCAG 2.2 AA" src="https://img.shields.io/badge/accessibility-WCAG%202.2%20AA-3E5A48"></a>
   </p>
   <p>
     <a href="#install"><strong>Install</strong></a> ·
-    <a href="#what-you-can-do"><strong>Features</strong></a> ·
+    <a href="#features"><strong>Features</strong></a> ·
     <a href="#private-by-design"><strong>Privacy</strong></a> ·
     <a href="#get-involved"><strong>Get involved</strong></a> ·
     <a href="#support"><strong>Support</strong></a>
@@ -27,7 +27,7 @@ Middle-earth Player lets you play The Lord of the Rings: The Card Game solo on a
   <img src=".github/readme/game-board.webp" width="640" alt="Combat on the game board: a Black Rider's attack on Celeborn is resolved, then Haldir of Lórien attacks the Black Rider">
 </p>
 
-## What you can do
+## Features
 
 - **Play the official campaigns from start to finish.** Every scenario is set up, dealt and resolved for you, and the campaign log carries your boons, burdens and fallen heroes from one scenario to the next. Any scenario can also be played on its own.
 
@@ -94,7 +94,7 @@ You can play a full game with VoiceOver or TalkBack: with a screen reader on, th
 
 The app isn't on the Play Store or the App Store. On Android you install the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-player/releases). On an iPhone or iPad you install the IPA through SideStore or AltStore, which sign it with your own Apple ID. It's free, and once it's installed it never needs a network connection.
 
-### What you need
+### Requirements
 
 - An Android phone running Android 7.0 or later, on a 64-bit processor.
 - Or an iPhone or iPad running iOS or iPadOS 15.1 or later, a free Apple ID, and SideStore or AltStore Classic. You need a computer once, for the setup. AltStore also needs AltServer running on that computer to refresh the app each week.
@@ -169,13 +169,13 @@ Middle-earth Player is open source under the MIT License, and you don't need to 
 
 Report security problems privately, as [SECURITY.md](SECURITY.md) describes, rather than in a public issue.
 
-### How the code is written
+### AI-assisted development
 
 Claude (Anthropic) writes most of the code, tests and docs in Claude Code. The maintainer directs that work: they set the product and its rules and decide what lands on `main`. Commits written this way name Claude as the author or in a `Co-Authored-By` line. The instructions the agents follow are in `CLAUDE.md`, `.claude/rules/` and `.claude/agents/`; you don't need them to contribute.
 
 Nothing lands until CI passes the tests, lint, the type check and the data check. Rules come from the printed cards and booklets, and the engine code cites the id of each rule it implements.
 
-### How it fits together
+### Project structure
 
 - `data/` holds the card, scenario and rules data. It is committed and built offline from snapshots in `data/raw/`, and `data/sources.json` pins every source.
 - `data/printed/` records the lines printed on each card, read from its scan. This is the card text the app uses.

@@ -6,7 +6,7 @@ The app should be playable without sight, and with low vision, limited hand move
 
 The app aims for [WCAG 2.2](https://www.w3.org/TR/WCAG22/) level AA, as [WCAG2Mobile](https://www.w3.org/TR/wcag2mobile-22/) applies it to native apps, and for the [Game Accessibility Guidelines](https://gameaccessibilityguidelines.com/). No third party has audited it, so it makes no claim of conformance. Checks run on every change; see Automated checks.
 
-## What the app supports
+## Supported features
 
 - You can play a full game with VoiceOver or TalkBack. With a screen reader on, the table becomes a scrolling list of zones and cards. Each card's label gives its full state (damage, resources, progress, attachments and effect modifiers), and its hint says what a double tap does. Anything you can long-press is also available as a reader action. New moments and refused moves are announced in order, without cutting each other off. The labelling rules are in the Screen reader sections of [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md).
 - Under Settings, At the table, set Table as a list to Always to use the list table without a screen reader, whether for Switch Control, Voice Control, Switch Access or simply because you prefer it. The default, Follow screen reader, shows the list only while a reader is on.
