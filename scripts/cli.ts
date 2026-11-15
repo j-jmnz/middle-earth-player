@@ -1,5 +1,5 @@
 // The package scripts' dispatcher: `pnpm <group> <command> [args]` runs the command's steps in order, each a child
-// process with the arguments after the command, and stops at the first that fails (README.md, Commands).
+// process with the arguments after the command, and stops at the first that fails (docs/development.md, Commands).
 // `pnpm <group>` alone lists the group's commands; `assets` alone runs all three packs, and `test` with no command
 // (or with a file filter) is a plain `vitest run`.
 import { spawnSync } from "node:child_process";

@@ -59,7 +59,7 @@ jobs:
           RESULTS: ${{ needs.checks.result }} ${{ needs.shard.result }}
         run: test "$RESULTS" = "success success"
 
-  # The web build audited with axe-core in Chromium (README.md, Commands). Its own job, so `test` stays as fast.
+  # The web build audited with axe-core in Chromium (docs/development.md, Commands). Its own job, so `test` stays as fast.
   a11y-web:
     runs-on: ubuntu-latest
     steps:
