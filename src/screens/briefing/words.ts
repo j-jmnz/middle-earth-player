@@ -28,6 +28,11 @@ export function actionLine(text: string | null | undefined): string | null {
   return text?.split("\n").find((line) => line.startsWith("Action:")) ?? null;
 }
 
+/** What a boon gives the hero it is attached to ("Attached hero gains the Lore resource icon."), or null when its text says nothing of the kind. */
+export function gainLine(text: string | null | undefined): string | null {
+  return text?.split("\n").find((line) => line.startsWith("Attached hero gains")) ?? null;
+}
+
 /**
  * What a campaign card's Setup choice says at the briefing: the sentence under "Seat N chooses" and the line the Deal bar gives while the choice
  * is unanswered. The Oath's choice (41050:A:2) is of Adaptation boons, which join the Campaign Pool; any other choice is a card.
