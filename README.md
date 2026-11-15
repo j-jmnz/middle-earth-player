@@ -13,7 +13,8 @@
     <a href="#install"><strong>Install</strong></a> ·
     <a href="#what-you-can-do"><strong>Features</strong></a> ·
     <a href="#private-by-design"><strong>Privacy</strong></a> ·
-    <a href="#get-involved"><strong>Get involved</strong></a>
+    <a href="#get-involved"><strong>Get involved</strong></a> ·
+    <a href="#support"><strong>Support</strong></a>
   </p>
 </div>
 
@@ -179,6 +180,10 @@ Before you push, run `pnpm lint` and `pnpm typecheck` as well. [docs/development
 - [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md) describe the screens and the game table.
 - [docs/releasing.md](docs/releasing.md) walks through the release pipeline.
 - [docs/INDEX.md](docs/INDEX.md) is a generated index of every doc, section by section.
+
+## Support
+
+If you enjoy the app, you can support its development through [GitHub Sponsors](https://github.com/sponsors/j-jmnz) or [Ko-fi](https://ko-fi.com/jjmnz). Donations pay for development time and build costs, never for game content. Nothing is paywalled and supporters get no rewards: every build is the same, free for everyone. The app itself never asks for money.
 
 ## Attribution
 
