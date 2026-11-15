@@ -24,21 +24,21 @@ Middle-earth Player lets you play The Lord of the Rings: The Card Game solo on a
 > This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
 
 <p align="center">
-  <img src=".github/readme/game-board.gif" width="640" alt="Combat on the game board: a Black Rider's attack on Celeborn is resolved, then Haldir of Lórien attacks the Black Rider">
+  <img src=".github/readme/game-board.webp" width="640" alt="Combat on the game board: a Black Rider's attack on Celeborn is resolved, then Haldir of Lórien attacks the Black Rider">
 </p>
 
 ## What you can do
 
 - **Play the official campaigns from start to finish.** Every scenario is set up, dealt and resolved for you, and the campaign log carries your boons, burdens and fallen heroes from one scenario to the next. Any scenario can also be played on its own.
 
-  <img src=".github/readme/start-a-campaign.gif" width="480" alt="Starting The Return of the King: the campaign map opens, then the first scenario's setup screen with a deck chosen and the Deal button">
+  <img src=".github/readme/start-a-campaign.webp" width="480" alt="Starting The Return of the King: the campaign map opens, then the first scenario's setup screen with a deck chosen and the Deal button">
 
 - **Let the app run the rules.** The engine applies every rule and card effect and works out every number. You choose from the legal moves it offers, and Undo takes a move back.
 - **Choose your challenge.** Play on Easy or Normal, and try Nightmare mode on the scenarios that have it.
 - **Play true solo or two-handed.** Run one seat, or two seats on the same device.
 - **Build your decks.** The deck builder has the full player-card pool and the official pre-built decks, and it imports any public deck from a RingsDB link.
 
-  <img src=".github/readme/decks.gif" width="480" alt="The deck list with the pre-built decks, then the Elves of Lórien deck open in the editor with its heroes, allies, attachments, threat and cost curve">
+  <img src=".github/readme/decks.webp" width="480" alt="The deck list with the pre-built decks, then the Elves of Lórien deck open in the editor with its heroes, allies, attachments, threat and cost curve">
 
 - **Look things up without leaving the game.** The rules reference and the printed booklets are built in, along with a glossary you can open from the table.
 - **See the cards.** Card art ships with the app, so nothing needs downloading.
