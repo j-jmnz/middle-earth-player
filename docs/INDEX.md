@@ -32,13 +32,13 @@ Each agent reads its own file.
 Read the sections your task touches.
 
 - `README.md` (~4.9K tok)
-  - 30–82 What you can do (~920)
+  - 30–82 Features (~920)
     - 47–65 Themes (~320)
     - 66–82 Campaigns (~200)
   - 83–88 Private by design (~180)
   - 89–92 Accessibility (~140)
   - 93–138 Install (~960)
-    - 97–102 What you need (~100)
+    - 97–102 Requirements (~100)
     - 103–112 Android (~160)
     - 113–125 iPhone and iPad (~350)
     - 126–129 Check a download (optional) (~60)

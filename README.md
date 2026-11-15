@@ -11,7 +11,7 @@
   </p>
   <p>
     <a href="#install"><strong>Install</strong></a> ·
-    <a href="#what-you-can-do"><strong>Features</strong></a> ·
+    <a href="#features"><strong>Features</strong></a> ·
     <a href="#private-by-design"><strong>Privacy</strong></a> ·
     <a href="#get-involved"><strong>Get involved</strong></a> ·
     <a href="#support"><strong>Support</strong></a>
@@ -27,7 +27,7 @@ Middle-earth Player lets you play The Lord of the Rings: The Card Game solo on a
   <img src=".github/readme/game-board.webp" width="640" alt="Combat on the game board: a Black Rider's attack on Celeborn is resolved, then Haldir of Lórien attacks the Black Rider">
 </p>
 
-## What you can do
+## Features
 
 - **Play the official campaigns from start to finish.** Every scenario is set up, dealt and resolved for you, and the campaign log carries your boons, burdens and fallen heroes from one scenario to the next. Any scenario can also be played on its own.
 
@@ -94,7 +94,7 @@ You can play a full game with VoiceOver or TalkBack: with a screen reader on, th
 
 The app isn't on the Play Store or the App Store. On Android you install the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-player/releases). On an iPhone or iPad you install the IPA through SideStore or AltStore, which sign it with your own Apple ID. It's free, and once it's installed it never needs a network connection.
 
-### What you need
+### Requirements
 
 - An Android phone running Android 7.0 or later, on a 64-bit processor.
 - Or an iPhone or iPad running iOS or iPadOS 15.1 or later, a free Apple ID, and SideStore or AltStore Classic. You need a computer once, for the setup. AltStore also needs AltServer running on that computer to refresh the app each week.
