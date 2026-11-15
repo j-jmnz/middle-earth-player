@@ -167,11 +167,12 @@ describe("what a win writes (41051:B:1)", () => {
 
 describe("what a loss leaves", () => {
   it("writes nothing to the log: no carry-over, no completed scenario, no removal from the pool", () => {
+    // The lost goldens' final states, as golden.json pins them (the scenario's golden test plays them).
     for (const golden of CAVES_GOLDENS.filter((item) => item.outcome === "lost")) {
-      const lost = playGolden(golden, ctxFor(golden.decks));
+      const lost = goldenState("the-caves-of-nibin-dum", golden.name);
       const blank = emptyLog(golden.seatCount);
-      expect(applyResolution(blank, lost.state.scenarioId, lost.state, cards, NO_COPY_LIMITS), golden.name).toBe(blank);
-      expect(applyResolution(oathTwo, lost.state.scenarioId, lost.state, cards, NO_COPY_LIMITS), golden.name).toBe(oathTwo);
+      expect(applyResolution(blank, lost.scenarioId, lost, cards, NO_COPY_LIMITS), golden.name).toBe(blank);
+      expect(applyResolution(oathTwo, lost.scenarioId, lost, cards, NO_COPY_LIMITS), golden.name).toBe(oathTwo);
     }
   });
 
