@@ -44,7 +44,7 @@ export function timed<B>(base: Timeable<B>, token: { ms: number }, scale: number
 }
 
 /** A curve, by name (motion/curves.ts evaluates it; src/ui/motion-run.ts gives Reanimated the same one). */
-export type EasingName = "linear" | "outCubic" | "inCubic" | "outQuad" | "inQuad" | "outBack";
+export type EasingName = "linear" | "outCubic" | "inCubic" | "outQuad" | "inQuad" | "outBack" | "inOutSine";
 
 /** A timed motion. `easing` null keeps the layout animation's own default. */
 export type Tween = { readonly ms: number; readonly easing: EasingName | null };
@@ -160,6 +160,13 @@ export const MOTION = {
   scrubSpread: tween(220, "outCubic"),
   scrubLift: tween(120, "outCubic"),
   scrubFall: tween(180, "inCubic"),
+  // The splash ring's glow while the app opens (docs/design-system.md, Splash): the halo comes in over `splashRampIn`, then swells and
+  // fades, each half of a breath `splashBreath`, until the databases are open; it flares over `splashFlare` while the black fades
+  // over `splashFade`, both starting together.
+  splashRampIn: tween(350, "outCubic"),
+  splashBreath: tween(800, "inOutSine"),
+  splashFlare: tween(160, "outCubic"),
+  splashFade: tween(380, "inQuad"),
 } as const;
 
 /** The eight beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
@@ -169,8 +176,8 @@ export const SPOTLIGHT_BEATS = ["spotlightEnter", "spotlightRead", "spotlightCha
 export const SPOTLIGHT_AGAIN_BEATS = ["spotlightSwap", "spotlightReadAgain", "spotlightChargeAgain", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightHold"] as const;
 export const SPOTLIGHT_AGAIN = 2200;
 
-/** The tokens that may pass 500 ms (a title sweep across the canvas, the combat spotlight's hold and its whole run, phase 24, and the life of its ash). */
-export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightHold", "spotlightAsh"];
+/** The tokens that may pass 500 ms (a title sweep across the canvas, the combat spotlight's hold and its whole run, phase 24, the life of its ash, and half of the splash ring's breath, which loops and holds nothing up). */
+export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightHold", "spotlightAsh", "splashBreath"];
 
 /** The longest a token runs, apart from LONG_TOKENS. */
 export const MAX_TOKEN_MS = 500;

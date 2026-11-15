@@ -1,6 +1,6 @@
 <div align="center">
-  <img src=".github/readme/icon.png" width="128" height="128" alt="Middle-earth Player app icon: the One Ring glowing on black">
-  <h1>Middle-earth Player</h1>
+  <img src=".github/readme/icon.png" width="128" height="128" alt="Middle-Earth Player app icon: the One Ring glowing on black">
+  <h1>Middle-Earth Player</h1>
   <p><strong>The Lord of the Rings: The Card Game, solo, on your phone.</strong><br>Offline, private, free and open source.</p>
   <p>
     <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3E5A48"></a>
@@ -18,7 +18,7 @@
   </p>
 </div>
 
-Middle-earth Player lets you play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android phone. The app handles the rules, the encounter deck and the bookkeeping, so you can concentrate on your decisions.
+Middle-Earth Player lets you play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android phone. The app handles the rules, the encounter deck and the bookkeeping, so you can concentrate on your decisions.
 
 > [!IMPORTANT]
 > This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
@@ -106,7 +106,7 @@ The app isn't on the Play Store or the App Store. On Android you install the APK
 2. Open the download from your browser or your Files app.
 3. If the phone asks, allow that app to install unknown apps (Settings, Allow from this source), then go back.
 4. Tap Install. If Play Protect warns you, tap More details, then Install anyway.
-5. Open Middle-earth Player.
+5. Open Middle-Earth Player.
 
 To update, install the newer `.apk` the same way and your saves carry over. Don't uninstall the old version first, because that deletes your saves.
 
@@ -115,7 +115,7 @@ To update, install the newer `.apk` the same way and your saves carry over. Don'
 1. Set up [SideStore](https://sidestore.io), which refreshes the app on the phone itself, or [AltStore Classic](https://altstore.io), which refreshes it through AltServer on a computer on the same Wi-Fi. AltStore PAL won't work, because it only installs apps from its own marketplace.
 2. On iOS 16 and later, turn on Developer Mode (Settings, Privacy & Security) and restart.
 3. In SideStore or AltStore, open Sources, tap +, and add `https://github.com/j-jmnz/middle-earth-player/releases/latest/download/source.json`.
-4. Open the Middle-earth Player source and tap Free or Get.
+4. Open the Middle-Earth Player source and tap Free or Get.
 
 You can also download the `.ipa` from the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest) in Safari and add it under My Apps, +.
 
@@ -160,7 +160,7 @@ ALeP's content comes after all of these. [docs/phases/STATUS.md](docs/phases/STA
 
 ## Get involved
 
-Middle-earth Player is open source under the MIT License, and you don't need to write code to help.
+Middle-Earth Player is open source under the MIT License, and you don't need to write code to help.
 
 - **Report a rules or card bug.** If a card or a ruling plays wrongly, the [Rules or card bug form](https://github.com/j-jmnz/middle-earth-player/issues/new?template=rules-bug.yml) asks for the card or rule and the printed source it comes from. These reports are the most useful thing a player can send.
 - **Report an accessibility barrier.** The [accessibility form](https://github.com/j-jmnz/middle-earth-player/issues/new?template=accessibility.yml) asks for your device, assistive technology and what got in the way. Barriers are treated as bugs.

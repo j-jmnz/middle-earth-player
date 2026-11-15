@@ -7,7 +7,7 @@ import { ARM_BAR_EASING, LONG_TOKENS, MAX_TOKEN_MS, MOTION, ms, motionScale, SHA
 
 const entries = Object.entries(MOTION) as [string, Tween | Spring][];
 const springs = entries.filter((entry): entry is [string, Spring] => "zeta" in entry[1]);
-const EASINGS: readonly EasingName[] = ["linear", "outCubic", "inCubic", "outQuad", "inQuad", "outBack"];
+const EASINGS: readonly EasingName[] = ["linear", "outCubic", "inCubic", "outQuad", "inQuad", "outBack", "inOutSine"];
 
 describe("motionScale", () => {
   it("is 1 for Normal, 0.6 for Quick and 0 under reduced motion", () => {
@@ -35,7 +35,7 @@ describe("motionScale", () => {
 });
 
 describe("the tokens", () => {
-  it("are each at most 500 ms, except the sweep, the spotlight and the particle lives", () => {
+  it("are each at most 500 ms, except the sweep, the spotlight, the particle lives and the splash breath", () => {
     for (const [name, token] of entries) {
       if (LONG_TOKENS.includes(name)) continue;
       expect(token.ms, name).toBeGreaterThan(0);
@@ -44,9 +44,9 @@ describe("the tokens", () => {
     expect(MOTION.sweep.ms).toBe(900);
   });
 
-  it("let only the sweep, the whole spotlight run and the life of its ash pass 500 ms", () => {
-    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
-    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
+  it("let only the sweep, the whole spotlight run, the life of its ash and the splash breath pass 500 ms", () => {
+    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["splashBreath", "spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
+    expect([...LONG_TOKENS].sort()).toEqual(["splashBreath", "spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
   });
 
   it("make a spotlight of 3200 ms at Normal and 1920 at Quick, each beat at most 500 ms apart from the hold", () => {
