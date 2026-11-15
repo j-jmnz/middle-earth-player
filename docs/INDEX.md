@@ -210,7 +210,7 @@ Read the sections your task touches.
     - 414–423 Card pool (the Cards tab) (~770) ← 3
     - 424–429 Card (~490) ← 2
     - 430–435 Packs and pack cards (~130)
-    - 436–449 Settings (~910) ← 11
+    - 436–449 Settings (~940) ← 11
     - 450–455 Rules (~470) ← 1
     - 456–459 Rule (~220) ← 1
     - 460–465 Booklet (~280) ← 2
