@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security problem
-    url: https://github.com/j-jmnz/middle-earth-player/security/advisories/new
+    url: https://github.com/j-jmnz/middle-earth-lcg/security/advisories/new
     about: Report a vulnerability privately, not in a public issue.

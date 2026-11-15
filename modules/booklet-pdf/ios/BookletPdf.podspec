@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.description    = 'Reads a bundled or imported booklet PDF with PDFKit and reports its page count'
   s.license        = 'UNLICENSED'
   s.author         = 'middle-earth-player'
-  s.homepage       = 'https://github.com/j-jmnz/middle-earth-player'
+  s.homepage       = 'https://github.com/j-jmnz/middle-earth-lcg'
   s.platforms      = {
     :ios => '16.4'
   }

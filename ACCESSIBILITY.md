@@ -36,4 +36,4 @@ All of these settings are in Settings and in the table's settings panel, and Res
 
 ## Reporting a barrier
 
-[Open an accessibility issue](https://github.com/j-jmnz/middle-earth-player/issues/new?template=accessibility.yml) and include your device, its OS version, the assistive technology you use and its version, the screen you were on, what happened and what you expected. Barriers are treated as bugs. This is a volunteer project, so there is no fixed response time.
+[Open an accessibility issue](https://github.com/j-jmnz/middle-earth-lcg/issues/new?template=accessibility.yml) and include your device, its OS version, the assistive technology you use and its version, the screen you were on, what happened and what you expected. Barriers are treated as bugs. This is a volunteer project, so there is no fixed response time.
