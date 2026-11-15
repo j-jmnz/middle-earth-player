@@ -1,4 +1,4 @@
-# Middle Earth Player — decisions and implementer brief
+# Middle-earth Player — decisions and implementer brief
 
 This is the source of truth for the app. It records what was decided and how to build it. Read the sections your task touches before writing code.
 

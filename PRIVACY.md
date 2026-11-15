@@ -1,6 +1,6 @@
 # Privacy policy
 
-Middle Earth Player collects no personal data. It has no accounts, analytics, advertising, server or crash reporting of its own, and the maintainers receive nothing from the app. This policy covers every Android, iPhone, iPad and web build this repository publishes.
+Middle-earth Player collects no personal data. It has no accounts, analytics, advertising, server or crash reporting of its own, and the maintainers receive nothing from the app. This policy covers every Android, iPhone, iPad and web build this repository publishes.
 
 ## What stays on your device
 

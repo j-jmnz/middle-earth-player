@@ -35,16 +35,16 @@ export function sourceOf(input: SourceInput): Record<string, unknown> {
   const site = `https://github.com/${input.repository}`;
   const iconURL = `https://raw.githubusercontent.com/${input.repository}/${input.tag}/assets/images/icon.png`;
   return {
-    name: "Middle Earth Player",
+    name: "Middle-earth Player",
     identifier: `${BUNDLE_ID}.source`,
-    subtitle: "Releases of the Middle Earth Player app",
+    subtitle: "Releases of the Middle-earth Player app",
     website: site,
     iconURL,
     apps: [
       {
-        name: "Middle Earth Player",
+        name: "Middle-earth Player",
         bundleIdentifier: BUNDLE_ID,
-        developerName: "Middle Earth Player contributors",
+        developerName: "Middle-earth Player contributors",
         subtitle: "The Lord of the Rings: The Card Game, offline",
         localizedDescription: DESCRIPTION,
         iconURL,

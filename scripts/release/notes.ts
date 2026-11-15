@@ -47,7 +47,7 @@ export function renderNotes(input: NotesInput): string {
     "## Install",
     "",
     "- Android: download the `.apk` below and open it. Allow your browser or file manager to install unknown apps when it asks. It installs over an earlier release and keeps your campaigns.",
-    `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle Earth Player from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The README (Install) has the steps.`,
+    `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle-earth Player from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The README (Install) has the steps.`,
   );
   if (input.testflightUrl) out.push(`- Or join the TestFlight beta through [its public link](${input.testflightUrl}); a release reaches it once Apple has reviewed the build.`);
   out.push("");
