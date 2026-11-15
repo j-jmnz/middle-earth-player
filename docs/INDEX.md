@@ -217,7 +217,7 @@ Read the sections your task touches.
     - 464–467 Database (~20)
   - 468–487 States (~620)
 - `docs/development.md` — Development (~1.9K tok)
-- `docs/releasing.md` — Releasing (~2.4K tok)
+- `docs/releasing.md` — Releasing (~2.6K tok)
 
 ## Agent procedures
 

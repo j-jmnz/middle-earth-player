@@ -143,6 +143,30 @@ describe("pack scans", () => {
     expect(moved.find((entry) => entry.code === "141031")).toMatchObject({ height: 700 });
   });
 
+  it("stops at the first failure and keeps what it packed, so the next pack fetches only what is missing", async () => {
+    const staged = stage();
+    const shrunk: number[] = [];
+    const shrink = (body: Uint8Array) => {
+      shrunk.push(body.length);
+      return Promise.resolve(body);
+    };
+    // One at a time, in code order: 141001 packs from the cache, 141022's fetch fails, 141031 and its side B never start.
+    const failing = packScans({ ...staged.options, shrink, concurrency: 1, fetch: () => Promise.reject(new Error("dropped")) }, log);
+    await expect(failing).rejects.toThrow("dropped");
+    expect(shrunk).toHaveLength(1);
+    const stamp = JSON.parse(readFileSync(path.join(staged.options.scansDir, ".packed.json"), "utf8")) as { entries: Record<string, unknown> };
+    expect(Object.keys(stamp.entries)).toEqual(["141001"]);
+    shrunk.length = 0;
+    const fetched: string[] = [];
+    const fetch = (url: string) => {
+      fetched.push(url);
+      return Promise.resolve(new Uint8Array(jpeg(560)));
+    };
+    await packScans({ ...staged.options, shrink, concurrency: 1, fetch }, log);
+    expect(fetched).toEqual([THREE_URL]);
+    expect(shrunk).toHaveLength(3);
+  });
+
   it("fails when the fetched bytes do not match the pin", async () => {
     const staged = stage();
     await expect(packScans({ ...staged.options, fetch: () => Promise.resolve(new Uint8Array(jpeg(300))) }, log)).rejects.toThrow(

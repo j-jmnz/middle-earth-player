@@ -8,7 +8,7 @@ import sharp from "sharp";
 import { SCENE_PICTURE } from "../../src/screens/art/crop.ts";
 import { sniffImage } from "../../src/screens/images/policy.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../data/paths.ts";
-import { fetchBytes, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
+import { fetchBytesRetrying, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
 import { renderPdfPage } from "../data/sources/pictures.ts";
 import { bytes, runScript, type Log } from "../log.ts";
 
@@ -44,6 +44,8 @@ export type PackScansOptions = {
   // The first quest card of each scenario: its scene is also bundled on its own, at the source's size (`<code>.scene`, sceneOf).
   sceneCodes?: ReadonlySet<string>;
   scene?: (body: Uint8Array, typeCode: string) => Promise<Uint8Array>;
+  // How many pictures are loaded at once (PACK_CONCURRENCY when not given).
+  concurrency?: number;
 };
 
 type Pin = SourceFile & { cacheDir: string };
@@ -64,7 +66,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   const picturePins = new Map([...sidePins(sources.pictures, "pictures", options.pictureCacheDir), ...sidePins(sources.nightmare, "pictures", options.pictureCacheDir)]);
   const pdfPins = new Map((sources.pictures?.files ?? []).filter((file) => file.path.startsWith("pdf/")).map((file) => [file.url, file]));
   const notes: RenderNotes = { noPdftoppm: [], rehashed: [] };
-  const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log)), pdfPins, notes };
+  const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytesRetrying(url, 120_000, log)), pdfPins, notes };
   const shrink = options.shrink ?? shrinkToMaxSide;
   const database = new Database(options.catalogDb, { readonly: true });
   let cards: { code: string; name: string; type_code: string }[];
@@ -93,9 +95,19 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   const tick = log.progress(jobs.length, "picture");
   // Many at a time: on a machine without the cache each card is a fetch that mostly waits on the server (4 at once ran
   // about 10 pictures a second, 16 about 35). sharp decodes and encodes on its own thread pool.
+  // The first failure stops every worker before its next picture, so a failed pack ends in seconds rather than after
+  // the rest of the downloads.
   let next = 0;
+  let failure: { error: unknown } | null = null;
   const worker = async () => {
-    while (next < jobs.length) {
+    try {
+      await work();
+    } catch (error) {
+      failure ??= { error };
+    }
+  };
+  const work = async () => {
+    while (failure === null && next < jobs.length) {
       const job = jobs[next++];
       if (!job) break;
       const { key, card } = job;
@@ -139,7 +151,13 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
       tick(`${key} ${bytes(shown.byteLength)}`);
     }
   };
-  await Promise.all(Array.from({ length: PACK_CONCURRENCY }, worker));
+  await Promise.all(Array.from({ length: options.concurrency ?? PACK_CONCURRENCY }, worker));
+  if (failure !== null) {
+    // What this pack finished, over the last stamp's entries for the cards it did not reach, so a rerun (a CI cache saved
+    // after the failure) fetches only what is still missing. An entry is reused only while its pin and files match.
+    writeFileSync(path.join(options.scansDir, STAMP_FILE), `${JSON.stringify({ ...stamp, entries: { ...before.entries, ...stamp.entries } })}\n`);
+    throw (failure as { error: unknown }).error;
+  }
   packed.sort((left, right) => left.code.localeCompare(right.code));
   writeScanMap(options.mapPath, packed);
   writeFileSync(path.join(options.scansDir, STAMP_FILE), `${JSON.stringify(stamp)}\n`);

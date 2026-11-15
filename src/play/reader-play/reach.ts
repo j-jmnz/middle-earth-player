@@ -65,8 +65,10 @@ class Walk {
   private readonly pileOpens: ReadonlySet<string>;
   private readonly table: TapContext;
   private readonly passLegal: boolean;
+  private readonly input: ReachInput;
 
-  constructor(private readonly input: ReachInput) {
+  constructor(input: ReachInput) {
+    this.input = input;
     const { game, ctx, legal, names } = input;
     this.seat = actingSeat(game);
     this.table = { game, ctx, legal, names };
