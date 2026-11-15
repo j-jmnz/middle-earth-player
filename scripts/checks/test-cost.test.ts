@@ -34,7 +34,7 @@ const PLAYS: Readonly<Record<string, number>> = {
   "src/campaign/scenarios/lost-in-mirkwood/campaign.test.ts": 1,
   "src/campaign/scenarios/passage-through-mirkwood/campaign.test.ts": 1,
   "src/campaign/scenarios/raid-on-the-grey-havens/campaign.test.ts": 2,
-  "src/campaign/scenarios/the-caves-of-nibin-dum/campaign.test.ts": 6,
+  "src/campaign/scenarios/the-caves-of-nibin-dum/campaign.test.ts": 5,
   "src/campaign/scenarios/the-caves-of-nibin-dum/resolution.test.ts": 2,
   "src/campaign/scenarios/the-city-of-corsairs/campaign.test.ts": 1,
   "src/campaign/scenarios/the-fate-of-numenor/campaign.test.ts": 2,
