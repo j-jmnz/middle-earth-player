@@ -34,6 +34,20 @@ export function hostOffered(options: readonly string[], card: string | null, hos
   });
 }
 
+/**
+ * A tap on a card or a hero of a card-for-a-hero choice, in either order: the card and hero now picked (a hero the new card cannot go on is let
+ * go) and the option they make once both are picked and offered.
+ */
+export function pickPair(options: readonly string[], card: string | null, host: string | null): { card: string | null; host: string | null; option: string | null } {
+  const kept = card != null && host != null && !hostOffered(options, card, host) ? null : host;
+  return { card, host: kept, option: card != null && kept != null ? pairOption(options, card, kept) : null };
+}
+
+/** The card an option names: itself, or the card of a "card>hero" pair. */
+export function optionCard(option: string): string {
+  return split(option).card;
+}
+
 /** What an option is called: its own words (put resources on the heroes), Skip, "card on hero", or the card's name with its sphere when copies share it. */
 export function optionLabel(option: string, nameOf: (code: string) => string, printedText: Readonly<Record<string, string | null | undefined>>, words?: Readonly<Record<string, string>>): string {
   const plain = words?.[option];

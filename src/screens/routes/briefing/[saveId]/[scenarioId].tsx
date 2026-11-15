@@ -133,8 +133,6 @@ export default function Briefing() {
 
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
   const faceOf = (code: string) => heroFace(briefingDecks.faces, code, nameOf(code));
-  // The cards of a card-for-a-hero choice are boons when they are The Oath's Adaptations (41050:A:2).
-  const boons = (result.needs?.options ?? []).every((option) => option === "skip" || (world.cards.get(option.split(">")[0] ?? "")?.traits ?? []).includes("Adaptation"));
   const asked = result.needs ? needWords(result.needs.seat, result.needs.options, (code) => world.cards.get(code)?.traits ?? [], nameOf) : null;
   // What the choice is, when the options alone do not say (a search of the encounter deck for cards the log's line removes).
   const intro = asked?.intro ?? result.needs?.note ?? null;
@@ -267,7 +265,7 @@ export default function Briefing() {
             key={`${result.needs.seat}-${made.length}`}
             options={result.needs.options}
             {...(result.needs.words ? { words: result.needs.words } : {})}
-            {...(boons ? { cardWord: "Boon" } : {})}
+            {...(asked ? { cardWord: asked.cardWord } : {})}
             nameOf={nameOf}
             faceOf={faceOf}
             onChoose={(option, label) => {

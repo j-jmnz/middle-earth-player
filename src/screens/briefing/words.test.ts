@@ -31,10 +31,11 @@ describe("campaign choice words (41050:A:2)", () => {
     const words = needWords(1, ["41044>02116", "41045>02116"], adaptation);
     expect(words.intro).toBe("Choose 1 Adaptation boon and the hero who carries it. It joins your Campaign Pool.");
     expect(words.waiting).toBe("Choose an Adaptation for seat 2 above.");
+    expect(words.cardWord).toBe("Boon");
   });
 
   it("says a card for any other choice and adds no explanation", () => {
-    expect(needWords(0, ["02001", "skip"], adaptation)).toEqual({ intro: null, waiting: "Choose a card for seat 1 above." });
+    expect(needWords(0, ["02001", "skip"], adaptation)).toEqual({ intro: null, waiting: "Choose a card for seat 1 above.", cardWord: "Card" });
   });
 
   it("reads the Action line of a card's printed text, or nothing", () => {

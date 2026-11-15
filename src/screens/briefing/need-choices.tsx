@@ -12,13 +12,11 @@ import { rowSurface, selectedRingOf, selectedWash } from "../../ui/surfaces";
 import { Text } from "../../ui/text";
 import { touchSlop, useUiScale } from "../../ui/ui-scale";
 import { useTableTokens } from "../../ui/use-table-tokens";
-import { CroppedArt } from "../art/art";
-import { PAINTING } from "../art/crop";
 import type { HeroFace } from "../art/hero-tile";
 import { useDatabases } from "../data/databases";
 import { Label, TextButton } from "../kit/chrome";
-import { CardThumb } from "./card-thumb";
-import { hostOffered, optionLabel, pairedChoice, pairOption } from "./choice-groups";
+import { CardThumb, HeroPainting } from "./card-thumb";
+import { hostOffered, optionCard, optionLabel, pairedChoice, pickPair } from "./choice-groups";
 import { OpenCardContext } from "./parts";
 import { actionLine, gainLine } from "./words";
 
@@ -68,7 +66,7 @@ function ChoiceRow({
       testID={testID}
       collapsable={false}
       accessibilityRole={radio ? "radio" : "button"}
-      accessibilityLabel={[label, ...lines].join(". ")}
+      accessibilityLabel={[label, ...lines].join(" ")}
       accessibilityState={state}
       aria-checked={radio ? selected : undefined}
       disabled={disabled}
@@ -111,22 +109,12 @@ function PreviewThumb({ code, name, imagesrc, onOpen }: { code: string; name: st
   );
 }
 
-// The hero's painting, square-cornered like the Ring-bearer rows'.
-function HeroPainting({ face }: { face: HeroFace }) {
-  const s = useUiScale();
-  return (
-    <View className="overflow-hidden rounded-control" importantForAccessibility="no-hide-descendants">
-      <CroppedArt card={face} region={PAINTING} width={56 * s} height={40 * s} />
-    </View>
-  );
-}
-
 export function NeedChoices({ options, words, nameOf, faceOf, onChoose, cardWord }: Props) {
   const openCard = useContext(OpenCardContext);
   const { catalog } = useDatabases();
   const paired = pairedChoice(options);
   // The offered cards' printed text (for the lines under each) and pictures, read once per choice.
-  const codes = useMemo(() => [...new Set(options.filter((option) => option !== "skip" && !words?.[option]).map((option) => option.split(">")[0] ?? ""))], [options, words]);
+  const codes = useMemo(() => [...new Set(options.filter((option) => option !== "skip" && !words?.[option]).map(optionCard))], [options, words]);
   const printed = useMemo<ReadonlyMap<string, Printed>>(
     () => (codes.length === 0 ? new Map() : new Map(catalog.select({ code: cards.code, text: cards.text, imagesrc: cards.imagesrc }).from(cards).where(inArray(cards.code, codes)).all().map((row) => [row.code, { text: row.text, imagesrc: row.imagesrc }]))),
     [catalog, codes],
@@ -145,11 +133,10 @@ export function NeedChoices({ options, words, nameOf, faceOf, onChoose, cardWord
   if (paired) {
     // Made as soon as both halves are picked, in either order; a hero the picked card cannot go on is dimmed and let go.
     const pick = (nextCard: string | null, nextHost: string | null) => {
-      const keptHost = nextCard != null && nextHost != null && !hostOffered(options, nextCard, nextHost) ? null : nextHost;
-      setCard(nextCard);
-      setHost(keptHost);
-      const option = nextCard != null && keptHost != null ? pairOption(options, nextCard, keptHost) : null;
-      if (option) onChoose(option, labelOf(option));
+      const next = pickPair(options, nextCard, nextHost);
+      setCard(next.card);
+      setHost(next.host);
+      if (next.option) onChoose(next.option, labelOf(next.option));
     };
     return (
       <>
@@ -208,8 +195,8 @@ export function NeedChoices({ options, words, nameOf, faceOf, onChoose, cardWord
               key={option}
               testID={`choice-${option}`}
               label={labelOf(option)}
-              lines={plain ? [] : linesOf(option)}
-              {...(plain ? {} : { leading: thumb(option), onLongPress: () => openCard(option) })}
+              lines={plain ? [] : linesOf(optionCard(option))}
+              {...(plain ? {} : { leading: thumb(optionCard(option)), onLongPress: () => openCard(optionCard(option)) })}
               radio={false}
               selected={false}
               disabled={false}
