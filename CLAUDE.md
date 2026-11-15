@@ -44,6 +44,10 @@ Scripts are grouped as `pnpm <group> <command> [args]` (`test`, `data`, `effects
 
 `implementer`, `reviewer`, `ux`, `orchestrator`, `effect-author`, `reading-judge` (reads each rendered record from `pnpm effects render` against its printed line; read-only) and `scenario-author` (one scenario, run by the orchestrator as the tasks of `docs/agents/agent-brief.md`, Scenario procedure) are in `.claude/agents`. `docs/agents/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/agents/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. A plan with several sections is run by `orchestrator` (`.claude/agents/orchestrator.md` sets the models and the one review round).
 
+## Skills
+
+`avoid-ai-writing` (`.claude/skills/avoid-ai-writing`) audits and rewrites prose for machine-written tells. Run it in `docs` context on a doc change, a pull request title and body, or anything else a person reads (the release notes are built from commit subjects). It never touches code, data or quoted card and rules text.
+
 ## Cloud sessions
 
 `.claude/hooks/session-start.sh` installs dependencies. A cloud session has no phone, simulator, or Maestro. Phone and tablet checks are not tracked: no notes for them in STATUS, phase files or reports (user instruction, 2026-11-06).
