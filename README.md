@@ -1,11 +1,22 @@
-# Middle Earth Player
+<div align="center">
+  <img src=".github/readme/icon.png" width="128" height="128" alt="Middle Earth Player app icon: the One Ring glowing on black">
+  <h1>Middle Earth Player</h1>
+  <p><strong>The Lord of the Rings: The Card Game, solo, on your phone.</strong><br>Offline, private, free and open source.</p>
+  <p>
+    <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3E5A48"></a>
+    <a href="https://github.com/j-jmnz/middle-earth-player/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release"></a>
+    <a href="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml/badge.svg?branch=main"></a>
+    <a href="ACCESSIBILITY.md#what-the-app-supports"><img alt="Accessibility: VoiceOver, TalkBack, Table as a list" src="https://img.shields.io/badge/accessibility-VoiceOver%20%7C%20TalkBack%20%7C%20Table%20as%20a%20list-3E5A48"></a>
+  </p>
+  <p>
+    <a href="#install"><strong>Install</strong></a> ·
+    <a href="#what-you-can-do"><strong>Features</strong></a> ·
+    <a href="#private-by-design"><strong>Privacy</strong></a> ·
+    <a href="#get-involved"><strong>Get involved</strong></a>
+  </p>
+</div>
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-3E5A48)](LICENSE)
-[![Latest release](https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release)](https://github.com/j-jmnz/middle-earth-player/releases/latest)
-[![Tests](https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml)
-[![Accessibility: VoiceOver, TalkBack, Table as a list](https://img.shields.io/badge/accessibility-VoiceOver%20%7C%20TalkBack%20%7C%20Table%20as%20a%20list-3E5A48)](ACCESSIBILITY.md#what-the-app-supports)
-
-Middle Earth Player lets you play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android phone. The app handles the rules, the encounter deck and the bookkeeping, so you can concentrate on your decisions. It works fully offline, collects nothing about you, and is free and open source.
+Middle Earth Player lets you play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android phone. The app handles the rules, the encounter deck and the bookkeeping, so you can concentrate on your decisions.
 
 > [!IMPORTANT]
 > This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
