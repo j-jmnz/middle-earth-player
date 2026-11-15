@@ -1,39 +1,39 @@
 # Accessibility
 
-The app should be playable without sight, with low vision, limited hand movement, colour-vision differences or slow reactions. A shortfall is a bug (see Reporting a barrier).
+The app should be playable without sight, and with low vision, limited hand movement, colour-vision differences or slow reactions. Anything that gets in the way is treated as a bug; see Reporting a barrier below.
 
 ## Target
 
-[WCAG 2.2](https://www.w3.org/TR/WCAG22/) level AA as [WCAG2Mobile](https://www.w3.org/TR/wcag2mobile-22/) applies it to native apps, and the [Game Accessibility Guidelines](https://gameaccessibilityguidelines.com/). Not audited by a third party; no conformance claim. Checks run on every change (Automated checks).
+The app aims for [WCAG 2.2](https://www.w3.org/TR/WCAG22/) level AA, as [WCAG2Mobile](https://www.w3.org/TR/wcag2mobile-22/) applies it to native apps, and for the [Game Accessibility Guidelines](https://gameaccessibilityguidelines.com/). No third party has audited it, so it makes no claim of conformance. Checks run on every change; see Automated checks.
 
 ## What the app supports
 
-- VoiceOver and TalkBack can play a full game. With a reader on, the table becomes a scrolling list of zones and cards. Each card's label gives its full state (damage, resources, progress, attachments, effect modifiers); its hint says what a double tap does. Long presses are also reader actions. New moments and refused moves are announced in order, without cutting each other off. Label rules: [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md), Screen reader.
-- Settings, At the table, Table as a list: Always shows the list table without a reader (for Switch Control, Voice Control, Switch Access or preference). The default, Follow screen reader, shows it only with a reader on.
-- Text follows the phone's text size up to 200% on every screen. The list table, dock, choice options and card preview grow with it; the drawn table follows UI scale only, so use Table as a list or the card preview for larger text. UI scale (Small, Medium, Large, Extra large) sizes text, buttons and cards, including the drawn table. Every control has a 44 pt target at every size.
-- Strong outlines (Follow system, Always, Off) thickens effect marks and token counts; Follow system turns it on with iOS Increase Contrast or Android High contrast text. On iOS, Reduce Transparency makes floating panels opaque and Bold Text draws text one weight heavier. Theme: dark, light or device. Title face (Carved, Plain) swaps the carved titles and numbers for the plain face. Game colours are tested to stay distinct under protanopia, deuteranopia and tritanopia, and sphere colours always come with their icons, including the deck donut's legend.
-- Reduce motion (Follow system, Always) snaps animations and stops the fog and combat replay. Animation speed (Normal, Quick, Slow) and Combat spotlight are separate settings. Banner closes (After a few seconds, When tapped) can make each new-moment banner wait for a tap.
-- No turn timer. Two-tap buttons wait 3 seconds for the second tap, 10 with a screen reader. Confirm time (Standard, Long, No limit) changes this; No limit waits until you tap again or choose something else.
+- You can play a full game with VoiceOver or TalkBack. With a screen reader on, the table becomes a scrolling list of zones and cards. Each card's label gives its full state (damage, resources, progress, attachments and effect modifiers), and its hint says what a double tap does. Anything you can long-press is also available as a reader action. New moments and refused moves are announced in order, without cutting each other off. The labelling rules are in the Screen reader sections of [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md).
+- Under Settings, At the table, set Table as a list to Always to use the list table without a screen reader, whether for Switch Control, Voice Control, Switch Access or simply because you prefer it. The default, Follow screen reader, shows the list only while a reader is on.
+- Text follows your phone's text size up to 200% on every screen. The list table, dock, choice options and card preview all grow with it. The drawn table follows UI scale only, so for larger text there, use Table as a list or the card preview. UI scale (Small, Medium, Large or Extra large) sizes text, buttons and cards, the drawn table included. Every control keeps a 44 pt touch target at every size.
+- Strong outlines (Follow system, Always or Off) thickens effect marks and token counts. With Follow system, it turns on when iOS Increase Contrast or Android High contrast text is on. On iOS, Reduce Transparency makes floating panels opaque, and Bold Text draws text one weight heavier. The theme can be dark, light or follow the device. Title face (Carved or Plain) swaps the carved titles and numbers for a plain typeface. The game's colours are tested to stay distinct under protanopia, deuteranopia and tritanopia, and sphere colours always come with their icons, including in the deck donut's legend.
+- Reduce motion (Follow system or Always) makes animations snap into place and stops the fog and the combat replay. Animation speed (Normal, Quick or Slow) and Combat spotlight are separate settings. Banner closes (After a few seconds or When tapped) lets each new-moment banner wait for your tap.
+- There is no turn timer. Buttons that need two taps wait 3 seconds for the second one, or 10 seconds with a screen reader. Confirm time (Standard, Long or No limit) changes this, and No limit waits until you tap again or choose something else.
 - The Haptics setting turns vibration off.
-- With Manage open on Decks, each deck has Move up and Move down buttons as well as drag.
-- Choices are short, plain sentences.
+- When Manage is open on the Decks screen, each deck has Move up and Move down buttons, so you don't have to drag.
+- Choices are written as short, plain sentences.
 
-All of these are in Settings and in the table's settings panel. Restore defaults resets them.
+All of these settings are in Settings and in the table's settings panel, and Restore defaults resets them.
 
 ## Automated checks
 
-`scripts/checks/a11y.test.ts` fails on a control without a role or name, a long press without a matching action, an unlabelled text field, or an image neither labelled nor hidden. Other tests cover the colour-vision pairs and layout at large text. `pnpm test a11y` (its own CI job) audits the main web screens with axe-core in Chromium, in both themes, and fails on a serious or critical finding. It checks the names, roles and states the web build exposes, not VoiceOver or TalkBack behaviour. The Label in Name findings it still reports are listed in `scripts/checks/a11y-web.ts` (see Known gaps).
+`scripts/checks/a11y.test.ts` fails on a control without a role or name, a long press without a matching reader action, an unlabelled text field, or an image that is neither labelled nor hidden. Other tests cover the colour-vision pairs and the layout at large text sizes. `pnpm test a11y`, which runs as its own CI job, audits the main web screens with axe-core in Chromium in both themes and fails on any serious or critical finding. It checks the names, roles and states the web build exposes, not how VoiceOver or TalkBack behave. The Label in Name findings it still reports are listed in `scripts/checks/a11y-web.ts`; Known gaps explains them.
 
 ## Known gaps
 
-- 200% text on a phone under 400 pt tall, with a choice open: at Medium UI scale the dock keeps its title, buttons and one row in view (reading aids, Undo included, move behind More); at Large and Extra large it does not. Use a smaller UI scale or Table as a list.
-- Same case: the dock's own buttons (a long main-button word wraps to three lines, other answers take a second row) are taller than the space under the top bar, so with the options open the dock overlaps the top bar. A taller screen fits it.
-- Hardware keyboard: the drawn table has no keyboard focus; use Table as a list, where rows, tray and dock buttons take focus with a visible ring. On Android, Escape closes the top panel, preview or banner, and Z (or Ctrl+Z) is Undo. On iPhone and iPad these keys do nothing yet; Tab and Full Keyboard Access move focus, Space or Enter presses. Switch and voice control work through the list table.
-- The web build (development only) has no drawn table; it lists each zone's cards by name (`src/play/canvas/table-canvas.tsx`). It has no reader announcements or focus moves, so those are checked on the phone only.
-- Label in Name (WCAG 2.5.3): spoken names start with the visible words ("Scenario 1, A Shadow of the Past, 3 quest stages", "Threat 20, P1, acting", "Planning, round 1"). axe still flags a few screens because on react-native-web it joins sibling text without spaces ("1A Shadow of the Past3 quest stages", "20P1"). The wording is correct.
-- The drawn table follows UI scale but not the phone's text size or Bold Text. Everything else does.
-- Sphere colours alone don't separate the spheres for some colour-vision types; the icon beside each one does.
+- At 200% text on a phone less than 400 pt tall, with a choice open, the dock still fits at Medium UI scale: it keeps its title, buttons and one row in view, and the reading aids, Undo included, move behind More. At Large and Extra large it doesn't fit. Use a smaller UI scale or Table as a list.
+- In the same case, the dock's own buttons are taller than the space under the top bar: a long word on the main button wraps onto three lines, and the other answers take a second row. So with the options open, the dock overlaps the top bar. A taller screen fits it.
+- With a hardware keyboard, the drawn table can't take keyboard focus. Use Table as a list instead, where rows, the tray and the dock buttons take focus with a visible ring. On Android, Escape closes the top panel, preview or banner, and Z (or Ctrl+Z) is Undo. On iPhone and iPad these keys do nothing yet, but Tab and Full Keyboard Access move focus, and Space or Enter presses. Switch and voice control work through the list table.
+- The web build, which is for development only, has no drawn table; it lists each zone's cards by name instead (`src/play/canvas/table-canvas.tsx`). It also makes no reader announcements or focus moves, so those can only be checked on a phone.
+- Label in Name (WCAG 2.5.3): spoken names start with the visible words, as in "Scenario 1, A Shadow of the Past, 3 quest stages", "Threat 20, P1, acting" or "Planning, round 1". axe still flags a few screens, because react-native-web joins sibling text without spaces ("1A Shadow of the Past3 quest stages", "20P1"). The wording itself is correct.
+- The drawn table follows UI scale, but not the phone's text size or Bold Text. Everything else follows both.
+- For some types of colour vision, sphere colours alone don't tell the spheres apart. The icon beside each one does.
 
 ## Reporting a barrier
 
-[Open an accessibility issue](https://github.com/j-jmnz/middle-earth-player/issues/new?template=accessibility.yml) with the device, OS version, assistive technology and version, the screen, what happened and what you expected. Barriers are treated as bugs. Volunteer project: no fixed response time.
+[Open an accessibility issue](https://github.com/j-jmnz/middle-earth-player/issues/new?template=accessibility.yml) and include your device, its OS version, the assistive technology you use and its version, the screen you were on, what happened and what you expected. Barriers are treated as bugs. This is a volunteer project, so there is no fixed response time.

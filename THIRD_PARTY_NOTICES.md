@@ -1,21 +1,21 @@
 # Third-party notices
 
-`LICENSE` (MIT) covers this project's own code and documentation, not the material below.
+The MIT license in `LICENSE` covers this project's own code and documentation. It does not cover the material described below.
 
 ## Game content
 
 The Lord of the Rings: The Card Game, its card text, card art, rules text and icons are © Fantasy Flight Games. The Lord of the Rings and the names of its characters, items, events and places are trademarks of Middle-earth Enterprises, used under license by Fantasy Flight Games. This is a fan-made, community-supported project and not an official client. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games, Asmodee or Middle-earth Enterprises in any way. No license is granted for this material.
 
-Locations:
+Game content appears in these places:
 
-- `data/cards/`, `data/scenarios/`, `data/campaigns/`, `data/printed/`, `data/rules/`, `data/decks/`, `src/effects/generated/`: game text and scenario lists.
-- `data/raw/`: verbatim source snapshots.
-- `assets/icons/`, `src/ui/icons/`: game icons built from `data/raw/icons/`.
-- Card images and PDFs: downloaded at build time, never committed.
+- `data/cards/`, `data/scenarios/`, `data/campaigns/`, `data/printed/`, `data/rules/`, `data/decks/` and `src/effects/generated/` hold game text and scenario lists.
+- `data/raw/` holds verbatim snapshots of the sources.
+- `assets/icons/` and `src/ui/icons/` hold game icons built from `data/raw/icons/`.
+- Card images and PDFs are downloaded at build time and never committed.
 
 ## Data sources
 
-None of these publishes a license for its data; it is used as published.
+None of these sources publishes a license for its data, so the data is used as published.
 
 | Source | Used for | Location |
 | --- | --- | --- |
@@ -26,12 +26,12 @@ None of these publishes a license for its data; it is used as published.
 | JvZijp's enhanced proxies and u/LepcisMagna's scans on [lotr.cardgame.tools](https://lotr.cardgame.tools) | Card pictures | `.cache/` |
 | A community Google Drive folder | Nightmare deck pictures and card lists | `data/raw/nightmare/`, `.cache/` |
 
-All sources are pinned by URL and sha256 in `data/sources.json`.
+Every source is pinned by URL and sha256 in `data/sources.json`.
 
 ## Fonts
 
-`assets/fonts/` (and the web build's copies in `public/fonts/`): Barlow Semi Condensed (Copyright 2017 The Barlow Project Authors) and Marcellus SC (Copyright 2012 Brian J. Bonislawsky DBA Astigmatic), SIL Open Font License 1.1. License texts: `assets/fonts/BarlowSemiCondensed-OFL.txt`, `assets/fonts/MarcellusSC-OFL.txt`.
+The fonts in `assets/fonts/`, and the web build's copies in `public/fonts/`, are Barlow Semi Condensed (Copyright 2017 The Barlow Project Authors) and Marcellus SC (Copyright 2012 Brian J. Bonislawsky DBA Astigmatic). Both are under the SIL Open Font License 1.1, and the license texts are in `assets/fonts/BarlowSemiCondensed-OFL.txt` and `assets/fonts/MarcellusSC-OFL.txt`.
 
 ## Dependencies
 
-npm dependencies keep their own licenses, in each package under `node_modules/`.
+The npm dependencies keep their own licenses, which you can find in each package under `node_modules/`.

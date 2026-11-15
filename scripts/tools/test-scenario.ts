@@ -10,7 +10,7 @@ import { duration, runScript, type Log } from "../log.ts";
 import { smokeCodes } from "../card-smoke/world.ts";
 import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 
-// The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/agents/agent-brief.md, Scenario procedure):
+// The tests to run while a scenario is being authored, a fraction of the full suite (docs/development.md, Commands; docs/agents/agent-brief.md, Scenario procedure):
 //
 //   pnpm test scenario <scenario-id> [--list]
 //   pnpm test scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader

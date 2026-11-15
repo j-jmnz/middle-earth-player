@@ -1,28 +1,28 @@
 # Security
 
-What the app stores and sends: [PRIVACY.md](PRIVACY.md). No accounts, backend, analytics, ads or crash reporting.
+[PRIVACY.md](PRIVACY.md) describes what the app stores and sends. There are no accounts and no backend, and the app has no analytics, ads or crash reporting.
 
 ## Network
 
-A release phone build makes one kind of request: a pasted RingsDB deck link fetches that deck's public JSON from `ringsdb.com`, plus the name of any card the app does not know (`src/screens/routes/deck-import.tsx`). Nothing else calls `fetch`.
+A release build on a phone makes only one kind of request. When you paste a RingsDB deck link, the app fetches that deck's public JSON from `ringsdb.com`, along with the name of any card it doesn't know (`src/screens/routes/deck-import.tsx`). Nothing else in the app calls `fetch`.
 
-Card pictures are bundled (`pnpm assets scans`). In a release build `remotePictureUrl` (`src/screens/images/remote.native.ts`) returns no URL, so a card without a bundled picture is drawn as text. Development and web builds (`remote.ts`) download such pictures from `ringsdb.com` or the Hall of Beorn and DragnCards buckets on `s3.amazonaws.com`. `src/screens/images/policy.ts` refuses any other host, non-HTTPS URLs and URLs with credentials, a port, a query or `..`.
+Card pictures are bundled with the app (`pnpm assets scans`). In a release build, `remotePictureUrl` (`src/screens/images/remote.native.ts`) returns no URL, so a card without a bundled picture is drawn as text instead. Development and web builds (`remote.ts`) download those pictures from `ringsdb.com`, or from the Hall of Beorn and DragnCards buckets on `s3.amazonaws.com`. `src/screens/images/policy.ts` refuses every other host, as well as any URL that isn't HTTPS or that carries credentials, a port, a query or `..`.
 
-Android permissions: `INTERNET` (deck import) and `VIBRATE` (haptics). `app.json` (`android.blockedPermissions`) removes the overlay and external-storage permissions Expo and its libraries would add. iOS: none. Rulebook PDFs open through the system file picker, which needs no permission.
+On Android the app asks for `INTERNET`, for deck import, and `VIBRATE`, for haptics. `app.json` (`android.blockedPermissions`) removes the overlay and external-storage permissions that Expo and its libraries would otherwise add. On iOS the app asks for no permissions. Rulebook PDFs open through the system file picker, which needs none.
 
-At build time only `pnpm data sync` uses the network. It fetches the sources in `data/sources.json` and checks each against its pinned sha256 or git commit.
+At build time, `pnpm data sync` is the only command that uses the network. It fetches the sources listed in `data/sources.json` and checks each one against its pinned sha256 or git commit.
 
 ## Supply chain
 
-- `pnpm-lock.yaml` is committed; CI installs with `--frozen-lockfile`.
-- CI (`.github/workflows/test.yml`) has a read-only token, so fork pull requests cannot write to the repository. Every action in it and in `.github/workflows/release.yml` (which holds the signing keys) is pinned to a commit SHA.
-- Releases are started by hand only: `.github/workflows/release.yml` and `.eas/workflows/e2e.yml` run on `workflow_dispatch` alone, which needs write access to the repository (or, for EAS, a login to the project's Expo account), and a real release refuses any branch but `main` or `release/v<major>.<minor>`. `scripts/checks/release-trigger.test.ts` fails if either gains another trigger or another workflow makes a tag or a release.
+- `pnpm-lock.yaml` is committed, and CI installs with `--frozen-lockfile`.
+- CI (`.github/workflows/test.yml`) runs with a read-only token, so pull requests from forks can't write to the repository. Every action used there and in `.github/workflows/release.yml`, which holds the signing keys, is pinned to a commit SHA.
+- Releases are only ever started by hand. `.github/workflows/release.yml` and `.eas/workflows/e2e.yml` run on `workflow_dispatch` alone, which needs write access to the repository, or for EAS a login to the project's Expo account. A real release refuses to run from any branch other than `main` or `release/v<major>.<minor>`. `scripts/checks/release-trigger.test.ts` fails if either workflow gains another trigger, or if any other workflow creates a tag or a release.
 - `.github/CODEOWNERS` makes the maintainer the reviewer of every pull request.
-- Dependabot (`.github/dependabot.yml`) opens weekly updates for npm packages and actions; they pass the same CI.
-- No secret, signing key or keystore is committed. `scripts/checks/private-data.test.ts` fails on a tracked file that holds a credential, a personal email address or a Claude Code session id.
+- Dependabot (`.github/dependabot.yml`) opens weekly updates for npm packages and actions, and those updates go through the same CI.
+- No secret, signing key or keystore is committed. `scripts/checks/private-data.test.ts` fails if a tracked file holds a credential, a personal email address or a Claude Code session id.
 
 ## Reporting a vulnerability
 
-Use the repository's Security tab, "Report a vulnerability". Do not open a public issue. Include what is affected (app, build script, dependency), how to reproduce it and what it allows.
+Use "Report a vulnerability" on the repository's Security tab, and please don't open a public issue. Say what is affected (the app, a build script or a dependency), how to reproduce the problem and what it allows an attacker to do.
 
-Volunteer project: no fixed response time. Fixes go to `main`; older releases are not maintained.
+This is a volunteer project, so there is no fixed response time. Fixes go to `main`, and older releases are not maintained.

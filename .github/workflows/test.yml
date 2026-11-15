@@ -1,7 +1,10 @@
 name: test
 
 on:
+  # A pull request runs once, on its merge with main; push runs only on the branches that release, so a push to a
+  # pull request's branch does not start a second, identical run.
   push:
+    branches: [main, "release/**"]
   pull_request:
   # The release workflow runs the same checks on the commit it releases.
   workflow_call:
@@ -59,7 +62,7 @@ jobs:
           RESULTS: ${{ needs.checks.result }} ${{ needs.shard.result }}
         run: test "$RESULTS" = "success success"
 
-  # The web build audited with axe-core in Chromium (README.md, Commands). Its own job, so `test` stays as fast.
+  # The web build audited with axe-core in Chromium (docs/development.md, Commands). Its own job, so `test` stays as fast.
   a11y-web:
     runs-on: ubuntu-latest
     steps:

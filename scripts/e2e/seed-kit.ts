@@ -167,7 +167,7 @@ export function goldenResolved(before: CampaignLog, scenarioId: string, golden: 
   return applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
 }
 
-/** How full a table is, for the showcase fixtures (docs/showcase.md, Saves and decks): the seats' cards in play, the cards attached to them, the engaged enemies, staging and the active location. */
+/** How full a table is, for the showcase fixtures: the seats' cards in play, the cards attached to them, the engaged enemies, staging and the active location. */
 export type Board = { play: number; attached: number; engaged: number; staging: number; location: boolean };
 
 export function boardOf(state: ScenarioState): Board {

@@ -52,7 +52,7 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
 const never = (): boolean => false;
 const atCommit = (state: ScenarioState): boolean => askingToCommit(state);
 const atPlanning = (state: ScenarioState): boolean => state.mode === "planning" && state.activeSeat === 0;
-// The README showcase's sea table (docs/showcase.md, Saves and decks): a planning window from round 3 on, with the ships and the characters in play and cards in staging.
+// The README showcase's sea table: a planning window from round 3 on, with the ships and the characters in play and cards in staging.
 const atShowcase = (state: ScenarioState): boolean => seatsStanding(state, 2) && state.round >= 3 && atPlanning(state) && !state.lost && boardHolds(state, { play: 8, staging: 2 });
 
 // The first seed of the Voyage game that `wanted` accepts, parked where `stop` says (checked before each intent) or at the game's end.
