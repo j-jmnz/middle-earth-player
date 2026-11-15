@@ -17,6 +17,7 @@ const EASINGS: Readonly<Record<EasingName, EasingFunction>> = {
   outQuad: Easing.out(Easing.quad),
   inQuad: Easing.in(Easing.quad),
   outBack: Easing.out(Easing.back(SHAPE.backOvershoot)),
+  inOutSine: Easing.inOut(Easing.sin),
 };
 
 /** Reanimated's version of a named curve. */

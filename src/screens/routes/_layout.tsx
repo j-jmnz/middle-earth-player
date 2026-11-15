@@ -22,6 +22,7 @@ import { ThemeContext, useResolvedTheme, type ThemeName } from "../../ui/theme";
 import { REM_BASE, UiScaleContext, uiFactor } from "../../ui/ui-scale";
 import { useIsTablet } from "../../ui/use-size-class";
 import { PicturesReady } from "../../ui/showcase/pictures-ready";
+import { SplashGlow } from "../kit/splash-glow";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -39,6 +40,13 @@ function applyColorScheme(setting: ThemeOption, resolved: ThemeName) {
 function reportSplashHideFailure(error: unknown): void {
   const reason = error instanceof Error ? error : new Error("Splash screen failed to hide");
   console.warn(reason.message);
+}
+
+// The native splash hides once SplashGlow has drawn the same frame over it, or when the app has opened, whichever comes first.
+function hideNativeSplash(hidden: { current: boolean }): void {
+  if (hidden.current) return;
+  hidden.current = true;
+  SplashScreen.hideAsync().catch(reportSplashHideFailure);
 }
 
 // A try/catch cannot be compiled inside a component (React Compiler), so the two below live here.
@@ -74,6 +82,8 @@ export default function RootLayout() {
   const [databases, setDatabases] = useState<AppDatabases | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const splashHidden = useRef(false);
+  // The drawn splash (SplashGlow) stays until its fade ends, over the first screen.
+  const [splashDone, setSplashDone] = useState(false);
   const themeSetting = useStore(tableSettings, (state) => state.settings.theme);
   const resolved = useResolvedTheme();
   const palette = palettes[resolved];
@@ -109,10 +119,8 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (splashHidden.current) return;
     if (!databases && !failure) return;
-    splashHidden.current = true;
-    SplashScreen.hideAsync().catch(reportSplashHideFailure);
+    hideNativeSplash(splashHidden);
   }, [databases, failure]);
 
   useEffect(() => {
@@ -164,7 +172,7 @@ export default function RootLayout() {
           Head publishes a Handoff activity whose URL needs an origin in the router config, and without one it raises an alert. */}
       {Platform.OS === "web" ? (
         <Head>
-          <title>Middle-earth Player</title>
+          <title>Middle-Earth Player</title>
         </Head>
       ) : null}
       <StatusBar hidden />
@@ -205,6 +213,7 @@ export default function RootLayout() {
           ) : null}
         </View>
       </SafeAreaProvider>
+      {splashDone ? null : <SplashGlow loading={!databases && !failure} onShown={() => hideNativeSplash(splashHidden)} onDone={() => setSplashDone(true)} />}
     </GestureHandlerRootView>
     </UiScaleContext.Provider>
     </ThemeContext.Provider>
