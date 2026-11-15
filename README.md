@@ -28,6 +28,7 @@ https://github.com/user-attachments/assets/6e01b9a1-ac99-44ea-ae78-fe406d3f8d35
 - [Local setup](#local-setup): [Requirements](#requirements), [In a browser](#in-a-browser), [On a phone](#on-a-phone), [Maestro](#maestro)
 - [Commands](#commands)
 - [Contributing](#contributing)
+- [Support](#support)
 - [Documentation](#documentation)
 - [Attribution](#attribution)
 - [License](#license)
@@ -232,6 +233,10 @@ Scripts log to stderr. `--verbose`, `--quiet`, or `LOG_LEVEL` (`debug`, `info`, 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Report security problems privately ([SECURITY.md](SECURITY.md)). A change that adds a network request, permission or data-sending SDK updates [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) in the same pull request.
+
+## Support
+
+If you enjoy the app, you can support its development through [GitHub Sponsors](https://github.com/sponsors/j-jmnz) or [Ko-fi](https://ko-fi.com/jjmnz). Donations pay for development time and build costs, never for game content. Nothing is paywalled and supporters get no rewards: every build is the same, free for everyone. The app itself never asks for money.
 
 ## Documentation
 
