@@ -285,6 +285,8 @@ Route files named below, such as `(tabs)/index.tsx` or `rule/[id].tsx`, are unde
 
 Black (`#000000`) with the app icon's glowing white ring (`assets/images/splash-icon.png`, 120 wide), so the icon opens into the same picture. No card art.
 
+While the app opens, the ring breathes. The native splash is a still picture, so the root layout draws the same frame over it (`SplashGlow`, `src/screens/kit/splash-glow.tsx`) and hides the native one once that ring has drawn. A blurred copy of the ring behind it comes in over `splashRampIn`, then swells and fades, one `splashBreath` each way, until the databases are open (or fail). Then the halo flares (`splashFlare`) while the black fades over the first screen (`splashFade`), and the overlay is gone. It never holds the app up: a quick launch shows the start of one breath. Under reduced motion the halo holds a steady glow and the black goes in one step.
+
 ### App icon
 
 Black, with the Campaigns tab's One Ring (`oneRing`) in white, lit by a soft glow (white close in, `glow` `#BED6BA` further out). The adaptive icon background is `#000000` (`app.json`); the monochrome layer is the ring alone, with no glow. iOS uses `assets/expo.icon` (a black fill under `Assets/ring.png`).

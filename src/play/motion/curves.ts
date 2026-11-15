@@ -33,6 +33,8 @@ export function ease(name: EasingName, x: number): number {
       const u = v - 1;
       return u * u * ((SHAPE.backOvershoot + 1) * u + SHAPE.backOvershoot) + 1;
     }
+    case "inOutSine":
+      return 0.5 - 0.5 * Math.cos(Math.PI * v);
   }
 }
 
