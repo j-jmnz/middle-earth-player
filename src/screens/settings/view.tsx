@@ -19,7 +19,7 @@ import { restoreDefaults, tableSettings } from "../../ui/table-settings";
 import { alwaysCodes, alwaysRows, CREDITS } from "../../play/chrome/settings-words";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSplitColumns } from "../nav/use-split-columns";
-import { openPrivacyPolicy } from "./privacy";
+import { openPrivacyPolicy, openSupport } from "./links";
 
 type Change = Parameters<ReturnType<typeof tableSettings.getState>["update"]>[0];
 const change = (next: Change) => tableSettings.getState().update(next);
@@ -60,6 +60,13 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
           testID="app-settings-privacy"
           accessibilityHint="Opens the privacy policy in your browser"
           onPress={openPrivacyPolicy}
+        />
+        <TextButton
+          label="Support"
+          tone="accent"
+          testID="app-settings-support"
+          accessibilityHint="Opens how to support the app in your browser"
+          onPress={openSupport}
         />
       </View>
       {confirming ? (

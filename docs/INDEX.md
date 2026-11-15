@@ -191,7 +191,7 @@ Read the sections your task touches.
   - 231–245 Icons (~480) ← 7
   - 246–264 Card art (~740) ← 2
   - 265–279 Tablets (~510) ← 13
-  - 280–467 Screens (~17.0K)
+  - 280–467 Screens (~17.1K)
     - 284–287 Splash (~40)
     - 288–291 App icon (~80)
     - 292–307 Campaigns (campaign list) (~1.5K) ← 6
@@ -210,7 +210,7 @@ Read the sections your task touches.
     - 412–421 Card pool (the Cards tab) (~770) ← 3
     - 422–427 Card (~490) ← 2
     - 428–433 Packs and pack cards (~130)
-    - 434–447 Settings (~910) ← 11
+    - 434–447 Settings (~940) ← 11
     - 448–453 Rules (~470) ← 1
     - 454–457 Rule (~220) ← 1
     - 458–463 Booklet (~280) ← 2
