@@ -44,6 +44,25 @@ Middle-earth Player lets you play The Lord of the Rings: The Card Game solo on a
 - **See the cards.** Card art ships with the app, so nothing needs downloading.
 - **Make it yours.** Choose a dark or light theme, the size of the interface, the animation speed and haptics, and look back over your run history.
 
+### Themes
+
+Ringwraiths is the dark theme, with Minas Morgul's pale green moonlight over a near-black table. Rivendell is the light theme, with warm parchment in morning sunlight. Pick one in Settings, or let the app follow your device.
+
+<table>
+  <tr>
+    <th>Ringwraiths (dark)</th>
+    <th>Rivendell (light)</th>
+  </tr>
+  <tr>
+    <td align="center"><img src=".github/readme/theme-phone-ringwraiths.webp" width="240" alt="The Campaigns screen on a phone in the Ringwraiths theme: dark, with green fog behind the Fellowship of the Ring campaign and a pale Resume button"></td>
+    <td align="center"><img src=".github/readme/theme-phone-rivendell.webp" width="240" alt="The Campaigns screen on a phone in the Rivendell theme: light parchment behind the Fellowship of the Ring campaign and a dark green Resume button"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src=".github/readme/theme-tablet-ringwraiths.webp" width="400" alt="The game board on a tablet in the Ringwraiths theme, at the Assault on Helm's Deep quest: cards over a red and green fog"></td>
+    <td align="center"><img src=".github/readme/theme-tablet-rivendell.webp" width="400" alt="The same game board on a tablet in the Rivendell theme: the cards over warm parchment"></td>
+  </tr>
+</table>
+
 ### Campaigns
 
 All eight official campaigns from the revised, repackaged products are playable. They're listed here in the order the app shows them.
