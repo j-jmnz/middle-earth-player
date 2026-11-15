@@ -23,7 +23,11 @@ export function sha256(body: string | Uint8Array): string {
 const fetchLog = createLog("fetch");
 
 // A response that came back with an error status: its message is already the whole story.
-class HttpError extends Error {}
+class HttpError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+  }
+}
 
 /**
  * GETs one URL. Each request is logged at debug with its status, size and time; a failure names the URL, the status or
@@ -34,7 +38,7 @@ export async function fetchBytes(url: string, timeoutMs = 120_000, log: Log = fe
   const took = () => duration(performance.now() - begin);
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-    if (!response.ok) throw new HttpError(`GET ${url} answered ${response.status}${response.statusText ? ` ${response.statusText}` : ""} after ${took()}`);
+    if (!response.ok) throw new HttpError(`GET ${url} answered ${response.status}${response.statusText ? ` ${response.statusText}` : ""} after ${took()}`, response.status);
     const body = new Uint8Array(await response.arrayBuffer());
     log.debug(`GET ${url} ${response.status}, ${bytes(body.byteLength)} in ${took()}`);
     return body;
@@ -42,6 +46,28 @@ export async function fetchBytes(url: string, timeoutMs = 120_000, log: Log = fe
     if (error instanceof HttpError) throw error;
     if (error instanceof Error && error.name === "TimeoutError") throw new Error(`GET ${url} timed out after ${duration(timeoutMs)}`, { cause: error });
     throw new Error(`GET ${url} failed after ${took()}`, { cause: error });
+  }
+}
+
+/** How fetchBytesRetrying spaces its attempts: the waits between them, in milliseconds. */
+export const RETRY_WAITS_MS: readonly number[] = [1_000, 4_000, 15_000];
+
+/**
+ * fetchBytes, tried again after each wait when the connection drops, the request times out or the server answers 429
+ * or 5xx. Another status is final. A long run of downloads (every card picture on a release build) meets a dropped
+ * connection now and then, and one must not fail the build.
+ */
+export async function fetchBytesRetrying(url: string, timeoutMs = 120_000, log: Log = fetchLog, waits: readonly number[] = RETRY_WAITS_MS): Promise<Uint8Array> {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await fetchBytes(url, timeoutMs, log);
+    } catch (error) {
+      const wait = waits[attempt];
+      const final = error instanceof HttpError && error.status !== 429 && error.status < 500;
+      if (wait === undefined || final) throw error;
+      log.warn(`${error instanceof Error ? error.message : String(error)}; trying again in ${duration(wait)}`);
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
   }
 }
 

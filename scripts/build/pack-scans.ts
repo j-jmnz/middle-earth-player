@@ -8,7 +8,7 @@ import sharp from "sharp";
 import { SCENE_PICTURE } from "../../src/screens/art/crop.ts";
 import { sniffImage } from "../../src/screens/images/policy.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../data/paths.ts";
-import { fetchBytes, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
+import { fetchBytesRetrying, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
 import { renderPdfPage } from "../data/sources/pictures.ts";
 import { bytes, runScript, type Log } from "../log.ts";
 
@@ -64,7 +64,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   const picturePins = new Map([...sidePins(sources.pictures, "pictures", options.pictureCacheDir), ...sidePins(sources.nightmare, "pictures", options.pictureCacheDir)]);
   const pdfPins = new Map((sources.pictures?.files ?? []).filter((file) => file.path.startsWith("pdf/")).map((file) => [file.url, file]));
   const notes: RenderNotes = { noPdftoppm: [], rehashed: [] };
-  const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log)), pdfPins, notes };
+  const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytesRetrying(url, 120_000, log)), pdfPins, notes };
   const shrink = options.shrink ?? shrinkToMaxSide;
   const database = new Database(options.catalogDb, { readonly: true });
   let cards: { code: string; name: string; type_code: string }[];
