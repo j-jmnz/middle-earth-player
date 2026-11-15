@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { GROUPS, resolve } from "./cli.ts";
+import { GROUPS, resolve, scriptPath } from "./cli.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const scripts = (JSON.parse(readFileSync(path.join(ROOT, "package.json"), "utf8")) as { scripts: Record<string, string> }).scripts;
@@ -19,8 +19,8 @@ describe("scripts/cli.ts", () => {
   });
 
   it("runs only files that exist", () => {
-    const files = Object.values(GROUPS).flatMap((commands) => Object.values(commands).flatMap((command) => command.steps.map((step) => step.script)));
-    const missing = files.filter((file) => !existsSync(path.isAbsolute(file) ? file : path.join(ROOT, "scripts", file)));
+    const files = Object.values(GROUPS).flatMap((commands) => Object.values(commands).flatMap((command) => command.steps.map(scriptPath)));
+    const missing = files.filter((file) => !existsSync(file));
     expect(missing).toEqual([]);
   });
 

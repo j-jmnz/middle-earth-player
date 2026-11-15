@@ -9,9 +9,11 @@ import { fileURLToPath } from "node:url";
 import { runScript, type Log } from "./log.ts";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const VITEST = path.join(path.dirname(createRequire(import.meta.url).resolve("vitest/package.json")), "vitest.mjs");
+// Vitest is found when a test step runs, not on import: the release workflow's plan job runs `pnpm release` without
+// installing the dependencies (.github/workflows/release.yml).
+const VITEST = "vitest";
 
-/** One child process: a script under `scripts/` (or vitest), the node flags and leading arguments it needs, and its env. */
+/** One child process: a script under `scripts/` (or `vitest`), the node flags and leading arguments it needs, and its env. */
 export type Step = { script: string; node?: string[]; args?: string[]; env?: Record<string, string> };
 export type Command = { steps: Step[]; about: string };
 
@@ -82,9 +84,15 @@ function usage(group: string): string {
   return [`usage: pnpm <${Object.keys(GROUPS).join("|")}> <command> [args]`, ...lines].join("\n");
 }
 
+/** The file a step runs: vitest's entry, or a script under `scripts/`. */
+export function scriptPath(step: Step): string {
+  if (step.script === VITEST) return path.join(path.dirname(createRequire(import.meta.url).resolve("vitest/package.json")), "vitest.mjs");
+  return path.join(ROOT, "scripts", step.script);
+}
+
 function run(log: Log, steps: readonly Step[], rest: readonly string[]): void {
   for (const step of steps) {
-    const file = path.isAbsolute(step.script) ? step.script : path.join(ROOT, "scripts", step.script);
+    const file = scriptPath(step);
     const argv = [...(step.node ?? []), file, ...(step.args ?? []), ...rest];
     log.debug(`node ${argv.join(" ")}`);
     const child = spawnSync(process.execPath, argv, { cwd: ROOT, stdio: "inherit", env: { ...process.env, ...step.env } });
