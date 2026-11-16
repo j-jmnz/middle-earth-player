@@ -75,7 +75,7 @@ Read the sections your task touches.
   - 402–417 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.1K tok)
   - 17–40 Sections (~490)
-  - 41–52 Product (~590) ← 2
+  - 41–52 Product (~590) ← 3
   - 53–66 Non-goals (~590)
   - 67–87 Decisions (~840)
   - 88–117 Stack (~950)
@@ -282,9 +282,17 @@ Read when a task names the plan.
   - 93–113 F. Faster feedback while authoring (~870)
   - 114–138 Where a scenario's cost is now (~790)
   - 139–155 Next steps (~410)
-  - 156–167 After each scenario phase (~220)
+  - 156–167 After each scenario phase (~220) ← 1
   - 168–171 Order (~70)
   - 172–179 Verification (~100)
+- `docs/plans/shadows-of-mirkwood.md` — Plan: the Shadows of Mirkwood cycle, playable standalone with Nightmare (~3.0K tok)
+  - 3–16 Context (~460)
+  - 17–22 What does not move (~170)
+  - 23–34 A. Data: the cycle's cards, scenarios and ledger (~790)
+  - 35–51 B. The cycle shell: a scenario with no campaign (~680)
+  - 52–64 C–H. The six scenarios, in pack order (~500)
+  - 65–71 Closing (~200)
+  - 72–78 Verification (~190)
 
 ## Handovers
 
