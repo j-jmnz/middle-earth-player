@@ -8,7 +8,7 @@ import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchFi
 import { editSavedDeck, startNewDeck } from "../deck/draft";
 import { savedDeckName } from "../deck/status";
 import { listDecks, readDeck, writeDeck } from "../deck/store";
-import { buildDecklist, cardUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type PrebuiltRow } from "../deck/import";
+import { buildDecklist, cardUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, deckRefusal, type BuiltDecklist, type PrebuiltRow } from "../deck/import";
 import { useDatabases } from "../data/databases";
 import { poolOf } from "../pool/cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
@@ -18,7 +18,8 @@ import { useListGutter } from "../nav/list-gutter";
 import { showToast } from "../kit/toast";
 
 const FETCH_FAILURE = "RingsDB did not respond.";
-const PRIVATE_DECK = "RingsDB did not return that deck. Make it public in its RingsDB sharing settings.";
+const PRIVATE_DECK = "That deck is not shared. Its owner turns on Share my decks in their RingsDB account settings.";
+const MISSING_DECK = "RingsDB has no deck with that number.";
 
 async function readJson(url: string): Promise<unknown> {
   const response = await fetch(url);
@@ -93,8 +94,13 @@ export default function DeckImportScreen() {
     await whileBusy(setBusy, async () => {
       const fetched = await fetchJson(ringsDbUrl(ref));
       if (!fetched) {
-        // RingsDB answers 404 for a deck its owner does not share, so the likely fix is the sharing setting.
-        setMessage(ref.kind === "deck" ? PRIVATE_DECK : FETCH_FAILURE);
+        setMessage(FETCH_FAILURE);
+        return;
+      }
+      // A deck its owner does not share, or an unknown id, comes back as a refusal, not an error status.
+      const refusal = deckRefusal(fetched.payload);
+      if (refusal) {
+        setMessage(refusal === "private" ? PRIVATE_DECK : MISSING_DECK);
         return;
       }
       const body = readDecklistBody(fetched.payload);
