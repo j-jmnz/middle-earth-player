@@ -20,7 +20,8 @@ export const ledgerEntrySchema = z.strictObject({
   inert: z.array(z.strictObject({ line: z.number().int().positive(), reason: z.string().min(1), keyword: z.string().optional() })),
   // Typos on the card itself. `lines` holds the corrected reading, this the printed wording of that line.
   misprints: z.array(z.strictObject({ line: z.number().int().positive(), printed: z.string().min(1) })),
-  readBy: z.string().min(1),
+  // Empty on a seeded entry (`pnpm data ledger-seed`) until the line is read against the scan; the effect coverage test refuses a playable scenario's card with it empty.
+  readBy: z.string(),
   // "user" for a call the user made, "sources" for one settled from several sources (named in basis), else null.
   confirmedBy: z.enum(["user", "sources"]).nullable(),
   basis: z.array(z.string().min(1)).optional(),

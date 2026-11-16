@@ -86,6 +86,12 @@ describe("effect coverage", () => {
     });
   }
 
+  // A seeded entry (`pnpm data ledger-seed`) has no reader until its lines are read against the scan.
+  it("reads every ledger entry of a playable scenario's cards against its scan", () => {
+    const unread = ledger.entries.filter((entry) => dealt.has(entry.code) && entry.readBy.trim() === "").map((entry) => keyOf(entry.code, entry.side));
+    expect(unread).toEqual([]);
+  });
+
   // A scenario with every line owned waits for PLAYABLE only until its golden is pinned: while golden.test.ts exists and golden.json does not
   // (the records are done and the game is being played), it may be absent; once golden.json exists it must be listed.
   const goldenPending = (id: string): boolean => {

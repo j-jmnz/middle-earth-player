@@ -1,0 +1,1540 @@
+{
+  "campaign": "shadows-of-mirkwood",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+  ],
+  "entries": [
+    {
+      "code": "02011",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-Hunt-Begins-1A.jpg",
+        "sha256": "4b8993d27f3ddea6175fcd64d574929d09a977e2ed605f5ecc8ceaa0b643b315"
+      },
+      "lines": [
+        "Setup: Reveal 1 card per player from the encounter deck, and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02011",
+      "side": "B",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-Hunt-Begins-1B.jpg",
+        "sha256": "8108bf865c30ddff83466b7971b562010a42d5cb2a5a6935357e20ad2016dc05"
+      },
+      "lines": [
+        "Forced: After the players quest successfully, the first player looks at the top 3 card fo the encounter deck. Reveal and add 1 of those cards to the staging area, and discard the other 2 cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02012",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/A-New-Terror-Abroad-2A.jpg",
+        "sha256": "1b1a8d0b0dbfba8b81796b2afa20c51b51f5c4933b290e08636c1003f54f832e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02012",
+      "side": "B",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/A-New-Terror-Abroad-2B.jpg",
+        "sha256": "c81ec379f042bb3dc6b61e786cdeba3fac4fe4a35e776cda6572cafb32a0c53b"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, the first player looks at the top 2 cards of the encounter deck. Reveal and add 1 of those cards to the staging area, and discard the other."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02013",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/On-the-Trail-3A.jpg",
+        "sha256": "0664e0b1ab74d739d02b86cf38f928259a2f3114152b6fc9a442eed83482a74e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02013",
+      "side": "B",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/On-the-Trail-3B.jpg",
+        "sha256": "19248fbdf04d3771ab4d7b6f332d0f100380e45b456403a385a7f527b6c5374d"
+      },
+      "lines": [
+        "Any player who does not control a hero with at least 1 Clue objective attached cannot commit characters to this quest. If there are ever no heroes with Clue objectives attached in play, reset the quest deck to stage 2B.",
+        "If the players defeat this stage, the players have once again found a true sign of Gollum's passing, and have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02014",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Signs-of-Gollum.jpg",
+        "sha256": "fef93e5d7ff477dd7e39b9a5e55a8bddfa847da09e83fd82c04d8acd6db46e28"
+      },
+      "lines": [
+        "Guarded.",
+        "Response: After the players quest successfully, the players may claim Signs of Gollum if it has no attached encounters. When claimed, attach Signs of Gollum to any hero committed to the quest. (Counts as a Condition attachment with: 'Forced: After attached hero is damaged or leaves play, return this card to the top of the encounter deck.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02015",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-Old-Ford.jpg",
+        "sha256": "9369af2730c7012221b1fb834290506d4dee41dc12dfdfbb90ddf9d11359e8b8"
+      },
+      "lines": [
+        "X is the number of ally cards in play.",
+        "Shadow: Discard from play all allies with a printed cost lower than the number of Riverland locations in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02016",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-Eaves-of-Mirkwood.jpg",
+        "sha256": "2781a7fd20a668b41f931f0a3c1156e5b47bc9e0a081e0bd564fe658d60b22b8"
+      },
+      "lines": [
+        "While The Eaves of Mirkwood is the active location, encounter card effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02017",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/River-Ninglor.jpg",
+        "sha256": "31f5ab6f87a121b3fe7ae75e27d45d6d5e9939dcfc51c89c81b6f22870489de3"
+      },
+      "lines": [
+        "While River Ninglor is the active location, remove 1 progress token from it and from the current quest at the end of each round.",
+        "Shadow: Remove 1 progress token from the current quest. (2 progress tokens instead if this attack is undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02018",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-East-Bank.jpg",
+        "sha256": "8463b5eed13f1c5cdc490a1dfadc5f9e14154100cea0eb4dd0a084304e79e9de"
+      },
+      "lines": [
+        "While The East Bank is the active location, ally cards cost 1 additional matching resource to play from hand.",
+        "Shadow: If you do not control at least 1 hero with a Clue card attached, return this enemy to the staging area after its attack resolves."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02019",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-West-Bank.jpg",
+        "sha256": "9d5a4cfbf6798644af836fd437a16d3e99ee017a89e2b58d7cc39232a68f7874"
+      },
+      "lines": [
+        "While The West Bank is the active location, attachment and event cards cost 1 additional matching resource to play from hand.",
+        "Shadow: If you do not control at least 1 hero with a Clue card attached, double this enemy's base Attack for this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02020",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Goblintown-Scavengers.jpg",
+        "sha256": "f5b145687cb1edb9dd217220ec77a78e48ecac6ab802b0c40d875fb3b28ee0ef"
+      },
+      "lines": [
+        "When Revealed: Discard the top card of each player's deck. Until the end of the phase, increase Goblintown Scavenger's Threat by the total printed cost of all cards discarded in this way."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02021",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Hunters-from-Mordor.jpg",
+        "sha256": "d0f9e28a91a92d25272f7a01530d4983c6d0e205a797fb100e7f005b20dc1074"
+      },
+      "lines": [
+        "Hunters from Mordor get +2 Attack and +2 Threat for each Clue card in play.",
+        "Shadow: Deal 1 damage to each hero with a Clue card attached. (3 damage instead if this attack is undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02022",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/False-Lead.jpg",
+        "sha256": "e42a49bf2e58b2b9f652f03d5a795af48b3da3c6541f4e548cea9cbc3e62bb04"
+      },
+      "lines": [
+        "When Revealed: The first player chooses and shuffles a card with the printed Clue trait back into the encounter deck. If there are no Clue cards in play, False Lead gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02023",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Flooding.jpg",
+        "sha256": "18a1b3717aded18918054149e5ebf687d685095382984413684e125ae84f7cda"
+      },
+      "lines": [
+        "Doomed 1. Surge.",
+        "When Revealed: Remove all progress tokens from all Riverland locations.",
+        "Shadow: Resolve the 'when revealed' effect of this card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02024",
+      "side": "A",
+      "printing": "HfG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Old-Wives'-Tales.jpg",
+        "sha256": "5891dd3749dcb1b27ce72412967c063830d6a0314ad1f0cb5d4f175b7173d3c8"
+      },
+      "lines": [
+        "When Revealed: Discard 1 resource from each hero's resource pool, if able. Exhaust any hero that could not discard a resource from its pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02035",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Grimbeorn's-Quest-1A.jpg",
+        "sha256": "5e634121588bba1b4cac52b238bad4d9fd951ad8425b6a7e57616df505f269ac"
+      },
+      "lines": [
+        "Setup: Add The Carrock to the staging area. Remove 4 unique Troll cards and 4 copies of the 'Sacked!' card from the encounter deck and set them aside, out of play. Then shuffle 1 'Sacked!' card per player back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02035",
+      "side": "B",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Grimbeorn's-Quest-1B.jpg",
+        "sha256": "a3c66d0b4598623c7fd28ce073e845b312814d2d58120aa31fe53bf287487e94"
+      },
+      "lines": [
+        "Forced: After placing the 7th progress token on Grimbeorn's Quest, The Carrock becomes the active location. Discard the previous active location from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02036",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Against-the-Trolls-2A.jpg",
+        "sha256": "359510fbdc571e710980efe8ba5a37aab39c7f712fe50a48718feb84935e96c2"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02036",
+      "side": "B",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Against-the-Trolls-2B.jpg",
+        "sha256": "49968cb9da37219d721fe616c94ba00a3a48744cd932a03b80d210b5da1394bf"
+      },
+      "lines": [
+        "When Revealed: Place the unique Troll cards previously set aside into the staging area.",
+        "Players cannot defeat this stage if there are any Troll enemies in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02037",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Grimbeorn-the-Old.jpg",
+        "sha256": "48e9fbb56b7812bdac9158280a04bf8d730e2402b7e2ccac0814daa263719408"
+      },
+      "lines": [
+        "Grimbeorn the Old does not exhaust to defend against Troll enemies.",
+        "If Grimbeorn the Old has 8 or more resource tokens on him, he joins the first player as an ally.",
+        "Action: Spend 1 Leadership resource to place that resource on Grimbeorn the Old."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02038",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Louis.jpg",
+        "sha256": "3d1446f67e5361e3e0c1725e1f5df83920a948063925d27185304bed895686ed"
+      },
+      "lines": [
+        "While Louis is engaged with a player, all Troll enemies gain, 'Forced: After this enemy attacks, the defending player must raise his threat by 3.'",
+        "Response: After defeating Louis, you may choose and discard 1 'Sacked!' card from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02039",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Morris.jpg",
+        "sha256": "904f8bd27113f95bb4b0e88b301ff1e02e561fecf8c7179a22f8e5e8451d2c68"
+      },
+      "lines": [
+        "While Morris is engaged with a player, all Troll enemies get +1 Attack.",
+        "Response: After defeating Morris, you may choose and discard 1 'Sacked!' card from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02040",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Stuart.jpg",
+        "sha256": "d38e85da1d4a45b019bcabb231e822299bad38b3e7951226a2f9a5fd7c9a0b44"
+      },
+      "lines": [
+        "While Stuart is engaged with a player, all Troll enemies get +1 Defense.",
+        "Response: After defeating Stuart, you may choose and discard 1 'Sacked!' card from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02041",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Rupert.jpg",
+        "sha256": "c5ab015179c581de065a3b904cd5fd870bb9cb3c0079e05b023651a690805f3a"
+      },
+      "lines": [
+        "Forced: After Rupert attacks, shuffle all copies of the 'Sacked!' card from the discard pile back into the encounter deck.",
+        "Response: After defeating Rupert, you may choose and discard 1 'Sacked!' card from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02042",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Muck-Adder.jpg",
+        "sha256": "40d4a955f9f9b4a7e8cbe58c836e8c4b817eaeccf00674b46a458db4610b9b06"
+      },
+      "lines": [
+        "Forced: If Muck Adder damages a character, discard that character from play.",
+        "Shadow: Defending character gets -1 Defense for the duration of this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02043",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/The-Carrock.jpg",
+        "sha256": "942bd8a8dbf5dbb239b1fd98a6eccfebd849fd8a2eff7b6d21d37d5ad5a91a8e"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Players cannot travel to The Carrock except through quest card effects.While The Carrock is the active location, Troll enemies get +1 Attack and +1 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02044",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/River-Langflood.jpg",
+        "sha256": "7df6c4c2d26e57faf97601adae7be172bdaf5ce7f357bd265a1eea44d600da23"
+      },
+      "lines": [
+        "While it is in the staging area, River Langflood gets +1 Threat for each Troll enemy in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02045",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Bee-Pastures.jpg",
+        "sha256": "8f51615ad3fd6110b267434a00e604673ed6c6457bf68093f60f4809890a4fc3"
+      },
+      "lines": [
+        "Response: After you travel to Bee Pastures, search the encounter deck and discard pile for Grimbeorn the Old and add him to the staging area. Then, shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02046",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Oak-wood-Grove.jpg",
+        "sha256": "90513af132367ccf9e6b591f7b0734f5ca6884679fff139499c270f0b72eac6b"
+      },
+      "lines": [
+        "While Oak-wood Grove is the active location, resource tokens from any sphere may be spent as Leadership resource tokens."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02047",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/A-Frightened-Beast.jpg",
+        "sha256": "186526bfae12ca986f5bedac1bce79d9755fbed04c0cf2e4bd09aac1efcc784f"
+      },
+      "lines": [
+        "When Revealed: Each player raises his threat by the total Threat of all cards in the staging area. Any player may choose to discard from play 1 Creature ally card he controls to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02048",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Sacked.jpg",
+        "sha256": "c46dccb0ba67cf648114ec272f8df99d73456806b64ce82d20e1aef514e43a17"
+      },
+      "lines": [
+        "When Revealed: Attach to a hero with no 'Sacked!' cards attached controlled by the first player. (Cannot be canceled.) Counts as a condition attachment with the text: 'Attached hero cannot attack, defend, commit to a quest, trigger its effect, or collect resources.'",
+        "Shadow: If attacking enemy is a Troll, resolve this card's 'when revealed' effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02049",
+      "side": "A",
+      "printing": "CatC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Roasted-Slowly.jpg",
+        "sha256": "4d5a355012120abce6fee7daf6955da917a729dcd8bb2b7ba9abb265b64dd496"
+      },
+      "lines": [
+        "When Revealed: Destroy all heroes with the card 'Sacked!' attached. Then, shuffle Roasted Slowly back into the encounter deck.",
+        "Shadow: If attacking enemy is a Troll, remove 2 damage tokens from it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02060",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/The-Wounded-Eagle-1A.jpg",
+        "sha256": "522816b8a9668016d8d7282b86f4969947b238c9eb4f8e090c55bd4db163be62"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for Rhosgobel and Wilyador, and add them to the staging area with 2 damage tokens on Wilyador. Then, shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02060",
+      "side": "B",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/The-Wounded-Eagle-1B.jpg",
+        "sha256": "c5dcc2119a1d2777f6d4bd57327f867552e04ef8045fcf316b34ae8f175868e0"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02061",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Radagast's-Request-2A.jpg",
+        "sha256": "259a5772bbac264215365ab31adaf08a851bfcc7d6b9e87777ae918afea8454c"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02061",
+      "side": "B",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Radagast's-Request-2B.jpg",
+        "sha256": "aae89bb4868a0431ef77cbca8a45959c2af12338c39aa2d922225c8d20c36c73"
+      },
+      "lines": [
+        "Forced: After a card effect heals Wilyador, remove that card from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02062",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Return-to-Rhosgobel-3A.jpg",
+        "sha256": "9d49435d5391cb9a1b5c833e27119907d3240aef67ef4ebf5685362fa072a1ca"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02062",
+      "side": "B",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Return-to-Rhosgobel-3B.jpg",
+        "sha256": "63674d2dd04f5e3e81c35f7a4828cd1342412297835c4982b2e7e45d505ce452"
+      },
+      "lines": [
+        "If Wilyador is completely healed when this effect resolves, Wilyador survives and the players have won the game. Otherwise, the players have lost the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02063",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Athelas.jpg",
+        "sha256": "63bc829d67653d6b5191f71a96d23b46ace499d80e63ffa4aa2254619593e561"
+      },
+      "lines": [
+        "Guarded.",
+        "Action: Exhaust a hero to claim this objective if it has no encounters attached. Then, attach Athelas to that hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02064",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Wilyador.jpg",
+        "sha256": "6d25d9695461bf79f85e8423d47b8bfae0a43154c8370f9145188f03ef6f784c"
+      },
+      "lines": [
+        "No attachments. The first player gains control of Wilyador.",
+        "Forced: At the end of each round, Wilyador suffers 2 damage.",
+        "Wilyador cannot be healed of more than 5 wounds by a single effect. If Wilyador leaves play, the players have lost the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02065",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Rhosgobel.jpg",
+        "sha256": "bc2b028c4a23598508adcc1c210a2067312dd14bab1a54811cd64c5fd9af624e"
+      },
+      "lines": [
+        "X is the number of players in the game.",
+        "While Rhosgobel is in the staging area, Wilyador cannot be healed.",
+        "Travel: Players must complete stage one of this quest before they can travel to Rhosgobel."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02066",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Forest-Grove.jpg",
+        "sha256": "d43f63af1c8d760c8e670da9d4daa703c7ca1e44d90cd688ef34116cd3004a60"
+      },
+      "lines": [
+        "Response: After the players explore Forest Grove, search the encounter deck and discard pile for 1 Athelas objective, and add it to the staging area. Then, shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02067",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Exhaustion.jpg",
+        "sha256": "5e94ae022be864f967bf3939be1f8f4020ea6b5f4e27a13060e259bd9edd24d8"
+      },
+      "lines": [
+        "When Revealed: Deal 2 damage to each exhausted character.",
+        "Shadow: Deal 1 damage to each exhausted character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02068",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Swarming-Insects.jpg",
+        "sha256": "e679e1c7d34daedaa092b5ee39a74d12b9d71d222ecdb3a56a20a3edaabc38dd"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each character without any attachments.",
+        "Shadow: If a character (including Wilyador) has more damage than each other character, deal 3 additional damage to that character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02069",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Festering-Wounds.jpg",
+        "sha256": "c6e04582cb47d2a2bc57d9d736f4c7712f0a3334ceb2d3d108488fa467688ee2"
+      },
+      "lines": [
+        "When Revealed: Deal 2 damage to each wounded character.",
+        "Shadow: Deal 1 damage to each wounded character. (2 damage instead if this attack is undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02070",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Mirkwood-Flock.jpg",
+        "sha256": "3b2db5bf3d6258e196886c4bb86adbd32ba0c52f1e57a7481fe95ba64b12044b"
+      },
+      "lines": [
+        "Only Eagle characters or characters with ranged can attack or defend against Mirkwood Flock.",
+        "Shadow: If this attack is undefended, the damage must be placed on Wilyador."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02071",
+      "side": "A",
+      "printing": "JtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Black-Forest-Bats.jpg",
+        "sha256": "6c75f6eccffa3d5255f2690f0f0494b30202688d60ada3f01bea65283bdb9876"
+      },
+      "lines": [
+        "Only Eagle characters or characters with ranged can attack or defend against Black Forest Bats.",
+        "Shadow: If this attack is undefended, the damage must be placed on Wilyador."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02082",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Hills-of-Emyn-Muil-1A.jpg",
+        "sha256": "bfc1379d9cd8f19da9ad498a2bc11389bdb61f1b45f8e82b340a75e469755e93"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for Amon Hen and Amon Lhaw, and add them to the staging area. Then shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02082",
+      "side": "B",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Hills-of-Emyn-Muil-1B.jpg",
+        "sha256": "455c467ef644086544c82451a2c05a9274b863434d9ff897785551dac4e40731"
+      },
+      "lines": [
+        "Forced: If there are no location cards in the staging area, the first treachery card revealed during the quest phase gains surge.",
+        "Players cannot defeat this stage until there are no Emyn Muil locations in play, and they have collected at least 20 victory points."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02083",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Amon-Hen.jpg",
+        "sha256": "c75281cfdd0fa9b9908afe011beec70dac0a54414e4079dd947506d8ab325201"
+      },
+      "lines": [
+        "X is double the number of players in the game.",
+        "While Amon Hen is the active location, players cannot play events."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02084",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Amon-Lhaw.jpg",
+        "sha256": "ec841ed6e175e8154d40342008d85f076db33ce1faf0206463ac40bdd3c343ff"
+      },
+      "lines": [
+        "X is double the number of players in the game.",
+        "While Amon Lhaw is the active location, treat all attachments as if their printed text boxes were blank."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02085",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-East-Wall-of-Rohan.jpg",
+        "sha256": "80e9ffa3a08752ed8b9730f3a8b2b0c60fd83a01f1530fcb568927f3d2922d19"
+      },
+      "lines": [
+        "While The East Wall of Rohan is the active location, non-Rohan characters cost 2 additional matching resources to play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02086",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-North-Stair.jpg",
+        "sha256": "f5ce5bcc903c0eb8d4db5eca94c38351ff80b02f954c0e56fbcbca30fcf1cfd3"
+      },
+      "lines": [
+        "Forced: After traveling to The North Stair, move the top card of the encounter discard pile to the staging area. Resolve any 'when revealed' effects on that card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02087",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Rauros-Falls.jpg",
+        "sha256": "b3915e73c349431322c9b7678f516e8c6ee87c4cd028c023662c81cc2eb18bc4"
+      },
+      "lines": [
+        "While Rauros Falls is the active location, all characters must commit to the current quest during the quest phase.",
+        "Shadow: After this attack resolves, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02088",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Shores-of-Nen-Hithoel.jpg",
+        "sha256": "c58f0b864452f18f797f190a3982812335399fedd0768015e4adaf688b056629"
+      },
+      "lines": [
+        "Travel: The first player must discard 1 event card from his hand to travel to this location.",
+        "Shadow: After this attack resolves, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02089",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Outer-Ridge.jpg",
+        "sha256": "1b9f709f7d251d7825f3fdf114ccb1299f8367f80bfd08e48a5304fd09b0c179"
+      },
+      "lines": [
+        "While The Outer Ridge is the active location, each location in the staging area gets +1 Threat.",
+        "Shadow: After this attack resolves, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02090",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Highlands.jpg",
+        "sha256": "4671c6d37cedbb7087e678efd5914a7a989852ce37bbe4cfe9f2154a166834b1"
+      },
+      "lines": [
+        "Travel: In order to travel to The Highlands, the players must reveal the top card of the encounter deck, and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02091",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Impassable-Chasm.jpg",
+        "sha256": "8bae4087b96fbd0f1fdd7cf062cc4cdbf596e76990e10a71ae5ed232fae5cfeb"
+      },
+      "lines": [
+        "When Revealed: If there is an active location, remove all progress tokens from that location and return it to the staging area. If no location is moved by this effect, this card gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02092",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Rockslide.jpg",
+        "sha256": "c4345bd070ae19224bb059d45d38848eed25ee8e6c044dfa93a6c5511aec54fb"
+      },
+      "lines": [
+        "When Revealed: Deal 2 damage to each character committed to this quest.",
+        "Shadow: Remove defending character from combat. This attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02093",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Slick-Footing.jpg",
+        "sha256": "6cf22f2cb1d6fcd44e598271352df404bf35be1f0bce0b53c5b7fc30ac52175b"
+      },
+      "lines": [
+        "When Revealed: Remove 1 progress token from each location in play. Then, discard the top card of each player's deck for each progress token removed by this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02094",
+      "side": "A",
+      "printing": "HoEM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Orc-Horse-Thieves.jpg",
+        "sha256": "073b6e9b0392cb3722a22db06fcd8bc8c0747d6e7ab7611642e706de527cf030"
+      },
+      "lines": [
+        "Doomed 2.",
+        "Orc Horse Thieves get +1 Attack for each location in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02105",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Into-the-Marshes-1A.jpg",
+        "sha256": "fc897e551b91d4f1be1f88bc89acdd631f11172a16d825179dd56e9efd1588ba"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for Gollum, and add it to the staging area. Shuffle the encounter deck, then reveal 1 card per player from the encounter deck and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02105",
+      "side": "B",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Into-the-Marshes-1B.jpg",
+        "sha256": "1ffe5c8eb96ee0f116e6f50c0702d38954d1c7600e6eaab30bdc06589ed752b1"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02106",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/The-Capture-2A.jpg",
+        "sha256": "09a8584d3e6ac5302ccf2ac4a7b2077e8fdc1fec4b1a2ad710409d168ad984bc"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02106",
+      "side": "B",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/The-Capture-2B.jpg",
+        "sha256": "085def9918b8955dbad855c0c4bb9e05ce2b1aee5a8c7b248776e998daf04e68"
+      },
+      "lines": [
+        "Forced: After this stage is defeated, the first player chooses a player. That player must pass an Escape test, dealing 1 card from the encounter deck for each resource token on Gollum, to capture him. If Gollum is not captured at this time, reset the quest deck to stage 1B.",
+        "If this final Escape test is passed, the players have captured Gollum and won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02107",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Gollum.jpg",
+        "sha256": "18118c4499e6d03fae2507128134e792961735e39c50935289951a9652bae6af"
+      },
+      "lines": [
+        "If Gollum ever has 8 or more resource tokens on him, shuffle him back into the encounter deck.",
+        "Forced: At the end of the quest phase, the party must make an escape test, dealing 1 card per player from the encounter deck. If this test is failed, place 2 resource tokens on Gollum."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02108",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/A-Wisp-of-Pale-Sheen.jpg",
+        "sha256": "6dec54183fb310cf1cba2a47866645ca97e396bb801406e5c6a8d353d092c8be"
+      },
+      "lines": [
+        "When Revealed: Place 2 resource tokens on Gollum. Any player may exhaust a Lore hero to reduce this effect to 1 resource token.Escape: 4"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02109",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Nightfall.jpg",
+        "sha256": "c65976dcf4b7c769bc899541038e5d3463a2e2ce08e4471f2d622053f7bc1c8a"
+      },
+      "lines": [
+        "When Revealed: The first player makes an escape test, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 2.Escape: 2"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02110",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Through-the-Mist.jpg",
+        "sha256": "a88f91238c31ac45c41cb9ba84d6fb27f85e7ed84ad494fef00460849f1cd328"
+      },
+      "lines": [
+        "When Revealed: The first player makes an escape test counting Attack instead of Willpower, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 1.Escape: 3"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02111",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/The-Lights-of-the-Dead.jpg",
+        "sha256": "80e4d503c5d39afa85e6f8c82cbeb42310965741590d84a90570b3f09e1fcebd"
+      },
+      "lines": [
+        "When Revealed: Each player must make an escape test, dealing 2 cards from the encounter deck for each test. Each player that fails this test places 1 resource token on Gollum, and raises his threat by 1.Escape: 5"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02112",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Giant-Marsh-Worm.jpg",
+        "sha256": "6a3a60703b0bb3104aeb41e73a436846d22ac8a1926c3023b9a21b02d592a0cb"
+      },
+      "lines": [
+        "Forced: Remove 2 damage from Giant Marsh Worm at the end of each round.Escape: 2"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02113",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Impassable-Bog.jpg",
+        "sha256": "554d09a0382e24d88557e45175d385fc29c55a8dcbea032aa38724e207717fd9"
+      },
+      "lines": [
+        "When Revealed: Place 1 resource token on Gollum for each location card in the staging area.Escape: 2"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02114",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/The-Heart-of-the-Marshes.jpg",
+        "sha256": "a89c4578f542bd8a630cde30c0e0ae9f03cc930a7545763d7d7df2f768828c7d"
+      },
+      "lines": [
+        "While The Heart of the Marshes is the active location, all cards dealt from the encounter deck for escape tests get +1 Escape. (Cards receive this bonus even if they do not have a printed escape value.)Escape: 1"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02115",
+      "side": "A",
+      "printing": "TDM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Fens-and-Mires.jpg",
+        "sha256": "2b46b4e5ab613738ed800e514c0e8d4edbf44ac28b2f3b94b45fe800881046bd"
+      },
+      "lines": [
+        "Forced: After the players travel to this location, place 1 resource token on Gollum.Escape: 2"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02126",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Through-the-Forest-1A.jpg",
+        "sha256": "ae37153cd9a535ec141eb8c56c7b88e2af16b6181392a57709f4f985489b0f75"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for Gollum. Choose a player to guard Gollum at the start of the game, and place Gollum in front of that player. Then shuffle the encounter deck. Reveal 1 card per player from the encounter deck, and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02126",
+      "side": "B",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Through-the-Forest-1B.jpg",
+        "sha256": "97240c999a23ef41833ab8d0e1dd5a1cb3c15c2f2abfc6df8a8a3f21e5d5e658"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02127",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Escape-Attempt-2A.jpg",
+        "sha256": "4291009eb4f21c16de1c5315479ee9f5e0bc1e2fec5b140bb07b725bd65fd5ba"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02127",
+      "side": "B",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Escape-Attempt-2B.jpg",
+        "sha256": "f48eb2147135a07fee5f1ad1f3d37f9fe126dad9aa1166dbc03290f8397ee7af"
+      },
+      "lines": [
+        "The player guarding Gollum cannot commit characters to this quest (unless he is the only player in the game).",
+        "If the players quest unsuccessfully, Gollum escapes and the players have lost the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02128",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/To-the-Elvin-King's-Halls-3A.jpg",
+        "sha256": "8167093d11ee452e74b552307bd6f759e1c354bd5cbf2413d94e5b38e7b0c1b0"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02128",
+      "side": "B",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/To-the-Elvin-King's-Halls-3B.jpg",
+        "sha256": "f2f7266c94a26dc555250cc66476ee4743ba31b316ce06902bf4a7bf62e99f10"
+      },
+      "lines": [
+        "The player guarding Gollum cannot play cards from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02129",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Ambush-4A.jpg",
+        "sha256": "406437afb0dcd7b3bc00c03c53c2c96aceffb2c6b4bc9b54323fd34054dee3d0"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02129",
+      "side": "B",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Ambush-4B.jpg",
+        "sha256": "a522d9a33f3cfb9849e7fba63d0de7a9164ebb85abdb21e4a1d9ae2bd3d4b430"
+      },
+      "lines": [
+        "Forced: At the beginning of the combat phase, all enemies in play enage the player guarding Gollum.",
+        "Player cannot defeat this stage if there are any enemies in play. If players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02130",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Gollum.jpg",
+        "sha256": "cce7f1f02eddfbab02dca687073cc20f14f4770c732396aee6e96184dbaba9ee"
+      },
+      "lines": [
+        "Damage from undefended attacks against you must be dealt to Gollum. If Gollum is destroyed, or if the player guarding Gollum is eliminated, the players have lost the game.",
+        "Forced: At the end of each round, raise the threat of the player guarding Gollum by 3. Then, that player may choose a new player to guard Gollum."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02131",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/The-Spiders'-Ring.jpg",
+        "sha256": "8bff8c32218b96930ab57a4412f6b537e31d1acca01907547e3b7c89bbe69676"
+      },
+      "lines": [
+        "While The Spider's Ring is the active location, the player guarding Gollum cannot change.",
+        "Shadow: If this attack is undefended, return any current active location to the staging area. The Spider's Ring becomes the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02132",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Dry-Watercourse.jpg",
+        "sha256": "503c2372a091c572960a449c1981fa89d8bc905d9ce974286904ad4f5adb33d9"
+      },
+      "lines": [
+        "While Dry Watercourse is the active location, all treachery card effects that target the player guarding Gollum also target each other player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02133",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Woodman's-Glade.jpg",
+        "sha256": "b7338c40ade070187ace1c665d3961c33a97d1c9ba19e6fbe15b846f640ac1d6"
+      },
+      "lines": [
+        "Travel: The player guarding Gollum must exhaust a hero he controls to travel to Woodman's Glade.Response: After exploring Woodman's Glade, reduce the threat of each player not guarding Gollum by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02134",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Wood-Elf-Path.jpg",
+        "sha256": "cdb3559dcafcda85e87587e8729378eb94a55f75f2cf7e5d01a4e5722c11db72"
+      },
+      "lines": [
+        "Response: After the players travel to Wood Elf Path, the player guarding Gollum may choose a new player to guard him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02135",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Gollum's-Anguish.jpg",
+        "sha256": "8f4219ba46ec5cd4387cd5b6d821bf6a4d6cde2f73260f7a56233fc9d0633be3"
+      },
+      "lines": [
+        "When Revealed: Raise the threat of the player guarding Gollum by 8. That player must choose a new player to guard Gollum, if able.",
+        "Shadow: Raise the threat of the player guarding Gollum by 4."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02136",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Gollum's-Bite.jpg",
+        "sha256": "eba80bd1fa4fb23506c6af0974c858f1eb648be300ea1522925026842b777e02"
+      },
+      "lines": [
+        "When Revealed: Deal 4 damage to a hero controlled by the player guarding Gollum. That player must choose a new player to guard Gollum, if able.",
+        "Shadow: Deal 2 damage to a hero controlled by the player guarding Gollum."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02137",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Wasted-Provisions.jpg",
+        "sha256": "f551c27f50eb2804332a79003fae39c10b5335eac2a930cd73aaef06913ef1bc"
+      },
+      "lines": [
+        "When Revealed: Discard the top 10 cards from the deck of the player guarding Gollum. That player must choose a new player to guard Gollum, if able.",
+        "Shadow: Discard the top 5 cards from the deck of the player guarding Gollum."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02138",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Mirkwood-Bats.jpg",
+        "sha256": "0658e081d97a4a3eed74d6aa4c12b571e59b0bab77ea9823ae22e014838e921e"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Mirkwood Bats engages a player, deal 1 damage to each character controlled by the player guarding Gollum."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02139",
+      "side": "A",
+      "printing": "RtM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Attercop-Attercop.jpg",
+        "sha256": "3d6ea29a178ee2c43ec1d2ee9b5061b085b7d50103fbf675519211c908273ad0"
+      },
+      "lines": [
+        "Forced: At the beginning of the encounter phase, Attercop, Attercop automatically engages the player guarding Gollum, regardless of his threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    }
+  ]
+}
