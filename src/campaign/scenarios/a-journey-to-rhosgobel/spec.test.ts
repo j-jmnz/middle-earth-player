@@ -16,6 +16,7 @@ const ROWS: readonly Row[] = [
   { line: "02063:A:2", name: "Action: a hero exhausts to claim Athelas, which is attached to it", layout: { staging: ["02063"], phase: "Planning" }, act: respond("02063"), expect: [zone("02063", "attached"), exhausted("dh1")] },
   { line: "02064:A:1", name: "the first player gains control of Wilyador, who leaves the staging area", layout: { staging: ["02064"] }, act: resolve("02064", "constant"), expect: [zone("02064", "play")] },
   { line: "02064:A:2", name: "Forced: Wilyador suffers 2 damage at the end of the round", layout: { play: ["02064"] }, act: endRound, expect: [damageOn("02064", 2)] },
+  { line: "02065:A:1", name: "Rhosgobel's Threat is the number of players", layout: { seats: 2, staging: ["02065"] }, act: announce("enteredPlay", "02065"), expect: [stat("02065", "threat", 2)] },
   { line: "02065:A:2", name: "while Rhosgobel is in the staging area Wilyador cannot be healed", layout: { staging: ["02065"], play: ["02064"] }, act: resolve("02065", "constant"), expect: [flag("02064", "cannotBeHealed")] },
   { line: "02066:A:1", name: "Response: after Forest Grove is explored an Athelas is added to the staging area", layout: { active: "02066", deck: ["f0", "02063"] }, act: [quest("success"), respond("02066")], expect: [zone("02063", "staging")] },
   { line: "02067:A:1", name: "When Revealed: 2 damage to each exhausted character", layout: { staging: ["02063"], deck: ["f0"], phase: "Planning" }, act: [respond("02063"), reveal("02067")], expect: [damageOn("dh1", 2), damageOn("dh2", 0)] },

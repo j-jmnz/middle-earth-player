@@ -183,6 +183,17 @@ describe("900602:A:3 the Goblin Eagle-hunter's shadow", () => {
 });
 
 describe("02070:A:1 and 02071:A:1 only Eagle characters or characters with ranged defend and attack", () => {
+  it("02070:A:1 lets Wilyador, an Eagle, defend Mirkwood Flock, and no hero", () => {
+    const made = table({ phase: "Encounter", engaged: ["02070"], play: [WILYADOR], deck: ["f0", "f0", "f0"] });
+    let run = send(start(syncConstants(made.state, made.ctx)), { type: "DeclineEngage" }, made.ctx);
+    for (let guard = 0; guard < 30 && run.state.window?.kind !== "defense"; guard += 1) {
+      const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineEngage");
+      if (!pass) break;
+      run = send(run, pass as PlayerIntent, made.ctx);
+    }
+    expect(legalTargets(run.state, { type: "DeclareDefender" }, made.ctx)).toEqual([first(run.state, WILYADOR)]);
+  });
+
   it("02071:A:1 lets nobody but an Eagle or a ranged character defend Black Forest Bats: a hero's declaration is refused", () => {
     const made = table({ phase: "Encounter", engaged: ["02071"], deck: ["f0", "f0", "f0"] });
     const state = syncConstants(made.state, made.ctx);
