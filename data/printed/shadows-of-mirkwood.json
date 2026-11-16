@@ -21,7 +21,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -33,12 +33,13 @@
         "sha256": "8108bf865c30ddff83466b7971b562010a42d5cb2a5a6935357e20ad2016dc05"
       },
       "lines": [
-        "Forced: After the players quest successfully, the first player looks at the top 3 card fo the encounter deck. Reveal and add 1 of those cards to the staging area, and discard the other 2 cards."
+        "Forced: After the players quest successfully, the first player looks at the top 3 cards of the encounter deck. Reveal and add 1 of those cards to the staging area, and discard the other 2 cards."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text reads 'card fo the'; the card prints 'cards of the'."
     },
     {
       "code": "02012",
@@ -51,8 +52,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text and a quotation; no ability."
     },
     {
       "code": "02012",
@@ -67,7 +69,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -81,8 +83,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only a quotation; no ability."
     },
     {
       "code": "02013",
@@ -94,12 +97,13 @@
       },
       "lines": [
         "Any player who does not control a hero with at least 1 Clue objective attached cannot commit characters to this quest. If there are ever no heroes with Clue objectives attached in play, reset the quest deck to stage 2B.",
-        "If the players defeat this stage, the players have once again found a true sign of Gollum's passing, and have won the game."
+        "If the players defeat this stage, the players have once again found a true sign of Gollum's passing, and won the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text reads 'and have won the game'; the card prints 'and won the game'."
     },
     {
       "code": "02014",
@@ -111,11 +115,11 @@
       },
       "lines": [
         "Guarded.",
-        "Response: After the players quest successfully, the players may claim Signs of Gollum if it has no attached encounters. When claimed, attach Signs of Gollum to any hero committed to the quest. (Counts as a Condition attachment with: 'Forced: After attached hero is damaged or leaves play, return this card to the top of the encounter deck.')"
+        "Response: After the players quest successfully, the players may claim Signs of Gollum if it has no attached encounters. When claimed, attach Signs of Gollum to any hero committed to the quest. (Counts as a Condition attachment with: \"Forced: After attached hero is damaged or leaves play, return this card to the top of the encounter deck.\")"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -132,7 +136,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -148,7 +152,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -165,7 +169,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -182,7 +186,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -199,7 +203,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -215,8 +219,9 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The card prints \"Goblintown Scavenger's\" (singular) in its own text, as the seeded line has it."
     },
     {
       "code": "02021",
@@ -232,7 +237,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -248,7 +253,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -262,11 +267,11 @@
       "lines": [
         "Doomed 1. Surge.",
         "When Revealed: Remove all progress tokens from all Riverland locations.",
-        "Shadow: Resolve the 'when revealed' effect of this card."
+        "Shadow: Resolve the \"when revealed\" effect of this card."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -282,7 +287,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -294,11 +299,11 @@
         "sha256": "5e634121588bba1b4cac52b238bad4d9fd951ad8425b6a7e57616df505f269ac"
       },
       "lines": [
-        "Setup: Add The Carrock to the staging area. Remove 4 unique Troll cards and 4 copies of the 'Sacked!' card from the encounter deck and set them aside, out of play. Then shuffle 1 'Sacked!' card per player back into the encounter deck."
+        "Setup: Add The Carrock to the staging area. Remove 4 unique Troll cards and 4 copies of the \"Sacked!\" card from the encounter deck and set them aside, out of play. Then shuffle 1 \"Sacked!\" card per player back into the encounter deck."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -314,7 +319,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -328,8 +333,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02036",
@@ -345,7 +351,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -363,7 +369,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -375,12 +381,12 @@
         "sha256": "3d1446f67e5361e3e0c1725e1f5df83920a948063925d27185304bed895686ed"
       },
       "lines": [
-        "While Louis is engaged with a player, all Troll enemies gain, 'Forced: After this enemy attacks, the defending player must raise his threat by 3.'",
-        "Response: After defeating Louis, you may choose and discard 1 'Sacked!' card from play."
+        "While Louis is engaged with a player, all Troll enemies gain, \"Forced: After this enemy attacks, the defending player must raise his threat by 3.\"",
+        "Response: After defeating Louis, you may choose and discard 1 \"Sacked!\" card from play."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -393,11 +399,11 @@
       },
       "lines": [
         "While Morris is engaged with a player, all Troll enemies get +1 Attack.",
-        "Response: After defeating Morris, you may choose and discard 1 'Sacked!' card from play."
+        "Response: After defeating Morris, you may choose and discard 1 \"Sacked!\" card from play."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -410,11 +416,11 @@
       },
       "lines": [
         "While Stuart is engaged with a player, all Troll enemies get +1 Defense.",
-        "Response: After defeating Stuart, you may choose and discard 1 'Sacked!' card from play."
+        "Response: After defeating Stuart, you may choose and discard 1 \"Sacked!\" card from play."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -426,12 +432,12 @@
         "sha256": "c5ab015179c581de065a3b904cd5fd870bb9cb3c0079e05b023651a690805f3a"
       },
       "lines": [
-        "Forced: After Rupert attacks, shuffle all copies of the 'Sacked!' card from the discard pile back into the encounter deck.",
-        "Response: After defeating Rupert, you may choose and discard 1 'Sacked!' card from play."
+        "Forced: After Rupert attacks, shuffle all copies of the \"Sacked!\" card from the discard pile back into the encounter deck.",
+        "Response: After defeating Rupert, you may choose and discard 1 \"Sacked!\" card from play."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -448,7 +454,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -461,12 +467,14 @@
       },
       "lines": [
         "Immune to player card effects.",
-        "Players cannot travel to The Carrock except through quest card effects.While The Carrock is the active location, Troll enemies get +1 Attack and +1 Defense."
+        "Players cannot travel to The Carrock except through quest card effects.",
+        "While The Carrock is the active location, Troll enemies get +1 Attack and +1 Defense."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the second and third paragraphs together; the card prints three."
     },
     {
       "code": "02044",
@@ -481,7 +489,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -497,7 +505,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -513,7 +521,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -529,7 +537,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -541,12 +549,12 @@
         "sha256": "c46dccb0ba67cf648114ec272f8df99d73456806b64ce82d20e1aef514e43a17"
       },
       "lines": [
-        "When Revealed: Attach to a hero with no 'Sacked!' cards attached controlled by the first player. (Cannot be canceled.) Counts as a condition attachment with the text: 'Attached hero cannot attack, defend, commit to a quest, trigger its effect, or collect resources.'",
-        "Shadow: If attacking enemy is a Troll, resolve this card's 'when revealed' effect."
+        "When Revealed: Attach to a hero with no \"Sacked!\" cards attached controlled by the first player. (Cannot be canceled.) Counts as a Condition attachment with the text: \"Attached hero cannot attack, defend, commit to a quest, trigger its effect, or collect resources.\"",
+        "Shadow: If attacking enemy is a Troll, resolve this card's \"when revealed\" effect."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -558,12 +566,12 @@
         "sha256": "4d5a355012120abce6fee7daf6955da917a729dcd8bb2b7ba9abb265b64dd496"
       },
       "lines": [
-        "When Revealed: Destroy all heroes with the card 'Sacked!' attached. Then, shuffle Roasted Slowly back into the encounter deck.",
+        "When Revealed: Destroy all heroes with the card \"Sacked!\" attached. Then, shuffle Roasted Slowly back into the encounter deck.",
         "Shadow: If attacking enemy is a Troll, remove 2 damage tokens from it."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
