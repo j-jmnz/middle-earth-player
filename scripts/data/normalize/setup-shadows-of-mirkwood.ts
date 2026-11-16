@@ -25,13 +25,13 @@ export function readShadowsOfMirkwood(sentence: string, names: NameIndex): Setup
     return [{ kind: "search", codes }, { kind: "stage", codes, perPlayer: null, count: 1 }, ...(match[2] === undefined ? [] : [{ kind: "damageOn", codes: damaged, amount: Number(match[2]) } as const])];
   }
 
-  // Conflict at the Carrock: the four unique Trolls and four 'Sacked!' are set aside, and one 'Sacked!' per player is shuffled back.
-  if ((match = /^Remove (\d+) unique Troll cards and (\d+) copies of the 'Sacked!' card from the encounter deck and set them aside, out of play$/i.exec(sentence))) {
+  // Conflict at the Carrock: the four unique Trolls and four "Sacked!" are set aside, and one "Sacked!" per player is shuffled back.
+  if ((match = /^Remove (\d+) unique Troll cards and (\d+) copies of the "Sacked!" card from the encounter deck and set them aside, out of play$/i.exec(sentence))) {
     const trolls = names.cards.filter((card) => card.isUnique && card.type === "enemy" && card.traits.includes("Troll")).map((card) => card.code);
     const sacked = named("Sacked!");
     return trolls.length !== Number(match[1]) || sacked.length === 0 ? null : [{ kind: "aside", codes: [...trolls, ...sacked], allCopies: false }];
   }
-  if ((match = /^Then,? shuffle (\d+) 'Sacked!' cards? per player back into the encounter deck$/i.exec(sentence))) {
+  if ((match = /^Then,? shuffle (\d+) "Sacked!" cards? per player back into the encounter deck$/i.exec(sentence))) {
     const codes = named("Sacked!");
     return codes.length === 0 ? null : [stepWith(codes)("shuffleAsideBack", { count: Number(match[1]), players: true })];
   }
