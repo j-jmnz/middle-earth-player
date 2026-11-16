@@ -3,8 +3,10 @@ import { cardRef as cardRefWords, renderAmount } from "./amounts.ts";
 import { done, isObj, jsonOf, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { ESCAPE_CONDITIONS } from "./escape.ts";
+import { GUARDIAN_CONDITIONS } from "./guardian.ts";
 
 export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
+export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
   activeLocation: "is the active location",
@@ -29,6 +31,7 @@ type Template = (c: Obj, ctx: Ctx) => { text: string; read: readonly string[] } 
 
 export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_CONDITIONS,
+  ...GUARDIAN_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
   subjectExplored: () => ({ text: "the card the event is about had enough progress to be explored", read: [] }),
@@ -82,9 +85,6 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
   matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}${c.inPlay === false ? " that is out of play now" : ""}`, read: ["card", "pick", "inPlay"] }),
   tokens: (c) => ({ text: `the card with code ${str(c.code)} in play holds at least ${str(c.min)} resource token(s)${c.perPlayer === true ? " for each player" : ""}`, read: ["code", "min", "perPlayer"] }),
-  noneDiscarded: () => ({ text: "the running effect has discarded no card (with DiscardEach)", read: [] }),
-  guardianCanChange: () => ({ text: "the player guarding Gollum may choose a new player: no card says he cannot change and another player is still in the game", read: [] }),
-  encounterHas: (c) => ({ text: `the encounter discard pile${c.piles === "deckAndDiscard" ? " or deck" : ""} holds ${withArticle(`${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.cardType === "string" ? c.cardType : "card"}`)}${c.aflame === true ? " with the Aflame keyword" : ""}`, read: ["piles", "cardType", "aflame", "trait"] }),
   controls: (c) => ({ text: `the actor controls the card with code ${str(c.code)}`, read: ["code"] }),
 };
 

@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import { renderAmount } from "./amounts.ts";
-import { CONDITION_TEMPLATES, ESCAPE_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
+import { CONDITION_TEMPLATES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
 import { newCtx, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
-import { ESCAPE_SAMPLES, TEMPLATES } from "./verbs.ts";
+import { ESCAPE_SAMPLES, GUARDIAN_SAMPLES, TEMPLATES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
 const HERO = { type: "hero", control: "you" };
-const SAMPLES: Readonly<Record<string, readonly Obj[]>> = { ...ESCAPE_SAMPLES,
+const SAMPLES: Readonly<Record<string, readonly Obj[]>> = { ...ESCAPE_SAMPLES, ...GUARDIAN_SAMPLES,
   ModifyStat: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true }, { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", target: "heroes" }],
   Pick: [{ verb: "Pick", pick: HERO }],
   FortitudeTest: [{ verb: "FortitudeTest", who: "firstPlayer", extraCards: { players: true }, extraEyes: { amount: 2, when: { kind: "firstPlayer" } } }],
@@ -186,15 +186,8 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = { ...ESCAPE_SAMPLES,
     { verb: "Restrict", what: "defend", belowSourceHitPoints: true },
     { verb: "Restrict", what: "travel", location: "18068", guarding: "Tiny" },
     { verb: "Restrict", what: "commit", unlessControls: HERO },
-    { verb: "Restrict", what: "draw", unlessControls: HERO },
-    { verb: "Restrict", what: "commit", guardian: true, exceptAlone: true },
-    { verb: "Restrict", what: "playFromHand", guardian: true },
+    { verb: "Restrict", what: "draw", unlessControls: HERO }, { verb: "Restrict", what: "commit", guardian: true, exceptAlone: true }, { verb: "Restrict", what: "playFromHand", guardian: true },
   ],
-  GuardGollum: [{ verb: "GuardGollum", code: "02130" }],
-  ChangeGuardian: [{ verb: "ChangeGuardian" }],
-  RemoveDiscardFromGame: [{ verb: "RemoveDiscardFromGame" }],
-  DealShadowFromDiscard: [{ verb: "DealShadowFromDiscard", trait: "Tantrum" }],
-  EngageAll: [{ verb: "EngageAll", who: "guardian", inPlay: true, trait: "Spider" }],
   ShuffleEncounterDeck: [{ verb: "ShuffleEncounterDeck" }],
   ShuffleEncounterDiscard: [{ verb: "ShuffleEncounterDiscard", trait: "Hazard" }],
   DiscardEncounterTop: [{ verb: "DiscardEncounterTop", count: 2 }],
@@ -360,7 +353,7 @@ describe("effects render read fields, conditions", () => {
     pileHas: [{ kind: "pileHas", pile: "harad", min: 1, max: 3 }],
     facedownUnder: [{ kind: "facedownUnder", code: "144027", min: 3, max: 8, players: true }],
     soleAttacker: [{ kind: "soleAttacker" }],
-    lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }], ...ESCAPE_CONDITION_SAMPLES,
+    lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }], ...ESCAPE_CONDITION_SAMPLES, ...GUARDIAN_CONDITION_SAMPLES,
     lastFortitudePassed: [{ kind: "lastFortitudePassed" }],
     fortitudeFailed: [{ kind: "fortitudeFailed", scope: "round", who: "any" }],
     hostControlledByActor: [{ kind: "hostControlledByActor" }],
@@ -368,9 +361,6 @@ describe("effects render read fields, conditions", () => {
     matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false }],
     controls: [{ kind: "controls", code: "12345" }],
     freeOfEncounters: [{ kind: "freeOfEncounters" }],
-    guardianCanChange: [{ kind: "guardianCanChange" }],
-    noneDiscarded: [{ kind: "noneDiscarded" }],
-    encounterHas: [{ kind: "encounterHas", piles: "deckAndDiscard", cardType: "treachery", aflame: true, trait: "Tantrum" }],
     // The combinators are not in the table: renderCondition words them.
     not: [{ kind: "not", condition: { kind: "firstPlayer" } }],
     all: [{ kind: "all", conditions: [{ kind: "firstPlayer" }, { kind: "otherPlayer" }] }],

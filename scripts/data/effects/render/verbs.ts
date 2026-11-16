@@ -5,8 +5,10 @@ import { renderCondition } from "./conditions.ts";
 import { compact, done, isObj, jsonOf, joinAnd, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { ESCAPE_STAT_NOTES, ESCAPE_TEMPLATES } from "./escape.ts";
+import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES, guardianRestrict } from "./guardian.ts";
 
 export { ESCAPE_SAMPLES } from "./escape.ts";
+export { GUARDIAN_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -111,6 +113,7 @@ const FLIP_GOLLUM = {
 
 export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_TEMPLATES,
+  ...GUARDIAN_TEMPLATES,
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
@@ -366,8 +369,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
       const who = i.allies === true ? "allies" : i.belowSourceHitPoints === true ? "allies with fewer printed hit points than this card" : typeof i.maxWillpower === "number" ? `characters with Willpower ${i.maxWillpower} or less` : "characters";
       return { text: `${who}${typeof i.exceptTrait === "string" ? ` (except those with the trait ${i.exceptTrait})` : ""} cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)`, read: ["what", "allies", "maxWillpower", "belowSourceHitPoints", "exceptTrait"] };
     }
-    if (i.what === "commit" && i.guardian === true) return { text: `the player guarding Gollum cannot commit characters to the quest${i.exceptAlone === true ? ", unless he is the only player remaining in the game" : ""}`, read: ["what", "guardian", "exceptAlone"] };
-    if (i.what === "playFromHand") return { text: `${i.guardian === true ? "the player guarding Gollum" : "a player"} cannot play cards from his hand (a card put into play is not played)`, read: ["what", "guardian"] };
+    const guarded = guardianRestrict(i); if (guarded) return guarded;
     if (i.what === "commit") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot commit characters to the quest`, read: ["what", "unlessControls"] };
     if (i.what === "draw") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot draw cards through card effects (the framework's draws are not card effects)`, read: ["what", "unlessControls"] };
     if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : "any location"} while this holds`, read: ["what", "location", "guarding"] };
@@ -377,11 +379,6 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   DiscardRandomVictoryLocation: (i) => ({ text: `discard a random ${str(i.trait)} location from the victory display to the encounter discard pile (chosen with the game's seed)`, read: ["trait"] }),
   ReturnRandomVictoryLocation: () => ({ text: "return a random location from the victory display to the staging area (chosen with the game's seed)", read: [] }),
   ShuffleVictoryIntoEncounterDeck: () => ({ text: "shuffle every location in the victory display into the encounter deck", read: [] }),
-  GuardGollum: (i) => ({ text: `the card with code ${str(i.code)}, in the encounter deck or set aside, enters play in front of the player last picked (the first player when none is), ready: that player guards Gollum`, read: ["code"] }),
-  ChangeGuardian: () => ({ text: "the player last picked becomes the player guarding Gollum: Gollum, with what is attached to him, goes to that player (nothing when a card says the guard cannot change, or that player already guards him)", read: [] }),
-  RemoveDiscardFromGame: () => ({ text: "every card in the acting player's discard pile is removed from the game", read: [] }),
-  DealShadowFromDiscard: (i) => ({ text: `the topmost ${typeof i.trait === "string" ? `${i.trait} ` : ""}card with a Shadow effect in the encounter discard pile is dealt to the attacking enemy as one more shadow card for this attack (nothing with none there)`, read: ["trait"] }),
-  EngageAll: (i) => ({ text: `${who(i.who)} engages ${i.inPlay === true ? "every enemy in play, the ones in the staging area and the ones engaged with another player" : "every enemy in the staging area"}${typeof i.trait === "string" ? ` with the trait ${i.trait}` : ""}`, read: ["who", "inPlay", "trait"] }),
   FlipGollum: (i) => ({ text: i.to === "smeagol" ? FLIP_GOLLUM.smeagol : FLIP_GOLLUM.gollum, read: ["to"] }),
   FollowFirstPlayer: () => ({ text: "this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)", read: [] }),
   GollumAttacks: () => ({ text: "Gollum, if he is in play, makes an immediate attack against the player he is engaged with", read: [] }),

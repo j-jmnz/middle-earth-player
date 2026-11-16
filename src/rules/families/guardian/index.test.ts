@@ -1,195 +1,132 @@
-// Rules: sotm.guarding-gollum, sotm.setup-return-to-mirkwood, rr.first-player, rr.ownership-and-control, rr.play-and-put-into-play (data/rules/entries.json); ledger lines 02126:A:1, 02127:B:1, 02128:B:1, 02130:A:1, 02130:A:2, 02131:A:1, 02134:A:1.
-// The guardian family: the player guarding Gollum is the controller of the Gollum card (seats.ts), the guard changes by a change of control (change.ts), undefended damage goes to Gollum (combat.ts), the guard is barred from committing and from playing from his hand (hand.ts, restrictions.ts).
+// Rules: sotm.guarding-gollum, rr.ownership-and-control, rr.first-player, rr.cannot, rr.in-play-and-out-of-play, rr.removed-from-game (data/rules/entries.json). The guardian family's verbs and hooks on their own (the cards that use them are tested in src/campaign/scenarios/return-to-mirkwood):
+// the guard is the controller of the Gollum card, the seat selector, ForEachPlayer's `seats`, ChangeGuardian, EngageAll `inPlay`, Restrict `guardian`, and RemoveDiscardFromGame.
 import { describe, expect, it } from "vitest";
 
+import type { Instruction } from "../../../catalog/boundary.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { first, idOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { eliminateSeat } from "../../core/eliminate.ts";
-import { undefendedTargets } from "../../combat/combat.ts";
-import { first, fightEnemy, legalIntents, legalTargets, resolveRecords, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { settle } from "../../engine/machine.ts";
-import { syncConstants } from "../../interpret/constants.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
+import { seatFor } from "../../interpret/verbs.ts";
+import { seatBarred } from "../../interpret/restrictions.ts";
+import { spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { guardianCanChange, guardianLocked, guardianSeat, otherThanGuardian } from "./seats.ts";
+import { guardianSeats, guardedGollum, guardianSeat, otherThanGuardian } from "./seats.ts";
 
-const table = (layout: Layout) => tableFromLayout("return-to-mirkwood", layout);
 const GOLLUM = "02130";
-const answer = (seat: number) => (state: ScenarioState) => (state.window?.kind === "choose" ? (state.window.options.find((option) => option === `seat:${seat}`) ?? state.window.options[0] ?? "") : "");
-const threat = (state: ScenarioState, seat: number) => state.seats[seat]?.threat ?? 0;
+const table = (layout: Layout = {}) => tableFromLayout("return-to-mirkwood", { seats: 2, play: [{ code: GOLLUM, seat: 0 }], ...layout });
+const run = (made: ReturnType<typeof table>, instruction: Instruction, state: ScenarioState = made.state, seat = 0): ScenarioState => runInstruction(state, instruction, { seat, sourceId: null }, made.ctx, [] as EngineStep[]);
 
-describe("02126:A:1 Setup", () => {
-  it("02126:A:1 the first player chooses the player who guards Gollum, who is placed in front of that player ready, then the deck is shuffled and one card for each player is revealed", () => {
-    const made = table({ stage: "02126", seats: 2, setAside: [GOLLUM], deck: ["f0", "f0", "f0", "f0"] });
-    expect(guardianSeat(made.state)).toBeNull();
-    const done = resolveRecords(made.state, made.ctx, "02126", "setup", first(made.state, "02126"), answer(1));
-    expect(guardianSeat(done.state)).toBe(1);
-    const gollum = done.state.cards[first(done.state, GOLLUM)];
-    expect(gollum?.zone).toBe("play");
-    expect(gollum?.exhausted).toBeFalsy();
-    expect(done.state.setAside).not.toContain(gollum?.id);
-    expect(Object.values(done.state.cards).filter((card) => card.code === "f0" && card.zone === "staging")).toHaveLength(2);
+describe("the guard is the controller of the Gollum card", () => {
+  it("is the seat of the Gollum card in play, and nobody before he is placed or when he is set aside", () => {
+    expect(guardianSeat(table().state)).toBe(0);
+    expect(guardianSeat(table({ play: [{ code: GOLLUM, seat: 1 }] }).state)).toBe(1);
+    expect(guardianSeat(table({ play: [], setAside: [GOLLUM] }).state)).toBeNull();
+    expect(guardedGollum(table().state)?.code).toBe(GOLLUM);
   });
 
-  it("02126:A:1 the first player decides, whoever holds the token (rr.first-player), and a lone player guards without being asked", () => {
-    const made = table({ stage: "02126", seats: 2, firstPlayer: 1, setAside: [GOLLUM], deck: ["f0", "f0", "f0"] });
-    const asked: (string | undefined)[] = [];
-    const done = resolveRecords(made.state, made.ctx, "02126", "setup", first(made.state, "02126"), (state) => {
-      asked.push(state.window?.kind === "choose" ? String(state.window.seat) : undefined);
-      return answer(0)(state);
-    });
-    expect(guardianSeat(done.state)).toBe(0);
-    expect(asked[0]).toBe("1");
-    const solo = resolveRecords(table({ stage: "02126", setAside: [GOLLUM], deck: ["f0", "f0"] }).state, made.ctx, "02126", "setup", undefined);
-    expect(guardianSeat(solo.state)).toBe(0);
+  it("seatFor reads who: guardian, the actor when nobody guards him", () => {
+    const made = table({ play: [{ code: GOLLUM, seat: 1 }] });
+    expect(seatFor(made.state, "guardian", 0)).toBe(1);
+    expect(seatFor(table({ play: [] }).state, "guardian", 0)).toBe(0);
+    expect(seatFor(made.state, "firstPlayer", 1)).toBe(0);
+    expect(seatFor(made.state, "actor", 1)).toBe(1);
   });
 
-  it("02126:A:1 Gollum is also found in the encounter deck when he is shuffled into it", () => {
-    const made = table({ stage: "02126", deck: ["f0", GOLLUM, "f0"] });
-    const done = resolveRecords(made.state, made.ctx, "02126", "setup", first(made.state, "02126"));
-    expect(guardianSeat(done.state)).toBe(0);
-    expect(done.state.encounterDeck.some((id) => done.state.cards[id]?.code === GOLLUM)).toBe(false);
+  it("the other players are listed from the first player on, the eliminated ones left out", () => {
+    const made = table({ seats: 2, firstPlayer: 1, play: [{ code: GOLLUM, seat: 0 }] });
+    expect(otherThanGuardian(made.state)).toEqual([1]);
+    const steps: EngineStep[] = [];
+    expect(otherThanGuardian(eliminateSeat(made.state, 1, steps))).toEqual([]);
   });
 });
 
-describe("02130:A:1 Gollum", () => {
-  const withGollum = (layout: Layout = {}) => table({ seats: 2, play: [{ code: GOLLUM, seat: 0 }], ...layout });
-  const gollumOf = (state: ScenarioState) => state.cards[first(state, GOLLUM)];
+describe("ChangeGuardian", () => {
 
-  it("02130:A:1 damage from an undefended attack against the guard is dealt to Gollum, not to a hero", () => {
-    const fight = fightEnemy(withGollum, "f0", "f3", {}, { undefended: true, lands: { f3: GOLLUM } });
-    expect(gollumOf(fight.run.state)?.damage).toBe(1);
-    expect(fight.run.state.cards[fight.made.hero]?.damage).toBe(0);
-    expect(fight.run.state.cards[fight.made.hero2]?.damage).toBe(0);
+  it("sotm.guarding-gollum passes Gollum, with his attachments, to the player picked last, and announces a change of control", () => {
+    const made = table({ attached: [{ code: "attachment", to: GOLLUM }] });
+    const state = run(made, { verb: "ChangeGuardian" }, picked(made, 1));
+    expect(guardianSeat(state)).toBe(1);
+    expect(state.cards[idOf(state, "attachment")]?.host).toBe(first(state, GOLLUM));
+    expect(state.pendingEvents?.some((event) => event.trigger === "changedControl" && event.cardId === first(state, GOLLUM))).toBe(true);
   });
 
-  it("02130:A:1 the attack on a player who is not guarding Gollum is dealt to his hero as usual", () => {
-    const made = withGollum({ engaged: [{ code: "f3", seat: 1 }], deck: ["f0", "f0"] });
-    const enemy = first(made.state, "f3");
-    const attack = (seat: number) => ({ ...made.state, pendingAttack: { enemyId: enemy, seat, undefended: true } }) as ScenarioState;
-    expect(undefendedTargets(attack(0), 0, made.ctx.cards)).toEqual([first(made.state, GOLLUM)]);
-    expect(undefendedTargets(attack(1), 1, made.ctx.cards)).toEqual([made.seat1Hero]);
-  });
-
-  it("02130:A:1 Gollum destroyed loses the game", () => {
-    const fight = fightEnemy(withGollum, "f0", "f3", {}, { undefended: true, lands: { f3: GOLLUM }, tweak: (state) => ({ ...state, cards: { ...state.cards, [first(state, GOLLUM)]: { ...state.cards[first(state, GOLLUM)]!, damage: 4 } } }) });
-    expect(fight.run.state.lost).toBe(true);
-  });
-
-  it("02130:A:1 Gollum leaving play for any reason loses the game, the guard changing does not", () => {
-    const made = withGollum();
-    const changed = send(start(made.state), { type: "Pass" }, made.ctx);
-    expect(changed.state.lost).toBeFalsy();
-  });
-
-  it("02130:A:1 the guard eliminated loses the game", () => {
-    const made = withGollum();
-    const steps: never[] = [];
-    const gone = settle(eliminateSeat(made.state, 0, steps), made.ctx, steps);
-    expect(gone.lost).toBe(true);
-    const other = settle(eliminateSeat(made.state, 1, steps), made.ctx, steps);
-    expect(other.lost).toBeFalsy();
-    expect(guardianSeat(other)).toBe(0);
-  });
-
-  it("02130:A:1 Gollum cannot be used to commit to a quest", () => {
-    const made = withGollum({ phase: "Quest" });
-    const targets = legalTargets(made.state, { type: "Commit" }, made.ctx);
-    expect(targets).not.toContain(first(made.state, GOLLUM));
-    expect(targets).toContain(made.hero);
+  it("rr.cannot does nothing while a card says the guard cannot change, when the same player is picked, or when none is", () => {
+    const made = table();
+    const locked = { ...made.state, modifiers: [...made.state.modifiers, { instanceId: "table", sourceId: "x", stat: "guardianLocked" as const, amount: 1, until: "endOfGame" as const }] };
+    expect(guardianSeat(run(made, { verb: "ChangeGuardian" }, picked({ ...made, state: locked }, 1)))).toBe(0);
+    expect(guardianSeat(run(made, { verb: "ChangeGuardian" }, picked(made, 0)))).toBe(0);
+    expect(guardianSeat(run(made, { verb: "ChangeGuardian" }))).toBe(0);
   });
 });
 
-describe("02130:A:2 the end of each round", () => {
-  const ended = (layout: Layout, pick = answer(1)) => {
-    const made = tableFromLayout("return-to-mirkwood", { seats: 2, play: [{ code: GOLLUM, seat: 0 }], ...layout });
-    return { made, run: resolveRecords(made.state, made.ctx, GOLLUM, "forced", first(made.state, GOLLUM), pick) };
-  };
-
-  it("02130:A:2 the guard raises his threat by 3, then may choose a new player to guard Gollum, who takes him", () => {
-    const { run } = ended({ threat: [28, 30] });
-    expect(threat(run.state, 0)).toBe(31);
-    expect(threat(run.state, 1)).toBe(30);
-    expect(guardianSeat(run.state)).toBe(1);
-  });
-
-  it("02130:A:2 the guard may keep Gollum", () => {
-    const { run } = ended({}, (state) => (state.window?.kind === "choose" ? (state.window.options.find((option) => option === "keep") ?? "") : ""));
-    expect(guardianSeat(run.state)).toBe(0);
-  });
-
-  it("02130:A:2 a lone player is not asked: there is no new player to choose", () => {
-    const made = table({ play: [{ code: GOLLUM, seat: 0 }] });
-    const asked: string[] = [];
-    const run = resolveRecords(made.state, made.ctx, GOLLUM, "forced", first(made.state, GOLLUM), (state) => {
-      asked.push(state.window?.kind ?? "");
-      return "";
-    });
-    expect(asked).toEqual([]);
-    expect(threat(run.state, 0)).toBe(31);
-    expect(guardianSeat(run.state)).toBe(0);
-  });
-
-  it("02130:A:2 a player eliminated does not count as another player", () => {
-    const made = withSeats();
-    const steps: never[] = [];
-    const down = eliminateSeat(made.state, 1, steps);
-    expect(guardianCanChange(down)).toBe(false);
-    expect(otherThanGuardian(down)).toEqual([]);
-  });
-});
-
-function withSeats() {
-  return tableFromLayout("return-to-mirkwood", { seats: 2, play: [{ code: GOLLUM, seat: 0 }] });
+// A frame that has picked the seat, as a Pick of a player leaves it.
+function picked(made: ReturnType<typeof table>, seat: number): ScenarioState {
+  const frame = { frame: "forced" as const, cardId: null, seat: 0, peril: false, data: { kind: "effect" as const, queue: [], picked: [`seat:${seat}`] } };
+  return { ...made.state, stack: [frame as unknown as ScenarioState["stack"][number]] };
 }
 
-describe("02131:A:1 the guard cannot change", () => {
-  it("02131:A:1 while The Spiders' Ring is the active location no choice changes the guard, and the end of round does not offer one", () => {
-    const made = tableFromLayout("return-to-mirkwood", { seats: 2, play: [{ code: GOLLUM, seat: 0 }], active: "02131" });
-    expect(guardianLocked(made.state)).toBe(true);
-    expect(guardianCanChange(made.state)).toBe(false);
-    const asked: string[] = [];
-    const run = resolveRecords(made.state, made.ctx, GOLLUM, "forced", first(made.state, GOLLUM), (state) => {
-      asked.push(state.window?.kind ?? "");
-      return answer(1)(state);
-    });
-    expect(asked).toEqual([]);
-    expect(guardianSeat(run.state)).toBe(0);
-    expect(threat(run.state, 0)).toBe(31);
+describe("ForEachPlayer with seats", () => {
+  it("seats: guardian is the guard alone, and with a treachery's When Revealed while treacheryHitsAll holds, each other player after him", () => {
+    const made = table({ firstPlayer: 1 });
+    const treachery = idOf(spawn(made.state, "02135", { zone: "encounterDeck" }).state, "02135");
+    const withTreachery = spawn(made.state, "02135", { zone: "encounterDeck" }).state;
+    expect(guardianSeats(withTreachery, made.ctx, treachery)).toEqual([0]);
+    const wide = { ...withTreachery, modifiers: [...withTreachery.modifiers, { instanceId: "table", sourceId: "x", stat: "treacheryHitsAll" as const, amount: 1, until: "endOfGame" as const }] };
+    expect(guardianSeats(wide, made.ctx, treachery)).toEqual([0, 1]);
+    // An enemy's own effect, or no source at all, is not a treachery's: Dry Watercourse leaves it alone.
+    expect(guardianSeats(wide, made.ctx, first(wide, GOLLUM))).toEqual([0]);
+    expect(guardianSeats(wide, made.ctx, null)).toEqual([0]);
   });
 
-  it("02131:A:1 the lock lifts when the location is no longer active", () => {
-    const made = tableFromLayout("return-to-mirkwood", { seats: 2, play: [{ code: GOLLUM, seat: 0 }], staging: ["02131"] });
-    expect(guardianLocked(made.state)).toBe(false);
-    expect(guardianCanChange(made.state)).toBe(true);
-    expect(guardianLocked(syncConstants(made.state, made.ctx))).toBe(false);
+  it("a shadow card dealt to an enemy that holds shadowHitsAll is widened, one dealt to another enemy is not", () => {
+    const made = table();
+    const enemy = spawn(made.state, "f3", { zone: "engaged", seat: 0 });
+    const shadow = spawn(enemy.state, "02135", { zone: "shadow", enemyId: enemy.id });
+    const flagged = { ...shadow.state, modifiers: [...shadow.state.modifiers, { instanceId: enemy.id, sourceId: enemy.id, stat: "shadowHitsAll" as const, amount: 1, until: "endOfGame" as const }] };
+    expect(guardianSeats(shadow.state, made.ctx, shadow.id)).toEqual([0]);
+    expect(guardianSeats(flagged, made.ctx, shadow.id)).toEqual([0, 1]);
   });
 });
 
-describe("02127:B:1 and 02128:B:1 what binds the guard", () => {
-  it("02127:B:1 the guard cannot commit characters to the quest unless he is the only player remaining", () => {
-    const made = tableFromLayout("return-to-mirkwood", { stage: "02127", seats: 2, play: [{ code: GOLLUM, seat: 0 }], phase: "Quest" });
-    const committers = legalTargets(made.state, { type: "Commit" }, made.ctx);
-    expect(committers).toEqual([]);
-    const second = { ...made.state, activeSeat: 1 };
-    expect(legalTargets(second, { type: "Commit" }, made.ctx).length).toBeGreaterThan(0);
-    const steps: never[] = [];
-    const alone = settle(eliminateSeat(made.state, 1, steps), made.ctx, steps);
-    expect(legalTargets({ ...alone, activeSeat: 0 }, { type: "Commit" }, made.ctx).length).toBeGreaterThan(0);
+describe("EngageAll inPlay", () => {
+  it("02129:B:1 engages the enemies of the staging area and those engaged with another player, with the guard", () => {
+    const made = table({ staging: ["f0"], engaged: [{ code: "f3", seat: 1 }] });
+    const state = run(made, { verb: "EngageAll", who: "guardian", inPlay: true });
+    expect(state.seats[0]?.engaged).toHaveLength(2);
+    expect(state.seats[1]?.engaged).toHaveLength(0);
+    // Without inPlay only the staging area is engaged, as ever.
+    const staged = run(made, { verb: "EngageAll", who: "guardian" });
+    expect(staged.seats[0]?.engaged).toHaveLength(1);
+    expect(staged.seats[1]?.engaged).toHaveLength(1);
+  });
+});
+
+describe("Restrict guardian", () => {
+  it("02127:B:1 binds the guard only, and not when he is alone", () => {
+    const made = table({ stage: "02127" });
+    expect(seatBarred(made.state, made.ctx, 0, "commit")).toBe(true);
+    expect(seatBarred(made.state, made.ctx, 1, "commit")).toBe(false);
+    const steps: EngineStep[] = [];
+    expect(seatBarred(eliminateSeat(made.state, 1, steps), made.ctx, 0, "commit")).toBe(false);
   });
 
-  it("02128:B:1 the guard cannot play cards from his hand, another player can, and the rule ends with the stage", () => {
-    const layout = { seats: 2, play: [{ code: GOLLUM, seat: 0 }], hand: [{ code: "filler", seat: 0 }, { code: "filler", seat: 1 }], phase: "Planning", heroResources: 3 } as const;
-    const plays = (state: ScenarioState, ctx: Parameters<typeof legalIntents>[1], seat: number) => legalIntents({ ...state, activeSeat: seat }, ctx).some((intent) => intent.type === "PlayCard");
-    const made = tableFromLayout("return-to-mirkwood", { stage: "02128", ...layout });
-    expect(plays(made.state, made.ctx, 0)).toBe(false);
-    expect(plays(made.state, made.ctx, 1)).toBe(true);
-    const free = tableFromLayout("return-to-mirkwood", { stage: "02126", ...layout });
-    expect(plays(free.state, free.ctx, 0)).toBe(true);
+  it("02128:B:1 bars the play from the hand of the guard", () => {
+    const made = table({ stage: "02128" });
+    expect(seatBarred(made.state, made.ctx, 0, "playFromHand")).toBe(true);
+    expect(seatBarred(made.state, made.ctx, 1, "playFromHand")).toBe(false);
+    expect(seatBarred(table({ stage: "02127" }).state, made.ctx, 0, "playFromHand")).toBe(false);
   });
+});
 
-  it("02128:B:1 a change of guard moves the bar to the new guard at once", () => {
-    const made = tableFromLayout("return-to-mirkwood", { stage: "02128", seats: 2, play: [{ code: GOLLUM, seat: 0 }], hand: [{ code: "filler", seat: 0 }, { code: "filler", seat: 1 }], phase: "Planning", heroResources: 3 });
-    const run = resolveRecords(made.state, made.ctx, GOLLUM, "forced", first(made.state, GOLLUM), answer(1));
-    const planning = { ...run.state, phase: "Planning" as const, mode: "planning" as const, window: { kind: "pass" as const } };
-    expect(legalIntents({ ...planning, activeSeat: 0 }, made.ctx).some((intent) => intent.type === "PlayCard")).toBe(true);
-    expect(legalIntents({ ...planning, activeSeat: 1 }, made.ctx).some((intent) => intent.type === "PlayCard")).toBe(false);
+describe("RemoveDiscardFromGame", () => {
+  it("900908:A:1 removes the acting player's whole discard pile from the game, and the other player's stays", () => {
+    const made = table();
+    const mine = spawn(spawn(made.state, "filler", { zone: "discard", seat: 0 }).state, "filler", { zone: "discard", seat: 0 }).state;
+    const both = spawn(mine, "filler", { zone: "discard", seat: 1 }).state;
+    const state = run(made, { verb: "RemoveDiscardFromGame" }, both);
+    expect(state.seats[0]?.discard).toEqual([]);
+    expect(state.removed).toHaveLength(2);
+    expect(state.seats[1]?.discard).toHaveLength(1);
   });
 });
