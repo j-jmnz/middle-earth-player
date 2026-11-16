@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 
 import { loadCards } from "../data/load-cards.ts";
-import { loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
+import { loadCampaignsInOrder, loadAnyScenario } from "../data/load-scenarios.ts";
 import { DATA_DIR, ROOT } from "../data/paths.ts";
 import { duration, runScript, type Log } from "../log.ts";
 import { smokeCodes } from "../card-smoke/world.ts";
@@ -187,7 +187,7 @@ export function hasReaderGames(id: string, registrySource: string): boolean {
 
 /** The player cards the scenario deals that have effect records: the campaign's starter decks when it opens the campaign, and player cards among its own. */
 export function playerCodes(id: string, recorded: readonly string[]): string[] {
-  const scenario = loadScenario(id);
+  const scenario = loadAnyScenario(id);
   const campaign = loadCampaignsInOrder().find((one) => one.scenarios.includes(id));
   const decks = campaign?.scenarios[0] === id ? (campaign.starterDecks ?? []).flatMap((deck) => deck.rows.map((row) => row.code)) : [];
   const own = new Set(loadCards().filter((card) => ["hero", "ally", "attachment", "event", "player-side-quest", "contract"].includes(card.type)).map((card) => card.code));
