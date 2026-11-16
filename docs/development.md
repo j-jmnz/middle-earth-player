@@ -75,6 +75,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm scenario pack <scenario-id>` | Writes `.agent/pack/<id>.md`, the context a scenario author reads: vocabulary, schema entries, cookbook sections and drafts. |
 | `pnpm scenario fixtures [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
 | `pnpm assets` | Runs `catalog`, `canvaskit`, `pdfjs`, `booklets` and `scans` in that order. `start`, `android`, `ios` and the native release builds run it for you (`start` with `--optional`). |
+| `pnpm assets catalog canvaskit pdfjs` | Any several packs, each run in the order named (`scripts/cli.ts`); the arguments after the last name go to every pack. |
 | `pnpm assets catalog` | Writes `assets/catalog.db`, which is never committed, and `src/catalog/version.ts`, which is. |
 | `pnpm assets canvaskit` | Copies CanvasKit's wasm to `public/canvaskit.wasm` (gitignored), which the web build loads to draw the table. `pnpm web` and `pnpm test a11y` run it with `catalog`. |
 | `pnpm assets pdfjs` | Copies pdf.js's worker and data (CMaps, standard fonts, ICC profiles, wasm decoders) to `public/pdfjs` (gitignored), which the web booklet reader loads. `pnpm web` runs it. |

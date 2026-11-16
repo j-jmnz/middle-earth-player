@@ -5,7 +5,9 @@
 import type { ReactNode } from "react";
 
 // The sentences whose gesture has no mouse twin by a plain swap come first: a double tap is a click (a mouse has no use for two), a hold is a right click, and a swipe has no click at all.
+// The dock's note for a hand with plays is the one line the folded dock holds at the smallest window (844 x 390), where the phone's words reach "or dr…": a mouse says it in 37 characters.
 const WORDS: readonly (readonly [RegExp, string])[] = [
+  [/\bTap a glowing card to play it, or drag it\./g, "Click or drag a glowing card to play."],
   [/\bDouble tap to\b/g, "Click to"],
   [/\bdouble tap to\b/g, "click to"],
   [/\bHold a card to read it\b/g, "Right-click a card to read it"],

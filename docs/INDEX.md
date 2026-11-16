@@ -179,7 +179,7 @@ Read the sections your task touches.
   - 368–379 Banner (~750) ← 5
   - 380–399 Screen reader (~3.0K) ← 19
   - 400–403 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~31.0K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~31.4K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
   - 35–45 Performance (~680) ← 4
@@ -194,7 +194,7 @@ Read the sections your task touches.
   - 232–246 Icons (~480) ← 7
   - 247–265 Card art (~740) ← 2
   - 266–281 Tablets (~630) ← 15
-  - 282–472 Screens (~17.6K)
+  - 282–474 Screens (~17.9K)
     - 286–291 Splash (~210) ← 3
     - 292–295 App icon (~80)
     - 296–311 Campaigns (campaign list) (~1.5K) ← 6
@@ -213,13 +213,13 @@ Read the sections your task touches.
     - 416–425 Card pool (the Cards tab) (~770) ← 3
     - 426–431 Card (~490) ← 2
     - 432–437 Packs and pack cards (~170)
-    - 438–452 Settings (~1.1K) ← 12
+    - 438–452 Settings (~1.2K) ← 12
     - 453–458 Rules (~470) ← 1
     - 459–462 Rule (~220) ← 1
-    - 463–468 Booklet (~280) ← 2
-    - 469–472 Database (~110)
-  - 473–492 States (~620)
-- `docs/development.md` — Development (~2.6K tok)
+    - 463–470 Booklet (~540) ← 2
+    - 471–474 Database (~110)
+  - 475–494 States (~620)
+- `docs/development.md` — Development (~2.7K tok)
 - `docs/releasing.md` — Releasing (~4.2K tok)
   - 5–19 Start a release (~290) ← 1
   - 20–35 Jobs (~1.6K) ← 4

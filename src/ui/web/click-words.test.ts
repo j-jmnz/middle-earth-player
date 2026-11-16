@@ -5,7 +5,8 @@ import { clickChildren, clickWords } from "./click-words.ts";
 
 describe("clickWords", () => {
   it("words the instructions of the table's tray and the spotlight for a mouse", () => {
-    expect(clickWords("Tap a glowing card to play it, or drag it.")).toBe("Click a glowing card to play it, or drag it.");
+    expect(clickWords("Tap a glowing card to play it, or drag it.")).toBe("Click or drag a glowing card to play.");
+    expect(clickWords("Tap a glowing card to play it, or drag it.").length).toBeLessThanOrEqual(38);
     expect(clickWords("Tap again: planning ends")).toBe("Click again: planning ends");
     expect(clickWords("X is what you pay. Tap a hero to take one resource from its pool.")).toBe("X is what you pay. Click a hero to take one resource from its pool.");
     expect(clickWords("A replay of each attack that deals or blocks damage. Tap to skip.")).toBe("A replay of each attack that deals or blocks damage. Click to skip.");
