@@ -92,6 +92,17 @@ describe("02065:A:3 Rhosgobel cannot be traveled to until stage 1 is complete", 
   });
 });
 
+describe("02062:B:1 only a claimed Athelas heals", () => {
+  it("02062:B:1 does not count an Athelas in the staging area, even one that still names the enemy it was once a shadow card of", () => {
+    const made = table({ stage: "02062", staging: ["02063"], play: [{ code: WILYADOR, damage: 4 }] });
+    const athelas = first(made.state, "02063");
+    const stale = updateCard(made.state, athelas, { host: first(made.state, WILYADOR) });
+    const resolved = resolveRecords(stale, made.ctx, "02062", "whenRevealed", first(stale, "02062"));
+    expect(resolved.state.cards[first(resolved.state, WILYADOR)]?.damage).toBe(4);
+    expect(resolved.state.lost).toBe(true);
+  });
+});
+
 describe("02063:A:1 Athelas is Guarded when it is revealed", () => {
   it("02063:A:1 takes the next encounter card as its guard, and its Action is offered only once nothing guards it", () => {
     const made = table({ deck: ["02070"], phase: "Planning" });

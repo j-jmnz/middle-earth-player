@@ -10,7 +10,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // Rules: rr.guarded, rr.objective-cards, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.search, rr.damage, rr.ranged, sotm.ally-objective-wilyador, sotm.removed-from-game (data/rules/entries.json); the MEC03 rulesheet for Wilyador (docs/brief.md, A Journey to Rhosgobel).
 const WILYADOR: PickSpec = { type: "character", control: "any", names: ["Wilyador"] };
 // An Athelas objective a hero carries: the players control it (the player attachment Athelas, 09011, is not an objective).
-const ATHELAS_CLAIMED: PickSpec = { type: "objective", control: "any", names: ["Athelas"], attached: true };
+const ATHELAS_CLAIMED: PickSpec = { type: "objective", control: "any", names: ["Athelas"], controlled: true };
 const READY_HERO: PickSpec = { type: "hero", control: "you", state: "ready" };
 const WILYADOR_WHOLE: PickSpec = { ...WILYADOR, damaged: false };
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };

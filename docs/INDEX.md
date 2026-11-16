@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.2K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~207.4K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~207.6K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~630) ← 3
   - 54–67 Non-goals (~590)
@@ -131,22 +131,22 @@ Read the sections your task touches.
     - 1562–1599 The Tower of Cirith Ungol (~4.4K)
     - 1600–1636 The Black Gate Opens (~4.4K) ← 2
     - 1637–1665 Mount Doom (~4.3K)
-  - 1666–1740 Shadows of Mirkwood (~7.9K) ← 2
+  - 1666–1741 Shadows of Mirkwood (~8.1K) ← 2
     - 1674–1695 The Hunt for Gollum (~2.1K) ← 1
     - 1696–1715 Conflict at the Carrock (~2.4K) ← 2
-    - 1716–1740 A Journey to Rhosgobel (~2.7K) ← 1
-  - 1741–1749 Nightmare (~410) ← 20
-  - 1750–1788 Deckbuilding (~2.0K)
-  - 1789–1867 Effects (~3.2K)
-    - 1791–1849 Three layers (~2.4K) ← 10
-    - 1850–1859 Player side quests, contracts and saga cards (~430)
-    - 1860–1863 Window stack (~100)
-    - 1864–1867 Coverage test (~270)
-  - 1868–1890 Data sources (~700) ← 2
-  - 1891–1909 Card images (~1.2K) ← 9
-  - 1910–1935 Persistence and shipping (~2.6K) ← 6
-  - 1936–1977 Screens (~5.0K) ← 1
-    - 1962–1977 Table screen (~1.8K) ← 3
+    - 1716–1741 A Journey to Rhosgobel (~2.9K) ← 1
+  - 1742–1750 Nightmare (~410) ← 20
+  - 1751–1789 Deckbuilding (~2.0K)
+  - 1790–1868 Effects (~3.2K)
+    - 1792–1850 Three layers (~2.4K) ← 10
+    - 1851–1860 Player side quests, contracts and saga cards (~430)
+    - 1861–1864 Window stack (~100)
+    - 1865–1868 Coverage test (~270)
+  - 1869–1891 Data sources (~700) ← 2
+  - 1892–1910 Card images (~1.2K) ← 9
+  - 1911–1936 Persistence and shipping (~2.6K) ← 6
+  - 1937–1978 Screens (~5.0K) ← 1
+    - 1963–1978 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~57.1K tok)
   - 5–8 Overview (~150) ← 1
   - 9–23 Top bar (~3.1K) ← 4
@@ -232,7 +232,7 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~810) ← 1
-  - 86–124 Scenario procedure (~1.9K) ← 34
+  - 86–124 Scenario procedure (~1.9K) ← 35
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
   - 150–156 Merge (~140) ← 1

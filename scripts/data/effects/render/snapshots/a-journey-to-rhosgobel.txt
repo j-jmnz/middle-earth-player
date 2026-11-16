@@ -33,7 +33,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 02062:B:1 (back): When Revealed: Heal 5 wounds from Wilyador for each Athelas objective card the players control.
   02062:whenRevealed:1: When revealed (record also names 02062:B:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - for each objective (any player controls) named "Athelas", that is attached to another card:
+    - for each objective (any player controls) named "Athelas", that is claimed (attached to a character a player controls):
       - choose character (any player controls) named "Wilyador"
       - heal 5 damage from the picked card (counts as an Athelas heal, which Noxious Supplies does not reduce)
     - then, if there is a undamaged character (any player controls) named "Wilyador" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
@@ -42,7 +42,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 02062:B:2 (back): If Wilyador is completely healed when this effect resolves, Wilyador survives and the players have won the game. Otherwise, the players have lost the game.
   02062:whenRevealed:1: When revealed (record also names 02062:B:1)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - for each objective (any player controls) named "Athelas", that is attached to another card:
+    - for each objective (any player controls) named "Athelas", that is claimed (attached to a character a player controls):
       - choose character (any player controls) named "Wilyador"
       - heal 5 damage from the picked card (counts as an Athelas heal, which Noxious Supplies does not reduce)
     - then, if there is a undamaged character (any player controls) named "Wilyador" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
