@@ -325,11 +325,11 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18070:A:2 (front): While there is an active location, Haldan does not exhaust to quest.
   18070:constant:2: Constant
-    only if there is a location (any player controls) [also {"active":true}] to choose
+    only if there is a location (any player controls) that is the active location to choose
     - this card: stat noExhaustQuest 1, while this card is in play
 
 18070:A:3 (front): If Haldan leaves play, the players lose the game.
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 202 by template, 23 as JSON)
+(rendered pieces: 203 by template, 22 as JSON)

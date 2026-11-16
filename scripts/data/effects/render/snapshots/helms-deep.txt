@@ -43,8 +43,8 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143034:A:2 (shadow): Shadow: Place 1 progress on the active location. Attacking enemy gets +1 Attack for each progress on the active location.
   143034:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a location (any player controls) [also {"active":true}] to choose: choose location (any player controls) [also {"active":true}]
-    - then, if there is a location (any player controls) [also {"active":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card
+    - if there is a location (any player controls) that is the active location to choose: choose location (any player controls) that is the active location
+    - then, if there is a location (any player controls) that is the active location to choose (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card
     - the attacking enemy: stat attack progress of the active location, until the end of the attack
 
 ## 143035 Warrior of Dunland
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if [json condition {"kind":"enemyInPlay","is":false}]
     - the players win the game
 
-(rendered pieces: 170 by template, 20 as JSON)
+(rendered pieces: 173 by template, 17 as JSON)

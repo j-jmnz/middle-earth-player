@@ -40,7 +40,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142021:B:2 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
   142021:forced:1: Forced after an enemy engages a player
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) chosen by the first player [also {"active":true}]
+    - choose location (any player controls) chosen by the first player, that is the active location
     - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
 
 ## 142022 The Hunt is Up!
@@ -64,7 +64,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142022:B:3 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
   142022:forced:2: Forced after an enemy engages a player
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) chosen by the first player [also {"active":true}]
+    - choose location (any player controls) chosen by the first player, that is the active location
     - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
 
 ## 142023 The Gates of Moria
@@ -85,7 +85,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142023:B:2 (back): Forced: After an enemy engages a player, place 1 damage on each active location.
   142023:forced:1: Forced after an enemy engages a player
-    - for each location (any player controls) [also {"active":true}]:
+    - for each location (any player controls) that is the active location:
       - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
 
 142023:B:3 (back): If Doors of Durin is explored, the players win the game.
@@ -147,7 +147,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142027:A:1 (front): Forced: When Howling Warg attacks, place 1 damage on an active location.
   142027:forced:1: Forced when this enemy attacks, before the defender is declared
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) chosen by the first player [also {"active":true}]
+    - choose location (any player controls) chosen by the first player, that is the active location
     - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
 
 142027:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 damage on an active location.
@@ -155,7 +155,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player [also {"active":true}]
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player, that is the active location
       - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked","when":{"kind":"x","min":1}}]
 
 ## 142028 Crebain from Dunland
@@ -267,7 +267,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142035:A:1 (front): When Revealed: Place 3 damage on each active location.
   142035:whenRevealed:1: When revealed
-    - for each location (any player controls) [also {"active":true}]:
+    - for each location (any player controls) that is the active location:
       - [json PlaceDamage {"verb":"PlaceDamage","amount":3,"card":"picked"}]
 
 142035:A:2 (shadow): Shadow: Undefended damage from this attack must be assigned to the active location.
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - raise threat by 1 (each player)
     - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
 
-(rendered pieces: 168 by template, 27 as JSON)
+(rendered pieces: 174 by template, 21 as JSON)

@@ -428,6 +428,7 @@ describe("effects render read fields, picks", () => {
     hasAttachment: { names: ["Wormsbane"] },
     hasGuard: true,
     isGuard: true,
+    active: true,
     questedThisRound: true,
     guardedByTrait: "Mordor",
     notGuardedByTrait: "Mordor",
