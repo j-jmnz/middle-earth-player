@@ -248,8 +248,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SearchStageCard"), code, ...when }),
   // "Add each enemy discarded by this effect to the staging area" (19162:A:2): every card of `type` that the effect's DiscardEncounterTop discarded and that is still in the encounter discard pile enters the staging area, in the order they were discarded.
   z.strictObject({ verb: z.literal("StageDiscarded"), type: z.literal("enemy"), ...when }),
-  // "Remove 1 progress from The Goblins' Assault" (19163:A:2): progress comes off the card in play with this title, at most as much as it holds.
-  z.strictObject({ verb: z.literal("RemoveProgressFrom"), amount: positiveAmountSchema, named: z.string().min(1), ...when }),
+  // "Remove 1 progress from The Goblins' Assault" (19163:A:2): progress comes off the card in play with this title, at most as much as it holds. `target` names the card itself instead ("remove 1 progress from River Ninglor", 02017:A:1:
+  // a card's own title is the card, though another copy is in play).
+  z.strictObject({ verb: z.literal("RemoveProgressFrom"), amount: positiveAmountSchema, named: z.string().min(1).optional(), target: cardRefSchema.optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [

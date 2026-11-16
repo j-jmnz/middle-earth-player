@@ -8,7 +8,7 @@ import { printedOf } from "../../core/printed.ts";
 import { takeProgressOff } from "../../core/progress.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
-import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { searchable } from "../../interpret/search.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
@@ -35,7 +35,9 @@ export function stageDiscarded(state: ScenarioState, instruction: Verb<"StageDis
 
 /** RemoveProgressFrom: up to `amount` progress comes off the card with the title; the step log records the loss as it records progress, with a negative amount. */
 export function removeProgressFrom(state: ScenarioState, instruction: Verb<"RemoveProgressFrom">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  return takeProgressOff(state, namedInPlay(state, instruction.named, ctx), resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), steps);
+  const scope = frameScope(state, focus.seat, focus.sourceId);
+  const id = instruction.target ? refCard(state, instruction.target, scope) : instruction.named ? namedInPlay(state, instruction.named, ctx) : null;
+  return takeProgressOff(state, id, resolveAmount(state, instruction.amount, scope, ctx), steps);
 }
 
 /** The card in play with this title holds the flag: "resources cannot be placed on The Heroes' Defense" read by the Watchtower's option. */

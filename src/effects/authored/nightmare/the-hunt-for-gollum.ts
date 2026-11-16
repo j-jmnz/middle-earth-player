@@ -15,6 +15,8 @@ const MORDOR_ENEMY: PickSpec = { ...FREE_MORDOR_ENEMY, who: "firstPlayer" };
 const A_MORDOR_ENEMY: Condition = { kind: "canPick", pick: FREE_MORDOR_ENEMY };
 const NO_CLUE_YOU: Condition = { kind: "not", condition: { kind: "canPick", pick: { type: "objective", control: "you", trait: "Clue" } } };
 const HAS_GUARD: PickSpec = { type: "objective", control: "any", hasGuard: true };
+// Nothing is picked when no Clue is attached to a hero: the picked card is then still the enemy.
+const PICKED_CLUE: Condition = { kind: "matches", card: "picked", pick: CLUE };
 const NOT_ATTACHED: Condition = { kind: "not", condition: { kind: "matches", card: "picked", pick: HAS_GUARD } };
 // The card found in the discard pile is attached to a Mordor enemy in play, if able (the enemy keeps any engagement).
 const ATTACH_FROM_DISCARD = [
@@ -105,8 +107,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       { verb: "Pick", pick: MORDOR_ENEMY },
       { verb: "Pick", pick: CLAIMED_CLUE, when: A_MORDOR_ENEMY },
-      { verb: "MoveEncounterCard", card: "picked", to: "staging", when: A_MORDOR_ENEMY },
-      { verb: "AttachGuard", guard: "previous", to: "picked", stayEngaged: true, when: A_MORDOR_ENEMY },
+      { verb: "MoveEncounterCard", card: "picked", to: "staging", when: PICKED_CLUE },
+      { verb: "AttachGuard", guard: "previous", to: "picked", stayEngaged: true, when: PICKED_CLUE },
     ],
   },
   { id: "900408:shadow:1", cardCode: "900408", lines: ["900408:A:3"], timing: "shadow", instructions: [{ verb: "UndefendedDamageTo", pick: { type: "hero", control: "you", hasAttachment: { trait: "Clue" } } }] },

@@ -106,7 +106,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "endOfRound",
       condition: ACTIVE,
-      instructions: [{ verb: "RemoveProgressFrom", amount: 1, named: "River Ninglor" }, { verb: "RemoveProgressFromQuest", amount: 1 }],
+      instructions: [{ verb: "RemoveProgressFrom", amount: 1, target: "self" }, { verb: "RemoveProgressFromQuest", amount: 1 }],
     },
     {
       id: "02017:shadow:1",

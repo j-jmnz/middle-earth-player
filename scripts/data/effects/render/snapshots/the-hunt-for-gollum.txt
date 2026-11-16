@@ -90,7 +90,7 @@ Scenario piles that place cards with no record (quest: 02011 The Hunt Begins; qu
   02017:forced:1: Forced at the end of the round
     only if this card is the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - remove 1 progress from "River Ninglor"
+    - remove 1 progress from this card
     - remove 1 progress from the current quest card (all of it when it holds less)
 
 02017:A:2 (shadow): Shadow: Remove 1 progress token from the current quest. (2 progress tokens instead if this attack is undefended.)
