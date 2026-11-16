@@ -1,12 +1,17 @@
 # sharp loads its prebuilt binary; its install script only builds from source.
 ignoredBuiltDependencies:
   - sharp
+  # esbuild's binary comes from its platform package; electron-winstaller is Squirrel.Windows, which the desktop targets do not use.
+  - esbuild
+  - electron-winstaller
 # Settings only. This repo is one package.
 nodeLinker: hoisted
 # Every script runs its .ts file with Node's built-in type stripping; this hides the reparse notice.
 nodeOptions: --disable-warning=MODULE_TYPELESS_PACKAGE_JSON
 onlyBuiltDependencies:
   - better-sqlite3
+  # The desktop shell's binary downloads in its postinstall (desktop/).
+  - electron
   - sharp
   - unrs-resolver
 # Security floors for transitive dependencies (pnpm audit): node-forge comes through @expo/cli, minimatch 10 through

@@ -51,6 +51,11 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return resolved;
 };
 
+// The Electron shell (desktop/) is not part of the app's bundle, and its build folders hold a web export of about a gigabyte that Metro must not watch.
+const desktopFolder = path.join(__dirname, "desktop").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const desktopFiles = new RegExp(`^${desktopFolder}[/\\\\].*`);
+config.resolver.blockList = [...[config.resolver.blockList ?? []].flat(), desktopFiles];
+
 const enhanceMiddleware = config.server.enhanceMiddleware;
 config.server.enhanceMiddleware = (middleware, metroServer) => {
   const enhancedMiddleware = enhanceMiddleware

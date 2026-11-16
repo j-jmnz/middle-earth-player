@@ -54,6 +54,10 @@ modules/*/android/.gradle/
 modules/*/android/.cxx/
 
 # generated data and local caches
+# the desktop shell's bundle, its web exports and the installers (pnpm desktop)
+desktop/build/
+desktop/out/
+
 # CanvasKit's wasm, copied by pnpm assets canvaskit
 public/canvaskit.wasm
 

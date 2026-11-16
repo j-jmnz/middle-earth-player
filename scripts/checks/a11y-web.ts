@@ -9,7 +9,7 @@
 // The web build is a development aid (ACCESSIBILITY.md, Known gaps): the native app is what the players use. This check finds what react-native-web's
 // output and the shared kit get wrong for a reader's tree (names, roles, contrast, targets), not what VoiceOver or TalkBack do.
 import { execFileSync } from "node:child_process";
-import { createReadStream, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
+import { createReadStream, existsSync, mkdirSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -18,6 +18,7 @@ import type { AddressInfo } from "node:net";
 import { AxeBuilder } from "@axe-core/playwright";
 import { chromium, type Browser, type BrowserContext } from "playwright";
 
+import { contentType, resolveFile } from "../../desktop/serve.ts";
 import { runScript, type Log } from "../log.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
@@ -62,36 +63,13 @@ const SCREENS: readonly Screen[] = [
   { name: "Table", route: `/table/${SAVE}`, ready: "table", landscape: true },
 ];
 
-const TYPES: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".wasm": "application/wasm", ".ttf": "font/ttf", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml", ".ico": "image/x-icon" };
-
-function isFile(file: string): boolean {
-  return existsSync(file) && statSync(file).isFile();
-}
-
-// A static Expo export has one html per route, with `[param].html` for a dynamic one; an unknown path falls back to that file.
-// A path that climbs out of the export folder ("/../") is not served: it falls to the not-found page.
-function inside(root: string, file: string): boolean {
-  const relative = path.relative(root, file);
-  return relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative);
-}
-
-function resolveFile(root: string, pathname: string): string {
-  const missing = path.join(root, "+not-found.html");
-  const at = (candidate: string) => path.resolve(root, `.${path.sep}${candidate}`);
-  const direct = [pathname, `${pathname}.html`, path.join(pathname, "index.html")].map(at).find((file) => inside(root, file) && isFile(file));
-  if (direct) return direct;
-  const dir = at(path.dirname(pathname));
-  const dynamic = inside(root, dir) && existsSync(dir) ? readdirSync(dir).find((name) => /^\[.*\]\.html$/.test(name)) : undefined;
-  return dynamic ? path.join(dir, dynamic) : missing;
-}
-
 // The database runs in a worker that needs a cross-origin isolated page (SharedArrayBuffer).
 function serve(root: string): Promise<Server> {
   const server = createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url ?? "/", "http://localhost").pathname);
     const file = resolveFile(root, pathname);
     response.writeHead(200, {
-      "content-type": TYPES[path.extname(file)] ?? "application/octet-stream",
+      "content-type": contentType(file),
       "cross-origin-opener-policy": "same-origin",
       "cross-origin-embedder-policy": "credentialless",
     });

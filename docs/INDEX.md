@@ -52,27 +52,28 @@ Read the sections your task touches.
   - 222–225 Support (~90)
   - 226–241 Attribution (~410)
   - 242–245 License (~50)
-- `docs/architecture.md` — Architecture (~25.4K tok)
+- `docs/architecture.md` — Architecture (~26.6K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
-  - 78–160 Modules (~2.3K) ← 3
-    - 126–160 Repository map (~890) ← 1
-  - 161–186 State (~1.1K) ← 9
-  - 187–208 Play loop (~250)
-  - 209–234 Engine (~5.9K)
-    - 223–234 Mechanic families (~5.0K) ← 5
-  - 235–240 Effects (~600) ← 5
-  - 241–273 Scenario definition (~800)
-  - 274–320 Persistence (~3.3K) ← 2
-    - 297–300 Open games across an update (~50)
-    - 301–307 Open game rows (~650)
-    - 308–313 Opening a game (~350)
-    - 314–320 Continue, Restart and the checkpoint (~380)
-  - 321–326 Images (~980) ← 6
-  - 327–381 Screens (~4.6K) ← 1
-  - 382–387 Catalog build (~410)
-  - 388–405 Tests (~2.0K) ← 5
-  - 406–421 Performance (~1.2K) ← 4
+  - 78–161 Modules (~2.4K) ← 3
+    - 126–161 Repository map (~960) ← 1
+  - 162–187 State (~1.1K) ← 9
+  - 188–209 Play loop (~250)
+  - 210–235 Engine (~5.9K)
+    - 224–235 Mechanic families (~5.0K) ← 5
+  - 236–241 Effects (~600) ← 5
+  - 242–274 Scenario definition (~800)
+  - 275–321 Persistence (~3.3K) ← 2
+    - 298–301 Open games across an update (~50)
+    - 302–308 Open game rows (~650)
+    - 309–314 Opening a game (~350)
+    - 315–321 Continue, Restart and the checkpoint (~380)
+  - 322–327 Images (~980) ← 6
+  - 328–382 Screens (~4.6K) ← 1
+  - 383–394 Desktop (~1.1K) ← 1
+  - 395–400 Catalog build (~410)
+  - 401–418 Tests (~2.0K) ← 5
+  - 419–434 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.5K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 3
@@ -217,7 +218,7 @@ Read the sections your task touches.
     - 461–466 Booklet (~280) ← 2
     - 467–470 Database (~20)
   - 471–490 States (~620)
-- `docs/development.md` — Development (~2.0K tok)
+- `docs/development.md` — Development (~2.4K tok)
 - `docs/releasing.md` — Releasing (~2.6K tok)
 
 ## Agent procedures
@@ -274,7 +275,7 @@ Read when a task names the plan.
 
 - `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~5.0K tok)
   - 3–16 Context (~370)
-  - 17–26 Decisions taken (~430)
+  - 17–26 Decisions taken (~430) ← 1
   - 27–39 What does not move (~470) ← 3
   - 40–57 A. The drawn table on web (go/no-go gate) (~820)
   - 58–64 B. Offline pictures and booklets on web (~500) ← 2
@@ -313,7 +314,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); plans/desktop.md, What does not move (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Modules (1); architecture.md, Repository map (1)
+- `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); plans/desktop.md, What does not move (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)

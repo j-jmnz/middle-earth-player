@@ -59,6 +59,12 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     encounter: { steps: [{ script: "card-smoke/encounter.ts" }], about: "plays a scenario's encounter cards and seeded games" },
     a11y: { steps: [catalog, canvaskit, { script: "checks/a11y-web.ts" }], about: "audits the web screens with axe-core in Chromium" },
   },
+  desktop: {
+    dev: { steps: [{ script: "desktop/dev.ts" }], about: "opens Electron on the Metro web server (desktop/policy.ts allows localhost:8081 in this mode only)" },
+    build: { steps: [{ script: "desktop/build.ts" }], about: "assets, the web export with EXPO_PUBLIC_DESKTOP=1 and the shell's bundle, in desktop/build (--skip-assets, --optional)" },
+    pack: { steps: [{ script: "desktop/pack.ts" }], about: "electron-builder for this OS into desktop/out (APP_VERSION sets the version; --skip-build, --dir)" },
+    smoke: { steps: [{ script: "checks/desktop-smoke.ts" }], about: "launches the desktop app on a seeded export and checks it (--skip-build, --app <packed app>)" },
+  },
   doc: {
     index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },
     section: { steps: [{ script: "docs/index.ts", args: ["section"] }], about: 'prints one doc section: <file> "<heading>"' },

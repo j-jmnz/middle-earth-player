@@ -12,6 +12,14 @@ This builds the catalog and opens the app through Metro. Narrow the window to ph
 
 There's also a Codespaces devcontainer (`.devcontainer/devcontainer.json`) that installs the dependencies and builds the catalog. Run `pnpm web` there and open port 8081.
 
+## On a desktop
+
+```bash
+pnpm desktop dev
+```
+
+This builds the catalog, CanvasKit and the pdf.js files, bundles the Electron shell (`desktop/`), starts Metro on port 8081 and opens the desktop window on it. The window may reach `http://localhost:8081` in this mode only. `pnpm desktop build` makes the production pieces in `desktop/build` (the packs, the web export with `EXPO_PUBLIC_DESKTOP=1`, the shell) and `pnpm desktop pack` an installer for the OS it runs on into `desktop/out` (an AppImage and a `.deb` on Linux); set `APP_VERSION=<major>.<minor>.<patch>` to stamp the version. `pnpm desktop smoke` launches the app on a seeded export and checks it; on Linux without a display it runs itself under `xvfb-run`. The shell, its folders and the policy it enforces are in [architecture.md](architecture.md) (Desktop).
+
 ## On a phone
 
 For iOS you need macOS and Xcode. For Android you need Android Studio, SDK Platform 36 and `ANDROID_HOME` set. The app id is `com.middleearth.player`. The app uses `expo-dev-client`, so Expo Go can't run it.
@@ -43,7 +51,7 @@ The screen-reader flow (`.maestro/features/screen-reader.yaml`, tagged `reader`)
 
 ## Commands
 
-Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
+Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `desktop`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
 
 | Command | What it does |
 | --- | --- |
@@ -72,6 +80,10 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm assets scans` / `pnpm assets booklets` | Packs the card pictures or the booklet PDFs into `assets/`. |
 | `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators. It needs macOS, Xcode and Maestro. |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet. `--publish` replaces the `showcase` branch with them. |
+| `pnpm desktop dev` | Opens the Electron shell on the Metro web server (`localhost:8081`, allowed in this mode only). |
+| `pnpm desktop build` | Writes the web export (`EXPO_PUBLIC_DESKTOP=1`) and the shell's bundle to `desktop/build`, after `pnpm assets`. `--skip-assets` leaves the packs, `--optional` lets one fail. |
+| `pnpm desktop pack` | Runs electron-builder for this OS into `desktop/out`; `APP_VERSION` sets the version, `--skip-build` packs the last build and `--dir` makes the unpacked app only. |
+| `pnpm desktop smoke` | Exports with the e2e seed, launches the app through Playwright and checks isolation, the table, a booklet and a picture when packed, that nothing left `app://` and that a relaunch finds the save. `--skip-build` reuses the export, `--app <path>` launches a packed app. |
 | `pnpm doc index` / `pnpm doc section <file> "<heading>"` | Regenerates `docs/INDEX.md`, or prints one section of a doc. |
 | `pnpm release plan --dry-run` | Prints the next tag and its release notes without changing anything. Run `git fetch --tags` first. |
 | `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source. The release workflow runs it. |

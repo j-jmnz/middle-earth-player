@@ -37,7 +37,9 @@
     ".expo/**",
     "web-build/**",
     ".claude/**",
-    "assets/booklets/**"
+    "assets/booklets/**",
+    "desktop/build/**",
+    "desktop/out/**"
   ],
   "rules": {
     "import/namespace": "error",
@@ -237,6 +239,11 @@
               "./catalog"
             ],
             "message": "src/catalog may not import other modules under src/."
+          },
+          {
+            "target": "./desktop",
+            "from": "./src",
+            "message": "desktop/ (the Electron shell) imports nothing from src/: it runs outside the app's bundle."
           }
         ]
       }
