@@ -1,4 +1,4 @@
-// What the desktop app may reach and open (docs/plans/desktop.md, Decision 4: the only request that leaves the computer is the RingsDB deck import). Pure, so
+// What the desktop app may reach and open (docs/architecture.md, Desktop, Policy: the only request that leaves the computer is the RingsDB deck import). Pure, so
 // desktop/policy.test.ts runs it; desktop/main.ts applies it to the session, to navigation, to new windows and to permission requests.
 import { APP_HOST, APP_SCHEME } from "./identity.ts";
 

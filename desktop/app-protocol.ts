@@ -32,7 +32,8 @@ export function serveApp(root: string): void {
     const range = parseRange(request.headers.get("range"), size);
     const headers = responseHeaders(file, range ? range.end - range.start + 1 : size);
     if (range) headers["content-range"] = `bytes ${range.start}-${range.end}/${size}`;
-    const stream = createReadStream(file, range ?? undefined);
-    return new Response(request.method === "HEAD" ? null : (Readable.toWeb(stream) as ReadableStream), { status: range ? 206 : status, headers });
+    // A HEAD request opens no stream: nothing would read it and the file handle would stay open.
+    const body = request.method === "HEAD" ? null : (Readable.toWeb(createReadStream(file, range ?? undefined)) as ReadableStream);
+    return new Response(body, { status: range ? 206 : status, headers });
   });
 }

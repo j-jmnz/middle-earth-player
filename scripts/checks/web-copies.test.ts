@@ -1,23 +1,27 @@
 // A web variant that has to copy a phone file (metro.config.js serves `X.canvaskit.ts(x)` in its place on the web platform) differs from it by the listed edits and nothing
-// else, so a change to the phone's file shows up here until the copy follows it (docs/plans/desktop.md, What does not move).
+// else, so a change to the phone's file shows up here until the copy follows it (docs/architecture.md, Screens).
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { ROOT } from "./tracked.ts";
+import { ROOT, tracked } from "./tracked.ts";
 
 type Edit = readonly [from: string, to: string];
 
 const read = (file: string): string => readFileSync(path.join(ROOT, file), "utf8");
 // The file from `marker` on, or without its opening `//` comment: each copy has a header of its own.
-const body = (text: string, marker?: string): string => {
+// With `to`, the part ends after the first `to` that follows (a copy of one block of a longer file).
+const body = (text: string, marker?: string, to?: string): string => {
   const start = marker === undefined ? text.search(/^(?!\/\/)/m) : text.indexOf(marker);
   expect(start, `no ${marker} in the file`).toBeGreaterThanOrEqual(0);
-  return text.slice(start);
+  if (to === undefined) return text.slice(start);
+  const end = text.indexOf(to, start);
+  expect(end, `no ${to} after ${marker}`).toBeGreaterThanOrEqual(0);
+  return text.slice(start, end + to.length);
 };
 
-const COPIES: readonly { phone: string; web: string; from?: string; edits: readonly Edit[] }[] = [
+const COPIES: readonly { phone: string; web: string; from?: string; to?: string; edits: readonly Edit[] }[] = [
   {
     phone: "src/play/spotlight/use-spotlight.ts",
     web: "src/play/spotlight/use-spotlight.canvaskit.ts",
@@ -64,6 +68,21 @@ const COPIES: readonly { phone: string; web: string; from?: string; edits: reado
     edits: [],
   },
   {
+    // The hooks the held layer shares with the phone's spotlight layer (the header of held-layer.tsx: change the two together).
+    phone: "src/play/spotlight/layer.native.tsx",
+    web: "src/play/spotlight/held-layer.tsx",
+    from: "  const s = useUiScale();\n",
+    to: "  }, [canPlay]);\n",
+    edits: [],
+  },
+  {
+    phone: "src/play/canvas/table-canvas.native.tsx",
+    web: "src/play/canvas/row-feet-probe.tsx",
+    from: "// Until the screen has measured",
+    to: "  return null;\n}\n",
+    edits: [["function RowFeetProbe", "export function RowFeetProbe"]],
+  },
+  {
     // expo-sqlite's own file, copied for the synchronous save's wall-clock wait (src/screens/data/web/sync-wait.ts); metro.config.js serves the copy on the web platform.
     phone: "node_modules/expo-sqlite/web/WorkerChannel.ts",
     web: "src/screens/data/web/worker-channel.ts",
@@ -72,21 +91,50 @@ const COPIES: readonly { phone: string; web: string; from?: string; edits: reado
       ["} from './web.types';", "} from '../../../../node_modules/expo-sqlite/web/web.types';"],
       [
         "  let i = 0;\n  // @ts-expect-error: Remove this when TypeScript supports Atomics.pause\n  const useAtomicsPause = typeof Atomics.pause === 'function';\n  while (Atomics.load(lock, 0) === PENDING) {\n    ++i;\n\n    if (useAtomicsPause) {\n      if (i > 1_000_000) {\n        throw new Error('Sync operation timeout');\n      }\n      // @ts-expect-error: Remove this when TypeScript supports Atomics.pause\n      Atomics.pause();\n    } else {\n      // NOTE(kudo): Unfortunate for the busy loop,\n      // because we don't have a way for main thread to yield its execution to other callbacks.\n      if (i > 1000_000_000) {\n        throw new Error('Sync operation timeout');\n      }\n    }\n  }\n",
-        "  const startedAt = performance.now();\n  let i = 0;\n  const useAtomicsPause = typeof Atomics.pause === 'function';\n  while (Atomics.load(lock, 0) === PENDING) {\n    ++i;\n\n    if (i % SYNC_CLOCK_EVERY === 0 && syncWaitExpired(startedAt, performance.now())) {\n      throw new Error('Sync operation timeout');\n    }\n    if (useAtomicsPause) {\n          Atomics.pause();\n    }\n  }\n",
+        "  const startedAt = performance.now();\n  let i = 0;\n  const useAtomicsPause = typeof Atomics.pause === 'function';\n  while (Atomics.load(lock, 0) === PENDING) {\n    ++i;\n\n    if (i % SYNC_CLOCK_EVERY === 0 && syncWaitExpired(startedAt, performance.now())) {\n      throw new Error('Sync operation timeout');\n    }\n    if (useAtomicsPause) {\n      Atomics.pause();\n    }\n  }\n",
       ],
     ],
   },
 ];
 
 describe("web variants that copy a phone file", () => {
-  for (const { phone, web, from, edits } of COPIES) {
+  for (const { phone, web, from, to, edits } of COPIES) {
     it(`${web} is ${phone} apart from its listed edits`, () => {
-      let expected = body(read(phone), from);
+      let expected = body(read(phone), from, to);
       for (const [from, to] of edits) {
         expect(expected.split(from).length - 1, `the phone's file no longer holds: ${from}`).toBe(1);
         expected = expected.replace(from, () => to);
       }
-      expect(body(read(web), from)).toBe(expected);
+      expect(body(read(web), from, to)).toBe(expected);
+    });
+  }
+});
+
+// Metro keeps one answer for a specifier a folder asks twice (per origin folder, specifier and platform), and metro.config.js redirects a phone file to its variant for every
+// importer but the variant itself. So the specifier a variant uses to reach its phone file must be one no other file in its folder uses: otherwise a cached answer sent that file to
+// the variant (or the variant to itself) depending on who asked first.
+describe("the specifier a web variant reaches its phone file by", () => {
+  const variants = tracked(["src"]).filter((file) => /\.canvaskit\.tsx?$/.test(file));
+  const sourcesIn = (dir: string): string[] => tracked(["src"]).filter((file) => path.posix.dirname(file) === dir && /\.tsx?$/.test(file));
+
+  it("finds the variants this check is about", () => {
+    expect(variants.length).toBeGreaterThan(5);
+  });
+
+  for (const variant of variants) {
+    it(`${variant} is the only file of its folder that asks for its phone file's specifier`, () => {
+      const dir = path.posix.dirname(variant);
+      const text = read(variant);
+      const phoneBase = path.posix.basename(variant).replace(/\.canvaskit\.tsx?$/, "");
+      const phoneFiles = [path.posix.join(dir, `${phoneBase}.native`), path.posix.join(dir, phoneBase), path.posix.join(dir, "..", `${phoneBase}.native`), path.posix.join(dir, "..", phoneBase)].map((file) => path.posix.normalize(file));
+      const specifiers = [...text.matchAll(/from\s+["'](\.[^"']*)["']/g)]
+        .map((match) => match[1] ?? "")
+        .filter((specifier) => phoneFiles.includes(path.posix.normalize(path.posix.join(dir, specifier.replace(/\.tsx?$/, "")))));
+      // A variant that is a copy of its phone file imports nothing of it; a copy of the whole file has no specifier to share.
+      for (const specifier of specifiers) {
+        const askers = sourcesIn(dir).filter((file) => file !== variant && !/\.test\.tsx?$/.test(file) && new RegExp(`["']${specifier.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']`).test(read(file)));
+        expect(askers, `${specifier} is also asked for by ${askers.join(", ")}`).toEqual([]);
+      }
     });
   }
 });

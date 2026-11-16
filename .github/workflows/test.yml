@@ -111,14 +111,14 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # pnpm's side-effects cache can restore electron without running its postinstall (a store filled under ELECTRON_SKIP_BINARY_DOWNLOAD), so the binary is fetched explicitly; a no-op when it is there.
+      # pnpm's side-effects cache can restore electron without running its postinstall (a store filled by a job that skipped the binary), so the binary is fetched explicitly; a no-op when it is there.
       - run: node node_modules/electron/install.js
       # The system libraries Chromium (and so Electron) needs, and xvfb for the display.
       - run: pnpm exec playwright install-deps chromium
       - run: sudo apt-get install -y xvfb
       - run: pnpm desktop smoke
 
-  # The Android bundle of a pull request with desktop work against main's (docs/plans/desktop.md, What does not move): both exported with --no-bytecode, and the job fails
+  # The Android bundle of a pull request with desktop work against main's (docs/architecture.md, Screens): both exported with --no-bytecode, and the job fails
   # unless they are byte-identical. The full history gives it the merge base; the script does nothing for a diff with no desktop work. Its own job, like a11y-web, and not
   # waited on by `test`, which stays as fast.
   phone-bundle:

@@ -546,7 +546,7 @@ jobs:
           key: desktop-electron-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: desktop-electron-${{ runner.os }}-
       - uses: ./.github/actions/install
-      # pnpm's side-effects cache can restore electron without running its postinstall (a store filled under ELECTRON_SKIP_BINARY_DOWNLOAD), so the binary is fetched explicitly; a no-op when it is there.
+      # pnpm's side-effects cache can restore electron without running its postinstall (a store filled by a job that skipped the binary), so the binary is fetched explicitly; a no-op when it is there.
       - name: Fetch the Electron binary
         run: node node_modules/electron/install.js
       # The system libraries Electron needs and xvfb for the display (the smoke script runs itself under xvfb-run).

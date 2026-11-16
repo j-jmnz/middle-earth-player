@@ -136,7 +136,7 @@ export function invokeWorkerSync<T extends SQLiteWorkerMessageType & keyof Resul
       throw new Error('Sync operation timeout');
     }
     if (useAtomicsPause) {
-          Atomics.pause();
+      Atomics.pause();
     }
   }
 

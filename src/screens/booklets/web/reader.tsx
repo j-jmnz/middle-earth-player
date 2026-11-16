@@ -83,9 +83,11 @@ export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testI
       opened = new PageRenderer(result.doc);
       setLoaded({ uri, renderer: opened });
     });
+    // The document is gone after cleanup, so `loaded` stops holding it: a hidden reader that is shown again (React Activity) opens it afresh instead of drawing a destroyed one.
     return () => {
       live = false;
       opened?.dispose();
+      setLoaded(null);
     };
   }, [uri]);
 

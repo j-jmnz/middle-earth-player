@@ -27,7 +27,7 @@ const webBookletPdf = path.join(__dirname, "src/screens/booklets/web/pdf-module.
 // The phone's files are never edited for the desktop (.claude/rules, phone-only files), and neither is a shared file's phone path. Where the web needs more than they
 // do, the web platform serves `X.canvaskit.ts(x)` in place of `X.native.ts(x)` or `X.ts(x)`, from beside it or from a `web` folder beside it, and that file imports the
 // phone's without the file extension (a request from the variant itself is not redirected; Metro keeps one answer for a specifier a folder asks twice, so the variant must
-// ask in other words than the phone's own importers do).
+// ask in other words than the phone's own importers do; scripts/checks/web-copies.test.ts holds that). `variants` remembers which variants exist: adding or deleting a `.canvaskit` file needs a Metro restart.
 const variants = new Map();
 const canvaskitOf = (filePath) => {
   if (!variants.has(filePath)) {

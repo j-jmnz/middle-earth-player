@@ -1,6 +1,6 @@
-// `pnpm test phone-bundle`: the Android JS bundle of this tree against the one of the merge base with origin/main (docs/plans/desktop.md, What does not move). The desktop work
+// `pnpm test phone-bundle`: the Android JS bundle of this tree against the one of the merge base with origin/main (docs/architecture.md, Screens). The desktop work
 // leaves the phone untouched, so the two must be byte-identical apart from where the checkout lives. It exports Android twice with `--no-bytecode --clear` and the same
-// environment, once in a temporary worktree at the merge base and once here, and fails, naming the first modules that differ, unless the bundles match.
+// environment, once in a temporary worktree at the merge base and once here, and fails, naming the first modules that differ, unless the bundles match. Both exports use this checkout's installed node_modules (the worktree symlinks them), so it proves the phone's source identical, not a dependency change: a pnpm-lock.yaml change touching a phone dependency is reviewed by hand.
 //   --base <ref>  compare against that commit instead of the merge base (`--base HEAD` compares the last commit with the working tree)
 //   --keep        keep the worktree and both exports, and print where they are
 //   --if-desktop-work  do nothing unless the diff from the base touches desktop work (phone-files.ts, isDesktopWork), as the pull request job runs it
@@ -159,7 +159,7 @@ async function main(log: Log): Promise<void> {
       return;
     }
     for (const line of describeDifference(baseText, headText)) log.error(line);
-    throw new Error(`the Android bundle differs from the one at ${base.sha.slice(0, 9)}: the desktop work must leave the phone's bundle byte-identical (docs/plans/desktop.md, What does not move)`);
+    throw new Error(`the Android bundle differs from the one at ${base.sha.slice(0, 9)}: the desktop work must leave the phone's bundle byte-identical (docs/architecture.md, Screens)`);
   } finally {
     if (keep) log.info(`kept ${scratch} (base worktree, base-out, head-out)`);
     else {

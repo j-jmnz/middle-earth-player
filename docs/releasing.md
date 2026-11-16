@@ -64,7 +64,7 @@ A release needs the Android key; `plan` refuses without it. The IPA needs no pro
 
 ### Desktop signing (optional)
 
-The installers are unsigned, like the IPA: Windows shows SmartScreen and macOS asks the player to right-click and choose Open (the app is ad-hoc signed so Apple silicon runs it). Only Windows has an optional step, off unless both secrets exist: `WINDOWS_CERT_BASE64` (an Authenticode `.pfx`, base64) and `WINDOWS_CERT_PASSWORD`, which the `desktop` job gives electron-builder as `WIN_CSC_LINK` and `WIN_CSC_KEY_PASSWORD`. `plan`'s Signing step reports it as `desktop_signed` and warns when only one is set. macOS notarization is not wired: it needs a Developer ID certificate and a change to `desktop/electron-builder.yml`'s `mac` block, and a release that adds it changes this section.
+The installers are unsigned, like the IPA: Windows shows SmartScreen and macOS asks the player to right-click and choose Open (the app is ad-hoc signed so Apple silicon runs it). Only Windows has an optional step, off unless both secrets exist: `WINDOWS_CERT_BASE64` (an Authenticode `.pfx`, base64) and `WINDOWS_CERT_PASSWORD`, which the Windows leg's pack step (only that step) gives electron-builder as `WIN_CSC_LINK` and `WIN_CSC_KEY_PASSWORD`. `plan`'s Signing step reports it as `desktop_signed`: with one secret set it warns and the installer ships unsigned, and with both the release notes say the Windows installer is signed instead of warning of SmartScreen. macOS notarization is not wired: it needs a Developer ID certificate and a change to `desktop/electron-builder.yml`'s `mac` block, and a release that adds it changes this section.
 
 ### Android key
 

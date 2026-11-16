@@ -1,7 +1,6 @@
-// What names the desktop app to the system and to the page. Every value here is permanent once a release ships: OPFS (the saves, user.db, and the booklets a player
-// added) belongs to the page's origin, and the origin is the scheme and host below, so changing APP_HOST or APP_SCHEME makes every saved campaign unreachable. The
-// profile folder (USER_DATA_DIR) holds that storage, so renaming it does the same, and APP_ID is the installer's and the OS's name for the app (an update installs over
-// the last one by it). desktop/identity.test.ts pins them (docs/plans/desktop.md, What does not move).
+// What names the desktop app to the system and to the page. Every value here is permanent once a release ships (.claude/rules/release-standards.md, Tags and releases says
+// why: the saves live under the origin and the profile folder). APP_ID is the installer's and the OS's name for the app (an update installs over the last one by it).
+// desktop/identity.test.ts pins them.
 export const APP_SCHEME = "app";
 export const APP_HOST = "middle-earth-player";
 /** The page's origin, without a trailing slash. */
@@ -13,7 +12,7 @@ export const APP_NAME = "Middle-Earth Player";
 export const USER_DATA_DIR = "Middle-Earth Player";
 export const APP_ID = "com.middleearth.player";
 
-/** The smallest window: the smallest landscape size the phone's compact class gives the table (docs/plans/desktop.md, C, Sizes). */
+/** The smallest window: the smallest landscape size the phone's compact class gives the table (docs/architecture.md, Desktop, Window). */
 export const MIN_WIDTH = 844;
 export const MIN_HEIGHT = 390;
 

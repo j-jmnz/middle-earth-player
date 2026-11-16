@@ -13,7 +13,7 @@ export const DESKTOP_OS: Readonly<Record<string, DesktopOs>> = { win32: "win", d
 /** A GitHub release asset is at most 2 GiB. */
 export const ASSET_LIMIT = 2 * 1024 ** 3;
 
-// The `<os>-<arch>` part of each name and the extensions its installers have (docs/plans/desktop.md, Decisions taken, 2).
+// The `<os>-<arch>` part of each name and the extensions its installers have (docs/releasing.md, Jobs).
 const INSTALLERS: Readonly<Record<DesktopOs, { target: string; extensions: readonly string[] }>> = {
   win: { target: "win-x64", extensions: ["exe", "zip"] },
   mac: { target: "mac-universal", extensions: ["dmg"] },

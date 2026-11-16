@@ -1,5 +1,5 @@
 // What the reader table lists and in which order (docs/design-system-table.md, Screen reader): the zones as headings, each with its cards,
-// then the piles. The same selectors as the reader table (table-canvas.tsx) give the cards; this file only orders and groups them, so a test
+// then the piles. The same selectors as the canvas table (table-canvas.native.tsx) give the cards; this file only orders and groups them, so a test
 // reads the rows as plain data in node. Pure.
 import type { PrintedCard } from "../../rules/core/printed.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";

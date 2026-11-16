@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { desktopBuild } from "./desktop";
 
-// The desktop export sets EXPO_PUBLIC_DESKTOP=1 (docs/plans/desktop.md, B); every other build leaves it unset.
+// The desktop export sets EXPO_PUBLIC_DESKTOP=1 (docs/architecture.md, Desktop); every other build leaves it unset.
 describe("desktop build flag", () => {
   afterEach(() => {
     vi.unstubAllEnvs();

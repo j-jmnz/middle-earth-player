@@ -1,4 +1,4 @@
-// A branch that holds desktop work leaves every phone-only file as it was (docs/plans/desktop.md, What does not move; user instruction, 2026-11-16):
+// A branch that holds desktop work leaves every phone-only file as it was (docs/architecture.md, Screens; user instruction, 2026-11-16):
 // the web gets its own variants, and a shared file gains only branches a phone cannot run. The changed files are the working tree's and the new
 // files' against the merge base with origin/main; after a squash merge the diff is empty, and a branch with no desktop file is not held to it.
 import { execFileSync } from "node:child_process";
@@ -28,7 +28,7 @@ describe("phone-only files", () => {
   test("which files are which", () => {
     expect(["src/play/canvas/table-canvas.native.tsx", "src/x/use.ios.ts", "a.android.tsx", "modules/skia/x.ts", "app.json", "plugins/p.js", "eas.json"].every(isPhoneOnly)).toBe(true);
     expect(["src/play/canvas/table-canvas.tsx", "src/play/spotlight/burn.ts", "package.json"].some(isPhoneOnly)).toBe(false);
-    expect(["desktop/main.ts", "src/ui/skia/skia-web.ts", "src/x/y.canvaskit.tsx", "docs/plans/desktop.md"].every(isDesktopWork)).toBe(true);
+    expect(["desktop/main.ts", "src/ui/skia/skia-web.ts", "src/x/y.canvaskit.tsx"].every(isDesktopWork)).toBe(true);
   });
 
   test("a change with desktop work names the phone files it touches; one without is not held", () => {

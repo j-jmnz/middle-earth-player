@@ -1,4 +1,4 @@
-# The installers (docs/plans/desktop.md, E.3). `pnpm desktop pack` runs electron-builder with this file for the OS it runs on and passes the version
+# The installers (docs/architecture.md, Desktop, Packaging). `pnpm desktop pack` runs electron-builder with this file for the OS it runs on and passes the version
 # (APP_VERSION, as app.config.js stamps the phone builds: package.json stays 0.0.0) and the Electron version on the command line.
 # The app is desktop/build/app (the bundled main process and its generated package.json); the web export is not packed into the asar: it is about a gigabyte of
 # pictures, so it goes beside it in resources/web, where desktop/main.ts serves it from.
@@ -11,7 +11,7 @@ directories:
   output: desktop/out
   buildResources: assets/images
 # Artifact names are middle-earth-player-<tag>-<os>-<arch>.<ext>, written out per OS: electron-builder's own ${arch} is x86_64 for an AppImage and amd64 for a .deb.
-# No auto-update (docs/plans/desktop.md, Decision 4): no publish target, so no latest*.yml or app-update.yml is written.
+# No auto-update (docs/architecture.md, Desktop, Packaging): no publish target, so no latest*.yml or app-update.yml is written.
 publish: null
 asar: true
 # The app is a bundle with no dependencies: electron-builder must not go looking for node_modules (desktop/before-build.cjs says why).
@@ -31,7 +31,7 @@ extraResources:
     to: THIRD_PARTY_NOTICES.md
   - from: LICENSE
     to: LICENSE.txt
-# Unsigned (docs/plans/desktop.md, Decision 1): Windows shows SmartScreen, and macOS needs right-click then Open. The macOS build is ad-hoc signed so Apple Silicon will run it.
+# Unsigned unless the Windows certificate is set (docs/releasing.md, Desktop signing): Windows shows SmartScreen, and macOS needs right-click then Open. The macOS build is ad-hoc signed so Apple Silicon will run it.
 mac:
   target:
     - target: dmg
