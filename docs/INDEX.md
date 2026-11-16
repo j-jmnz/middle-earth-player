@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.2K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~213.5K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~213.7K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~630) ← 3
   - 54–67 Non-goals (~590)
@@ -131,13 +131,13 @@ Read the sections your task touches.
     - 1563–1600 The Tower of Cirith Ungol (~4.4K)
     - 1601–1637 The Black Gate Opens (~4.4K) ← 2
     - 1638–1666 Mount Doom (~4.3K)
-  - 1667–1805 Shadows of Mirkwood (~13.9K) ← 2
+  - 1667–1805 Shadows of Mirkwood (~14.0K) ← 2
     - 1675–1696 The Hunt for Gollum (~2.1K) ← 1
     - 1697–1716 Conflict at the Carrock (~2.4K) ← 2
     - 1717–1742 A Journey to Rhosgobel (~2.9K) ← 1
     - 1743–1760 The Hills of Emyn Muil (~1.5K) ← 1
     - 1761–1781 The Dead Marshes (~2.1K) ← 2
-    - 1782–1805 Return to Mirkwood (~2.2K) ← 4
+    - 1782–1805 Return to Mirkwood (~2.3K) ← 4
   - 1806–1814 Nightmare (~410) ← 21
   - 1815–1853 Deckbuilding (~2.0K)
   - 1854–1932 Effects (~3.2K)

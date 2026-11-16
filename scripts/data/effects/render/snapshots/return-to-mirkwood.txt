@@ -96,7 +96,7 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
       - exhaust the picked card
 
 02133:A:2 (front): Response: After exploring Woodman's Glade, reduce the threat of each player not guarding Gollum by 2.
-  02133:response:1: Response on the event activeExplored
+  02133:response:1: Response on the event activeExplored (heard about this card)
     - for each player not guarding Gollum, first player first:
       - lower threat by 2 (the acting player)
 

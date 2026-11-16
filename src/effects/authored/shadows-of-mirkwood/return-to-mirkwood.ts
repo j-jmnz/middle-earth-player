@@ -73,7 +73,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "02131:constant:1", cardCode: "02131", lines: ["02131:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "guardianLocked", amount: 1, until: "whileSourceInPlay", target: "table" }] },
   { id: "02131:shadow:1", cardCode: "02131", lines: ["02131:A:2"], timing: "shadow", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "activeLocation", when: { kind: "undefended" } }] },
 
-  // 02132 Dry Watercourse. While it is the active location a treachery's When Revealed that targets the guard targets each other player too.
+  // 02132 Dry Watercourse. While it is the active location the effects of a treachery card (When Revealed or Shadow) that target the guard target each other player too.
   { id: "02132:constant:1", cardCode: "02132", lines: ["02132:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "treacheryHitsAll", amount: 1, until: "whileSourceInPlay", target: "table" }] },
 
   // 02133 Woodman's Glade. Travel: the guard exhausts a hero he controls (no ready hero, no travel). Response: after it is explored each player not guarding Gollum reduces his threat by 2.
@@ -84,6 +84,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["02133:A:2"],
     timing: "response",
     trigger: "activeExplored",
+    subject: "self",
     instructions: [{ verb: "ForEachPlayer", order: "firstFirst", seats: "otherThanGuardian", instructions: [{ verb: "LowerThreat", amount: 2, who: "actor" }] }],
   },
 

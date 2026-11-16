@@ -54,7 +54,7 @@ import * as carrock from "../scenarios/conflict-at-the-carrock/game.ts";
 import * as rhosgobel from "../scenarios/a-journey-to-rhosgobel/game.ts";
 import * as muil from "../scenarios/the-hills-of-emyn-muil/game.ts";
 import * as deadmarshes from "../scenarios/the-dead-marshes/game.ts";
-// import * as returnmirkwood from "../scenarios/return-to-mirkwood/game.ts";
+import * as returnmirkwood from "../scenarios/return-to-mirkwood/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -135,5 +135,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("a-journey-to-rhosgobel", "A Journey to Rhosgobel", rhosgobel.RHOSGOBEL_GOLDENS, rhosgobel.rhosgobelWorld, rhosgobel.playGolden),
   entry("the-hills-of-emyn-muil", "The Hills of Emyn Muil", muil.MUIL_GOLDENS, muil.muilWorld, muil.playGolden),
   entry("the-dead-marshes", "The Dead Marshes", deadmarshes.DEADMARSHES_GOLDENS, deadmarshes.deadmarshesWorld, deadmarshes.playGolden),
-  // entry("return-to-mirkwood", "Return to Mirkwood", returnmirkwood.RETURNMIRKWOOD_GOLDENS, returnmirkwood.returnmirkwoodWorld, returnmirkwood.playGolden),
+  entry("return-to-mirkwood", "Return to Mirkwood", returnmirkwood.RETURNMIRKWOOD_GOLDENS, returnmirkwood.returnmirkwoodWorld, returnmirkwood.playGolden),
 ];

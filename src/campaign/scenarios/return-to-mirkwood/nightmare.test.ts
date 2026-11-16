@@ -190,10 +190,10 @@ describe("900905 Deceptive Path", () => {
     expect(state.activeLocation).toBe(first(state, "place"));
   });
 
-  it("900905:A:2 with no location in the deck every card is discarded, nothing becomes active and Deceptive Path is still discarded", () => {
+  it("900905:A:2 with no location in the deck every card is discarded and nothing new becomes active; the Then part does not resolve (rr.then), so Deceptive Path is not discarded", () => {
     const { state } = becameActive({ active: "900905", deck: ["f0", "f0"] });
-    expect(state.activeLocation).toBeNull();
-    expect(zoneOf(state, "900905")).toBe("encounterDiscard");
+    expect(zoneOf(state, "900905")).toBe("activeLocation");
+    expect(state.activeLocation).toBe(first(state, "900905"));
     expect(state.encounterDeck).toEqual([]);
   });
 });

@@ -39,17 +39,15 @@ export function guardianCanChange(state: ScenarioState): boolean {
 }
 
 /**
- * The seats a ForEachPlayer with `seats: "guardian"` runs for: the guard, and, when the effect's source is a treachery card's When Revealed while a card holds `treacheryHitsAll` (Dry Watercourse, 02132:A:1), or a shadow card dealt to an enemy
- * that holds `shadowHitsAll` (Ambushing Orcs, 900902:A:1), each other player after him in player order. A shadow effect of a treachery card is not changed by Dry Watercourse (agent recommendation, docs/brief.md, Return to Mirkwood).
+ * The seats a ForEachPlayer with `seats: "guardian"` runs for: the guard, and, when the effect's source is a treachery card's When Revealed or Shadow effect while a card holds `treacheryHitsAll` (Dry Watercourse, 02132:A:1), or a shadow card dealt to an enemy
+ * that holds `shadowHitsAll` (Ambushing Orcs, 900902:A:1), each other player after him in player order. A treachery card's Shadow effect is covered too: the printed line says "all treachery card effects" (docs/brief.md, Return to Mirkwood).
  */
 export function guardianSeats(state: ScenarioState, ctx: ReduceContext, sourceId: string | null): number[] {
   const guard = guardianSeat(state);
   if (guard == null) return [];
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source || state.modifiers.length === 0) return [guard];
-  const widened =
-    source.zone === "shadow"
-      ? source.host != null && flagged(state, source.host, "shadowHitsAll")
-      : printedOf(ctx.cards, source.code).type === "treachery" && heldAmount(state, "table", "treacheryHitsAll") > 0;
+  const treachery = printedOf(ctx.cards, source.code).type === "treachery" && heldAmount(state, "table", "treacheryHitsAll") > 0;
+  const widened = source.zone === "shadow" ? treachery || (source.host != null && flagged(state, source.host, "shadowHitsAll")) : treachery;
   return widened ? [guard, ...otherThanGuardian(state)] : [guard];
 }

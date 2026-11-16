@@ -80,7 +80,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "900904:shadow:1", cardCode: "900904", lines: ["900904:A:2"], timing: "shadow", instructions: [GUARDIAN({ verb: "Pick", pick: { type: "character", control: "you", state: "ready" } }, { verb: "Exhaust", target: { kind: "picked" } })] },
 
   // 900905 Deceptive Path. No progress while it is in the staging area. Forced: after it becomes the active location the discard pile is shuffled into the deck, cards are discarded until a location is, that location is revealed and made the active location (Deceptive Path goes back to the
-  // staging area), then Deceptive Path is discarded (also when no location was found).
+  // staging area), then Deceptive Path is discarded (rr.then: only when a location was found and made active).
   { id: "900905:constant:1", cardCode: "900905", lines: ["900905:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   {
     id: "900905:forced:1",
@@ -88,7 +88,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["900905:A:2"],
     timing: "forced",
     trigger: "becameActive",
-    instructions: [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntil", type: "location" }, { verb: "RevealCard" }, { verb: "MoveEncounterCard", to: "activeLocation" }, { verb: "Discard", target: { kind: "self" } }],
+    instructions: [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntil", type: "location" }, { verb: "RevealCard" }, { verb: "MoveEncounterCard", to: "activeLocation" }, { verb: "Discard", target: { kind: "self" }, when: { kind: "matches", card: "picked", pick: { type: "location", control: "any" } } }],
   },
 
   // 900906 Web-wall. When Revealed: the topmost Spider enemy in the encounter discard pile is revealed and added to the staging area. Shadow: the guard discards every resource from each hero he controls.

@@ -2,11 +2,10 @@ appId: com.middleearth.player
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `returnmirkwood-lost` (scripts/e2e/shadows-of-mirkwood/return-to-mirkwood.ts): a real two-handed
-# standalone game of Return to Mirkwood, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/standalone-loss.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `returnmirkwood-lost` (scripts/e2e/shadows-of-mirkwood/return-to-mirkwood.ts): a real two-handed
+# standalone game of Return to Mirkwood (the One Deck and Defenders of Gondor lists, Easy), parked on its loss: no seat remains, the rail reads Defeat.
+# The steps are the shared subflow's (.maestro/subflows/standalone-loss.yaml): the defeat on the table, the outcome with the reason, and the Scenarios tab. A loss writes nothing, and a cycle has no campaign to check.
 - runFlow:
     file: ../../subflows/standalone-loss.yaml
     env:
       FIXTURE: returnmirkwood-lost
-# TODO: this scenario's own assertions on the outcome screen after the loss (the reason).

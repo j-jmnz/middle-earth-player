@@ -7,6 +7,7 @@ import type { EngineStep } from "../../../rules/core/intents.ts";
 import { guardianSeat } from "../../../rules/families/guardian/seats.ts";
 import { shadowCards } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { queueEvent } from "../../../rules/windows/queue.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { fightEnemy, finish, first, idOf, idsOf, legalIntents, legalTargets, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -101,6 +102,21 @@ describe("02131 The Spiders' Ring", () => {
     expect(shadowCards(fight.run.state.cards[first(fight.run.state, "f3")])).not.toContain(ring?.id);
   });
 
+  it("02131:A:2 the location that was active keeps its progress when it returns to the staging area", () => {
+    const fight = fightEnemy(
+      (layout: Layout) => {
+        const made = table(layout);
+        return { ...made, state: updateCard(made.state, idOf(made.state, "place"), { progress: 1 }) };
+      },
+      "02131",
+      "f3",
+      { active: "place" },
+      { undefended: true, lands: { f3: GOLLUM } },
+    );
+    expect(zoneOf(fight.run.state, "place")).toBe("staging");
+    expect(fight.run.state.cards[first(fight.run.state, "place")]?.progress).toBe(1);
+  });
+
   it("02131:A:2 a defended attack leaves the active location as it was", () => {
     const fight = stricken(false);
     expect(zoneOf(fight.run.state, "place")).toBe("activeLocation");
@@ -116,14 +132,20 @@ describe("02132 Dry Watercourse", () => {
     expect(threat(state, 1)).toBe(38);
   });
 
-  it("02132:A:1 with another active location only the guard is targeted, and a shadow effect is not changed", () => {
+  it("02132:A:1 with another active location only the guard is targeted", () => {
     const made = table({ active: "place", threat: [28, 30], deck: ["f0", "f0"] });
     const state = revealed(made, "02135", answer("seat:1"));
     expect(threat(state, 0)).toBe(36);
     expect(threat(state, 1)).toBe(30);
-    const fight = fightEnemy((layout: Layout) => table(layout), "02135", "f3", { active: "02132", threat: [28, 30] }, { undefended: true, lands: { f3: GOLLUM } });
+    const fight = fightEnemy((layout: Layout) => table(layout), "02135", "f3", { active: "place", threat: [28, 30] }, { undefended: true, lands: { f3: GOLLUM } });
     expect(threat(fight.run.state, 0)).toBe(32);
     expect(threat(fight.run.state, 1)).toBe(30);
+  });
+
+  it("02132:A:1 a treachery card's Shadow effect that targets the guard targets each other player too (the printed line says all treachery card effects)", () => {
+    const fight = fightEnemy((layout: Layout) => table(layout), "02135", "f3", { active: "02132", threat: [28, 30] }, { undefended: true, lands: { f3: GOLLUM } });
+    expect(threat(fight.run.state, 0)).toBe(32);
+    expect(threat(fight.run.state, 1)).toBe(34);
   });
 });
 
@@ -153,6 +175,23 @@ describe("02133 Woodman's Glade", () => {
     const run = resolveRecords(made.state, made.ctx, "02133", "response", first(made.state, "02133"));
     expect(threat(run.state, 0)).toBe(30);
     expect(threat(run.state, 1)).toBe(28);
+  });
+});
+
+describe("02133:A:2 hears only its own exploration", () => {
+  const heardOffered = (state: ScenarioState, ctx: Parameters<typeof settle>[1], subject: string) => settle(queueEvent({ ...state, window: null }, { trigger: "activeExplored", seat: null, subject }), ctx, []);
+
+  it("02133:A:2 another active location explored while Woodman's Glade lies in the staging area does not trigger it", () => {
+    const made = table({ active: "place", staging: ["02133"], threat: [30, 30] });
+    const run = heardOffered(made.state, made.ctx, idOf(made.state, "place"));
+    expect(legalIntents(run, made.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === idOf(made.state, "02133"))).toBe(false);
+    expect(threat(run, 1)).toBe(30);
+  });
+
+  it("02133:A:2 Woodman's Glade explored as the active location triggers it once", () => {
+    const made = table({ active: "02133", threat: [30, 30] });
+    const run = heardOffered(made.state, made.ctx, idOf(made.state, "02133"));
+    expect(legalIntents(run, made.ctx).filter((intent) => intent.type === "Trigger" && intent.cardId === idOf(made.state, "02133"))).toHaveLength(1);
   });
 });
 
