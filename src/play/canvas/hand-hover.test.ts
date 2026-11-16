@@ -1,8 +1,9 @@
 // The mouse over the hand and the wheel (docs/design-system-table.md, Pointer): which card the pointer lifts, and how far the wheel steps it.
 import { describe, expect, it } from "vitest";
 
-import { hoverCard, stepCard, WHEEL_STEP, wheelPixels, wheelSteps } from "./hand-hover.ts";
+import { GRAB_STEP, grabPoint, hoverCard, liftedRect, risenCardAt, stepCard, WHEEL_STEP, wheelAdvance, wheelPixels, wheelSteps } from "./hand-hover.ts";
 import { spreadLayout, type Spread } from "./hand-scrub.ts";
+import { hitSlot } from "../layout/hits.ts";
 import { cardSize, handCardSize, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "../layout/layout.ts";
 
 const none: Rect = { x: 0, y: 0, w: 0, h: 0 };
@@ -62,14 +63,52 @@ describe("hoverCard", () => {
     expect(hoverCard(spread, layout.slots, CANVAS.width / 2, 40, false)).toBe(-1);
   });
 
-  it("keeps an open hand open on the lifted card, which stands above the resting hand", () => {
-    const risen = spread.slots[2] as Rect;
-    expect(hoverCard(spread, layout.slots, risen.x + risen.w / 2, risen.y + risen.h / 2, true)).toBe(2);
+  it("opens on the card the risen spread has under the pointer", () => {
+    const x = (first.x + first.w + (layout.slots[1] as CardSlot).x) / 2;
+    expect(hoverCard(spread, layout.slots, x, first.y + 4, false)).toBe(spread.centers.reduce((best, c, i) => (Math.abs(c - x) < Math.abs((spread.centers[best] as number) - x) ? i : best), 0));
   });
 
-  it("closes an open hand when the pointer is well above it or past its ends", () => {
-    expect(hoverCard(spread, layout.slots, CANVAS.width / 2, 10, true)).toBe(-1);
+  it("keeps an open hand open on the lifted card, which stands above the resting hand", () => {
+    const risen = liftedRect(spread, 2) as Rect;
+    expect(hoverCard(spread, layout.slots, risen.x + risen.w / 2, risen.y + 3, true, 2)).toBe(2);
+  });
+
+  it("keeps the lifted card while the pointer stays on it and lifts the card under the pointer once it leaves", () => {
+    const risen = liftedRect(spread, 2) as Rect;
+    // A few pixels toward the neighbour, still on the lifted card, which is wider than a slot.
+    expect(hoverCard(spread, layout.slots, risen.x + risen.w - 2, risen.y + risen.h - 3, true, 2)).toBe(2);
+    const next = spread.slots[3] as Rect;
+    expect(hoverCard(spread, layout.slots, next.x + next.w - 1, next.y + next.h - 1, true, 2)).toBe(3);
+  });
+
+  it("closes an open hand as soon as the pointer is above the spread or past its ends", () => {
+    expect(hoverCard(spread, layout.slots, CANVAS.width / 2, 10, true, 2)).toBe(-1);
+    expect(hoverCard(spread, layout.slots, CANVAS.width / 2, spread.top - 4, true, -1)).toBe(-1);
+    expect(hoverCard(spread, layout.slots, spread.left - 30, CANVAS.height - 5, true, 0)).toBe(-1);
     expect(hoverCard(spread, [], 0, CANVAS.height - 5, true)).toBe(-1);
+  });
+
+  it("answers the drawn card under a pointer in the gap between two and the foot of the strip", () => {
+    const a = spread.slots[1] as Rect;
+    const b = spread.slots[2] as Rect;
+    expect(risenCardAt(spread, (a.x + a.w + b.x) / 2, a.y + a.h / 2, -1)).toBeGreaterThanOrEqual(0);
+    expect(risenCardAt(spread, a.x + a.w / 2, CANVAS.height - 1, -1)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe("grabPoint", () => {
+  it("is a point the phone's own hit test gives that card, for each card of an overlapping hand", () => {
+    const crowded = handLayout(9);
+    for (const slot of crowded.slots) {
+      const at = grabPoint(crowded.slots, slot.id);
+      expect(at, slot.id).not.toBeNull();
+      expect(crowded.slots[hitSlot(crowded.slots, at?.x ?? 0, at?.y ?? 0)]?.id).toBe(slot.id);
+      expect(crowded.slots[hitSlot(crowded.slots, at?.x ?? 0, (at?.y ?? 0) + GRAB_STEP)]?.id).toBe(slot.id);
+    }
+  });
+
+  it("is null for a card that is not in the layout", () => {
+    expect(grabPoint(layout.slots, "nobody")).toBeNull();
   });
 });
 
@@ -83,6 +122,32 @@ describe("the wheel", () => {
       const next = wheelSteps(total + 12);
       steps += next.steps;
       total = next.rest;
+    }
+    expect(steps).toBe(2);
+  });
+
+  it("is exactly one step for a mouse notch and never carries a remainder into the next", () => {
+    let rest = 0;
+    const steps: number[] = [];
+    for (let i = 0; i < 3; i++) {
+      const next = wheelAdvance(rest, 100, 0);
+      steps.push(next.steps);
+      rest = next.rest;
+    }
+    expect(steps).toEqual([1, 1, 1]);
+    expect(rest).toBe(0);
+    expect(wheelAdvance(30, -100, 0)).toEqual({ steps: -1, rest: 0 });
+    expect(wheelAdvance(0, 3, 1)).toEqual({ steps: 1, rest: 0 });
+    expect(wheelAdvance(10, -1, 2)).toEqual({ steps: -1, rest: 0 });
+  });
+
+  it("adds up a trackpad's small deltas", () => {
+    let rest = 0;
+    let steps = 0;
+    for (let i = 0; i < 10; i++) {
+      const next = wheelAdvance(rest, 12, 0);
+      steps += next.steps;
+      rest = next.rest;
     }
     expect(steps).toBe(2);
   });
