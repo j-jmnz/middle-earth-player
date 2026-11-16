@@ -8,10 +8,10 @@
 set -euo pipefail
 
 families=(
-  node-cache-Linux-x64-pnpm- node-cache-macOS-arm64-pnpm- scans-Linux- ccache-android- ccache-ios-launcher- gradle-deps-
-  pods- metro-android- metro-ios-
+  node-cache-Linux-x64-pnpm- node-cache-macOS-arm64-pnpm- scans-Linux- ccache-android- gradle-modules- xcode-cas- pods-
+  metro-android- metro-ios-
 )
-retired=(setup-java-Linux-x64-gradle- gradle-home- ccache-ios-Xcode- scans-macOS-)
+retired=(setup-java-Linux-x64-gradle- gradle-home- gradle-deps- ccache-ios- scans-macOS-)
 
 caches="repos/$GITHUB_REPOSITORY/actions/caches"
 read -r -a keep <<< "$KEEP"

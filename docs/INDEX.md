@@ -220,12 +220,12 @@ Read the sections your task touches.
 - `docs/releasing.md` — Releasing (~3.3K tok)
   - 5–19 Start a release (~290) ← 1
   - 20–33 Jobs (~1.1K) ← 2
-  - 34–55 Caches (~630)
-  - 56–86 Signing (~760) ← 1
-    - 60–73 Android key (~250) ← 1
-    - 74–86 TestFlight (optional) (~420) ← 1
-  - 87–90 Installing (~60)
-  - 91–101 Troubleshooting (~390)
+  - 34–56 Caches (~640)
+  - 57–87 Signing (~760) ← 1
+    - 61–74 Android key (~250) ← 1
+    - 75–87 TestFlight (optional) (~420) ← 1
+  - 88–91 Installing (~60)
+  - 92–102 Troubleshooting (~390)
 
 ## Agent procedures
 
