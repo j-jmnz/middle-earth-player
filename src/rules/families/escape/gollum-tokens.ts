@@ -1,6 +1,7 @@
 // Rules: sotm.escape-test, rr.then (data/rules/entries.json); ledger lines 02107:A:1, 900802:A:2. The resource tokens The Dead Marshes puts on Gollum: where they go when he is not in play (`redirectResources`), and the shuffle once he holds too many (`shufflesAtTokens`).
 import type { Effect } from "../../../catalog/boundary.ts";
 
+import { gameReads } from "../../core/game-reads.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -29,8 +30,9 @@ function shufflingCodes(ctx: ReduceContext): ReadonlySet<string> {
 
 /** A card in play that holds `shufflesAtTokens` and has that many resource tokens is shuffled into the encounter deck, its tokens gone with it (02107:A:1). A standing state, checked each time the engine settles. */
 export function shuffleFullCards(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // Only a game with a card that shuffles at a number of tokens scans the table here.
+  if (!gameReads(state, ctx, '"shufflesAtTokens"')) return state;
   const codes = shufflingCodes(ctx);
-  if (codes.size === 0) return state;
   const holders = Object.values(state.cards).filter((card) => codes.has(card.code) && inPlay(card.zone) && card.resources > 0);
   if (holders.length === 0) return state;
   const synced = syncConstants(state, ctx);
