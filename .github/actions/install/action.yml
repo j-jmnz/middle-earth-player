@@ -25,7 +25,7 @@ runs:
       run: |
         prefix="node-cache-${{ runner.os }}-${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}-pnpm-"
         echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
-        echo "key=$prefix${{ hashFiles('pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"
+        echo "key=${prefix}${{ hashFiles('pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"
     - id: restore
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
