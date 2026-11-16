@@ -56,11 +56,11 @@ export type RhosgobelGame = PlayedGame;
 // The goldens (src/campaign/scenarios/a-journey-to-rhosgobel/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type RhosgobelGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: RhosgobelDecks; outcome: "won" | "lost"; policy?: Partial<RhosgobelPolicy>; lossReason?: string };
 
-// The games to pin (about 350 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal, one on Easy and one two-handed on Nightmare (Radagast's Request is used in the first), and each way the scenario is lost: every
+// The games to pin (the first is the longest win: the reader parity test plays it, src/play/reader-play/games.ts; about 350 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal, one on Easy and one two-handed on Nightmare (Radagast's Request is used in the first), and each way the scenario is lost: every
 // player's threat at 50 (heroes with a high threat and no Willpower), every hero destroyed, Wilyador destroyed by the damage he takes each round, the seat that controls him eliminated while the other lives on, and stage 3 reached with Wilyador not healed.
 export const RHOSGOBEL_GOLDENS: readonly RhosgobelGolden[] = [
-  { name: "solo win", seatCount: 1, seed: 41, difficulty: "Normal", decks: "strong", outcome: "won", policy: { radagast: 20 } },
   { name: "two-handed win", seatCount: 2, seed: 97, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win", seatCount: 1, seed: 41, difficulty: "Normal", decks: "strong", outcome: "won", policy: { radagast: 20 } },
   { name: "Easy solo win", seatCount: 1, seed: 82, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "Nightmare two-handed win", seatCount: 2, seed: 104, difficulty: "Nightmare", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
