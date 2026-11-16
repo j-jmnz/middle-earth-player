@@ -16,6 +16,7 @@ import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
 import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scenarios/gundabad-beats.ts";
+import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -233,8 +234,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(`Willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`, "willpower");
         return;
       case "escapeTest":
-        open(1, step.success ? "Escape test passed" : "Escape test failed", step.success ? "good" : "bad");
-        line(`${step.committed} committed against ${step.escape} Escape`, "willpower");
+        open(1, escapeResultTitle(step.success, step.seat, after.seatCount > 1), step.success ? "good" : "bad");
+        line(escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape), step.stat ?? "willpower");
         return;
       case "hideTest":
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");

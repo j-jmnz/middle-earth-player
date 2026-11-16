@@ -1,6 +1,7 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
 import { plural } from "../words/list.ts";
+import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
 import type { Cause } from "../../rules/core/cause.ts";
@@ -19,7 +20,7 @@ export type LogNames = {
 
 // The mark beside a log line: a game icon (threat, willpower), or a token coin for damage, progress and a resource (no
 // high-resolution source of those tokens exists; docs/design-system.md, Icons).
-export type LogMark = "threat" | "willpower" | "attack" | "damage" | "progress" | "resource" | null;
+export type LogMark = "threat" | "willpower" | "attack" | "defense" | "damage" | "progress" | "resource" | null;
 
 export type LogLine = { key: string; text: string; cause: string | null; mark: LogMark };
 
@@ -34,9 +35,10 @@ function markOf(step: EngineStep): LogMark {
       return "threat";
     case "hideTest":
     case "fortitudeTest":
-    case "escapeTest":
     case "quest":
       return "willpower";
+    case "escapeTest":
+      return step.stat ?? "willpower";
     case "strike":
       return "attack";
     case "damage":
@@ -112,7 +114,7 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "escapeCommit":
       return `${names.card(step.cardId)} commits to the escape test`;
     case "escapeTest":
-      return `Escape test ${step.success ? "passed" : "failed"}: ${step.committed} committed against ${step.escape} Escape`;
+      return `${escapeResultTitle(step.success, step.seat, true)}: ${escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape)}`;
     case "fortitudeTest":
       return `Fortitude test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`;
     case "hideTest":

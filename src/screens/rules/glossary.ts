@@ -20,12 +20,16 @@ const DOC_NAMES: Readonly<Record<string, string>> = {
   mec108: bookletName("angmar-awakened"),
   mec112: bookletName("the-two-towers"),
   mec113: bookletName("the-return-of-the-king"),
+  jtr: "A Journey to Rhosgobel rules",
+  hoem: "The Hills of Emyn Muil rules",
+  tdm: "The Dead Marshes rules",
+  rtm: "Return to Mirkwood rules",
 };
 
 // A decklist, a scenario's setup or one scenario's stage is read on its own screen (deck import, briefing), not looked up.
 function inGlossary(entry: RuleEntry): boolean {
   if (!(entry.doc in DOC_NAMES)) return false;
-  return !/^(decklist\.|mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-|emce\.setup-|mec108\.(campaign-)?setup-|mec11[23]\.setup-)/.test(entry.id);
+  return !/^(decklist\.|mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-|emce\.setup-|mec108\.(campaign-)?setup-|mec11[23]\.setup-|sotm\.setup-)/.test(entry.id);
 }
 
 // A title's words without what opens it: an FAQ entry number ("(1.11) Limitations on Attacks"), a framework step number

@@ -90,7 +90,7 @@ function dealStep(state: ScenarioState, frame: Frame, data: EscapeData, ctx: Red
   const escape = escapeTotal(next, dealt, ctx);
   const committed = committedTotal(next, data.committedIds, data.stat, ctx);
   const result = { success: escapePassed(committed, escape), committed, escape };
-  steps.push({ kind: "escapeTest", seat: frame.seat, dealtIds: dealt, committed, escape, success: result.success });
+  steps.push({ kind: "escapeTest", seat: data.seats.length > 1 ? null : frame.seat, dealtIds: dealt, committed, escape, success: result.success, ...(data.stat === "willpower" ? {} : { stat: data.stat }) });
   return patchTop(next, { step: 2, data: { ...data, dealtIds: dealt, escape, result } });
 }
 

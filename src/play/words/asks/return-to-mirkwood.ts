@@ -39,7 +39,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 900904:A:1 (When Revealed): the guard exhausts a hero or the enemy gains surge.
   "900904:whenRevealed:1 @0 Choose": { owned: true, note: "{card}: choose one you can resolve: exhaust a ready hero you control, or {card} gains surge." },
   "900904:whenRevealed:1 @0 exhaust": { label: "Exhaust a ready hero you control" },
-  "900904:whenRevealed:1 @0 surge": { label: "Gain surge: reveal 1 additional encounter card" },
+  "900904:whenRevealed:1 @0 surge": { label: "{card} gains surge: reveal 1 more encounter card" },
 
   // 900909:A:1 (When Revealed): the guard reveals the topmost Tantrum from the discard pile or 2 additional encounter cards.
   "900909:whenRevealed:1 @0 Choose": { owned: true, note: "{card}: choose one you can resolve: reveal the topmost Tantrum in the encounter discard pile, or reveal 2 additional encounter cards." },

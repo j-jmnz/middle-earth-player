@@ -21,7 +21,8 @@ export type EngineStep =
   | { kind: "hideCommit"; cardId: string }
   | { kind: "fortitudeCommit"; cardId: string }
   | { kind: "escapeCommit"; cardId: string }
-  | { kind: "escapeTest"; seat: number | null; dealtIds: readonly string[]; committed: number; escape: number; success: boolean }
+  // `seat`: the player who made the test, null for a party test (every player commits to it). `stat`: what the committed characters counted, left out for Willpower.
+  | { kind: "escapeTest"; seat: number | null; dealtIds: readonly string[]; committed: number; escape: number; success: boolean; stat?: "attack" | "defense" }
   | { kind: "fortitudeTest"; seat: number; discardedIds: readonly string[]; willpower: number; eyes: number; success: boolean }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   // `stormcaller`: the Stormcaller's quest stage advanced (dcce.stormcallers-area-stages), not the players' quest.

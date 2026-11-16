@@ -6,9 +6,11 @@ import { heldStat, NO_COUNTS } from "../../rules/interpret/constants.ts";
 import { escapeCommitLimit } from "../../rules/families/escape/commit.ts";
 import { nearestEscape } from "../../rules/families/escape/test.ts";
 import { committedTotal } from "../../rules/families/escape/value.ts";
+import { topFrame } from "../../rules/windows/windows.ts";
 
-import { escapeCommitWords, escapeCountWords, escapeNoneCaution } from "../words/scenarios/escape.ts";
+import { escapeCommitWords, escapeCountWords, escapeNoneCaution, escapeReadoutWords, escapeStatWord } from "../words/scenarios/escape.ts";
 import { seatSays } from "../words/seat.ts";
+import type { SheetStat } from "./sheet-types.ts";
 
 /** The stat the committed characters count in the test going on, or willpower with none. */
 export function escapeStat(game: ScenarioState): "willpower" | "attack" | "defense" {
@@ -31,7 +33,23 @@ export function escapeCountNote(game: ScenarioState, ctx: ReduceContext): string
   if (!found) return null;
   const { data } = found.frame;
   const committed = committedTotal(game, data.committedIds, data.stat, ctx);
-  return seatSays(game, found.frame.seat).titled("Escape test", escapeCountWords(data.stat, committed, data.cards, heldStat(game, 0, "escapeValueBonus", NO_COUNTS)));
+  const words = escapeCountWords(data.stat, committed, data.cards, heldStat(game, 0, "escapeValueBonus", NO_COUNTS));
+  // A party test counts every player's characters: no one seat leads its note.
+  return data.seats.length > 1 ? `Escape test: ${words}` : seatSays(game, found.frame.seat).titled("Escape test", words);
+}
+
+/**
+ * The numbers beside the commit sheet (the stat of the characters already committed, with the ones picked now) or the action window (the stat committed): the total every player has put into the test, in the stat's icon,
+ * and the cards dealt next. Null outside the test. `picking` is the rows picked on the commit sheet, null elsewhere.
+ */
+export function escapeNumbers(game: ScenarioState, ctx: ReduceContext, picking: readonly string[] | null): { stats: readonly SheetStat[]; result: string } | null {
+  const found = nearestEscape(game);
+  if (!found) return null;
+  const { data } = found.frame;
+  const stat = (ids: readonly string[]): SheetStat => ({ icon: data.stat, value: committedTotal(game, ids, data.stat, ctx), word: escapeStatWord(data.stat) });
+  if (picking && game.window?.kind === "escapeCommit") return { stats: [stat([...data.committedIds, ...picking])], result: escapeReadoutWords(data.cards, "commit") };
+  if (game.window?.kind === "frameAction" && topFrame(game)?.data.kind === "escape") return { stats: [stat(data.committedIds)], result: escapeReadoutWords(data.cards, "actions") };
+  return null;
 }
 
 /** The armed Pass of the action window while no one is committed: the test fails. Null otherwise, and outside the test. */
