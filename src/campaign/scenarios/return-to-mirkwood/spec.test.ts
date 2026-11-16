@@ -1,4 +1,4 @@
-// Rules: sotm.guarding-gollum, sotm.setup-return-to-mirkwood, rr.forced, rr.staging, rr.travel, rr.shadow-effects, rr.damage, rr.engagement, rr.active-location (data/rules/entries.json).
+// Rules: sotm.guarding-gollum, sotm.setup-return-to-mirkwood, rr.forced, rr.staging, rr.travel, rr.shadow-effects, rr.damage, rr.engaged, rr.active-location (data/rules/entries.json).
 import { describe, it } from "vitest";
 
 import { announce, attack, cardSpecs, damageOn, exhausted, reveal, resolve, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
