@@ -6,6 +6,8 @@ Middle-Earth Player collects no personal data. It has no accounts, analytics, ad
 
 Your campaigns, games, logs, decks, notes and settings are saved only in the app's own storage, a SQLite database called `user.db`. An open game also keeps a checkpoint there: a copy of its table (the cards and where they lie), taken at the start of each phase and whenever you leave the table. That way the game can continue from where you were even after an update changes the rules. When you open a booklet or a deck file with the system file picker, the app copies it into the same storage, and it reads only the file you pick. In a web browser or the desktop app, a booklet you add is kept in the browser's private file storage for the app (OPFS, a `booklets` folder next to the database), under the same origin and the same rules: it never leaves your computer, and clearing the site's data or uninstalling the app deletes it.
 
+In a web browser the saves are in the browser's private file storage for the app (OPFS); in the desktop app they are in the app's own profile folder on your computer. Neither is sent anywhere. In a browser or the desktop app, Settings can write a backup of `user.db` to a file (`middle-earth-player-<date>.backup`) and read one back. The file is made only when you tap Back up saves, holds every campaign, game, deck, run and setting you have saved, and goes to the folder your browser or system downloads to. The app never uploads it, so it leaves your computer only if you move it.
+
 Your phone's backup (iCloud or Google) may include these saves. That copy goes to your Apple or Google account, not to this project. Uninstalling the app deletes everything it saved.
 
 ## Network connections

@@ -74,7 +74,7 @@ Web only; no shared file's phone path changes (the Android bundle stays byte for
 
 ## D. Save backup file
 
-1. Settings gains "Back up saves" and "Restore from a backup", desktop and web only (phones keep the system backup): export serializes `user.db` (`serializeAsync`) to a downloaded `middle-earth-player-<date>.backup`; restore validates the file through the existing migration and `readSaveChecked` path (`src/screens/data/campaign-store.ts`) before replacing, and refuses a file from a newer schema.
+1. Settings gains "Back up saves" and "Restore from a backup", desktop and web only (phones keep the system backup): export serializes `user.db` (`serializeAsync`) to a downloaded `middle-earth-player-<date>.backup`; restore validates the file on a copy in memory (`deserializeDatabaseAsync`, the migrations, `readSaveChecked` on every save) and refuses a file from a newer schema, then replaces the rows in one transaction on the live connection and reloads the page (the open file is never swapped, so a cut-short restore rolls back). The booklet and picture rows stay as the computer has them. The rows are web-only through `view.canvaskit.tsx` and `setting-rows.canvaskit.tsx` (`src/screens/settings/web/`, `docs/architecture.md`, Persistence).
 2. `PRIVACY.md` (Data on your device) says where desktop saves live and that the backup file is made only when asked.
 
 ## E. The Electron shell
