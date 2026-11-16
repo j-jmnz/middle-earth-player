@@ -23,7 +23,7 @@ export type ReaderChoice = {
   onStep: (id: string, delta: 1 | -1) => void;
 };
 
-export function useReaderChoice({ readerMode, listShown, sheet, held, setHeld, peeking, cards }: { readerMode: boolean; listShown: boolean; sheet: Sheet; held: Choice | null; setHeld: (choice: Choice) => void; peeking: boolean; cards: ReadonlyMap<string, PrintedCard> }): ReaderChoice {
+export function useReaderChoice({ readerMode, sheet, held, setHeld, peeking, cards }: { readerMode: boolean; sheet: Sheet; held: Choice | null; setHeld: (choice: Choice) => void; peeking: boolean; cards: ReadonlyMap<string, PrintedCard> }): ReaderChoice {
   // The card or row a screen reader's user last activated: focus stays on it when the next moment still asks about it.
   const [touched, setTouched] = useState<string | null>(null);
   const stayFocus = readerMode && touched != null && !peeking && holdsFocus(touched, tappable(sheet));
@@ -56,6 +56,5 @@ export function useReaderChoice({ readerMode, listShown, sheet, held, setHeld, p
     },
     [sheet, held, setHeld],
   );
-  // `listShown`: the web table is the list while CanvasKit loads (canvas/table-canvas.tsx), which needs the seed with no reader on.
-  return { readerSeed: readerMode || listShown ? { sheet, cards } : null, stayFocus, touch, reset, onStep };
+  return { readerSeed: readerMode ? { sheet, cards } : null, stayFocus, touch, reset, onStep };
 }

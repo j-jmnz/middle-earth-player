@@ -22,7 +22,6 @@ import { ThemeContext, useResolvedTheme, type ThemeName } from "../../ui/theme";
 import { REM_BASE, UiScaleContext, uiFactor } from "../../ui/ui-scale";
 import { useIsTablet } from "../../ui/use-size-class";
 import { PicturesReady } from "../../ui/showcase/pictures-ready";
-import { startCanvasKit } from "../../ui/skia/skia-web";
 import { SplashGlow } from "../kit/splash-glow";
 
 void SplashScreen.preventAutoHideAsync();
@@ -123,13 +122,6 @@ export default function RootLayout() {
     if (!databases && !failure) return;
     hideNativeSplash(splashHidden);
   }, [databases, failure]);
-
-  // Web only: CanvasKit loads after the first paint, so the table's Skia files are imported once it has (ui/skia/skia-web.ts). The phone has Skia built in.
-  useEffect(() => {
-    if (Platform.OS !== "web") return;
-    const frame = requestAnimationFrame(startCanvasKit);
-    return () => cancelAnimationFrame(frame);
-  }, []);
 
   useEffect(() => {
     if (!databases || Platform.OS === "web") return;

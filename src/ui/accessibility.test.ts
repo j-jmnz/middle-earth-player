@@ -14,14 +14,8 @@ const phone = vi.hoisted(() => ({
   handlers: new Map<string, (enabled: boolean) => void>(),
   added: 0,
   removed: 0,
-  os: "ios",
 }));
 vi.mock("react-native", () => ({
-  Platform: {
-    get OS() {
-      return phone.os;
-    },
-  },
   AccessibilityInfo: {
     isReduceMotionEnabled: () => Promise.resolve(phone.reduceMotion),
     isScreenReaderEnabled: () => Promise.resolve(phone.screenReader),
@@ -53,21 +47,10 @@ beforeEach(() => {
   phone.highText = false;
   phone.added = 0;
   phone.removed = 0;
-  phone.os = "ios";
   phone.handlers.clear();
 });
 
 describe("the accessibility store", () => {
-  it("never reports a screen reader on the web, where react-native-web says yes whatever is running", async () => {
-    phone.os = "web";
-    phone.screenReader = true;
-    const stop = subscribeAccessibility(() => undefined);
-    await settle();
-    expect(accessibility().screenReader).toBe(false);
-    expect(phone.handlers.has("screenReaderChanged")).toBe(false);
-    stop();
-  });
-
   it("opens six listeners for any number of readers, and closes them with the last", () => {
     const stops = [subscribeAccessibility(() => undefined), subscribeAccessibility(() => undefined), subscribeAccessibility(() => undefined)];
     expect(phone.added).toBe(6);

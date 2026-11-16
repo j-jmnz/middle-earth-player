@@ -116,6 +116,25 @@ jobs:
       - run: sudo apt-get install -y xvfb
       - run: pnpm desktop smoke
 
+  # The Android bundle of a pull request with desktop work against main's (docs/plans/desktop.md, What does not move): both exported with --no-bytecode, and the job fails
+  # unless they are byte-identical. The full history gives it the merge base; the script does nothing for a diff with no desktop work. Its own job, like a11y-web, and not
+  # waited on by `test`, which stays as fast.
+  phone-bundle:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm assets catalog
+      - run: pnpm test phone-bundle --if-desktop-work
+
   # The pull request title becomes the squash commit's subject (.claude/rules/commit-standards.md, Squash).
   commits:
     if: github.event_name == 'pull_request'

@@ -52,7 +52,7 @@ Read the sections your task touches.
   - 222–225 Support (~90)
   - 226–241 Attribution (~410)
   - 242–245 License (~50)
-- `docs/architecture.md` — Architecture (~26.6K tok)
+- `docs/architecture.md` — Architecture (~26.8K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–161 Modules (~2.4K) ← 3
@@ -69,7 +69,7 @@ Read the sections your task touches.
     - 309–314 Opening a game (~350)
     - 315–321 Continue, Restart and the checkpoint (~380)
   - 322–327 Images (~980) ← 6
-  - 328–382 Screens (~4.6K) ← 1
+  - 328–382 Screens (~4.8K) ← 1
   - 383–394 Desktop (~1.1K) ← 1
   - 395–400 Catalog build (~410)
   - 401–418 Tests (~2.0K) ← 5
@@ -218,7 +218,7 @@ Read the sections your task touches.
     - 461–466 Booklet (~280) ← 2
     - 467–470 Database (~20)
   - 471–490 States (~620)
-- `docs/development.md` — Development (~2.4K tok)
+- `docs/development.md` — Development (~2.6K tok)
 - `docs/releasing.md` — Releasing (~2.6K tok)
 
 ## Agent procedures
@@ -273,11 +273,11 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
-- `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~5.1K tok)
+- `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~5.2K tok)
   - 3–16 Context (~370)
   - 17–26 Decisions taken (~430) ← 1
-  - 27–39 What does not move (~470) ← 3
-  - 40–57 A. The drawn table on web (go/no-go gate) (~820)
+  - 27–39 What does not move (~600) ← 6
+  - 40–57 A. The drawn table on web (go/no-go gate) (~840)
   - 58–64 B. Offline pictures and booklets on web (~500) ← 2
   - 65–74 C. Mouse, keyboard and window (~400)
   - 75–79 D. Save backup file (~220)
@@ -314,7 +314,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); plans/desktop.md, What does not move (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1)
+- `scripts/checks`: plans/desktop.md, What does not move (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)

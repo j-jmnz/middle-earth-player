@@ -15,7 +15,6 @@ import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";
 import type { Moment } from "../store/outcome.ts";
 import { readoutFor, type Readout } from "../readouts/readout.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
-import { useCanvasKit } from "../../ui/skia/skia-web.ts";
 import { hidesFace, actingSeat, isDead, isLooked, onTableFor } from "../store/selectors.ts";
 import { dropOutcome, targetFromKey } from "../store/selection.ts";
 import { cannotPay } from "./why.ts";
@@ -115,10 +114,8 @@ export function useTableChoice({
   const legal = useStore(store, (state) => state.legal);
   const moment = useStore(store, (state) => state.moment);
   const canUndo = useStore(store, (state) => state.history.length > 0);
-  // A screen reader, or Table as a list on Always: it hears a sheet's readerNote and gets the words of each card (reader-table.tsx).
+  // The phone's screen reader (not the web list): it hears a sheet's readerNote and gets the words of each card (reader-table.tsx).
   const readerMode = useReaderMode();
-  // The web's canvas needs CanvasKit; until it is loaded the table is the reader table's list (canvas/table-canvas.tsx). Always true on the phone.
-  const canvasReady = useCanvasKit() === "ready";
   // The tray lists the choices for any reader, and a development build that forces the reader table (screen-reader.ts) lists them too.
   const reader = useScreenReader() || readerMode;
   const [overlay, setOverlay] = useState<Overlay | null>(null);
@@ -148,7 +145,7 @@ export function useTableChoice({
   const onTable = useMemo(() => onTableFor(game, acting, rowFolded), [game, acting, rowFolded]);
   // A moment that is not this one (a new sheet key) ends a peek; while it lasts a tap on a card only previews it.
   const peeking = usePeeking(store, sheet.key);
-  const { readerSeed, stayFocus, touch: touchReader, reset: resetReader, onStep } = useReaderChoice({ readerMode, listShown: !canvasReady, sheet, held, setHeld, peeking, cards: ctx.cards });
+  const { readerSeed, stayFocus, touch: touchReader, reset: resetReader, onStep } = useReaderChoice({ readerMode, sheet, held, setHeld, peeking, cards: ctx.cards });
   // On paper: when the player asked, when a screen reader is on (a card drawn only on the canvas is no control for it), or
   // when the choices are not cards drawn whole on the table. The action window itself stays on the table.
   // A Response the player may use opens listed, beside the dock's Pass (user request, 2026-10-29).

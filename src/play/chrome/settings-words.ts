@@ -46,7 +46,6 @@ export const AWAKE_LINE = "Keeps the screen on during a game. Uses more battery.
 // The assistive technology each platform names for the way in: VoiceOver and Switch Control and Voice Control, or TalkBack and Switch Access.
 export const TABLE_LIST_LINE = Platform.select({
   ios: "Lists the table's cards and choices as text. Follow screen reader does it only while VoiceOver is on; Always does it for Switch Control, Voice Control, or if you prefer it.",
-  web: "Lists the table's cards and choices as text, in place of the drawn table. Follow screen reader does it only while the app is told a screen reader is on; Always does it for a screen reader a browser cannot detect, for keyboard play, or if you prefer it.",
   default: "Lists the table's cards and choices as text. Follow screen reader does it only while TalkBack is on; Always does it for Switch Access, or if you prefer it.",
 });
 export const CONFIRM_TIME_LINE = "How long a button that asks for a second tap waits. Standard is 3 seconds, 10 with a screen reader. No limit waits until you tap again or choose something else.";

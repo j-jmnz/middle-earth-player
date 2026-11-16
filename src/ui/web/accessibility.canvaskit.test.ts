@@ -45,6 +45,17 @@ describe("accessibility on the web", () => {
     expect(base.listeners.size).toBe(0);
   });
 
+  it("keeps the flag off when the store says a screen reader is on, which react-native-web does whatever is running", () => {
+    base.state = { ...base.state, screenReader: true };
+    const off = accessibility();
+    expect(off).toEqual({ ...base.state, screenReader: false });
+    expect(accessibility()).toBe(off);
+    const shell = installShell();
+    expect(accessibility()).toBe(off);
+    shell.enabled = true;
+    expect(accessibility()).toBe(base.state);
+  });
+
   it("keeps the flag off while the shell says no, and turns it on when the shell says yes, as one stable object", () => {
     const shell = installShell();
     expect(accessibility()).toBe(base.state);

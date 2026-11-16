@@ -57,6 +57,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     scenario: { steps: [{ script: "tools/test-scenario.ts" }], about: "one scenario's tests, goldens, checks and smokes" },
     smoke: { steps: [{ script: "card-smoke/run.ts" }], about: "plays seeded games with player cards' records" },
     encounter: { steps: [{ script: "card-smoke/encounter.ts" }], about: "plays a scenario's encounter cards and seeded games" },
+    "phone-bundle": { steps: [{ script: "checks/phone-bundle.ts" }], about: "exports the Android bundle here and at the merge base with origin/main and fails unless they are byte-identical (--base <ref>, --keep, --if-desktop-work)" },
     a11y: { steps: [catalog, canvaskit, { script: "checks/a11y-web.ts" }], about: "audits the web screens with axe-core in Chromium" },
   },
   desktop: {
