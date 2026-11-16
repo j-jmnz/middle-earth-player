@@ -18,10 +18,11 @@ What already works on web and is reused as is: both SQLite databases (`src/scree
 
 1. **Unsigned to start**, like the IPA: Windows shows SmartScreen, macOS needs right-click → Open (the build is ad-hoc signed so Apple Silicon runs it). Authenticode and Apple notarization are optional later, wired like TestFlight.
 2. **Formats**: Windows NSIS installer and a portable zip (x64); macOS universal `.dmg`; Linux AppImage and `.deb` (x64).
-3. **No auto-update, no telemetry.** The only network request stays the RingsDB deck import, and the shell enforces it.
-4. **The browser dev build gets the drawn table too**, since it is the same code. It keeps remote pictures; only the desktop build bundles them.
-5. **Release pipeline**: built on the shape of `claude/release-workflow-performance-mz4n7m` (builds start beside `assets` and wait with `.github/scripts/wait-for-assets.sh`; `publish` needs `assets`). Section G starts after that branch is on `main`.
-6. **Scope change**: `docs/brief.md` (Product, Stack, Persistence and shipping) and `.claude/rules/release-standards.md` ("ships on both platforms") are rewritten for three desktop targets, stamped "(user decision, 2026-11-16)".
+3. **Everything ships inside the app, fully offline**: `catalog.db`, every card picture and scene (`assets/scans`, about 1 GB), the booklet PDFs (`assets/booklets`, about 113 MB), the fonts, the icons, CanvasKit's `.wasm` and the pdf.js worker are all in the web export, which the installer carries as `extraResources` and the shell serves from disk over `app://`. A picture missing from the bundle is drawn as its text, never fetched. Saves (`user.db`) and booklets the player adds live in the app's profile folder. The smoke test (F.2) fails on any request that leaves `app://` other than the deck import.
+4. **No auto-update, no telemetry.** The only network request stays the RingsDB deck import, and the shell enforces it.
+5. **The browser dev build gets the drawn table too**, since it is the same code. It keeps remote pictures; only the desktop build bundles them.
+6. **Release pipeline**: built on the shape of `claude/release-workflow-performance-mz4n7m` (builds start beside `assets` and wait with `.github/scripts/wait-for-assets.sh`; `publish` needs `assets`). Section G starts after that branch is on `main`.
+7. **Scope change**: `docs/brief.md` (Product, Stack, Persistence and shipping) and `.claude/rules/release-standards.md` ("ships on both platforms") are rewritten for three desktop targets, stamped "(user decision, 2026-11-16)".
 
 ## What does not move
 
