@@ -167,7 +167,7 @@ async function main(log: Log): Promise<void> {
       log.error(`DIFFERENT: the ${platform} bundle`);
       for (const line of describeDifference(baseText, headText)) log.error(line);
     }
-    if (failed.length > 0) throw new Error(`the ${failed.join(" and ")} bundle differs from the one at ${base.sha.slice(0, 9)}: the desktop work must leave the phone's bundles byte-identical (docs/architecture.md, Screens)`);
+    if (failed.length > 0) throw new Error(`the ${failed.join(" and ")} ${failed.length > 1 ? "bundles differ" : "bundle differs"} from the one at ${base.sha.slice(0, 9)}: the desktop work must leave the phone's bundles byte-identical (docs/architecture.md, Screens)`);
   } finally {
     if (keep) log.info(`kept ${scratch} (base worktree, base-out-<platform>, head-out-<platform>)`);
     else {

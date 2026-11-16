@@ -220,7 +220,7 @@ Read the sections your task touches.
     - 471–474 Database (~110)
   - 475–494 States (~620)
 - `docs/development.md` — Development (~2.7K tok)
-- `docs/releasing.md` — Releasing (~4.3K tok)
+- `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1
   - 20–35 Jobs (~1.7K) ← 4
   - 36–60 Caches (~750)

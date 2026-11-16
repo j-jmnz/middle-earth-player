@@ -691,7 +691,8 @@ jobs:
   # finishes a release whose upload failed.
   testflight:
     needs: [plan, ios, publish]
-    if: ${{ needs.plan.outputs.ios_signed == 'true' }}
+    # An explicit test: the implicit success() would also skip it when the optional desktop build, upstream of publish, failed.
+    if: ${{ !cancelled() && needs.publish.result == 'success' && needs.plan.outputs.ios_signed == 'true' }}
     runs-on: macos-latest
     timeout-minutes: 90
     steps:

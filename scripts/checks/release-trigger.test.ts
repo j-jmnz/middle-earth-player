@@ -80,6 +80,10 @@ describe("release.yml desktop jobs", () => {
     expect(publish).toContain("needs.desktop.result == 'success'");
     expect(publish).toContain("--desktop-missing");
     expect(all.get("cleanup")).toContain("if: ${{ !cancelled() }}");
+    // TestFlight follows publish alone: the implicit success() would skip it when the desktop build failed.
+    const tfCond = /^\s*if: (.*)$/m.exec(all.get("testflight") ?? "")?.[1] ?? "";
+    expect(tfCond).toContain("!cancelled()");
+    expect(tfCond).toContain("needs.publish.result == 'success'");
   });
 
   it("starts the web export beside the assets job and waits for it, as the native builds do", () => {
