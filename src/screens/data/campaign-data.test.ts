@@ -1,19 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 
 import index from "../../../data/campaigns/index.json";
 import entries from "../../../data/rules/entries.json";
-import { BOXES, bookletPageOf, bookletParams, boxOf, campaignIds, campaignOf, campaignOfScenario, scenarioName, scenarioNames, scenarioOf } from "./campaign-data";
+import { BOXES, bookletOf, bookletPageOf, bookletParams, boxOf, campaignIds, campaignOf, campaignOfScenario, scenarioName, scenarioNames, scenarioOf } from "./campaign-data";
 import { dealSeed } from "../nav/e2e";
-
-// The cycles built in data/ (campaign files of kind "cycle") and their scenarios.
-const CYCLE_FILES = readdirSync("data/campaigns")
-  .filter((name) => name !== "index.json")
-  .map((name) => JSON.parse(readFileSync(`data/campaigns/${name}`, "utf8")) as { id: string; kind?: string; scenarios: string[] })
-  .filter((file) => file.kind === "cycle");
-const CYCLES = new Set(CYCLE_FILES.map((file) => file.id));
-const CYCLE_SCENARIOS = new Set(CYCLE_FILES.flatMap((file) => file.scenarios));
 
 describe("campaign data on the phone", () => {
   it("lists the six scenarios of the Fellowship in book order, each readable", () => {
@@ -35,8 +27,7 @@ describe("campaign data on the phone", () => {
 
 describe("the registry", () => {
   it("holds every playable campaign data/campaigns/index.json lists, and nothing else that is built", () => {
-    // A cycle's file (Shadows of Mirkwood: no campaign card, played standalone) is not in the registry until the app reads cycles.
-    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json" && !CYCLES.has(name.replace(/\.json$/, ""))).map((name) => name.replace(/\.json$/, "")).sort();
+    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).sort();
     expect([...campaignIds()].sort()).toEqual(built);
     for (const entry of index) {
       const campaign = campaignOf(entry.id);
@@ -48,7 +39,7 @@ describe("the registry", () => {
   });
 
   it("holds every scenario file, and each campaign's scenarios are all in it", () => {
-    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).filter((id) => !CYCLE_SCENARIOS.has(id)).sort();
+    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).sort();
     for (const id of files) expect(scenarioOf(id)?.id, id).toBe(id);
     for (const id of campaignIds()) for (const scenario of campaignOf(id)?.scenarios ?? []) expect(files, `${id}: ${scenario}`).toContain(scenario);
   });
@@ -63,7 +54,7 @@ describe("the registry", () => {
   });
 
   it("splits the scenarios into the boxes, each scenario in one, each box inside its own campaign", () => {
-    expect(BOXES.map((box) => box.name)).toEqual(["Revised Core Set", "The Dark of Mirkwood", "Angmar Awakened Campaign Expansion", "The Fellowship of the Ring Saga Expansion", "The Two Towers Saga Expansion", "The Return of the King Saga Expansion", "Dream-chaser Campaign Expansion", "Ered Mithrin Campaign Expansion"]);
+    expect(BOXES.map((box) => box.name)).toEqual(["Shadows of Mirkwood", "Revised Core Set", "The Dark of Mirkwood", "Angmar Awakened Campaign Expansion", "The Fellowship of the Ring Saga Expansion", "The Two Towers Saga Expansion", "The Return of the King Saga Expansion", "Dream-chaser Campaign Expansion", "Ered Mithrin Campaign Expansion"]);
     // The boxes are in the campaigns table's order (`position`): by release, the saga boxes together at the Fellowship's.
     const positions = BOXES.map((box) => index.find((entry) => entry.id === box.campaignId)?.position ?? 0);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
@@ -131,6 +122,24 @@ describe("the registry", () => {
     expect(bookletParams("ered-mithrin", "journey-up-the-anduin")).toEqual({ id: "ered-mithrin", page: "5" });
     expect(bookletParams("ered-mithrin", "the-fate-of-wilderland")).toEqual({ id: "ered-mithrin", page: "22" });
     expect(bookletParams("ered-mithrin")).toEqual({ id: "ered-mithrin" });
+  });
+
+  it("registers Shadows of Mirkwood as a cycle: six scenarios in pack order in one box, no saga, no XP, no booklet to open", () => {
+    const cycle = campaignOf("shadows-of-mirkwood");
+    expect(campaignIds()).toContain("shadows-of-mirkwood");
+    expect(cycle).toMatchObject({ name: "Shadows of Mirkwood", kind: "cycle", saga: false, prelude: [], campaignCards: {} });
+    expect(cycle?.scenarios).toEqual(["the-hunt-for-gollum", "conflict-at-the-carrock", "a-journey-to-rhosgobel", "the-hills-of-emyn-muil", "the-dead-marshes", "return-to-mirkwood"]);
+    for (const id of cycle?.scenarios ?? []) {
+      expect(scenarioOf(id)?.id).toBe(id);
+      expect(scenarioOf(id)?.campaignCard, id).toBeUndefined();
+      expect(boxOf(id)?.id, id).toBe("shadows-of-mirkwood");
+      expect(campaignOfScenario(id)?.id, id).toBe("shadows-of-mirkwood");
+      expect(bookletOf("shadows-of-mirkwood", id), id).toBeNull();
+    }
+    expect(BOXES[0]?.scenarios).toEqual(cycle?.scenarios);
+    expect(scenarioName("the-hunt-for-gollum")).toBe("The Hunt for Gollum");
+    // A campaign still opens its booklet.
+    expect(bookletOf("the-two-towers", "the-passage-of-the-marshes")).toEqual({ id: "the-two-towers", page: "9" });
   });
 
   it("names a scenario as printed, without Hall of Beorn's \" (Campaign)\" suffix", () => {

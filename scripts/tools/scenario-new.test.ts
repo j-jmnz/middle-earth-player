@@ -16,8 +16,7 @@ const exists = (file: string): boolean => existsSync(path.join(ROOT, file));
 const SCENARIOS = readdirSync(path.join(ROOT, "data", "scenarios")).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -".json".length));
 const scaffolded = (id: string): boolean => exists(`src/effects/authored/${authoredRelOfScenario(id)}.ts`) || exists(`test/scenarios/${id}`);
 // The next scenario the scaffold has not been run for: its previous part has its files (the planner refuses a part whose earlier part has none).
-// A cycle scenario has no campaign to scaffold into yet (the tool plans campaign scenarios only), so the real-repo dry run takes the first campaign scenario.
-const NEW = loadCampaignsInOrder().filter((campaign) => campaign.kind !== "cycle").flatMap((campaign) => campaign.scenarios.filter((id, at) => SCENARIOS.includes(id) && !scaffolded(id) && (at === 0 || scaffolded(campaign.scenarios[at - 1] as string))))[0];
+const NEW = loadCampaignsInOrder().flatMap((campaign) => campaign.scenarios.filter((id, at) => SCENARIOS.includes(id) && !scaffolded(id) && (at === 0 || scaffolded(campaign.scenarios[at - 1] as string))))[0];
 
 // A view of the repo as if `ids` had none of their lines in the registries and none of their files: the planner is tested on explicit ids,
 // whether or not the real repo has scaffolded them yet. (Every registry line that names a scenario carries its id.)
@@ -113,6 +112,28 @@ describe("pnpm scenario new", () => {
     expect(authored?.text).toContain('from "../../../catalog/boundary.ts"');
     expect(authored?.text).toContain("from ../reprint.ts when");
     expect(cli(id, "--dry-run").output).toContain(`src/effects/authored/return-of-the-king/${id}.ts`);
+  });
+
+  // A scenario of a cycle (Shadows of Mirkwood) is standalone only: no campaign card, no campaign test, a standalone test, standalone fixtures and flows.
+  it.each(["the-hunt-for-gollum", "conflict-at-the-carrock"])("plans the standalone skeletons of the cycle scenario %s", (id) => {
+    const view = without(id);
+    const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
+    expect(problems).toEqual([]);
+    const files = plan?.files.map((item) => item.file) ?? [];
+    expect(files).toContain(`src/campaign/scenarios/${id}/standalone.test.ts`);
+    expect(files).not.toContain(`src/campaign/scenarios/${id}/campaign.test.ts`);
+    expect(files).toContain(`scripts/e2e/shadows-of-mirkwood/${id}.ts`);
+    expect(files).toContain(`src/effects/authored/shadows-of-mirkwood/${id}.ts`);
+    const text = (name: string): string => plan?.files.find((item) => item.file.endsWith(name))?.text ?? "";
+    expect(text("game.ts")).toContain("standaloneGame<");
+    expect(text("game.ts")).toContain(`loadAnyScenario("${id}")`);
+    expect(text("golden.test.ts")).toContain("standalone: true");
+    expect(text("standalone.test.ts")).toContain("toBeUndefined()");
+    expect(text(`${id}.yaml`)).toContain("subflows/standalone-win.yaml");
+    expect(text(`${id}-loss.yaml`)).toContain("subflows/standalone-loss.yaml");
+    const registry = plan?.edits.find((edit) => edit.file === "src/campaign/fixtures/registry.ts");
+    expect(registry?.after).toContain(`scenarioId: "${id}", kind: "standalone"`);
+    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
   });
 
   it("refuses a short name that is not an identifier", () => {

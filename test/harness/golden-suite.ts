@@ -1,11 +1,13 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/log.ts";
+import { completedRounds, scoreOf } from "../../src/campaign/score.ts";
 import { campaignPath, nextStep, type PathNode } from "../../src/campaign/path.ts";
 import { tableDigest } from "../../src/campaign/digest.ts";
 import { beginActive, recordIntent, replay } from "../../src/campaign/replay.ts";
+import { resolutionResult } from "../../src/rules/setup/resolution.ts";
 import { xpAwarded } from "../../src/campaign/xp.ts";
-import type { CampaignData, ScenarioData } from "../../src/catalog/scenario-data.ts";
+import type { AnyScenarioData, CampaignData } from "../../src/catalog/scenario-data.ts";
 import type { PrintedCard } from "../../src/rules/core/printed.ts";
 import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import type { Cause } from "../../src/rules/core/cause.ts";
@@ -21,6 +23,8 @@ import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 // snapshot of the games, the opening, the cause of every number (the scenario's own records among them), a golden replayed from its
 // save, the won loop (the Resolution, the XP, the next part on the campaign path) and the lost loop (nothing is written). The scenario
 // passes its opening assertions, its expected XP and its own checks. Each golden is played once, here.
+// A scenario of a cycle (`standalone: true`) has no Campaign Mode: its won loop checks the score and that nothing is earned (no Resolution, no XP, no next
+// part), and its lost loop the loss; the rest of the suite is the same.
 
 export type SuiteWorld = { cards: Map<string, PrintedCard>; ctx: ReduceContext };
 export type SuiteGolden<D extends string> = CampaignGoldenBase & { name: string; decks: D; outcome: "won" | "lost"; lossReason?: string };
@@ -33,7 +37,9 @@ export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string, P extend
   /** The golden.json beside the test: `new URL("./golden.json", import.meta.url).pathname`. */
   file: string;
   campaign: CampaignData;
-  scenario: ScenarioData;
+  scenario: AnyScenarioData;
+  /** The scenario belongs to a cycle: no campaign card, no log, no XP, no next part. */
+  standalone?: true;
   goldens: readonly G[];
   world: (decks: D) => Promise<SuiteWorld>;
   play: (golden: G, ctx: ReduceContext) => P;
@@ -62,8 +68,8 @@ export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string, P extend
 };
 
 /** The causes of the number-changing steps that name a record of the scenario's own cards (its campaign card, quest cards, encounter cards and the cards its campaign card places, A Heavy Burden). */
-export function ownCauses(scenario: ScenarioData, steps: readonly EngineStep[]): Cause[] {
-  const own = new Set([scenario.campaignCard, ...scenario.stages, ...scenario.campaignPlaced, ...scenario.cards.map((card) => card.code)]);
+export function ownCauses(scenario: AnyScenarioData, steps: readonly EngineStep[]): Cause[] {
+  const own = new Set([...(scenario.campaignCard === undefined ? [] : [scenario.campaignCard]), ...scenario.stages, ...scenario.campaignPlaced, ...scenario.cards.map((card) => card.code)]);
   return steps
     .filter((step) => NUMBER_STEPS.has(step.kind))
     .map((step) => (step as { cause: Cause }).cause)
@@ -81,7 +87,7 @@ export function expectReplays(game: Pick<PlayedGame, "start" | "intents" | "stat
 }
 
 /** The log of a campaign whose parts before this scenario were won (nothing else written). */
-export function logBefore(campaign: CampaignData, scenario: ScenarioData, seatCount: 1 | 2): CampaignLog {
+export function logBefore(campaign: CampaignData, scenario: AnyScenarioData, seatCount: 1 | 2): CampaignLog {
   return { ...emptyLog(seatCount), completed: campaign.scenarios.slice(0, campaign.scenarios.indexOf(scenario.id)) };
 }
 
@@ -167,6 +173,15 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         expect(state.failure).toBeNull();
         expect(state.window).toBeNull();
         spec.won(state, golden, world);
+        if (spec.standalone) {
+          // The win settles at once with nothing earned, and is scored by the Learn to Play's system (ltp.scoring).
+          expect(resolutionResult(state)).toEqual({ earned: [], fallen: [], captives: [] });
+          expect(scoreOf(state, world.cards).rounds).toBe(completedRounds(state));
+          expect(Number.isInteger(scoreOf(state, world.cards).score)).toBe(true);
+          expect(spec.campaign.kind).toBe("cycle");
+          expect(spec.campaign.scenarios[index]).toBe(spec.scenario.id);
+          return;
+        }
         const xp = spec.expectedXp?.(state, golden, world);
         if (xp != null) expect(state.resolutionLog.xp).toBe(xp);
         const earlier = spec.campaign.scenarios.slice(0, index);
@@ -200,6 +215,12 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         expect(state.failure).toBeNull();
         expect(state.resolutionLog.earned).toEqual([]);
         expect(state.resolutionLog.xp).toBeUndefined();
+        if (spec.standalone) {
+          // A lost standalone game ends with its reason and the rounds completed; there is no Resolution.
+          expect(resolutionResult(state)).toBeNull();
+          spec.lost?.(state, golden, worldOf(golden), game(golden));
+          return;
+        }
         const log = emptyLog(golden.seatCount);
         expect(applyResolution(log, state.scenarioId, state, cards, NO_COPY_LIMITS)).toBe(log);
         spec.lost?.(state, golden, worldOf(golden), game(golden));

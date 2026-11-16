@@ -4,18 +4,19 @@ import { describe, expect, it } from "vitest";
 import { CATALOG_VERSION } from "../catalog/version.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { loadCampaign } from "../../scripts/data/load-scenarios.ts";
-import { catalog, worldFor } from "../../test/harness/fixture-world.ts";
+import { catalog, worldFor, worldForStandalone } from "../../test/harness/fixture-world.ts";
 
 import { cards as cardRows } from "../catalog/schema.ts";
 import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
 
 import { briefing } from "./briefing.ts";
 import { emptyLog } from "./log.ts";
-import { fixture, fixtureSave, FIXTURE_NAMES, hasFixture, type FixtureName } from "./fixtures.ts";
+import { fixture, fixtureKindOf, fixtureSave, fixtureStandalone, FIXTURE_NAMES, hasFixture, standaloneFixture, type FixtureName } from "./fixtures.ts";
 import { FIXTURE_REGISTRY } from "./fixtures/registry.ts";
 import { campaignPath, nextStep, openNode } from "./path.ts";
 import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import { contextOf, finish, resume } from "./session.ts";
+import { finishStandalone, resumeStandalone, standaloneBriefing } from "./standalone.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 
@@ -23,7 +24,9 @@ import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 // loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won
 // game writes. When this fails, run scripts/e2e/fixtures.ts again. `won` and `knife-lost` are open (docs/phases/STATUS.md):
 // no legal win of the two starter decks has been found, so the tests that need them are skipped until they are committed.
-const COMMITTED = FIXTURE_NAMES.filter(hasFixture);
+// A scenario of a cycle has no campaign save: its fixtures are one open standalone game each (the describe at the foot).
+const COMMITTED = FIXTURE_NAMES.filter((name) => hasFixture(name) && fixtureKindOf(name) === "campaign");
+const STANDALONE_ENTRIES = FIXTURE_REGISTRY.filter((entry) => entry.names.some((name) => fixtureKindOf(name) === "standalone"));
 const WON = hasFixture("won");
 const KNIFE = hasFixture("knife-lost");
 
@@ -282,3 +285,37 @@ describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioI
     }
   });
 });
+
+// A scenario of a cycle (Shadows of Mirkwood): the fixtures are one open standalone game each, dealt from the cycle's own order with no log and no earlier part.
+describe("standalone fixtures (a cycle's scenarios)", () => {
+  it("name only scenarios of a cycle, in the cycle's order", () => {
+    for (const entry of STANDALONE_ENTRIES) {
+      const cycle = loadCampaign(standaloneFixtureCycle(entry.names));
+      expect(cycle.kind, entry.scenarioId).toBe("cycle");
+      expect(cycle.scenarios, entry.scenarioId).toContain(entry.scenarioId);
+    }
+    for (const name of FIXTURE_NAMES.filter((item) => fixtureKindOf(item) === "standalone")) expect(() => fixture(name), name).toThrow();
+  });
+
+  it("are loadouts the standalone briefing deals, replayed to their win or loss", () => {
+    for (const name of FIXTURE_NAMES.filter((item) => fixtureKindOf(item) === "standalone" && hasFixture(item))) {
+      const found = standaloneFixture(name);
+      const world = worldForStandalone(name);
+      const plan = standaloneBriefing({ world, seatCount: found.seatCount, seats: found.loadout.seats, ringBearer: found.loadout.ringBearer, difficulty: found.loadout.difficulty });
+      expect(plan.problems, name).toEqual([]);
+      const game = fixtureStandalone(name, "s", CATALOG_VERSION);
+      expect(game.active?.engineVersion, name).toBe(ENGINE_VERSION);
+      const resumed = resumeStandalone(game, world);
+      expect(resumed.ok, name).toBe(true);
+      if (!resumed.ok) continue;
+      const ended = finishStandalone(game, world, resumed.state);
+      expect(ended.result?.outcome, name).toBe(name.endsWith("-lost") ? "lost" : "won");
+      expect(ended.active, name).toBeNull();
+    }
+  });
+});
+
+function standaloneFixtureCycle(names: readonly string[]): string {
+  const first = (names as readonly FixtureName[]).find((name) => hasFixture(name));
+  return first ? standaloneFixture(first).campaignId : "shadows-of-mirkwood";
+}

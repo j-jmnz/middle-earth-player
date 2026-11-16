@@ -52,7 +52,7 @@ import * as realm from "../scenarios/the-dread-realm/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
-// Every scenario's golden games (the `*_GOLDENS` of its test/scenarios/<id>/game.ts), in campaign order. The reader check
+// Every scenario's golden games (the `*_GOLDENS` of its test/scenarios/<id>/game.ts), in campaign order and then the cycle's pack order. The reader check
 // (src/play/reader-play/games.ts) plays them, `pnpm test scenario` filters the Maestro fixtures by an entry's title and
 // `pnpm scenario new` reads the previous part's names here. Each scenario's golden.test.ts plays, pins, cause-checks and replays its
 // goldens (test/harness/golden-suite.ts). A Shadow of the Past's goldens are the filler-hero games and the starter decks
@@ -123,4 +123,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
   entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
+  // Shadows of Mirkwood, a cycle (standalone games, no Campaign Mode), after the campaigns: `pnpm scenario new` adds each scenario's entry here, in pack order.
 ];

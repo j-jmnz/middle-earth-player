@@ -4,6 +4,7 @@ import { loadCampaignsInOrder } from "../load-scenarios.ts";
 // count of scripts/e2e); every other finder is top-level, named for its scenario. The one source for pnpm scenario new, the fixture writers and anything else that locates a finder.
 export const E2E_CAMPAIGN_FOLDERS: Readonly<Record<string, string>> = {
   "angmar-awakened": "angmar-awakened",
+  "shadows-of-mirkwood": "shadows-of-mirkwood",
 };
 
 /** The path under scripts/e2e/, without the extension, of the seed finder of scenario `id` in `campaignId`. */

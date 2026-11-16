@@ -1,5 +1,5 @@
 import { setupRoleVerbs, type Effect, type ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCards, encounterCodes, questDeckCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCards, encounterCodes, questDeckCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type AnyScenarioData, type CampaignData, type Difficulty } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
@@ -14,7 +14,7 @@ export type PlayMode = "campaign" | "standalone";
 
 export type StartInput = {
   campaign: CampaignData;
-  scenario: ScenarioData;
+  scenario: AnyScenarioData;
   seatCount: 1 | 2;
   seed: number;
   threatModifier: number;
@@ -95,7 +95,7 @@ export function buildStart(start: StartInput): StartScenario {
     const side = MODE_CARD_SIDE[input.modeCard];
     definition = { ...definition, modeCard: { code: MODE_CARD_CODE, side }, resolution: [...definition.resolution, ...sideInstructions(effects, MODE_CARD_CODE, side, "resolution")] };
   }
-  const campaignSetup = standalone ? [] : recordInstructions(effects, input.scenario.campaignCard, "campaignSetup");
+  const campaignSetup = standalone || input.scenario.campaignCard === undefined ? [] : recordInstructions(effects, input.scenario.campaignCard, "campaignSetup");
   // What the engine runs in Setup, in the campaign card's printed order: the Fellowship's two verbs and the Mirkwood ones (an
   // objective ally put into play, a card set aside). AttachChosen, AddToHandAfterMulligan and AddToPool are dealt by the checklist.
   const dealt = campaignSetup.filter((instruction) => DEALT_VERBS.has(instruction.verb));

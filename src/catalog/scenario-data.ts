@@ -370,7 +370,7 @@ export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: 
 
 // What a campaign game deals of a scenario that has reprints: the Campaign Expansion's reprint of each card in place of the original, in every
 // pile, the quest stages and the cards the campaign card places (ScenarioData.reprints). Standalone play deals the scenario as it is.
-export function campaignScenario(data: ScenarioData): ScenarioData {
+export function campaignScenario<T extends AnyScenarioData>(data: T): T {
   const reprints = data.reprints;
   if (!reprints) return data;
   const swap = (code: string): string => reprints[code] ?? code;

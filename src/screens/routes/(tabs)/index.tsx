@@ -6,7 +6,7 @@ import { PillButton } from "../../kit/chrome";
 import { FoldSection, useFolds } from "../../kit/fold-section";
 import { heroFace } from "../../art/hero-tile";
 import { deckFaces } from "../../deck/store";
-import { campaignListQueries, lockedCampaignTiles, scenarioWords } from "../../campaign/list";
+import { campaignListQueries, lockedCampaignTiles, scenarioWords, startableRows } from "../../campaign/list";
 import { campaignOf } from "../../data/campaign-data";
 import { listSaves, type ListedSave } from "../../data/campaign-store";
 import { useDatabases } from "../../data/databases";
@@ -102,9 +102,10 @@ export default function CampaignList() {
       </OtherRuns>
     ) : null;
 
-  // Every campaign the catalog marks playable starts from its tile: the setup screen takes the seats and the carry-over.
-  const startable = campaigns.flatMap((row) => {
-    const data = row.playable ? campaignOf(row.id) : null;
+  // Every campaign the catalog marks playable starts from its tile: the setup screen takes the seats and the carry-over. A cycle
+  // (Shadows of Mirkwood) has no Campaign Mode and is played from the Scenarios tab, so it never offers a new playthrough.
+  const startable = startableRows(campaigns).flatMap((row) => {
+    const data = campaignOf(row.id);
     return data ? [{ id: row.id, name: row.name, data }] : [];
   });
   const posters = size === "compact" ? 0 : 3;

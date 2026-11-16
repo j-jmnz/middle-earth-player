@@ -6,6 +6,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/log.ts";
 import { contextOf, deal, resume } from "../../src/campaign/session.ts";
 import { newSave, type Save, type StoredLoadout } from "../../src/campaign/save.ts";
+import { dealStandalone, resumeStandalone, type StandaloneLoadout } from "../../src/campaign/standalone.ts";
 import { loadWorld, logCodes, type World } from "../../src/campaign/world.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { goldenState } from "../../test/harness/golden-state.ts";
@@ -15,7 +16,7 @@ import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } fro
 import prebuilt from "../../data/decks/prebuilt.json" with { type: "json" };
 import testDecks from "../../data/decks/test-decks.json" with { type: "json" };
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
-import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
+import { loadAnyScenario, loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import type { Log } from "../log.ts";
 import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 
@@ -103,6 +104,65 @@ export function playSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): Seed
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...(spec.log ? logCodes(spec.log) : []), ...(spec.codes ?? [])]);
   const save = newSave("fixture", campaign.id, spec.seatCount);
   return { loadout, ...playDealt(world, spec.log ? { ...save, log: spec.log } : save, loadout, seed, spec.limit ?? 8000, spec.answer, spec.stop) };
+}
+
+export type StandaloneSeedSpec<S extends 1 | 2> = {
+  /** The cycle's id: a cycle scenario's games are standalone (src/campaign/standalone.ts). */
+  campaignId: string;
+  scenarioId: string;
+  seatCount: S;
+  /** The saved decklists the seats play (the first seat's, then the second's). */
+  decks?: readonly string[];
+  difficulty?: StandaloneLoadout["difficulty"];
+  limit?: number;
+  seeds?: number;
+  /** Cards the world loads besides the decklists'. */
+  codes?: readonly string[];
+  /** The scenario's answer, and the point (checked before each intent) a game is parked at. */
+  answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent;
+  stop?: (state: ScenarioState, played: number) => boolean;
+};
+export type StandaloneSeedFixture<S extends 1 | 2> = { campaignId: string; seatCount: S; loadout: StandaloneLoadout; seed: number; intents: PlayerIntent[] };
+
+/** Plays seed `seed` of a cycle scenario as the standalone briefing deals it (dealStandalone, then resumeStandalone as the table does) until the game ends or `stop` says so. */
+export function playStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>, seed: number): { loadout: StandaloneLoadout; intents: PlayerIntent[]; state: ScenarioState } {
+  const campaign = loadCampaign(spec.campaignId);
+  const scenario = loadAnyScenario(spec.scenarioId);
+  const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
+  const seats = (spec.decks ?? FIXTURE_DECKS).slice(0, spec.seatCount).map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
+  const loadout: StandaloneLoadout = { scenarioId: scenario.id, difficulty: spec.difficulty ?? "Easy", seats, ringBearer: null };
+  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...(spec.codes ?? [])]);
+  const dealt = dealStandalone("fixture", world, spec.seatCount, loadout, seed);
+  if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
+  const resumed = resumeStandalone(dealt.game, world);
+  if (!resumed.ok) throw new Error(resumed.reason);
+  const ctx = contextOf(world);
+  let state = resumed.state;
+  const intents: PlayerIntent[] = [];
+  const memory = new Set<string>();
+  for (let turn = 0; turn < (spec.limit ?? 8000) && !state.lost && !state.stageCleared && !spec.stop?.(state, intents.length); turn += 1) {
+    const intent = spec.answer(state, ctx, memory);
+    const result = reduce(state, intent, ctx);
+    if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
+    state = result.state;
+    intents.push(intent);
+  }
+  return { loadout, intents, state };
+}
+
+/** `firstSeed` for a cycle scenario's standalone games: the first seed (1 to the count in `seedsVar`, 100 by default) whose game `wanted` accepts, or null with a warning. */
+export function firstStandaloneSeed<S extends 1 | 2>(say: Log, spec: StandaloneSeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): StandaloneSeedFixture<S> | null {
+  const limit = Math.max(Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
+  for (let seed = 1; seed <= limit; seed += 1) {
+    const game = playStandaloneSeed(spec, seed);
+    const outcome = game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "parked";
+    say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${outcome}`);
+    if (!wanted(game.state)) continue;
+    say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${outcome}`);
+    return { campaignId: spec.campaignId, seatCount: spec.seatCount, loadout: game.loadout, seed, intents: game.intents };
+  }
+  say.warn(`no ${label} game found in ${limit} seeds`);
+  return null;
 }
 
 /** The seed the committed fixture `label` was found at (src/campaign/fixtures/<scenario-id>.json, keyed by the fixture's name), or 0 when none is committed. */

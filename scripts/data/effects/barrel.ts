@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { CampaignData, AnyScenarioData } from "../../../src/catalog/scenario-data.ts";
@@ -17,7 +17,8 @@ const FOLDERS = [
 ] as const;
 
 export function authoredFileNames(dir: string): string[] {
-  const holders = ["", ...Object.values(AUTHORED_CAMPAIGN_FOLDERS)];
+  // A campaign's folder exists once its first scenario file does (a cycle's holds none until then).
+  const holders = ["", ...Object.values(AUTHORED_CAMPAIGN_FOLDERS)].filter((folder) => existsSync(path.join(dir, folder)));
   return holders
     .flatMap((folder) =>
       readdirSync(path.join(dir, folder), { withFileTypes: true })

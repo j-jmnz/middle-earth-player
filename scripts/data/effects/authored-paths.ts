@@ -5,6 +5,7 @@ import { loadCampaignsInOrder } from "../load-scenarios.ts";
 export const AUTHORED_CAMPAIGN_FOLDERS: Readonly<Record<string, string>> = {
   "the-return-of-the-king": "return-of-the-king",
   "angmar-awakened": "angmar-awakened",
+  "shadows-of-mirkwood": "shadows-of-mirkwood",
 };
 
 /** The path under src/effects/authored/, without the extension, of the file named `id` for a scenario (or the campaign card file) of `campaignId`. */

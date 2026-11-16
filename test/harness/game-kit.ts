@@ -6,7 +6,7 @@ import { buildStart } from "../../src/campaign/start.ts";
 import { angmarAwakenedFacts } from "../../src/campaign/log-angmar-awakened.ts";
 import { wilderlandFacts } from "../../src/campaign/wilderland.ts";
 import { namesTreasures } from "../../src/campaign/world.ts";
-import { campaignScenario, type CampaignData, type Difficulty, type ScenarioData } from "../../src/catalog/scenario-data.ts";
+import { campaignScenario, type AnyScenarioData, type CampaignData, type Difficulty, type ScenarioData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import type { CampaignFacts, ModeCard } from "../../src/rules/core/campaign-state.ts";
 import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";
@@ -291,4 +291,60 @@ export function dealtGame<D extends string>(spec: DealtGameSpec<D>) {
   }
 
   return { world, start };
+}
+
+export type StandaloneGameSpec<D extends string, P extends object> = {
+  /** The cycle's data (data/campaigns/<cycle>.json): no campaign cards, no starter decks. */
+  campaign: CampaignData;
+  scenario: AnyScenarioData;
+  /** The numbers of the stand-in heroes q1 to q6, by deck. */
+  stats: Readonly<Record<D, HeroStats>>;
+  /** The codes loaded after the scenario's own. */
+  codes: readonly string[];
+  /** The scenario's answer (its policy applied) and the policy a golden's own is laid over. */
+  intent: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: P) => PlayerIntent;
+  policy: P;
+  /** The most intents a game may take. */
+  limit: number;
+  /** The seats a game deals (the stand-in heroes and the filler deck by default). */
+  loadout?: (seatCount: 1 | 2) => LoadoutSeat[];
+};
+
+/** What a standalone golden names: the seats, the seed and the difficulty. There is no log, no earlier part, no Upgraded side and no Mode card. */
+export type StandaloneGoldenBase = { seatCount: 1 | 2; seed: number; difficulty: Difficulty };
+
+/**
+ * The seeded whole game of one scenario of a cycle (test/scenarios/<scenario-id>/game.ts), played standalone: its world (the scenario's
+ * cards and the stand-in heroes and filler deck), the seats a game deals, the start of a seed (no Campaign Setup Checklist, no log, no
+ * earlier part: src/campaign/standalone.ts), and a golden played from its fields. The scenario passes what is its own: the codes, the
+ * hero numbers, the intent policy, the goldens' facts.
+ */
+export function standaloneGame<D extends string, P extends object>(spec: StandaloneGameSpec<D, P>) {
+  async function world(decks: D): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
+    const codes = [...spec.scenario.cards.map((card) => card.code), ...spec.scenario.campaignPlaced, ...gameCodes(spec.campaign, spec.scenario), ...(spec.scenario.nightmare ? [spec.scenario.nightmare.setupCard, ...spec.scenario.nightmare.cards.map((card) => card.code)] : []), ...spec.codes];
+    const cards = await standInWorld(codes, spec.stats[decks]);
+    if (namesTreasures(EFFECTS, new Set(codes))) for (const [code, treasure] of loadTreasures()) if (!cards.has(code)) cards.set(code, treasure);
+    return { cards, ctx: { effects: EFFECTS, cards } };
+  }
+
+  /** The seats a standalone game deals: the loadout as it stands, with no checklist to change a hero or add a card. */
+  function plan(seatCount: 1 | 2, loadout?: LoadoutSeat[]): LoadoutSeat[] {
+    return loadout ?? spec.loadout?.(seatCount) ?? fillerLoadout(seatCount);
+  }
+
+  function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, loadout?: LoadoutSeat[]): StartScenario {
+    return buildStart({ campaign: spec.campaign, scenario: spec.scenario, seatCount, seed, threatModifier: 0, seats: plan(seatCount, loadout), effects: EFFECTS, difficulty, mode: "standalone" });
+  }
+
+  /** Plays until the scenario is lost, or won (a standalone win settles at once: there is no Resolution to answer), or `limit` intents. */
+  function play(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, options: { policy?: Partial<P>; limit?: number } = {}): PlayedGame {
+    const policy = { ...spec.policy, ...options.policy };
+    return playToEnd(start(seatCount, seed, difficulty), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit);
+  }
+
+  function playGolden(golden: StandaloneGoldenBase & { policy?: Partial<P> }, ctx: ReduceContext): PlayedGame {
+    return play(golden.seatCount, golden.seed, golden.difficulty, ctx, { policy: golden.policy });
+  }
+
+  return { world, plan, start, play, playGolden };
 }

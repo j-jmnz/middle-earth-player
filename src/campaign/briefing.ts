@@ -4,7 +4,7 @@
 // this returns and deals only when `dealable` is true.
 import { deckRulesOf, heroLimit } from "../catalog/deck-rules.ts";
 import { deckSaveRefusal, formatDeckRefusal } from "../catalog/deck-save.ts";
-import { placementsAt, recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
+import { placementsAt, recordInstructions, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import { printedOf } from "../rules/core/printed.ts";
 import type { StartScenario } from "../rules/setup/setup.ts";
 
@@ -164,15 +164,28 @@ export function difficultyProblems(world: World, difficulty: Difficulty): Proble
   return [{ rule: "Nightmare not playable yet", message: world.scenario.nightmare ? `${name} on Nightmare is not playable yet: some of its Nightmare cards have no effect record.` : `${name} has no Nightmare deck.` }];
 }
 
+// The scenario of a campaign deal. A cycle scenario has no Campaign Mode: it is played standalone only.
+function campaignScenarioOf(world: World): ScenarioData {
+  const { scenario } = world;
+  if (scenario.campaignCard === undefined) throw new Error(`${scenario.id} is a cycle scenario: it has no campaign deal`);
+  return scenario;
+}
+
+// Whether the scenario's campaign card waives the hero-change penalty; a cycle scenario has no campaign card.
+function waivesPenalty(world: World): boolean {
+  const card = world.scenario.campaignCard;
+  return card !== undefined && recordInstructions(world.effects, card, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty");
+}
+
 export function briefing(input: BriefingInput): Briefing {
   const { world, log } = input;
   const { problems, loadout } = check(input);
   const needsRingBearer = needsRingBearerSlot(world, input.seats[0]);
-  const waived = recordInstructions(world.effects, world.scenario.campaignCard, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty");
+  const waived = waivesPenalty(world);
   const empty: Briefing = { problems, needs: null, needsRingBearer, penaltyAdded: 0, penaltyWaived: waived, steps: [], dealable: false };
   if (problems.length > 0) return empty;
 
-  const plan = checklist({ log, scenario: world.scenario, seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
+  const plan = checklist({ log, scenario: campaignScenarioOf(world), seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
   if (!plan.ok) {
     return { ...empty, needs: plan.needs, problems: plan.errors.map((message) => ({ rule: "Campaign Setup Checklist", message })) };
   }
@@ -193,7 +206,7 @@ export function checklistPlan(input: BriefingInput): Extract<ChecklistPlan, { ok
   const { problems, loadout } = check(input);
   if (problems.length > 0) throw new Error(problems.map((problem) => problem.message).join(" "));
   const { world, log } = input;
-  const plan = checklist({ log, scenario: world.scenario, seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
+  const plan = checklist({ log, scenario: campaignScenarioOf(world), seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
   if (!plan.ok) throw new Error(plan.errors.join(" ") || "The campaign card asks for a choice");
   return plan;
 }
@@ -255,7 +268,7 @@ export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMo
   if (scenario.cards.some((card) => card.pile === "burden")) rules.push("Burden deck");
   if (scenario.widgets.secondActiveLocation) rules.push("Second active location");
   if (scenario.widgets.perSeatStaging) rules.push("Separate staging areas");
-  if (mode === "campaign" && recordInstructions(world.effects, scenario.campaignCard, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty")) rules.push("No hero-change penalty");
+  if (mode === "campaign" && waivesPenalty(world)) rules.push("No hero-change penalty");
   return {
     number: scenario.number,
     name: printedScenarioName(scenario.name),
