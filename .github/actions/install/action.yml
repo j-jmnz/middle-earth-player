@@ -1,5 +1,10 @@
 name: Install the dependencies
-description: Sets up pnpm and Node 22 and installs the locked dependencies, for a job that builds or runs the app but packs no assets (docs/releasing.md, Jobs).
+description: Sets up pnpm and Node 22 and installs the locked dependencies, for a job that builds or runs the app but packs no assets (docs/releasing.md, Caches).
+
+outputs:
+  key:
+    description: The pnpm store's cache key, which the release workflow's cleanup job keeps.
+    value: ${{ steps.key.outputs.key }}
 
 runs:
   using: composite
@@ -8,6 +13,33 @@ runs:
     - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
       with:
         node-version: 22
-        cache: pnpm
+        package-manager-cache: false
+    # The pnpm store, under setup-node's own key, so an entry test.yml saved for the same lockfile is a hit here. Unlike
+    # setup-node's cache it falls back to the newest entry of an older lockfile, so a dependency bump downloads only what
+    # changed.
+    - id: store
+      shell: bash
+      run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+    - id: key
+      shell: bash
+      run: |
+        prefix="node-cache-${{ runner.os }}-${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}-pnpm-"
+        echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+        echo "key=${prefix}${{ hashFiles('pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"
+    - id: restore
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.store.outputs.path }}
+        key: ${{ steps.key.outputs.key }}
+        restore-keys: ${{ steps.key.outputs.prefix }}
     - shell: bash
       run: pnpm install --frozen-lockfile
+    # An entry restored from an older lockfile holds packages this one no longer uses; they are pruned before it is saved.
+    - if: steps.restore.outputs.cache-hit != 'true'
+      shell: bash
+      run: pnpm store prune
+    - if: steps.restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.store.outputs.path }}
+        key: ${{ steps.key.outputs.key }}
