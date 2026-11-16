@@ -38,7 +38,7 @@ No phase is open.
 - A booklet missing on the desktop reads "This booklet is not on this phone.": route files cannot have `.canvaskit` variants, so the wording is the phone's. Pending user decision.
 - A failed web save is retried only by the next successful save: catching it in `src/screens/data/game-store.ts` would change the phone bundle. Pending user decision.
 - Windows and macOS packaging has been proven only in CI (`docs/releasing.md`); open each packed app by hand on each OS once before the first release.
-- `pnpm test a11y` failed on the Cards screen with React error #520 when last run by the desktop sections; not re-run since.
+- `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
 - `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.

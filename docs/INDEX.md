@@ -265,14 +265,14 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~14.0K tok)
+- `docs/phases/STATUS.md` — Phase status (~14.1K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
   - 22–290 Open items (~12.7K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
-    - 35–42 Desktop (~250)
+    - 35–42 Desktop (~270)
     - 43–84 Fixtures and Maestro (~2.3K)
     - 85–124 Rules and engine (~1.6K)
     - 125–245 Rules and engine (Angmar Awakened) (~5.3K)
