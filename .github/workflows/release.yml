@@ -123,11 +123,6 @@ jobs:
     outputs:
       caches: ${{ steps.caches.outputs.keys }}
     steps:
-      # The native build needs more room than the runner leaves free, but not until Gradle runs, so the deletion goes on
-      # behind the next steps; the build waits for it.
-      - name: Free disk space
-        run: |
-          nohup sh -c 'sudo rm -rf /usr/share/dotnet /usr/local/lib/node_modules /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL "$AGENT_TOOLSDIRECTORY/PyPy"; touch "$RUNNER_TEMP/disk.done"' > /dev/null 2>&1 &
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
@@ -135,6 +130,12 @@ jobs:
           java-version: 17
       - id: install
         uses: ./.github/actions/install
+      # The native build needs more room than the runner leaves free, but not until Gradle runs, so the deletion goes on
+      # behind the next steps and the build waits for it. It starts only now: pnpm's setup runs the runner's own npm,
+      # which lives in /usr/local/lib/node_modules.
+      - name: Free disk space
+        run: |
+          nohup sh -c 'sudo rm -rf /usr/share/dotnet /usr/local/lib/node_modules /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL "$AGENT_TOOLSDIRECTORY/PyPy"; touch "$RUNNER_TEMP/disk.done"' > /dev/null 2>&1 &
       # Gradle installs the NDK React Native pins and the Android Gradle plugin's default CMake (3.22.1, which no module
       # overrides) while it configures, about a minute; this starts the same install behind the next steps, and the build
       # waits for it. If it fails, Gradle installs them itself.
