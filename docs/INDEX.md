@@ -191,7 +191,7 @@ Read the sections your task touches.
   - 231–245 Icons (~480) ← 7
   - 246–264 Card art (~740) ← 2
   - 265–279 Tablets (~510) ← 13
-  - 280–469 Screens (~17.2K)
+  - 280–469 Screens (~17.3K)
     - 284–289 Splash (~210) ← 3
     - 290–293 App icon (~80)
     - 294–309 Campaigns (campaign list) (~1.5K) ← 6
@@ -206,7 +206,7 @@ Read the sections your task touches.
     - 376–379 Table opens stale (~750) ← 4
     - 380–393 Resolution and standalone outcome (~1.9K) ← 2
     - 394–403 Decks (~920) ← 2
-    - 404–413 Deck builder (deck editor) (~850) ← 3
+    - 404–413 Deck builder (deck editor) (~870) ← 3
     - 414–423 Card pool (the Cards tab) (~770) ← 3
     - 424–429 Card (~490) ← 2
     - 430–435 Packs and pack cards (~130)
