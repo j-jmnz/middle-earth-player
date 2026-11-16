@@ -83,7 +83,7 @@
     "id": "shadows-of-mirkwood",
     "name": "Shadows of Mirkwood",
     "scenarioCount": 6,
-    "playable": false,
+    "playable": true,
     "kind": "cycle",
     "box": null,
     "released": "2011-07-22",

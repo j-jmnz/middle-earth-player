@@ -1,0 +1,188 @@
+Scenario piles that place cards with no record (quest: 02011 The Hunt Begins; quest: 02012 A New Terror Abroad; quest: 02013 On the Trail)
+
+## 02011 The Hunt Begins
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02011:A:1 (front): Setup: Reveal 1 card per player from the encounter deck, and add it to the staging area.
+  02011:setup:1: Setup
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+02011:B:1 (back): Forced: After the players quest successfully, the first player looks at the top 3 cards of the encounter deck. Reveal and add 1 of those cards to the staging area, and discard the other 2 cards.
+  02011:forced:1: Forced after the players quest successfully
+    only if the actor holds the first player token
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
+    - the cards looked at, but the picked one, go to the encounter discard pile faceup; the picked card is then the top card of the encounter deck
+    - the acting player reveals an encounter card
+
+## 02012 A New Terror Abroad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02012:B:1 (back): Forced: At the beginning of the quest phase, the first player looks at the top 2 cards of the encounter deck. Reveal and add 1 of those cards to the staging area, and discard the other.
+  02012:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player looks at the top 2 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
+    - the cards looked at, but the picked one, go to the encounter discard pile faceup; the picked card is then the top card of the encounter deck
+    - the acting player reveals an encounter card
+
+## 02013 On the Trail
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02013:B:1 (back): Any player who does not control a hero with at least 1 Clue objective attached cannot commit characters to this quest. If there are ever no heroes with Clue objectives attached in play, reset the quest deck to stage 2B.
+  02013:constant:1: Constant
+    - a player who does not control a hero (you control) with a Clue card attached cannot commit characters to the quest
+  02013:constant:2: Constant
+    only if not (there is a hero (any player controls) with a Clue card attached to choose)
+    - the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
+
+02013:B:2 (back): If the players defeat this stage, the players have once again found a true sign of Gollum's passing, and won the game.
+  02013:constant:3: Constant
+    (no instructions)
+
+## 02014 Signs of Gollum
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02014:A:1 (front): Guarded.
+  02014:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+
+02014:A:2 (front): Response: After the players quest successfully, the players may claim Signs of Gollum if it has no attached encounters. When claimed, attach Signs of Gollum to any hero committed to the quest. (Counts as a Condition attachment with: "Forced: After attached hero is damaged or leaves play, return this card to the top of the encounter deck.")
+  02014:response:1: Response after the players quest successfully (event happened to the controller)
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (the quest succeeded) and (there is a hero (any player controls) that was committed to this round's quest (the quest's resolution already cleared the commitment) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls) that was committed to this round's quest (the quest's resolution already cleared the commitment)
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+  02014:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - this card: stat returnsToEncounterDeck 1, while this card is in play
+  02014:forced:1: Forced after a card takes damage (heard about the host)
+    - this card goes on top of the encounter deck
+
+## 02015 The Old Ford
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02015:A:1 (front): X is the number of ally cards in play.
+  02015:constant:1: Constant
+    - this card: stat threat the number of card (any player controls) of card type ally, while this card is in play
+
+02015:A:2 (shadow): Shadow: Discard from play all allies with a printed cost lower than the number of Riverland locations in play.
+  02015:shadow:1: Shadow
+    - for each ally (any player controls):
+      - if cost of the picked card is less than the number of Riverland location (any player controls): discard the picked card
+
+## 02016 The Eaves of Mirkwood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02016:A:1 (front): While The Eaves of Mirkwood is the active location, encounter card effects cannot be canceled.
+  02016:constant:1: Constant
+    only if this card is the active location
+    - the table: stat encounterUncancelable 1, while this card is in play
+
+## 02017 River Ninglor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02017:A:1 (front): While River Ninglor is the active location, remove 1 progress token from it and from the current quest at the end of each round.
+  02017:forced:1: Forced at the end of the round
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - remove 1 progress from "River Ninglor"
+    - remove 1 progress from the current quest card (all of it when it holds less)
+
+02017:A:2 (shadow): Shadow: Remove 1 progress token from the current quest. (2 progress tokens instead if this attack is undefended.)
+  02017:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): remove 1 progress from the current quest card (all of it when it holds less)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): remove 2 progress from the current quest card (all of it when it holds less)
+
+## 02018 The East Bank
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02018:A:1 (front): While The East Bank is the active location, ally cards cost 1 additional matching resource to play from hand.
+  02018:constant:1: Constant
+    only if this card is the active location
+    - while this card is in play, each card a player plays (from its owner's hand only) that is a card (any player controls) of card type ally costs 1 more (every player's; several such cards stack)
+
+02018:A:2 (shadow): Shadow: If you do not control at least 1 hero with a Clue card attached, return this enemy to the staging area after its attack resolves.
+  02018:shadow:1: Shadow
+    - if not (there is a hero (you control) with a Clue card attached to choose): when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 02019 The West Bank
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02019:A:1 (front): While The West Bank is the active location, attachment and event cards cost 1 additional matching resource to play from hand.
+  02019:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - while this card is in play, each card a player plays (from its owner's hand only) that is a card (any player controls) of card type attachment costs 1 more (every player's; several such cards stack)
+    - while this card is in play, each card a player plays (from its owner's hand only) that is a card (any player controls) of card type event costs 1 more (every player's; several such cards stack)
+
+02019:A:2 (shadow): Shadow: If you do not control at least 1 hero with a Clue card attached, double this enemy's base Attack for this attack.
+  02019:shadow:1: Shadow
+    - if not (there is a hero (you control) with a Clue card attached to choose): the attacking enemy: stat attack printed attack of the attacking enemy, until the end of the attack
+
+## 02020 Goblintown Scavengers
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02020:A:1 (front): When Revealed: Discard the top card of each player's deck. Until the end of the phase, increase Goblintown Scavenger's Threat by the total printed cost of all cards discarded in this way.
+  02020:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the effect's X is set to 0
+      - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
+      - this card: stat threat X, until the end of the phase
+
+## 02021 Hunters from Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02021:A:1 (front): Hunters from Mordor get +2 Attack and +2 Threat for each Clue card in play.
+  02021:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack the number of Clue objective (any player controls) x 2, while this card is in play
+    - this card: stat threat the number of Clue objective (any player controls) x 2, while this card is in play
+
+02021:A:2 (shadow): Shadow: Deal 1 damage to each hero with a Clue card attached. (3 damage instead if this attack is undefended.)
+  02021:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): deal 1 damage to each hero (any player controls) with a Clue card attached
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to each hero (any player controls) with a Clue card attached
+
+## 02022 False Lead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02022:A:1 (front): When Revealed: The first player chooses and shuffles a card with the printed Clue trait back into the encounter deck. If there are no Clue cards in play, False Lead gains surge.
+  02022:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a Clue objective (any player controls) to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - choose Clue objective (any player controls) chosen by the first player
+    - the encounter cards that guard the picked card stay in the staging area and no longer guard it
+    - the picked card is shuffled into the encounter deck
+
+## 02023 Flooding
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02023:A:1: Doomed 1. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+02023:A:2 (front): When Revealed: Remove all progress tokens from all Riverland locations.
+  02023:whenRevealed:1: When revealed
+    - remove all the progress from each Riverland location (any player controls)
+
+02023:A:3 (shadow): Shadow: Resolve the "when revealed" effect of this card.
+  02023:shadow:1: Shadow
+    - the When Revealed effects of this card resolve as if it had just been revealed
+
+## 02024 Old Wives' Tales
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02024:A:1 (front): When Revealed: Discard 1 resource from each hero's resource pool, if able. Exhaust any hero that could not discard a resource from its pool.
+  02024:whenRevealed:1: When revealed
+    - for each hero (any player controls):
+      - if not (the picked card is a hero (any player controls) with resources on it): exhaust the picked card
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
+
+(rendered pieces: 131 by template, 0 as JSON)
