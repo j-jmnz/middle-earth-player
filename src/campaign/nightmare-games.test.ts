@@ -39,6 +39,7 @@ const CAMPAIGN_OF: Readonly<Record<string, string>> = {
   "a-journey-to-rhosgobel": "shadows-of-mirkwood",
   "the-hills-of-emyn-muil": "shadows-of-mirkwood",
   "the-dead-marshes": "shadows-of-mirkwood",
+  "return-to-mirkwood": "shadows-of-mirkwood",
 };
 
 function seatFor(campaignId: string): { heroes: string[]; deck: string[]; protect: string } {

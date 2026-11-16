@@ -327,7 +327,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
           - the acting player discards each card (you control) in hand [also {"notCardType":"player-side-quest"}]
         * option "treasure":
           - the acting player discards each card (you control) in hand [also {"notCardType":"treasure"}]
-    - then, if [json condition {"kind":"noneDiscarded"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 12106:A:2 (shadow): Shadow: If the active location is Underwater, search the encounter deck and discard pile for a Creature enemy, and add it to the staging area.
   12106:shadow:1: Shadow
@@ -362,4 +362,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 204 by template, 44 as JSON)
+(rendered pieces: 205 by template, 43 as JSON)

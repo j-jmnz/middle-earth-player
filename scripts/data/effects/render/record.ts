@@ -96,6 +96,7 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (effect.cost !== undefined) notes.push(`cost: ${renderCost(effect.cost, ctx)}`);
   if (effect.anyPlayer === true) notes.push("any player may use it");
   if (effect.answeredBy === "eventSeat") notes.push("answered by the player the event happened to");
+  if (effect.answeredBy === "guardian") notes.push("answered by the player guarding Gollum");
   if (effect.fromHand === true) notes.push("used from hand");
   if (effect.fromVictory === true) notes.push("used from the victory display");
   if (effect.byEncounterDeck === true) notes.push("only when the encounter deck revealed it");

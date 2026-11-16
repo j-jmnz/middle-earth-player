@@ -27,7 +27,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141022:B:1 (back): When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)
   141022:triggered:1: Triggered (mandatory, not printed as Forced) on the event hideFailed
-    - [json EngageAll {"verb":"EngageAll","trait":"Nazgûl","who":"actor"}]
+    - the acting player engages every enemy in the staging area with the trait Nazgûl
 
 141022:B:2 (back): The players cannot advance unless Bag End is in the victory display.
   141022:constant:1: Constant
@@ -49,7 +49,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141023:B:3 (back): When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)
   141023:triggered:1: Triggered (mandatory, not printed as Forced) on the event hideFailed
-    - [json EngageAll {"verb":"EngageAll","trait":"Nazgûl","who":"actor"}]
+    - the acting player engages every enemy in the staging area with the trait Nazgûl
 
 ## 141024 Escape to Buckland
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -66,7 +66,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141024:B:2 (back): When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)
   141024:triggered:1: Triggered (mandatory, not printed as Forced) on the event hideFailed
-    - [json EngageAll {"verb":"EngageAll","trait":"Nazgûl","who":"actor"}]
+    - the acting player engages every enemy in the staging area with the trait Nazgûl
 
 141024:B:3 (back): Response: After a player makes a successful Hide test, place X progress on a non-unique location in play. X is twice the number of players in the game.
   141024:response:1: Response on the event hideSucceeded
@@ -367,7 +367,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141079:A:2 (front): When Revealed: At the end of the phase, each enemy in the staging area engages the first player. If The One Ring is exhausted, this effect cannot be canceled.
   141079:whenRevealed:1: When revealed (cannot be canceled while the card with code 141085 in play is exhausted)
     - later, at the end of this phase (cannot be canceled while the card with code 141085 in play is exhausted):
-      - [json EngageAll {"verb":"EngageAll","who":"firstPlayer"}]
+      - the first player engages every enemy in the staging area
 
 ## 141085 The One Ring
 
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 216 by template, 42 as JSON)
+(rendered pieces: 220 by template, 38 as JSON)

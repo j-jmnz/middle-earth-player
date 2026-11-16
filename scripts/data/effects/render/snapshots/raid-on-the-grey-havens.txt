@@ -86,7 +86,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
       * option "damage" (only if there is a location (any player controls) [also {"aflame":true}] to choose):
         - choose location (any player controls) chosen by the first player [also {"aflame":true}]
         - deal 2 damage to the picked card
-      * option "search" (only if [json condition {"kind":"encounterHas","piles":"deckAndDiscard","cardType":"location","aflame":true}]):
+      * option "search" (only if the encounter discard pile or deck holds a location with the Aflame keyword):
         - [json SearchAflame {"verb":"SearchAflame"}]
 
 ## 11041 Sahír's Ravager
@@ -145,7 +145,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - the first player chooses one of:
       * option "damage":
         - deal 3 damage to this card
-      * option "discard" (only if [json condition {"kind":"encounterHas","piles":"discard","cardType":"enemy"}]):
+      * option "discard" (only if the encounter discard pile holds an enemy):
         - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
         - the picked card goes to the staging area (it is not revealed)
 
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 294 by template, 42 as JSON)
+(rendered pieces: 296 by template, 40 as JSON)

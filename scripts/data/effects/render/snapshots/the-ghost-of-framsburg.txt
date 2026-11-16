@@ -27,7 +27,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 12189:B:3 (back): Action: Raise each player's threat by 1 to shuffle the encounter discard pile into the encounter deck. (Any player may trigger this ability.)
   12189:action:1: Action (any player may use it)
-    only if [json condition {"kind":"encounterHas","piles":"discard"}]
+    only if the encounter discard pile holds a card
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
     - shuffle the encounter discard pile into the encounter deck
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     only if [json condition {"kind":"inVictory","code":"19098","is":false}]
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 190 by template, 42 as JSON)
+(rendered pieces: 191 by template, 41 as JSON)
