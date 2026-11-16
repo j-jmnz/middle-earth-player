@@ -49,6 +49,7 @@ import { gollumFixtures } from "./shadows-of-mirkwood/the-hunt-for-gollum.ts";
 import { carrockFixtures } from "./shadows-of-mirkwood/conflict-at-the-carrock.ts";
 import { rhosgobelFixtures } from "./shadows-of-mirkwood/a-journey-to-rhosgobel.ts";
 import { muilFixtures } from "./shadows-of-mirkwood/the-hills-of-emyn-muil.ts";
+import { deadmarshesFixtures } from "./shadows-of-mirkwood/the-dead-marshes.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -107,4 +108,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "conflict-at-the-carrock": () => carrockFixtures(),
   "a-journey-to-rhosgobel": () => rhosgobelFixtures(),
   "the-hills-of-emyn-muil": () => muilFixtures(),
+  "the-dead-marshes": () => deadmarshesFixtures(),
 };
