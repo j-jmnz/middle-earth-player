@@ -98,21 +98,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 02065 Rhosgobel. Threat X (the number of players). While in the staging area Wilyador cannot be healed. Travel: not until stage 1 is complete.
     copyLine("110077:A:1", "02065:A:1"),
     { id: "02065:constant:2", cardCode: "02065", lines: ["02065:A:2"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "cannotBeHealed", amount: 1, until: "whileSourceInPlay", holders: WILYADOR }] },
-    // The Travel line has no cost to pay: the players may not travel here until stage 1 is complete, a rule the engine checks while the card is in play (a constant, which names the card's constant line: the check allows no other; as 18033:A:3).
-    { id: "02065:travel:1", cardCode: "02065", lines: ["02065:A:3"], timing: "travel", instructions: [] },
-    { id: "02065:constant:3", cardCode: "02065", lines: ["02065:A:2"], timing: "constant", condition: { kind: "onStage", stage: 1 }, instructions: [{ verb: "Restrict", what: "travel" }] },
+    // The Travel line is a requirement, not a cost: until stage 1 is complete the players cannot travel to Rhosgobel itself (a Travel line that bars the trip is also a constant, scripts/data/normalize/timings.ts).
+    { id: "02065:constant:3", cardCode: "02065", lines: ["02065:A:3"], timing: "constant", condition: { kind: "onStage", stage: 1 }, instructions: [{ verb: "Restrict", what: "travel" }] },
     // 02066 Forest Grove. Response: after the players explore it (in the staging area or as the active location), an Athelas from the encounter deck or its discard pile is added to the staging area (not revealed, so not guarded); the deck is shuffled.
-    ...(["activeExplored", "locationExplored"] as const).map(
-      (trigger, at): Effect => ({
-        id: `02066:response:${at + 1}`,
-        cardCode: "02066",
-        lines: ["02066:A:1"],
-        timing: "response",
-        trigger,
-        subject: "self",
-        instructions: [{ verb: "SearchMove", code: "02063", to: "staging" }, { verb: "ShuffleEncounterDeck" }],
-      }),
-    ),
+    { id: "02066:response:1", cardCode: "02066", lines: ["02066:A:1"], timing: "response", trigger: "locationExplored", subject: "self", instructions: [{ verb: "SearchMove", code: "02063", to: "staging" }, { verb: "ShuffleEncounterDeck" }] },
     // 02067 Exhaustion. 2 damage to each exhausted character (Wilyador too); shadow: 1.
     { id: "02067:whenRevealed:1", cardCode: "02067", lines: ["02067:A:1"], timing: "whenRevealed", instructions: [{ verb: "DamageEach", amount: 2, pick: EXHAUSTED }] },
     { id: "02067:shadow:1", cardCode: "02067", lines: ["02067:A:2"], timing: "shadow", instructions: [{ verb: "DamageEach", amount: 1, pick: EXHAUSTED }] },

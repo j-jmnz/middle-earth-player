@@ -7,6 +7,7 @@ import { fightEnemy, finish, first, idsOf, legalIntents, legalTargets, resolveRe
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { eliminateSeat } from "../../../rules/core/eliminate.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { hasTrait } from "../../../rules/interpret/conditions.ts";
 import { pushEffectFrame } from "../../../rules/interpret/effect-frames.ts";
@@ -15,6 +16,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { attachTo, moveCard, spawn } from "../../../rules/core/zones.ts";
 
 const WILYADOR = "02064";
+const GROVE = "900604";
 const table = (layout: Layout) => tableFromLayout("a-journey-to-rhosgobel", layout);
 
 describe("02064:A:1 Wilyador joins the first player and follows the token", () => {
@@ -48,6 +50,23 @@ describe("02064:A:3 Wilyador leaves play", () => {
   });
 });
 
+describe("02061:B:1 Radagast's Request is the first player's", () => {
+  it("02061:B:1 is offered to the first player when the token is with the second seat, and the damage goes on the Wilyador that player controls", () => {
+    const made = table({ stage: "02061", seats: 2, firstPlayer: 1, play: [{ code: WILYADOR, seat: 1 }], deck: ["f0", "f0", "f0", "f0"], phase: "Planning" });
+    let run = start(made.state);
+    const offer = (state: ScenarioState) => legalIntents(state, made.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === first(state, "02061"));
+    for (let guard = 0; guard < 12 && !offer(run.state); guard += 1) {
+      const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass");
+      if (!pass) break;
+      run = send(run, pass as PlayerIntent, made.ctx);
+    }
+    expect(offer(run.state)).toBeDefined();
+    expect(run.state.activeSeat).toBe(1);
+    const used = finish(send(run, offer(run.state) as PlayerIntent, made.ctx), made.ctx);
+    expect(used.state.cards[first(used.state, WILYADOR)]?.damage).toBe(2);
+  });
+});
+
 describe("02061:B:2 the card whose effect healed Wilyador leaves the game", () => {
   it("02061:B:2 removes the event that healed him from the game, and not the card of a heal that healed nothing", () => {
     const made = table({ stage: "02061", play: [{ code: WILYADOR, damage: 6 }], hand: ["filler"] });
@@ -65,6 +84,9 @@ describe("02065:A:3 Rhosgobel cannot be traveled to until stage 1 is complete", 
   it("02065:A:3 is barred while stage 1 is current and open after it", () => {
     const one = table({ staging: ["02065"] });
     expect(travelBlocked(one.state, one.ctx, first(one.state, "02065"))).toBe(true);
+    // The bar is on Rhosgobel itself: another location may be traveled to while stage 1 is current.
+    const other = table({ staging: ["02065", "02066"] });
+    expect(travelBlocked(other.state, other.ctx, first(other.state, "02066"))).toBe(false);
     const two = table({ stage: "02061", staging: ["02065"] });
     expect(travelBlocked(two.state, two.ctx, first(two.state, "02065"))).toBe(false);
   });
@@ -83,6 +105,25 @@ describe("02063:A:1 Athelas is Guarded when it is revealed", () => {
     expect(offered(revealed.state)).toBe(false);
     const freed = moveCard(updateCard(revealed.state, athelas, { attachments: [] }), guard, { zone: "discard", seat: 0 });
     expect(offered(updateCard(freed, guard, { host: null }))).toBe(true);
+  });
+});
+
+describe("02066:A:1 Forest Grove's Response", () => {
+  it("02066:A:1 is offered once when it is explored as the active location, adds one Athelas to the staging area and is not offered again", () => {
+    // A quest with the active location explored: willpower of both heroes against its 2 quest points.
+    const made = table({ phase: "Quest", active: "02066", deck: ["f0", "02063", "02063"] });
+    let run = send(start(made.state), { type: "Commit", cardIds: [first(made.state, "dh1"), first(made.state, "dh2")] }, made.ctx);
+    run = send(run, { type: "Pass" }, made.ctx);
+    const offers = (state: ScenarioState) => legalIntents(state, made.ctx).filter((intent) => intent.type === "Trigger" && intent.cardId === first(state, "02066"));
+    for (let guard = 0; guard < 16 && offers(run.state).length === 0; guard += 1) {
+      const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass");
+      if (!pass) break;
+      run = send(run, pass as PlayerIntent, made.ctx);
+    }
+    expect(offers(run.state)).toHaveLength(1);
+    const used = finish(send(run, offers(run.state)[0] as PlayerIntent, made.ctx), made.ctx);
+    expect(used.state.staging.filter((id) => used.state.cards[id]?.code === "02063")).toHaveLength(1);
+    expect(offers(used.state)).toHaveLength(0);
   });
 });
 
@@ -147,6 +188,13 @@ describe("900601:A:3 and 900601:A:4 the Nightmare setup card", () => {
     expect(used.state.encounterDeck).toContain(athelas);
     expect(used.state.encounterDiscard).not.toContain(athelas);
   });
+  it("900601:A:4 asks the first player, whoever holds the token", () => {
+    const made = nightmare({ seats: 2, firstPlayer: 1, phase: "Planning", staging: ["02063"], deck: ["f0"] });
+    const athelas = first(made.state, "02063");
+    const discarded = settle({ ...moveCard(made.state, athelas, { zone: "encounterDiscard" }), window: null, mode: "planning", phase: "Planning" }, made.ctx, []);
+    expect(legalIntents(discarded, made.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "900601:response:1")).toBe(true);
+    expect(discarded.activeSeat).toBe(1);
+  });
 });
 
 describe("900603:A:2 Treetop Bird-eater engages the player who controls Wilyador", () => {
@@ -205,6 +253,22 @@ describe("02070:A:1 and 02071:A:1 only Eagle characters or characters with range
     }
     expect(run.state.window?.kind).toBe("defense");
     expect(legalTargets(run.state, { type: "DeclareDefender" }, made.ctx)).toEqual([]);
+  });
+});
+
+describe("900604:A:1 Dark-wood Grove counts every Athelas card in play", () => {
+  const grove = (made: ReturnType<typeof table>, state: ScenarioState) => {
+    const synced = syncConstants(state, made.ctx);
+    const card = synced.cards[first(synced, GROVE)]!;
+    return [modifiedStat(synced, card, "threat", made.ctx.cards), modifiedStat(synced, card, "questPoints", made.ctx.cards)];
+  };
+  it("900604:A:1 counts an Athelas in the staging area (unclaimed) and a claimed one, and none when there is none", () => {
+    const none = table({ staging: [GROVE] });
+    const [threat, points] = grove(none, none.state);
+    for (const layout of [{ staging: [GROVE, "02063"] }, { staging: [GROVE], attached: [{ code: "02063", to: "dh1" }] }]) {
+      const made = table(layout);
+      expect(grove(made, made.state), JSON.stringify(layout)).toEqual([threat + 1, points + 1]);
+    }
   });
 });
 
@@ -287,6 +351,28 @@ describe("900608:A:2 Noxious Supplies and the heals", () => {
     const once = heal(made, state);
     expect(once.cards[first(once, WILYADOR)]?.damage).toBe(7);
     expect(idsOf(once, "900608").filter((id) => once.cards[id]?.zone === "attached")).toHaveLength(1);
+  });
+
+  // The other card-effect heals reach Wilyador too: Elrond's Response heals quietly, and The Long Defeat heals among characters one damage at a time.
+  const healWith = (made: ReturnType<typeof table>, state: typeof made.state, instructions: readonly object[]) => {
+    const steps: EngineStep[] = [];
+    const pushed = pushEffectFrame({ ...state, window: null, mode: "stopped" }, { frame: "whenRevealed", sourceId: first(state, "filler"), actor: 0, peril: false, effectId: "fixture:whenRevealed:1", instructions: instructions as never, cancel: null, blockCancel: null }, steps);
+    return finish({ state: settle(pushed, made.ctx, steps), steps }, made.ctx).state;
+  };
+  const attached = (state: ScenarioState) => idsOf(state, "900608").filter((id) => state.cards[id]?.zone === "attached");
+
+  it("900608:A:2 reduces a quiet heal (Elrond's Response) to 1 and discards a copy", () => {
+    const { made, state } = poisoned(2, {});
+    const done = healWith(made, state, [{ verb: "Pick", pick: { type: "character", control: "any", names: ["Wilyador"] } }, { verb: "HealQuietly", amount: 3, target: "picked" }]);
+    expect(done.cards[first(done, WILYADOR)]?.damage).toBe(7);
+    expect(attached(done)).toHaveLength(1);
+  });
+
+  it("900608:A:2 reduces a heal among characters to 1 for the whole effect, and discards a copy", () => {
+    const { made, state } = poisoned(2, {});
+    const done = healWith(made, state, [{ verb: "HealAmong", amount: 5, pick: { type: "character", control: "any", names: ["Wilyador"] } }]);
+    expect(done.cards[first(done, WILYADOR)]?.damage).toBe(7);
+    expect(attached(done)).toHaveLength(1);
   });
 
   it("900608:A:2 leaves the final stage's heal whole", () => {

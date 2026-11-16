@@ -93,23 +93,17 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
   02065:constant:2: Constant
     only if this card is in the staging area
     - each character (any player controls) named "Wilyador": stat cannotBeHealed 1, while this card is in play
+
+02065:A:3 (front): Travel: Players must complete stage one of this quest before they can travel to Rhosgobel.
   02065:constant:3: Constant
     only if the players are on stage 1
     - the players cannot travel to any location while this holds
-
-02065:A:3 (front): Travel: Players must complete stage one of this quest before they can travel to Rhosgobel.
-  02065:travel:1: Travel
-    (no instructions)
 
 ## 02066 Forest Grove
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 02066:A:1 (front): Response: After the players explore Forest Grove, search the encounter deck and discard pile for 1 Athelas objective, and add it to the staging area. Then, shuffle the encounter deck.
-  02066:response:1: Response on the event activeExplored (heard about this card)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one card with code 02063 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
-    - shuffle the encounter deck
-  02066:response:2: Response on the event locationExplored (heard about this card)
+  02066:response:1: Response on the event locationExplored (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 02063 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
@@ -173,4 +167,4 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
   02071:shadow:1: Shadow
     - if the attack has no defender: the damage of this attack, if undefended, must go on a character (any player controls) named "Wilyador" in play, whoever controls it, if able (a defended attack still damages its defender)
 
-(rendered pieces: 120 by template, 0 as JSON)
+(rendered pieces: 116 by template, 0 as JSON)

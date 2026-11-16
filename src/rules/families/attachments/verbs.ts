@@ -32,18 +32,22 @@ function again(state: ScenarioState, instruction: Instruction, seat: number): Sc
 }
 
 // HealAmong: one damage at a time on a damaged card that matches, chosen by the actor, until `amount` is healed or they stop.
-export function healAmong(state: ScenarioState, instruction: Extract<Instruction, { verb: "HealAmong" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
+export function healAmong(state: ScenarioState, instruction: Extract<Instruction, { verb: "HealAmong" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const total = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   const healed = instruction.healed ?? 0;
   if (healed >= total || focus.chosen === DONE) return state;
-  const options = pickCandidates(state, { ...instruction.pick, damaged: true }, focus.seat, [], focus.sourceId, ctx).filter((id) => !healBlocked(state, id) && healAllowed(state, id, 1, ctx) > 0);
+  const capped = instruction.capped ?? [];
+  const options = pickCandidates(state, { ...instruction.pick, damaged: true }, focus.seat, [], focus.sourceId, ctx).filter((id) => !capped.includes(id) && !healBlocked(state, id) && healAllowed(state, id, 1, ctx) > 0);
   if (options.length === 0) return state;
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : undefined;
   if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, [...options, DONE]) : state;
   const card = state.cards[chosen];
   if (!card) return state;
-  const healedOne = queueEvent(healDamage(state, chosen, 1, ctx).state, { trigger: "healed", seat: card.controller, cardId: chosen, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
-  return again(healedOne, { ...instruction, healed: healed + 1 }, focus.seat);
+  const healedBy = healDamage(state, chosen, 1, ctx, { sourceId: focus.sourceId });
+  const healedOne = queueEvent(healedBy.state, { trigger: "healed", seat: card.controller, cardId: chosen, ...(focus.sourceId && focus.sourceId !== chosen ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+  // An attachment that cut the heal to 1 (Noxious Supplies) is discarded after it, and this effect heals that card no more: "the amount of damage healed is reduced to 1" holds for the whole effect.
+  const reduced = healedBy.reducer ? destroyCard(healedOne, healedBy.reducer, ctx.cards, steps) : healedOne;
+  return again(reduced, { ...instruction, healed: healed + 1, ...(healedBy.reducer ? { capped: [...capped, chosen] } : {}) }, focus.seat);
 }
 
 // ChooseAttackers: the enemy is read (and the source discarded, when that is the cost), then the actor chooses attackers one at
