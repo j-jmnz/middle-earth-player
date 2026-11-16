@@ -312,7 +312,8 @@ describe("standalone fixtures (a cycle's scenarios)", () => {
       expect(ended.result?.outcome, name).toBe(name.endsWith("-lost") ? "lost" : "won");
       expect(ended.active, name).toBeNull();
     }
-  });
+    // Every cycle fixture replays in turn: about 2.5 s alone, past the default 5 s on a busy run of the whole suite.
+  }, 30_000);
 });
 
 function standaloneFixtureCycle(names: readonly string[]): string {
