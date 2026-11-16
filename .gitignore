@@ -54,6 +54,8 @@ modules/*/android/.gradle/
 modules/*/android/.cxx/
 
 # generated data and local caches
+# CanvasKit's wasm, copied by pnpm assets canvaskit
+public/canvaskit.wasm
 .cache/
 assets/catalog.db
 agent-tools/

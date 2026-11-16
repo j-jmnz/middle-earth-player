@@ -1,7 +1,7 @@
 // The settings rows the Settings tab (src/screens/settings/view.tsx) and the table's settings panel (reading-panels.tsx) share (docs/design-system.md,
 // Components and Settings; user request, 2026-10-28): the grouped sections with their choices and switches, so the two cannot drift apart.
 // They live in src/play because src/play cannot import src/screens. `testPrefix` is `app-settings` on the tab and `settings` on the panel.
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import type { ReactNode } from "react";
 
 import { TextButton } from "../../ui/buttons.tsx";
@@ -123,10 +123,7 @@ export function SettingsRows({
         <SettingGroup title="At the table" testID={id("table")} first={first && top === "table"}>
           <SettingSwitch roomy label="First-game guide" detail={GUIDE_LINE} value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID={id("guide")} />
           {stops ? <SettingSwitch roomy label="Stops on" detail={STOPS_LINE} value={settings.stopsOn} onChange={(stopsOn) => onChange({ stopsOn })} testID={id("stops")} /> : null}
-          {/* The web build is already a list of names: the row would change nothing there. */}
-          {Platform.OS !== "web" ? (
-            <ChoiceRow title="Table as a list" detail={TABLE_LIST_LINE} id={id("table-list")} options={TABLE_LIST_OPTIONS} words={TABLE_LIST_WORDS} value={settings.tableAsList} onChange={(tableAsList) => onChange({ tableAsList })} />
-          ) : null}
+          <ChoiceRow title="Table as a list" detail={TABLE_LIST_LINE} id={id("table-list")} options={TABLE_LIST_OPTIONS} words={TABLE_LIST_WORDS} value={settings.tableAsList} onChange={(tableAsList) => onChange({ tableAsList })} />
           <ChoiceRow title="Confirm time" detail={CONFIRM_TIME_LINE} id={id("confirm-time")} options={CONFIRM_TIME_OPTIONS} words={CONFIRM_TIME_WORDS} value={settings.confirmTime} onChange={(confirmTime) => onChange({ confirmTime })} />
           <SettingSwitch roomy label="Keep screen awake" detail={AWAKE_LINE} value={settings.keepAwake} onChange={(keepAwake) => onChange({ keepAwake })} testID={id("awake")} />
           <SettingChoice title="Responses used every time" detail={always.length > 0 ? ALWAYS_LINE : ALWAYS_EMPTY_LINE} testID={id("always")}>

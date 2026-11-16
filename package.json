@@ -67,7 +67,7 @@
     "android": "pnpm assets && expo run:android",
     "android:usb": "adb reverse tcp:8081 tcp:8081 && REACT_NATIVE_PACKAGER_HOSTNAME=localhost pnpm android",
     "ios": "pnpm assets && expo run:ios",
-    "web": "pnpm assets catalog && expo start --web",
+    "web": "pnpm assets catalog && pnpm assets canvaskit && expo start --web",
     "lint": "oxlint",
     "typecheck": "tsrs -p . --noEmit",
     "test": "node scripts/cli.ts test",

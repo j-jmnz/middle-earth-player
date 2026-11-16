@@ -10,15 +10,11 @@
 // frames, and the canvas does not record its scene once for each picture.
 import { FilterMode, MipmapMode, Skia, type SkImage } from "@shopify/react-native-skia";
 import { useEffect, useEffectEvent, useState } from "react";
-import { Image as RNImage, PixelRatio } from "react-native";
+import { PixelRatio } from "react-native";
 
+import { assetUri } from "./asset-uri.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { boxesKey, coverPixels, pixelBoxes, redecode, SLACK, type Box } from "./table-pictures.ts";
-
-function uriOf(source: PictureSource): string | null {
-  if (typeof source !== "number") return source.uri;
-  return RNImage.resolveAssetSource(source)?.uri ?? null;
-}
 
 // Draws `image` into a surface `w` x `h` with linear filtering, and releases `image`.
 function redraw(image: SkImage, w: number, h: number): SkImage {
@@ -46,7 +42,7 @@ function atSize(full: SkImage, box: Box): SkImage {
 }
 
 async function decode(source: PictureSource, box: Box): Promise<SkImage | null> {
-  const uri = uriOf(source);
+  const uri = assetUri(source);
   if (!uri) return null;
   try {
     const data = await Skia.Data.fromURI(uri);

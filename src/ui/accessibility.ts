@@ -3,7 +3,7 @@
 // this store through useSyncExternalStore, so the AccessibilityInfo listeners exist once while any component reads them, not once for
 // each hook call (about twenty on an open table). The first subscriber starts the listeners and reads the current values; the last one
 // leaving removes them.
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, Platform } from "react-native";
 
 export type Accessibility = {
   // The phone's Reduce motion, or null until the phone has answered (the hook then uses Reanimated's reading of it).
@@ -67,11 +67,15 @@ function start(): () => void {
       if (live) set({ reduceMotion: enabled });
     })
     .catch(() => undefined);
-  AccessibilityInfo.isScreenReaderEnabled()
-    .then((enabled) => {
-      if (live) set({ screenReader: enabled });
-    })
-    .catch(() => undefined);
+  // react-native-web answers yes whatever is running, and a browser cannot tell a screen reader: on the web the flag stays off (the web table is
+  // drawn, and Table as a list is the way to the list). The desktop shell will set it from the platform's own flag.
+  if (Platform.OS !== "web") {
+    AccessibilityInfo.isScreenReaderEnabled()
+      .then((enabled) => {
+        if (live) set({ screenReader: enabled });
+      })
+      .catch(() => undefined);
+  }
   ask("isBoldTextEnabled").then((enabled) => {
     if (live) set({ boldText: enabled });
   });
@@ -85,7 +89,7 @@ function start(): () => void {
   });
   const subscriptions = [
     AccessibilityInfo.addEventListener("reduceMotionChanged", (enabled) => set({ reduceMotion: enabled })),
-    AccessibilityInfo.addEventListener("screenReaderChanged", (enabled) => set({ screenReader: enabled })),
+    ...(Platform.OS !== "web" ? [AccessibilityInfo.addEventListener("screenReaderChanged", (enabled) => set({ screenReader: enabled }))] : []),
     ...PHONE.map(({ field, event }) => listen(event, (enabled) => set({ [field]: enabled }))),
   ];
   return () => {

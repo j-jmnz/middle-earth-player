@@ -1,4 +1,4 @@
-// The reader gate: a screen reader on a phone, never on the web (whose react-native-web always says yes) and never with no reader.
+// The reader gate: a screen reader on, or Table as a list on Always, on any platform; never with neither.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useReaderMode, useScreenReader } from "./screen-reader.ts";
@@ -40,11 +40,12 @@ describe("useReaderMode with Table as a list", () => {
     expect(useScreenReader()).toBe(false);
   });
 
-  it("is false with the default, and false on the web whatever the setting says", () => {
+  it("is false with the default, and true on the web (browser and desktop) when the setting is Always", () => {
     expect(useReaderMode()).toBe(false);
-    tableSettings.getState().update({ tableAsList: "always" });
     phone.os = "web";
     expect(useReaderMode()).toBe(false);
+    tableSettings.getState().update({ tableAsList: "always" });
+    expect(useReaderMode()).toBe(true);
   });
 });
 
@@ -62,11 +63,11 @@ describe("useReaderMode", () => {
     expect(useReaderMode()).toBe(true);
   });
 
-  it("is false on the web even though the web build reports a screen reader", () => {
+  it("is true on the web when the platform reports a screen reader (the store holds it false until the desktop shell sets it: accessibility.ts)", () => {
     phone.os = "web";
     phone.screenReader = true;
     expect(useScreenReader()).toBe(true);
-    expect(useReaderMode()).toBe(false);
+    expect(useReaderMode()).toBe(true);
   });
 });
 
@@ -104,10 +105,10 @@ describe("useReaderMode with EXPO_PUBLIC_FORCE_READER", () => {
     expect(useReaderMode()).toBe(false);
   });
 
-  it("is false on the web even in a development build with the variable set", () => {
+  it("is true on the web in a development build with the variable set", () => {
     vi.stubGlobal("__DEV__", true);
     vi.stubEnv("EXPO_PUBLIC_FORCE_READER", "1");
     phone.os = "web";
-    expect(useReaderMode()).toBe(false);
+    expect(useReaderMode()).toBe(true);
   });
 });

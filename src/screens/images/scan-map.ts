@@ -1,5 +1,5 @@
 export type ScanAsset = {
-  moduleId: number;
+  moduleId: number | { uri: string };
   width: number;
   height: number;
 };

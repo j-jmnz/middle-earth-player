@@ -1,6 +1,6 @@
 // The package scripts' dispatcher: `pnpm <group> <command> [args]` runs the command's steps in order, each a child
 // process with the arguments after the command, and stops at the first that fails (docs/development.md, Commands).
-// `pnpm <group>` alone lists the group's commands; `assets` alone runs all three packs, and `test` with no command
+// `pnpm <group>` alone lists the group's commands; `assets` alone runs every pack, and `test` with no command
 // (or with a file filter) is a plain `vitest run`.
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
@@ -20,11 +20,13 @@ export type Command = { steps: Step[]; about: string };
 const catalog: Step = { script: "build/catalog.ts" };
 const booklets: Step = { script: "build/pack-booklets.ts" };
 const scans: Step = { script: "build/pack-scans.ts" };
+const canvaskit: Step = { script: "build/pack-canvaskit.ts" };
 
 export const GROUPS: Record<string, Record<string, Command>> = {
   assets: {
-    all: { steps: [catalog, booklets, scans], about: "catalog, booklets and scans in order (`--optional` lets a pack fail)" },
+    all: { steps: [catalog, canvaskit, booklets, scans], about: "catalog, canvaskit, booklets and scans in order (`--optional` lets a pack fail)" },
     catalog: { steps: [catalog], about: "writes assets/catalog.db and src/catalog/version.ts" },
+    canvaskit: { steps: [canvaskit], about: "copies CanvasKit's wasm to public/canvaskit.wasm for the web table" },
     booklets: { steps: [booklets], about: "packs the booklet PDFs into assets/booklets" },
     scans: { steps: [scans], about: "packs every card picture into assets/scans" },
     capture: { steps: [{ script: "showcase/capture.ts" }], about: "takes the README showcase's captures on the iOS simulators (--app <App.app>, macOS)" },
@@ -53,7 +55,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     scenario: { steps: [{ script: "tools/test-scenario.ts" }], about: "one scenario's tests, goldens, checks and smokes" },
     smoke: { steps: [{ script: "card-smoke/run.ts" }], about: "plays seeded games with player cards' records" },
     encounter: { steps: [{ script: "card-smoke/encounter.ts" }], about: "plays a scenario's encounter cards and seeded games" },
-    a11y: { steps: [catalog, { script: "checks/a11y-web.ts" }], about: "audits the web screens with axe-core in Chromium" },
+    a11y: { steps: [catalog, canvaskit, { script: "checks/a11y-web.ts" }], about: "audits the web screens with axe-core in Chromium" },
   },
   doc: {
     index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },

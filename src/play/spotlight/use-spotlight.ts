@@ -3,7 +3,6 @@
 // and the dock, the banner, the settle after a moment and the canvas's card motions hold while the gate is open (`useSpotlightHold`).
 // A tap ends the gate, which lands the table on the new state. Nothing here draws, and nothing gates an intent.
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useMemo, useState } from "react";
-import { Platform } from "react-native";
 import { cancelAnimation, useAnimatedReaction, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
@@ -22,8 +21,8 @@ import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import type { TableStore } from "../store/store.ts";
 import { tableSettings } from "../../ui/table-settings.ts";
 
-// The web build lists the table and has no canvas to play a spotlight on.
-const CANVAS = Platform.OS !== "web";
+// A canvas draws the spotlight on every platform (the web's once CanvasKit has loaded, and until then the list table ends each gate: reader-gate.ts).
+const CANVAS = true;
 
 /**
  * The motion scale the spotlight plays at: the table's scale (1 Normal, 0.6 Quick), or 0, which plays none, when the player turned the

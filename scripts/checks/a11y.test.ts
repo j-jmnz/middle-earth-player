@@ -16,13 +16,7 @@ const EXCEPTIONS: readonly Exception[] = [
     file: "src/play/canvas/table-canvas.native.tsx",
     rule: "picture-label",
     tag: "Canvas",
-    reason: "The table's Skia canvas is the sighted drawing. With a reader on, ReaderTable replaces it (reader-table.tsx), so the canvas is never what a reader reaches.",
-  },
-  {
-    file: "src/play/canvas/table-canvas.tsx",
-    rule: "long-press-action",
-    tag: "Pressable",
-    reason: "The web list of the table stays as it is (user instruction, 2026-11-05: the web build is unchanged); react-native-web has no actions menu. The phone's reader table has the Show card action.",
+    reason: "The table's Skia canvas is the sighted drawing. With a reader on, or Table as a list on Always, ReaderTable replaces it (reader-table.tsx), so the canvas is never what a reader reaches.",
   },
 ];
 
