@@ -39,7 +39,7 @@ Read the sections your task touches.
   - 90–93 Accessibility (~140)
   - 94–149 Install (~1.2K)
     - 98–103 Requirements (~100)
-    - 104–123 Android (~350)
+    - 104–123 Android (~440)
     - 124–136 iPhone and iPad (~350)
     - 137–140 Check a download (optional) (~60)
     - 141–149 If something goes wrong (~210)
