@@ -25,8 +25,10 @@ export const carrockStart = (seatCount: 1 | 2, seed: number, difficulty: Difficu
 export type CarrockPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
   choose: "first" | "last";
+  // The heroes take every attack undefended (their damage is nothing to the stand-in heroes); false: they defend, as real heroes must.
+  undefended: boolean;
 };
-export const DEFAULT_POLICY: CarrockPolicy = { choose: "first" };
+export const DEFAULT_POLICY: CarrockPolicy = { choose: "first", undefended: true };
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
 // The players fight the Trolls. One hero of each seat quests (his Willpower is more than the staging area's Threat) until a Troll is engaged; then all stay ready. They engage Louis alone first (his Forced effect raises the threat after every Troll's attack) and the other Trolls once he is dead, take
@@ -64,7 +66,7 @@ export function carrockIntent(state: ScenarioState, ctx: ReduceContext, memory: 
     const heroes = legalTargets(state, { type: "Undefended" }, ctx);
     const defenders = intents.some((intent) => intent.type === "DeclareDefender") ? legalTargets(state, { type: "DeclareDefender" }, ctx) : [];
     const attacker = state.cards[window.enemyId]?.code;
-    if (attacker === "02042" && defenders[0]) return { type: "DeclareDefender", defenderId: defenders[0] };
+    if ((attacker === "02042" || !policy.undefended) && defenders[0]) return { type: "DeclareDefender", defenderId: defenders[0] };
     // The damage is spread: the hero with the least takes it.
     const spread = [...heroes].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
     if (spread) return { type: "Undefended", heroId: spread };
