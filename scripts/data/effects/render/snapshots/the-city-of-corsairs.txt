@@ -90,7 +90,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - choose card (any player controls) named "The Black Sword", with resources on it
     - choose ready hero (you control)
     - exhaust the picked card
-    - [json MoveResources {"verb":"MoveResources","amount":1}]
+    - move 1 resource tokens from the card picked before the last to the last card picked
     - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"The Black Sword","when":{"kind":"count","pick":{"type":"card","control":"any","names":["The Black Sword"],"hasResources":true},"max":0}}]
 
 11215:B:4 (back): Resolution: The players win the campaign!
@@ -376,7 +376,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): choose hero (you control) with resources on it
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
-    - [json MoveResources {"verb":"MoveResources","amount":1,"when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Raider"}}}]
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): move 1 resource tokens from the card picked before the last to the last card picked
 
 ## 12163 Foes of Ecthelion
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -412,4 +412,4 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
       - the acting player assigns the resource tokens on Raider enemy (any player controls) engaged with you damage among the character (you control), one at a time
     - then, if the number of Raider enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 261 by template, 40 as JSON)
+(rendered pieces: 265 by template, 38 as JSON)

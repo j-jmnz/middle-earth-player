@@ -327,7 +327,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142084:A:2 (front): When Revealed: Attach to a non-Fellowship hero in play. Counts as a Condition attachment with the text: "Forced: After The One Ring exhausts, raise each player's threat by 1 and reduce attached hero's Willpower to 0 until the end of the round."
   142084:whenRevealed:1: When revealed
-    - attach this card to a hero
+    - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   142084:forced:1: Forced on the event exhausted (heard about card (any player controls) named "The One Ring")
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)

@@ -4,6 +4,9 @@ import { cardRef, renderAmount } from "./amounts.ts";
 import { renderCondition } from "./conditions.ts";
 import { compact, done, isObj, jsonOf, joinAnd, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
+import { ESCAPE_STAT_NOTES, ESCAPE_TEMPLATES } from "./escape.ts";
+
+export { ESCAPE_SAMPLES } from "./escape.ts";
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -59,6 +62,7 @@ const TARGET_STAT: Readonly<Record<string, string>> = {
 const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(value);
 // What a stat flag means where the bare name would not say it.
 const STAT_NOTE: Readonly<Record<string, string>> = {
+  ...ESCAPE_STAT_NOTES,
   questProgressCap: " (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count)",
   cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
   cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",
@@ -106,6 +110,7 @@ const FLIP_GOLLUM = {
 } as const;
 
 export const TEMPLATES: Readonly<Record<string, Template>> = {
+  ...ESCAPE_TEMPLATES,
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
@@ -132,7 +137,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   CannotPlay: (i, ctx) => ({ text: `${i.anyPlayer === true ? "no player" : "its controller"} can play, or put into play, a ${pick(i.pick, ctx)}`, read: ["pick", "anyPlayer"] }),
   UncancelableWhenRevealed: (i) => ({ text: `while this card is in play (under its condition), the When Revealed effects of ${typeof i.trait === "string" ? `${i.trait} cards` : i.cardType === "treachery" ? "treachery cards" : i.firstRevealedEachRound === true ? "the first treachery revealed each round" : "cards"} cannot be canceled`, read: ["trait", "cardType", "firstRevealedEachRound"] }),
   DamageOncePerRound: (i) => ({ text: `deal ${str(i.amount)} damage to ${cardRef(i.target ?? "subject")} unless a card with this card's title has dealt it damage this round (it is marked for the round once the damage is dealt)`, read: ["amount", "target"] }),
-  PlaceResourceTokens: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on ${cardRef(i.on)}`, read: ["amount", "on"] }),
+  PlaceResourceTokens: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on ${i.code === undefined ? cardRef(i.on) : `the card in play with code ${str(i.code)} (when it is not in play, on the card that holds redirectResources, else nowhere)`}`, read: ["amount", "on", "code"] }),
   AddResources: (i, ctx) => ({ text: `add ${amount(i.amount, ctx)} resources to ${cardRef(i.to ?? "host")}`, read: ["amount", "to"] }),
   DealDamage: () => ({ text: "deal damage", read: [] }),
   DamageCard: (i, ctx) => ({ text: `deal ${amount(i.amount, ctx)} damage to ${cardRef(i.target ?? "picked")}`, read: ["amount", "target"] }),
@@ -304,7 +309,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     text: `the ${i.who === "firstPlayer" ? "first player" : "acting player"} searches the encounter deck and discard pile for ${typeof i.trait === "string" ? `a ${i.trait} ` : "a "}${typeof i.type === "string" ? i.type : "card"}, reveals it and ${i.to === "engaged" ? "puts it into play engaged with them" : "adds it to the staging area"}${i.cost === true ? " (a Travel cost: payable only when a card is found)" : ""}`,
     read: ["trait", "type", "who", "to", "cost"],
   }),
-  AttachSelf: (i) => (isObj(i.to) && i.to.kind === "character" ? { text: `attach this card to ${typeof i.to.name === "string" ? `the character titled "${i.to.name}"` : `a ${typeof i.to.trait === "string" ? `${i.to.trait} ` : ""}character of any player (the first player chooses it)`}${i.to.unlimited === true ? " (any number of copies may be attached)" : " that carries no copy of this card"}; with none this card is discarded`, read: ["to"] } : isObj(i.to) && i.to.kind === "hero" ? { text: `attach this card to ${i.to.control === "firstPlayer" ? "a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)" : typeof i.to.trait === "string" ? `a ${i.to.trait} hero` : "a hero"}`, read: ["to"] } : null),
+  AttachSelf: (i) => (isObj(i.to) && i.to.kind === "character" ? { text: `attach this card to ${typeof i.to.name === "string" ? `the character titled "${i.to.name}"` : `a ${typeof i.to.trait === "string" ? `${i.to.trait} ` : ""}character of any player (the first player chooses it)`}${i.to.unlimited === true ? " (any number of copies may be attached)" : " that carries no copy of this card"}; with none this card is discarded`, read: ["to"] } : isObj(i.to) && i.to.kind === "hero" ? { text: `attach this card to ${i.to.control === "firstPlayer" ? "a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)" : typeof i.to.trait === "string" ? `a ${i.to.trait} hero` : `a hero${typeof i.to.minWillpower === "number" ? ` with ${i.to.minWillpower} or more Willpower` : ""}${i.to.control === "any" ? " of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)" : ""}`}`, read: ["to"] } : null),
   EndQuestPhase: () => ({ text: "end the quest phase at once (no quest resolution)", read: [] }),
   ImmediateAttack: (i, ctx) => ({
     text: `${i.afterThis === true ? "the attacking enemy makes an additional attack against the defending player once this attack has ended" : ctx.attacker !== true ? "this enemy attacks now" : ctx.engagedNext === true ? "the attacking enemy makes an immediate attack against the player it just engaged" : "the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack)"}${i.shadow === false ? (i.keepShadows === true ? ", dealt no new shadow card (the shadow cards it holds all resolve)" : ", dealt no shadow card") : i.afterThis === true ? ", dealt a new shadow card" : ", dealt a new shadow card after its old ones are discarded"}`,

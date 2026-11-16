@@ -1,4 +1,5 @@
 // Pick filters: the noun phrase a Pick, a count or a holder names ("enemy in play (any player) named \"Urdug\""). `src/catalog/effect-schema-pick.ts` owns the keys.
+import { onWords } from "./escape.ts";
 import { done, isObj, joinAnd, jsonOf, quoted, str, type Ctx, type Obj } from "./kit.ts";
 
 export type PickRenderer = (pick: unknown, ctx: Ctx) => string;
@@ -89,6 +90,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["copyOfDefender"], pick.copyOfDefender === true ? "with the title of the defending character" : null);
   note(["minDamage"], typeof pick.minDamage === "number" ? `with at least ${pick.minDamage} damage on it` : null);
   note(["aboveThreat"], pick.aboveThreat === true ? "with an engagement cost higher than the chooser's threat" : null);
+  note(["on"], onWords(pick.on));
   note(["other"], pick.other === true ? "other than this card" : null);
   note(["different"], pick.different === true ? "other than the cards this effect already picked" : null);
   note(["guardsObjectiveLocation"], pick.guardsObjectiveLocation === true ? "attached to an objective-location as its guard" : null);

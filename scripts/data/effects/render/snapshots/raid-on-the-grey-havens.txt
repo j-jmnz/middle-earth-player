@@ -154,7 +154,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): choose character (any player controls) defending
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
-    - [json MoveResources {"verb":"MoveResources","all":true,"when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Raider"}}}]
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): move all the resource tokens from the card picked before the last to the last card picked
 
 ## 11045 White Ship
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -295,7 +295,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
     - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","notTrait":"Ship"}]
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 11067:A:2 (shadow): Shadow: If the attacking enemy is a Raider, place 2 resources on it.
   11067:shadow:1: Shadow
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 290 by template, 44 as JSON)
+(rendered pieces: 294 by template, 42 as JSON)

@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141065:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ImmediateAttackEach {"verb":"ImmediateAttackEach"}]
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141065:A:2 (shadow): Shadow: If this attack destroys a character, remove all progress from the current quest.
   141065:shadow:1: Shadow
@@ -304,4 +304,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141084:shadow:1: Shadow
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 126 by template, 28 as JSON)
+(rendered pieces: 127 by template, 27 as JSON)

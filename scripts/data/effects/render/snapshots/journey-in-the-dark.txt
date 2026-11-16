@@ -342,7 +342,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142087:A:2 (front): Forced: After a character is destroyed, if Overcome by Grief is unattached, attach to a hero. (Counts as a Condition attachment with the text: "Forced: After a character you control is destroyed, exhaust attached hero. Until the end of the round, attached hero cannot ready.")
   142087:forced:1: Forced on the event characterDestroyed
     only if this card is in the staging area
-    - attach this card to a hero
+    - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   142087:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142087:forced:2: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])

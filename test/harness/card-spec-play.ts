@@ -141,13 +141,15 @@ function perform(done: Done, act: Act, next: Act | undefined, picks: string[], s
       return finish(send(run, { type: "Choose", optionId: act.id }, table.ctx), table.ctx, pick);
     }
     case "commit": {
-      if (run.state.window?.kind !== "fortitudeCommit") {
+      const escape = run.state.window?.kind === "escapeCommit";
+      if (run.state.window?.kind !== "fortitudeCommit" && !escape) {
         // Without the row's records no test is made: the commit is skipped, and the expectation says whether the row held.
         if (lenient) return run;
-        throw new Error(`commit(${act.heroes.join(", ")}) with no Fortitude test waiting (window ${run.state.window?.kind ?? "none"})`);
+        throw new Error(`commit(${act.heroes.join(", ")}) with no Fortitude or escape test waiting (window ${run.state.window?.kind ?? "none"})`);
       }
-      let sent = send(run, { type: "CommitFortitude", cardIds: act.heroes.map((code) => idOf(run.state, code)) }, table.ctx);
-      for (let guard = 0; guard < 20 && sent.state.window?.kind === "frameAction" && topFrame(sent.state)?.frame === "fortitude"; guard += 1) sent = send(sent, { type: "Pass" }, table.ctx);
+      const cardIds = act.heroes.map((code) => idOf(run.state, code));
+      let sent = send(run, escape ? { type: "CommitEscape", cardIds } : { type: "CommitFortitude", cardIds }, table.ctx);
+      for (let guard = 0; guard < 20 && sent.state.window?.kind === "frameAction" && topFrame(sent.state)?.frame === (escape ? "escape" : "fortitude"); guard += 1) sent = send(sent, { type: "Pass" }, table.ctx);
       return finish(sent, table.ctx, pick);
     }
     case "respond":

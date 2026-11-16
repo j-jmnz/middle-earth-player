@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import { renderAmount } from "./amounts.ts";
-import { CONDITION_TEMPLATES, renderCondition } from "./conditions.ts";
+import { CONDITION_TEMPLATES, ESCAPE_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
 import { newCtx, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
-import { TEMPLATES } from "./verbs.ts";
+import { ESCAPE_SAMPLES, TEMPLATES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
 const HERO = { type: "hero", control: "you" };
-const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
+const SAMPLES: Readonly<Record<string, readonly Obj[]>> = { ...ESCAPE_SAMPLES,
   ModifyStat: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true }, { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", target: "heroes" }],
   Pick: [{ verb: "Pick", pick: HERO }],
   FortitudeTest: [{ verb: "FortitudeTest", who: "firstPlayer", extraCards: { players: true }, extraEyes: { amount: 2, when: { kind: "firstPlayer" } } }],
@@ -18,7 +18,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   PlaceTokensOnCampaignCard: [{ verb: "PlaceTokensOnCampaignCard", amount: 3 }],
   PlaceProgressOn: [{ verb: "PlaceProgressOn", amount: 2, target: "self" }],
   RemoveProgressFrom: [{ verb: "RemoveProgressFrom", amount: 2, named: "Camp" }],
-  PlaceResourceTokens: [{ verb: "PlaceResourceTokens", amount: 2, on: "self" }], DealShadow: [{ verb: "DealShadow", additional: true }], CannotPlay: [{ verb: "CannotPlay", pick: HERO, anyPlayer: true }], UncancelableWhenRevealed: [{ verb: "UncancelableWhenRevealed", trait: "Hazard" }, { verb: "UncancelableWhenRevealed", cardType: "treachery" }, { verb: "UncancelableWhenRevealed", firstRevealedEachRound: true }], DamageOncePerRound: [{ verb: "DamageOncePerRound", amount: 1, target: "picked" }],
+  PlaceResourceTokens: [{ verb: "PlaceResourceTokens", amount: 2, on: "self" }, { verb: "PlaceResourceTokens", amount: 2, code: "02107" }], DealShadow: [{ verb: "DealShadow", additional: true }], CannotPlay: [{ verb: "CannotPlay", pick: HERO, anyPlayer: true }], UncancelableWhenRevealed: [{ verb: "UncancelableWhenRevealed", trait: "Hazard" }, { verb: "UncancelableWhenRevealed", cardType: "treachery" }, { verb: "UncancelableWhenRevealed", firstRevealedEachRound: true }], DamageOncePerRound: [{ verb: "DamageOncePerRound", amount: 1, target: "picked" }],
   AddResources: [{ verb: "AddResources", amount: 2, to: "self" }],
   DealDamage: [{ verb: "DealDamage" }],
   DamageCard: [{ verb: "DamageCard", amount: 2, target: "self" }],
@@ -353,7 +353,7 @@ describe("effects render read fields, conditions", () => {
     pileHas: [{ kind: "pileHas", pile: "harad", min: 1, max: 3 }],
     facedownUnder: [{ kind: "facedownUnder", code: "144027", min: 3, max: 8, players: true }],
     soleAttacker: [{ kind: "soleAttacker" }],
-    lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }],
+    lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }], ...ESCAPE_CONDITION_SAMPLES,
     lastFortitudePassed: [{ kind: "lastFortitudePassed" }],
     fortitudeFailed: [{ kind: "fortitudeFailed", scope: "round", who: "any" }],
     hostControlledByActor: [{ kind: "hostControlledByActor" }],
@@ -442,7 +442,7 @@ describe("effects render read fields, picks", () => {
     notGuardedByTrait: "Mordor",
     guardsTrait: "Clue", soleMostDamaged: true, attached: true };
   const SAMPLES: readonly Obj[] = [
-    BIG,
+    BIG, { type: "attachment", control: "any", on: { type: "character", control: "you", minWillpower: 3 } },
     { type: "hero", control: "you", captive: "only" },
     { type: "hero", control: "you", captive: "free" },
     { type: "hero", control: "you", captive: "include" },

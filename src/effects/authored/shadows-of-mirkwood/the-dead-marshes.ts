@@ -10,7 +10,8 @@ const GOLLUM_IN_PLAY: Condition = { kind: "canPick", pick: GOLLUM };
 const GOLLUM_ABSENT: Condition = { kind: "not", condition: GOLLUM_IN_PLAY };
 const FAILED: Condition = { kind: "lastEscapeFailed" };
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
-const STAGED_LOCATION: PickSpec = { type: "location", control: "any", stagingOnly: true };
+// The Bog is placed after its When Revealed resolves (rr.staging), so it is not counted: another location only (the engine places a revealed card before its effects resolve).
+const OTHER_STAGED_LOCATION: PickSpec = { type: "location", control: "any", stagingOnly: true, other: true };
 const LORE_HERO: PickSpec = { type: "hero", control: "you", sphere: "lore", state: "ready" };
 
 // "Place N resource token(s) on Gollum" (02108:A:1, 02109:A:1, ...): on the card in play with his code; nothing when he is out of play.
@@ -111,7 +112,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   escapeValue("02112", 2),
 
   // 02113 Impassable Bog. 1 resource token on Gollum for each location in the staging area as it is revealed (the Bog itself is not there yet). Escape 2.
-  { id: "02113:whenRevealed:1", cardCode: "02113", lines: ["02113:A:1"], timing: "whenRevealed", instructions: [{ verb: "PlaceResourceTokens", amount: { count: STAGED_LOCATION }, code: GOLLUM_CODE }] },
+  { id: "02113:whenRevealed:1", cardCode: "02113", lines: ["02113:A:1"], timing: "whenRevealed", instructions: [{ verb: "PlaceResourceTokens", amount: { count: OTHER_STAGED_LOCATION }, code: GOLLUM_CODE }] },
   escapeValue("02113", 2),
 
   // 02114 The Heart of the Marshes. While it is the active location every card dealt for an escape test counts 1 more Escape, a card with no printed value too. Escape 1.

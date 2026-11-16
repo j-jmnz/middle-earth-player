@@ -2,6 +2,9 @@
 import { cardRef as cardRefWords, renderAmount } from "./amounts.ts";
 import { done, isObj, jsonOf, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
+import { ESCAPE_CONDITIONS } from "./escape.ts";
+
+export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
   activeLocation: "is the active location",
@@ -25,6 +28,7 @@ const range = (min: unknown, max: unknown): string => {
 type Template = (c: Obj, ctx: Ctx) => { text: string; read: readonly string[] } | null;
 
 export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
+  ...ESCAPE_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
   subjectExplored: () => ({ text: "the card the event is about had enough progress to be explored", read: [] }),

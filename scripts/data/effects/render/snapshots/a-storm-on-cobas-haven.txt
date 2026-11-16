@@ -376,7 +376,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - then, if there is a objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
     - choose objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters)
     - the card picked before becomes the guard of the picked card, attached to it in the staging area
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 12134 Sea-ward Tower
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -444,4 +444,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus -4, while this card is in play
 
-(rendered pieces: 202 by template, 64 as JSON)
+(rendered pieces: 203 by template, 63 as JSON)
