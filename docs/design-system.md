@@ -30,6 +30,7 @@ What every screen does. A screen that breaks one is a finding in review.
 6. **Every target is 44 pt.** A smaller visible mark keeps its 44 pt target with a hit slop or a larger pressable.
 7. **Feedback in the same frame.** A press darkens a button about 8% (`PRESSED_FILTER`, `surfaces.ts`: its own fill, darker, on Dark and Light alike; a text button, which has no fill, takes a capsule of shade) and the primary also sinks 1 pt; a row and a panel take the pressed fill. Nothing animates on the scroll path.
 8. **Size classes, not devices.** A layout asks the window's width in logical points (its points over the UI scale), never the device: compact under 600, medium 600 to 839, expanded 840 and up (`sizeClass`, `useSizeClass`, `src/ui/size-class.ts`). See Tablets.
+9. **Click, not tap, on the web and the desktop.** The words say Tap for a finger. On the web and the desktop an instruction in the app's own text says Click ("Click a glowing card to play it, or drag it.", "Click again: planning ends"): `src/ui/web/text.canvaskit.tsx` words it on its way to the screen (`click-words.ts`), so the sentences are written once. A screen reader's labels and hints keep the platform's words.
 
 ## Performance
 
@@ -274,6 +275,7 @@ Design for the window's width, not for iPad against iPhone. The numbers are in `
 
 - **Measured in logical points**: the width is the window's over the UI scale (`paneWidths`, `columnsFor`, `READABLE` 640, `WIDE` 1040, `RAIL` 88).
 - **Two columns only with room**: a screen that splits in a `wide` scroll does so only when the measured width leaves its main column at least 400 (`split-columns.ts`) and the right column has something in it; else it keeps one readable column. A supporting column is 360 to 440 (`paneWidths("supporting")`).
+- **The rail in a short window** (desktop only: a phone never shows a root screen this short, and the phone's tab bar is unchanged). Under 480 pt high (`isShortWindow`) the rail's items shrink from 72 pt to share the height with an 8 pt margin above and below (`compactItemHeight`, `src/screens/nav/rail-fit.ts`, never under 44 pt), icon over a one-line word, so the five tabs and Settings all show with no scroll at the smallest window, 844 by 390 (`src/screens/nav/tab-bar.canvaskit.tsx`).
 - **Lists** keep their full width and inset their content to the 640 reading column (`useListGutter`, `list-gutter.ts`: the list measures itself, seeded from the window's width so the first frame is already in the column, and passes `gutter` as `contentContainerStyle`), so the scrollbar stays at the list's edge. A phone gets no style at all.
 - **Orientation**: a tablet is a screen whose shorter side is 600 points or more (`useIsTablet`). Phone: portrait on every route except the table (landscape) and the card, booklet, glossary and rule screens. Tablet: any orientation on every route except the table (landscape only).
 
@@ -437,7 +439,7 @@ On a tablet: the titles and the empty sentences sit in a 640 `Column`, and the r
 
 `settings.tsx` (`settings/view.tsx`), scene `calm`, a pushed screen opened by the gear or the rail's foot (`settings-open`), screen `app-settings`. Back and the title Settings, then one scrolling page of five `Section` groups, no sub-menus. Each row is a semibold name over a muted detail stating what the setting changes, with a stretched `Segmented` under it (so four words fit at Extra large, wrapping when they do not) or the switch at its right. Every row shows its detail; none is spoken only. The words are in `src/play/chrome/settings-words.ts`.
 
-- **Display:** Theme (Ringwraith, Rivendell, System: the dark and light themes by Middle-earth names, heard as "Ringwraith, dark" and "Rivendell, light"), UI scale (Small, Medium, Large, Extra large), Strong outlines (Follow system, Always, Off; see Color), Title face (Carved, Plain; see Type). The phone's Reduce Transparency and Bold Text have no setting: they follow the phone (see Surfaces and Type).
+- **Display:** Theme (Ringwraith, Rivendell, System: the dark and light themes by Middle-earth names, heard as "Ringwraith, dark" and "Rivendell, light"), UI scale (Small, Medium, Large, Extra large; the desktop build, for a profile that has stored none, starts at Large in a window of 1600 by 900 or more and Extra large from 2400 by 1350, `defaultUiScale`, `src/screens/settings/default-scale.ts`; a stored choice is never replaced), Strong outlines (Follow system, Always, Off; see Color), Title face (Carved, Plain; see Type). The phone's Reduce Transparency and Bold Text have no setting: they follow the phone (see Surfaces and Type).
 - **Performance:** a muted note under the heading: "Lower these if the table stutters or the device runs hot. Gameplay is unchanged." (`app-settings-performance-note`). Card pictures (High, Low) and Moving fog ("Animated fog behind the table. Off saves battery." on Rivendell; dimmed, saying why, when Reduce motion already holds the fog still: "No effect: Reduce motion already stops the fog."; it still saves). Reduce motion and Keep screen awake also affect the device and say so in their detail.
 - **Motion and feel:** Animation speed (Normal, Quick, Slow), Reduce motion (Follow system, Always), Banner closes (After a few seconds, When tapped), Combat spotlight, Haptics.
 - **At the table:** First-game guide, Stops on, Table as a list (Follow screen reader, Always; the reader table on every platform), Confirm time (Standard, Long, No limit; see Two taps in `docs/design-system-table.md`), Keep screen awake, and Responses used every time ("None yet" when empty; otherwise one accent text button per Response under "Played without asking. Tap one to be asked again.", heard as "Ask again: name").
@@ -466,7 +468,7 @@ What a reader hears (`modules/booklet-pdf`): each page is "Page 12 of 32", and a
 
 ### Database
 
-Scene `calm`. Title Database, the failure in body. No retry.
+Scene `calm`. The phone: title Database, the failure in body, no retry. The web and the desktop (`database-error.canvaskit.tsx`): title Your saves, "Your saves could not be read just now." in danger (`database-error`), "Nothing was changed. Try again in a moment.", a Retry primary that reloads the page and so opens the databases again (`database-retry`), and the reason the browser gave as a muted line under them (`database-error-reason`).
 
 ## States
 
