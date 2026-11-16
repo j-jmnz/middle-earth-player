@@ -19,6 +19,8 @@ export type NotesInput = {
   ipa?: { name: string; sha256: string };
   /** The installers the desktop jobs built (the .exe, .zip, .dmg, .AppImage and .deb), each with its SHA-256. */
   desktop?: readonly { name: string; sha256: string }[];
+  /** The desktop build did not finish for this release (the publish job ships the phone builds without it): the notes say there are no desktop files instead of linking them. */
+  desktopMissing?: boolean;
   /** The Windows installer was signed with the project's certificate (the plan job's desktop_signed output), so SmartScreen does not warn first. */
   windowsSigned?: boolean;
   /** The TestFlight public link (the repository variable TESTFLIGHT_URL), set only while the optional TestFlight channel runs. */
@@ -60,12 +62,16 @@ export function renderNotes(input: NotesInput): string {
     "- Android: download the `.apk` below and open it. Allow your browser or file manager to install unknown apps when it asks. It installs over an earlier release and keeps your campaigns.",
     `- Android, with automatic updates: install [Obtainium](https://obtainium.imranr.dev), then tap [Add to Obtainium](${obtainiumUrl(input.repository)}) on your phone, or add \`https://github.com/${input.repository}\` in Obtainium yourself. It installs each new release over the last and keeps your campaigns.`,
     `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle-Earth Player from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The README (Install) has the steps.`,
-    input.windowsSigned
-      ? "- Windows: download the `-win-x64.exe` installer below and run it, or unzip the `-win-x64.zip` and run the app from the folder without installing. The installer is signed."
-      : "- Windows: download the `-win-x64.exe` installer below and run it, or unzip the `-win-x64.zip` and run the app from the folder without installing. The app is not signed, so Windows SmartScreen warns first: choose More info, then Run anyway.",
-    "- Mac: download the `.dmg`, open it and drag Middle-Earth Player to Applications. The app is not signed by Apple, so the first time, right-click it and choose Open, then Open again. It runs on Apple silicon and Intel Macs.",
-    "- Linux: download the `.AppImage`, make it executable (`chmod +x`) and run it, or install the `.deb` with your package manager.",
-    "- The desktop app plays fully offline and keeps your campaigns on that computer; Settings can back them up to a file.",
+    ...(input.desktopMissing
+      ? ["- Windows, Mac and Linux: the desktop app is not part of this release, because its build did not finish. The next release brings it."]
+      : [
+      input.windowsSigned
+        ? "- Windows: download the `-win-x64.exe` installer below and run it, or unzip the `-win-x64.zip` and run the app from the folder without installing. The installer is signed."
+        : "- Windows: download the `-win-x64.exe` installer below and run it, or unzip the `-win-x64.zip` and run the app from the folder without installing. The app is not signed, so Windows SmartScreen warns first: choose More info, then Run anyway.",
+      "- Mac: download the `.dmg`, open it and drag Middle-Earth Player to Applications. The app is not signed by Apple, so the first time, right-click it and choose Open, then Open again. It runs on Apple silicon and Intel Macs.",
+      "- Linux: download the `.AppImage`, make it executable (`chmod +x`) and run it, or install the `.deb` with your package manager.",
+      "- The desktop app plays fully offline and keeps your campaigns on that computer; Settings can back them up to a file.",
+        ]),
   );
   if (input.testflightUrl) out.push(`- Or join the TestFlight beta through [its public link](${input.testflightUrl}); a release reaches it once Apple has reviewed the build.`);
   out.push("");

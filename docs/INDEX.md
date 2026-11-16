@@ -220,9 +220,9 @@ Read the sections your task touches.
     - 471–474 Database (~110)
   - 475–494 States (~620)
 - `docs/development.md` — Development (~2.7K tok)
-- `docs/releasing.md` — Releasing (~4.2K tok)
+- `docs/releasing.md` — Releasing (~4.3K tok)
   - 5–19 Start a release (~290) ← 1
-  - 20–35 Jobs (~1.6K) ← 4
+  - 20–35 Jobs (~1.7K) ← 4
   - 36–60 Caches (~750)
   - 61–95 Signing (~980) ← 2
     - 65–68 Desktop signing (optional) (~220) ← 1
@@ -278,7 +278,7 @@ STATUS.md, then the active phase file.
     - 125–245 Rules and engine (Angmar Awakened) (~5.3K)
     - 246–270 Screens and code (~1.6K)
     - 271–290 Rules and engine (The Two Towers) (~1.4K)
-  - 291–315 Standing decisions (~940)
+  - 291–315 Standing decisions (~950)
 
 ## Live plans
 

@@ -20,6 +20,7 @@ import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf
 //   --apk <file>           adds the APK's name and SHA-256 to the notes; --cert-sha256 <hex> adds its signing certificate
 //   --ipa <file>           adds the IPA's name and SHA-256
 //   --desktop <file>       adds a desktop installer's name and SHA-256; repeat it for each of the three OSes' files
+//   --desktop-missing      says the desktop build did not finish, so the notes carry no desktop files and say so (the publish job passes it instead of --desktop)
 //   --windows-signed       says the Windows installer is signed (the plan job's desktop_signed), so the notes do not warn of SmartScreen
 //   --dry-run              a branch other than main or release/vX.Y only warns, so the pipeline can be tried from any branch
 //   --github-output        writes tag, version and previous_tag to $GITHUB_OUTPUT and the notes to $GITHUB_STEP_SUMMARY
@@ -149,6 +150,7 @@ async function main(log: Log): Promise<void> {
   const apk = apkFile ? { name: path.basename(apkFile), sha256: await fileSha256(apkFile), certificateSha256: flag(args, "--cert-sha256") } : undefined;
   const ipaFile = flag(args, "--ipa");
   const ipa = ipaFile ? { name: path.basename(ipaFile), sha256: await fileSha256(ipaFile) } : undefined;
+  if (args.includes("--desktop-missing") && flagValues(args, "--desktop").length > 0) throw new Error("--desktop-missing and --desktop together: the desktop build either finished or it did not");
   const desktop = await Promise.all(flagValues(args, "--desktop").map(async (file) => ({ name: path.basename(file), sha256: await fileSha256(file) })));
   const notes = renderNotes({
     tag,
@@ -161,6 +163,7 @@ async function main(log: Log): Promise<void> {
     apk,
     ipa,
     desktop: desktop.length > 0 ? desktop : undefined,
+    desktopMissing: args.includes("--desktop-missing"),
     windowsSigned: args.includes("--windows-signed"),
     testflightUrl: process.env.TESTFLIGHT_URL || undefined,
   });

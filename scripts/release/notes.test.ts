@@ -100,4 +100,12 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(renderNotes(base)).toContain("- Windows: download");
     expect(renderNotes(base)).not.toContain("SHA-256");
   });
+
+  it("says the desktop app is missing, with no desktop install line, when its build did not finish", () => {
+    const notes = renderNotes({ ...base, desktopMissing: true });
+    expect(notes).toContain("the desktop app is not part of this release");
+    for (const gone of ["- Windows: download", "- Mac: download", "- Linux: download", "plays fully offline"]) expect(notes).not.toContain(gone);
+    expect(notes).toContain("- Android: download the `.apk`");
+    expect(notes).toContain("- iPhone and iPad:");
+  });
 });

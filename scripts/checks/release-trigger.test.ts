@@ -70,6 +70,18 @@ describe("release.yml desktop jobs", () => {
     expect(all.get("publish")).toContain("pattern: desktop-*");
   });
 
+  it("lets a failed desktop build leave the phone release alone, and still cleans up", () => {
+    const publish = all.get("publish") ?? "";
+    const cond = /^\s*if: (.*)$/m.exec(publish)?.[1] ?? "";
+    expect(cond).toContain("!cancelled()");
+    expect(cond).toContain("!inputs.dry_run");
+    for (const job of ["plan", "checks", "assets", "android", "ios"]) expect(cond, job).toContain(`needs.${job}.result == 'success'`);
+    expect(cond).not.toMatch(/needs\.(desktop|web)\.result == 'success'/);
+    expect(publish).toContain("needs.desktop.result == 'success'");
+    expect(publish).toContain("--desktop-missing");
+    expect(all.get("cleanup")).toContain("if: ${{ !cancelled() }}");
+  });
+
   it("starts the web export beside the assets job and waits for it, as the native builds do", () => {
     for (const job of ["web", "android", "ios"]) expect(all.get(job), job).toContain(".github/scripts/wait-for-assets.sh");
     expect(all.get("web")).toMatch(/needs: \[plan\]/);

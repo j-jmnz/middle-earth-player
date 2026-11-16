@@ -6,6 +6,7 @@ describe("flagValues", () => {
   it("collects every value of a repeated flag, in order, and nothing for a flag not given", () => {
     const args = ["--bump", "patch", "--desktop", "a.exe", "--ipa", "b.ipa", "--desktop", "c.dmg", "--desktop", "d.AppImage"];
     expect(flagValues(args, "--desktop")).toEqual(["a.exe", "c.dmg", "d.AppImage"]);
+    expect(flagValues(["--desktop-missing", "--ipa", "b.ipa"], "--desktop")).toEqual([]);
     expect(flagValues(args, "--apk")).toEqual([]);
   });
 
