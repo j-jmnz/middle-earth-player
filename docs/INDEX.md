@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.2K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~202.2K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~202.3K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~630) ← 3
   - 54–67 Non-goals (~590)
@@ -131,20 +131,20 @@ Read the sections your task touches.
     - 1562–1599 The Tower of Cirith Ungol (~4.4K)
     - 1600–1636 The Black Gate Opens (~4.4K) ← 2
     - 1637–1665 Mount Doom (~4.3K)
-  - 1666–1694 Shadows of Mirkwood (~2.7K) ← 2
-    - 1674–1694 The Hunt for Gollum (~2.1K) ← 1
-  - 1695–1703 Nightmare (~410) ← 20
-  - 1704–1742 Deckbuilding (~2.0K)
-  - 1743–1821 Effects (~3.2K)
-    - 1745–1803 Three layers (~2.4K) ← 10
-    - 1804–1813 Player side quests, contracts and saga cards (~430)
-    - 1814–1817 Window stack (~100)
-    - 1818–1821 Coverage test (~270)
-  - 1822–1844 Data sources (~700) ← 2
-  - 1845–1863 Card images (~1.2K) ← 9
-  - 1864–1889 Persistence and shipping (~2.6K) ← 6
-  - 1890–1931 Screens (~5.0K) ← 1
-    - 1916–1931 Table screen (~1.8K) ← 3
+  - 1666–1695 Shadows of Mirkwood (~2.7K) ← 2
+    - 1674–1695 The Hunt for Gollum (~2.1K) ← 1
+  - 1696–1704 Nightmare (~410) ← 20
+  - 1705–1743 Deckbuilding (~2.0K)
+  - 1744–1822 Effects (~3.2K)
+    - 1746–1804 Three layers (~2.4K) ← 10
+    - 1805–1814 Player side quests, contracts and saga cards (~430)
+    - 1815–1818 Window stack (~100)
+    - 1819–1822 Coverage test (~270)
+  - 1823–1845 Data sources (~700) ← 2
+  - 1846–1864 Card images (~1.2K) ← 9
+  - 1865–1890 Persistence and shipping (~2.6K) ← 6
+  - 1891–1932 Screens (~5.0K) ← 1
+    - 1917–1932 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~57.1K tok)
   - 5–8 Overview (~150) ← 1
   - 9–23 Top bar (~3.1K) ← 4
