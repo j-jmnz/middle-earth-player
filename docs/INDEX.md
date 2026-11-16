@@ -217,7 +217,15 @@ Read the sections your task touches.
     - 466–469 Database (~20)
   - 470–489 States (~620)
 - `docs/development.md` — Development (~1.9K tok)
-- `docs/releasing.md` — Releasing (~2.6K tok)
+- `docs/releasing.md` — Releasing (~3.1K tok)
+  - 5–19 Start a release (~290) ← 1
+  - 20–32 Jobs (~1.1K) ← 2
+  - 33–47 Caches (~450)
+  - 48–78 Signing (~760) ← 1
+    - 52–65 Android key (~250) ← 1
+    - 66–78 TestFlight (optional) (~420) ← 1
+  - 79–82 Installing (~60)
+  - 83–93 Troubleshooting (~390)
 
 ## Agent procedures
 
