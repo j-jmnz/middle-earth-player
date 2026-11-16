@@ -353,7 +353,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:constant:1: Constant
     - this card: stat immuneToPlayerCards 1, while this card is in play
   144076:constant:2: Constant
-    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area)
+    - this card is controlled by the first player while this holds
 
 144076:A:2 (front): Forced: After the players quest unsuccessfully, flip Sméagol to Gollum.
   144076:forced:1: Forced after the players quest unsuccessfully

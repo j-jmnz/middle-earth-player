@@ -43,7 +43,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 02037:A:2 (front): If Grimbeorn the Old has 8 or more resource tokens on him, he joins the first player as an ally.
   02037:constant:2: Constant
     only if the card with code 02037 in play holds at least 8 resource token(s)
-    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area)
+    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area, faceup and ready)
 
 02037:A:3 (front): Action: Spend 1 Leadership resource to place that resource on Grimbeorn the Old.
   02037:action:1: Action (cost: pay 1 leadership resource(s); any player may use it)

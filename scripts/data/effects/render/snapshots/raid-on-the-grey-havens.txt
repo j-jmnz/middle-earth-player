@@ -324,7 +324,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11077:A:1 (front): The first player gains control of Captain Sahír.
   11077:constant:1: Constant
-    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area)
+    - this card is controlled by the first player while this holds
 
 11077:A:2 (front): Captain Sahír gets +1 Willpower and +1 Attack for each resource on him (max +6).
   11077:constant:2: Constant
@@ -375,7 +375,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11079:A:1 (front): The last player gains control of Na'asiyah.
   11079:constant:1: Constant
-    - this card is controlled by the last player while this holds (a card in the staging area joins that player's play area)
+    - this card is controlled by the last player while this holds
 
 11079:A:2 (front): Action: While Na'asiyah is attacking or defending, spend 1 resource from her to give her +2 Attack or +2 Defense for this attack.
   11079:action:2: Action (cost: pay 1 resource(s) from this card's pool)

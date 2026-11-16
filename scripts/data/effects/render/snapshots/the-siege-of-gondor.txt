@@ -211,7 +211,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
   145068:constant:1: Constant
     - this card: stat immuneToPlayerCards 1, while this card is in play
   145068:constant:2: Constant
-    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area)
+    - this card is controlled by the first player while this holds
 
 145068:A:2 (front): Setup: The first player takes control of Army of the Dead.
   145068:campaignSetup:1: Campaign setup

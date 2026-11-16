@@ -12,7 +12,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09016:A:2 (front): The first player gains control of Iârion.
   09016:constant:2: Constant
-    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area)
+    - this card is controlled by the first player while this holds
 
 09016:A:3 (front): Response: After a side quest is revealed from the encounter deck, ready Iârion.
   09016:response:1: Response after a card is revealed (heard about card (any player controls) of card type encounter-side-quest; not for a card found in the encounter discard pile)
