@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildDecklist,
   droppedSentence,
+  fetchFailureMessage,
   parseDecklistRef,
   prebuiltBody,
   prebuiltDecks,
@@ -58,6 +59,21 @@ describe("ringsDbUrl", () => {
   it("names the public JSON of each kind", () => {
     expect(ringsDbUrl({ kind: "decklist", id: "4821" })).toBe("https://ringsdb.com/api/public/decklist/4821.json");
     expect(ringsDbUrl({ kind: "deck", id: "4821" })).toBe("https://ringsdb.com/api/public/deck/4821.json");
+  });
+});
+
+describe("fetchFailureMessage", () => {
+  const deck = { kind: "deck", id: "4821" } as const;
+  const decklist = { kind: "decklist", id: "4821" } as const;
+
+  it("names sharing only when RingsDB refuses a deck", () => {
+    for (const status of [401, 403, 404]) expect(fetchFailureMessage(deck, { kind: "status", status })).toContain("Share my decks");
+    expect(fetchFailureMessage(decklist, { kind: "status", status: 404 })).toBe("RingsDB has no published decklist with that number.");
+  });
+
+  it("says no answer or a server error for what is not a refusal", () => {
+    expect(fetchFailureMessage(deck, { kind: "no-answer" })).toBe("RingsDB did not respond. Check your connection and try again.");
+    expect(fetchFailureMessage(deck, { kind: "status", status: 503 })).toBe("RingsDB could not send that deck (error 503). Try again later.");
   });
 });
 

@@ -56,6 +56,22 @@ export function ringsDbUrl(ref: RingsDbRef): string {
   return `https://ringsdb.com/api/public/${ref.kind}/${ref.id}.json`;
 }
 
+/** How a RingsDB request went wrong: no answer at all, or an answer with an error status. */
+export type FetchFailure = { kind: "no-answer" } | { kind: "status"; status: number };
+
+/**
+ * What the import screen says when RingsDB does not send the deck or decklist. RingsDB answers 404 both for an id it does
+ * not have and for a deck whose owner does not share it (401 or 403 are read the same way), so a refused deck names both
+ * fixes. Only a refusal mentions sharing: a request that got no answer, or a server error, says so instead.
+ */
+export function fetchFailureMessage(ref: RingsDbRef, failure: FetchFailure): string {
+  if (failure.kind === "no-answer") return "RingsDB did not respond. Check your connection and try again.";
+  const refused = failure.status === 401 || failure.status === 403 || failure.status === 404;
+  if (!refused) return `RingsDB could not send that ${ref.kind} (error ${failure.status}). Try again later.`;
+  if (ref.kind === "decklist") return "RingsDB has no published decklist with that number.";
+  return "RingsDB would not send that deck. Check the link is your own deck's page, and that Share my decks is on and saved in your RingsDB account settings.";
+}
+
 export function cardUrl(code: string): string {
   return `https://ringsdb.com/api/public/card/${code}.json`;
 }

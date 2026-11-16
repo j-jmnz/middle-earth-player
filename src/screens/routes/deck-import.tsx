@@ -8,7 +8,7 @@ import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchFi
 import { editSavedDeck, startNewDeck } from "../deck/draft";
 import { savedDeckName } from "../deck/status";
 import { listDecks, readDeck, writeDeck } from "../deck/store";
-import { buildDecklist, cardUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type PrebuiltRow } from "../deck/import";
+import { buildDecklist, cardUrl, droppedSentence, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
 import { useDatabases } from "../data/databases";
 import { poolOf } from "../pool/cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
@@ -17,12 +17,23 @@ import { goBack } from "../nav/go-back";
 import { useListGutter } from "../nav/list-gutter";
 import { showToast } from "../kit/toast";
 
-const FETCH_FAILURE = "RingsDB did not respond.";
-const PRIVATE_DECK = "RingsDB did not return that deck. Make it public in its RingsDB sharing settings.";
+// A failed request, read by fetchFailureMessage (deck/import.ts).
+class RingsDbFailure extends Error {
+  readonly failure: FetchFailure;
+  constructor(failure: FetchFailure) {
+    super("RingsDB request failed");
+    this.failure = failure;
+  }
+}
 
 async function readJson(url: string): Promise<unknown> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(FETCH_FAILURE);
+  let response: Response;
+  try {
+    response = await fetch(url);
+  } catch {
+    throw new RingsDbFailure({ kind: "no-answer" });
+  }
+  if (!response.ok) throw new RingsDbFailure({ kind: "status", status: response.status });
   return response.json() as Promise<unknown>;
 }
 
@@ -40,12 +51,12 @@ async function droppedName(code: string): Promise<string> {
 }
 
 // The try/catch and try/finally below live here because the React Compiler cannot compile them inside a component.
-// The deck or decklist as fetched, or null when the request failed.
-async function fetchJson(url: string): Promise<{ payload: unknown } | null> {
+// The deck or decklist as fetched, how the request failed, or null when the answer was not JSON.
+async function fetchJson(url: string): Promise<{ payload: unknown } | { failure: FetchFailure } | null> {
   try {
     return { payload: await readJson(url) };
-  } catch {
-    return null;
+  } catch (error) {
+    return error instanceof RingsDbFailure ? { failure: error.failure } : null;
   }
 }
 
@@ -92,12 +103,11 @@ export default function DeckImportScreen() {
     }
     await whileBusy(setBusy, async () => {
       const fetched = await fetchJson(ringsDbUrl(ref));
-      if (!fetched) {
-        // RingsDB answers 404 for a deck its owner does not share, so the likely fix is the sharing setting.
-        setMessage(ref.kind === "deck" ? PRIVATE_DECK : FETCH_FAILURE);
+      if (fetched && "failure" in fetched) {
+        setMessage(fetchFailureMessage(ref, fetched.failure));
         return;
       }
-      const body = readDecklistBody(fetched.payload);
+      const body = fetched ? readDecklistBody(fetched.payload) : null;
       if (!body) {
         setMessage("That decklist could not be read.");
         return;
@@ -154,7 +164,7 @@ export default function DeckImportScreen() {
       </View>
       <Section title="RingsDB" className="mt-4" />
       <View className="flex-row">
-        <SearchField testID="deck-import-input" value={value} onChangeText={setValue} placeholder="RingsDB deck or decklist" accessibilityLabel="RingsDB deck or decklist link, or decklist number" search={false} />
+        <SearchField testID="deck-import-input" value={value} onChangeText={setValue} placeholder="RingsDB URL or decklist ID" accessibilityLabel="RingsDB deck or decklist link, or decklist number" search={false} />
       </View>
       {message ? (
         <BodyText tone="danger" className="mt-4">
