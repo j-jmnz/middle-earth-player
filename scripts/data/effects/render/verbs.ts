@@ -4,6 +4,7 @@ import { cardRef, renderAmount } from "./amounts.ts";
 import { renderCondition } from "./conditions.ts";
 import { compact, done, isObj, jsonOf, joinAnd, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
+import { ANGMAR_TEMPLATES } from "./angmar.ts";
 import { ESCAPE_STAT_NOTES, ESCAPE_TEMPLATES } from "./escape.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES, guardianRestrict } from "./guardian.ts";
 
@@ -113,6 +114,7 @@ const FLIP_GOLLUM = {
 
 export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_TEMPLATES,
+  ...ANGMAR_TEMPLATES,
   ...GUARDIAN_TEMPLATES,
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
@@ -326,28 +328,6 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     read: ["target", "trait"],
   }),
   SetStat: (i) => ({ text: `${i.target === "host" ? "the card this one is attached to" : "this card"}: stat ${str(i.stat)} is set to ${str(i.value)}, overriding every other modifier of it`, read: ["stat", "value", "target"] }),
-  // The Dread Realm (src/catalog/families/angmar.ts): Reanimated Dead, the cards that deal themselves as shadow cards and the Wraith and Possession that attach.
-  Reanimate: (i, ctx) => {
-    const seats: Readonly<Record<string, string>> = { firstPlayer: "the first player", controller: "that ally's controller", defending: "the defending player" };
-    const seat = seats[str(i.who)] ?? "the acting player";
-    const from: Readonly<Record<string, string>> = {
-      deckTop: i.count === undefined ? "the top card of their deck" : typeof i.count === "number" ? `the top ${i.count} card(s) of their deck` : `the top X card(s) of their deck, X being ${amount(i.count, ctx)}`,
-      handRandom: "a random card of their hand (chosen with the game's seed)",
-      discardTop: "the card on top of their discard pile, if it is an ally that this effect just discarded from the top of a deck",
-      card: `${cardRef(i.card ?? "picked")}, if it lies in a discard pile`,
-      destroyed: "the character the attack in progress destroyed, if it lies in a discard pile",
-    };
-    return {
-      text: `${seat} reanimates ${from[str(i.from)] ?? str(i.from)}: each is placed facedown ${i.to === "staging" ? "in the staging area" : "in front of them as if it had just engaged them (their engaged Responses hear it)"} and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward`,
-      read: ["from", "count", "card", "who", "to"],
-    };
-  },
-  ResolveWhenRevealedOf: (i) => ({
-    text: i.of === "heldShadows" ? `the "when revealed" effects of each ${str(i.trait)} shadow card dealt to this enemy resolve, in the order dealt, the defending player revealing them (after the shadow effects)` : i.of === "looked" ? `the "when revealed" effects of each ${str(i.trait)} card this effect discarded from the top of the encounter deck resolve, in the order discarded, the acting player revealing them` : `the "when revealed" effects of the ${str(i.trait)} cards named by ${str(i.of)} resolve`,
-    read: ["of", "trait"],
-  }),
-  DealSourceAsShadow: () => ({ text: "this card, out of play, is dealt facedown as a shadow card to the card the effect picked last, an enemy in play (with no progress or damage on it; nothing when no enemy is picked)", read: [] }),
-  AttachEnemyToPicked: () => ({ text: "this enemy, out of play, attaches to the picked card as an attachment: it has no enemy text there and returns to the staging area as an enemy when that card leaves play", read: [] }),
   DestroyHighestCostAlly: () => ({ text: "the ally with the highest printed cost among every player's allies in play (no printed cost or X counts 0; the first player chooses among ties) is destroyed, and is the picked card in its owner's discard pile", read: [] }),
   DiscardOtherInPlay: () => ({ text: "the other card of the event (the card this one was attached to) is discarded if it is still in play", read: [] }),
   MakeSetAsideActive: (i) => ({ text: `the set-aside card with code ${str(i.code)} becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free`, read: ["code"] }),
