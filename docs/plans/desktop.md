@@ -64,11 +64,13 @@ A task that cannot keep one of these stops and reports.
 
 ## C. Mouse, keyboard and window
 
-1. **Table pointer input**, web only and without editing `src/play/canvas/hand-gestures.native.ts`: through the web gate (`table-canvas.tsx` wraps what it draws in a pointer layer), a shim, or a `.canvaskit` variant. Right-click on a card → `onPreview` (same target rules as the 350 ms hold, which stays); `Gesture.Hover` over the hand drives the same lift as the scrub pose (`scrub-pose.ts`) with no haptic; wheel over the hand steps the lifted card. Drag to play already works through the pan.
-2. **Keys.** `src/screens/table/use-table-back.ts` passes `onKeyDown` to a root View, which only receives keys when focused on web: add one window `keydown` listener (web only, torn down on unmount) feeding the same `keyAction` (`src/ui/key-shortcuts.ts`). Add Space/Enter for the primary choice button and arrows for the hand only if `docs/design-system-table.md` gains the rows in the same change.
-3. **Chrome**: `cursor: pointer` on pressables and the focus ring on web (`src/ui/focus-ring.ts` skips web today).
-4. **Leaving**: `src/screens/session/flush-runs-on-leave.ts` (web) flushes `pending-runs.ts` on `visibilitychange` and `pagehide`.
-5. **Sizes**: the table is landscape-only; the window minimum (section E) is set so no layout drops below the compact class the phone supports. `/ux` reviews the expanded-window layouts at 1280×720 and 1920×1080.
+Web only; no shared file's phone path changes (the Android bundle stays byte for byte):
+
+1. **Table pointer input** is `src/play/canvas/hand-gestures.canvaskit.ts`, which `metro.config.js` serves in place of `hand-gestures.native.ts` on the web (generalised to any `X.canvaskit.ts(x)` beside, or in a `web` folder beside, `X.native.ts(x)` or `X.ts(x)`). It returns the phone's gestures as they are and adds right click, hover and wheel from the page's own pointer events, driving the phone hook's scrub values (a gesture composed beside the phone's race would make its drag, scrub, hold and tap run together, and a hover that stayed active would cancel a drag), so the phone file is unchanged. The web's spotlight canvas ignores pointers by style (`held-layer.tsx`), or it would take every click meant for the table.
+2. **Keys**: `play/canvas/table-keys.ts`, mounted by the web gate, sends Escape and Z pressed outside the table's root to the root, where the unchanged `use-table-back.ts` handles them. No Space, Enter or arrow rows: Enter and Space press the focused control, and the canvas takes no keyboard focus.
+3. **Chrome**: react-native-web's `Pressable` already has `cursor: pointer`; the focus ring is `src/ui/web/focus-ring.canvaskit.ts`.
+4. **Leaving**: `src/screens/session/flush-runs-on-leave.ts` flushes on `visibilitychange` and `pagehide`.
+5. **Sizes**: the table is landscape-only and the window minimum (section E) is 844 x 390, the smallest landscape size the phone's compact class gives the table; `/ux` reviews 1280 x 720 and 1920 x 1080.
 
 ## D. Save backup file
 
@@ -81,7 +83,7 @@ New top-level `desktop/` (main-process TypeScript, bundled by esbuild to `deskto
 
 1. `desktop/main.ts`
    - `protocol.registerSchemesAsPrivileged` for `app` (standard, secure, `supportFetchAPI`, `stream`), served from the export folder with COOP `same-origin`, COEP `credentialless`, a strict CSP and `application/wasm`. Path resolution is a pure function in `desktop/serve.ts` (traversal guard, `.html` and `[param].html` fallbacks, `+not-found.html`), the logic of `resolveFile` in `scripts/checks/a11y-web.ts`, moved to one shared module both use.
-   - One `BrowserWindow`: `contextIsolation`, `sandbox`, no `nodeIntegration`, no remote module; minimum size; window bounds remembered; single-instance lock.
+   - One `BrowserWindow`: `contextIsolation`, `sandbox`, no `nodeIntegration`, no remote module; minimum size 844 x 390 (section C, Sizes); window bounds remembered; single-instance lock.
    - Network policy in `desktop/policy.ts` (pure, tested): `session.webRequest` cancels everything but `app://` and `https://ringsdb.com/api/public/`; `will-navigate` is refused; `setWindowOpenHandler` sends only the Settings links (`src/screens/settings/links.ts` hosts) to `shell.openExternal`; every permission request is denied.
    - A minimal menu (Undo, Full screen, Quit, About with the version and licences).
 2. `desktop/preload.ts`: exposes only `accessibilitySupportEnabled` and its change event.

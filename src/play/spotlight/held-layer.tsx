@@ -2,7 +2,7 @@
 // canvas compiles a pipeline the first time it draws with it, and a new canvas would compile them all again at every spotlight, so here the canvas
 // stays mounted, transparent and idle between spotlights, and once the table has settled it draws a warm plan through it (warm-spotlight.tsx), so
 // even the first spotlight finds them built. It stays only while a spotlight can play (not with the Combat spotlight off, reduced motion or a
-// screen reader on). The canvas ignores touches and is invisible while nothing plays. The phone's file is not edited for the web: change the two
+// screen reader on). The canvas ignores touches, clicks and hover and is invisible while nothing plays. The phone's file is not edited for the web: change the two
 // together where they share a line (what the layer holds, and the dark tokens).
 import { Canvas } from "@shopify/react-native-skia";
 import { StyleSheet } from "react-native";
@@ -28,8 +28,10 @@ import { useSpotlightImages } from "./use-spotlight-images.native.ts";
 import { useSpotlightScale } from "./use-spotlight.ts";
 import { WarmSpotlight } from "./warm-spotlight.tsx";
 
-// What the canvas is while no spotlight plays: invisible, and it covers nothing a finger can reach (it ignores touches).
-const HIDDEN = { ...StyleSheet.absoluteFill, opacity: 0 };
+// What the canvas is while a spotlight plays, and while none does (invisible). The Skia canvas on the web ignores the `pointerEvents` prop, so the style says it
+// too: without it the full-screen canvas would take every touch, click and hover meant for the table beneath it.
+const LIVE = { ...StyleSheet.absoluteFill, pointerEvents: "none" } as const;
+const HIDDEN = { ...LIVE, opacity: 0 } as const;
 
 // Memoized: the table renders on every move, and the layer reads its plan and clock from the handoff store, not from props.
 export const HeldSpotlightLayer = memo(function HeldSpotlightLayer({ handoff, picture, pictureRevision, nameOf, sphereOf }: SpotlightLayerProps) {
@@ -61,7 +63,7 @@ export const HeldSpotlightLayer = memo(function HeldSpotlightLayer({ handoff, pi
   if (!live && !canPlay) return null;
   const t = tableTokensByTheme.dark;
   return (
-    <Canvas style={live ? StyleSheet.absoluteFill : HIDDEN} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <Canvas style={live ? LIVE : HIDDEN} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       {live ? <Spotlight plan={plan} progress={progress} images={images} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={t} theme={theme} drift={drift} s={s} nameOf={nameOf} sphereOf={iconOf} k={k} /> : null}
       <WarmSpotlight enabled={canPlay} busy={live} card={player ?? encounter} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={t} theme={theme} drift={drift} s={s} />
     </Canvas>

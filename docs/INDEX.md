@@ -52,7 +52,7 @@ Read the sections your task touches.
   - 222–225 Support (~90)
   - 226–241 Attribution (~410)
   - 242–245 License (~50)
-- `docs/architecture.md` — Architecture (~25.0K tok)
+- `docs/architecture.md` — Architecture (~25.2K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
@@ -69,7 +69,7 @@ Read the sections your task touches.
     - 306–311 Opening a game (~350)
     - 312–318 Continue, Restart and the checkpoint (~380)
   - 319–324 Images (~980) ← 6
-  - 325–379 Screens (~4.4K) ← 1
+  - 325–379 Screens (~4.6K) ← 1
   - 380–385 Catalog build (~410)
   - 386–403 Tests (~2.0K) ← 5
   - 404–419 Performance (~1.2K) ← 4
@@ -143,7 +143,7 @@ Read the sections your task touches.
   - 1831–1856 Persistence and shipping (~2.7K) ← 7
   - 1857–1898 Screens (~4.9K) ← 1
     - 1883–1898 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~57.4K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~58.0K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -161,22 +161,23 @@ Read the sections your task touches.
   - 223–248 Spotlight (~2.6K) ← 33
   - 249–254 Gestures (~620) ← 4
   - 255–258 Hold, slide and release (~940)
-  - 259–264 Peeking at the other seat (~610) ← 1
-  - 265–284 Command column (~2.6K) ← 11
-  - 285–288 Two taps (~420) ← 2
-  - 289–292 One answer, one tap (~240)
-  - 293–296 Stops and Always use (~250)
-  - 297–300 Guide (~120)
-  - 301–317 Choice tray (~5.6K) ← 48
-  - 318–332 Reading panels (~1.6K) ← 5
-  - 333–342 Phase carousel (~680)
-  - 343–348 Quest advance (~530) ← 1
-  - 349–352 Undo (~150)
-  - 353–356 Haptics (~280)
-  - 357–368 Banner (~750) ← 5
-  - 369–388 Screen reader (~2.9K) ← 17
-  - 389–392 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~30.4K tok)
+  - 259–268 Pointer and keys (~570) ← 5
+  - 269–274 Peeking at the other seat (~610) ← 1
+  - 275–294 Command column (~2.6K) ← 11
+  - 295–298 Two taps (~420) ← 2
+  - 299–302 One answer, one tap (~240)
+  - 303–306 Stops and Always use (~250)
+  - 307–310 Guide (~120)
+  - 311–327 Choice tray (~5.6K) ← 48
+  - 328–342 Reading panels (~1.6K) ← 5
+  - 343–352 Phase carousel (~680)
+  - 353–358 Quest advance (~530) ← 1
+  - 359–362 Undo (~150)
+  - 363–366 Haptics (~280)
+  - 367–378 Banner (~750) ← 5
+  - 379–398 Screen reader (~2.9K) ← 18
+  - 399–402 Android Back (~90)
+- `docs/design-system.md` — Design system — Carved Stone (~30.5K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -187,7 +188,7 @@ Read the sections your task touches.
   - 147–168 Backdrops (~1.0K) ← 5
   - 169–177 Navigation (~560) ← 6
   - 178–215 Components (~1.8K) ← 9
-  - 216–230 Screen reader (~920) ← 8
+  - 216–230 Screen reader (~970) ← 8
   - 231–245 Icons (~480) ← 7
   - 246–264 Card art (~740) ← 2
   - 265–279 Tablets (~510) ← 13
@@ -271,20 +272,20 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
-- `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~4.8K tok)
+- `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~4.9K tok)
   - 3–16 Context (~370)
   - 17–26 Decisions taken (~430)
   - 27–39 What does not move (~470) ← 3
   - 40–57 A. The drawn table on web (go/no-go gate) (~820)
   - 58–64 B. Offline pictures and booklets on web (~500) ← 2
-  - 65–72 C. Mouse, keyboard and window (~350)
-  - 73–77 D. Save backup file (~140)
-  - 78–91 E. The Electron shell (~620)
-  - 92–97 F. Tests (~190)
-  - 98–109 G. Release pipeline (~300)
-  - 110–121 H. Docs and policy (~280)
-  - 122–125 Order (~130)
-  - 126–134 Verification (~190)
+  - 65–74 C. Mouse, keyboard and window (~400)
+  - 75–79 D. Save backup file (~140)
+  - 80–93 E. The Electron shell (~630)
+  - 94–99 F. Tests (~190)
+  - 100–111 G. Release pipeline (~300)
+  - 112–123 H. Docs and policy (~280)
+  - 124–127 Order (~130)
+  - 128–136 Verification (~190)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -323,8 +324,8 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (21); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Return of the King (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Angmar Awakened (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)
-- `src/play`: design-system-table.md, Choice tray (41); design-system-table.md, Spotlight (29); design-system-table.md, Cards (25); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
+- `src/play`: design-system-table.md, Choice tray (41); design-system-table.md, Spotlight (29); design-system-table.md, Cards (25); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); design-system-table.md, Pointer and keys (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
 - `src/rules`: brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); brief.md, Angmar Awakened (2); architecture.md, State (1); brief.md, Escape from Mount Gram (1); brief.md, The Black Gate Opens (1); brief.md, The Return of the King (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Briefing (6); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Settings (4); brief.md, Persistence and shipping (3); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); plans/desktop.md, B. Offline pictures and booklets on web (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Screens (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
-- `src/ui`: design-system.md, Settings (4); design-system.md, Type (4); design-system.md, Components (3); design-system-table.md, Screen reader (2); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Surfaces (1)
+- `src/ui`: design-system.md, Settings (4); design-system.md, Type (4); design-system-table.md, Screen reader (3); design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Surfaces (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

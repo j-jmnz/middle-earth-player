@@ -1,7 +1,7 @@
 import { bookletPdfAvailable, bookletPdfUnavailableReason } from "booklet-pdf";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 
 import { BodyText, PrimaryButton, RingMark, Screen, TextButton } from "../../kit/chrome";
 import { bookletName, isBookletId, startPage } from "../../booklets/books";
@@ -124,7 +124,9 @@ export default function Booklet() {
   const reason = bookletPdfAvailable() ? null : bookletPdfUnavailableReason();
   // A build packed without the books (Metro started before `pnpm assets booklets`) says so, so it is not taken for a lost file.
   const notCarried = hasBundledBooklet(id) ? "" : " This build does not carry it; add it from your files.";
-  const missing = reason ? `This build cannot show PDFs. ${reason}` : `This booklet is not on this phone.${notCarried} Scenarios still play without it.`;
+  // The web and the desktop say "in the app"; the branch is one the phone cannot run.
+  const absent = Platform.OS === "web" ? `This booklet is not in the app.${notCarried} Scenarios still play without it.` : `This booklet is not on this phone.${notCarried} Scenarios still play without it.`;
+  const missing = reason ? `This build cannot show PDFs. ${reason}` : absent;
 
   async function add(): Promise<void> {
     if (!id || busy) return;
