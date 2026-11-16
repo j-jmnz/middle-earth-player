@@ -6,8 +6,9 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
-import { heldAmount, type ScenarioState } from "../../../rules/core/state.ts";
+import { expireModifiers, heldAmount, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
+import { notePlaced, progressRoom } from "../../../rules/families/south/locations.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
@@ -52,5 +53,16 @@ describe("the start of The Hills of Emyn Muil", () => {
     expect(heldAmount(synced, hen(synced), "progressCap")).toBe(1);
     const active = { ...synced, cards: { ...synced.cards, [hen(synced)]: { ...synced.cards[hen(synced)]!, zone: "activeLocation" as const } } };
     expect(heldAmount(syncConstants({ ...active, activeLocation: hen(synced), staging: synced.staging.filter((id) => id !== hen(synced)) }, nightmare.ctx), hen(synced), "progressCap")).toBe(0);
+  });
+
+  it("900701:A:2 caps each location in the staging area at 1 progress a round, not all of them together; the next round it is 1 again", () => {
+    const { state, ctx } = game("Nightmare");
+    const synced = syncConstants(state, ctx);
+    const [hen, lhaw] = ["02083", "02084"].map((code) => synced.staging.find((id) => synced.cards[id]?.code === code) ?? "");
+    expect(progressRoom(synced, hen, ctx.cards)).toBe(1);
+    const placed = notePlaced(updateCard(synced, hen, { progress: 1 }), hen, 1);
+    expect(progressRoom(placed, hen, ctx.cards)).toBe(0);
+    expect(progressRoom(placed, lhaw, ctx.cards)).toBe(1);
+    expect(progressRoom(expireModifiers(placed, ["endOfRound"]), hen, ctx.cards)).toBe(1);
   });
 });

@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
-import { allyCard, finish, first, idsOf, legalIntents, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { allyCard, finish, first, idsOf, legalIntents, legalTargets, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { definePrinted } from "../../../rules/core/printed.ts";
@@ -97,6 +97,16 @@ describe("02082:B:1 resolves after the revealed card's own effects", () => {
   it("02082:B:1 sees the location Impassable Chasm returned to the staging area, so the stage gives no surge then; the Chasm gains its own", () => {
     expect(surged("02091", { active: "place" })).toBe(false);
     expect(surged("02091", {})).toBe(true);
+  });
+
+  it("02082:B:1 stacks with a printed Surge (rr.surge): Hazardous Terrain as the first treachery with no location staged reveals two more cards", () => {
+    const made = table({ stage: "02082", phase: "Quest", deck: ["f0", "f0", "f0"] });
+    const state = revealFromTop(made.state, made.ctx, "900708", []).state;
+    expect(idsOf(state, "f0").filter((id) => state.cards[id]?.zone === "staging")).toHaveLength(2);
+    // With a location staged only its printed Surge applies.
+    const held = table({ stage: "02082", phase: "Quest", staging: ["place"], deck: ["f0", "f0", "f0"] });
+    const once = revealFromTop(held.state, held.ctx, "900708", []).state;
+    expect(idsOf(once, "f0").filter((id) => once.cards[id]?.zone === "staging")).toHaveLength(1);
   });
 });
 
@@ -269,12 +279,13 @@ describe("900702:A:1 and A:2 Tunneling Nameless Thing", () => {
     expect(zoneOf(settle(syncConstants(busy.state, busy.ctx), busy.ctx, []), "900702")).toBe("engaged");
   });
 
-  it("900702:A:2 cannot be engaged while no location is active", () => {
-    const made = table({ staging: ["900702"] });
+  it("900702:A:2 may be engaged with no location active (the printed line bars nothing) and then goes straight back to the staging area, without a loop", () => {
+    const made = table({ phase: "Encounter", staging: ["900702"] });
     const id = first(made.state, "900702");
-    expect(syncConstants(made.state, made.ctx).modifiers.some((modifier) => modifier.instanceId === id && modifier.stat === "cannotBeEngaged")).toBe(true);
-    const busy = table({ staging: ["900702"], active: "place" });
-    expect(syncConstants(busy.state, busy.ctx).modifiers.some((modifier) => modifier.stat === "cannotBeEngaged")).toBe(false);
+    const opened = { ...made.state, window: { kind: "optionalEngage" } } as ScenarioState;
+    expect(legalTargets(opened, { type: "Engage" }, made.ctx)).toContain(id);
+    const run = send(start(opened), { type: "Engage", enemyId: id } as PlayerIntent, made.ctx);
+    expect(run.state.cards[id]).toMatchObject({ zone: "staging", controller: null });
   });
 });
 

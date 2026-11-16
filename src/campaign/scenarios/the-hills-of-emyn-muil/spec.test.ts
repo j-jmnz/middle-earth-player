@@ -1,7 +1,7 @@
 // Rules: rr.forced, rr.active-location, rr.travel, rr.reveal, rr.shadow-effects, rr.damage, rr.blank, rr.cannot, rr.step-6-4-3, rr.explored (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, flag, resolve, resourcesOn, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, deckCount, flag, resolve, resourcesOn, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Hills of Emyn Muil (shadows-of-mirkwood part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot say (a play that is not offered, a card that is not reached,
@@ -28,6 +28,7 @@ const ROWS: readonly Row[] = [
   { line: "900704:A:1", name: "Forced: after a character commits to the quest it takes 1 damage", layout: { phase: "Quest", staging: ["900704"] }, act: announce("committed", "dh1"), expect: [damageOn("dh1", 1), damageOn("dh2", 0)] },
   { line: "900706:A:1", name: "When Revealed: a player raises his threat by 5", layout: { phase: "Planning", deck: ["f0"] }, act: [reveal("900706"), answer("threat")], expect: [threat(33)] },
   { line: "900706:A:1", name: "When Revealed: or reveals an additional encounter card", layout: { phase: "Planning", deck: ["f0"] }, act: [reveal("900706"), answer("reveal")], expect: [revealedBy("f0", 0)] },
+  { line: "900708:A:3", name: "Shadow: another shadow card is dealt for the attack even when no Hazard card was shuffled back", layout: {}, act: attack("f3", { shadow: "900708", undefended: true }), expect: [deckCount(2)] },
   { line: "900706:A:2", name: "Shadow: +X Attack, X the Threat of the active location", layout: { active: "place" }, act: attack("f3", { shadow: "900706", undefended: true }), expect: [damageOn("dh1", 3)] },
 ];
 

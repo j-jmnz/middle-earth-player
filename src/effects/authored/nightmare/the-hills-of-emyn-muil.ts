@@ -16,10 +16,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 900701 The Hills of Emyn Muil Nightmare (setup card). A:1 prints nothing the engine reads; A:2 is the progress cap of 18067:B:1, written again here because the shipped ledger holds no Nightmare card for a copy to compare (each location in the staging area takes at most 1 progress a round; the active location is not capped).
   { id: "900701:constant:1", cardCode: "900701", lines: ["900701:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "progressCap", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", stagingOnly: true } }] },
 
-  // 900702 Tunneling Nameless Thing. Forced: after the players travel to a location it engages the first player, from the staging area or from another player. While no location is active it returns to the staging area and cannot be engaged (a state, not a Forced effect).
+  // 900702 Tunneling Nameless Thing. Forced: after the players travel to a location it engages the first player, from the staging area or from another player. While no location is active it returns to the staging area (a state, not a Forced effect; the printed line adds no bar on engaging it).
   { id: "900702:forced:1", cardCode: "900702", lines: ["900702:A:1"], timing: "forced", trigger: "traveled", subject: ANY_LOCATION, instructions: [{ verb: "EngageFirstPlayer", moves: true }] },
   { id: "900702:constant:1", cardCode: "900702", lines: ["900702:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsWithoutActive", amount: 1, until: "whileSourceInPlay", target: "self" }] },
-  { id: "900702:constant:2", cardCode: "900702", lines: ["900702:A:2"], timing: "constant", condition: NO_ACTIVE_LOCATION, instructions: [{ verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }] },
 
   // 900703 Orc Interceptor. +1 Threat and +1 Attack for each resource token on it. Forced: after a location leaves play as an explored location it takes a resource token.
   {
