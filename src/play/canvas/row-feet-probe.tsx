@@ -1,3 +1,5 @@
+// The web gate's copy of the probe in table-canvas.native.tsx (RowFeetProbe): the gate (table-canvas.tsx) answers the rows' feet before CanvasKit has
+// loaded, when that Skia file cannot be imported. Keep the two the same; the phone's file is not edited for the web.
 import { useLayoutEffect } from "react";
 import { useStore } from "zustand";
 

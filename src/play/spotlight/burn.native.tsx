@@ -4,7 +4,6 @@
 // (spotlight/pieces.native.tsx, FlyingCard and Veil).
 import { Group, Paint, RuntimeShader, Skia, type SkRuntimeEffect } from "@shopify/react-native-skia";
 import type { ReactNode } from "react";
-import { Platform } from "react-native";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
 import type { Rect } from "../layout/layout.ts";
@@ -13,12 +12,9 @@ import { BURN, BURN_SKSL, burnSeed, burnThreshold } from "./burn.ts";
 
 let effect: SkRuntimeEffect | null | undefined;
 
-/**
- * The compiled burn shader, compiled once; null when this device's Skia cannot compile it (the target then fades and drops). On the web it is
- * always null: CanvasKit has no image-filter runtime shader (Skia.RuntimeShaderBuilder is not implemented there), so the burn layer cannot run.
- */
+/** The compiled burn shader, compiled once; null when this device's Skia cannot compile it (the target then fades and drops). */
 export function burnEffect(): SkRuntimeEffect | null {
-  if (effect === undefined) effect = Platform.OS === "web" ? null : Skia.RuntimeEffect.Make(BURN_SKSL);
+  if (effect === undefined) effect = Skia.RuntimeEffect.Make(BURN_SKSL);
   return effect;
 }
 

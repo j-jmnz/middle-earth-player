@@ -29,6 +29,7 @@ What already works on web and is reused as is: both SQLite databases (`src/scree
 A task that cannot keep one of these stops and reports.
 
 - The phone app: every `.native` file's behaviour, the spotlight gate, skip, Back, haptics, the banner wait, Undo, relaunch replay.
+- **Phone-only files stay byte for byte as they are (user instruction, 2026-11-16).** Every `*.native.*`, `*.ios.*` and `*.android.*` file (a new one too: it lands in the phone bundle), `modules/**`, `plugins/**`, `app.json`, `app.config.js` and `eas.json` have no diff from `main` on a branch with desktop work; `scripts/checks/phone-files.test.ts` fails and names the file otherwise. The web gets its own code instead, in this order: a web-only sibling with no platform suffix (`table-canvas.tsx`, `layer.tsx`, and files only they import); a shim installed once CanvasKit has loaded (`src/ui/skia/web-shims.ts`), for what CanvasKit or react-native-web lacks, so the unchanged `.native` file runs; and, as a last resort, a `metro.config.js` `resolveRequest` for the web platform that serves `X.canvaskit.ts(x)` in place of `X.native.ts(x)` (never `.web`, which would take the imports of a pure `.ts` of the same stem). A shared file (no platform suffix) gains only a branch a phone cannot run (`Platform.OS === "web"`, a web-only file, a web-only lazy import) or a change that is the same on the phone.
 - The engine: every golden, step log and `data/` file; `ENGINE_VERSION`.
 - `src/play/compiler.test.ts` at zero bailouts; `src/screens` imports nothing from `src/rules`.
 - The save is written synchronously on every accepted intent, on desktop too.
@@ -39,15 +40,17 @@ A task that cannot keep one of these stops and reports.
 ## A. The drawn table on web (go/no-go gate)
 
 1. **Load CanvasKit locally.** New `assets` step copies `node_modules/canvaskit-wasm/bin/full/canvaskit.wasm` to `public/canvaskit.wasm` (gitignored). New `src/ui/skia/skia-web.ts`: one module store (`useSyncExternalStore`) around `LoadSkiaWeb({ locateFile: () => "/canvaskit.wasm" })`, started after first paint from `src/screens/routes/_layout.tsx`, web only.
-2. **Web entry points become gates.** The Skia files keep their `.native.tsx` names (several have pure-logic `.ts` siblings of the same stem, so a rename collides). Each web sibling waits for the store, then lazy-imports its `.native.tsx` by explicit path, so no Skia module is evaluated before CanvasKit or during the static render:
-   - `src/play/canvas/table-canvas.tsx` → `table-canvas.native.tsx` (the list table there is deleted; while CanvasKit loads it shows the reader table, step 5).
-   - `src/play/spotlight/layer.tsx` → `layer.native.tsx`; `use-spotlight.ts` `CANVAS` becomes true on web.
+2. **Web entry points become gates.** The Skia files keep their `.native.tsx` names and are not edited. Each web-only sibling waits for the store, then lazy-imports what it draws by explicit path, so no Skia module is evaluated before CanvasKit or during the static render:
+   - `src/play/canvas/table-canvas.tsx` → `table-canvas.native.tsx` (while CanvasKit loads it shows the reader table, step 5, with its own copy of the rows' feet probe in `row-feet-probe.tsx`).
+   - `src/play/spotlight/layer.tsx` → `held-layer.tsx`, the web's copy of `layer.native.tsx` whose canvas stays mounted and warmed between spotlights; `use-spotlight.ts` `CANVAS` is true everywhere (it already was on the phone).
    - `src/ui/arc-ring.tsx`, `src/screens/art/backdrop.tsx` and `scene-canvas.tsx` keep their CSS ports.
-3. **Assets for Skia on web.**
-   - `src/play/canvas/table-images.native.ts`: `RNImage.resolveAssetSource` does not exist on web, where a required image is `{ uri, width, height }`. Add one helper `assetUri(source)` and widen `ScanAsset.moduleId` (`src/screens/images/scan-map.ts`, written by `scripts/build/pack-scans.ts` `writeScanMap`) to `number | { uri: string }`.
-   - `table-fonts.native.ts`: `matchFont` with a system family needs a font manager on CanvasKit; on web draw no text until the bundled typefaces load.
+3. **What Skia on web lacks, as shims** (`src/ui/skia/web-shims.ts`, installed by `skia-web-load.ts` once CanvasKit has loaded, never on the phone):
+   - `Image.resolveAssetSource` (react-native-web has none; the bundler's `require` of a picture is a number expo-asset resolves). `ScanAsset.moduleId` (`src/screens/images/scan-map.ts`, written by `scripts/build/pack-scans.ts` `writeScanMap`) is `number | { uri: string }`.
+   - The system font manager, which CanvasKit does not implement: no face, so no text until the bundled typefaces load.
+   - The burn's runtime shader: no effect compiles, so `burn.native.tsx` takes its fade, drop and darken fallback.
+   - Freeing an image: CanvasKit frees at once and the scene that drew it is replaced a few tasks later, so a disposed image is freed after 500 ms.
    - `table-assets.native.ts`: confirm `MakeImageFromEncoded` on the `.svg` icons; rasterize them in `scripts/` if CanvasKit refuses.
-   - Verify on CanvasKit: `Skia.Surface.Make` + `makeImageSnapshot` + `dispose` (`table-images`), `MakeOffscreen` (`src/ui/fog/fog.native.tsx`), `Atlas` / `useRSXformBuffer` / `useTexture` (`particles.native.tsx`). `RuntimeEffect` is already proven by `src/play/spotlight/burn.test.ts`.
+   - Verify on CanvasKit: `Skia.Surface.Make` + `makeImageSnapshot` + `dispose` (`table-images`), `MakeOffscreen` (`src/ui/fog/fog.native.tsx`), `Atlas` / `useRSXformBuffer` / `useTexture` (`particles.native.tsx`).
 4. **Measure.** A scratch Playwright script (not committed) opens `/e2e/duo` → `/table/save-e2e-duo` in Chromium and records frame times idle, during a card motion and during a spotlight. **Gate: within the 6 ms a frame budget of `.claude/rules/code-standards.md` on a mid laptop profile (4× CPU throttle reported beside the unthrottled number). If not, stop and report with the numbers before any later section.**
 5. **Reader table on web.** `src/ui/screen-reader.ts` `useReaderMode` honours "Table as a list" on web; `src/play/chrome/setting-rows.tsx` shows the row; `reader-table.tsx` replaces the deleted list. On desktop, "Follow screen reader" reads Electron's `accessibilitySupportEnabled` through the preload (section E).
 6. **Checks that key on paths**: `scripts/checks/a11y.test.ts` exceptions for `table-canvas.tsx`; `scripts/checks/a11y-web.ts` `OPEN` counts for the Table screen; `ACCESSIBILITY.md` Known gaps.
@@ -61,7 +64,7 @@ A task that cannot keep one of these stops and reports.
 
 ## C. Mouse, keyboard and window
 
-1. **Table pointer input** in `src/play/canvas/hand-gestures.native.ts`, added to the existing `Gesture.Race`, web only: right-click on a card → `onPreview` (same target rules as the 350 ms hold, which stays); `Gesture.Hover` over the hand drives the same lift as the scrub pose (`scrub-pose.ts`) with no haptic; wheel over the hand steps the lifted card. Drag to play already works through the pan.
+1. **Table pointer input**, web only and without editing `src/play/canvas/hand-gestures.native.ts`: through the web gate (`table-canvas.tsx` wraps what it draws in a pointer layer), a shim, or a `.canvaskit` variant. Right-click on a card → `onPreview` (same target rules as the 350 ms hold, which stays); `Gesture.Hover` over the hand drives the same lift as the scrub pose (`scrub-pose.ts`) with no haptic; wheel over the hand steps the lifted card. Drag to play already works through the pan.
 2. **Keys.** `src/screens/table/use-table-back.ts` passes `onKeyDown` to a root View, which only receives keys when focused on web: add one window `keydown` listener (web only, torn down on unmount) feeding the same `keyAction` (`src/ui/key-shortcuts.ts`). Add Space/Enter for the primary choice button and arrows for the hand only if `docs/design-system-table.md` gains the rows in the same change.
 3. **Chrome**: `cursor: pointer` on pressables and the focus ring on web (`src/ui/focus-ring.ts` skips web today).
 4. **Leaving**: `src/screens/session/flush-runs-on-leave.ts` (web) flushes `pending-runs.ts` on `visibilitychange` and `pagehide`.

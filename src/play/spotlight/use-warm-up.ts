@@ -1,4 +1,4 @@
-// The web layer's warm-up clock (spotlight/layer.native.tsx, warm-plan.ts). Once the layer can play a spotlight and the table has had time to
+// The web layer's warm-up clock (spotlight/held-layer.tsx, warm-plan.ts). Once the layer can play a spotlight and the table has had time to
 // settle, the browser is idle for a moment, and then the clock steps through a warm plan one animation frame at a time: each step is one
 // frame the layer's persistent canvas draws, hidden, so the pipelines the spotlight needs are compiled before a real attack asks for them.
 // It does nothing while a spotlight plays (the real one has the canvas) and starts over if it was cut short; every timer and frame it

@@ -32,7 +32,6 @@ import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "../store/peek.ts";
 import { actingSeat, lookedOf, shownSeat, stacksUnder } from "../store/selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { ReaderTable } from "./reader-table.tsx";
-import { RowFeetProbe } from "./row-feet-probe.tsx";
 import { useReaderMode } from "../../ui/screen-reader.ts";
 import { usePictureHold } from "../../ui/showcase/use-picture-hold.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
@@ -215,6 +214,20 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
       </GestureDetector>
     </>
   );
+}
+
+// Until the screen has measured the command column and its dock (`reach` null) the table is not laid out: this only tells the screen the rows' feet, which
+// do not depend on the reach, so the first table that is drawn, folded and answered is the one the reach decides, and a resumed game opens as the same moment reached in play.
+function RowFeetProbe({ store, width, height, column, onRowFeet, facts, bottomInset }: TableCanvasProps) {
+  const s = useUiScale();
+  const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
+  const { views, piles } = useViews(store, seat, facts);
+  const stacks = useStore(store, stacksUnder);
+  const feet = rowFeet(tableLayout(width, height, views, piles, { bottomInset, scale: s, stacks, column }));
+  useLayoutEffect(() => {
+    onRowFeet?.({ staging: feet.staging, engaged: feet.engaged });
+  }, [onRowFeet, feet.staging, feet.engaged]);
+  return null;
 }
 
 // With a screen reader on the phone the reader table takes the canvas's place (reader-table.tsx); the probe keeps answering the rows' feet so the command column lays out as it does over the canvas.

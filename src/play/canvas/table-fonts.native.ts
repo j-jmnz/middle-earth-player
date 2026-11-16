@@ -3,7 +3,7 @@
 // (`useSpotFonts`) are loaded once by its layer, not once for each attack it plays; they are null while the file loads. Every file and size is loaded
 // once for the app and shared by the canvas, its token layer and the spotlight's layer (table-assets.native.ts).
 // Every size is Medium's times the UI scale (ui-scale.ts, user request, 2026-10-28), which the canvas root passes in.
-import { matchFont, Skia, type SkFont } from "@shopify/react-native-skia";
+import { matchFont, type SkFont } from "@shopify/react-native-skia";
 import { useMemo } from "react";
 import { Platform } from "react-native";
 
@@ -36,18 +36,11 @@ export function useSpotFonts(scale = 1, plain = false): SpotFonts {
   return useMemo(() => ({ pill, count, word, number, stamp, note }), [pill, count, word, number, stamp, note]);
 }
 
-// The face drawn while a file loads: the phone's system face. CanvasKit has no system font manager (matchFamilyStyle is not implemented on the web),
-// so the web has none: a font with no typeface draws no text until the bundled files load.
-function systemFont(family: string, fontSize: number, bold: boolean): SkFont {
-  if (Platform.OS === "web") return Skia.Font(undefined, fontSize);
-  return bold ? matchFont({ fontFamily: family, fontSize, fontWeight: "bold" }) : matchFont({ fontFamily: family, fontSize });
-}
-
 export function useTableFonts(scale = 1, plain = false): Fonts {
   const family = Platform.select({ ios: "Helvetica", default: "sans-serif" });
-  const systemNames = useMemo(() => systemFont(family, 11 * scale, false), [family, scale]);
-  const systemSmall = useMemo(() => systemFont(family, 10 * scale, true), [family, scale]);
-  const systemBadge = useMemo(() => systemFont(family, 11 * scale, true), [family, scale]);
+  const systemNames = useMemo(() => matchFont({ fontFamily: family, fontSize: 11 * scale }), [family, scale]);
+  const systemSmall = useMemo(() => matchFont({ fontFamily: family, fontSize: 10 * scale, fontWeight: "bold" }), [family, scale]);
+  const systemBadge = useMemo(() => matchFont({ fontFamily: family, fontSize: 11 * scale, fontWeight: "bold" }), [family, scale]);
   const names = useSharedFont(BARLOW, 12 * scale);
   const small = useSharedFont(BARLOW_BOLD, 11 * scale);
   const badge = useSharedFont(BARLOW_BOLD, 12 * scale);

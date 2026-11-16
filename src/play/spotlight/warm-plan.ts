@@ -1,4 +1,4 @@
-// A spotlight nobody sees, for the web layer to draw once while the table is idle (spotlight/layer.native.tsx, use-warm-up.ts): on the
+// A spotlight nobody sees, for the web layer to draw once while the table is idle (spotlight/held-layer.tsx, use-warm-up.ts): on the
 // web a canvas compiles each pipeline the first time something draws with it (about 200 ms for the spotlight), so the layer draws this plan
 // through its one persistent canvas ahead of the first real attack, and every later spotlight finds the pipelines built. Three attacks
 // reach every kind of picture the spotlight draws: a fan with a turned shadow card and a "+n" that hits, one that destroys and one that is

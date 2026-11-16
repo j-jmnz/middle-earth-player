@@ -1,7 +1,7 @@
-// The web layer's warm-up (spotlight/layer.native.tsx, warm-plan.ts, use-warm-up.ts): inside the persistent canvas, a spotlight of the warm
+// The web layer's warm-up (spotlight/held-layer.tsx, warm-plan.ts, use-warm-up.ts): inside the persistent canvas, a spotlight of the warm
 // plan that draws, hidden, a few frames while the table is idle, so every pipeline a real spotlight draws with is compiled before it plays.
 // It is a component of the canvas (not of the layer) so that its clock, its screen size and its images are not the layer's to render again,
-// and it is mounted on the web only.
+// and it exists on the web only.
 import type { SkImage } from "@shopify/react-native-skia";
 import { useWindowDimensions } from "react-native";
 import { useMemo, type ComponentProps } from "react";

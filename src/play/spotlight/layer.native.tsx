@@ -7,12 +7,8 @@
 // the dark theme's tokens: the stage is dark on the Light theme too; the screen's theme sets only how deep its flat dark is. The black
 // fog's tiles are baked once after the table first paints, and only when a spotlight can play (`useSpotlightScale` above 0), so the
 // first spotlight does not pay for the noise and a table that plays none keeps no tiles.
-// On the web the canvas stays mounted, transparent and idle between spotlights (HOLD_CANVAS): a web canvas compiles a pipeline the first time
-// it draws with it, and a new canvas would compile them all again at every spotlight. Once the table has settled it draws a warm plan through
-// it (spotlight/warm-spotlight.native.tsx), so even the first spotlight finds them built. The canvas ignores touches and is invisible while
-// nothing plays; the phone mounts it only while a spotlight plays, as it always did.
 import { Canvas } from "@shopify/react-native-skia";
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { useStore } from "zustand";
 
@@ -33,12 +29,6 @@ import { tableTokensByTheme } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useSpotlightImages } from "./use-spotlight-images.native.ts";
 import { useSpotlightScale } from "./use-spotlight.ts";
-import { WarmSpotlight } from "./warm-spotlight.native.tsx";
-
-// Whether the canvas stays mounted between spotlights: the web only.
-const HOLD_CANVAS = Platform.OS === "web";
-// What the canvas is while no spotlight plays: invisible, and it covers nothing a finger can reach (it ignores touches).
-const HIDDEN = { ...StyleSheet.absoluteFill, opacity: 0 };
 
 // Memoized: the table renders on every move, and the layer reads its plan and clock from the handoff store, not from props.
 export const SpotlightLayer = memo(function SpotlightLayer({ handoff, picture, pictureRevision, nameOf, sphereOf }: SpotlightLayerProps) {
@@ -66,14 +56,10 @@ export const SpotlightLayer = memo(function SpotlightLayer({ handoff, picture, p
   useEffect(() => {
     if (canPlay) warmFog(EDGE_FOG);
   }, [canPlay]);
-  const live = playing && plan != null && progress != null;
-  // The web keeps the canvas only while a spotlight can play (not with the Combat spotlight off, reduced motion or a screen reader on).
-  if (!live && !(HOLD_CANVAS && canPlay)) return null;
-  const t = tableTokensByTheme.dark;
+  if (!playing || !plan || !progress) return null;
   return (
-    <Canvas style={live ? StyleSheet.absoluteFill : HIDDEN} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {live ? <Spotlight plan={plan} progress={progress} images={images} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={t} theme={theme} drift={drift} s={s} nameOf={nameOf} sphereOf={iconOf} k={k} /> : null}
-      {HOLD_CANVAS ? <WarmSpotlight enabled={canPlay} busy={live} card={player ?? encounter} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={t} theme={theme} drift={drift} s={s} /> : null}
+    <Canvas style={StyleSheet.absoluteFill} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Spotlight plan={plan} progress={progress} images={images} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={tableTokensByTheme.dark} theme={theme} drift={drift} s={s} nameOf={nameOf} sphereOf={iconOf} k={k} />
     </Canvas>
   );
 });
