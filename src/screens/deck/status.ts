@@ -53,7 +53,10 @@ export function deckLootRule(cards: DeckContent["cards"]): LootRule | null {
 export function sideDeckNote(loot: LootRule | null, side: DeckContent["cards"], faces: ReadonlyMap<string, DeckSaveCard>): string {
   if (!loot) return "Cards kept with the deck but not in it. A contract that takes cards from outside the deck takes them from here.";
   const name = faces.get(loot.cardCode)?.name ?? "The contract";
-  return `${name} takes its loot deck from here: ${lootWords(loot)}, ${lootCodes(loot, side, faces).length} so far.`;
+  const found = lootCodes(loot, side, faces).length;
+  const extra = found - loot.size;
+  const chooses = extra > 0 ? `: you leave ${extra} out at Setup` : "";
+  return `${name} takes its loot deck from here: ${lootWords(loot)}, ${found} so far${chooses}.`;
 }
 
 // A ready deck has no words (nothing on the deck screens says it is ready): `text` is what a deck that is not ready still needs.

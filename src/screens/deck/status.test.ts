@@ -51,14 +51,16 @@ describe("a contract's loot deck", () => {
   const deck = (side: { code: string; count: number }[]) => ({ name: "x", heroes: ["h1"], cards: [...allies, { code: "22024", count: 1 }], side });
   const loot = deckLootRule(deck([]).cards);
 
-  it("needs exactly 14 different Item or Artifact attachments in the side deck", () => {
-    expect(deckReadiness(deck(items.slice(0, 13)), faces)).toEqual({ ready: false, text: "The Burglar's Turn: The side deck needs exactly 14 different Item or Artifact attachments for the loot deck (it has 13)." });
+  it("needs at least 14 different Item or Artifact attachments in the side deck", () => {
+    expect(deckReadiness(deck(items.slice(0, 13)), faces)).toEqual({ ready: false, text: "The Burglar's Turn: The side deck needs at least 14 different Item or Artifact attachments for the loot deck (it has 13)." });
     expect(deckReadiness(deck([...items.slice(0, 14), { code: "weapon", count: 2 }]), faces).ready).toBe(true);
-    expect(deckReadiness(deck(items), faces).ready).toBe(false);
+    // More than 14: the player leaves the rest out at Setup.
+    expect(deckReadiness(deck(items), faces).ready).toBe(true);
   });
 
   it("says in the editor how much of the loot deck the side deck holds", () => {
     expect(sideDeckNote(loot, items.slice(0, 9), faces)).toBe("The Burglar's Turn takes its loot deck from here: 14 different Item or Artifact attachments, 9 so far.");
+    expect(sideDeckNote(loot, items, faces)).toBe("The Burglar's Turn takes its loot deck from here: 14 different Item or Artifact attachments, 15 so far: you leave 1 out at Setup.");
     expect(sideDeckNote(null, [], faces)).toMatch(/^Cards kept with the deck but not in it/);
   });
 });

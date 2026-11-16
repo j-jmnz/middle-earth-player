@@ -1,8 +1,9 @@
 // Rules: rr.deckbuilding (data/rules/entries.json). The Rules Reference has no contract span; this follows The Burglar's Turn
 // (22024:A:2): "Setup: Choose 14 different Item or Artifact attachments from your collection and shuffle them together. This is your
-// loot deck." The app keeps no collection, so the player chooses them in the deck's side deck: the deck is not ready to play until
-// its side deck holds exactly that many different titles that qualify, and those are the loot deck the start deals
-// (StartSeat.loot, src/rules/families/sidequests/loot.ts). Other cards in the side deck are left alone.
+// loot deck." The app keeps no collection, so the deck's side deck stands for it (the sideboard is the loot deck, as OCTGN plays it):
+// the deck is not ready to play until its side deck holds at least that many different titles that qualify. The start deals one of each
+// (StartSeat.loot), and with more than the size the player leaves the rest out at Setup (src/rules/families/sidequests/loot.ts). Other
+// cards in the side deck are left alone.
 import type { Effect } from "./boundary.ts";
 import { traitTokens, type DeckSaveCard, type DeckSaveRefusal } from "./deck-save.ts";
 
@@ -54,9 +55,9 @@ export function lootWords(rule: LootRule): string {
   return `${rule.size} different ${traitWords(rule.traits)} ${rule.type}s`;
 }
 
-/** The refusal while the side deck does not hold exactly the loot deck the rule asks for, or null. Named for the contract. */
+/** The refusal while the side deck holds fewer titles than the loot deck the rule asks for, or null. Named for the contract. */
 export function lootRefusal(rule: LootRule, side: readonly Entry[], facts: Facts): DeckSaveRefusal | null {
   const found = lootCodes(rule, side, facts).length;
-  if (found === rule.size) return null;
-  return { cardCode: rule.cardCode, cardName: facts.get(rule.cardCode)?.name ?? null, rule: `The side deck needs exactly ${lootWords(rule)} for the loot deck (it has ${found}).` };
+  if (found >= rule.size) return null;
+  return { cardCode: rule.cardCode, cardName: facts.get(rule.cardCode)?.name ?? null, rule: `The side deck needs at least ${lootWords(rule)} for the loot deck (it has ${found}).` };
 }

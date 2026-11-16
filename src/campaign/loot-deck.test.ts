@@ -59,9 +59,27 @@ describe("The Burglar's Turn's loot deck from the side deck (22024:A:2)", () => 
   });
 
   it("takes one copy of each title and leaves the other side deck cards out", () => {
-    const side = [...loot.slice(0, 14), loot[0]!, events[0]!];
+    const side = [...loot.slice(0, 15), loot[0]!, events[0]!];
     const [seat] = loadoutOf({ world, seatCount: 1, seats: loadout(side).seats, ringBearer: FRODO });
-    expect(seat?.loot).toEqual(loot.slice(0, 14));
+    expect(seat?.loot).toEqual(loot.slice(0, 15));
+  });
+
+  it("asks the player to leave out the titles past 14, and deals the rest", () => {
+    const start = standaloneStart(world, 1, loadout(loot.slice(0, 15)), 1);
+    const ctx = contextOf(world);
+    const kept = reduce(startScenario(start, ctx), { type: "Keep" }, ctx);
+    expect(kept.ok).toBe(true);
+    const asked = kept.ok ? kept.state : null;
+    expect(asked?.window?.kind).toBe("choose");
+    const options = asked?.window?.kind === "choose" ? asked.window.options : [];
+    expect(options).toHaveLength(15);
+    const out = options[0]!;
+    const chosen = reduce(asked!, { type: "Choose", optionId: out }, ctx);
+    expect(chosen.ok).toBe(true);
+    const state = chosen.ok ? chosen.state : null;
+    expect(state?.lootDecks?.[0]).toHaveLength(14);
+    expect(state?.cards[out]?.zone).toBe("removed");
+    expect(Object.values(state?.cards ?? {}).find((card) => card.code === CONTRACT)?.face).toBe("B");
   });
 
   it("still deals a loadout stored before side decks, with no loot deck", () => {

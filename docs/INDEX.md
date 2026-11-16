@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.7K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.8K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~590)
@@ -133,9 +133,9 @@ Read the sections your task touches.
     - 1635–1663 Mount Doom (~4.3K)
   - 1664–1672 Nightmare (~410) ← 19
   - 1673–1713 Deckbuilding (~2.1K)
-  - 1714–1793 Effects (~3.6K)
+  - 1714–1793 Effects (~3.7K)
     - 1716–1774 Three layers (~2.4K) ← 10
-    - 1775–1785 Player side quests, contracts and saga cards (~860) ← 1
+    - 1775–1785 Player side quests, contracts and saga cards (~940)
     - 1786–1789 Window stack (~100)
     - 1790–1793 Coverage test (~270)
   - 1794–1814 Data sources (~530)
@@ -207,7 +207,7 @@ Read the sections your task touches.
     - 380–393 Resolution and standalone outcome (~1.9K) ← 2
     - 394–403 Decks (~920) ← 2
     - 404–413 Deck builder (deck editor) (~1.0K) ← 3
-    - 414–423 Card pool (the Cards tab) (~890) ← 3
+    - 414–423 Card pool (the Cards tab) (~910) ← 3
     - 424–429 Card (~490) ← 2
     - 430–435 Packs and pack cards (~170)
     - 436–449 Settings (~940) ← 11
@@ -264,16 +264,16 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~13.6K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–282 Open items (~12.5K)
+  - 22–281 Open items (~12.4K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
     - 35–76 Fixtures and Maestro (~2.3K)
     - 77–115 Rules and engine (~1.6K)
     - 116–236 Rules and engine (Angmar Awakened) (~5.3K)
-    - 237–262 Screens and code (~1.6K)
-    - 263–282 Rules and engine (The Two Towers) (~1.4K)
-  - 283–303 Standing decisions (~720)
+    - 237–261 Screens and code (~1.6K)
+    - 262–281 Rules and engine (The Two Towers) (~1.4K)
+  - 282–302 Standing decisions (~720)
 
 ## Live plans
 

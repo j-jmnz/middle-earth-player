@@ -345,8 +345,10 @@ export function CardPoolBody({
   );
 }
 
-// The bar's count of the side deck: "12 cards", or "9 of 14 loot" while the deck's contract builds a loot deck from it.
+// The bar's count of the side deck: "12 cards", or "9 of 14 loot" while the deck's contract builds a loot deck from it ("16 loot, 14
+// kept" past the size: the player leaves the rest out at Setup).
 function sideDeckLine(count: number, loot: { found: number; size: number } | null): string {
+  if (loot && loot.found > loot.size) return `${loot.found} loot, ${loot.size} kept`;
   if (loot) return `${loot.found} of ${loot.size} loot`;
   return `${count} ${count === 1 ? "card" : "cards"}`;
 }
