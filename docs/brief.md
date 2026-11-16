@@ -1756,6 +1756,7 @@ Shadows of Mirkwood part 4 (pack `HoEM`), standalone only. Every printed line of
 - A Hurrying Darkness (900706:A:1): each player chooses in turn, the first player first, and a revealed encounter card resolves before the next player chooses (agent recommendation for the sequencing; "not as a group", https://visionofthepalantir.com/2019/01/05/nightmare-the-hills-of-emyn-muil/, community).
 - Blast of Savage Wind (900707:A:2): the +2 Threat reaches Emyn Muil locations that arrive later in the round, in the staging area or active (`faq.lasting-effects`, `rr.lasting-effects`).
 - Hazardous Terrain (900708:A:3): "Then, deal another shadow card" is dealt whether or not a Hazard card was shuffled back, the shuffle counting as resolved with none to move (the same reading as Bee Pastures in Conflict at the Carrock; `rr.then` does not say whether shuffling nothing resolves; no source speaks to the shadow, and the When Revealed's own "whiff" is described by https://visionofthepalantir.com/2019/01/05/nightmare-the-hills-of-emyn-muil/, community; agent recommendation).
+- The table (the Table step): no record of this scenario creates a tracker, a zone or a held card, so it adds no readout, dial or held-card drawing; the victory display and the stage's restriction (02082:B:2) are drawn as every scenario's are.
 
 ## Nightmare
 

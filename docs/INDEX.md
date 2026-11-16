@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.2K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~209.0K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~209.2K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~630) ← 3
   - 54–67 Non-goals (~590)
@@ -131,23 +131,23 @@ Read the sections your task touches.
     - 1563–1600 The Tower of Cirith Ungol (~4.4K)
     - 1601–1637 The Black Gate Opens (~4.4K) ← 2
     - 1638–1666 Mount Doom (~4.3K)
-  - 1667–1758 Shadows of Mirkwood (~9.3K) ← 2
+  - 1667–1760 Shadows of Mirkwood (~9.6K) ← 2
     - 1675–1696 The Hunt for Gollum (~2.1K) ← 1
     - 1697–1716 Conflict at the Carrock (~2.4K) ← 2
     - 1717–1742 A Journey to Rhosgobel (~2.9K) ← 1
-    - 1743–1758 The Hills of Emyn Muil (~1.3K) ← 1
-  - 1759–1767 Nightmare (~410) ← 20
-  - 1768–1806 Deckbuilding (~2.0K)
-  - 1807–1885 Effects (~3.2K)
-    - 1809–1867 Three layers (~2.4K) ← 10
-    - 1868–1877 Player side quests, contracts and saga cards (~430)
-    - 1878–1881 Window stack (~100)
-    - 1882–1885 Coverage test (~270)
-  - 1886–1908 Data sources (~700) ← 2
-  - 1909–1927 Card images (~1.2K) ← 9
-  - 1928–1953 Persistence and shipping (~2.6K) ← 6
-  - 1954–1995 Screens (~5.0K) ← 1
-    - 1980–1995 Table screen (~1.8K) ← 3
+    - 1743–1760 The Hills of Emyn Muil (~1.5K) ← 1
+  - 1761–1769 Nightmare (~410) ← 20
+  - 1770–1808 Deckbuilding (~2.0K)
+  - 1809–1887 Effects (~3.2K)
+    - 1811–1869 Three layers (~2.4K) ← 10
+    - 1870–1879 Player side quests, contracts and saga cards (~430)
+    - 1880–1883 Window stack (~100)
+    - 1884–1887 Coverage test (~270)
+  - 1888–1910 Data sources (~700) ← 2
+  - 1911–1929 Card images (~1.2K) ← 9
+  - 1930–1955 Persistence and shipping (~2.6K) ← 6
+  - 1956–1997 Screens (~5.0K) ← 1
+    - 1982–1997 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~57.1K tok)
   - 5–8 Overview (~150) ← 1
   - 9–23 Top bar (~3.1K) ← 4

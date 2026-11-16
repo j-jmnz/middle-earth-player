@@ -2,12 +2,12 @@ appId: com.middleearth.player
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `muil-won` (scripts/e2e/shadows-of-mirkwood/the-hills-of-emyn-muil.ts): a real two-handed
-# standalone game of The Hills of Emyn Muil, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `muil-won` (scripts/e2e/shadows-of-mirkwood/the-hills-of-emyn-muil.ts): a real two-handed
+# standalone game of The Hills of Emyn Muil (the One Deck and Defenders of Gondor lists, Easy), parked on its win: no Emyn Muil location in play, 20 Victory points in the victory display, the rail reads Victory.
+# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml): the victory on the table, the outcome with its score, and the Scenarios tab, where the scenario's tile reads as won.
+# A cycle has no campaign: no Resolution, no XP and no next part, so the flow checks nothing more.
 - runFlow:
     file: ../../subflows/standalone-win.yaml
     env:
       FIXTURE: muil-won
       SCENARIO_ID: the-hills-of-emyn-muil
-# TODO: this scenario's own assertions on the outcome screen after the win (the score).
