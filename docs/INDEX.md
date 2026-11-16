@@ -75,7 +75,7 @@ Read the sections your task touches.
   - 402–417 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.1K tok)
   - 17–40 Sections (~490)
-  - 41–52 Product (~590) ← 2
+  - 41–52 Product (~590) ← 3
   - 53–66 Non-goals (~590)
   - 67–87 Decisions (~840)
   - 88–117 Stack (~950)
@@ -271,6 +271,20 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
+- `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~4.1K tok)
+  - 3–16 Context (~370)
+  - 17–25 Decisions taken (~280)
+  - 26–37 What does not move (~200)
+  - 38–53 A. The drawn table on web (go/no-go gate) (~750)
+  - 54–60 B. Offline pictures and booklets on web (~320)
+  - 61–68 C. Mouse, keyboard and window (~320)
+  - 69–73 D. Save backup file (~140)
+  - 74–87 E. The Electron shell (~620)
+  - 88–93 F. Tests (~190)
+  - 94–105 G. Release pipeline (~300)
+  - 106–117 H. Docs and policy (~280)
+  - 118–121 Order (~130)
+  - 122–130 Verification (~190)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
