@@ -235,7 +235,6 @@ No phase is open.
 - Renderer gaps, The Dread Realm (behaviour proven by tests): A Fell Dread's highest-threat host without one already (101163:A:1), the location count's zones (10152:B:3), the first player as the Altar's actor (10154:A:2), 10193's Setup verbs and its win line print as JSON or "(no instructions)".
 
 ### Screens and code
-- Messenger of the King: its Setup resolving after the mulligan rests on a designer ruling reported in the FFG forums, not an official FAQ (community-settled, not user-confirmed; `docs/brief.md`, Player side quests, contracts and saga cards).
 - The Burglar's Turn: a side deck with more than 14 qualifying titles is refused, not chosen from (agent recommendation, not user-confirmed; `docs/brief.md`, Player side quests, contracts and saga cards).
 - Fire in the Night: the table has no side-quest deck area or current-quest mark (`docs/brief.md`, Ered Mithrin).
 - Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
