@@ -1,6 +1,8 @@
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
-import { renderNotes, type NotesInput } from "./notes.ts";
+import { obtainiumUrl, renderNotes, type NotesInput } from "./notes.ts";
 import { parseCommit } from "./version.ts";
 
 const base: NotesInput = {
@@ -56,5 +58,17 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes).toContain("`middle-earth-player-v0.4.0.ipa` SHA-256: `ef56`");
     expect(notes).not.toContain("TestFlight");
     expect(renderNotes({ ...base, testflightUrl: "https://testflight.apple.com/join/abc" })).toContain("[its public link](https://testflight.apple.com/join/abc)");
+  });
+
+  it("links the app into Obtainium for Android updates, with the link the README gives", () => {
+    const url = obtainiumUrl(base.repository);
+    expect(JSON.parse(decodeURIComponent(url.split("obtainium://app/")[1] ?? ""))).toEqual({
+      id: "com.middleearth.player",
+      url: "https://github.com/j-jmnz/middle-earth-player",
+      author: "j-jmnz",
+      name: "Middle-Earth Player",
+    });
+    expect(renderNotes(base)).toContain(`[Add to Obtainium](${url})`);
+    expect(readFileSync(new URL("../../README.md", import.meta.url), "utf8")).toContain(`[Add to Obtainium](${url})`);
   });
 });
