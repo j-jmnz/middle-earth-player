@@ -54,6 +54,7 @@ import rhudaurFixtures from "./fixtures/the-treachery-of-rhudaur.json";
 import dumFixtures from "./fixtures/the-battle-of-carn-dum.json";
 import realmFixtures from "./fixtures/the-dread-realm.json";
 import gollumFixtures from "./fixtures/the-hunt-for-gollum.json";
+import carrockFixtures from "./fixtures/conflict-at-the-carrock.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -126,6 +127,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-battle-of-carn-dum": dumFixtures,
   "the-dread-realm": realmFixtures,
   "the-hunt-for-gollum": gollumFixtures,
+  "conflict-at-the-carrock": carrockFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
