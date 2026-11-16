@@ -14,7 +14,9 @@ const JOINS: Effect = {
   condition: { kind: "tokens", code: "helper", min: 2 },
   instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self", intoPlay: true }],
 };
-const ctx = playCtx([JOINS]);
+// Wilyador (02064:A:1): he joins the first player and then follows the token (`follows`).
+const FOLLOWS: Effect = { id: "wil:constant:1", cardCode: "wil", lines: ["02064:A:1"], timing: "constant", instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self", intoPlay: true, follows: true }] };
+const ctx = playCtx([JOINS, FOLLOWS]);
 
 describe("02037:A:2 an objective ally that joins the first player", () => {
   it("stays in the staging area until it has enough resource tokens, then enters the first player's play area", () => {
@@ -36,5 +38,18 @@ describe("02037:A:2 an objective ally that joins the first player", () => {
     const joined = run(full, ctx);
     const passed = run({ ...joined, firstPlayer: 0 }, ctx);
     expect(passed.cards[staged.id]).toMatchObject({ zone: "play", controller: 1 });
+  });
+});
+
+describe("02064:A:1 an objective ally that follows the first player token", () => {
+  it("joins the first player from the staging area, then passes to each new first player", () => {
+    const table = seat(2, ["dwarf"]);
+    const staged = put({ ...table.state, firstPlayer: 1 }, "wil", "staging");
+    const joined = run(staged.state, ctx);
+    expect(joined.cards[staged.id]).toMatchObject({ zone: "play", controller: 1 });
+    const passed = run({ ...joined, firstPlayer: 0 }, ctx);
+    expect(passed.cards[staged.id]).toMatchObject({ zone: "play", controller: 0 });
+    expect(passed.seats[0]?.play).toContain(staged.id);
+    expect(passed.seats[1]?.play).not.toContain(staged.id);
   });
 });

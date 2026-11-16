@@ -1,6 +1,7 @@
 // Effect items that act on a picked or found card: ReturnToStaging, AttachSelf, the searches, ShuffleIntoDeck, DiscardRestricted, ReadyHero,
 // BarAttack, PlaceProgressOnLocation. The candidates are found, one is chosen (a player chooses only among different cards), and the verb applies.
 import type { Instruction } from "../../catalog/boundary.ts";
+import { characters } from "../combat/combat.ts";
 import { frameScope, refCard } from "./amounts.ts";
 import { askTarget } from "../windows/choices.ts";
 import { hasTrait } from "./conditions.ts";
@@ -57,7 +58,12 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     }
     case "AttachSelf": {
       const code = sourceId ? state.cards[sourceId]?.code : undefined;
-      const free = (id: string): boolean => !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) && (code == null || !attachBlocked(state, ctx, id, code));
+      const unlimited = instruction.to.kind === "character" && instruction.to.unlimited === true;
+      const free = (id: string): boolean => (unlimited || !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code)) && (code == null || !attachBlocked(state, ctx, id, code));
+      if (instruction.to.kind === "character") {
+        const { trait, name } = instruction.to;
+        return livingSeats(state).flatMap((seat) => characters(state, seat, ctx.cards)).filter((id) => (trait == null || hasTrait(state, id, trait, ctx)) && (name == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name) && free(id));
+      }
       if (instruction.to.kind === "hero") {
         const seat = attachSeat(state, instruction, item.seat, sourceId);
         const hosts = seat == null ? [] : attachHeroHosts(state, instruction.to, seat, ctx.cards).filter(free);

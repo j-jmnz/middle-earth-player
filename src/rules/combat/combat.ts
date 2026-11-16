@@ -5,7 +5,7 @@ import { familyAttackReason, familyDefenseReason, familyUndefendedTargets } from
 import { announceEnemyAttacked, attackerLimitReached } from "../families/aflame/attack.ts";
 import { attackBarred } from "../interpret/constants.ts";
 import type { EngineStep } from "../core/intents.ts";
-import { modifiedStat, placeDamage } from "../core/keywords.ts";
+import { hasKeyword, modifiedStat, placeDamage } from "../core/keywords.ts";
 import { heldAmountByClass } from "../core/holder-classes.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
@@ -23,6 +23,7 @@ import { undefendedExtras } from "../families/defense/damage.ts";
 import { markDefender, moreDefenders, staysReadyToDefend } from "../families/defense/defenders.ts";
 import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
+import { flightAttackBarred } from "../families/attack/flight.ts";
 import { countsDefense, struck } from "../families/attack/strike.ts";
 import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
@@ -241,6 +242,8 @@ export function canAttack(
   if (!isCharacterType(printed) || attacker.host != null) return false;
   // A ship-objective attacks only ship-enemies (dcce.ship-objectives), and only Ship objectives can be declared as attackers against Raider Flagship (12124:A:3).
   if (familyAttackReason(state, enemyId, printed, printedOf(cards, enemy.code), attackerId)) return false;
+  // "Only Eagle characters or characters with ranged can attack ... Mirkwood Flock" (02070:A:1), "cannot be attacked by characters with the ranged keyword" (900606:A:2).
+  if (flightAttackBarred(state, enemyId, attackerId, cards)) return false;
   // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
   if (flagged(state, enemyId, "cannotBeAttacked") || attackerLimitReached(state, enemyId)) return false;
   if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
@@ -250,7 +253,7 @@ export function canAttack(
   // attackers against it, with their own characters and ranged characters of the others (rr.ranged).
   if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithFirst")) {
     if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
-    return attacker.controller === seat || printed.keywords.ranged || flagged(state, attackerId, "ranged");
+    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack/targets.ts).
@@ -258,7 +261,7 @@ export function canAttack(
   // A location in the staging area the first player may attack in the combat phase as if it were engaged with him (Cracked Pillar, 41028:A:1).
   if (enemy.zone === "staging" && flagged(state, enemyId, "attackableAsEngaged")) {
     if (flagged(state, attackerId, "cannotAttack") || state.phase !== "Combat" || seat !== state.firstPlayer) return false;
-    return attacker.controller === seat || printed.keywords.ranged || flagged(state, attackerId, "ranged");
+    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
   if (enemy.zone !== "engaged" && !(open && enemy.zone === "staging")) return stagingAttackable(state, seat, attackerId, enemyId, cards);
   // The declaring seat's own characters attack its own enemies. A ranged character may attack an enemy engaged with
@@ -266,7 +269,7 @@ export function canAttack(
   if (flagged(state, attackerId, "cannotAttack")) return false;
   if (open) return true;
   if (attacker.controller === seat && enemy.controller === seat) return true;
-  return printed.keywords.ranged || flagged(state, attackerId, "ranged");
+  return hasKeyword(state, attackerId, "ranged", cards);
 }
 
 export function legalAttackEnemies(state: ScenarioState, seat: number, attackerId: string, cards: Cards, exhaustedOk = false): string[] {
@@ -407,6 +410,7 @@ export function undefendedTargets(state: ScenarioState, seat: number, cards: Car
   // A character another card lets take it for this player (08093), whoever controls that character.
   const all = [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))];
   // A shadow effect says the damage must go on one of these heroes (families/south/watcher.ts, 900408:A:3).
+  // A character of another player named by the shadow effect (Wilyador, 02070:A:2) is among them though the seat does not control it.
   const only = state.pendingAttack?.onlyHeroes;
-  return only ? all.filter((id) => only.includes(id)) : all;
+  return only ? [...all.filter((id) => only.includes(id)), ...only.filter((id) => !all.includes(id) && state.cards[id] != null && inPlay(state.cards[id].zone))] : all;
 }

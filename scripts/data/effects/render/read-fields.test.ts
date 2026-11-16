@@ -22,7 +22,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   AddResources: [{ verb: "AddResources", amount: 2, to: "self" }],
   DealDamage: [{ verb: "DealDamage" }],
   DamageCard: [{ verb: "DamageCard", amount: 2, target: "self" }],
-  Heal: [{ verb: "Heal", amount: 2, target: "self" }, { verb: "Heal", all: true, target: "self" }],
+  Heal: [{ verb: "Heal", amount: 2, target: "self", athelas: true }, { verb: "Heal", all: true, target: "self" }],
   Exhaust: [{ verb: "Exhaust", target: "picked", who: "actor" }],
   Ready: [{ verb: "Ready", target: "picked" }],
   Discard: [{ verb: "Discard", target: "picked" }],
@@ -34,7 +34,8 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ReturnToStaging: [{ verb: "ReturnToStaging", target: "picked" }],
   ReturnToStage: [{ verb: "ReturnToStage", stage: 2 }],
   RemoveAllProgress: [{ verb: "RemoveAllProgress", target: "self" }, { verb: "RemoveAllProgress", pick: HERO }],
-  UndefendedDamageTo: [{ verb: "UndefendedDamageTo", pick: HERO }],
+  UndefendedDamageTo: [{ verb: "UndefendedDamageTo", pick: HERO, character: true }, { verb: "UndefendedDamageTo", pick: HERO }],
+  EngageSeatWith: [{ verb: "EngageSeatWith", pick: HERO, controls: true }, { verb: "EngageSeatWith", pick: HERO }], GrantSurgeToSubject: [{ verb: "GrantSurgeToSubject" }], PlaceDamageOn: [{ verb: "PlaceDamageOn", code: "02064", amount: 2 }], SearchToStaging: [{ verb: "SearchToStaging", code: "900602" }], PlaceDamage: [{ verb: "PlaceDamage", amount: 2, card: "picked" }, { verb: "PlaceDamage", amount: { players: true } }],
   LookAtTop: [{ verb: "LookAtTop", count: 3, deck: "own" }],
   DiscardOtherLooked: [{ verb: "DiscardOtherLooked" }],
   SetX: [{ verb: "SetX", value: 2 }],
@@ -151,11 +152,11 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   DamageHeldCaptive: [{ verb: "DamageHeldCaptive", amount: 1 }],
   DiscardRandomFromHand: [{ verb: "DiscardRandomFromHand", amount: 2, who: "eachSeat", remember: true }],
   SearchReveal: [{ verb: "SearchReveal", trait: "Uruk-hai", type: "enemy", who: "firstPlayer", to: "engaged", cost: true }],
-  AttachSelf: [{ verb: "AttachSelf", to: { kind: "hero", trait: "Warrior" } }, { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } }],
+  AttachSelf: [{ verb: "AttachSelf", to: { kind: "hero", trait: "Warrior" } }, { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } }, { verb: "AttachSelf", to: { kind: "character", trait: "Eagle", unlimited: true } }, { verb: "AttachSelf", to: { kind: "character", name: "Wilyador" } }],
   MakeActive: [{ verb: "MakeActive" }, { verb: "MakeActive", target: "self" }],
-  ControlledBy: [{ verb: "ControlledBy", who: "firstPlayer", card: "host" }, { verb: "ControlledBy", who: "lastPlayer", card: "self", intoPlay: true }],
+  ControlledBy: [{ verb: "ControlledBy", who: "firstPlayer", card: "host" }, { verb: "ControlledBy", who: "lastPlayer", card: "self", intoPlay: true, follows: true }],
   ShuffleIntoDeck: [{ verb: "ShuffleIntoDeck", code: "02048", trait: "Troll", type: "enemy", each: true }],
-  CancelEffect: [{ verb: "CancelEffect" }], SetAsideFromDeck: [{ verb: "SetAsideFromDeck", code: "900503" }], RemoveFromGame: [{ verb: "RemoveFromGame", self: true }],
+  CancelEffect: [{ verb: "CancelEffect" }], SetAsideFromDeck: [{ verb: "SetAsideFromDeck", code: "900503" }], RemoveFromGame: [{ verb: "RemoveFromGame", self: true }, { verb: "RemoveFromGame", card: "other" }],
   EndQuestPhase: [{ verb: "EndQuestPhase" }],
   ImmediateAttack: [{ verb: "ImmediateAttack", shadow: false, keepShadows: true }],
   ConsiderUndefended: [{ verb: "ConsiderUndefended" }],
@@ -439,15 +440,14 @@ describe("effects render read fields, picks", () => {
     questedThisRound: true,
     guardedByTrait: "Mordor",
     notGuardedByTrait: "Mordor",
-    guardsTrait: "Clue",
-  };
+    guardsTrait: "Clue", soleMostDamaged: true, attached: true };
   const SAMPLES: readonly Obj[] = [
     BIG,
     { type: "hero", control: "you", captive: "only" },
     { type: "hero", control: "you", captive: "free" },
     { type: "hero", control: "you", captive: "include" },
     { type: "hero", control: "you", committed: false, progress: false, damaged: false },
-    { type: "hero", control: "you", hasAttachment: { trait: "Clue" }, hasGuard: false, isGuard: false },
+    { type: "hero", control: "you", hasAttachment: { trait: "Clue" }, hasGuard: false, isGuard: false }, { type: "hero", control: "you", hasAttachment: { none: true }, attached: false },
   ];
   const render: Render = (value, ctx) => renderPick(value, ctx);
 

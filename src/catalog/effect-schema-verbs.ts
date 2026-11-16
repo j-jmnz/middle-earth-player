@@ -235,6 +235,9 @@ export const simpleVerbs = [
       // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
       // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
       z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),
+      // A character (hero or ally, an objective ally included) of any player, chosen by the first player: with `trait`, one that has the Trait now ("Attach to an Eagle character", 900607:A:2; a character that lost it is not offered); with `name`, the
+      // character of that title ("Attach to Wilyador", 900608:A:2). A character that carries a copy is not offered, unless `unlimited` (the card has no limit per character). With none to host it the card is discarded.
+      z.strictObject({ kind: z.literal("character"), trait: z.string().min(1).optional(), name: z.string().min(1).optional(), unlimited: z.literal(true).optional() }),
     ]),
     ...when,
   }),

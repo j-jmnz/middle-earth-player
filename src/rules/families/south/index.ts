@@ -37,7 +37,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DamageActiveLocation":
       return markLocationDamage(state);
     case "UndefendedDamageTo":
-      return markHeroDamage(state, instruction.pick, focus, ctx);
+      return markHeroDamage(state, instruction.pick, focus, ctx, instruction.character === true);
     case "AttackFromStaging":
       return attackFromStaging(state, instruction, focus, ctx, steps);
     case "PickHighestEngagement":

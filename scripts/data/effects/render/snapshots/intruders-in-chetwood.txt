@@ -330,7 +330,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 10158:A:1 (front): Forced: After an attack damages a character, place 1 damage on Protect the Innocent.
   10158:forced:1: Forced on the event attackDamagedCharacter (heard about enemy (any player controls) or in the staging area)
-    - [json PlaceDamageOn {"verb":"PlaceDamageOn","code":"10158","amount":1}]
+    - place 1 damage token(s) on the card in play with code 10158 (placed, not dealt: nothing cancels or reduces them)
 
 10158:A:2 (front): When progress would be placed on Protect the Innocent, remove that much damage from it instead.
   10158:constant:1: Constant
@@ -342,4 +342,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 204 by template, 9 as JSON)
+(rendered pieces: 205 by template, 8 as JSON)

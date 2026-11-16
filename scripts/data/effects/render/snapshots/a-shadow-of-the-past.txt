@@ -394,7 +394,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   906101:forced:1: Forced on the event stageRevealed
     only if all of: (the card the event is about is a card (any player controls) named "Escape to Buckland") and (the card with code 906102 is not in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchToStaging {"verb":"SearchToStaging","code":"906102"}]
+    - search the encounter deck, discard pile and victory display for the card with code 906102 and add it to the staging area (not revealed; nothing when none is found)
     - shuffle the encounter deck
 
 906101:B:1 (back): Begin with the standard quest deck and encounter deck for the A Shadow of the Past scenario.
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 214 by template, 44 as JSON)
+(rendered pieces: 215 by template, 43 as JSON)

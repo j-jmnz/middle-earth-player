@@ -65,9 +65,12 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["isHost"], pick.isHost === true ? "that this card is attached to" : null);
   note(["hasShadow"], pick.hasShadow === true ? "with a shadow card" : null);
   note(["looked"], pick.looked === true ? "among the cards this effect looked at or discarded" : null);
+  note(["soleMostDamaged"], pick.soleMostDamaged === true ? "with more damage than each other character in play (a tie for the most matches none)" : null);
+  note(["attached"], pick.attached === true ? "that is attached to another card" : pick.attached === false ? "that is attached to no card" : null);
   const attached = isObj(pick.hasAttachment) && Array.isArray(pick.hasAttachment.names) && Object.keys(pick.hasAttachment).every((key) => key === "names" || key === "none") ? pick.hasAttachment : null;
+  const attachedNone = isObj(pick.hasAttachment) && pick.hasAttachment.none === true && Object.keys(pick.hasAttachment).length === 1;
   const attachedTrait = isObj(pick.hasAttachment) && typeof pick.hasAttachment.trait === "string" && Object.keys(pick.hasAttachment).length === 1 ? pick.hasAttachment.trait : null;
-  note(["hasAttachment"], attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : attachedTrait ? `with a ${attachedTrait} card attached` : null);
+  note(["hasAttachment"], attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : attachedTrait ? `with a ${attachedTrait} card attached` : attachedNone ? "with no attachment of any kind" : null);
   note(["active"], pick.active === true ? "that is the active location" : null);
   note(["hasGuard"], pick.hasGuard === true ? "that has an encounter card attached as its guard" : pick.hasGuard === false ? "that has no encounter card attached (free of encounters)" : null);
   note(["isGuard"], pick.isGuard === true ? "that is attached to an objective as its guard" : pick.isGuard === false ? "that is not guarding an objective" : null);

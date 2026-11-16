@@ -66,7 +66,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 145034:A:1 (front): Forced: At the end of the round, place a damage token here. Then, if there are 4 damage tokens here, discard Pelargir Quays and assign 4 damage among characters in play.
   145034:forced:1: Forced at the end of the round
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"self"}]
+    - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
     - then, if 3 is less than damage of this card (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player assigns 4 damage among the character (any player controls) chosen by the first player, one at a time
     - then, if 3 is less than damage of this card (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
 
@@ -254,4 +254,4 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
         * option "damage" (only if there is a character (you control) to choose):
           - the acting player assigns the resource tokens on objective (any player controls) named "The Corsair Fleet" damage among the character (you control), one at a time
 
-(rendered pieces: 182 by template, 4 as JSON)
+(rendered pieces: 183 by template, 3 as JSON)

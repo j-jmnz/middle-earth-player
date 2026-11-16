@@ -13,6 +13,7 @@ import { countMatching, pickCandidates } from "./pick.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { guardsTitled } from "../families/objectives/pick.ts";
 import { guardedSafeLocation } from "../families/angmar/safe.ts";
+import { flightDefenseBarred } from "../families/attack/flight.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
@@ -184,6 +185,8 @@ export function defenseBlocked(state: ScenarioState, ctx: ReduceContext, defende
   const attack = state.pendingAttack;
   const defender = state.cards[defenderId];
   if (!attack || !defender) return false;
+  // "Only Eagle characters or characters with ranged can ... defend against Mirkwood Flock" (02070:A:1).
+  if (flightDefenseBarred(state, attack.enemyId, defenderId, ctx.cards)) return true;
   return restricted(state, ctx, "defend").some(
     (rule) =>
       rule.sourceId === attack.enemyId &&

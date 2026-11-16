@@ -379,6 +379,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A host that leaves play rescues every card captured underneath it (mec108.captured-cards).
   // A card captured with a hero that is itself put into a captured deck stays with it (the boons set aside with it, mec108.captured-deck).
   if (moved.capture && inPlay(current.zone) && !inPlay(dest.zone) && dest.zone !== "captured") moved = rescueUnder(moved, id, areaHeadOf(state, id));
+  // A card placed in the encounter discard pile is announced where the table asks for it (`noteEncounterDiscards`, 900601:A:4).
+  if (dest.zone === "encounterDiscard" && current.zone !== "encounterDiscard" && state.modifiers.length > 0 && flagged(state, "table", "noteEncounterDiscards")) moved = queueEvent(moved, { trigger: "encounterDiscarded", seat: null, subject: id });
   // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller/zone.ts).
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted/zone.ts).

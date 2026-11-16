@@ -336,7 +336,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143079:B:2 (back): Forced: After a non-unique location is explored, place 1 damage here. Then, if there are 5 damage tokens here, advance to stage 3A.
   143079:forced:1: Forced on the event locationExplored (heard about non-unique location (any player controls))
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"self"}]
+    - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143080","when":{"kind":"less","left":4,"right":{"stat":"damage","of":"self"}}}]
 
 143079:B:3 (back): Quest Action: Exhaust Ent of Fangorn to place 2 progress on a non-unique location.
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 244 by template, 12 as JSON)
+(rendered pieces: 245 by template, 11 as JSON)

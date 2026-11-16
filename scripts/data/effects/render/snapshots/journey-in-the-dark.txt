@@ -6,7 +6,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142040:A:1 (front): Setup: Set The Balrog, The Great Bridge, and Chamber of Mazarbul aside out of play. Add Doom, Doom, Doom to the staging area and place 10 damage tokens on it. Each player adds 1 different location to the staging area.
   142040:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PlaceDamageOn {"verb":"PlaceDamageOn","code":"142043","amount":10}]
+    - place 10 damage token(s) on the card in play with code 142043 (placed, not dealt: nothing cancels or reduces them)
     - for each player, first player first:
       - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if not (this card is in the staging area)
     - deal 1 damage to its host
 
-(rendered pieces: 195 by template, 13 as JSON)
+(rendered pieces: 196 by template, 12 as JSON)

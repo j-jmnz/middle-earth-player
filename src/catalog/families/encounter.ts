@@ -120,6 +120,9 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // About an encounter card (the event's subject) just placed in the encounter discard pile, from the deck, from play or from anywhere else ("After an Athelas card is placed in the discard pile", 900601:A:4). Announced only in a game whose table holds the flag
+  // `noteEncounterDiscards`, which the Setup of the card that hears it sets.
+  "encounterDiscarded",
   // About an encounter card: it entered play, placed in the staging area once its staging resolved (rr.staging), or put
   // into play by a player card effect (MoveEncounterCard).
   "encounterEnteredPlay",
@@ -136,6 +139,8 @@ const TRIGGERS = [
 ] as const;
 
 const FLAGS = [
+  // Held by the table: a card placed in the encounter discard pile is announced (`encounterDiscarded`).
+  "noteEncounterDiscards",
   // Held by the table until the end of the phase: the staging step reveals this many fewer cards, to a minimum of 0
   // (`revealFewer`) or of 1 (`revealFewerMinOne`).
   "revealFewer",

@@ -286,7 +286,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18072:B:1 (back): The first Spider enemy revealed each quest phase gains surge.
   18072:forced:1: Forced after a card is revealed (heard about Spider enemy (any player controls); limit once per phase; only when the encounter deck revealed it)
     only if it is the Quest phase
-    - [json GrantSurgeToSubject {"verb":"GrantSurgeToSubject"}]
+    - the card just revealed gains surge
 
 18072:B:2 (back): Forced: When a Spider enemy attacks and damages a character, that character cannot ready until the end of the round.
   18072:forced:2: Forced on the event damagedByAttack (heard about character (any player controls))
@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18073:B:1 (back): The first Orc enemy revealed each quest phase gains surge.
   18073:forced:1: Forced after a card is revealed (heard about Orc enemy (any player controls); limit once per phase; only when the encounter deck revealed it)
     only if it is the Quest phase
-    - [json GrantSurgeToSubject {"verb":"GrantSurgeToSubject"}]
+    - the card just revealed gains surge
 
 18073:B:2 (back): Forced: When an Orc enemy attacks and damages a character, that character's controller chooses and discards 1 card from his hand.
   18073:forced:2: Forced on the event damagedByAttack (heard about character (any player controls); event happened to the controller)
@@ -416,4 +416,4 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 248 by template, 46 as JSON)
+(rendered pieces: 250 by template, 44 as JSON)

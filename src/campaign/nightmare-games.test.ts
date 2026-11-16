@@ -36,6 +36,7 @@ const CAMPAIGN_OF: Readonly<Record<string, string>> = {
   "escape-from-dol-guldur": "mirkwood-paths",
   "the-hunt-for-gollum": "shadows-of-mirkwood",
   "conflict-at-the-carrock": "shadows-of-mirkwood",
+  "a-journey-to-rhosgobel": "shadows-of-mirkwood",
 };
 
 function seatFor(campaignId: string): { heroes: string[]; deck: string[]; protect: string } {
