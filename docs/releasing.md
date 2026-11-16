@@ -38,8 +38,8 @@ Each build restores what an earlier run built, so most releases compile only wha
 | --- | --- | --- | --- |
 | `node-cache-<os>-<arch>-pnpm-` | every job that installs | lockfile | The pnpm store, under setup-node's key so `test.yml`'s entries are hits; pruned before it is saved (`.github/actions/install`). |
 | `scans-<os>-` | `assets` | `data/sources.json` and the packing code | The packed card pictures (`.github/actions/pack-assets`). |
-| `ccache-android-`, `ccache-ios-<Xcode build>-` | `android`, `ios` | lockfile | Compiled C, C++ and Objective-C of every native module, at most 1 GB each. Android launches its compilers through ccache from CMake; iOS sets `USE_CCACHE=1`, which the generated Podfile reads. |
-| `gradle-home-` | `android` | lockfile | Gradle's dependencies, wrapper and build cache. |
+| `ccache-android-`, `ccache-ios-launcher-<Xcode build>-` | `android`, `ios` | lockfile | Compiled C, C++ and Objective-C of every native module, at most 1 GB each. Android launches its compilers through ccache from CMake; iOS passes it to `xcodebuild` as `C_COMPILER_LAUNCHER`, which keeps Xcode's explicit modules on, and reads its settings from ccache's own config file. |
+| `gradle-deps-` | `android` | lockfile | Gradle's downloaded dependencies (`caches/modules-2`), its build cache (`caches/build-cache-1`) and the Gradle distribution. |
 | `pods-` | `ios` | lockfile | The CocoaPods download cache and React Native's prebuilt core, dependencies and Hermes. |
 | `metro-android-`, `metro-ios-` | `android`, `ios` | lockfile, `babel.config.js`, `metro.config.js`, commit | The Metro transforms the last build used (`EXPO_METRO_CACHE_RESTORE_DIR` and `EXPO_METRO_CACHE_OUTPUT_DIR`, read by `@expo/metro-config`). |
 

@@ -168,11 +168,14 @@ jobs:
           restore-keys: ccache-android-
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
+          # The downloaded dependencies, the build cache and the Gradle distribution; the transforms and the per-version
+          # caches Gradle rebuilds quickly, and with them the entry came to 4.4 GiB.
           path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-home-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: gradle-home-
+            ~/.gradle/caches/modules-2
+            ~/.gradle/caches/build-cache-1
+            ~/.gradle/wrapper/dists
+          key: gradle-deps-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: gradle-deps-
       # Metro reads the restored transforms and writes the ones this build used to its output directory, which is saved
       # under this commit, so the next release starts from them.
       - id: metro
@@ -221,6 +224,7 @@ jobs:
           cd android
           ./gradlew assembleRelease --no-daemon --build-cache -PreactNativeArchitectures=arm64-v8a "${signing[@]}"
           ccache --show-stats
+          du -sh ~/.gradle/caches/* ~/.gradle/wrapper/* 2>/dev/null | sort -h | tail -n 8
           mkdir -p "$RUNNER_TEMP/out"
           mv app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/out/$APK_NAME"
           rm -f "$RUNNER_TEMP/release.jks"
@@ -274,9 +278,6 @@ jobs:
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       SIGNED: ${{ needs.plan.outputs.ios_signed }}
       IPA_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
-      # The Podfile expo prebuild writes reads this and compiles every pod and the app through React Native's ccache
-      # wrappers (node_modules/react-native/scripts/xcode), which carry its ccache.conf.
-      USE_CCACHE: "1"
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_INSTALL_CLEANUP: "1"
     steps:
@@ -292,10 +293,15 @@ jobs:
         name: Point the build caches at the runner
         run: |
           command -v ccache > /dev/null || brew install ccache
-          # ccache's own default directory, so the cache is found whether or not Xcode hands CCACHE_DIR to the compiler.
+          # Xcode starts ccache itself (C_COMPILER_LAUNCHER, in Archive) and may not hand it this job's environment, so
+          # ccache uses its default directory and reads its settings from the config file there. The sloppiness is React
+          # Native's (node_modules/react-native/scripts/xcode/ccache.conf).
+          ccache --set-config=max_size=1G
+          ccache --set-config=sloppiness=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
+          ccache --set-config=depend_mode=true
+          ccache --set-config=inode_cache=true
           {
             echo "CCACHE_DIR=$HOME/Library/Caches/ccache"
-            echo "CCACHE_MAXSIZE=1G"
             echo "EXPO_METRO_CACHE_RESTORE_DIR=$RUNNER_TEMP/metro-restored"
             echo "EXPO_METRO_CACHE_OUTPUT_DIR=$RUNNER_TEMP/metro"
           } >> "$GITHUB_ENV"
@@ -303,8 +309,8 @@ jobs:
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/Library/Caches/ccache
-          key: ccache-ios-${{ steps.caches.outputs.xcode }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: ccache-ios-${{ steps.caches.outputs.xcode }}-
+          key: ccache-ios-launcher-${{ steps.caches.outputs.xcode }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: ccache-ios-launcher-${{ steps.caches.outputs.xcode }}-
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
@@ -351,10 +357,16 @@ jobs:
           else
             signing=(CODE_SIGNING_ALLOWED=NO)
           fi
+          # Xcode's own launcher setting, on the command line so it reaches every target, the pods included. Explicit
+          # modules stay on with it; a compiler swapped in through CC turns them off.
           ccache --zero-stats > /dev/null
+          set -o pipefail
           xcodebuild -quiet -workspace "$workspace" -scheme "$scheme" -configuration Release -destination generic/platform=iOS \
-            -archivePath "$archive" archive "${signing[@]}"
+            -archivePath "$archive" archive "${signing[@]}" \
+            C_COMPILER_LAUNCHER="$(command -v ccache)" CLANG_ENABLE_EXPLICIT_MODULES_WITH_COMPILER_LAUNCHER=YES \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild.log"
           ccache --show-stats
+          echo "explicit-modules notes: $(grep -c 'Explicit modules is enabled but the compiler was not recognized' "$RUNNER_TEMP/xcodebuild.log" || true)"
           # The sideloading IPA: the app in Payload/, zipped.
           mkdir -p "$RUNNER_TEMP/out" "$RUNNER_TEMP/ipa/Payload"
           cp -R "$archive"/Products/Applications/*.app "$RUNNER_TEMP/ipa/Payload/"
