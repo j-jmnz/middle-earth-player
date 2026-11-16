@@ -111,6 +111,16 @@ The app isn't on the Play Store or the App Store. On Android you install the APK
 
 To update, install the newer `.apk` the same way and your saves carry over. Don't uninstall the old version first, because that deletes your saves.
 
+#### Automatic updates with Obtainium
+
+[Obtainium](https://obtainium.imranr.dev) is a free app that checks the Releases page for you and installs each new version as it comes out.
+
+1. Install Obtainium from its [GitHub releases](https://github.com/ImranR98/Obtainium/releases/latest) or from F-Droid.
+2. On your phone, tap [Add to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.middleearth.player%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fj-jmnz%2Fmiddle-earth-player%22%2C%22author%22%3A%22j-jmnz%22%2C%22name%22%3A%22Middle-Earth%20Player%22%7D). If the link doesn't open Obtainium, open Obtainium, tap Add App, paste `https://github.com/j-jmnz/middle-earth-player`, and tap Add.
+3. Tap Install. If Middle-Earth Player is already on the phone, Obtainium picks it up and offers the next release as an update.
+
+Obtainium checks in the background and tells you when an update is ready. On Android 12 or later it can install updates without asking each time, but only for apps it installed itself. Your saves carry over just as they do with a manual update.
+
 ### iPhone and iPad
 
 1. Set up [SideStore](https://sidestore.io), which refreshes the app on the phone itself, or [AltStore Classic](https://altstore.io), which refreshes it through AltServer on a computer on the same Wi-Fi. AltStore PAL won't work, because it only installs apps from its own marketplace.
