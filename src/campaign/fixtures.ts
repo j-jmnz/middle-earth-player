@@ -56,6 +56,7 @@ import realmFixtures from "./fixtures/the-dread-realm.json";
 import gollumFixtures from "./fixtures/the-hunt-for-gollum.json";
 import carrockFixtures from "./fixtures/conflict-at-the-carrock.json";
 import rhosgobelFixtures from "./fixtures/a-journey-to-rhosgobel.json";
+import muilFixtures from "./fixtures/the-hills-of-emyn-muil.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -130,6 +131,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-hunt-for-gollum": gollumFixtures,
   "conflict-at-the-carrock": carrockFixtures,
   "a-journey-to-rhosgobel": rhosgobelFixtures,
+  "the-hills-of-emyn-muil": muilFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
