@@ -87,9 +87,10 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
       const id = instruction.card === "host" ? source.host : source.id;
       const holder = instruction.who === "lastPlayer" ? lastPlayer(next) : next.firstPlayer;
       const held = id ? next.cards[id] : undefined;
-      // An objective ally in the staging area joins the first player's play area, faceup and ready (Grimbeorn the Old, 02037:A:2).
+      // An objective ally in the staging area joins the first player's play area, faceup and ready, and stays with that player when the first player token moves on: "joins the first player" is one change of
+      // control, not a rule that follows the token (Grimbeorn the Old, 02037:A:2; docs/brief.md, Conflict at the Carrock).
       if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
-      else if (id && held?.controller !== holder) next = giveControl(next, id, holder);
+      else if (id && instruction.intoPlay !== true && held?.controller !== holder) next = giveControl(next, id, holder);
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {
       next = destroyCard(next, source.id, ctx.cards, steps);
     }

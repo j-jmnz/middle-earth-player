@@ -8,6 +8,8 @@ const TROLL: PickSpec = { type: "enemy", control: "any", trait: "Troll", staging
 const SACKED: PickSpec = { type: "attachment", control: "any", names: ["Sacked!"] };
 const ROB_AND_BOB: PickSpec = { type: "enemy", control: "any", names: ["Rob and Bob"] };
 const DAMAGED_TROLL: PickSpec = { ...TROLL, damaged: true };
+// A hero was picked from a discard pile for Time for Supper (the matches test reads the card, not its zone, so it holds once the hero has left the pile).
+const HERO_REMOVED: Condition = { kind: "matches", card: "picked", pick: { type: "hero", control: "any", from: "discard" } };
 const IN_VICTORY: Condition = { kind: "sourceIn", zone: "victory" };
 const SACKED_IN_PLAY: Condition = { kind: "canPick", pick: SACKED };
 const NIGHTMARE_TROLLS = ["900504", "900505", "900506", "900507"] as const;
@@ -49,6 +51,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "response",
     trigger: "enemyDestroyed",
     subject: { type: "enemy", control: "any", trait: "Troll", unique: true },
+    answeredBy: "eventSeat",
     condition: SACKED_IN_PLAY,
     instructions: [{ verb: "Pick", pick: SACKED }, { verb: "Discard", target: { kind: "picked" } }],
   },
@@ -97,9 +100,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "whenRevealed",
     instructions: [
       { verb: "Pick", pick: { type: "hero", control: "any", from: "discard", who: "firstPlayer" } },
-      { verb: "RemoveFromGame", when: { kind: "matches", card: "picked", pick: { type: "hero", control: "any", from: "discard" } } },
+      { verb: "RemoveFromGame", when: HERO_REMOVED },
+      // "Then, heal all damage ...": with no hero to remove the part before "then" does not resolve, so nothing is healed (rr.then) and no damage was removed, which is the surge. The surge test is made before the healing.
+      { verb: "GainSurge", when: { kind: "not", condition: HERO_REMOVED } },
       { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: DAMAGED_TROLL } } },
-      { verb: "Each", pick: DAMAGED_TROLL, instructions: [{ verb: "Heal", all: true, target: "picked" }] },
+      { verb: "Each", pick: DAMAGED_TROLL, when: HERO_REMOVED, instructions: [{ verb: "Heal", all: true, target: "picked" }] },
     ],
   },
   // 900511 Grimbeorn's Folly (stage 3, no quest points). When Revealed: Rob and Bob joins the staging area and each player in turn finds a non-unique Troll enemy there, if able. When Rob and Bob is defeated the players win.

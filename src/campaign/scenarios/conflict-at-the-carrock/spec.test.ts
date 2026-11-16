@@ -1,11 +1,22 @@
 // Rules: rr.active-location, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.reveal, rr.shadow-effects, rr.search (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, defend, endPhase, exhausted, flag, quest, resolve, respond, reveal, travel, stat, threat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, quest, resolve, respond, reveal, travel, stat, threat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Conflict at the Carrock (shadows-of-mirkwood part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
 const ROWS: readonly Row[] = [
+  { line: "900502:A:2", name: "Shadow: against a Troll the defending character does not ready this round", layout: { engaged: ["02038"] }, act: [attack("02038", { shadow: "900502" }), defend("dh1")], expect: [flag("dh1", "cannotReady")] },
+  { line: "900504:A:1", name: "after Nightmare Louis attacks the defending player raises threat by 3", layout: { engaged: ["900504"] }, act: attack("900504", { undefended: true }), expect: [threat(31)] },
+  { line: "900505:A:1", name: "Nightmare Morris is immune to player events", layout: { engaged: ["900505"] }, act: resolve("900505", "constant"), expect: [flag("900505", "immuneToPlayerEvents")] },
+  { line: "900505:A:2", name: "while Nightmare Morris is in the victory display each Troll is immune to player events", layout: { engaged: ["02038"], victory: ["900505"] }, act: resolve("900505", "constant"), expect: [flag("02038", "immuneToPlayerEvents")] },
+  { line: "900506:A:1", name: "Nightmare Rupert's Defense cannot be reduced", layout: { engaged: ["900506"] }, act: resolve("900506", "constant"), expect: [flag("900506", "cannotReduceDefense")] },
+  { line: "900507:A:2", name: "while Nightmare Stuart is in the victory display each Troll cannot have player attachments", layout: { engaged: ["02038"], victory: ["900507"] }, act: resolve("900507", "constant"), expect: [flag("02038", "noPlayerAttachments")] },
+  { line: "900508:A:2", name: "Shadow: against a Troll 4 damage tokens come off the attacker", layout: { engaged: [{ code: "02038", damage: 6 }] }, act: attack("02038", { shadow: "900508" }), expect: [damageOn("02038", 2)] },
+  { line: "02035:A:1", name: "Setup shuffles one of the set-aside Sacked! for each player into the encounter deck", layout: { seats: 2, setAside: ["02048", "02048", "02048", "02048"], deck: ["f0"] }, act: resolve("02035", "setup"), expect: [deckCount(3)] },
+  { line: "02036:B:1", name: "stage 2B puts the four unique Trolls set aside into the staging area", layout: { stage: "02036", setAside: ["02038", "02039", "02040", "02041"] }, act: resolve("02036", "whenRevealed"), expect: [zone("02038", "staging"), zone("02039", "staging"), zone("02040", "staging"), zone("02041", "staging")] },
+  { line: "02038:A:1", name: "a Troll engaged with another player attacks: its defending player raises threat by 3 too", layout: { seats: 2, engaged: ["02038", { code: "02039", seat: 1 }] }, act: attack("02039", { undefended: true }), expect: [threat(31, 1)] },
+  { line: "02042:A:2", name: "Shadow: the defending character gets -1 Defense for the attack", layout: { engaged: ["02038"] }, act: [attack("02038", { shadow: "02042" }), defend("dh1")], expect: [damageOn("dh1", 3)] },
   { line: "02048:A:1", name: "When Revealed: attaches to a hero the first player chooses and bars it from attacking", layout: { deck: ["f0"] }, act: [reveal("02048"), answer("dh1")], expect: [zone("02048", "attached"), flag("dh1", "cannotAttack"), flag("dh1", "cannotQuest")] },
   { line: "02035:B:1", name: "the 7th progress makes The Carrock the active location", layout: { stage: "02035", progress: 6, staging: ["02043"] }, act: quest("success"), expect: [zone("02043", "activeLocation")] },
   { line: "02038:A:1", name: "while Louis is engaged, a Troll's attack raises the threat by 3", layout: { engaged: ["02038"] }, act: attack("02038", { undefended: true }), expect: [threat(31)] },

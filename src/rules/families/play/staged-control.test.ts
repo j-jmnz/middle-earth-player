@@ -28,4 +28,13 @@ describe("02037:A:2 an objective ally that joins the first player", () => {
     expect(joined.staging).not.toContain(staged.id);
     expect(joined.seats[1]?.play).toContain(staged.id);
   });
+
+  it("stays with the player he joined when the first player token moves on", () => {
+    const table = seat(2, ["dwarf"]);
+    const staged = put({ ...table.state, firstPlayer: 1 }, "helper", "staging");
+    const full = { ...staged.state, cards: { ...staged.state.cards, [staged.id]: { ...staged.state.cards[staged.id]!, resources: 2 } } };
+    const joined = run(full, ctx);
+    const passed = run({ ...joined, firstPlayer: 0 }, ctx);
+    expect(passed.cards[staged.id]).toMatchObject({ zone: "play", controller: 1 });
+  });
 });

@@ -26,6 +26,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   Exhaust: [{ verb: "Exhaust", target: "picked", who: "actor" }],
   Ready: [{ verb: "Ready", target: "picked" }],
   Discard: [{ verb: "Discard", target: "picked" }],
+  Destroy: [{ verb: "Destroy", target: "picked" }],
   DiscardFromHand: [{ verb: "DiscardFromHand", amount: 2 }],
   Draw: [{ verb: "Draw", who: "firstPlayer", amount: 2, perHero: "Dwarf", from: "bottom" }],
   RaiseThreat: [{ verb: "RaiseThreat", amount: 2, who: "eachSeat", perCommitted: { type: "hero", exceptSphere: "fellowship" } }],

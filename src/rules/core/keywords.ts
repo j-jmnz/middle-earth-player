@@ -274,7 +274,7 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
 
 // A hero, ally or enemy whose damage reached its hit points: the cards attached to it hear it ("When attached enemy is destroyed", families/attachments/hold.ts), it is
 // destroyed, and Responses and Forced effects hear that a hero or ally (rr.destroy) or an enemy was destroyed. Damage and the sweep below both end this way.
-function destroyAndAnnounce(state: ScenarioState, instance: CardInstance, printed: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
+export function destroyAndAnnounce(state: ScenarioState, instance: CardInstance, printed: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
   let next = state;
   if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, instance.id, printed.type === "hero" ? cards : undefined);
   next = destroyCard(next, instance.id, cards, steps, false, true);

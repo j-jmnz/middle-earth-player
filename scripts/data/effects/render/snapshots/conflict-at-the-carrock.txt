@@ -58,7 +58,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
     - raise threat by 3 (the player the event is about)
 
 02038:A:2 (front): Response: After defeating Louis, you may choose and discard 1 "Sacked!" card from play.
-  02038:response:1: Response after an enemy is destroyed (heard about this card)
+  02038:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
     only if there is a attachment (any player controls) named "Sacked!" to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (any player controls) named "Sacked!"
@@ -73,7 +73,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
     - each Troll enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
 
 02039:A:2 (front): Response: After defeating Morris, you may choose and discard 1 "Sacked!" card from play.
-  02039:response:1: Response after an enemy is destroyed (heard about this card)
+  02039:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
     only if there is a attachment (any player controls) named "Sacked!" to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (any player controls) named "Sacked!"
@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
     - each Troll enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
 
 02040:A:2 (front): Response: After defeating Stuart, you may choose and discard 1 "Sacked!" card from play.
-  02040:response:1: Response after an enemy is destroyed (heard about this card)
+  02040:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
     only if there is a attachment (any player controls) named "Sacked!" to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (any player controls) named "Sacked!"
@@ -102,7 +102,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
     - every card with code 02048 in the encounter discard pile goes back into the encounter deck, which is shuffled (nothing with none there)
 
 02041:A:2 (front): Response: After defeating Rupert, you may choose and discard 1 "Sacked!" card from play.
-  02041:response:1: Response after an enemy is destroyed (heard about this card)
+  02041:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
     only if there is a attachment (any player controls) named "Sacked!" to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (any player controls) named "Sacked!"
@@ -203,7 +203,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
   02049:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each hero (any player controls) with an attachment named "Sacked!":
-      - discard the picked card
+      - the picked card is destroyed (not discarded: rr.destroy)
     - this card is shuffled into the encounter deck
 
 02049:A:2 (shadow): Shadow: If attacking enemy is a Troll, remove 2 damage tokens from it.

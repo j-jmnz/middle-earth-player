@@ -15,8 +15,8 @@ const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const ENGAGED: Condition = { kind: "sourceIn", zone: "engaged" };
 const TROLLS_SET_ASIDE = ["02038", "02039", "02040", "02041"] as const;
-// "Response: After defeating X, you may choose and discard 1 'Sacked!' card from play" (02038..02041, 900501:A:5): the first player answers it (the card is an encounter card); nothing to discard, no offer.
-const DISCARD_SACKED: Pick<Effect, "condition" | "instructions"> = { condition: { kind: "canPick", pick: SACKED }, instructions: [{ verb: "Pick", pick: SACKED }, { verb: "Discard", target: { kind: "picked" } }] };
+// "Response: After defeating X, you may choose and discard 1 'Sacked!' card from play" (02038..02041, 900501:A:5): the card is an encounter card, so "you" is the player the defeated enemy was engaged with (`answeredBy`); nothing to discard, no offer.
+const DISCARD_SACKED: Pick<Effect, "answeredBy" | "condition" | "instructions"> = { answeredBy: "eventSeat", condition: { kind: "canPick", pick: SACKED }, instructions: [{ verb: "Pick", pick: SACKED }, { verb: "Discard", target: { kind: "picked" } }] };
 const THREAT_STAT = (stat: "attack" | "defense"): Effect["instructions"] => [{ verb: "ModifyStat", stat, amount: 1, until: "whileSourceInPlay", holders: TROLL }];
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
@@ -142,7 +142,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "02049",
     lines: ["02049:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "Each", pick: HERO_WITH_SACKED, instructions: [{ verb: "Discard", target: { kind: "picked" } }] }, { verb: "MoveEncounterCard", card: "self", to: "shuffle" }],
+    instructions: [{ verb: "Each", pick: HERO_WITH_SACKED, instructions: [{ verb: "Destroy", target: { kind: "picked" } }] }, { verb: "MoveEncounterCard", card: "self", to: "shuffle" }],
   },
   {
     id: "02049:shadow:1",

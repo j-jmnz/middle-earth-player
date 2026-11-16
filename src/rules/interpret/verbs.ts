@@ -9,7 +9,7 @@ import { outOfPlayChoices } from "./search.ts";
 import { scheduleDelayed } from "../windows/delayed.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { destroyCard, isEncounterCardEffect, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../core/keywords.ts";
+import { destroyAndAnnounce, destroyCard, isEncounterCardEffect, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import { eliminateEmpties } from "../core/eliminate.ts";
 import { lastPicked, otherSeat, seatsFor } from "./player-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -181,6 +181,8 @@ export function runExtraVerb(
     }
     case "Discard":
       return discardTarget(state, instruction.target.kind, focus, ctx, steps);
+    case "Destroy":
+      return discardTarget(state, instruction.target.kind, focus, ctx, steps, true);
     case "UncommitAll": {
       const seat = seatFor(state, instruction.who, focus.seat);
       let next = state;
@@ -371,6 +373,7 @@ function discardTarget(
   focus: VerbFocus,
   ctx: ReduceContext,
   steps: EngineStep[],
+  destroy = false,
 ): ScenarioState {
   const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" || kind === "other" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
@@ -378,6 +381,10 @@ function discardTarget(
   if (kind === "other" && !inPlay(state.cards[id]?.zone ?? "removed")) return state;
   // "Unique locations cannot be discarded from play by encounter card effects" (12193:B:1): the card holds the flag.
   if (flagged(state, id, "cannotBeDiscardedByEncounter") && isEncounterCardEffect(state, ctx.cards, focus.sourceId)) return state;
+  if (destroy) {
+    const instance = state.cards[id];
+    return instance && inPlay(instance.zone) ? destroyAndAnnounce(state, instance, printedOf(ctx.cards, instance.code), ctx.cards, steps) : state;
+  }
   return destroyCard(state, id, ctx.cards, steps);
 }
 

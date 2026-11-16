@@ -135,6 +135,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   Exhaust: (i) => ({ text: `exhaust ${target(i.target)}${typeof i.who === "string" ? ` (controlled by ${who(i.who)})` : ""}`, read: ["target", "who"] }),
   Ready: (i) => ({ text: `ready ${typeof i.target === "string" && i.target === "allCharacters" ? "every character" : cardRef(i.target ?? "self")}`, read: ["target"] }),
   Discard: (i) => ({ text: `discard ${target(i.target)}`, read: ["target"] }),
+  Destroy: (i) => ({ text: `${target(i.target)} is destroyed (not discarded: rr.destroy)`, read: ["target"] }),
   DiscardFromHand: (i, ctx) => ({ text: `discard ${amount(i.amount, ctx)} cards from hand`, read: ["amount"] }),
   Draw: (i, ctx) => ({ text: `${who(i.who ?? "actor")} draws ${i.amount === undefined ? "1" : amount(i.amount, ctx)} card(s)${typeof i.perHero === "string" ? ` for each ${i.perHero} hero` : ""}${i.from === "bottom" ? " from the bottom of the deck" : ""}`, read: ["who", "amount", "perHero", "from"] }),
   RaiseThreat: (i, ctx) => ({ text: `raise threat by ${i.amount === undefined ? "1" : amount(i.amount, ctx)} (${who(i.who ?? "actor")})${isObj(i.perCommitted) ? ` for each ${typeof i.perCommitted.exceptSphere === "string" ? `non-${i.perCommitted.exceptSphere} ` : ""}${str(i.perCommitted.type)} committed to the quest` : ""}`, read: ["amount", "who", "perCommitted"] }),

@@ -212,6 +212,8 @@ export const simpleVerbs = [
     ...when,
   }),
   z.strictObject({ verb: z.literal("Discard"), target: targetSchema, ...when }),
+  // The card is destroyed (rr.destroy), not discarded: a hero or ally lies in its owner's discard pile and the table hears it was destroyed ("Destroy all heroes with the card 'Sacked!' attached", 02049:A:1).
+  z.strictObject({ verb: z.literal("Destroy"), target: targetSchema, ...when }),
   z.strictObject({
     verb: z.literal("AttachSelf"),
     to: z.discriminatedUnion("kind", [

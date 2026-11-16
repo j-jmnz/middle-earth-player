@@ -65,6 +65,24 @@ describe("the quest deck of Conflict at the Carrock", () => {
     expect(trolls).toHaveLength(2);
   });
 
+  it("900501:A:2 sets Rob and Bob aside with the four Nightmare Trolls at Setup on Nightmare, and 02035:A:1 shuffles a Sacked! for each player into the encounter deck", () => {
+    const { state } = game("Nightmare", 2);
+    const zoneOf = (code: string) => Object.values(state.cards).filter((card) => card.code === code).map((card) => card.zone);
+    expect(zoneOf("900503")).toEqual(["setAside"]);
+    for (const code of ["900504", "900505", "900506", "900507"]) expect(zoneOf(code)).toEqual(["setAside"]);
+    // The deck holds the one Sacked! the Setup leaves in it, and Setup shuffles one more in for each player.
+    expect(zoneOf("02048").filter((zone) => zone === "encounterDeck")).toHaveLength(3);
+  });
+
+  it("900501:A:3 puts the four Nightmare Trolls into the staging area when stage 2B is revealed, and not Rob and Bob", () => {
+    const { state, ctx } = game("Nightmare", 1);
+    const second = advanceStage({ ...state, window: null }, ctx.cards, [], () => true);
+    const revealed = settle(afterProgress(second, 0, ctx, [{ kind: "advance", cardId: second.questStage ?? "" }]), ctx, []);
+    const staged = codesOf(revealed, revealed.staging);
+    for (const code of ["900504", "900505", "900506", "900507"]) expect(staged).toContain(code);
+    expect(staged).not.toContain("900503");
+  });
+
   it("02036:B:2 wins the game on Normal when Against the Trolls is defeated", () => {
     const { state, ctx } = game("Normal");
     const second = advanceStage({ ...state, window: null }, ctx.cards, [], () => true);
