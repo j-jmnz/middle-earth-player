@@ -36,6 +36,7 @@ export type FrameName =
   | "reveal"
   | "hide"
   | "fortitude"
+  | "escape"
   | "whenRevealed"
   | "forced"
   | "shadow"
@@ -50,6 +51,9 @@ export type HideResult = { success: boolean; willpower: number; threat: number }
 
 // A finished Fortitude test (mec113.fortitude-tests): the committed heroes' total Willpower against the Sauron's Eye icons counted; it passes only when the Willpower is greater.
 export type FortitudeResult = { success: boolean; willpower: number; eyes: number };
+
+// A finished escape test (sotm.escape-test): the committed characters' total of the counted stat against the total Escape of the cards dealt; it passes only when the committed total is higher.
+export type EscapeResult = { success: boolean; committed: number; escape: number };
 
 // One instruction still to run, with the seat it runs for. `chosen` is the card a player picked for it.
 // `offset` is where ArrangeTop has got to in the deck.
@@ -121,6 +125,8 @@ export type EffectData = {
   hideFailed?: boolean;
   // The last Fortitude test this effect made (FortitudeTest; the `lastFortitudeFailed` and `lastFortitudePassed` conditions, families/mount-doom/conditions.ts).
   fortitude?: "failed" | "passed";
+  // The last escape test this effect made (EscapeTest; the `lastEscapeFailed` and `lastEscapePassed` conditions, families/escape/conditions.ts).
+  escape?: "failed" | "passed";
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -146,6 +152,22 @@ export type FortitudeData = {
   ignored: readonly string[];
   eyes: number;
   result: FortitudeResult | null;
+};
+
+// An escape test under way (families/escape/test.ts, sotm.escape-test). `stat`: the stat the committed characters count. `cards`: the cards to deal, read as the test was made. `seats`: the players who commit, in order, and `asked` how many have been asked
+// (a party test asks every player, one test for them all). `fresh`: the characters just committed, whose "after a character commits" Forced effects are still to resolve. `dealtIds`: the cards dealt, held out of the encounter discard pile until the total is read.
+// `escape`: their total Escape and what the table adds, read once they are dealt.
+export type EscapeData = {
+  kind: "escape";
+  stat: "willpower" | "attack" | "defense";
+  cards: number;
+  seats: readonly number[];
+  asked: number;
+  fresh: readonly string[];
+  committedIds: readonly string[];
+  dealtIds: readonly string[];
+  escape: number;
+  result: EscapeResult | null;
 };
 
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
@@ -174,6 +196,7 @@ export type FrameData =
   | { kind: "reveal"; hide: HideResult | null; surge: boolean; extraSurge?: number; surgeLeft?: number; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
   | HideData
   | FortitudeData
+  | EscapeData
   | EffectData;
 
 export type Frame = {

@@ -95,7 +95,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "MoveResourceFromHeroes":
       return moveResourceFromHeroes(state, instruction.to, focus);
     case "PlaceResourceTokens":
-      return placeResourceTokens(state, instruction.on, instruction.amount, focus, ctx);
+      return placeResourceTokens(state, instruction.on, instruction.code, instruction.amount, focus, ctx);
     default:
       return null;
   }

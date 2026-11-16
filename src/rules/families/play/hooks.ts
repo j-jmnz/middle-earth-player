@@ -10,6 +10,7 @@ import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { livingSeats, modifierActive } from "../../core/state.ts";
+import { modifiedStat } from "../../core/keywords.ts";
 
 // Whether an effect's trigger hears an event: its own trigger, either half of "enters or leaves play" (Gwaihir, 22108:A:3), the exploring of the active location as "a location is explored" (12092:B:2), or a location
 // leaving play as the Wizardry line's trigger (mec112.wizardry; the record's own condition asks that it left explored).
@@ -44,7 +45,7 @@ export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, {
   const printed = (id: string): PrintedCard => printedOf(cards, state.cards[id]?.code ?? "");
   const heroes = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []);
   const top = to.control === "highestThreatCost" ? Math.max(...heroes.map((id) => printed(id).threat ?? 0)) : null;
-  return heroes.filter((id) => (top == null || (printed(id).threat ?? 0) === top) && (to.exceptSphere == null || printed(id).sphere !== to.exceptSphere) && (to.trait == null || printed(id).traits.includes(to.trait)));
+  return heroes.filter((id) => (top == null || (printed(id).threat ?? 0) === top) && (to.exceptSphere == null || printed(id).sphere !== to.exceptSphere) && (to.trait == null || printed(id).traits.includes(to.trait)) && (to.minWillpower == null || modifiedStat(state, state.cards[id] as CardInstance, "willpower", cards) >= to.minWillpower));
 }
 
 // The seat that chooses the host of an AttachSelf card that goes to a hero: the first player when it may go to any player's hero, the

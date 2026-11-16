@@ -14,6 +14,7 @@ import { optionIntents, optionReason } from "../windows/choices.ts";
 import { mulliganTriggers } from "../families/deck/play.ts";
 import { hideCommitReason, hideCommitters } from "../quest/hide.ts";
 import { fortitudeCommitReason, fortitudeCommitters } from "../families/mount-doom/commit.ts";
+import { escapeCommitReason, escapeCommitters } from "../families/escape/commit.ts";
 import type { LegalIntent, PlayerIntent, Selection } from "../core/intents.ts";
 import { suppliesNumber } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
@@ -56,6 +57,8 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
       return [{ type: "CommitHide" }];
     case "fortitudeCommit":
       return [{ type: "CommitFortitude" }];
+    case "escapeCommit":
+      return [{ type: "CommitEscape" }];
     case "choose":
       return optionIntents(state);
     case "cancelOffer":
@@ -93,6 +96,8 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
       return state.window?.kind === "hideCommit" ? hideCommitters(state, state.window.seat, ctx.cards) : [];
     case "CommitFortitude":
       return state.window?.kind === "fortitudeCommit" ? fortitudeCommitters(state, state.window.seat) : [];
+    case "CommitEscape":
+      return state.window?.kind === "escapeCommit" ? escapeCommitters(state, state.window.seat, ctx) : [];
     case "Travel":
       return canTravel(state, ctx) ? travelTargets(state, ctx) : [];
     case "Engage":
@@ -151,6 +156,8 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       return hideCommitReason(state, intent, ctx);
     case "CommitFortitude":
       return fortitudeCommitReason(state, intent);
+    case "CommitEscape":
+      return escapeCommitReason(state, intent, ctx);
     case "Trigger":
       return triggerReason(state, intent, ctx);
     case "Choose":

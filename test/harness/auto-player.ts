@@ -6,6 +6,7 @@ import { printedOf } from "../../src/rules/core/printed.ts";
 import { costPayer } from "../../src/rules/player/usage.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "../../src/rules/core/intents.ts";
 import { hideCommitLimit } from "../../src/rules/families/nightmare/guards.ts";
+import { escapeCommitLimit } from "../../src/rules/families/escape/commit.ts";
 import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 // Test helper. A fixed policy that answers every window from the legal intents the reducer offers, so a
@@ -125,6 +126,8 @@ export function nextIntent(
       if (state.mode === "questCommit" && !has(intents, "Pass") && has(intents, "Commit")) return { type: "Commit", cardIds: legalTargets(state, { type: "Commit" }, ctx) };
       return { type: "Pass" };
     }
+    case "escapeCommit":
+      return { type: "CommitEscape", cardIds: legalTargets(state, { type: "CommitEscape" }, ctx).slice(0, escapeCommitLimit(state, window.seat) ?? undefined) };
     case "fortitudeCommit":
       return { type: "CommitFortitude", cardIds: legalTargets(state, { type: "CommitFortitude" }, ctx) };
     case "hideCommit":

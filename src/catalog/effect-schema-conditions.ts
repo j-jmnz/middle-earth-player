@@ -46,6 +46,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // false before the effect has made one. `fortitudeFailed`: a player failed a Fortitude test this round, `who` the actor ("If you failed a Fortitude test this round", 146055:A:3) or any player ("If a player has failed a Fortitude test this round", 146046:A:1).
   z.strictObject({ kind: z.literal("lastFortitudeFailed") }),
   z.strictObject({ kind: z.literal("lastFortitudePassed") }),
+  // The escape family's conditions (src/rules/families/escape/conditions.ts): the last escape test the running effect made was failed, or passed ("If this test is failed", 02109:A:1; "If this final Escape test is passed", 02106:B:2). False before the effect has made one.
+  z.strictObject({ kind: z.literal("lastEscapeFailed") }),
+  z.strictObject({ kind: z.literal("lastEscapePassed") }),
   z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),
   // The source card is attached to a card the actor controls ("After you fail a Fortitude test, exhaust attached hero", 146057:A:1): an encounter card attached to a hero is controlled by nobody, so the Forced effect's actor, the player the event happened to, is compared with the host's controller.
   z.strictObject({ kind: z.literal("hostControlledByActor") }),

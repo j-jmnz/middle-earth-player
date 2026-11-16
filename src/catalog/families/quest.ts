@@ -112,6 +112,9 @@ const TRIGGERS = [
 ] as const;
 
 const FLAGS = [
+  // On a final quest stage that holds the win ("Forced: After this stage is defeated ... If this final Escape test is passed, the players ... won the game", 02106:B:1, 02106:B:2): defeating it does not win the game. The stage stays the current quest card, defeated, `questCardDefeated` is announced
+  // to its own Forced effects, and the game is won only by what they do (`WinGame`) or the quest is reset (`ReturnToStage`). Read by rules/quest/quest.ts (advanceStage).
+  "holdsWin",
   // On "table": no character may be committed to the quest ("Do not commit characters to the quest", 143078:B:1; rules/engine/legal.ts committers).
   "cannotCommit",
   // On a seat: it does not raise threat from questing unsuccessfully; a player card effect that reduces its threat reduces it by

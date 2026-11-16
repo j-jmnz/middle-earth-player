@@ -34,6 +34,7 @@ function markOf(step: EngineStep): LogMark {
       return "threat";
     case "hideTest":
     case "fortitudeTest":
+    case "escapeTest":
     case "quest":
       return "willpower";
     case "strike":
@@ -108,6 +109,10 @@ function words(step: EngineStep, names: LogNames): string | null {
       return `${names.card(step.cardId)} commits to the Hide test`;
     case "fortitudeCommit":
       return `${names.card(step.cardId)} commits to the Fortitude test`;
+    case "escapeCommit":
+      return `${names.card(step.cardId)} commits to the escape test`;
+    case "escapeTest":
+      return `Escape test ${step.success ? "passed" : "failed"}: ${step.committed} committed against ${step.escape} Escape`;
     case "fortitudeTest":
       return `Fortitude test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`;
     case "hideTest":

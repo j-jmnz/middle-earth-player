@@ -232,6 +232,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         open(1, step.success ? "Fortitude test passed" : "Fortitude test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`, "willpower");
         return;
+      case "escapeTest":
+        open(1, step.success ? "Escape test passed" : "Escape test failed", step.success ? "good" : "bad");
+        line(`${step.committed} committed against ${step.escape} Escape`, "willpower");
+        return;
       case "hideTest":
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against threat ${step.threat}`, "willpower");
@@ -322,6 +326,8 @@ export function intentWords(intent: PlayerIntent, card: (cardId: string) => stri
       return `${listed(intent.cardIds, card)} committed to the Hide test`;
     case "CommitFortitude":
       return `${listed(intent.cardIds, card)} committed to the Fortitude test`;
+    case "CommitEscape":
+      return `${listed(intent.cardIds, card)} committed to the escape test`;
     case "Travel":
       return `Traveled to ${card(intent.locationId)}`;
     case "DeclineTravel":

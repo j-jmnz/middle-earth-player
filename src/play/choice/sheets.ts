@@ -44,6 +44,7 @@ import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
 import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
 import { eyesStat, fortitudeCommitCheck, fortitudeCommitNote, fortitudeCountNote, fortitudePassCaution } from "../readouts/fortitude.ts";
+import { escapeCommitNote, escapeCountNote, escapePassCaution, escapeStat } from "./escape-notes.ts";
 import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
@@ -112,7 +113,7 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
  * like any action window, with Pass, the Actions list and the hand.
  */
 export function isStepWindow(game: ScenarioState): boolean {
-  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide" && topFrame(game)?.frame !== "fortitude";
+  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide" && topFrame(game)?.frame !== "fortitude" && topFrame(game)?.frame !== "escape";
 }
 
 /**
@@ -202,6 +203,23 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         ...(check ? { fortitude: check } : {}),
       };
     }
+    case "escapeCommit": {
+      const source = frame?.cardId ?? null;
+      const stat = escapeStat(game);
+      return {
+        kind: "multi",
+        key: `escapeCommit:${frame?.id ?? ""}:${window.seat}`,
+        step: "Escape test",
+        title: source ? `${names.card(source)}: Escape test` : "Escape test",
+        note: escapeCommitNote(game),
+        verb: "Commit",
+        options: legalTargets(game, { type: "CommitEscape" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, stat) })),
+        build: { kind: "CommitEscape" },
+        allowEmpty: true,
+        preselected: [],
+        alternative: null,
+      };
+    }
     case "frameAction": {
       if (isStepWindow(game)) return null;
       const hide = game.widgets.hide && frame?.data.kind === "hide" ? hideNumbers(game, ctx, frame) : null;
@@ -209,19 +227,22 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const fortitude = frame?.data.kind === "fortitude" ? fortitudeCountNote(game, ctx, names.card) : null;
       // While the count fails, Continue says so and what it costs, as the other sheets that can lose something do.
       const fortitudeCaution = fortitude ? fortitudePassCaution(game, ctx) : null;
+      // An escape test's action window: the stat committed against the cards dealt after it.
+      const escape = frame?.data.kind === "escape" ? escapeCountNote(game, ctx) : null;
+      const escapeCaution = escape ? escapePassCaution(game) : null;
       const source = frame?.cardId ?? null;
       return {
         kind: "trigger",
         key: `frameAction:${frame?.id ?? ""}:${frame?.step ?? 0}`,
-        step: hide ? "Hide test" : fortitude ? "Fortitude test" : step(game),
+        step: hide ? "Hide test" : fortitude ? "Fortitude test" : escape ? "Escape test" : step(game),
         title: source ? names.card(source) : "Action window",
         sourceId: source,
         timing: "Action",
-        note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : (fortitude ?? "Actions may be used before this resolves."),
+        note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : (fortitude ?? escape ?? "Actions may be used before this resolves."),
         hide,
         options: triggerOptions(game, ctx, legal, names),
         pass: "Continue",
-        ...(fortitudeCaution ? { passCaution: fortitudeCaution } : {}),
+        ...(fortitudeCaution ? { passCaution: fortitudeCaution } : escapeCaution ? { passCaution: escapeCaution } : {}),
       };
     }
     case "choose": {

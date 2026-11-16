@@ -12,6 +12,7 @@ const idsOf = (intent: PlayerIntent): readonly string[] => {
     case "Commit":
     case "CommitHide":
     case "CommitFortitude":
+    case "CommitEscape":
       return intent.cardIds;
     case "DeclareAttackers":
       return intent.attackerIds;
@@ -47,7 +48,7 @@ export function reachable(intent: PlayerIntent, sent: Sent): boolean {
     const other = entry.intent;
     const family = entry.family;
     if (!family || other.type !== intent.type) return false;
-    if (family.kind === "ids" && (intent.type === "Commit" || intent.type === "CommitHide" || intent.type === "CommitFortitude" || intent.type === "DeclareAttackers")) {
+    if (family.kind === "ids" && (intent.type === "Commit" || intent.type === "CommitHide" || intent.type === "CommitFortitude" || intent.type === "CommitEscape" || intent.type === "DeclareAttackers")) {
       if (intent.type === "DeclareAttackers" && other.type === "DeclareAttackers" && intent.enemyId !== other.enemyId) return false;
       if (intent.type === "Commit" && other.type === "Commit" && intent.sideQuestId !== other.sideQuestId) return false;
       const picks = idsOf(intent);
@@ -82,6 +83,8 @@ function targetsMissing(state: ScenarioState, ctx: ReduceContext, legal: LegalIn
       return [...lacks("character", legalTargets(state, { type: "Commit" }, ctx), (id) => of("Commit").some((entry) => names(entry, id)))];
     case "CommitHide":
       return [...lacks("character", legalTargets(state, { type: "CommitHide" }, ctx), (id) => of("CommitHide").some((entry) => names(entry, id)))];
+    case "CommitEscape":
+      return [...lacks("character", legalTargets(state, { type: "CommitEscape" }, ctx), (id) => of("CommitEscape").some((entry) => names(entry, id)))];
     case "CommitFortitude":
       return [...lacks("hero", legalTargets(state, { type: "CommitFortitude" }, ctx), (id) => of("CommitFortitude").some((entry) => names(entry, id)))];
     case "DeclareAttackers": {

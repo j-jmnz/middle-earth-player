@@ -121,7 +121,12 @@ export const pickSchema = z.strictObject({
   attachedTo: z.enum(["source", "host", "activeLocation", "defender"]).optional(),
   // An attachment on a card of this type controlled by the chooser (`you`), by another player (`other`) or by anyone ("a Weapon
   // card attached to a hero you control", "an attachment on a hero you control").
-  on: z.strictObject({ type: z.enum(["hero", "character"]), control: z.enum(["you", "other", "any"]) }).optional(),
+  on: z.strictObject({
+    type: z.enum(["hero", "character"]),
+    control: z.enum(["you", "other", "any"]),
+    // The host's current Willpower is at least this ("each character you control with 3 or more Willpower", 900807:A:2).
+    minWillpower: z.number().int().min(0).optional(),
+  }).optional(),
   // Not the card the source is attached to ("each other questing character" on an attachment).
   notHost: z.boolean().optional(),
   // An enemy that engaged a player this round (a Shadow card: "if it was engaged this round", 142026:A:3).

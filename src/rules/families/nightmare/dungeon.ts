@@ -20,6 +20,7 @@ import type { Focus } from "../index.ts";
 import { twinCode } from "./guards.ts";
 import { campaignTurnsDown, heroesOf, prisonerHeroes, prisonersOfSeat } from "../prisoner/index.ts";
 import { captureHero } from "../south/captive.ts";
+import { tokenTarget } from "../escape/gollum-tokens.ts";
 
 // TakeMorePrisoners: heroes are captured at random, from the players who have none captured, until 1 (1 or 2 players), 2 (3 players) or 3
 // (4 players) are the prisoner (900301:A:2).
@@ -67,7 +68,10 @@ export function returnToStage(state: ScenarioState, stage: number, ctx: ReduceCo
   next = updateCard(moveCard(next, currentId, { zone: "questDeck" }), currentId, { face: "A", progress: 0 });
   next = updateCard(moveCard(next, earlier.id, { zone: "questStage" }), earlier.id, { face: "B", progress: 0 });
   steps.push({ kind: "advance", cardId: earlier.id });
-  return next;
+  // A final stage that was held after its defeat (`holdsWin`) is the quest card no more.
+  if (next.stageHeld == null) return next;
+  const { stageHeld: _held, ...rest } = next;
+  return rest;
 }
 
 // EngageOutOfPlay: the first copy found out of play (set aside, the encounter deck, its discard pile, the victory display) enters play engaged
@@ -81,9 +85,10 @@ export function engageOutOfPlay(state: ScenarioState, code: string, ctx: ReduceC
 }
 
 // PlaceResourceTokens: resource tokens go on the card named, while it is in play (900302:A:1, 900305:A:2, 900306:A:2).
-export function placeResourceTokens(state: ScenarioState, on: CardRef, amount: Amount, focus: Focus, ctx: ReduceContext): ScenarioState {
+export function placeResourceTokens(state: ScenarioState, on: CardRef | undefined, code: string | undefined, amount: Amount, focus: Focus, ctx: ReduceContext): ScenarioState {
   const scope = frameScope(state, focus.seat, focus.sourceId);
-  return addResourceTokens(state, refCard(state, on, scope), resolveAmount(state, amount, scope, ctx));
+  const target = on != null ? refCard(state, on, scope) : code != null ? tokenTarget(state, code) : null;
+  return addResourceTokens(state, target, resolveAmount(state, amount, scope, ctx));
 }
 
 /** `count` resource tokens on the card with this id, while it is in play and nothing bars them (`noResourcesPlaced`, 19161:A:2). */

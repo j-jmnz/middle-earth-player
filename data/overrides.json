@@ -100,6 +100,16 @@
     },
     {
       "match": {
+        "code": "900806"
+      },
+      "set": {
+        "name": "Lost Soul of Lórien"
+      },
+      "reason": "Hall of Beorn's export garbles the title as 'Lost Soul of L≤rien' (its image path too). The scan and the ledger line 900806:A:1 print 'Lórien'; a record naming the card would otherwise miss.",
+      "source": "scan 900806.A (data/printed/nightmare.json, 900806:A:1)"
+    },
+    {
+      "match": {
         "code": "12100"
       },
       "set": {

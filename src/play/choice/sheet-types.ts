@@ -73,7 +73,7 @@ export type PickSheet = {
 // A card a Sailing test looked at, with the success symbols its ledger side prints (sea-sheets.ts).
 export type LookRow = { id: string; code: string; name: string; success: number };
 
-export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "CommitFortitude" } | { kind: "attack"; enemyId: string };
+export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "CommitFortitude" } | { kind: "CommitEscape" } | { kind: "attack"; enemyId: string };
 
 // What a Fortitude commit sheet needs to arm a commit that fails the test for certain: the icons already added, the Willpower of each hero a row offers and what failing costs (readouts/fortitude.ts).
 export type CommitCheck = { added: number; willpower: Readonly<Record<string, number>>; fails: readonly string[] };

@@ -7,6 +7,7 @@ import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { hideStep, pushHide } from "../quest/hide.ts";
 import { fortitudeStep } from "../families/mount-doom/fortitude.ts";
+import { escapeStep } from "../families/escape/test.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { raiseThreat } from "../core/keywords.ts";
 import { queueEvent } from "./queue.ts";
@@ -44,6 +45,8 @@ export function advanceFrame(state: ScenarioState, ctx: ReduceContext, steps: En
       return hideStep(state, frame, ctx, steps);
     case "fortitude":
       return fortitudeStep(state, frame, ctx, steps);
+    case "escape":
+      return escapeStep(state, frame, ctx, steps);
     case "response":
       return responseStep(state, ctx, steps);
     default:

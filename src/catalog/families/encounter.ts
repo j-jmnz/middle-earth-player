@@ -66,6 +66,10 @@ const VERBS = [
   // no collection (docs/brief.md): the collection holds every card the game knows, so a copy of `code` is made when neither the deck nor the pile
   // has one. The deck is shuffled by a ShuffleEncounterDeck after it (the line says so).
   z.strictObject({ verb: z.literal("SearchCollection"), code: z.string().min(1), to: z.literal("staging"), ...when }),
+  // The topmost `count` cards of the encounter discard pile that are enemies with this Trait are returned to the staging area, not revealed: no When Revealed, no engagement check ("Return the top X Undead enemies in the encounter discard pile to the staging area", 900810:A:1). Fewer when the pile holds
+  // fewer. The number returned is the effect's `returned` count, read by `noneReturned` ("If no enemies were returned ... gains surge").
+  z.strictObject({ verb: z.literal("ReturnFromDiscard"), trait: z.string().min(1), count: positiveAmountSchema, ...when }),
+
   // The encounter discard pile is shuffled into the encounter deck; with `trait`, only the cards of that printed or gained Trait go back and the deck is shuffled ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
   z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), trait: z.string().min(1).optional(), ...when }),
 
