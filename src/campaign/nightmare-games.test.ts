@@ -11,7 +11,7 @@ import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { announceStageRevealed } from "../rules/families/nightmare/setup.ts";
 import { reduce, startScenario } from "../rules/engine/reduce.ts";
-import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
+import { loadAnyScenario, loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { playOut } from "../../test/harness/auto-player.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import prebuilt from "../../data/decks/prebuilt.json" with { type: "json" };
@@ -34,6 +34,7 @@ const CAMPAIGN_OF: Readonly<Record<string, string>> = {
   "passage-through-mirkwood": "mirkwood-paths",
   "journey-along-the-anduin": "mirkwood-paths",
   "escape-from-dol-guldur": "mirkwood-paths",
+  "the-hunt-for-gollum": "shadows-of-mirkwood",
 };
 
 function seatFor(campaignId: string): { heroes: string[]; deck: string[]; protect: string } {
@@ -53,7 +54,7 @@ describe("a seeded Nightmare game of each scenario on NIGHTMARE_PLAYABLE", () =>
       const campaignId = CAMPAIGN_OF[id] ?? "fellowship-of-the-ring";
       const campaign = loadCampaign(campaignId);
       const seat = seatFor(campaignId);
-      const world = loadWorld(catalog, campaign, loadScenario(id), EFFECTS, [...seat.heroes, ...seat.deck]);
+      const world = loadWorld(catalog, campaign, loadAnyScenario(id), EFFECTS, [...seat.heroes, ...seat.deck]);
       const ctx = contextOf(world);
       for (const seed of [1, 2, 3]) {
         const start = buildStart({ campaign, scenario: world.scenario, seatCount: 1, seed, threatModifier: 0, seats: [{ heroes: seat.heroes, deck: seat.deck }], difficulty: "Nightmare", effects: world.effects, mode: "standalone" });

@@ -1,6 +1,6 @@
 // Rules: mec109.campaign-mode (data/rules/entries.json): a scenario of a cycle (Shadows of Mirkwood, data/campaigns kind "cycle") belongs to no campaign. It has no
-// campaign card, no log and no Resolution, and is played standalone only. This is the shell every cycle scenario sits in: dealt standalone on stand-in heroes
-// while its lines are still open, so it is not playable. The tabs that list it are src/screens/campaign/cycle-tabs.test.ts.
+// campaign card, no log and no Resolution, and is played standalone only. This is the shell every cycle scenario sits in: dealt standalone on stand-in heroes,
+// and not playable while any of its lines is open. The tabs that list it are src/screens/campaign/cycle-tabs.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
@@ -70,8 +70,11 @@ describe("a scenario of the Shadows of Mirkwood cycle", () => {
   });
 
   it("is coming soon while any of its lines is open: not playable, and the standalone briefing says so and nothing else", () => {
-    expect(isPlayable(ID)).toBe(false);
-    const world = loadWorld(catalog, cycle, gollum, EFFECTS, []);
+    // The first scenario of the cycle that is not playable yet (none, once every scenario of the cycle is).
+    const open = cycle.scenarios.find((id) => !isPlayable(id));
+    if (open == null) return;
+    const scenario = loadAnyScenario(open);
+    const world = loadWorld(catalog, cycle, scenario, EFFECTS, []);
     expect(worldHash(world)).toBeGreaterThan(0);
     const plan = standaloneBriefing({ world, seatCount: 1, seats: [{ deckId: null, heroes: [], deck: [] }], ringBearer: null, difficulty: "Normal" });
     expect(plan.dealable).toBe(false);
