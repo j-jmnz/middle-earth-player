@@ -37,10 +37,15 @@ const canvaskitOf = (filePath) => {
   }
   return variants.get(filePath);
 };
+// expo-sqlite's synchronous call gives up after a count of spins, which a slow OPFS flush outlasts on a recent Chromium, so the web waits on a wall-clock deadline instead:
+// a copy of its WorkerChannel.ts (src/screens/data/web/worker-channel.ts, held to the original by scripts/checks/web-copies.test.ts) replaces it for every importer on the web.
+const webWorkerChannel = path.join(__dirname, "src/screens/data/web/worker-channel.ts");
+const sqliteWorkerChannel = /[\\/]expo-sqlite[\\/]web[\\/]WorkerChannel\.ts$/;
 const resolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (platform === "web" && moduleName === "booklet-pdf") return { type: "sourceFile", filePath: webBookletPdf };
   const resolved = (resolveRequest ?? context.resolveRequest)(context, moduleName, platform);
+  if (platform === "web" && resolved.type === "sourceFile" && sqliteWorkerChannel.test(resolved.filePath)) return { type: "sourceFile", filePath: webWorkerChannel };
   if (platform === "web" && resolved.type === "sourceFile") {
     const web = canvaskitOf(resolved.filePath);
     if (web && web !== context.originModulePath) return { type: "sourceFile", filePath: web };
