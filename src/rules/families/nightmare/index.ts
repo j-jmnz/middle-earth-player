@@ -71,7 +71,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PickDiscardTop":
       return pickDiscardTop(state, instruction.types, ctx, instruction.trait);
     case "DealShadowFromDiscard":
-      return dealShadowFromDiscard(state, ctx);
+      return dealShadowFromDiscard(state, ctx, instruction.trait);
     case "EngageSeatWith":
       return engageSeatWith(state, instruction, focus, ctx, steps);
     case "PickMostHitPoints": {
@@ -229,11 +229,11 @@ export function topOfEncounterDiscard(state: ScenarioState, types: readonly stri
 
 // DealShadowFromDiscard: the topmost card of the encounter discard pile with a Shadow effect (a shadow record: every printed line has one) becomes
 // one more shadow card of the attacking enemy, face down; the attack resolves it after the ones it has (900107:A:3, rr.step-6-4-2).
-function dealShadowFromDiscard(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+function dealShadowFromDiscard(state: ScenarioState, ctx: ReduceContext, trait?: string): ScenarioState {
   const enemyId = state.pendingAttack?.enemyId;
   if (!enemyId || !state.cards[enemyId]) return state;
   const found = [...state.encounterDiscard].reverse().find((id) => {
-    return effectsOf(ctx, state.cards[id]?.code ?? "").some((effect) => effect.timing === "shadow");
+    return effectsOf(ctx, state.cards[id]?.code ?? "").some((effect) => effect.timing === "shadow") && (trait == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(trait));
   });
   return found ? updateCard(moveCard(state, found, { zone: "shadow", enemyId }), found, { face: "down", controller: null }) : state;
 }

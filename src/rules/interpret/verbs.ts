@@ -33,12 +33,15 @@ import { noteEncounterThreat } from "../families/encounter/reveal.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
 import { isGollum } from "../families/gollum/index.ts";
+import { guardianSeat } from "../families/guardian/seats.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
 // "otherPlayer" is the next seat in the game after the actor; with no other player it is the actor.
-export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | "otherPlayer" | undefined, actor: number): number {
+export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | "otherPlayer" | "guardian" | undefined, actor: number): number {
   if (who === "otherPlayer") return otherSeat(state, actor) ?? actor;
+  // "guardian": the player guarding Gollum (sotm.guarding-gollum), the actor when nobody does.
+  if (who === "guardian") return guardianSeat(state) ?? actor;
   return who === "firstPlayer" ? state.firstPlayer : actor;
 }
 
@@ -176,6 +179,15 @@ export function runExtraVerb(
       for (const id of stagingEnemies(state, ctx.cards, focus.seat)) {
         if (instruction.trait && !hasTrait(state, id, instruction.trait, ctx)) continue;
         next = engageEnemy(next, seat, id, steps);
+      }
+      // Enemies engaged with another player move to the seat, in play order (02129:B:1).
+      if (instruction.inPlay === true && !next.seats[seat]?.eliminated) {
+        for (const other of livingSeats(next)) {
+          if (other === seat) continue;
+          for (const id of [...(next.seats[other]?.engaged ?? [])]) {
+            if (next.cards[id]?.zone === "engaged" && !flagged(next, id, "cannotBeEngaged")) next = engageWith(next, seat, id, steps);
+          }
+        }
       }
       return next;
     }

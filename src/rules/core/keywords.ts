@@ -439,6 +439,7 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   const blank = textBlank(state, id, cards) && !keywordsKept(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
   if (keyword === "ranged" && flagged(state, id, "loseRanged")) return false;
+  if (keyword === "sentinel" && flagged(state, id, "loseSentinel")) return false;
   if (!blank && printed.keywords[keyword]) return true;
   return (keyword === "sentinel" || keyword === "ranged") && flagged(state, id, keyword);
 }

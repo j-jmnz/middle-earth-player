@@ -2,7 +2,8 @@
 // names the holders of a constant modifier, and says which cards a trigger hears about.
 import { z } from "zod";
 
-export const whoSchema = z.enum(["actor", "firstPlayer"]);
+// "guardian": the player guarding Gollum (Return to Mirkwood, sotm.guarding-gollum; src/rules/families/guardian/). Resolved by `seatFor` (src/rules/interpret/verbs.ts) and by a Choose (src/rules/windows/choices.ts).
+export const whoSchema = z.enum(["actor", "firstPlayer", "guardian"]);
 
 export const sphereSchema = z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]);
 

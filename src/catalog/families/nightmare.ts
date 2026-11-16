@@ -48,7 +48,8 @@ const VERBS = [
   // A shadow effect: the topmost card of the encounter discard pile that has a Shadow effect is dealt to the attacking enemy as one more
   // shadow card, and resolves in this attack after the ones it has ("Deal and resolve the topmost Shadow effect in the encounter discard
   // pile for this attack", 900107:A:3; rr.step-6-4-2). Nothing happens with none there.
-  z.strictObject({ verb: z.literal("DealShadowFromDiscard"), ...when }),
+  // `trait`: the topmost card with this Trait that has a Shadow effect ("Deal the topmost Tantrum card in the encounter discard pile as a new shadow card for this attack, if able", 900909:A:2).
+  z.strictObject({ verb: z.literal("DealShadowFromDiscard"), trait: z.string().min(1).optional(), ...when }),
   // The source enemy engages a player who is engaged with an enemy that matches `pick` ("Anduin Troll Spawn engages a player engaged with a
   // Hill Troll", 900203:A:2); the first player chooses among several (rr.first-player). Nothing happens when no player is, or when the source
   // is already engaged with one who is. `seat` is engine use: the player chosen.

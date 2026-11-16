@@ -42,11 +42,12 @@ import { manifest as mountDoom } from "./mount-doom.ts";
 import { manifest as angmar } from "./angmar.ts";
 import { manifest as captured } from "./captured.ts";
 import { manifest as escape } from "./escape.ts";
+import { manifest as guardian } from "./guardian.ts";
 
 // The mechanic families, in the order their verbs, triggers and flags join the shared enums (docs/architecture.md, Mechanic families). A new family is
 // one file here and one in src/rules/families, and one line in this list and one in the rules list.
 export const CATALOG_FAMILIES = [
-  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape,
+  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian,
 ] as const;
 
 export const FAMILY_VERBS = collect(CATALOG_FAMILIES, "verbs");

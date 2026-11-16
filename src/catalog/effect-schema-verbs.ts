@@ -206,10 +206,12 @@ export const simpleVerbs = [
     ...when,
   }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
   z.strictObject({ verb: z.literal("ReturnToStaging"), target: targetSchema, ...when }),
+  // Engages the enemies in the staging area with `who` (the player guarding Gollum with `guardian`). `inPlay`: every enemy in play, the ones engaged with another player too, which move to `who` ("all enemies in play engage the player guarding Gollum", 02129:B:1; rr.in-play-and-out-of-play).
   z.strictObject({
     verb: z.literal("EngageAll"),
     trait: z.string().min(1).optional(),
     who: whoSchema,
+    inPlay: z.literal(true).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("Discard"), target: targetSchema, ...when }),
@@ -265,7 +267,7 @@ export const simpleVerbs = [
   // active location the players must travel to it and nowhere else, if able (01088:A:1).
   z.strictObject({
     verb: z.literal("Restrict"),
-    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly", "commit", "draw"]),
+    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly", "commit", "draw", "playFromHand"]),
     // With "travel" on a card that is not the location: the players cannot travel to the location with this code ("The players cannot travel to The Old Ford unless there is at least 5 progress here", 18068:B:1).
     location: z.string().min(1).optional(),
     // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
@@ -285,6 +287,10 @@ export const simpleVerbs = [
     // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
     // draws, not card effects). The pick is read from each player's side.
     unlessControls: pickSchema.optional(),
+    // With "commit" and "playFromHand": the rule binds the player guarding Gollum only ("The player guarding Gollum cannot commit characters to this quest", 02127:B:1; "cannot play cards from his hand", 02128:B:1). "playFromHand" bars playing a card from the hand, not putting one into play
+    // (rr.play-and-put-into-play). `exceptAlone`: unless he is the only player remaining in the game. Read by src/rules/interpret/restrictions.ts (seatBarred) and src/rules/families/guardian/.
+    guardian: z.literal(true).optional(),
+    exceptAlone: z.literal(true).optional(),
     ...when,
   }),
   // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's

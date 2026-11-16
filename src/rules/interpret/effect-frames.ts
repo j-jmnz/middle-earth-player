@@ -20,6 +20,7 @@ import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, withSeat } from "../core/state.ts";
 import { sharing } from "../families/breaking/areas.ts";
+import { guardianSeats, otherThanGuardian } from "../families/guardian/seats.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { holdsNow } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
@@ -218,7 +219,7 @@ function runItemNow(
     case "Choose":
       return openBranch(state, item, returned, ctx);
     case "ForEachPlayer":
-      return expandPlayers(state, item, instruction, item.cause);
+      return expandPlayers(state, item, instruction, item.cause, ctx);
     case "Each":
       return expandEach(state, item, frame, ctx);
     case "Repeat":
@@ -260,11 +261,12 @@ function expandPlayers(
   item: QueueItem,
   instruction: Extract<Instruction, { verb: "ForEachPlayer" }>,
   cause: Cause | undefined,
+  ctx: ReduceContext,
 ): ScenarioState {
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect") return state;
-  // The players sharing the acting player's staging area when areas are joined (families/captured/); every living player otherwise.
-  const seats = state.capture && state.separate ? sharing(state, item.seat) : livingSeats(state);
+  // The players sharing the acting player's staging area when areas are joined (families/captured/); every living player otherwise. `seats: "guardian"`: the player guarding Gollum, and the others while a card widens the effect (families/guardian/seats.ts).
+  const seats = instruction.seats === "guardian" ? guardianSeats(state, ctx, topFrame(state)?.cardId ?? null) : instruction.seats === "otherThanGuardian" ? otherThanGuardian(state) : state.capture && state.separate ? sharing(state, item.seat) : livingSeats(state);
   const ordered = instruction.order === "lastFirst" ? [...seats].reverse() : seats;
   const expanded = ordered.flatMap((seat) =>
     instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat, chosen: null, ...(cause ? { cause } : {}) })),

@@ -301,7 +301,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("underBurn"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
   // that has something to find ("search ... for the Aflame location", 11040:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
-  z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional() }),
+  z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional(), trait: z.string().min(1).optional() }),
   // A location in play with this trait has a total Threat of at least `min`, its grappled enemies' Threat included ("if the total Threat of any one Ship location is 9 or higher", 12041:B:2;
   // src/rules/families/grapple/values.ts).
   z.strictObject({ kind: z.literal("locationThreat"), trait: z.string().min(1), min: z.number().int().min(0) }),
@@ -345,6 +345,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("playerUnengaged") }),
   // The active location prints a Wizardry line ("If no Wizardry effect is triggered this way", 143062:A:1, read with `not`; false with no active location). Read by the wizardry family.
   z.strictObject({ kind: z.literal("hasWizardry") }),
+  // The player guarding Gollum may choose a new player now: no card says the guard cannot change and another player is still in the game ("must choose a new player to guard Gollum, if able", 02135:A:1; the option is offered only then, rr.effects). Read by the guardian family.
+  z.strictObject({ kind: z.literal("guardianCanChange") }),
   // Progress was placed on the current quest card itself this phase, the overflow of an explored active location included ("if no progress was placed on the current quest this phase", 900501:A:4, `is: false`); read from the note the table's `noteQuestProgress` flag keeps (src/rules/families/wizardry/progress.ts).
   z.strictObject({ kind: z.literal("questProgressNoted"), is: z.boolean() }),
   z.strictObject({ kind: z.literal("soleAttacker") }),
