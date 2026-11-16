@@ -22,6 +22,10 @@ describe("backup file parts", () => {
     expect(schemaVerdict([], known)).toBe("older");
     expect(schemaVerdict([10, 20, 30, 40], known)).toBe("newer");
     expect(schemaVerdict([10, 20, 99], known)).toBe("newer");
+    // An unknown migration is newer even when the count matches or it is older than the rest: the sets differ.
+    expect(schemaVerdict([10, 20, 25], known)).toBe("newer");
+    expect(schemaVerdict([5, 10, 20, 30], known)).toBe("newer");
+    expect(schemaVerdict([30, 20, 10], known)).toBe("current");
   });
 
   test("a restore replaces the games and keeps what describes this computer's files", () => {

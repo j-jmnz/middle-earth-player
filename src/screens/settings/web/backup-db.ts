@@ -9,6 +9,7 @@ import { deserializeDatabaseAsync, type SQLiteDatabase } from "expo-sqlite";
 
 import migrations from "../../../../drizzle/migrations";
 import { readSaveChecked } from "../../data/campaign-store";
+import { readStandalone } from "../../data/standalone-store";
 import { hasSqliteHeader, restoredTables, schemaVerdict, type Refusal } from "./backup-file";
 
 // drizzle keeps the connection it was given on `$client`; AppDatabases types the database without it.
@@ -31,8 +32,8 @@ async function tableNames(db: SQLiteDatabase): Promise<string[]> {
   return rows.map((row) => row.name);
 }
 
-// The copy's check, or the reason it is refused. An older file is migrated in place (on the copy).
-async function checkCopy(copy: SQLiteDatabase): Promise<Refusal | null> {
+// The copy's check, or the reason it is refused. An older file is migrated in place (on the copy). Every save and every standalone game is read the way the app reads it.
+export async function checkCopy(copy: SQLiteDatabase): Promise<Refusal | null> {
   const check = await copy.getFirstAsync<{ quick_check: string }>("PRAGMA quick_check");
   if (check?.quick_check !== "ok") return "damaged";
   const names = await tableNames(copy);
@@ -44,11 +45,12 @@ async function checkCopy(copy: SQLiteDatabase): Promise<Refusal | null> {
   const db = drizzle(copy);
   if (verdict === "older") await migrate(db, migrations);
   for (const row of await copy.getAllAsync<{ id: string }>("SELECT id FROM saves")) readSaveChecked(db, row.id);
+  for (const row of await copy.getAllAsync<{ id: string }>("SELECT id FROM standalone_games")) readStandalone(db, row.id);
   return null;
 }
 
 // The games, decks, runs and settings of `copy` put over the live ones in one transaction.
-async function replaceFrom(live: SQLiteDatabase, copy: SQLiteDatabase): Promise<void> {
+export async function replaceFrom(live: SQLiteDatabase, copy: SQLiteDatabase): Promise<void> {
   const copied = new Set(await tableNames(copy));
   const tables = restoredTables(await tableNames(live)).filter((name) => copied.has(name));
   await live.execAsync("BEGIN IMMEDIATE");

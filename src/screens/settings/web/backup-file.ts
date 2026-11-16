@@ -31,14 +31,15 @@ export function hasSqliteHeader(bytes: Uint8Array): boolean {
 }
 
 /**
- * Where a file's applied migrations (their `created_at`, the journal's `when`) stand against this build's: `newer` when it holds one this build
- * does not know, `current` when it holds them all, `older` when it lacks some (they are run on the copy before anything is replaced).
+ * Where a file's applied migrations (their `created_at`, the journal's `when`) stand against this build's, compared as sets: `newer` when it holds one this
+ * build does not know (a later one, or an earlier one from a line this build never had: either way it is not this build's to migrate), `current` when it holds
+ * them all, `older` when it lacks some (they are run on the copy before anything is replaced).
  */
 export function schemaVerdict(applied: readonly number[], known: readonly number[]): "newer" | "current" | "older" {
   const knownSet = new Set(known);
-  if (applied.some((when) => !knownSet.has(when) && when > Math.max(...known))) return "newer";
-  if (applied.length > known.length) return "newer";
-  return applied.length === known.length ? "current" : "older";
+  if (applied.some((when) => !knownSet.has(when))) return "newer";
+  const appliedSet = new Set(applied);
+  return known.every((when) => appliedSet.has(when)) ? "current" : "older";
 }
 
 /** The tables a restore leaves as they are on this computer: they describe files and the catalog stored here, not the player's games. */
