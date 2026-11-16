@@ -36,7 +36,7 @@ export type DealtCard = { code: string; pile: string };
 /** Every encounter-side card the scenario deals (its piles, its Nightmare deck, the other side of a two-code card) and its quest cards, each once. */
 export function encounterCards(scenario: AnyScenarioData): { cards: DealtCard[]; stages: string[] } {
   const cards = new Map<string, string>();
-  const stages = new Set<string>(scenario.stages);
+  const stages = new Set<string>([...scenario.stages, ...(scenario.nightmare?.questCards ?? [])]);
   for (const placement of [...scenario.cards, ...(scenario.nightmare?.cards ?? [])]) {
     if (placement.pile === "quest") stages.add(placement.code);
     else cards.set(placement.code, cards.get(placement.code) ?? placement.pile);
@@ -76,7 +76,12 @@ function reveal(base: ScenarioState, ctx: ReduceContext, code: string, steps: En
   const top = revealFromTop(base, ctx, code, steps);
   const depth = base.stack.length;
   const done = drive(top.state, ctx, steps, (state) => state.stack.length <= depth && state.window?.kind !== "choose");
-  return left(done, top.id, "was not revealed");
+  // A card whose When Revealed shuffles it back into the deck ("Then, shuffle Roasted Slowly back into the encounter deck", 02049:A:1) is in the deck again when it is done.
+  return shufflesBack(ctx, code) ? done : left(done, top.id, "was not revealed");
+}
+
+function shufflesBack(ctx: ReduceContext, code: string): boolean {
+  return ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "whenRevealed" && effect.instructions.some((instruction) => instruction.verb === "ShuffleSelfIntoEncounterDeck" || (instruction.verb === "MoveEncounterCard" && instruction.card === "self" && instruction.to === "shuffle")));
 }
 
 // The state, or a thrown problem when the card is still in the encounter deck: the probe did nothing to it.

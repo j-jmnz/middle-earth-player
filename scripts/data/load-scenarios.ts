@@ -90,7 +90,7 @@ export function gameCodes(campaign: CampaignData | readonly CampaignData[], scen
 
 // The cards a scenario deals on Nightmare that it does not deal otherwise: its Nightmare deck's setup card and cards.
 export function nightmareCodes(scenarios: readonly AnyScenarioData[]): Set<string> {
-  return new Set(scenarios.flatMap((scenario) => (scenario.nightmare ? [scenario.nightmare.setupCard, ...scenario.nightmare.cards.map((card) => card.code)] : [])));
+  return new Set(scenarios.flatMap((scenario) => (scenario.nightmare ? [scenario.nightmare.setupCard, ...scenario.nightmare.cards.map((card) => card.code), ...(scenario.nightmare.questCards ?? [])] : [])));
 }
 
 // Every card of the starter decklists.

@@ -272,7 +272,7 @@ export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMo
   return {
     number: scenario.number,
     name: printedScenarioName(scenario.name),
-    stages: scenario.stages.map((code) => (world.cards.has(code) ? printedOf(world.cards, code).name : code)),
+    stages: [...scenario.stages, ...(difficulty === "Nightmare" ? (scenario.nightmare?.questCards ?? []) : [])].map((code) => (world.cards.has(code) ? printedOf(world.cards, code).name : code)),
     sets,
     deckSize: encounter.reduce((sum, card) => sum + countOf(card), 0),
     rules,

@@ -255,13 +255,15 @@ export function encounterCodes(data: AnyScenarioData, difficulty: Difficulty = "
 
 // The quest deck: each stage once, and a stage printed in several copies ("a different stage 2A" for each player, 10038:B:1) once for each seat, never more than
 // the copies the box holds. Every stage the box prints once is dealt once, so a scenario without such a stage deals `data.stages` unchanged.
+// The Nightmare deck's quest cards (`nightmare.questCards`) follow the stages on Nightmare: a stage 3 after the last printed one (Grimbeorn's Folly, 900511).
 export function questDeckCodes(data: AnyScenarioData, difficulty: Difficulty = "Normal", seatCount = 1): string[] {
   const placements = placementsAt(data, difficulty);
-  return data.stages.flatMap((code) => {
+  const stages = data.stages.flatMap((code) => {
     const printed = placements.find((card) => card.pile === "quest" && card.code === code);
     const copies = printed ? Math.max(1, Math.min(copiesAt(printed, difficulty), seatCount)) : 1;
     return Array.from({ length: copies }, () => code);
   });
+  return difficulty === "Nightmare" ? [...stages, ...(data.nightmare?.questCards ?? [])] : stages;
 }
 
 const SETUP_VERB = {
@@ -382,7 +384,7 @@ export function campaignScenario<T extends AnyScenarioData>(data: T): T {
 // A stage that names CatchUpWins (12013:B:3) carries the Stormcaller's stage number that makes its defeat a win as its `catchUp`.
 // A stage that names AdvanceToRandomStage (19048:B:2) carries the stages it proceeds to, in a random order, as its `randomNext`.
 // A stage that names FlipAtQuestPhase (19135:A:2) is a stage of a quest deck (`deck`): it is not flipped when revealed.
-function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true }; deck?: true } {
+export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true }; deck?: true } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");

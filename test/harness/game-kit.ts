@@ -321,7 +321,7 @@ export type StandaloneGoldenBase = { seatCount: 1 | 2; seed: number; difficulty:
  */
 export function standaloneGame<D extends string, P extends object>(spec: StandaloneGameSpec<D, P>) {
   async function world(decks: D): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-    const codes = [...spec.scenario.cards.map((card) => card.code), ...spec.scenario.campaignPlaced, ...gameCodes(spec.campaign, spec.scenario), ...(spec.scenario.nightmare ? [spec.scenario.nightmare.setupCard, ...spec.scenario.nightmare.cards.map((card) => card.code)] : []), ...spec.codes];
+    const codes = [...spec.scenario.cards.map((card) => card.code), ...spec.scenario.campaignPlaced, ...gameCodes(spec.campaign, spec.scenario), ...(spec.scenario.nightmare ? [spec.scenario.nightmare.setupCard, ...spec.scenario.nightmare.cards.map((card) => card.code), ...(spec.scenario.nightmare.questCards ?? [])] : []), ...spec.codes];
     const cards = await standInWorld(codes, spec.stats[decks]);
     if (namesTreasures(EFFECTS, new Set(codes))) for (const [code, treasure] of loadTreasures()) if (!cards.has(code)) cards.set(code, treasure);
     return { cards, ctx: { effects: EFFECTS, cards } };

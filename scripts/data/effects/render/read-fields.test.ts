@@ -333,7 +333,7 @@ describe("effects render read fields, conditions", () => {
     tokens: [{ kind: "tokens", code: "09072", min: 1, perPlayer: true }],
     currentQuest: [{ kind: "currentQuest", is: "side" }, { kind: "currentQuest", is: "self" }, { kind: "currentQuest", is: "other" }],
     questLeads: [{ kind: "questLeads" }],
-    questProgressNoted: [{ kind: "questProgressNoted" }],
+    questProgressNoted: [{ kind: "questProgressNoted", is: true }, { kind: "questProgressNoted", is: false }],
     currentQuestProgress: [{ kind: "currentQuestProgress", is: "some" }, { kind: "currentQuestProgress", is: "none" }],
     defendingAgainst: [{ kind: "defendingAgainst", trait: "Undead" }],
     attacking: [{ kind: "attacking", card: "host", enemy: { type: "enemy", control: "any" }, notEnemy: { type: "enemy", control: "any" }, alone: true, ranged: true }],

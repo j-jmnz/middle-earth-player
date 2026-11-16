@@ -81,6 +81,7 @@ export function worldCodes(campaign: CampaignData, scenario: AnyScenarioData, ef
   if (scenario.nightmare) {
     codes.add(scenario.nightmare.setupCard);
     for (const card of scenario.nightmare.cards) codes.add(card.code);
+    for (const code of scenario.nightmare.questCards ?? []) codes.add(code);
   }
   if (scenario.campaignCard !== undefined) for (const code of instructionCodes(effects, scenario.campaignCard)) codes.add(code);
   for (const code of extra) codes.add(code);

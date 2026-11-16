@@ -337,8 +337,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("playerUnengaged") }),
   // The active location prints a Wizardry line ("If no Wizardry effect is triggered this way", 143062:A:1, read with `not`; false with no active location). Read by the wizardry family.
   z.strictObject({ kind: z.literal("hasWizardry") }),
-  // Progress was placed on the current quest card itself this phase, the overflow of an explored active location included ("if no progress was placed on the current quest this phase", 900501:A:4, read with `not`); read from the note the table's `noteQuestProgress` flag keeps (src/rules/families/wizardry/progress.ts).
-  z.strictObject({ kind: z.literal("questProgressNoted") }),
+  // Progress was placed on the current quest card itself this phase, the overflow of an explored active location included ("if no progress was placed on the current quest this phase", 900501:A:4, `is: false`); read from the note the table's `noteQuestProgress` flag keeps (src/rules/families/wizardry/progress.ts).
+  z.strictObject({ kind: z.literal("questProgressNoted"), is: z.boolean() }),
   z.strictObject({ kind: z.literal("soleAttacker") }),
   // The Captives in play (the Uruk-hai's heroes under To Isengard! or held by an enemy; src/rules/families/captives): at least `min` and at most `max` of them, or with `of: "actor"` only the acting seat's ("a seat with no Captive chooses one", 143069:A:1; "if there are no Captives in play", 143022:A:1).
   z.strictObject({ kind: z.literal("captives"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), of: z.literal("actor").optional() }),
