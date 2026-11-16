@@ -1,6 +1,6 @@
-// `pnpm test phone-bundle`: the Android JS bundle of this tree against the one of the merge base with origin/main (docs/architecture.md, Screens). The desktop work
-// leaves the phone untouched, so the two must be byte-identical apart from where the checkout lives. It exports Android twice with `--no-bytecode --clear` and the same
-// environment, once in a temporary worktree at the merge base and once here, and fails, naming the first modules that differ, unless the bundles match. Both exports use this checkout's installed node_modules (the worktree symlinks them), so it proves the phone's source identical, not a dependency change: a pnpm-lock.yaml change touching a phone dependency is reviewed by hand.
+// `pnpm test phone-bundle`: the Android and iOS JS bundles of this tree against the ones of the merge base with origin/main (docs/architecture.md, Screens). The desktop work
+// leaves the phone untouched, so each pair must be byte-identical apart from where the checkout lives. It exports each platform twice with `--no-bytecode --clear` and the same
+// environment, once in a temporary worktree at the merge base and once here, and fails, naming the first modules that differ, unless the bundles of both platforms match (an iOS export needs no Xcode). Both exports use this checkout's installed node_modules (the worktree symlinks them), so it proves the phone's source identical, not a dependency change: a pnpm-lock.yaml change touching a phone dependency is reviewed by hand.
 //   --base <ref>  compare against that commit instead of the merge base (`--base HEAD` compares the last commit with the working tree)
 //   --keep        keep the worktree and both exports, and print where they are
 //   --if-desktop-work  do nothing unless the diff from the base touches desktop work (phone-files.ts, isDesktopWork), as the pull request job runs it
@@ -38,23 +38,26 @@ function baseCommit(asked: string | null): { sha: string } | { skip: string } {
   return base.ok && base.out !== "" ? { sha: base.out } : { skip: "no merge base with origin/main (a shallow clone: fetch the history)" };
 }
 
-function exportAndroid(log: Log, tree: string, out: string): void {
+type Platform = "android" | "ios";
+const PLATFORMS: readonly Platform[] = ["android", "ios"];
+
+function exportBundle(log: Log, platform: Platform, tree: string, out: string): void {
   const cli = createRequire(path.join(ROOT, "package.json")).resolve("expo/bin/cli");
   const started = performance.now();
-  const run = spawnSync(process.execPath, [cli, "export", "-p", "android", "--no-bytecode", "--clear", "--output-dir", out], {
+  const run = spawnSync(process.execPath, [cli, "export", "-p", platform, "--no-bytecode", "--clear", "--output-dir", out], {
     cwd: tree,
     encoding: "utf8",
     maxBuffer: 1 << 28,
     env: { ...process.env, CI: "1", EXPO_NO_TELEMETRY: "1", EXPO_OFFLINE: "1" },
   });
   if (run.status !== 0) throw new Error(`expo export failed in ${tree}:\n${run.stdout}\n${run.stderr}`.slice(-4000));
-  log.debug(`exported ${tree} in ${duration(performance.now() - started)}`);
+  log.debug(`exported ${platform} of ${tree} in ${duration(performance.now() - started)}`);
 }
 
-function bundleOf(out: string): string {
-  const dir = path.join(out, "_expo/static/js/android");
+function bundleOf(platform: Platform, out: string): string {
+  const dir = path.join(out, "_expo/static/js", platform);
   const files = existsSync(dir) ? readdirSync(dir).filter((name) => name.endsWith(".js")) : [];
-  if (files.length !== 1) throw new Error(`expected one Android bundle in ${dir}, found ${files.length}`);
+  if (files.length !== 1) throw new Error(`expected one ${platform} bundle in ${dir}, found ${files.length}`);
   return readFileSync(path.join(dir, files[0] ?? ""), "utf8");
 }
 
@@ -148,20 +151,25 @@ async function main(log: Log): Promise<void> {
     // `pnpm assets scans` rewrites the tracked scan map in place; the base is given the one this tree has.
     if (existsSync(path.join(ROOT, "assets/scans")) && existsSync(path.join(tree, SCAN_MAP))) cpSync(path.join(ROOT, SCAN_MAP), path.join(tree, SCAN_MAP));
 
-    const baseOut = path.join(scratch, "base-out");
-    const headOut = path.join(scratch, "head-out");
-    exportAndroid(log, tree, baseOut);
-    exportAndroid(log, ROOT, headOut);
-    const baseText = normalise(bundleOf(baseOut), tree);
-    const headText = normalise(bundleOf(headOut), ROOT);
-    if (baseText === headText) {
-      log.info(`IDENTICAL: the Android bundle matches the one at ${base.sha.slice(0, 9)} (${bytes(headText.length)}, ${modulesOf(headText).length} modules)`);
-      return;
+    const failed: string[] = [];
+    for (const platform of PLATFORMS) {
+      const baseOut = path.join(scratch, `base-out-${platform}`);
+      const headOut = path.join(scratch, `head-out-${platform}`);
+      exportBundle(log, platform, tree, baseOut);
+      exportBundle(log, platform, ROOT, headOut);
+      const baseText = normalise(bundleOf(platform, baseOut), tree);
+      const headText = normalise(bundleOf(platform, headOut), ROOT);
+      if (baseText === headText) {
+        log.info(`IDENTICAL: the ${platform} bundle matches the one at ${base.sha.slice(0, 9)} (${bytes(headText.length)}, ${modulesOf(headText).length} modules)`);
+        continue;
+      }
+      failed.push(platform);
+      log.error(`DIFFERENT: the ${platform} bundle`);
+      for (const line of describeDifference(baseText, headText)) log.error(line);
     }
-    for (const line of describeDifference(baseText, headText)) log.error(line);
-    throw new Error(`the Android bundle differs from the one at ${base.sha.slice(0, 9)}: the desktop work must leave the phone's bundle byte-identical (docs/architecture.md, Screens)`);
+    if (failed.length > 0) throw new Error(`the ${failed.join(" and ")} bundle differs from the one at ${base.sha.slice(0, 9)}: the desktop work must leave the phone's bundles byte-identical (docs/architecture.md, Screens)`);
   } finally {
-    if (keep) log.info(`kept ${scratch} (base worktree, base-out, head-out)`);
+    if (keep) log.info(`kept ${scratch} (base worktree, base-out-<platform>, head-out-<platform>)`);
     else {
       if (added) git(["worktree", "remove", "--force", tree]);
       git(["worktree", "prune"]);

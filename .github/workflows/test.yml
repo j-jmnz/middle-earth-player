@@ -118,8 +118,8 @@ jobs:
       - run: sudo apt-get install -y xvfb
       - run: pnpm desktop smoke
 
-  # The Android bundle of a pull request with desktop work against main's (docs/architecture.md, Screens): both exported with --no-bytecode, and the job fails
-  # unless they are byte-identical. The full history gives it the merge base; the script does nothing for a diff with no desktop work. Its own job, like a11y-web, and not
+  # The Android and iOS bundles of a pull request with desktop work against main's (docs/architecture.md, Screens): each exported with --no-bytecode, and the job fails
+  # unless each pair is byte-identical. The full history gives it the merge base; the script does nothing for a diff with no desktop work. Its own job, like a11y-web, and not
   # waited on by `test`, which stays as fast.
   phone-bundle:
     if: github.event_name == 'pull_request'
