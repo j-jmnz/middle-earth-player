@@ -1,5 +1,5 @@
 // What the reader table lists and in which order (docs/design-system-table.md, Screen reader): the zones as headings, each with its cards,
-// then the piles. The same selectors as the web list (table-canvas.tsx) give the cards; this file only orders and groups them, so a test
+// then the piles. The same selectors as the reader table (table-canvas.tsx) give the cards; this file only orders and groups them, so a test
 // reads the rows as plain data in node. Pure.
 import type { PrintedCard } from "../../rules/core/printed.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
@@ -39,7 +39,7 @@ export type ReaderRowsDeps = {
   discover: number;
 };
 
-// The sea family's lines the web list prints above the zones: the Heading, the seat's ships with their damage, and the Sailing test's look.
+// The sea family's lines the reader table prints above the zones: the Heading, the seat's ships with their damage, and the Sailing test's look.
 function seaNotes(game: ScenarioState, seat: number, deps: ReaderRowsDeps): ReaderItem[] {
   const notes: string[] = [];
   const step = headingStepOf(game.sea?.heading);
@@ -53,7 +53,7 @@ function seaNotes(game: ScenarioState, seat: number, deps: ReaderRowsDeps): Read
   return notes.map((text) => ({ kind: "text", text }));
 }
 
-// A pile's words: the count (and the points a victory display scores), a card playable from it, and the card on top or attached, as the web list says them.
+// A pile's words: the count (and the points a victory display scores), a card playable from it, and the card on top or attached, as the reader table says them.
 function pileItem(game: ScenarioState, view: PileView, deps: ReaderRowsDeps): ReaderItem {
   const id = `pile:${view.pile}`;
   const speech = pileSpeech({ zone: view.pile, count: view.ids.length, points: view.points }, deps.playable.has(id), view.pile === "grottoDeck" && view.top ? deps.nameOf(view.top.code) : null);

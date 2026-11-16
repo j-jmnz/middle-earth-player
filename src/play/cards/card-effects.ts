@@ -351,7 +351,7 @@ export type SlotNumbers = {
   side: SideQuestMark | null;
   // A hero or ally the Campaign Log marks determined, or that carries a Determination (determined-mark.ts): a small pill with the word, and what it means in the preview and to the reader.
   determined: DeterminedMark | null;
-  // A facedown Reanimated Dead (The Dread Realm): what it is and whose card it is, drawn as the small mark on its back and said by the reader and the web list (realm-preview.ts). Null on every other card.
+  // A facedown Reanimated Dead (The Dread Realm): what it is and whose card it is, drawn as the small mark on its back and said by the reader and the reader table (realm-preview.ts). Null on every other card.
   dead: string | null;
   // In the enemy attacks step: an engaged enemy's attack or a character's defense, drawn at the card's foot (combatNumber).
   combat: CombatNumber | null;

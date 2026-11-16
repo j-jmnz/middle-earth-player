@@ -354,7 +354,7 @@ export function discoverLogLine(facts: Pick<DiscoverFacts, "looked"> & { locatio
   return `Discover at ${facts.location}: looked at ${cards(facts.looked)}${facts.loot ? `, attached ${facts.loot}` : ""}${facts.hazard ? `, revealed ${facts.hazard}` : ""}`;
 }
 
-/** What a screen reader hears of the strip, and the web list's line for it. */
+/** What a screen reader hears of the strip, and the reader table's line for it. */
 export function lookStripWords(count: number): string {
   return `Discover look, ${cards(count)} placed in the encounter discard pile`;
 }

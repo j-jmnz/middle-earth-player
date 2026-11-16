@@ -45,7 +45,7 @@ export function leaveGate(gate: SpotlightGate, seq = gate.seq): SpotlightGate {
 
 /**
  * Whether the table is waiting for the spotlight: it has attacks to play, has not ended, a canvas will draw it, and the motion
- * scale is not 0 (reduced motion plays none; the banner carries the attack). The web build has no canvas to draw it.
+ * scale is not 0 (reduced motion plays none; the banner carries the attack). The reader table mounts no canvas and ends the gate itself (reader-gate.ts).
  */
 export function spotlightHolds(gate: SpotlightGate, scale: number, canvas: boolean): boolean {
   return canvas && scale > 0 && gate.clashes.length > 0 && gate.ended == null;

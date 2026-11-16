@@ -70,7 +70,7 @@ export function stripText(slot: CardSlot, questPoints: number | null, owner?: st
   return loses ? `${count} · lose` : count;
 }
 
-// What the canvas draws on a card, in words for the web list: an enemy's engagement cost against the threat, a delayed
+// What the canvas draws on a card, in words for the reader table: an enemy's engagement cost against the threat, a delayed
 // effect to come.
 export function marksText(slot: SlotInfo | null): string {
   if (!slot) return "";

@@ -10,7 +10,7 @@
 // frames, and the canvas does not record its scene once for each picture.
 import { FilterMode, MipmapMode, Skia, type SkImage } from "@shopify/react-native-skia";
 import { useEffect, useEffectEvent, useState } from "react";
-import { PixelRatio } from "react-native";
+import { PixelRatio, Platform } from "react-native";
 
 import { assetUri } from "./asset-uri.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
@@ -58,6 +58,22 @@ async function decode(source: PictureSource, box: Box): Promise<SkImage | null> 
 // How long a frame may spend decoding before the rest wait for the next frame (ms): the work that blocks the JS thread is the
 // decode and the downscale, and a 60 Hz frame is 16 ms.
 const FRAME_BUDGET = 6;
+
+// The web frees an image the moment it is disposed (CanvasKit's memory is not reference counted), and the Skia scene that drew it is replaced a few
+// tasks after the React commit that dropped it, so a released copy is freed after this long (ms), not at once. The phone frees at once.
+const WEB_RELEASE_MS = 500;
+
+// Frees copies the committed canvas no longer draws.
+function release(images: readonly SkImage[]): void {
+  if (images.length === 0) return;
+  if (Platform.OS !== "web") {
+    for (const image of images) image.dispose();
+    return;
+  }
+  setTimeout(() => {
+    for (const image of images) image.dispose();
+  }, WEB_RELEASE_MS);
+}
 
 // How many copies of codes the table no longer draws are kept, the ones it drew last: in two-handed play the table turns to the other
 // seat on every pass, and turned back its cards are drawn at once instead of as their names while they decode again. Enough for one seat's
@@ -149,11 +165,16 @@ class Pictures {
     this.pump();
   }
 
-  /** Disposes the copies the canvas has stopped drawing: called once the map without them is committed. */
-  disposeRetired(): void {
-    const done = this.retired;
-    this.retired = [];
-    for (const image of done) image.dispose();
+  /**
+   * Disposes the copies the canvas has stopped drawing: called once the map `shown` is committed. A copy retired after that map was announced
+   * (a decode finished in between) is still in it, and waits for the commit of the next map, which every retirement announces: on the web a
+   * disposed image frees its memory at once, and a scene that still draws it throws.
+   */
+  disposeRetired(shown: ReadonlyMap<string, SkImage>): void {
+    const drawn = new Set(shown.values());
+    const done = this.retired.filter((image) => !drawn.has(image));
+    this.retired = this.retired.filter((image) => drawn.has(image));
+    release(done);
   }
 
   /**
@@ -170,9 +191,9 @@ class Pictures {
     this.announcing = null;
     this.pumping = null;
     this.announce(NONE);
-    for (const copy of this.held.values()) copy.image.dispose();
+    release([...this.held.values()].map((copy) => copy.image));
     this.held.clear();
-    this.disposeRetired();
+    this.disposeRetired(NONE);
   }
 
   private announceSoon(): void {
@@ -255,7 +276,7 @@ export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: 
   const key = boxesKey(boxes, kept);
 
   useEffect(() => {
-    pictures.disposeRetired();
+    pictures.disposeRetired(images);
   }, [images, pictures]);
 
   // Tells the pictures what the table wants now. It runs when the boxes' key or the cache revision changes, and reads the latest boxes and `picture`.

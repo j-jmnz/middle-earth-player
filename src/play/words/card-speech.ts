@@ -124,7 +124,7 @@ function costWords(printed: PrintedCard): string | null {
 }
 
 function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: CardSpeechDeps): string {
-  // The same three facedown words the web list uses.
+  // The same three facedown words the reader table uses.
   if (isPrisoner(card)) return `Prisoner: ${deps.nameOf(card.code)}, face down`;
   if (card.prisoner === true) return "Face down, held with the prisoner";
   // A Reanimated Dead says what it is and whose card it is, never the card behind it (realm-preview.ts).

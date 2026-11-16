@@ -115,7 +115,7 @@ export function useTableChoice({
   const legal = useStore(store, (state) => state.legal);
   const moment = useStore(store, (state) => state.moment);
   const canUndo = useStore(store, (state) => state.history.length > 0);
-  // The phone's screen reader (not the web list): it hears a sheet's readerNote and gets the words of each card (reader-table.tsx).
+  // A screen reader, or Table as a list on Always: it hears a sheet's readerNote and gets the words of each card (reader-table.tsx).
   const readerMode = useReaderMode();
   // The web's canvas needs CanvasKit; until it is loaded the table is the reader table's list (canvas/table-canvas.tsx). Always true on the phone.
   const canvasReady = useCanvasKit() === "ready";
