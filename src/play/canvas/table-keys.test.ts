@@ -44,10 +44,11 @@ describe("relays", () => {
 });
 
 describe("relayKeys", () => {
-  it("sends the key to the root as a key down, and unbinds", () => {
+  it("sends the key to the root as a key down, not to a hidden root, and unbinds", () => {
     const listeners = new Map<string, (event: unknown) => void>();
     const dispatched: { type: string; key: string }[] = [];
-    const table = { contains: () => false, dispatchEvent: (event: { type: string; key: string }) => dispatched.push(event) };
+    let visible = true;
+    const table = { contains: () => false, checkVisibility: () => visible, dispatchEvent: (event: { type: string; key: string }) => dispatched.push(event) };
     class FakeKeyboardEvent {
       type: string;
       key: string;
@@ -68,6 +69,9 @@ describe("relayKeys", () => {
     listeners.get("keydown")?.(press("Escape"));
     listeners.get("keydown")?.(press("a"));
     expect(dispatched).toMatchObject([{ type: "keydown", key: "Escape" }]);
+    visible = false;
+    listeners.get("keydown")?.(press("z"));
+    expect(dispatched).toHaveLength(1);
     unbind();
     expect(listeners.size).toBe(0);
   });

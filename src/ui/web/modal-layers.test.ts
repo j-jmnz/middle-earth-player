@@ -1,7 +1,7 @@
 // Which nodes a modal layer makes inert (modal-layers.ts): the siblings of the layer and of each of its ancestors, and nothing inside it or above it.
 import { describe, expect, it } from "vitest";
 
-import { outsideOf } from "./modal-layers.ts";
+import { outsideOf, ownScrim } from "./modal-layers.ts";
 
 type Node = { name: string; parent: Node | null; children: Node[] };
 
@@ -26,5 +26,17 @@ describe("outsideOf", () => {
   it("stops at a detached layer instead of walking past the top", () => {
     const lone = tree("lone", leaf("a"));
     expect(outsideOf(lone, (node) => node.parent, (node) => node.children, tree("body"))).toEqual([]);
+  });
+});
+
+describe("ownScrim", () => {
+  const box = {};
+  const element = (testID: string | null, parentElement: unknown) => ({ parentElement, getAttribute: () => testID });
+  it("is a scrim beside the layer, not a scrim elsewhere or another sibling", () => {
+    const modal = { parentElement: box };
+    expect(ownScrim(element("carousel-scrim", box), modal)).toBe(true);
+    expect(ownScrim(element("carousel-scrim", {}), modal)).toBe(false);
+    expect(ownScrim(element("phase-rail", box), modal)).toBe(false);
+    expect(ownScrim(element(null, box), modal)).toBe(false);
   });
 });
