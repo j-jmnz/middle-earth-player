@@ -587,7 +587,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -601,8 +601,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02061",
@@ -615,8 +616,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02061",
@@ -627,12 +629,14 @@
         "sha256": "aae89bb4868a0431ef77cbca8a45959c2af12338c39aa2d922225c8d20c36c73"
       },
       "lines": [
+        "Response: After the quest phase begins, the first player may place X damage tokens on Wilyador to look at the top 3 cards of the encounter deck. Reveal and add 1 of these cards to the staging area, and discard the other 2. X is the number of players in the game.",
         "Forced: After a card effect heals Wilyador, remove that card from the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text omits the Response paragraph; the card prints it first."
     },
     {
       "code": "02062",
@@ -645,8 +649,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02062",
@@ -657,12 +662,14 @@
         "sha256": "63674d2dd04f5e3e81c35f7a4828cd1342412297835c4982b2e7e45d505ce452"
       },
       "lines": [
+        "When Revealed: Heal 5 wounds from Wilyador for each Athelas objective card the players control.",
         "If Wilyador is completely healed when this effect resolves, Wilyador survives and the players have won the game. Otherwise, the players have lost the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text omits the When Revealed paragraph; the card prints it first."
     },
     {
       "code": "02063",
@@ -678,7 +685,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -690,14 +697,15 @@
         "sha256": "6d25d9695461bf79f85e8423d47b8bfae0a43154c8370f9145188f03ef6f784c"
       },
       "lines": [
-        "No attachments. The first player gains control of Wilyador.",
+        "No attachments. The first player gains control of Wilyador, as an ally.",
         "Forced: At the end of each round, Wilyador suffers 2 damage.",
         "Wilyador cannot be healed of more than 5 wounds by a single effect. If Wilyador leaves play, the players have lost the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text omits 'as an ally'."
     },
     {
       "code": "02065",
@@ -714,7 +722,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -730,7 +738,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -747,7 +755,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -764,7 +772,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -781,7 +789,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -798,7 +806,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -815,7 +823,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -831,7 +839,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -848,7 +856,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -865,7 +873,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -882,7 +890,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -898,7 +906,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -910,11 +918,11 @@
         "sha256": "f5ce5bcc903c0eb8d4db5eca94c38351ff80b02f954c0e56fbcbca30fcf1cfd3"
       },
       "lines": [
-        "Forced: After traveling to The North Stair, move the top card of the encounter discard pile to the staging area. Resolve any 'when revealed' effects on that card."
+        "Forced: After traveling to The North Stair, move the top card of the encounter discard pile to the staging area. Resolve any \"when revealed\" effects on that card."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -931,7 +939,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -948,7 +956,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -965,7 +973,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -981,7 +989,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -997,7 +1005,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1014,7 +1022,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1030,7 +1038,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1047,7 +1055,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
