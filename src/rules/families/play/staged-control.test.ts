@@ -12,7 +12,7 @@ const JOINS: Effect = {
   lines: ["02037:A:2"],
   timing: "constant",
   condition: { kind: "tokens", code: "helper", min: 2 },
-  instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self" }],
+  instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self", intoPlay: true }],
 };
 const ctx = playCtx([JOINS]);
 

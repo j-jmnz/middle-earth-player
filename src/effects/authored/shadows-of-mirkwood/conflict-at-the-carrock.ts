@@ -55,7 +55,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "constant",
     instructions: [{ verb: "ModifyStat", stat: "noExhaustDefendVersus", amount: 1, until: "whileSourceInPlay", target: "self", when: { kind: "defendingAgainst", trait: "Troll" } }],
   },
-  { id: "02037:constant:2", cardCode: "02037", lines: ["02037:A:2"], timing: "constant", condition: { kind: "tokens", code: "02037", min: 8 }, instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self" }] },
+  { id: "02037:constant:2", cardCode: "02037", lines: ["02037:A:2"], timing: "constant", condition: { kind: "tokens", code: "02037", min: 8 }, instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self", intoPlay: true }] },
   {
     id: "02037:action:1",
     cardCode: "02037",

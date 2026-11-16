@@ -88,7 +88,7 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
       const holder = instruction.who === "lastPlayer" ? lastPlayer(next) : next.firstPlayer;
       const held = id ? next.cards[id] : undefined;
       // An objective ally in the staging area joins the first player's play area, faceup and ready (Grimbeorn the Old, 02037:A:2).
-      if (id && held?.zone === "staging") next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
+      if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
       else if (id && held?.controller !== holder) next = giveControl(next, id, holder);
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {
       next = destroyCard(next, source.id, ctx.cards, steps);

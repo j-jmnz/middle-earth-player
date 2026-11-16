@@ -152,7 +152,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   SearchReveal: [{ verb: "SearchReveal", trait: "Uruk-hai", type: "enemy", who: "firstPlayer", to: "engaged", cost: true }],
   AttachSelf: [{ verb: "AttachSelf", to: { kind: "hero", trait: "Warrior" } }, { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } }],
   MakeActive: [{ verb: "MakeActive" }, { verb: "MakeActive", target: "self" }],
-  ControlledBy: [{ verb: "ControlledBy", who: "firstPlayer", card: "host" }, { verb: "ControlledBy", who: "lastPlayer", card: "self" }],
+  ControlledBy: [{ verb: "ControlledBy", who: "firstPlayer", card: "host" }, { verb: "ControlledBy", who: "lastPlayer", card: "self", intoPlay: true }],
   ShuffleIntoDeck: [{ verb: "ShuffleIntoDeck", code: "02048", trait: "Troll", type: "enemy", each: true }],
   CancelEffect: [{ verb: "CancelEffect" }], SetAsideFromDeck: [{ verb: "SetAsideFromDeck", code: "900503" }], RemoveFromGame: [{ verb: "RemoveFromGame", self: true }],
   EndQuestPhase: [{ verb: "EndQuestPhase" }],
