@@ -33,6 +33,8 @@ No phase is open.
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50). Until it exists `.maestro/scenarios/conflict-at-the-carrock/conflict-at-the-carrock.yaml` cannot run.
+- `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists. Until it exists `.maestro/scenarios/return-to-mirkwood/return-to-mirkwood.yaml` cannot run.
 - `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.
 - `dum-won` is not committed: no seed in 600 wins The Battle of Carn Dûm with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-carn-dum/the-battle-of-carn-dum.yaml` cannot run.
 - `rhudaur-won` is not committed: no seed wins The Treachery of Rhudaur with the saved decklists under the golden policy. Until it exists `.maestro/scenarios/the-treachery-of-rhudaur/the-treachery-of-rhudaur.yaml` cannot run.
@@ -248,7 +250,7 @@ No phase is open.
 - Not built from the Carved Stone handoff: the card screen's "Add to a deck"; the table's encounter row and right-hand piles; the handoff's defend tray.
 - Tablet follow-ups: an Android `appCategory` or large-screen plugin if the table lock must hold on Android 16; pushed routes under the tabs; a Packs list-detail; a Deck import section in `docs/design-system.md`; a "Tap anywhere to close" hint on the preview.
 - Run `pnpm assets scans` on the build machine before a release, so side B pictures and the `.scene` files are bundled.
-- Scenario pipeline (`docs/plans/scenario-pipeline.md`): section E (ledger seed, pile overrides, XP rows in data) is not built, nor are its Next steps; the core's remaining direct family calls (travel, pick, condition, amount, `syncThreatSaves`, `playSweep`, `heldByLapsedStage`) move behind the hooks when their family is next changed.
+- Scenario pipeline (`docs/plans/scenario-pipeline.md`): section E's ledger seed is built (`pnpm data ledger-seed`); its pile overrides and XP rows in data are not, nor are its Next steps; the core's remaining direct family calls (travel, pick, condition, amount, `syncThreatSaves`, `playSweep`, `heldByLapsedStage`) move behind the hooks when their family is next changed.
 - Choice words: the entries marked Open in the allowlist of `src/play/words/scenario-words.test.ts` are bare prompts still to be named.
 - The Maestro subflows in `.maestro/subflows/` and the eight Dream-chaser flows that call them are checked statically only, not run.
 - Accessibility: the drawn canvas takes no keyboard focus and its own text and fixed alphas do not follow Bold Text or Reduce Transparency; on iOS, Escape and Z do nothing (React Native sends no key events there).
@@ -279,6 +281,13 @@ No phase is open.
 - Renderer gaps, The Black Gate Opens (behaviour proven by spec rows): a self-only travel bar reads "any location" (146024:A:1), the cancelling seat shown as "the acting player" (146031:A:2), a subjectless leave-play trigger shown as any card (146028:A:1), the Embassy, `totalOf`, `mostPerPlayer`, `PlaceUnderSelf`, `ReturnUnderToStaging`, `SearchMove`, `EngageNextPlayer`, `RemoveFromQuest`, `DealShadowTo`, `TakeControl`, `AssignDamage` and the campaign verbs printed as JSON, and `firstPlayerReveals`, `raiseThreatIfDestroys` and `endsInDefeat` as bare names (146025 to 146041, 146072 to 146074).
 - Renderer gaps, Mount Doom (behaviour proven by spec rows): `firstPlayerTens`, `stageProgress`, `mostPerPlayer`, `DiscardUntil`, `MoveEncounterCard`, `AssignDamage`, `SearchMove`, `TravelTo`, `LimitEntries`, `UncancelableWhenRevealed`, `ChooseOption`, `EndCampaign` and the campaign verbs print as JSON, `other` as a bare flag (146043 to 146057, 146075:A:1, 146076, 146078:B:1, 146079).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
+
+### Rules and engine (Shadows of Mirkwood)
+- The rulesheets of The Hunt for Gollum and Conflict at the Carrock (MEC02, MEC03) have no text layer, so their rules have no span in `data/rules`; `docs/brief.md` (The Hunt for Gollum, Conflict at the Carrock) cites the PDFs.
+- Readings settled only by community discussion are marked so under each scenario in `docs/brief.md` (Shadows of Mirkwood). Not user-confirmed.
+- A discarded shadow card keeps its `host` (`detach` in `src/rules/core/zones.ts`); clearing it changes every `golden.json` (the field only), so it waits for an all-scenario engine bump. Workarounds: `src/rules/families/encounter/moves.ts` (a move to the active location) and `inspectTargets` in `src/play/store/selectors.ts`.
+- The Nightmare decks are not in `pnpm effects render --all`, so their renders have no snapshot (`scripts/data/effects/render/snapshots`).
+- Renderer gaps, Shadows of Mirkwood (behaviour proven by spec rows and line tests): a pick or count of `control: any` does not say it reaches the staging area; the final-stage win (02013:B:2); `activeThreat`, `returnsToEncounterDeck`, `cannotTriggerEffects`, `progressCap`, `returnsWithoutActive`, `undefendedToHolder`, `shadowHitsAll` and `treacheryHitsAll` show as flags; "engaged with a player" reads "the player"; victory-display stats read "while in play"; the seat a Response or a next player is counted from; `escapePassed` heard only from its own test (02106:B:2); a self-only travel bar reads "any location" (02065:A:3).
 
 ## Standing decisions
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.

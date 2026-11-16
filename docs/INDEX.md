@@ -31,27 +31,28 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` (~5.2K tok)
-  - 31–83 Features (~920)
+- `README.md` (~5.3K tok)
+  - 31–91 Features (~990)
     - 48–66 Themes (~320)
-    - 67–83 Campaigns (~200)
-  - 84–89 Private by design (~180)
-  - 90–93 Accessibility (~140)
-  - 94–149 Install (~1.2K)
-    - 98–103 Requirements (~100)
-    - 104–123 Android (~440)
-    - 124–136 iPhone and iPad (~350)
-    - 137–140 Check a download (optional) (~60)
-    - 141–149 If something goes wrong (~210)
-  - 150–171 Roadmap (~630)
-  - 172–221 Get involved (~970)
-    - 183–188 AI-assisted development (~150)
-    - 189–198 Project structure (~210)
-    - 199–212 Local setup (~170)
-    - 213–221 Documentation (~160)
-  - 222–225 Support (~90)
-  - 226–241 Attribution (~410)
-  - 242–245 License (~50)
+    - 67–81 Campaigns (~180)
+    - 82–91 Cycles (~90)
+  - 92–97 Private by design (~180)
+  - 98–101 Accessibility (~140)
+  - 102–157 Install (~1.2K)
+    - 106–111 Requirements (~100)
+    - 112–131 Android (~440)
+    - 132–144 iPhone and iPad (~350)
+    - 145–148 Check a download (optional) (~60)
+    - 149–157 If something goes wrong (~210)
+  - 158–178 Roadmap (~640)
+  - 179–228 Get involved (~970)
+    - 190–195 AI-assisted development (~150)
+    - 196–205 Project structure (~210)
+    - 206–219 Local setup (~170)
+    - 220–228 Documentation (~160)
+  - 229–232 Support (~90)
+  - 233–248 Attribution (~410)
+  - 249–252 License (~50)
 - `docs/architecture.md` — Architecture (~24.6K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
@@ -75,7 +76,7 @@ Read the sections your task touches.
   - 402–417 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~213.8K tok)
   - 17–41 Sections (~520)
-  - 42–53 Product (~630) ← 3
+  - 42–53 Product (~630) ← 2
   - 54–67 Non-goals (~590)
   - 68–88 Decisions (~840)
   - 89–118 Stack (~950)
@@ -131,8 +132,8 @@ Read the sections your task touches.
     - 1563–1600 The Tower of Cirith Ungol (~4.4K)
     - 1601–1637 The Black Gate Opens (~4.4K) ← 2
     - 1638–1666 Mount Doom (~4.3K)
-  - 1667–1805 Shadows of Mirkwood (~14.1K) ← 2
-    - 1675–1696 The Hunt for Gollum (~2.1K) ← 1
+  - 1667–1805 Shadows of Mirkwood (~14.1K) ← 3
+    - 1675–1696 The Hunt for Gollum (~2.1K) ← 2
     - 1697–1716 Conflict at the Carrock (~2.4K) ← 2
     - 1717–1742 A Journey to Rhosgobel (~2.9K) ← 1
     - 1743–1760 The Hills of Emyn Muil (~1.5K) ← 1
@@ -260,19 +261,20 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~13.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~14.1K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–282 Open items (~12.4K)
+  - 22–291 Open items (~12.9K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
-    - 35–76 Fixtures and Maestro (~2.3K)
-    - 77–116 Rules and engine (~1.6K)
-    - 117–237 Rules and engine (Angmar Awakened) (~5.3K)
-    - 238–262 Screens and code (~1.6K)
-    - 263–282 Rules and engine (The Two Towers) (~1.4K)
-  - 283–303 Standing decisions (~700)
+    - 35–78 Fixtures and Maestro (~2.4K)
+    - 79–118 Rules and engine (~1.6K)
+    - 119–239 Rules and engine (Angmar Awakened) (~5.3K)
+    - 240–264 Screens and code (~1.6K)
+    - 265–284 Rules and engine (The Two Towers) (~1.4K)
+    - 285–291 Rules and engine (Shadows of Mirkwood) (~380)
+  - 292–312 Standing decisions (~700)
 
 ## Live plans
 
@@ -289,17 +291,9 @@ Read when a task names the plan.
   - 93–113 F. Faster feedback while authoring (~870)
   - 114–138 Where a scenario's cost is now (~790)
   - 139–155 Next steps (~410)
-  - 156–167 After each scenario phase (~220) ← 1
+  - 156–167 After each scenario phase (~220)
   - 168–171 Order (~70)
   - 172–179 Verification (~100)
-- `docs/plans/shadows-of-mirkwood.md` — Plan: the Shadows of Mirkwood cycle, playable standalone with Nightmare (~3.0K tok)
-  - 3–16 Context (~460)
-  - 17–22 What does not move (~170)
-  - 23–34 A. Data: the cycle's cards, scenarios and ledger (~790)
-  - 35–51 B. The cycle shell: a scenario with no campaign (~680)
-  - 52–64 C–H. The six scenarios, in pack order (~500)
-  - 65–71 Closing (~200)
-  - 72–78 Verification (~190)
 
 ## Handovers
 
