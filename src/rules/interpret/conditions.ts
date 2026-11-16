@@ -13,7 +13,7 @@ import { spendablePools } from "../families/costs/verbs.ts";
 import { engagedThisRound } from "../families/attack/events.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
 import { seatThreat } from "../families/play/hooks.ts";
-import { distinctTraitCount, flaggedTrait } from "../families/misc/traits.ts";
+import { distinctTraitCount, flaggedTrait, lostTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
 import { headOf, inAreaOf } from "../families/breaking/areas.ts";
@@ -424,7 +424,7 @@ function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLo
 
 export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
-  if (trait === "Eagle" && instance != null && flagged(state, id, "losesEagle")) return false;
+  if (instance != null && lostTrait(state, id, trait)) return false;
   return (
     instance != null &&
     ((printedOf(ctx.cards, instance.code).traits.includes(trait) && !flagged(state, id, "blanksTraits")) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait) || countedTraits(state, id, ctx).includes(trait))

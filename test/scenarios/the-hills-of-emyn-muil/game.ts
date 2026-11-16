@@ -9,7 +9,7 @@ const cycle = loadCampaign("shadows-of-mirkwood");
 const muil = loadAnyScenario("the-hills-of-emyn-muil");
 
 // Test helper. A whole standalone game of The Hills of Emyn Muil played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. Every character quests, each seat engages every enemy it may and attacks together, a defender takes every attack he can, the travel phase goes to the first location offered and a choice takes the first option (`muilIntent`).
 export const MUIL_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: true };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type MuilDecks = "strong" | "weak" | "brittle";

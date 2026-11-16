@@ -351,7 +351,7 @@ export type ScenarioState = {
   stagesReached?: readonly string[];
   // The defeated stage waits for the first player to choose the next one (LookAtStages): "due" until its record is pushed, "asking" while it runs.
   stageChoice?: "due" | "asking";
-  // The final stage that holds the win (the flag `holdsWin`, 02106:B:2) was defeated and waits for its own Forced effect to win or reset the quest (families/escape/held.ts). Absent otherwise.
+  // The final stage that holds the win (the flag `holdsWin`, 02106:B:2) was defeated and waits for its own Forced effect to win or reset the quest (`holdStage`, families/quest/branch.ts). Absent otherwise.
   stageHeld?: string;
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];

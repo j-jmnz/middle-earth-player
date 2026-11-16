@@ -151,6 +151,8 @@ export function travelThere(state: ScenarioState, id: string, ctx: ReduceContext
 }
 
 // The encounter discard pile goes back into the encounter deck, which is shuffled; with a `trait`, only the cards with that trait do ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
+export function shuffleDiscardIn(state: ScenarioState): ScenarioState;
+export function shuffleDiscardIn(state: ScenarioState, ctx: ReduceContext, trait?: string): ScenarioState;
 export function shuffleDiscardIn(state: ScenarioState, ctx?: ReduceContext, trait?: string): ScenarioState {
   let next = state;
   for (const id of [...state.encounterDiscard]) if (trait == null || (ctx != null && hasTrait(state, id, trait, ctx))) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
