@@ -123,11 +123,11 @@ describe("900510:A:1 Time for Supper", () => {
     expect(run.state.cards[first(run.state, "f0")]?.zone).not.toBe("encounterDeck");
   });
 
-  it("900510:A:1 gains Surge when no Troll was damaged", () => {
-    const made = table({ engaged: ["900502"], deck: ["f0"] });
+  it("900510:A:1 gains Surge when no Troll was damaged: one instance, so one additional card (rr.surge)", () => {
+    const made = table({ engaged: ["900502"], deck: ["f0", "f0"] });
     const steps: EngineStep[] = [];
     const run = finish({ state: revealFromTop(made.state, made.ctx, "900510", steps).state, steps }, made.ctx);
-    expect(run.state.cards[first(run.state, "f0")]?.zone).not.toBe("encounterDeck");
+    expect(idsOf(run.state, "f0").filter((id) => run.state.cards[id]?.zone === "encounterDeck")).toHaveLength(1);
   });
 });
 

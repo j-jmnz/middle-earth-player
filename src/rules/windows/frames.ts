@@ -199,14 +199,25 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // A card still in play has entered play (rr.staging, step 3): "After a location enters play" (04060:A:1).
       const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });
       const revealing = next.seats[seat];
-      const surge = printed.keywords.surge || flagged(next, id, "gainsSurge") || (frame.data.kind === "reveal" && frame.data.surge);
-      if (!surge || !revealing || revealing.eliminated) return next;
-      return startReveal(next, seat, ctx, steps);
+      // Each separate instance of surge reveals 1 additional card (rr.surge): the printed keyword, each gain from a card in play and each grant made during this reveal.
+      const surges = (printed.keywords.surge ? 1 : 0) + heldAmount(next, id, "gainsSurge") + (frame.data.kind === "reveal" ? (frame.data.surge ? 1 : 0) + (frame.data.extraSurge ?? 0) : 0);
+      if (surges <= 0 || !revealing || revealing.eliminated || frame.data.kind !== "reveal") return next;
+      // The instances still to answer wait in the frame (step 6 reveals the next card when the one just revealed is done).
+      return startReveal(surges > 1 ? patchTop(next, { data: { ...frame.data, surgeLeft: surges - 1 } }) : next, seat, ctx, steps);
     }
+    case 6:
+      if (frame.data.kind === "reveal" && (frame.data.surgeLeft ?? 0) > 0 && !state.seats[seat]?.eliminated) {
+        return startReveal(patchTop(state, { data: { ...frame.data, surgeLeft: (frame.data.surgeLeft ?? 0) - 1 } }), seat, ctx, steps);
+      }
+      return finishReveal(state, frame, ctx, steps);
     default:
-      // The revealed card's staging is resolved: an encounter deck it emptied is reset now (faq.last-encounter-card).
-      return resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps, ctx);
+      return finishReveal(state, frame, ctx, steps);
   }
+}
+
+function finishReveal(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // The revealed card's staging is resolved: an encounter deck it emptied is reset now (faq.last-encounter-card).
+  return resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps, ctx);
 }
 
 function revealAnother(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

@@ -388,14 +388,17 @@ function discardTarget(
   return destroyCard(state, id, ctx.cards, steps);
 }
 
-// The reveal frame of the source card keeps the surge it was given for the rest of that reveal.
+// The reveal frame of the source card counts each separate instance of surge it was given (rr.surge) for the rest of that reveal.
 export function markSurge(state: ScenarioState, sourceId: string | null): ScenarioState {
   for (let index = state.stack.length - 1; index >= 0; index -= 1) {
     const frame = state.stack[index];
     if (frame?.frame !== "reveal" || frame.cardId !== sourceId || frame.data.kind !== "reveal") continue;
-    const stack = state.stack.map((entry, at) =>
-      at === index && entry.data.kind === "reveal" ? { ...entry, data: { ...entry.data, surge: true } } : entry,
-    );
+    // The first grant sets `surge`; each later grant is another separate instance (`extraSurge`).
+    const stack = state.stack.map((entry, at) => {
+      if (at !== index || entry.data.kind !== "reveal") return entry;
+      const data = entry.data;
+      return { ...entry, data: data.surge ? { ...data, extraSurge: (data.extraSurge ?? 0) + 1 } : { ...data, surge: true } };
+    });
     return { ...state, stack };
   }
   return state;

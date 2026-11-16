@@ -101,9 +101,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       { verb: "Pick", pick: { type: "hero", control: "any", from: "discard", who: "firstPlayer" } },
       { verb: "RemoveFromGame", when: HERO_REMOVED },
-      // "Then, heal all damage ...": with no hero to remove the part before "then" does not resolve, so nothing is healed (rr.then) and no damage was removed, which is the surge. The surge test is made before the healing.
+      // "Then, heal all damage ...": with no hero to remove the part before "then" does not resolve, so nothing is healed (rr.then) and no damage was removed, which is the surge. The surge test is made before the healing. One sentence, one instance of surge (rr.surge).
+      // The two cases are exclusive: no hero removed, or a hero removed and no Troll damaged.
       { verb: "GainSurge", when: { kind: "not", condition: HERO_REMOVED } },
-      { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: DAMAGED_TROLL } } },
+      { verb: "GainSurge", when: { kind: "all", conditions: [HERO_REMOVED, { kind: "count", pick: DAMAGED_TROLL, max: 0 }] } },
       { verb: "Each", pick: DAMAGED_TROLL, when: HERO_REMOVED, instructions: [{ verb: "Heal", all: true, target: "picked" }] },
     ],
   },
