@@ -10,7 +10,7 @@ import { isNightmarePlayable } from "../../../../campaign/playable";
 import { loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { EFFECTS } from "../../../../effects";
-import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, expandSide, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
 import { SeatPicker } from "../../../briefing/seat-picker";
 import { bookletParams, campaignOfScenario, scenarioOf } from "../../../data/campaign-data";
 import { BodyText, Section, Segmented } from "../../../kit/chrome";
@@ -47,14 +47,15 @@ export default function StandaloneBriefing() {
     () =>
       Array.from({ length: seatCount }, (_, index) => {
         const deck = savedDecks.find((item) => item.id === picked[index]);
-        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck) };
+        const side = expandSide(deck);
+        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck), ...(side.length > 0 ? { side } : {}) };
       }),
     [seatCount, savedDecks, picked],
   );
 
   // The world is built from the scenario and these codes (the Ring-bearers, every saved deck's heroes, the picked decks' cards), as one
   // string: a deck list read again on focus, or a pick of the same cards, keeps the world instead of loading it again.
-  const codeKey = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)])].sort().join("\0");
+  const codeKey = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => [...seat.deck, ...(seat.side ?? [])])])].sort().join("\0");
   const world = useMemo(() => {
     if (!campaign || !scenario) return null;
     return loadWorld(catalog, campaign, scenario, EFFECTS, codeKey === "" ? [] : codeKey.split("\0"));
@@ -93,7 +94,7 @@ export default function StandaloneBriefing() {
     const loadout: StandaloneLoadout = {
       scenarioId: scenario.id,
       difficulty,
-      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck] })),
+      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck], ...(seat.side ? { side: [...seat.side] } : {}) })),
       ringBearer,
     };
     try {

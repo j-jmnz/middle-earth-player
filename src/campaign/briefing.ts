@@ -4,6 +4,7 @@
 // this returns and deals only when `dealable` is true.
 import { deckRulesOf, heroLimit } from "../catalog/deck-rules.ts";
 import { deckSaveRefusal, formatDeckRefusal } from "../catalog/deck-save.ts";
+import { lootCodes, lootRefusal, lootRuleOf } from "../catalog/loot.ts";
 import { placementsAt, recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
 import { printedOf } from "../rules/core/printed.ts";
 import type { StartScenario } from "../rules/setup/setup.ts";
@@ -22,7 +23,8 @@ import type { World } from "./world.ts";
 import { wilderlandFacts } from "./wilderland.ts";
 import { xpFacts, type ModeCard } from "./xp.ts";
 
-export type BriefingSeat = { deckId: string | null; heroes: readonly string[]; deck: readonly string[] };
+// `side`: the saved deck's side deck, one code per copy (absent for none).
+export type BriefingSeat = { deckId: string | null; heroes: readonly string[]; deck: readonly string[]; side?: readonly string[] | undefined };
 
 export type BriefingInput = {
   world: World;
@@ -79,11 +81,14 @@ export function deckHasRingBearer(world: World, seat: BriefingSeat | undefined):
 // The loadout the saga rules and the checklist read: the saved deck's heroes, and in front of them the slot's hero when the
 // deck brings no Ring-bearer, or the ☺ hero the scenario grants the first player (☺ Aragorn: mec112.setting-up-the-game). A fallen hero is
 // not special-cased here: step 2 of the checklist names it.
+// A seat's contract takes its loot deck from the side deck (The Burglar's Turn): the cards that qualify, one of each title.
 export function loadoutOf(input: LoadoutInput): LoadoutSeat[] {
   const role = sagaRole(input.world);
   return input.seats.slice(0, input.seatCount).map((seat, index) => {
     const slot = role.kind === "ringBearer" && index === 0 && input.ringBearer && !deckHasRingBearer(input.world, seat) ? [input.ringBearer] : role.kind === "hero" && index === 0 && !seat.heroes.includes(role.hero) ? [role.hero] : [];
-    return { heroes: [...slot, ...seat.heroes], deck: seat.deck };
+    const rule = lootRuleOf(input.world.effects, seat.deck);
+    const loot = rule && input.world.deckFacts ? lootCodes(rule, deckCounts(seat.side ?? []), input.world.deckFacts) : [];
+    return { heroes: [...slot, ...seat.heroes], deck: seat.deck, ...(loot.length > 0 ? { loot } : {}) };
   });
 }
 
@@ -134,7 +139,10 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
       // A deck saves before it is ready to play (rr.deckbuilding); it is not dealt until it is. A contract's deckbuilding rules apply.
       // A treasure the log records is no deck card for this check: it is outside the 50 card minimum (emce.treasure); validateLoadout admits or refuses it.
       const refusal = deckSaveRefusal(seat.heroes, deckCounts(seat.deck.filter((code) => world.cards.get(code)?.campaignKind !== "treasure")), world.deckFacts, [], deckRulesOf(world.effects, seat.deck));
-      if (refusal) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(refusal)}` });
+      // A contract that builds a loot deck needs it in the side deck (src/catalog/loot.ts).
+      const rule = lootRuleOf(world.effects, seat.deck);
+      const short = refusal ?? (rule ? lootRefusal(rule, deckCounts(seat.side ?? []), world.deckFacts) : null);
+      if (short) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(short)}` });
     }
     for (const code of seat.heroes) {
       if (fallen.includes(code)) problems.push({ rule: "A fallen hero cannot start", message: `${nameOf(code)} is a fallen hero and cannot start.` });

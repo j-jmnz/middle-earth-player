@@ -715,7 +715,7 @@ export const RECORDS: readonly Effect[] = [
   // guarded X keyword, ignore it." "Forced: When the active location is explored, you may put each guarded attachment on that
   // location into play at no cost, or add it to your hand."
   { id: "22024:constant:1", cardCode: "22024", lines: ["22024:A:1"], timing: "constant", instructions: [{ verb: "DeckRule", rule: { kind: "noCards", type: "attachment" } }] },
-  { id: "22024:setup:1", cardCode: "22024", lines: ["22024:A:2"], timing: "setup", instructions: [{ verb: "BuildLootDeck" }, { verb: "FlipCard" }] },
+  { id: "22024:setup:1", cardCode: "22024", lines: ["22024:A:2"], timing: "setup", instructions: [{ verb: "BuildLootDeck", size: 14, type: "attachment", traits: ["Item", "Artifact"] }, { verb: "FlipCard" }] },
   {
     id: "22024:constant:2",
     cardCode: "22024",

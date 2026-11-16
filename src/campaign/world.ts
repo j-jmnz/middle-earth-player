@@ -93,9 +93,10 @@ export function logCodes(log: CampaignLog): string[] {
 
 // The codes of a deal's loadout: the Ring-bearer and the heroes and cards of each seat's deck. Shared by what the table opens with (a save's
 // log adds its own) and what a deal stamps, so both hash the same cards (worldHash).
-export function dealtCodes(loadout: { ringBearer: string | null; seats: readonly { heroes: readonly string[]; deck: readonly string[] }[] } | null): string[] {
+export function dealtCodes(loadout: { ringBearer: string | null; seats: readonly { heroes: readonly string[]; deck: readonly string[]; side?: readonly string[] | undefined }[] } | null): string[] {
   if (!loadout) return [];
-  return [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
+  // The side deck's cards too: a contract can deal them (The Burglar's Turn's loot deck).
+  return [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck, ...(seat.side ?? [])])];
 }
 
 // Every code a game can reach, which loadWorld loads and worldHash hashes: worldCodes, `extra`, and the cards its records take from the collection by code.

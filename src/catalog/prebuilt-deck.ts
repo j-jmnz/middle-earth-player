@@ -4,7 +4,7 @@ const slotSchema = z.strictObject({ code: z.string().min(1), count: z.number().i
 
 // data/decks/prebuilt.json: the player decks an official product prints or ships ready to play, built by
 // scripts/data/prebuilt-decks.ts from data/prebuilt-decks.json. `source` is the rule span that prints the list or the
-// DragnCards deck it was read from. `sideboard` holds the product's remaining cards; the app imports heroes and cards only.
+// DragnCards deck it was read from. `sideboard` holds the product's remaining cards; the import makes it the side deck.
 export const prebuiltDeckSchema = z.strictObject({
   id: z.string().min(1),
   name: z.string().min(1),

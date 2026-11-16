@@ -19,7 +19,7 @@ import { recordUnclosedRun } from "../../../session/table-session";
 import { dealSeed } from "../../../nav/e2e";
 import { needWords } from "../../../briefing/words";
 import { NeedChoices } from "../../../briefing/need-choices";
-import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, expandSide, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
 import { SeatPicker } from "../../../briefing/seat-picker";
 import { heroFace } from "../../../art/hero-tile";
 import { routeCode } from "../../../nav/route-code";
@@ -76,7 +76,8 @@ export default function Briefing() {
     () =>
       Array.from({ length: seatCount }, (_, index) => {
         const deck = savedDecks.find((item) => item.id === picked[index]);
-        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck) };
+        const side = expandSide(deck);
+        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck), ...(side.length > 0 ? { side } : {}) };
       }),
     [seatCount, savedDecks, picked],
   );
@@ -84,7 +85,7 @@ export default function Briefing() {
   // The world is built from the scenario and these codes (the log's cards, the Ring-bearers, every saved deck's heroes, the picked decks'
   // cards), as one string: a deck list read again on focus, or a pick of the same cards, keeps the world instead of loading it again.
   const hasSave = save != null;
-  const codeKey = hasSave ? [...new Set([...logCodes(save.log), ...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)])].sort().join("\0") : "";
+  const codeKey = hasSave ? [...new Set([...logCodes(save.log), ...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => [...seat.deck, ...(seat.side ?? [])])])].sort().join("\0") : "";
   const world = useMemo(() => {
     if (!hasSave || !campaign || !scenario) return null;
     return loadWorld(catalog, campaign, scenario, EFFECTS, codeKey === "" ? [] : codeKey.split("\0"));
@@ -150,7 +151,7 @@ export default function Briefing() {
     const stored = {
       scenarioId: scenario?.id ?? "",
       difficulty,
-      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck] })),
+      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck], ...(seat.side ? { side: [...seat.side] } : {}) })),
       ringBearer,
       choices: [...choices],
       acceptPenalty: accepted,

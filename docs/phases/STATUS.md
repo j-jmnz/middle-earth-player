@@ -97,7 +97,6 @@ No phase is open.
 - Fellowship-of-heroes with no replacement left in the collection is not modelled (`ltp.fellowship-of-heroes`, `rr.fellowship-of-heroes`).
 - Simultaneous Forced and delayed effects resolve in a fixed order, not the first player's choice (FAQ 1.02).
 - `src/play/readouts/threat-level.ts` shows 50 as the elimination level and ignores The One Ring's `eliminationReduction`.
-- Burglar's Turn loot has no table UI.
 - Collapsed Mine's per-round cap ignores progress placed before it appears (fixing it moves every game; in the brief).
 - 41004:B:1 prints "searches the encounter deck"; the record also searches the discard pile.
 - The Oath: the Tokens dial does not open the quest preview; the Resolution joins used Adaptations with a comma, not "and".

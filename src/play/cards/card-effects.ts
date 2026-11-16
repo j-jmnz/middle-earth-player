@@ -15,6 +15,8 @@ import { areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
 import { AREA_APART, AREA_TOGETHER, stageLines } from "../words/scenarios/stormcaller.ts";
 import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
+import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
+import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
 import { areaStanding } from "../../rules/families/stormcaller/values.ts";
@@ -324,7 +326,18 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
-  return held.length > 0 ? heldWords(held.map((other) => printedOf(ctx.cards, other.code).name)) : null;
+  if (held.length > 0) return heldWords(held.map((other) => printedOf(ctx.cards, other.code).name));
+  return lootMark(game, ctx, cardId);
+}
+
+// The Burglar's Turn (22024:B:2): the attachments a location guards as loot, "2 loot"; on the contract, the cards left in its
+// controller's loot deck. Only in a game that dealt a loot deck.
+function lootMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
+  if (!game.lootDecks) return null;
+  const card = game.cards[cardId];
+  if (card && card.controller != null && printedOf(ctx.cards, card.code).type === "contract" && game.lootDecks[card.controller]) return lootDeckWords(game.lootDecks[card.controller]?.length ?? 0);
+  const guarded = lootUnder(game, cardId);
+  return guarded.length > 0 ? lootGuardWords(guarded.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name)) : null;
 }
 
 /** The mark on an Aflame location in play: "3/5" damage against its value, threat red when one more damage destroys it. */

@@ -22,7 +22,7 @@ export function contextOf(world: World): ReduceContext {
 }
 
 function inputOf(save: Save, world: World, loadout: StoredLoadout): BriefingInput {
-  const seats: BriefingSeat[] = loadout.seats.map((seat) => ({ deckId: seat.deckId, heroes: seat.heroes, deck: seat.deck }));
+  const seats: BriefingSeat[] = loadout.seats.map((seat) => ({ deckId: seat.deckId, heroes: seat.heroes, deck: seat.deck, ...(seat.side ? { side: seat.side } : {}) }));
   return {
     world,
     log: save.log,

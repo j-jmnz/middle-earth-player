@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.1K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.3K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~590)
@@ -132,17 +132,17 @@ Read the sections your task touches.
     - 1598–1634 The Black Gate Opens (~4.4K) ← 2
     - 1635–1663 Mount Doom (~4.3K)
   - 1664–1672 Nightmare (~410) ← 19
-  - 1673–1711 Deckbuilding (~2.0K)
-  - 1712–1790 Effects (~3.2K)
-    - 1714–1772 Three layers (~2.4K) ← 10
-    - 1773–1782 Player side quests, contracts and saga cards (~430)
-    - 1783–1786 Window stack (~100)
-    - 1787–1790 Coverage test (~270)
-  - 1791–1811 Data sources (~530)
-  - 1812–1830 Card images (~1.2K) ← 9
-  - 1831–1856 Persistence and shipping (~2.6K) ← 6
-  - 1857–1898 Screens (~4.9K) ← 1
-    - 1883–1898 Table screen (~1.8K) ← 3
+  - 1673–1713 Deckbuilding (~2.1K)
+  - 1714–1793 Effects (~3.3K)
+    - 1716–1774 Three layers (~2.4K) ← 10
+    - 1775–1785 Player side quests, contracts and saga cards (~550)
+    - 1786–1789 Window stack (~100)
+    - 1790–1793 Coverage test (~270)
+  - 1794–1814 Data sources (~530)
+  - 1815–1833 Card images (~1.2K) ← 9
+  - 1834–1859 Persistence and shipping (~2.6K) ← 6
+  - 1860–1901 Screens (~4.9K) ← 1
+    - 1886–1901 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~57.1K tok)
   - 5–8 Overview (~150) ← 1
   - 9–23 Top bar (~3.1K) ← 4
@@ -176,7 +176,7 @@ Read the sections your task touches.
   - 357–368 Banner (~750) ← 5
   - 369–388 Screen reader (~2.8K) ← 17
   - 389–392 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~30.5K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~30.6K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -191,7 +191,7 @@ Read the sections your task touches.
   - 231–245 Icons (~480) ← 7
   - 246–264 Card art (~740) ← 2
   - 265–279 Tablets (~510) ← 13
-  - 280–469 Screens (~17.3K)
+  - 280–469 Screens (~17.5K)
     - 284–289 Splash (~210) ← 3
     - 290–293 App icon (~80)
     - 294–309 Campaigns (campaign list) (~1.5K) ← 6
@@ -206,8 +206,8 @@ Read the sections your task touches.
     - 376–379 Table opens stale (~750) ← 4
     - 380–393 Resolution and standalone outcome (~1.9K) ← 2
     - 394–403 Decks (~920) ← 2
-    - 404–413 Deck builder (deck editor) (~870) ← 3
-    - 414–423 Card pool (the Cards tab) (~770) ← 3
+    - 404–413 Deck builder (deck editor) (~970) ← 3
+    - 414–423 Card pool (the Cards tab) (~830) ← 3
     - 424–429 Card (~490) ← 2
     - 430–435 Packs and pack cards (~170)
     - 436–449 Settings (~940) ← 11
@@ -264,16 +264,16 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~13.5K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–282 Open items (~12.4K)
+  - 22–281 Open items (~12.4K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
     - 35–76 Fixtures and Maestro (~2.3K)
-    - 77–116 Rules and engine (~1.6K)
-    - 117–237 Rules and engine (Angmar Awakened) (~5.3K)
-    - 238–262 Screens and code (~1.6K)
-    - 263–282 Rules and engine (The Two Towers) (~1.4K)
-  - 283–303 Standing decisions (~700)
+    - 77–115 Rules and engine (~1.6K)
+    - 116–236 Rules and engine (Angmar Awakened) (~5.3K)
+    - 237–261 Screens and code (~1.6K)
+    - 262–281 Rules and engine (The Two Towers) (~1.4K)
+  - 282–302 Standing decisions (~700)
 
 ## Live plans
 

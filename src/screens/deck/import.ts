@@ -9,6 +9,8 @@ export type DecklistBody = {
   name: string;
   heroes: DecklistCounts;
   slots: DecklistCounts;
+  // RingsDB's `sideslots`: the side deck. Empty when the list has none.
+  side?: DecklistCounts;
 };
 
 export type PoolFact = {
@@ -21,6 +23,8 @@ export type BuiltDecklist = {
   name: string;
   heroes: string[];
   cards: { code: string; count: number }[];
+  // The side deck's cards (no heroes or contracts: those belong in the deck).
+  side: { code: string; count: number }[];
   droppedCodes: string[];
   heroLimit: { cardCode: string; cardName: string } | null;
 };
@@ -107,15 +111,16 @@ function countRecord(value: unknown): DecklistCounts | null {
   return counts;
 }
 
-/** Reads name, heroes, and slots. sideslots are ignored. */
+/** Reads name, heroes, slots and sideslots (the side deck). A sideslots that is not a count record (an empty list) is no side deck. */
 export function readDecklistBody(payload: unknown): DecklistBody | null {
   if (typeof payload !== "object" || payload === null) return null;
-  const record = payload as { name?: unknown; heroes?: unknown; slots?: unknown };
+  const record = payload as { name?: unknown; heroes?: unknown; slots?: unknown; sideslots?: unknown };
   if (typeof record.name !== "string") return null;
   const heroes = countRecord(record.heroes ?? {});
   const slots = countRecord(record.slots ?? {});
   if (!heroes || !slots) return null;
-  return { name: record.name, heroes, slots };
+  const side = countRecord(record.sideslots ?? {});
+  return { name: record.name, heroes, slots, ...(side && Object.keys(side).length > 0 ? { side } : {}) };
 }
 
 export function buildDecklist(
@@ -124,6 +129,7 @@ export function buildDecklist(
 ): BuiltDecklist {
   const heroes: string[] = [];
   const cards: { code: string; count: number }[] = [];
+  const side: { code: string; count: number }[] = [];
   const droppedCodes: string[] = [];
   let heroLimit: BuiltDecklist["heroLimit"] = null;
   const heroCounts = new Map<string, number>();
@@ -162,8 +168,15 @@ export function buildDecklist(
     if (code in body.heroes && (!fact || fact.typeCode === "hero")) continue;
     take(code, count);
   }
+  // The side deck keeps the deck-legal cards that are not heroes or contracts; the rest are dropped and named like the deck's.
+  for (const [code, count] of Object.entries(body.side ?? {})) {
+    const fact = pool.get(code);
+    if (count < 1) continue;
+    if (!fact || !fact.deckLegal || fact.typeCode === "hero" || fact.typeCode === "contract") droppedCodes.push(code);
+    else side.push({ code, count });
+  }
 
-  return { name: body.name, heroes, cards, droppedCodes, heroLimit };
+  return { name: body.name, heroes, cards, side, droppedCodes, heroLimit };
 }
 
 export function droppedSentence(names: readonly string[]): string | null {
@@ -179,12 +192,13 @@ export function prebuiltDecks(): readonly PrebuiltDeck[] {
   return decks;
 }
 
-/** A pre-built deck as a decklist body, read like an import. Its sideboard is left out, like RingsDB sideslots. */
+/** A pre-built deck as a decklist body, read like an import: the product's remaining cards (its sideboard) are the side deck. */
 export function prebuiltBody(deck: PrebuiltDeck): DecklistBody {
   return {
     name: deck.name,
     heroes: Object.fromEntries(deck.heroes.map((code) => [code, 1])),
     slots: Object.fromEntries(deck.cards.map((slot) => [slot.code, slot.count])),
+    ...(deck.sideboard.length > 0 ? { side: Object.fromEntries(deck.sideboard.map((slot) => [slot.code, slot.count])) } : {}),
   };
 }
 

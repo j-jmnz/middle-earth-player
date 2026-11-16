@@ -19,6 +19,9 @@ export const decks = sqliteTable("decks", {
   name: text("name").notNull(),
   heroes: text("heroes", { mode: "json" }).$type<string[]>().notNull(),
   cards: text("cards", { mode: "json" }).$type<DeckCard[]>().notNull(),
+  // The side deck: cards kept with the deck but not in it. A contract takes from it what it chooses "from your collection" (The
+  // Burglar's Turn's loot deck, src/catalog/loot.ts). Empty for a deck saved before 0011.
+  side: text("side", { mode: "json" }).$type<DeckCard[]>().notNull().default(sql`'[]'`),
   // When the player last saved the deck (ms since the epoch). The deck list puts the one saved last first. Starter rows
   // and rows from before 0005 read null and follow.
   updatedAt: integer("updated_at"),

@@ -31,7 +31,7 @@ import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
 import { useTopInset } from "../nav/use-top-inset";
 
-export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
+export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[]; side: { code: string; count: number }[] };
 
 // What each difficulty changes (ltp.easy-mode, easy-mode.easy-mode, and the Nightmare setup card), in the briefing under the switch.
 const DIFFICULTY_NOTES: Readonly<Record<Difficulty, string>> = {
@@ -48,6 +48,11 @@ const BANNER_HEIGHT = 330;
 /** A saved deck's cards, one code per copy. */
 export function expand(deck: SavedDeck | undefined): string[] {
   return deck ? deck.cards.flatMap((card) => Array.from({ length: card.count }, () => card.code)) : [];
+}
+
+/** A saved deck's side deck, one code per copy: the briefing hands it to the loadout, which takes a loot deck from it (src/catalog/loot.ts). */
+export function expandSide(deck: SavedDeck | undefined): string[] {
+  return deck ? deck.side.flatMap((card) => Array.from({ length: card.count }, () => card.code)) : [];
 }
 
 export type BriefingDecks = {
@@ -100,7 +105,7 @@ export function useBriefingDecks(saga: boolean): BriefingDecks {
     [catalog, saga],
   );
   const faces = useMemo(
-    () => deckFaces(catalog, [...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)])]),
+    () => deckFaces(catalog, [...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code), ...deck.side.map((card) => card.code)])]),
     [catalog, candidates, savedDecks],
   );
   const readiness = useMemo(() => new Map(savedDecks.map((deck) => [deck.id, deckReadiness(deck, faces, saga)])), [savedDecks, faces, saga]);
