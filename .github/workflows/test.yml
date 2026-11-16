@@ -14,6 +14,10 @@ on:
 permissions:
   contents: read
 
+# Electron's postinstall downloads its binary (about 110 MB); only the desktop-smoke job runs it.
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+
 concurrency:
   group: ${{ github.workflow }}-test-${{ github.ref }}
   cancel-in-progress: true
@@ -91,6 +95,26 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test a11y
+
+  # The desktop app launched through Playwright's Electron driver under xvfb (docs/development.md, Commands): isolation, the drawn table, a save dialog for the backup, no request
+  # off app://, and a relaunch that finds the save. Catalog only, no scans: the picture assertion is skipped here, and the booklets are packed only when present, so the release
+  # job runs those. Its own job, like a11y-web, so `test` stays as fast.
+  desktop-smoke:
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: ""
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The system libraries Chromium (and so Electron) needs, and xvfb for the display.
+      - run: pnpm exec playwright install-deps chromium
+      - run: sudo apt-get install -y xvfb
+      - run: pnpm desktop smoke
 
   # The pull request title becomes the squash commit's subject (.claude/rules/commit-standards.md, Squash).
   commits:

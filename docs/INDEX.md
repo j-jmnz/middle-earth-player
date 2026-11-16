@@ -273,7 +273,7 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
-- `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~5.0K tok)
+- `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~5.1K tok)
   - 3–16 Context (~370)
   - 17–26 Decisions taken (~430) ← 1
   - 27–39 What does not move (~470) ← 3
@@ -281,8 +281,8 @@ Read when a task names the plan.
   - 58–64 B. Offline pictures and booklets on web (~500) ← 2
   - 65–74 C. Mouse, keyboard and window (~400)
   - 75–79 D. Save backup file (~220)
-  - 80–93 E. The Electron shell (~630)
-  - 94–99 F. Tests (~190)
+  - 80–93 E. The Electron shell (~720)
+  - 94–99 F. Tests (~220)
   - 100–111 G. Release pipeline (~300)
   - 112–123 H. Docs and policy (~280)
   - 124–127 Order (~130)

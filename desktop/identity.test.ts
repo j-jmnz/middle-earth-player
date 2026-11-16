@@ -23,7 +23,8 @@ describe("the permanent names", () => {
   it("agree with the installer's", () => {
     expect(yml("appId")).toBe(APP_ID);
     expect(yml("productName")).toBe(APP_NAME);
-    expect(builder).toContain("artifactName: middle-earth-player-v${version}-${os}-${arch}.${ext}");
+    // middle-earth-player-<tag>-<os>-<arch>.<ext>, per OS.
+    for (const name of ["mac-universal", "win-x64", "linux-x64"]) expect(builder).toContain(`artifactName: middle-earth-player-v\${version}-${name}.\${ext}`);
   });
 
   it("keep the window at the smallest landscape size of the table", () => {

@@ -10,6 +10,9 @@ directories:
   app: desktop/build/app
   output: desktop/out
   buildResources: assets/images
+# Artifact names are middle-earth-player-<tag>-<os>-<arch>.<ext>, written out per OS: electron-builder's own ${arch} is x86_64 for an AppImage and amd64 for a .deb.
+# No auto-update (docs/plans/desktop.md, Decision 4): no publish target, so no latest*.yml or app-update.yml is written.
+publish: null
 asar: true
 # The Electron fuses that a shipped app has no use for: running the binary as Node, NODE_OPTIONS, and loading the app from anywhere but its asar. The inspector flag stays on,
 # because the smoke test drives the packed app through it.
@@ -25,7 +28,6 @@ extraResources:
     to: THIRD_PARTY_NOTICES.md
   - from: LICENSE
     to: LICENSE.txt
-artifactName: middle-earth-player-v${version}-${os}-${arch}.${ext}
 # Unsigned (docs/plans/desktop.md, Decision 1): Windows shows SmartScreen, and macOS needs right-click then Open. The macOS build is ad-hoc signed so Apple Silicon will run it.
 mac:
   target:
@@ -36,8 +38,7 @@ mac:
   identity: "-"
   hardenedRuntime: false
   gatekeeperAssess: false
-dmg:
-  artifactName: middle-earth-player-v${version}-${os}-${arch}.${ext}
+  artifactName: middle-earth-player-v${version}-mac-universal.${ext}
 win:
   target:
     - target: nsis
@@ -45,8 +46,9 @@ win:
     - target: zip
       arch: x64
   icon: assets/images/icon.png
+  artifactName: middle-earth-player-v${version}-win-x64.${ext}
 nsis:
-  artifactName: middle-earth-player-v${version}-${os}-${arch}.${ext}
+  artifactName: middle-earth-player-v${version}-win-x64.${ext}
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
@@ -58,5 +60,6 @@ linux:
       arch: x64
   category: Game
   icon: assets/images/icon.png
-  synopsis: Play The Lord of the Rings: The Card Game solo, offline
+  synopsis: "Play The Lord of the Rings: The Card Game solo, offline"
   maintainer: Middle-Earth Player <noreply@users.noreply.github.com>
+  artifactName: middle-earth-player-v${version}-linux-x64.${ext}
