@@ -532,9 +532,6 @@ jobs:
     env:
       APP_VERSION: ${{ needs.plan.outputs.version }}
       TAG: ${{ needs.plan.outputs.tag }}
-      # electron-builder signs the Windows installer when these are set (docs/releasing.md, Desktop signing); empty, it does not.
-      WIN_CSC_LINK: ${{ secrets.WINDOWS_CERT_BASE64 }}
-      WIN_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Point the Electron downloads at the runner
@@ -549,6 +546,9 @@ jobs:
           key: desktop-electron-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: desktop-electron-${{ runner.os }}-
       - uses: ./.github/actions/install
+      # pnpm's side-effects cache can restore electron without running its postinstall (a store filled under ELECTRON_SKIP_BINARY_DOWNLOAD), so the binary is fetched explicitly; a no-op when it is there.
+      - name: Fetch the Electron binary
+        run: node node_modules/electron/install.js
       # The system libraries Electron needs and xvfb for the display (the smoke script runs itself under xvfb-run).
       - if: runner.os == 'Linux'
         run: |
@@ -558,7 +558,12 @@ jobs:
         with:
           name: web-dist
           path: desktop/build/web
+      # electron-builder signs the Windows installer when these are set (docs/releasing.md, Desktop signing); empty, it does not. Only the Windows leg gets them, and only when
+      # the plan job found both secrets (desktop_signed), so one secret alone ships an unsigned installer instead of failing the build.
       - name: Pack the installers
+        env:
+          WIN_CSC_LINK: ${{ matrix.os == 'windows' && needs.plan.outputs.desktop_signed == 'true' && secrets.WINDOWS_CERT_BASE64 || '' }}
+          WIN_CSC_KEY_PASSWORD: ${{ matrix.os == 'windows' && needs.plan.outputs.desktop_signed == 'true' && secrets.WINDOWS_CERT_PASSWORD || '' }}
         run: pnpm desktop pack --skip-build
       # Every installer this OS makes must exist, stay under GitHub's 2 GiB asset limit and get a SHA-256 file (Node hashes, so no sha256sum or shasum).
       - id: stage
@@ -637,6 +642,7 @@ jobs:
           BUMP: ${{ inputs.bump }}
           TAG: ${{ needs.plan.outputs.tag }}
           TESTFLIGHT_URL: ${{ vars.TESTFLIGHT_URL }}
+          WINDOWS_SIGNED: ${{ needs.plan.outputs.desktop_signed }}
         run: |
           apk=$(ls "$RUNNER_TEMP"/out/*.apk)
           ipa=$(ls "$RUNNER_TEMP"/out/*.ipa)
@@ -645,7 +651,8 @@ jobs:
           for file in "$RUNNER_TEMP"/out/*-win-x64.* "$RUNNER_TEMP"/out/*-mac-universal.* "$RUNNER_TEMP"/out/*-linux-x64.*; do
             case "$file" in *.sha256) ;; *) desktop+=(--desktop "$file") ;; esac
           done
-          pnpm --silent release plan --bump "$BUMP" --expect "$TAG" --apk "$apk" --ipa "$ipa" "${desktop[@]}" \
+          signed=(); if [ "$WINDOWS_SIGNED" = true ]; then signed=(--windows-signed); fi
+          pnpm --silent release plan --bump "$BUMP" --expect "$TAG" --apk "$apk" --ipa "$ipa" "${desktop[@]}" "${signed[@]}" \
             --cert-sha256 "$(cat "$RUNNER_TEMP/out/certificate.sha256")" --notes "$RUNNER_TEMP/notes.md"
           pnpm --silent release source --tag "$TAG" --ipa "$ipa" --notes "$RUNNER_TEMP/notes.md" --out "$RUNNER_TEMP/out/source.json"
       - name: Tag and release

@@ -111,6 +111,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # pnpm's side-effects cache can restore electron without running its postinstall (a store filled under ELECTRON_SKIP_BINARY_DOWNLOAD), so the binary is fetched explicitly; a no-op when it is there.
+      - run: node node_modules/electron/install.js
       # The system libraries Chromium (and so Electron) needs, and xvfb for the display.
       - run: pnpm exec playwright install-deps chromium
       - run: sudo apt-get install -y xvfb

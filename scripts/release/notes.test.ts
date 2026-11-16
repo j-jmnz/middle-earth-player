@@ -35,6 +35,13 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes.indexOf("Before you update")).toBeLessThan(notes.indexOf("## New"));
   });
 
+  it("says the Windows installer is unsigned unless the plan found the certificate", () => {
+    expect(renderNotes(base)).toContain("The app is not signed, so Windows SmartScreen warns first");
+    const signed = renderNotes({ ...base, windowsSigned: true });
+    expect(signed).toContain("The installer is signed.");
+    expect(signed).not.toContain("SmartScreen");
+  });
+
   it("names the scenarios whose open games the update can reach, and warns of nothing when none", () => {
     const some = renderNotes({ ...base, changes: [], reach: { all: false, names: ["The Oath", "The Drowned Ruins"] } });
     expect(some).toContain("## Before you update\n\n- Open games of The Oath and The Drowned Ruins may ask you to continue or restart");

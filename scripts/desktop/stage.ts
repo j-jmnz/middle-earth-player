@@ -2,19 +2,13 @@
 // desktop/electron-builder.yml names (release-files.ts), refuses one over GitHub's 2 GiB asset limit, copies each into <dir> under the release's name with a `.sha256` file beside it
 // (`<hex>  <name>`, as sha256sum writes; Node does the hashing, so Windows and macOS need no `sha256sum` or `shasum`), and with --github-output writes `app=` (the
 // executable the launch check opens) and `names=` to $GITHUB_OUTPUT.
-import { copyFileSync, createReadStream, appendFileSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
-import { createHash } from "node:crypto";
+import { copyFileSync, appendFileSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { runScript, type Log } from "../log.ts";
+import { fileSha256 } from "../release/sha256.ts";
 import { ASSET_LIMIT, DESKTOP_OS, installerNames, missingInstallers, packedApp, stagedName } from "./release-files.ts";
 import { desktopVersion, OUT_DIR } from "./shell.ts";
-
-async function fileSha256(file: string): Promise<string> {
-  const hash = createHash("sha256");
-  for await (const chunk of createReadStream(file)) hash.update(chunk as Buffer);
-  return hash.digest("hex");
-}
 
 function flag(args: readonly string[], name: string): string | undefined {
   const at = args.indexOf(name);

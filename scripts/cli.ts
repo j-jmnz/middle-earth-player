@@ -77,12 +77,28 @@ export const GROUPS: Record<string, Record<string, Command>> = {
   },
 };
 
+// Groups whose leading arguments may name several commands (`pnpm assets catalog canvaskit pdfjs`).
+const MULTI = new Set(["assets"]);
+
 /** The command a group's arguments name, and the arguments left for its steps. A group with `all` runs it when the first argument names no command. */
 export function resolve(group: string, args: readonly string[]): { command: Command; rest: string[] } | null {
   const commands = GROUPS[group];
   if (!commands) return null;
   const [first = "", ...rest] = args;
   const named = Object.hasOwn(commands, first) && first !== "all" ? commands[first] : undefined;
+  if (named && MULTI.has(group)) {
+    // `pnpm assets catalog canvaskit pdfjs` runs each named pack in the order given; the arguments after the last name go to every step.
+    const steps = [...named.steps];
+    let at = 0;
+    while (at < rest.length) {
+      const next = rest[at] ?? "";
+      const more = Object.hasOwn(commands, next) && next !== "all" ? commands[next] : undefined;
+      if (!more) break;
+      steps.push(...more.steps);
+      at += 1;
+    }
+    return { command: { steps, about: named.about }, rest: rest.slice(at) };
+  }
   if (named) return { command: named, rest };
   const fallback = commands["all"];
   return fallback ? { command: fallback, rest: [...args] } : null;

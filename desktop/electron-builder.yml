@@ -14,11 +14,14 @@ directories:
 # No auto-update (docs/plans/desktop.md, Decision 4): no publish target, so no latest*.yml or app-update.yml is written.
 publish: null
 asar: true
-# The Electron fuses that a shipped app has no use for: running the binary as Node, NODE_OPTIONS, and loading the app from anywhere but its asar. The inspector flag stays on,
-# because the smoke test drives the packed app through it.
+# The app is a bundle with no dependencies: electron-builder must not go looking for node_modules (desktop/before-build.cjs says why).
+beforeBuild: ./desktop/before-build.cjs
+# The Electron fuses that a shipped app has no use for: running the binary as Node, NODE_OPTIONS, the Node inspector flags, and loading the app from anywhere but its asar.
+# The launch check attaches to a packed app over Chromium's debugging port, which these do not touch.
 electronFuses:
   runAsNode: false
   enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
   onlyLoadAppFromAsar: true
   grantFileProtocolExtraPrivileges: false
 extraResources:

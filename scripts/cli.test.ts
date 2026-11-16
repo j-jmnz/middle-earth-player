@@ -29,6 +29,14 @@ describe("scripts/cli.ts", () => {
     expect(resolve("doc", ["section", "brief", "Core round"])?.rest).toEqual(["brief", "Core round"]);
   });
 
+  it("runs every pack `pnpm assets` names, in order, and passes the arguments after them on", () => {
+    const assets = GROUPS["assets"] ?? {};
+    const resolved = resolve("assets", ["catalog", "canvaskit", "pdfjs", "--optional"]);
+    expect(resolved?.command.steps).toEqual([...(assets["catalog"]?.steps ?? []), ...(assets["canvaskit"]?.steps ?? []), ...(assets["pdfjs"]?.steps ?? [])]);
+    expect(resolved?.rest).toEqual(["--optional"]);
+    expect(resolve("assets", ["canvaskit"])?.command.steps).toEqual(assets["canvaskit"]?.steps);
+  });
+
   it("falls back to the group's all, with every argument, and has nothing for a group without one", () => {
     expect(resolve("test", ["src/foo.test.ts", "-t", "x"])).toEqual({ command: GROUPS["test"]?.["all"], rest: ["src/foo.test.ts", "-t", "x"] });
     expect(resolve("assets", ["--optional"])).toEqual({ command: GROUPS["assets"]?.["all"], rest: ["--optional"] });

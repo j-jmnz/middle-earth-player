@@ -10,27 +10,29 @@
 // Flags (scripts/desktop/smoke-args.ts): --skip-build reuses the last export and bundle; --app <path> launches a packed app (an installer's unpacked app or an AppImage)
 // instead of the checkout's, which has no seeded export, so the seeded checks are skipped; with --require-bundle the picture and booklet checks must pass instead of being skipped
 // for want of local packs, and --expect-version <x.y.z> fails unless the app reports it (the release job's launch check). On Linux without a display the script runs itself under xvfb-run.
+// The checkout's shell is launched through Playwright's `_electron`, which injects its loader so the page is attached before the window opens. A packed app cannot take the loader (an
+// `executablePath` launch races the window: it hangs whenever the window is up before Playwright attaches), so it is started as a plain process with a debugging port and attached
+// with `connectOverCDP`; its version is read from its app.asar (scripts/desktop/asar.ts) and the save-dialog check, which needs the main process, runs on the checkout's shell only.
 // The renderer sandbox is off for the run on Linux (--no-sandbox): a container runs as root and a CI runner may forbid the user namespaces the sandbox needs.
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
-import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { _electron as electron, type ElectronApplication, type Page } from "playwright";
+import { _electron as electron, chromium, type Browser, type BrowserContext, type ElectronApplication, type Page } from "playwright";
 import sharp from "sharp";
 
 import { APP_ORIGIN, DESKTOP_API } from "../../desktop/identity.ts";
 import { duration, runScript, type Log } from "../log.ts";
+import { packedVersion } from "../desktop/asar.ts";
 import { parseSmokeArgs } from "../desktop/smoke-args.ts";
 import { APP_DIR, bundleShell, desktopVersion, exportDesktopWeb, packAssets, ROOT, WEB_E2E_DIR } from "../desktop/shell.ts";
 
-const ELECTRON = createRequire(import.meta.url)("electron") as string;
 const FIXTURE = "duo";
 const SAVE = `save-e2e-${FIXTURE}`;
 const TIMEOUT = 90_000;
 
-type Session = { app: ElectronApplication; page: Page; requests: string[]; csp: string[]; errors: string[] };
+type Session = { page: Page; context: BrowserContext; app: ElectronApplication | null; close: () => Promise<void>; requests: string[]; csp: string[]; errors: string[] };
 type Options = { packed: string | null; userData: string };
 
 // pnpm gives every script the NODE_OPTIONS of pnpm-workspace.yaml (--disable-warning=...), which Electron refuses: the launch then never answers. Node's own flags are not Electron's.
@@ -38,17 +40,95 @@ function cleanEnv(): Record<string, string> {
   return Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => entry[0] !== "NODE_OPTIONS" && entry[1] !== undefined));
 }
 
-async function launch(log: Log, { packed, userData }: Options): Promise<Session> {
-  const flags = [`--user-data-dir=${userData}`, ...(process.platform === "linux" ? ["--no-sandbox", "--enable-unsafe-swiftshader", "--disable-dev-shm-usage"] : [])];
+const linuxFlags = (): string[] => (process.platform === "linux" ? ["--no-sandbox", "--enable-unsafe-swiftshader", "--disable-dev-shm-usage"] : []);
+
+function exited(child: ChildProcess): Promise<void> {
+  return new Promise((resolve) => {
+    if (child.exitCode !== null || child.signalCode !== null) resolve();
+    else child.once("exit", () => resolve());
+  });
+}
+
+// Windows keeps Chromium's child processes alive for a moment after the main process is gone, so the whole tree goes.
+function killTree(child: ChildProcess): void {
+  if (child.pid === undefined) return;
+  if (process.platform === "win32") spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+  else child.kill("SIGKILL");
+}
+
+// The packed app, started as a plain process with a debugging port, and attached to over CDP. Browser.close quits it the way the window's close does.
+async function launchPacked(executable: string, userData: string): Promise<{ browser: Browser; child: ChildProcess }> {
+  const child: ChildProcess = spawn(executable, [`--user-data-dir=${userData}`, "--remote-debugging-port=0", ...linuxFlags()], {
+    env: { ...process.env, NODE_OPTIONS: undefined, APPIMAGE_EXTRACT_AND_RUN: "1" },
+    stdio: ["ignore", "ignore", "pipe"],
+  });
+  const endpoint = await new Promise<string>((resolve, reject) => {
+    let seen = "";
+    const timer = setTimeout(() => reject(new Error(`the packed app printed no DevTools address in 60 s:\n${seen.slice(-600)}`)), 60_000);
+    child.stderr?.on("data", (chunk: Buffer) => {
+      seen += String(chunk);
+      const match = /DevTools listening on (ws:\/\/\S+)/.exec(seen);
+      if (match?.[1]) {
+        clearTimeout(timer);
+        resolve(match[1]);
+      }
+    });
+    child.once("error", (error: Error) => reject(error));
+    void exited(child).then(() => reject(new Error(`the packed app exited before it was ready:\n${seen.slice(-600)}`)));
+  }).catch((error: unknown) => {
+    killTree(child);
+    throw error;
+  });
+  await windowCommitted(endpoint, child);
+  return { browser: await chromium.connectOverCDP(endpoint, { timeout: 60_000 }), child };
+}
+
+// Playwright (both `_electron` with an executable and `connectOverCDP`) hangs when it attaches to a page whose first navigation has not committed yet (the shell opens its window within a few hundred ms of starting), so the attach
+// waits until the debugging port lists a page at the app's address.
+async function windowCommitted(endpoint: string, child: ChildProcess): Promise<void> {
+  const port = /:(\d+)\//.exec(endpoint)?.[1];
+  const until = Date.now() + 60_000;
+  while (Date.now() < until && child.exitCode === null) {
+    const pages = (await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json() as Promise<{ type: string; url: string }[]>, () => [])) ?? [];
+    if (pages.some((entry) => entry.type === "page" && entry.url.startsWith(APP_ORIGIN))) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  killTree(child);
+  throw new Error("the packed app opened no window at its address in 60 s");
+}
+
+async function openPacked(executable: string, userData: string): Promise<Pick<Session, "page" | "context" | "app" | "close">> {
+  const { browser, child } = await launchPacked(executable, userData);
+  const context = browser.contexts()[0];
+  if (!context) throw new Error("the packed app has no browser context");
+  const page = context.pages()[0] ?? (await context.waitForEvent("page", { timeout: 60_000 }));
+  const close = async () => {
+    // Browser.close may never answer once the app is gone, so it is not awaited; the exit is.
+    void browser.newBrowserCDPSession().then((cdp) => cdp.send("Browser.close")).catch(() => undefined);
+    await Promise.race([exited(child), new Promise((resolve) => setTimeout(resolve, 5_000))]);
+    killTree(child);
+    await exited(child);
+  };
+  return { page, context, app: null, close };
+}
+
+async function openChecked(userData: string): Promise<Pick<Session, "page" | "context" | "app" | "close">> {
   const app = await electron.launch({
-    executablePath: packed ?? ELECTRON,
-    args: packed ? flags : [path.join(APP_DIR, "main.js"), ...flags],
-    env: { ...cleanEnv(), ...(packed ? { APPIMAGE_EXTRACT_AND_RUN: "1" } : { MIDDLE_EARTH_PLAYER_WEB_ROOT: WEB_E2E_DIR }) },
+    args: [path.join(APP_DIR, "main.js"), `--user-data-dir=${userData}`, ...linuxFlags()],
+    env: { ...cleanEnv(), MIDDLE_EARTH_PLAYER_WEB_ROOT: WEB_E2E_DIR },
     timeout: 60_000,
   });
-  const page = await app.firstWindow();
-  const session: Session = { app, page, requests: [], csp: [], errors: [] };
-  app.context().on("request", (request) => session.requests.push(request.url()));
+  return { page: await app.firstWindow(), context: app.context(), app, close: () => app.close() };
+}
+
+async function launch(log: Log, { packed, userData }: Options): Promise<Session> {
+  const opened = packed ? await openPacked(packed, userData) : await openChecked(userData);
+  const session: Session = { ...opened, requests: [], csp: [], errors: [] };
+  const { page } = session;
+  session.context.on("request", (request) => session.requests.push(request.url()));
   page.on("console", (message) => {
     const text = message.text();
     log.debug(`console.${message.type()} ${text.slice(0, 300)}`);
@@ -175,6 +255,7 @@ async function refusals(session: Session): Promise<string> {
 // download once the shell's own handler has run, so no dialog stays open on the run's screen.
 async function download(session: Session): Promise<string> {
   const { app, page } = session;
+  if (app === null) throw new Error("no main process to listen on");
   const offered = app.evaluate(
     ({ session: electronSession }) =>
       new Promise<{ name: string; path: string }>((resolve) => {
@@ -231,11 +312,15 @@ async function main(log: Log): Promise<void> {
     const first = session;
     await check(results, log, "isolation and preload", () => isolation(first));
     if (expectVersion !== null) {
-      await check(results, log, "reports the tag's version", async () => {
-        const version = await first.app.evaluate(({ app }) => app.getVersion());
-        assert(version === expectVersion, `the app reports ${version}, not ${expectVersion}`);
-        return version;
-      });
+      if (packed === null) skip(results, log, "reports the tag's version", "the checkout's shell carries no stamped version");
+      else if (packedVersion(packed) === null) skip(results, log, "reports the tag's version", "an AppImage's app.asar is inside it; its file name carries the version (pnpm desktop stage)");
+      else {
+        await check(results, log, "reports the tag's version", async () => {
+          const version = packedVersion(packed);
+          assert(version === expectVersion, `the app's package.json says ${version}, not ${expectVersion}`);
+          return version ?? "";
+        });
+      }
     }
     let fresh = "";
     let seeded = "";
@@ -265,9 +350,10 @@ async function main(log: Log): Promise<void> {
       assert(first.csp.length === 0, `CSP: ${first.csp[0]}`);
       assert(first.errors.length === 0, `page error: ${first.errors[0]}`);
     });
-    await check(results, log, "a Blob download opens a save dialog", () => download(first));
+    if (packed === null) await check(results, log, "a Blob download opens a save dialog", () => download(first));
+    else skip(results, log, "a Blob download opens a save dialog", "the packed app has no main process to listen on; the checkout's run covers it");
     await check(results, log, "refuses what is not the app", () => refusals(first));
-    await first.app.close();
+    await first.close();
     session = null;
     if (packed === null) {
       const second = await launch(log, { packed, userData });
@@ -280,8 +366,13 @@ async function main(log: Log): Promise<void> {
       });
     }
   } finally {
-    await session?.app.close().catch(() => undefined);
-    rmSync(userData, { recursive: true, force: true });
+    await session?.close().catch(() => undefined);
+    // Windows may hold a profile file for a moment after the app is gone.
+    try {
+      rmSync(userData, { recursive: true, force: true, maxRetries: 10, retryDelay: 500 });
+    } catch (error) {
+      log.warn(`could not remove ${userData}: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
   const failed = results.filter((result) => result.verdict === "FAIL");
   const passed = results.filter((result) => result.verdict === "ok").length;
