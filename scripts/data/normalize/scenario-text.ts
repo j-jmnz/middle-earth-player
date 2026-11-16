@@ -25,7 +25,7 @@ export function setupOf(text: string | null | undefined, continued: boolean): { 
 export function bookletSetsOf(entry: RuleEntry | undefined): string[] {
   if (!entry) return [];
   const flat = entry.text.replace(/\s+/g, " ");
-  const match = /built with all the cards from (?:the following encounter sets?: )?(.+?)(?: encounter set)?\.(?: These sets| This set| \s*$|$)/.exec(flat);
+  const match = /built with all the cards from (?:the following encounter sets?: )?(.+?)(?: encounter set)?\.(?: These sets| This set| \(| \s*$|$)/.exec(flat);
   if (!match?.[1]) return [];
   // "(these last two sets can be found in ... the core set)" says where sets are found, not what they are called.
   return setsOf(match[1].replace(/\s*\([^)]*\)/g, ""));

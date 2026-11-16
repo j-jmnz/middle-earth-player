@@ -16,7 +16,8 @@ const exists = (file: string): boolean => existsSync(path.join(ROOT, file));
 const SCENARIOS = readdirSync(path.join(ROOT, "data", "scenarios")).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -".json".length));
 const scaffolded = (id: string): boolean => exists(`src/effects/authored/${authoredRelOfScenario(id)}.ts`) || exists(`test/scenarios/${id}`);
 // The next scenario the scaffold has not been run for: its previous part has its files (the planner refuses a part whose earlier part has none).
-const NEW = loadCampaignsInOrder().flatMap((campaign) => campaign.scenarios.filter((id, at) => SCENARIOS.includes(id) && !scaffolded(id) && (at === 0 || scaffolded(campaign.scenarios[at - 1] as string))))[0];
+// A cycle scenario has no campaign to scaffold into yet (the tool plans campaign scenarios only), so the real-repo dry run takes the first campaign scenario.
+const NEW = loadCampaignsInOrder().filter((campaign) => campaign.kind !== "cycle").flatMap((campaign) => campaign.scenarios.filter((id, at) => SCENARIOS.includes(id) && !scaffolded(id) && (at === 0 || scaffolded(campaign.scenarios[at - 1] as string))))[0];
 
 // A view of the repo as if `ids` had none of their lines in the registries and none of their files: the planner is tested on explicit ids,
 // whether or not the real repo has scaffolded them yet. (Every registry line that names a scenario carries its id.)

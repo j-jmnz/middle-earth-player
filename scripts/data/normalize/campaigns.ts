@@ -29,7 +29,7 @@ export function buildCampaignIndex(
     const listed = count(new Set(def.products.map(scenarioProductOf)));
     if (listed !== campaign.scenarios.length) throw new Error(`campaign index: ${campaign.id} builds ${campaign.scenarios.length} scenarios, Hall of Beorn lists ${listed}`);
     for (const product of def.products) claimed.set(product, campaign.id);
-    index.push({ id: campaign.id, name: campaign.name, scenarioCount: campaign.scenarios.length, playable: campaign.scenarios.some((id) => playable.includes(id)), kind: "campaign", box: null, released: def.released });
+    index.push({ id: campaign.id, name: campaign.name, scenarioCount: campaign.scenarios.length, playable: campaign.scenarios.some((id) => playable.includes(id)), kind: def.kind ?? "campaign", box: null, released: def.released });
   }
   for (const campaign of overrides.campaigns) {
     const empty = campaign.products.filter((product) => count(new Set([product])) === 0);

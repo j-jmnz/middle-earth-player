@@ -1500,6 +1500,22 @@
       "pile": "staging",
       "reason": "DragnCards loads the four Savage Trollspawn set aside; the quest card's Setup searches the encounter deck for 1 copy per player and adds them to the staging area (10064:A:1), so they are the staged copies, the rest of the box's four staying in the deck.",
       "source": "data/printed/angmar-awakened.json 10064:A:1; data/raw/dragncards (Q05.6)"
+    },
+    {
+      "scenario": "conflict-at-the-carrock",
+      "code": "02048",
+      "from": "staging",
+      "pile": "setAside",
+      "reason": "DragnCards loads 4 copies of 'Sacked!' in the staging area (Q01.5, E01.5) and the rest in the encounter deck. The quest card Grimbeorn's Quest (02035) prints \"Setup: ... Remove 4 unique Troll cards and 4 copies of the 'Sacked!' card from the encounter deck and set them aside, out of play. Then shuffle 1 'Sacked!' card per player back into the encounter deck.\", so the 4 copies are set aside, not staged (the Hall of Beorn total of 5 is those 4 and the 1 in the deck).",
+      "source": "dragncards preBuiltDecks.json (Q01.5, E01.5); Grimbeorn's Quest 02035 printed Setup; hallofbeorn Scenarios/Conflict-at-the-Carrock"
+    },
+    {
+      "scenario": "return-to-mirkwood",
+      "code": "02130",
+      "from": "staging",
+      "pile": "setAside",
+      "reason": "DragnCards loads Gollum in the staging area (Q01.9, E01.9). The quest card Through the Forest (02126) prints \"Setup: Search the encounter deck for Gollum. Choose a player to guard Gollum at the start of the game, and place Gollum in front of that player.\", so he is guarded by a player, not staged.",
+      "source": "dragncards preBuiltDecks.json (Q01.9, E01.9); Through the Forest 02126 printed Setup; return_to_mirkwood_rulesheet.pdf (Guarding Gollum)"
     }
   ],
   "scenarioRemovals": [
@@ -1664,22 +1680,6 @@
     }
   ],
   "campaigns": [
-    {
-      "id": "shadows-of-mirkwood",
-      "name": "Shadows of Mirkwood",
-      "kind": "cycle",
-      "products": [
-        "The Hunt for Gollum",
-        "Conflict at the Carrock",
-        "A Journey to Rhosgobel",
-        "The Hills of Emyn Muil",
-        "The Dead Marshes",
-        "Return to Mirkwood"
-      ],
-      "released": "2011-07-22",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenario of each of the cycle's six Adventure Packs, The Hunt for Gollum to Return to Mirkwood, under its product; RingsDB numbers the six packs as cycle 10. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 10; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
     {
       "id": "dwarrowdelf",
       "name": "Dwarrowdelf",

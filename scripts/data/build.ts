@@ -90,11 +90,12 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
       id: campaign.id,
       name: campaign.name,
       scenarios: campaign.scenarios,
+      ...(def.kind === "cycle" ? { kind: "cycle" as const } : {}),
       campaignCards: campaign.campaignCards,
       prelude: campaign.prelude,
       starterDecks: def.starterDecks ? loadStarterDecks(cards, entries) : [],
-      bookletPages: bookletPages(entries, campaign.scenarios, def.bookletDoc),
-      bookletId: campaign.bookletId,
+      ...(def.bookletDoc !== undefined ? { bookletPages: bookletPages(entries, campaign.scenarios, def.bookletDoc) } : {}),
+      ...(campaign.bookletId !== undefined ? { bookletId: campaign.bookletId } : {}),
       saga: campaign.saga,
       ...(def.xp ? { xp: true } : {}),
     })),
@@ -106,7 +107,11 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
   for (const file of readdirSync(scenarioDir)) rmSync(path.join(scenarioDir, file));
   for (const scenario of built.scenarios) writeFileSync(path.join(scenarioDir, `${scenario.id}.json`), `${JSON.stringify(scenario, null, 2)}\n`);
   for (const file of readdirSync(campaignDir)) rmSync(path.join(campaignDir, file));
-  for (const campaign of built.campaigns) writeFileSync(path.join(campaignDir, `${campaign.id}.json`), `${JSON.stringify(campaign, null, 2)}\n`);
+  // A cycle's file has no campaign cards or prelude (campaignDataSchema reads them as empty).
+  for (const campaign of built.campaigns) {
+    const file = campaign.kind === "cycle" ? Object.fromEntries(Object.entries(campaign).filter(([key]) => key !== "campaignCards" && key !== "prelude")) : campaign;
+    writeFileSync(path.join(campaignDir, `${campaign.id}.json`), `${JSON.stringify(file, null, 2)}\n`);
+  }
   // Pre-built player decks (data/prebuilt-decks.json): the Learn to Play's core decks and the DragnCards starter decks.
   const prebuilt = log.step("pre-built decks", () => loadPrebuiltDecks(raw, cards, entries));
   mkdirSync(path.join(outDir, "decks"), { recursive: true });

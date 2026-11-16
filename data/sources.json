@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "1893f9b9928cc4de8ec1f3f7f7df9cadcc39f24570b62e48662749875cae7f87"
+        "value": "32beb5dbf32a388f6c0f5838e0b4b42c7755d6125aa37ab46a7f43622da84ffb"
       },
-      "fetchedAt": "2026-11-12T11:49:31.913Z",
+      "fetchedAt": "2026-11-16T12:48:39.139Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -253,6 +253,42 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/Mount-Doom",
           "sha256": "61eb72531cbca0d5725ce7bdf7aeb4f3085bf59eaf469d0db3e2ec60415c8afa",
           "bytes": 14716
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Hunt-for-Gollum.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Hunt-for-Gollum",
+          "sha256": "3ea8aaebdac07af32469d0703cc8dd2fb4fcf138874685e88024333aae51936b",
+          "bytes": 12373
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Conflict-at-the-Carrock.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Conflict-at-the-Carrock",
+          "sha256": "1ae06edb1edb8112b5d5d48d9212ae012bc86d8fbf38e057290e48ecb4476c59",
+          "bytes": 13876
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/A-Journey-to-Rhosgobel.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/A-Journey-to-Rhosgobel",
+          "sha256": "9b443b4a6027113c9b729108a54876dddc1d5f8d458fdc3f1321de1b92ba4979",
+          "bytes": 12721
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Hills-of-Emyn-Muil.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Hills-of-Emyn-Muil",
+          "sha256": "7d0113cc5059a9f241de534faac9f118657d4e184bd417d8019d747ee2310ba3",
+          "bytes": 9396
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Dead-Marshes.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Dead-Marshes",
+          "sha256": "04c18419512c5fe94bf27aecea4fb4665348e41d9d4bae0fb680a23f692138ea",
+          "bytes": 10982
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Return-to-Mirkwood.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Return-to-Mirkwood",
+          "sha256": "7b5febdc8208a86a2eb74bf5f0a1b8957c48184a79be0e7ea47ad9c72407ea9e",
+          "bytes": 14590
         },
         {
           "path": "raw/hallofbeorn/Scenarios/Intruders-in-Chetwood.json",
@@ -5329,9 +5365,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "127735bb9e052937288de3547b3856c8f1f599b51150b22dd04b25ba5512e45f"
+        "value": "812fc73806160d4cf4a0d6db94739014a30a441f2d1d28b7fb18165417166ac5"
       },
-      "fetchedAt": "2026-11-12T12:52:01.139Z",
+      "fetchedAt": "2026-11-16T13:16:13.246Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -6312,6 +6348,108 @@
           "bytes": 4073312
         },
         {
+          "path": "pictures/02011.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-aOJKGFw1jdgw8VjDiQB_8yz9tfnq_W5&export=download&confirm=t",
+          "sha256": "9fe35a22fdd1a36a8903c7b4962483da9da867ff492a4ab77e64d6980e38d4f5",
+          "bytes": 2629274
+        },
+        {
+          "path": "pictures/02011.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-aLoLEPrzU1CQb_BsaFli3NltI7eENfQ&export=download&confirm=t",
+          "sha256": "9b92ee39cdfc73695aae5d6945a3ef7efb3acbfda6abad58f863f92e47c9362b",
+          "bytes": 2540667
+        },
+        {
+          "path": "pictures/02012.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-_HCUPZ9b6CRSeUX1fNrKYjfWNqu_FKy&export=download&confirm=t",
+          "sha256": "7628e73e6651449f667c84518b8497b09645383dcc884731dec6f6f37f8e42d3",
+          "bytes": 3475810
+        },
+        {
+          "path": "pictures/02012.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=105Z7KDQ6vUn_AJzXXYyS1IRM4gq7XMoY&export=download&confirm=t",
+          "sha256": "a949b7d6077a3ee1016eb134b347dfdf467cf1a6a2802d66eda2ef973ef2945a",
+          "bytes": 3520796
+        },
+        {
+          "path": "pictures/02013.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=103KPi_87gcK2OES8Dur6f1q_P4LM9xul&export=download&confirm=t",
+          "sha256": "ea827b65927c4d3b80a000f95041b0e2e8a46ca2255eeba9dc2445a7337344f8",
+          "bytes": 3047560
+        },
+        {
+          "path": "pictures/02013.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-zK-zjP9ByErAP_z-tv2BW12kPAVWAh1&export=download&confirm=t",
+          "sha256": "ec599ceef97c30435fce3e68fb5b3866eb1c0ac4062c58477a25861ac96695e4",
+          "bytes": 3134971
+        },
+        {
+          "path": "pictures/02014.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zW970MgduNkc12mG8AVjkUzAf6vzG2iv&export=download&confirm=t",
+          "sha256": "0880a5758190f732aa85f077822dbc6a774bd5d454c9c4a4380b0f32d137de29",
+          "bytes": 3963545
+        },
+        {
+          "path": "pictures/02015.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zPVrM-qn4VDhxgrphrGUZ2vK_DJeBFml&export=download&confirm=t",
+          "sha256": "717eef23ffd1a3aae9f27d9f0e1a53c66197b82a786cdccbd99c446e7574dccd",
+          "bytes": 4137062
+        },
+        {
+          "path": "pictures/02016.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zLcWN6GoZUU1caeogOLurg_SyxYv6ubQ&export=download&confirm=t",
+          "sha256": "060d9710712da3534e83ce28db9540104a4f9d86b7f7be36529b43ff7b20a4a9",
+          "bytes": 4179975
+        },
+        {
+          "path": "pictures/02017.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zdz2lFLu7PD6LovOPukUC5GaJ16I69xF&export=download&confirm=t",
+          "sha256": "8cc02b49f79176b88750a7eb77114f55b3eb57a7a2cef319413706200e7fe355",
+          "bytes": 4235926
+        },
+        {
+          "path": "pictures/02018.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zc4VhmsQGF5omhUyM7Ictq4VbF-T2BT-&export=download&confirm=t",
+          "sha256": "da8384a56e20d4ed18b2d1ba2f8dc61197f5282141b7323dbf4528a1c51a57d0",
+          "bytes": 4275874
+        },
+        {
+          "path": "pictures/02019.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zbzy60lqS-7mvY-RtaftGrmVtaQLedLw&export=download&confirm=t",
+          "sha256": "7c47c1c2bd763599351b09c001a9c74ace1bcbfb0b3bfa36d55ab64ad3647faa",
+          "bytes": 4637660
+        },
+        {
+          "path": "pictures/02020.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zauKjCnqByYRSIGYmMwELHvAPFPFd1HH&export=download&confirm=t",
+          "sha256": "e6c74752a75f815c25a845d02cf07d8a71eb949e4eeb97d15feefecd59b10e02",
+          "bytes": 3993808
+        },
+        {
+          "path": "pictures/02021.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=12ya0qa0os8PsSZqRyB5w4qnIc-cGbc0A&export=download&confirm=t",
+          "sha256": "896437ddd7d156b6180974c4aa47f6a9d974e298b45afeb7a0b7bc7699c3ac2b",
+          "bytes": 3957775
+        },
+        {
+          "path": "pictures/02022.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11zFYA8boQWSmHWP0XYrXLHyzZ0RP1AC0&export=download&confirm=t",
+          "sha256": "0616f0e317859d8a654f6a01627c6ea808f87840a835f1ad8304aa15ec0ee921",
+          "bytes": 4362059
+        },
+        {
+          "path": "pictures/02023.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=183A86jpwypyx44cWJGIob8Q3JZRaft9K&export=download&confirm=t",
+          "sha256": "beb412243614ce46403e17bb0a89161a75cf053d8a4529a1bceb18122d54dd55",
+          "bytes": 4077871
+        },
+        {
+          "path": "pictures/02024.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zhG7eq-KWmzmgdkMIhlhvcLbQq1Qwgl5&export=download&confirm=t",
+          "sha256": "b6aa2298c9e0acf45bc35aabff2218a9c2e3b5563c31d87a94aa2049efcd01ff",
+          "bytes": 3960402
+        },
+        {
           "path": "pictures/02025.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=10tSt0UgIk19sFPqEEeUTOC81zP8Ni7Hc&export=download&confirm=t",
           "sha256": "a2ff3fdd84091042a0cb02d80d50a5ba438d931ada8963b60be8eaf897380207",
@@ -6370,6 +6508,108 @@
           "url": "https://drive.usercontent.google.com/download?id=11X4yu8V_82xfwwKm0dy7_k_ImZl_eYYn&export=download&confirm=t",
           "sha256": "b48005150b1dd60ca129ef54f52b47b60dd91c3956d01436416b82b8d690c926",
           "bytes": 3920904
+        },
+        {
+          "path": "pictures/02035.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11Oqc48MRLtkmADFAAiWyOZ26HgN62DDy&export=download&confirm=t",
+          "sha256": "a170b4ce2adf8f7308cfd1fafb3a2fdd14d878526a0a0216d930625dc8580fb1",
+          "bytes": 3012255
+        },
+        {
+          "path": "pictures/02035.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11Si-iVKBVXG0pMwfEmwrq_fkXljl0AP7&export=download&confirm=t",
+          "sha256": "6c4619c8b1384959b2169c44368c932b72f74ec800cfb8fff6b18ab0e0dd1d6e",
+          "bytes": 2909966
+        },
+        {
+          "path": "pictures/02036.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11qySFMM8XtUeta_Mdz9vhT16Ctr_aXEU&export=download&confirm=t",
+          "sha256": "86f950ff65a7a3f1f9ca62c7842493bccf02b780fba9c0c973799144da1713b4",
+          "bytes": 3153844
+        },
+        {
+          "path": "pictures/02036.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11k-Ri8WR-A7iEUP1o6TQgGnD0oLoM7nl&export=download&confirm=t",
+          "sha256": "69526e89d7909a99729fd7cf0cf8d1cb1a376c50fcda6ffe0faf3dfb1e96556f",
+          "bytes": 3120476
+        },
+        {
+          "path": "pictures/02037.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-u8Llo3sxg2vVAb68CMfYkTPclT6nYoN&export=download&confirm=t",
+          "sha256": "e0c71e893928c21d9617a6ce658df164ecd0d9bc98a1e81f74986084feebfe82",
+          "bytes": 3755175
+        },
+        {
+          "path": "pictures/02038.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-nkyUZDqCoTcvP_vkeW39xJvKfK0pNp_&export=download&confirm=t",
+          "sha256": "571a474e6806cb3e94812845dedfbc8e2d867686a62e9b01c4749433744f8c3d",
+          "bytes": 3928481
+        },
+        {
+          "path": "pictures/02039.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10NAcQwaVd9x_Ypg7OI1a2Y7Iv9VnOuNX&export=download&confirm=t",
+          "sha256": "036840a69a8fe21b698edc56e726a062f61763d42ca6bd5ec31d370a373af8d0",
+          "bytes": 4263918
+        },
+        {
+          "path": "pictures/02040.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10IblqjGmtCAZaAKBcBsyAqHzYQdKjFoj&export=download&confirm=t",
+          "sha256": "14afc2c380bb3b63f6196cb111d1d56110571311c8919f9db6524d15902ac118",
+          "bytes": 4145208
+        },
+        {
+          "path": "pictures/02041.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10GnST51wcN3SpqsVvBj-aGa69FWlxEhl&export=download&confirm=t",
+          "sha256": "606739935fde19fb7186e3ab13294c5ae79212ef152c3a683c30a66f966c6d39",
+          "bytes": 3901842
+        },
+        {
+          "path": "pictures/02042.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10EAruL-Jl7Rag1GBZMK4kWQ_wHk2nf5g&export=download&confirm=t",
+          "sha256": "bf354e1191dee6c37dfad475d2d6473a10c210fa7b3c8665dcfe50f2c20cdab7",
+          "bytes": 3865695
+        },
+        {
+          "path": "pictures/02043.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10qQKI55CQuWiCJ-OyXkdz9mjK8eQzPxO&export=download&confirm=t",
+          "sha256": "d6050cb29958b8af0ba03a65518237f16c4fa401fb54fa331c9eba9975775c5d",
+          "bytes": 4216109
+        },
+        {
+          "path": "pictures/02044.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10elguYMLHvyb3-DeSpto5CpZxULTSI7E&export=download&confirm=t",
+          "sha256": "2462170035db2773c7d25fbd15762e4653d3cf181b35cdd8607607b7cbe66365",
+          "bytes": 4015606
+        },
+        {
+          "path": "pictures/02045.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10cctDKAgWErto0aCZKJ_GWf7DY_lIY91&export=download&confirm=t",
+          "sha256": "fe62d8205b1ec66be218d6179bea58382ec6532b82882bfe461e643284ca5eb4",
+          "bytes": 4366269
+        },
+        {
+          "path": "pictures/02046.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10bu4wlkW2FGqAYmN6ErHpJiJuCIucSK5&export=download&confirm=t",
+          "sha256": "cbb6482e38630832a625c5cace9b6f238c8914c12b4281e23c082fdc535b59c6",
+          "bytes": 3713395
+        },
+        {
+          "path": "pictures/02047.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=114uX72G3m57gQnH3E6DKcPB5jykKhUH_&export=download&confirm=t",
+          "sha256": "0ef211aad8b9081a5c59f5b4c0c40f8a1c7db2ac47d6fb46a7b15fe4a6bc2723",
+          "bytes": 4071169
+        },
+        {
+          "path": "pictures/02048.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=111o4b93bzcyX-oQ11jT5UzLjI8BfbFwJ&export=download&confirm=t",
+          "sha256": "5b0b8345590e2fed5021cf47d89702cbdee450df4f9a95f29c89a52640d5fbe8",
+          "bytes": 4517483
+        },
+        {
+          "path": "pictures/02049.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10xH7vU2jUokVBLgpDKhj8oSAECUeNK6N&export=download&confirm=t",
+          "sha256": "b7820dce9da0146baeba7d506ec6878045a95b543f9d0c3aa29cf44f0bfabae3",
+          "bytes": 4079306
         },
         {
           "path": "pictures/02050.A.jpg",
@@ -6432,6 +6672,96 @@
           "bytes": 3984859
         },
         {
+          "path": "pictures/02060.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13PN_oY5IXxbUmC_xaKmByB_Su5j1K8T2&export=download&confirm=t",
+          "sha256": "2cb5698ba6106695aeaa124b7a7eaeb3a074f2c55307043adae49be29c3bf8da",
+          "bytes": 3121070
+        },
+        {
+          "path": "pictures/02060.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13D7DX4VwvdUPpHFV0bK-PltWE-_phYr9&export=download&confirm=t",
+          "sha256": "a5e73ab8e74b69bc75469ed192041dcea78a7e5fb325667aa4889b17afa59689",
+          "bytes": 2939061
+        },
+        {
+          "path": "pictures/02061.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13CP4Zd31fxZS4sLe-Rg8gMH0X9W6CgpY&export=download&confirm=t",
+          "sha256": "9b6263f134fbad983d88c1cf5710e2862416b2940d2dd26f69e24f04728ec90b",
+          "bytes": 3248907
+        },
+        {
+          "path": "pictures/02061.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=136zMEJb6azByLrPDlbw97X-y1pRUnA7B&export=download&confirm=t",
+          "sha256": "e31134cbaf3bb86aa5c8c53e11613aa533caf488738ed9f506065cdb280f2847",
+          "bytes": 3221382
+        },
+        {
+          "path": "pictures/02062.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=132yRXthsP_T5tPi15IHN9dL_sAnTis2i&export=download&confirm=t",
+          "sha256": "33682d2bbf2c618be1cb142ed249723152737dac433ce1872db1042440879b69",
+          "bytes": 3531465
+        },
+        {
+          "path": "pictures/02062.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13fYqM9se9ortv9PoMajWlFi1IwnUIFwG&export=download&confirm=t",
+          "sha256": "b7d10bc69996f443a2dfd2f2929de6102686ad02195e2a6caa421987ddde806d",
+          "bytes": 3554991
+        },
+        {
+          "path": "pictures/02063.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11hzgDcVycJxtS6BR6e7XkRokNiV3DGq6&export=download&confirm=t",
+          "sha256": "9e583d59f950005cf7144493e3cb8a602b3542dae1cb79e363fb205958a4bddd",
+          "bytes": 3701207
+        },
+        {
+          "path": "pictures/02064.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11gQTcMXo10XYubFIgIcL5D2QVKNwrx0m&export=download&confirm=t",
+          "sha256": "45d73c7b251fc574feb050dfbb736c250a57f683fbae5c81acc2c77441d766a2",
+          "bytes": 3873870
+        },
+        {
+          "path": "pictures/02065.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11fIGo6sW8DHiTx1TWvd6_sPWDYTEE9zY&export=download&confirm=t",
+          "sha256": "1f791ea13435d3f1baa038758c9239c45a53e417f8eee761d8c11759cf146324",
+          "bytes": 4323650
+        },
+        {
+          "path": "pictures/02066.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1225aQz5apU6rDIy1VGdK0rGDBg48CPSN&export=download&confirm=t",
+          "sha256": "71f24686bad871ce99d4a58b1d6dfeb9188ca7bc10c62e15b969da9550d4ce8b",
+          "bytes": 4237408
+        },
+        {
+          "path": "pictures/02067.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11tGNoSRUjAQLD2hJ-1yCZy2V1-8SRW7p&export=download&confirm=t",
+          "sha256": "bd3ab2e2f8d5ae18fb1a4135b0b9e44d2b5bcce93c8b4399d52e6ea52920c8c9",
+          "bytes": 3890969
+        },
+        {
+          "path": "pictures/02068.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11smd7m0LhPvHp2nj7opbwLl9Aeu0j1rf&export=download&confirm=t",
+          "sha256": "3a96ebf97b0a871ab487481c0e2513af58df4d66c039d368ae44e4e7e94916a1",
+          "bytes": 4009806
+        },
+        {
+          "path": "pictures/02069.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11s99pRGHVvrQymzoPvamI_v6zTzEiEEj&export=download&confirm=t",
+          "sha256": "8e229ce67edbf8c4b1a64dcc337256958a01fbf6cfbdbecde8b95891d17239a0",
+          "bytes": 3912390
+        },
+        {
+          "path": "pictures/02070.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=12Fajt29F2SOfeN7YflpLBWLp-u79oS6h&export=download&confirm=t",
+          "sha256": "6005a0f6957a3fec8a3a1d09216d18377742fb3b447a720757d8605587d1dac2",
+          "bytes": 3874244
+        },
+        {
+          "path": "pictures/02071.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=12DEjOPgnzaB5jTsVt3R8AFRakcLKnzPR&export=download&confirm=t",
+          "sha256": "a54ed0b37872cd435ee2a8a5d169bef50e8db681cbf25797a5537513f9c15709",
+          "bytes": 3980712
+        },
+        {
           "path": "pictures/02072.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=14KkcR6RL1COrPw7D6y1qmKMlXBjSXfF3&export=download&confirm=t",
           "sha256": "5ca2862fdc2a9f37b2faf66e03bbadd1a38fcafdebee2478a0744f878eede6dc",
@@ -6490,6 +6820,90 @@
           "url": "https://drive.usercontent.google.com/download?id=14fPoEzHF--OQ1Z_LEhd1swxxpdroSqQB&export=download&confirm=t",
           "sha256": "49dde7b74a91a377de9b75898c75ad860f5321c71ac3b8aa34c08989a301d621",
           "bytes": 4131929
+        },
+        {
+          "path": "pictures/02082.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=14VFXj5MJs_hY8yJ3u0CFcd5hZRp2lSzh&export=download&confirm=t",
+          "sha256": "2272ff780261eca9493e7be7d72ea4d78728d83a10e19afcab772ec7bc495052",
+          "bytes": 2959486
+        },
+        {
+          "path": "pictures/02082.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=154mvbBQqPTBBO1RLrt84Z8zAq-hg6t6u&export=download&confirm=t",
+          "sha256": "93c7e2756016c5c3d9c53fe1ece9b5b658123e7bca32900a0088b62ed1f161fd",
+          "bytes": 2953236
+        },
+        {
+          "path": "pictures/02083.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13XWz-mNBJtM4F3uiMpDM3D1ISEIVFw-a&export=download&confirm=t",
+          "sha256": "f185d8a22ace68b56422f6532ceaba6a642c4a048310cb373499ca12d3553936",
+          "bytes": 4109826
+        },
+        {
+          "path": "pictures/02084.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13VoiVDwn_Ujz_4YIBtW_z8rV9ENgzGXa&export=download&confirm=t",
+          "sha256": "25929c793d75f9152524710b219ece71011a68c28eee100e4b179f4290be25f6",
+          "bytes": 4056644
+        },
+        {
+          "path": "pictures/02085.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13SK11Jti3jP0Ygg727f9DQApjMDnfn1b&export=download&confirm=t",
+          "sha256": "8ab1fe4f1249082e4cdc59a838cdcb0d1d9e6e43234b85b3c1b71dfcd98e154e",
+          "bytes": 4098226
+        },
+        {
+          "path": "pictures/02086.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13p3TFmB8Frz1pZ9wEoXhs1xWdocfd2no&export=download&confirm=t",
+          "sha256": "284bb2a00963029da6524cd8606f35425df582d618325fcefcbf6f39c89b18ce",
+          "bytes": 3953335
+        },
+        {
+          "path": "pictures/02087.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13mlLMlwB0_tVxOcL8gqUpY6ci7uLrDWV&export=download&confirm=t",
+          "sha256": "5c56c855e2bcc4e210f7f2eb579a7368f929841573397ec8647d8a4a5431ea4f",
+          "bytes": 4057123
+        },
+        {
+          "path": "pictures/02088.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13kZFZ82ywaPRbblUXyQ0dlsk_mzwcS9F&export=download&confirm=t",
+          "sha256": "865737c09a979d0433bfef81adabfa1f6ac5407a5d404775bc227e3c320cc24e",
+          "bytes": 3959202
+        },
+        {
+          "path": "pictures/02089.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13fjSlD6bjNLrpltJAs1lvzwZPVGGIuvs&export=download&confirm=t",
+          "sha256": "98effd57d9e894be0447b7d0f3e76914f4be90f2d9c78f39647af773d46d6971",
+          "bytes": 3929419
+        },
+        {
+          "path": "pictures/02090.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1449Co-e_xOqRyL8rBd919jK9WBYTPFmZ&export=download&confirm=t",
+          "sha256": "0e3f980bcef7e2e33caac36682538b248269e7afcf62f3bbaa7a5ba7732c1ee1",
+          "bytes": 4026738
+        },
+        {
+          "path": "pictures/02091.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=14-N46GjeUG7E2YQznFh3w3PhozNQNpip&export=download&confirm=t",
+          "sha256": "cbb73a8ce9e58c717fd39de2a3a8a33884de81c5611d7ed934bda0851a84bcfe",
+          "bytes": 3706671
+        },
+        {
+          "path": "pictures/02092.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13vR6qhJXAm4PmepHdwq0RotuAlXs6iTK&export=download&confirm=t",
+          "sha256": "e4ac638448320a44ce769fa5d55a7cab7a3c82e551513f94e542f054245c27a9",
+          "bytes": 3858350
+        },
+        {
+          "path": "pictures/02093.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13tXXZR481IHIaE0H_Y2UtJIXZDwAst9A&export=download&confirm=t",
+          "sha256": "3829e59eabe0709b15c35e09a7e0cb5206ee24a7b224ece3ad319e98a48b018e",
+          "bytes": 4189391
+        },
+        {
+          "path": "pictures/02094.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=14OJgVaHU2rsGIP3IemqP1b-jx9HPI6IG&export=download&confirm=t",
+          "sha256": "c83ea39020181f7584e77ddd7283a447e7a8352469f85070b1d77b7fe9b1e6c8",
+          "bytes": 3905041
         },
         {
           "path": "pictures/02095.A.jpg",
@@ -6552,6 +6966,84 @@
           "bytes": 3987173
         },
         {
+          "path": "pictures/02105.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1yx4Qkz__pQ-30xTm-t1TqDIkZLCQ4D7H&export=download&confirm=t",
+          "sha256": "2a308f4a5cff70aeb0cfa2f9a6058ed325f6eadafb7dc2766b810a6c715e4437",
+          "bytes": 3251408
+        },
+        {
+          "path": "pictures/02105.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1yurP3rOrzsm9wPXCOBY2j2BW2765dybF&export=download&confirm=t",
+          "sha256": "26291ad01c0665020483693e27c483e290ba903c08a7b0d7b778f01262d91a68",
+          "bytes": 3197107
+        },
+        {
+          "path": "pictures/02106.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1yquiCgW4TRMMBIyqX6vATixRHntMTPZy&export=download&confirm=t",
+          "sha256": "aebf4e9a8e12d07975de2308709d6955ed6707931cfffdbfbceadbf6f6d2e40d",
+          "bytes": 3211931
+        },
+        {
+          "path": "pictures/02106.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1yp1Gca58itVVVZvZoGNnAoGggZIO7YH7&export=download&confirm=t",
+          "sha256": "959e59426417680dc987d9ec578d67b11f7c27a1ee5108e7f3c1765c48134fa0",
+          "bytes": 3266874
+        },
+        {
+          "path": "pictures/02107.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1xn0iNWUENi9w3VoSIP78aN_83Mm3gBYZ&export=download&confirm=t",
+          "sha256": "c8d12f1cd500cc6aa6de39e5e9c3dd49750ba71b878fe428cb9a9ec7a74a66b3",
+          "bytes": 3536340
+        },
+        {
+          "path": "pictures/02108.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1xbwoyLErOIlDYMUUPQSbcJaA2bRKq4C_&export=download&confirm=t",
+          "sha256": "e31ed927afebfbcec3f41dc61a8c537b205319553d0b8ae6359271f97a8fffd6",
+          "bytes": 3634067
+        },
+        {
+          "path": "pictures/02109.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1xWkoLox31kF6yXsYpiuej6EQ5r0Wj598&export=download&confirm=t",
+          "sha256": "9abce3e5ed8da19a3ffbdda87e8867e414fa2d425e75afc6c2c7c8ebc5e3c300",
+          "bytes": 3817310
+        },
+        {
+          "path": "pictures/02110.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1xMDFVTTINteyctv3JHvgx6LvnG-Hs7Zn&export=download&confirm=t",
+          "sha256": "f9ec41fc322315c881737a715242d5cfc2be0d8c3597685df020d0e7e29167e5",
+          "bytes": 3740532
+        },
+        {
+          "path": "pictures/02111.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1xxcinIs4AQgYPoQlmddx7qniQLFBUW8g&export=download&confirm=t",
+          "sha256": "800f2900588c17ccaab1cc737d2969f1254ffdf01b6b836ad7ef27ec7823d64e",
+          "bytes": 3738986
+        },
+        {
+          "path": "pictures/02112.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1xuGa2oAElKbt9pOFqsUICwneUJrmPDg2&export=download&confirm=t",
+          "sha256": "77b593785654dfd3346bbefff411bfb22c0584da9cf41bd4aba28827d1b4e6fe",
+          "bytes": 4021371
+        },
+        {
+          "path": "pictures/02113.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1xrbw0HdtBV4L3wm1ljwmpn8jXxuQiH-0&export=download&confirm=t",
+          "sha256": "75d629042091b7538a223fd7f7fb02f47c8e813de4edc7106e3f3f85aac52508",
+          "bytes": 3714509
+        },
+        {
+          "path": "pictures/02114.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1xnzKO5tJavdqwCibLZ3daSl_l8apXONH&export=download&confirm=t",
+          "sha256": "672ff6bf2e85595375e00a7d127fac7ee3461f75dac7d3926d4c799566c8c74c",
+          "bytes": 3907433
+        },
+        {
+          "path": "pictures/02115.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1yFs47_ZcJBj1qTzaRd21KvSWTDymGGDD&export=download&confirm=t",
+          "sha256": "97d1ac9dcfca8b95b6bf3c26a6f70fcef628526b1c320a9af11e179f17c91d71",
+          "bytes": 3711428
+        },
+        {
           "path": "pictures/02116.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=14nce-PsZlIm451FP9cPBYdllwYs6Q511&export=download&confirm=t",
           "sha256": "bae3022bd6c0b85f41f54645772c0b35c2afa95283e78e3f6a3de6f044d33a6f",
@@ -6610,6 +7102,114 @@
           "url": "https://drive.usercontent.google.com/download?id=15Tra5e25Mmsn9t25mJozzTdmagyE_fSy&export=download&confirm=t",
           "sha256": "e3185b8b9ebb2c8a91215185a79db1a150862fb085312b79cd2a2df896a8f2f7",
           "bytes": 3744919
+        },
+        {
+          "path": "pictures/02126.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=15l9MPkWhhN5uskEw8LNqYNcaYZcJ5-Rd&export=download&confirm=t",
+          "sha256": "99af44c15589205f827173b21f4538496a395b96e48e31b366b8bb87e9fbb050",
+          "bytes": 3487494
+        },
+        {
+          "path": "pictures/02126.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=15hNwAqBtiZyR3ALUyDoNWqua0hrN22rJ&export=download&confirm=t",
+          "sha256": "8491cd9f7635f40123a395198d018328aa8dcbe7840527ef58b8f1e63e9fdfb8",
+          "bytes": 3320827
+        },
+        {
+          "path": "pictures/02127.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=15fZRCxP6GxxkM6Oh5WwZD0ma7eCMXCHC&export=download&confirm=t",
+          "sha256": "6bf10b07045a98186fc7b5b90e370a2aef687da9a57d370263e79c63f02a5e13",
+          "bytes": 3001784
+        },
+        {
+          "path": "pictures/02127.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=15bIqmK64H77i4DPUObjRuUYIOKvwbFGx&export=download&confirm=t",
+          "sha256": "2c7aa9547c2080cd7beb5eb3dcdb920bebe6e80caf324ccfb54c2aa6c5c78d31",
+          "bytes": 3098247
+        },
+        {
+          "path": "pictures/02128.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=15YUziB0W8WxWmSNaRCPA184reydf2-3U&export=download&confirm=t",
+          "sha256": "a1650ecec4f0c9fdd9c49ebd80b426d909a2aaa90a602c92d01e071fb1157de5",
+          "bytes": 3071780
+        },
+        {
+          "path": "pictures/02128.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=160yFmy_pTENIvHMpj9k2jO-qdoTpvB8A&export=download&confirm=t",
+          "sha256": "e32f3353f8dd6c2ba3d3478fb44567eac949f7cd2773ca3062a0e9fa64c0cf7b",
+          "bytes": 2915116
+        },
+        {
+          "path": "pictures/02129.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=15seeQi6cVenfO-iD1oNX0aIbSQC4Y4uD&export=download&confirm=t",
+          "sha256": "9eee164e2655ece8d66cb1a78ee2936ce324bdf53cb01fb6438a9914c268b099",
+          "bytes": 3259275
+        },
+        {
+          "path": "pictures/02129.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=15pcbO3hWdIa4jCASMx5P2B0YC1ZUp7Q2&export=download&confirm=t",
+          "sha256": "ceee707afa751291907e0c76fc48e01802a207dd1a37bba118b4baf74dce09d0",
+          "bytes": 3315299
+        },
+        {
+          "path": "pictures/02130.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ynwnwXCDT4gD2CfoOvL93d40fzjq5Vsp&export=download&confirm=t",
+          "sha256": "2dd9de0a593f16fa38ce862b28c1f55b7fe4967b2d882a42d2284fc71cf242f1",
+          "bytes": 3719691
+        },
+        {
+          "path": "pictures/02131.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zBEUc9ANaU4HuEW30ldIsW9gTOrnetg2&export=download&confirm=t",
+          "sha256": "d6cc7f66099db08abc1fe9c704ec21eb80f36014b7eeca9e40c4df251073a54d",
+          "bytes": 4090043
+        },
+        {
+          "path": "pictures/02132.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1z4gyRM_uJviqzFEUANHdL1gyMazxCs9C&export=download&confirm=t",
+          "sha256": "dae57c83c0c180e0b67ebc5b220070aaa222d7b7f04cc4e3e3a947c2f977ffa6",
+          "bytes": 4197483
+        },
+        {
+          "path": "pictures/02133.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1z11_dXcO5h1b1y3rxKf7-XAV4hPvtddr&export=download&confirm=t",
+          "sha256": "a84d39dd3d6ee84f20f886d0fa4ff01d18e7b85229aaa02b889846ea6240c075",
+          "bytes": 4312779
+        },
+        {
+          "path": "pictures/02134.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1z0kBbhLJOQR1jKvBffUndHZelUE3uZ23&export=download&confirm=t",
+          "sha256": "7fce68235bd37e7deac3bc6cab26ce42c7c59dff06f31e0604af7f766ff08c10",
+          "bytes": 3751857
+        },
+        {
+          "path": "pictures/02135.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zGdba_wz0r1qN6UWJx8W4j51jSE_XYb-&export=download&confirm=t",
+          "sha256": "c395a102bf1d80450b072026957058a5763165fef9fa74798d9fe50402104e3c",
+          "bytes": 3882674
+        },
+        {
+          "path": "pictures/02136.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zGLbzSFjtERVqQlGM7z5w-10Fww9lvul&export=download&confirm=t",
+          "sha256": "c165f86dc2203bfc402c66630dd31428487cc066f7fdbd86fca7a031f787ee60",
+          "bytes": 3783468
+        },
+        {
+          "path": "pictures/02137.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zFn3os1fW9riD-Z8oqNnz2DC6H4vKgvR&export=download&confirm=t",
+          "sha256": "1b665920ce3b71ecfde1fd592ff5298fd46d066ba04e877d4f887e7ee74995da",
+          "bytes": 4347664
+        },
+        {
+          "path": "pictures/02138.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1zD3vQuzG4NOQbBsA5bnyYA5V2MPzPk6E&export=download&confirm=t",
+          "sha256": "91bb62fc97041743793fe501a311d818a7003ad99cc0d49a900f0d572da4af13",
+          "bytes": 4136102
+        },
+        {
+          "path": "pictures/02139.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=14qGaOUhxTrbiVgO6TJwWEjxdUAFkMzEl&export=download&confirm=t",
+          "sha256": "f54303d4ef90316f29311cbc52521bcaa8e048374496fa078d4b3ddc51a97c14",
+          "bytes": 4122552
         },
         {
           "path": "pictures/03001.A.jpg",
@@ -19901,9 +20501,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "776222fe05ff0af294c6d9837ea3ff96903251987de5754f77fd954fec4d37c5"
+        "value": "2d80d130d9001df93521ec329328a85741ade1111da4b3c382efdaf5a1e50d5d"
       },
-      "fetchedAt": "2026-11-12T11:49:49.499Z",
+      "fetchedAt": "2026-11-16T12:50:15.338Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -20080,6 +20680,30 @@
           "bytes": 4748254
         },
         {
+          "path": "pdf/a-journey-to-rhosgobel-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/a-journey-to-rhosgobel-rules.pdf",
+          "sha256": "ebab0575b115a767ebdb3cc46134fb99f587b3b1942eed916109f298818f9785",
+          "bytes": 927228
+        },
+        {
+          "path": "pdf/the_hills_of_emyn_muil_rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/the_hills_of_emyn_muil_rulesheet.pdf",
+          "sha256": "afd6e465d9ccaab9caafa83a80fdbec02fee9438770b01fd165305c83f06d37b",
+          "bytes": 961445
+        },
+        {
+          "path": "pdf/the_dead_marshes_rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/the_dead_marshes_rulesheet.pdf",
+          "sha256": "855e9634249b629d2bfa563bb8ee720a045b1c15a9b42ef6078f53a7c1b178d5",
+          "bytes": 1137648
+        },
+        {
+          "path": "pdf/return_to_mirkwood_rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/return_to_mirkwood_rulesheet.pdf",
+          "sha256": "0fa3138b7544903c19b0bb26264df683bdeaa87474797351b86415f4a88927aa",
+          "bytes": 994412
+        },
+        {
           "path": "pdf/mec_communitydecklists_eomerandeowyn-compressed.pdf",
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec_communitydecklists_eomerandeowyn-compressed.pdf",
           "sha256": "5cfc904b2e07a1d07c68918c220bc0afd643ad69df380a808f31960c6c4f79d7",
@@ -20104,9 +20728,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "2b87020f0a8bce77812feb63017ef10b12ae433bd030f4ad61e01f23a394581b"
+        "value": "878b8ac49ed3f5031ffe96518a345ccb404db87bc78dcd2539769f6991abd8e3"
       },
-      "fetchedAt": "2026-11-12T12:12:26.209Z",
+      "fetchedAt": "2026-11-16T13:09:40.011Z",
       "files": [
         {
           "path": "scans/01001.A.jpg",
@@ -21013,6 +21637,570 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Scarred.jpg",
           "sha256": "0474fb62907e57f013c2002353729843953ab8a558cf5bc03c7a515077f97ee7",
           "bytes": 47608
+        },
+        {
+          "path": "scans/02011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-Hunt-Begins-1A.jpg",
+          "sha256": "4b8993d27f3ddea6175fcd64d574929d09a977e2ed605f5ecc8ceaa0b643b315",
+          "bytes": 111510
+        },
+        {
+          "path": "scans/02011.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-Hunt-Begins-1B.jpg",
+          "sha256": "8108bf865c30ddff83466b7971b562010a42d5cb2a5a6935357e20ad2016dc05",
+          "bytes": 105222
+        },
+        {
+          "path": "scans/02012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/A-New-Terror-Abroad-2A.jpg",
+          "sha256": "1b1a8d0b0dbfba8b81796b2afa20c51b51f5c4933b290e08636c1003f54f832e",
+          "bytes": 143429
+        },
+        {
+          "path": "scans/02012.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/A-New-Terror-Abroad-2B.jpg",
+          "sha256": "c81ec379f042bb3dc6b61e786cdeba3fac4fe4a35e776cda6572cafb32a0c53b",
+          "bytes": 155628
+        },
+        {
+          "path": "scans/02013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/On-the-Trail-3A.jpg",
+          "sha256": "0664e0b1ab74d739d02b86cf38f928259a2f3114152b6fc9a442eed83482a74e",
+          "bytes": 134759
+        },
+        {
+          "path": "scans/02013.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/On-the-Trail-3B.jpg",
+          "sha256": "19248fbdf04d3771ab4d7b6f332d0f100380e45b456403a385a7f527b6c5374d",
+          "bytes": 139632
+        },
+        {
+          "path": "scans/02014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Signs-of-Gollum.jpg",
+          "sha256": "fef93e5d7ff477dd7e39b9a5e55a8bddfa847da09e83fd82c04d8acd6db46e28",
+          "bytes": 112731
+        },
+        {
+          "path": "scans/02015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-Old-Ford.jpg",
+          "sha256": "9369af2730c7012221b1fb834290506d4dee41dc12dfdfbb90ddf9d11359e8b8",
+          "bytes": 116309
+        },
+        {
+          "path": "scans/02016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-Eaves-of-Mirkwood.jpg",
+          "sha256": "2781a7fd20a668b41f931f0a3c1156e5b47bc9e0a081e0bd564fe658d60b22b8",
+          "bytes": 117360
+        },
+        {
+          "path": "scans/02017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/River-Ninglor.jpg",
+          "sha256": "31f5ab6f87a121b3fe7ae75e27d45d6d5e9939dcfc51c89c81b6f22870489de3",
+          "bytes": 945432
+        },
+        {
+          "path": "scans/02018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-East-Bank.jpg",
+          "sha256": "8463b5eed13f1c5cdc490a1dfadc5f9e14154100cea0eb4dd0a084304e79e9de",
+          "bytes": 118751
+        },
+        {
+          "path": "scans/02019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/The-West-Bank.jpg",
+          "sha256": "9d5a4cfbf6798644af836fd437a16d3e99ee017a89e2b58d7cc39232a68f7874",
+          "bytes": 122851
+        },
+        {
+          "path": "scans/02020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Goblintown-Scavengers.jpg",
+          "sha256": "f5b145687cb1edb9dd217220ec77a78e48ecac6ab802b0c40d875fb3b28ee0ef",
+          "bytes": 121315
+        },
+        {
+          "path": "scans/02021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Hunters-from-Mordor.jpg",
+          "sha256": "d0f9e28a91a92d25272f7a01530d4983c6d0e205a797fb100e7f005b20dc1074",
+          "bytes": 118980
+        },
+        {
+          "path": "scans/02022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/False-Lead.jpg",
+          "sha256": "e42a49bf2e58b2b9f652f03d5a795af48b3da3c6541f4e548cea9cbc3e62bb04",
+          "bytes": 126972
+        },
+        {
+          "path": "scans/02023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Flooding.jpg",
+          "sha256": "18a1b3717aded18918054149e5ebf687d685095382984413684e125ae84f7cda",
+          "bytes": 111238
+        },
+        {
+          "path": "scans/02024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-Gollum/Old-Wives'-Tales.jpg",
+          "sha256": "5891dd3749dcb1b27ce72412967c063830d6a0314ad1f0cb5d4f175b7173d3c8",
+          "bytes": 116856
+        },
+        {
+          "path": "scans/02035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Grimbeorn's-Quest-1A.jpg",
+          "sha256": "5e634121588bba1b4cac52b238bad4d9fd951ad8425b6a7e57616df505f269ac",
+          "bytes": 128582
+        },
+        {
+          "path": "scans/02035.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Grimbeorn's-Quest-1B.jpg",
+          "sha256": "a3c66d0b4598623c7fd28ce073e845b312814d2d58120aa31fe53bf287487e94",
+          "bytes": 122922
+        },
+        {
+          "path": "scans/02036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Against-the-Trolls-2A.jpg",
+          "sha256": "359510fbdc571e710980efe8ba5a37aab39c7f712fe50a48718feb84935e96c2",
+          "bytes": 137745
+        },
+        {
+          "path": "scans/02036.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Against-the-Trolls-2B.jpg",
+          "sha256": "49968cb9da37219d721fe616c94ba00a3a48744cd932a03b80d210b5da1394bf",
+          "bytes": 135718
+        },
+        {
+          "path": "scans/02037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Grimbeorn-the-Old.jpg",
+          "sha256": "48e9fbb56b7812bdac9158280a04bf8d730e2402b7e2ccac0814daa263719408",
+          "bytes": 117221
+        },
+        {
+          "path": "scans/02038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Louis.jpg",
+          "sha256": "3d1446f67e5361e3e0c1725e1f5df83920a948063925d27185304bed895686ed",
+          "bytes": 117929
+        },
+        {
+          "path": "scans/02039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Morris.jpg",
+          "sha256": "904f8bd27113f95bb4b0e88b301ff1e02e561fecf8c7179a22f8e5e8451d2c68",
+          "bytes": 124049
+        },
+        {
+          "path": "scans/02040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Stuart.jpg",
+          "sha256": "d38e85da1d4a45b019bcabb231e822299bad38b3e7951226a2f9a5fd7c9a0b44",
+          "bytes": 123237
+        },
+        {
+          "path": "scans/02041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Rupert.jpg",
+          "sha256": "c5ab015179c581de065a3b904cd5fd870bb9cb3c0079e05b023651a690805f3a",
+          "bytes": 118441
+        },
+        {
+          "path": "scans/02042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Muck-Adder.jpg",
+          "sha256": "40d4a955f9f9b4a7e8cbe58c836e8c4b817eaeccf00674b46a458db4610b9b06",
+          "bytes": 121981
+        },
+        {
+          "path": "scans/02043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/The-Carrock.jpg",
+          "sha256": "942bd8a8dbf5dbb239b1fd98a6eccfebd849fd8a2eff7b6d21d37d5ad5a91a8e",
+          "bytes": 121797
+        },
+        {
+          "path": "scans/02044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/River-Langflood.jpg",
+          "sha256": "7df6c4c2d26e57faf97601adae7be172bdaf5ce7f357bd265a1eea44d600da23",
+          "bytes": 114439
+        },
+        {
+          "path": "scans/02045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Bee-Pastures.jpg",
+          "sha256": "8f51615ad3fd6110b267434a00e604673ed6c6457bf68093f60f4809890a4fc3",
+          "bytes": 123489
+        },
+        {
+          "path": "scans/02046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Oak-wood-Grove.jpg",
+          "sha256": "90513af132367ccf9e6b591f7b0734f5ca6884679fff139499c270f0b72eac6b",
+          "bytes": 110137
+        },
+        {
+          "path": "scans/02047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/A-Frightened-Beast.jpg",
+          "sha256": "186526bfae12ca986f5bedac1bce79d9755fbed04c0cf2e4bd09aac1efcc784f",
+          "bytes": 119666
+        },
+        {
+          "path": "scans/02048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Sacked.jpg",
+          "sha256": "c46dccb0ba67cf648114ec272f8df99d73456806b64ce82d20e1aef514e43a17",
+          "bytes": 132081
+        },
+        {
+          "path": "scans/02049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/Roasted-Slowly.jpg",
+          "sha256": "4d5a355012120abce6fee7daf6955da917a729dcd8bb2b7ba9abb265b64dd496",
+          "bytes": 123776
+        },
+        {
+          "path": "scans/02060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/The-Wounded-Eagle-1A.jpg",
+          "sha256": "522816b8a9668016d8d7282b86f4969947b238c9eb4f8e090c55bd4db163be62",
+          "bytes": 135732
+        },
+        {
+          "path": "scans/02060.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/The-Wounded-Eagle-1B.jpg",
+          "sha256": "c5dcc2119a1d2777f6d4bd57327f867552e04ef8045fcf316b34ae8f175868e0",
+          "bytes": 125744
+        },
+        {
+          "path": "scans/02061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Radagast's-Request-2A.jpg",
+          "sha256": "259a5772bbac264215365ab31adaf08a851bfcc7d6b9e87777ae918afea8454c",
+          "bytes": 139403
+        },
+        {
+          "path": "scans/02061.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Radagast's-Request-2B.jpg",
+          "sha256": "aae89bb4868a0431ef77cbca8a45959c2af12338c39aa2d922225c8d20c36c73",
+          "bytes": 143335
+        },
+        {
+          "path": "scans/02062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Return-to-Rhosgobel-3A.jpg",
+          "sha256": "9d49435d5391cb9a1b5c833e27119907d3240aef67ef4ebf5685362fa072a1ca",
+          "bytes": 144503
+        },
+        {
+          "path": "scans/02062.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Return-to-Rhosgobel-3B.jpg",
+          "sha256": "63674d2dd04f5e3e81c35f7a4828cd1342412297835c4982b2e7e45d505ce452",
+          "bytes": 151543
+        },
+        {
+          "path": "scans/02063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Athelas.jpg",
+          "sha256": "63bc829d67653d6b5191f71a96d23b46ace499d80e63ffa4aa2254619593e561",
+          "bytes": 109816
+        },
+        {
+          "path": "scans/02064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Wilyador.jpg",
+          "sha256": "6d25d9695461bf79f85e8423d47b8bfae0a43154c8370f9145188f03ef6f784c",
+          "bytes": 113945
+        },
+        {
+          "path": "scans/02065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Rhosgobel.jpg",
+          "sha256": "bc2b028c4a23598508adcc1c210a2067312dd14bab1a54811cd64c5fd9af624e",
+          "bytes": 124207
+        },
+        {
+          "path": "scans/02066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Forest-Grove.jpg",
+          "sha256": "d43f63af1c8d760c8e670da9d4daa703c7ca1e44d90cd688ef34116cd3004a60",
+          "bytes": 125217
+        },
+        {
+          "path": "scans/02067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Exhaustion.jpg",
+          "sha256": "5e94ae022be864f967bf3939be1f8f4020ea6b5f4e27a13060e259bd9edd24d8",
+          "bytes": 109635
+        },
+        {
+          "path": "scans/02068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Swarming-Insects.jpg",
+          "sha256": "e679e1c7d34daedaa092b5ee39a74d12b9d71d222ecdb3a56a20a3edaabc38dd",
+          "bytes": 119443
+        },
+        {
+          "path": "scans/02069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Festering-Wounds.jpg",
+          "sha256": "c6e04582cb47d2a2bc57d9d736f4c7712f0a3334ceb2d3d108488fa467688ee2",
+          "bytes": 118216
+        },
+        {
+          "path": "scans/02070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Mirkwood-Flock.jpg",
+          "sha256": "3b2db5bf3d6258e196886c4bb86adbd32ba0c52f1e57a7481fe95ba64b12044b",
+          "bytes": 115868
+        },
+        {
+          "path": "scans/02071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Journey-to-Rhosgobel/Black-Forest-Bats.jpg",
+          "sha256": "6c75f6eccffa3d5255f2690f0f0494b30202688d60ada3f01bea65283bdb9876",
+          "bytes": 119805
+        },
+        {
+          "path": "scans/02082.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Hills-of-Emyn-Muil-1A.jpg",
+          "sha256": "bfc1379d9cd8f19da9ad498a2bc11389bdb61f1b45f8e82b340a75e469755e93",
+          "bytes": 137949
+        },
+        {
+          "path": "scans/02082.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Hills-of-Emyn-Muil-1B.jpg",
+          "sha256": "455c467ef644086544c82451a2c05a9274b863434d9ff897785551dac4e40731",
+          "bytes": 132237
+        },
+        {
+          "path": "scans/02083.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Amon-Hen.jpg",
+          "sha256": "c75281cfdd0fa9b9908afe011beec70dac0a54414e4079dd947506d8ab325201",
+          "bytes": 123223
+        },
+        {
+          "path": "scans/02084.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Amon-Lhaw.jpg",
+          "sha256": "ec841ed6e175e8154d40342008d85f076db33ce1faf0206463ac40bdd3c343ff",
+          "bytes": 119136
+        },
+        {
+          "path": "scans/02085.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-East-Wall-of-Rohan.jpg",
+          "sha256": "80e9ffa3a08752ed8b9730f3a8b2b0c60fd83a01f1530fcb568927f3d2922d19",
+          "bytes": 120947
+        },
+        {
+          "path": "scans/02086.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-North-Stair.jpg",
+          "sha256": "f5ce5bcc903c0eb8d4db5eca94c38351ff80b02f954c0e56fbcbca30fcf1cfd3",
+          "bytes": 125091
+        },
+        {
+          "path": "scans/02087.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Rauros-Falls.jpg",
+          "sha256": "b3915e73c349431322c9b7678f516e8c6ee87c4cd028c023662c81cc2eb18bc4",
+          "bytes": 122264
+        },
+        {
+          "path": "scans/02088.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Shores-of-Nen-Hithoel.jpg",
+          "sha256": "c58f0b864452f18f797f190a3982812335399fedd0768015e4adaf688b056629",
+          "bytes": 117587
+        },
+        {
+          "path": "scans/02089.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Outer-Ridge.jpg",
+          "sha256": "1b9f709f7d251d7825f3fdf114ccb1299f8367f80bfd08e48a5304fd09b0c179",
+          "bytes": 116718
+        },
+        {
+          "path": "scans/02090.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/The-Highlands.jpg",
+          "sha256": "4671c6d37cedbb7087e678efd5914a7a989852ce37bbe4cfe9f2154a166834b1",
+          "bytes": 118061
+        },
+        {
+          "path": "scans/02091.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Impassable-Chasm.jpg",
+          "sha256": "8bae4087b96fbd0f1fdd7cf062cc4cdbf596e76990e10a71ae5ed232fae5cfeb",
+          "bytes": 111650
+        },
+        {
+          "path": "scans/02092.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Rockslide.jpg",
+          "sha256": "c4345bd070ae19224bb059d45d38848eed25ee8e6c044dfa93a6c5511aec54fb",
+          "bytes": 121394
+        },
+        {
+          "path": "scans/02093.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Slick-Footing.jpg",
+          "sha256": "6cf22f2cb1d6fcd44e598271352df404bf35be1f0bce0b53c5b7fc30ac52175b",
+          "bytes": 121459
+        },
+        {
+          "path": "scans/02094.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hills-of-Emyn-Muil/Orc-Horse-Thieves.jpg",
+          "sha256": "073b6e9b0392cb3722a22db06fcd8bc8c0747d6e7ab7611642e706de527cf030",
+          "bytes": 117566
+        },
+        {
+          "path": "scans/02105.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Into-the-Marshes-1A.jpg",
+          "sha256": "fc897e551b91d4f1be1f88bc89acdd631f11172a16d825179dd56e9efd1588ba",
+          "bytes": 127246
+        },
+        {
+          "path": "scans/02105.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Into-the-Marshes-1B.jpg",
+          "sha256": "1ffe5c8eb96ee0f116e6f50c0702d38954d1c7600e6eaab30bdc06589ed752b1",
+          "bytes": 128680
+        },
+        {
+          "path": "scans/02106.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/The-Capture-2A.jpg",
+          "sha256": "09a8584d3e6ac5302ccf2ac4a7b2077e8fdc1fec4b1a2ad710409d168ad984bc",
+          "bytes": 130376
+        },
+        {
+          "path": "scans/02106.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/The-Capture-2B.jpg",
+          "sha256": "085def9918b8955dbad855c0c4bb9e05ce2b1aee5a8c7b248776e998daf04e68",
+          "bytes": 134789
+        },
+        {
+          "path": "scans/02107.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Gollum.jpg",
+          "sha256": "18118c4499e6d03fae2507128134e792961735e39c50935289951a9652bae6af",
+          "bytes": 109105
+        },
+        {
+          "path": "scans/02108.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/A-Wisp-of-Pale-Sheen.jpg",
+          "sha256": "6dec54183fb310cf1cba2a47866645ca97e396bb801406e5c6a8d353d092c8be",
+          "bytes": 115972
+        },
+        {
+          "path": "scans/02109.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Nightfall.jpg",
+          "sha256": "c65976dcf4b7c769bc899541038e5d3463a2e2ce08e4471f2d622053f7bc1c8a",
+          "bytes": 113732
+        },
+        {
+          "path": "scans/02110.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Through-the-Mist.jpg",
+          "sha256": "a88f91238c31ac45c41cb9ba84d6fb27f85e7ed84ad494fef00460849f1cd328",
+          "bytes": 114989
+        },
+        {
+          "path": "scans/02111.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/The-Lights-of-the-Dead.jpg",
+          "sha256": "80e4d503c5d39afa85e6f8c82cbeb42310965741590d84a90570b3f09e1fcebd",
+          "bytes": 116962
+        },
+        {
+          "path": "scans/02112.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Giant-Marsh-Worm.jpg",
+          "sha256": "6a3a60703b0bb3104aeb41e73a436846d22ac8a1926c3023b9a21b02d592a0cb",
+          "bytes": 124081
+        },
+        {
+          "path": "scans/02113.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Impassable-Bog.jpg",
+          "sha256": "554d09a0382e24d88557e45175d385fc29c55a8dcbea032aa38724e207717fd9",
+          "bytes": 112007
+        },
+        {
+          "path": "scans/02114.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/The-Heart-of-the-Marshes.jpg",
+          "sha256": "a89c4578f542bd8a630cde30c0e0ae9f03cc930a7545763d7d7df2f768828c7d",
+          "bytes": 119919
+        },
+        {
+          "path": "scans/02115.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Fens-and-Mires.jpg",
+          "sha256": "2b46b4e5ab613738ed800e514c0e8d4edbf44ac28b2f3b94b45fe800881046bd",
+          "bytes": 111302
+        },
+        {
+          "path": "scans/02126.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Through-the-Forest-1A.jpg",
+          "sha256": "ae37153cd9a535ec141eb8c56c7b88e2af16b6181392a57709f4f985489b0f75",
+          "bytes": 165682
+        },
+        {
+          "path": "scans/02126.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Through-the-Forest-1B.jpg",
+          "sha256": "97240c999a23ef41833ab8d0e1dd5a1cb3c15c2f2abfc6df8a8a3f21e5d5e658",
+          "bytes": 139570
+        },
+        {
+          "path": "scans/02127.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Escape-Attempt-2A.jpg",
+          "sha256": "4291009eb4f21c16de1c5315479ee9f5e0bc1e2fec5b140bb07b725bd65fd5ba",
+          "bytes": 118439
+        },
+        {
+          "path": "scans/02127.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Escape-Attempt-2B.jpg",
+          "sha256": "f48eb2147135a07fee5f1ad1f3d37f9fe126dad9aa1166dbc03290f8397ee7af",
+          "bytes": 122464
+        },
+        {
+          "path": "scans/02128.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/To-the-Elvin-King's-Halls-3A.jpg",
+          "sha256": "8167093d11ee452e74b552307bd6f759e1c354bd5cbf2413d94e5b38e7b0c1b0",
+          "bytes": 124154
+        },
+        {
+          "path": "scans/02128.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/To-the-Elvin-King's-Halls-3B.jpg",
+          "sha256": "f2f7266c94a26dc555250cc66476ee4743ba31b316ce06902bf4a7bf62e99f10",
+          "bytes": 109153
+        },
+        {
+          "path": "scans/02129.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Ambush-4A.jpg",
+          "sha256": "406437afb0dcd7b3bc00c03c53c2c96aceffb2c6b4bc9b54323fd34054dee3d0",
+          "bytes": 126648
+        },
+        {
+          "path": "scans/02129.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Ambush-4B.jpg",
+          "sha256": "a522d9a33f3cfb9849e7fba63d0de7a9164ebb85abdb21e4a1d9ae2bd3d4b430",
+          "bytes": 138432
+        },
+        {
+          "path": "scans/02130.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Gollum.jpg",
+          "sha256": "cce7f1f02eddfbab02dca687073cc20f14f4770c732396aee6e96184dbaba9ee",
+          "bytes": 118197
+        },
+        {
+          "path": "scans/02131.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/The-Spiders'-Ring.jpg",
+          "sha256": "8bff8c32218b96930ab57a4412f6b537e31d1acca01907547e3b7c89bbe69676",
+          "bytes": 123279
+        },
+        {
+          "path": "scans/02132.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Dry-Watercourse.jpg",
+          "sha256": "503c2372a091c572960a449c1981fa89d8bc905d9ce974286904ad4f5adb33d9",
+          "bytes": 127373
+        },
+        {
+          "path": "scans/02133.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Woodman's-Glade.jpg",
+          "sha256": "b7338c40ade070187ace1c665d3961c33a97d1c9ba19e6fbe15b846f640ac1d6",
+          "bytes": 124109
+        },
+        {
+          "path": "scans/02134.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Wood-Elf-Path.jpg",
+          "sha256": "cdb3559dcafcda85e87587e8729378eb94a55f75f2cf7e5d01a4e5722c11db72",
+          "bytes": 109677
+        },
+        {
+          "path": "scans/02135.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Gollum's-Anguish.jpg",
+          "sha256": "8f4219ba46ec5cd4387cd5b6d821bf6a4d6cde2f73260f7a56233fc9d0633be3",
+          "bytes": 117565
+        },
+        {
+          "path": "scans/02136.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Gollum's-Bite.jpg",
+          "sha256": "eba80bd1fa4fb23506c6af0974c858f1eb648be300ea1522925026842b777e02",
+          "bytes": 116693
+        },
+        {
+          "path": "scans/02137.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Wasted-Provisions.jpg",
+          "sha256": "f551c27f50eb2804332a79003fae39c10b5335eac2a930cd73aaef06913ef1bc",
+          "bytes": 126780
+        },
+        {
+          "path": "scans/02138.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Mirkwood-Bats.jpg",
+          "sha256": "0658e081d97a4a3eed74d6aa4c12b571e59b0bab77ea9823ae22e014838e921e",
+          "bytes": 123234
+        },
+        {
+          "path": "scans/02139.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Attercop-Attercop.jpg",
+          "sha256": "3d6ea29a178ee2c43ec1d2ee9b5061b085b7d50103fbf675519211c908273ad0",
+          "bytes": 127869
         },
         {
           "path": "scans/09016.A.jpg",

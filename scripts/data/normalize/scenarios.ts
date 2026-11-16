@@ -2,12 +2,12 @@ import { parse as parseJsonc } from "jsonc-parser";
 
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import {
-  parseScenarioData,
+  parseAnyScenarioData,
   PILES,
   type CampaignData,
   type Pile,
   type Placement,
-  type ScenarioData,
+  type AnyScenarioData,
 } from "../../../src/catalog/scenario-data.ts";
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
@@ -45,7 +45,7 @@ const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2
 // A scenario is written only when every check passes. The rest are listed in problems and stay unbuilt
 // until an override or a template resolves them.
 export type ScenarioResult = {
-  scenarios: ScenarioData[];
+  scenarios: AnyScenarioData[];
   // Every built campaign with its definition, each listing the scenarios of it that were built, in play order.
   campaigns: { data: CampaignData; def: CampaignDef }[];
   problems: string[];
@@ -73,13 +73,16 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
 
   // The name of a card as a word of a text, either apostrophe: built once per name.
   const mentioned = new Map<string, RegExp>();
-  const scenarios: ScenarioData[] = [];
+  const scenarios: AnyScenarioData[] = [];
   const campaignCards: Record<string, string> = {};
   // The cards a campaign's scenarios start with in player 1's play area (the Fellowship's Ring-bearer attachments), by scenario.
   const preludes = new Map<string, { code: string }[]>();
   const hobById = new Map(raw.scenarios.map((hob) => [scenarioSlug(hob.Title), hob]));
 
+  // A scenario of a cycle (Shadows of Mirkwood) has no campaign card: its piles are checked against the quest card's printed Setup (and the Adventure Pack's rules insert where one is pinned).
+  const cycleIds = new Set(campaignDefs.flatMap((campaign) => (campaign.kind === "cycle" ? campaign.scenarios.map((scenario) => scenario.id) : [])));
   for (const def of scenarioDefs(campaignDefs)) {
+    const cycle = cycleIds.has(def.id);
     const hob = hobById.get(def.id);
     const id = def.id;
     if (!hob) {
@@ -108,8 +111,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const easyDeck = easyKey ? decks[easyKey] : undefined;
     // The campaign card, boons and burdens are the box's (a Dream-chaser scenario's are the Campaign Expansion's).
     const cardPacks = productOf(def.campaignProduct ?? def.product).packs;
-    const campaignCard = campaignCardsOf(cardPacks).get(hob.Title.replace(CAMPAIGN_SUFFIX, ""));
-    if (!campaignCard) {
+    const campaignCard = cycle ? undefined : campaignCardsOf(cardPacks).get(hob.Title.replace(CAMPAIGN_SUFFIX, ""));
+    if (!cycle && !campaignCard) {
       problems.push(`${id}: no campaign card named "${hob.Title.replace(CAMPAIGN_SUFFIX, "")}"`);
       continue;
     }
@@ -125,7 +128,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // The campaign card names more than the scenario lists: the Campaign Expansion's own cards (Sea Serpent) and the originals of its reprints
     // (Calphon is in no list of Raid on the Grey Havens). They match a name only where no card of the scenario's own list bears it.
     // A card of the scenario's own box that its campaign card names without its scenario listing it (Ered Mithrin's The King's Quest: "Haldan may be included").
-    const campaignText = `${byCode.get(campaignCard)?.text ?? ""}\n${bySlug.get(hob.QuestCards[0]?.Slug ?? "")?.text ?? ""}`;
+    const campaignText = `${byCode.get(campaignCard ?? "")?.text ?? ""}\n${bySlug.get(hob.QuestCards[0]?.Slug ?? "")?.text ?? ""}`;
     const ownBox = productOf(def.product).packs;
     const inCampaignText = (card: Card) => {
       if (card.campaignKind != null || PLAYER_TYPES.has(card.type) || !card.printings.some((p) => ownBox.includes(p.pack))) return false;
@@ -149,7 +152,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
 
     // The printed Setup of the first quest stage and of the campaign card.
     const questSetup = setupOf(byCode.get(stages[0] ?? "")?.text, false).setup;
-    const campaignLines = setupOf(byCode.get(campaignCard)?.text, def.deck !== undefined || product.sagaStart === true);
+    const campaignLines = setupOf(byCode.get(campaignCard ?? "")?.text, def.deck !== undefined || product.sagaStart === true);
     const campaignSetup = campaignLines.setup;
     const quest: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
     const camp: ParsedSetup = campaignSetup ? parseSetup(campaignSetup, names) : { clauses: [], unread: [] };
@@ -309,7 +312,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     for (const code of normal.campaign) campaignPlaced.add(code);
     for (const code of codesOf(camp, ["earned", "choose"])) campaignPlaced.add(code);
     for (const code of campaignNamed) campaignPlaced.add(code);
-    for (const code of campaignTextCodes({ names, byCode, ruleById, campaignCard, campaignLines: campaignLines.others, setupSpan: def.deck !== undefined ? def.setupSpan : null, cardPacks, campaignCardsOnly: productOf(def.campaignProduct ?? def.product).campaignCardRewards === true })) campaignPlaced.add(code);
+    for (const code of cycle || campaignCard === undefined ? [] : campaignTextCodes({ names, byCode, ruleById, campaignCard, campaignLines: campaignLines.others, setupSpan: def.deck !== undefined ? (def.setupSpan ?? null) : null, cardPacks, campaignCardsOnly: productOf(def.campaignProduct ?? def.product).campaignCardRewards === true })) campaignPlaced.add(code);
     for (const rule of overrides.scenarioCampaignPlaced) if ([rule.scenario].flat().includes(id)) for (const code of [rule.code].flat()) campaignPlaced.add(code);
     // Everything the quest Setup names must be in a pile.
     const inPile = (code: string, piles: readonly string[]) => placed.some((item) => same(item.code, code) && piles.includes(item.pile));
@@ -340,14 +343,24 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const life = clausesOf(quest, "lifeSet")[0]?.amount;
 
     // Encounter sets: the booklet's Setup paragraph names them, in its order; Hall of Beorn's list must agree.
-    const rule = ruleById.get(def.setupSpan);
+    const rule = def.setupSpan === undefined ? undefined : ruleById.get(def.setupSpan);
+    if (def.setupSpan === undefined && !cycle) local.push(`${id}: a campaign scenario names its Setup span (scripts/data/campaign-defs.ts)`);
+    if (def.setupSpan !== undefined && !rule) local.push(`${id}: no rules span ${def.setupSpan} (data/rules/index.json)`);
     // Angmar Awakened's booklet lists an icon named for an objective-ally (Amarthiúl) among the encounter sets; his card is dealt in its own scenario's set, so the name is a card title, not a set.
     const namesAnObjective = (name: string) => placed.some((item) => byCode.get(item.code)?.type === "objective" && canon(byCode.get(item.code)?.name ?? "") === canon(name) && canon(byCode.get(item.code)?.encounterSet ?? "") !== canon(name));
     const booklet = bookletSetsOf(rule).filter((name) => !(def.deck && namesAnObjective(name)));
     const first = hob.QuestCards[0];
     const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign" || byCode.get(code)?.campaignKind != null;
     let hobSets = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
-    if (booklet.length === 0) local.push(`${id}: the booklet's Setup paragraph ${def.setupSpan} lists no encounter sets`);
+    if (def.setupSpan === undefined) {
+      // No rules insert is pinned for this scenario (a cycle's Adventure Pack): Hall of Beorn's set list is the list, and the sets of the cards the load list deals must be exactly those.
+      const dealtSets = new Set<string>();
+      for (const item of placed) {
+        const card = byCode.get(item.code);
+        if (card && item.pile !== "quest" && !isCampaign(item.code) && card.encounterSet) dealtSets.add(canon(card.encounterSet));
+      }
+      if (JSON.stringify([...dealtSets].sort()) !== JSON.stringify(hobSets.map(canon).sort())) local.push(`${id}: encounter sets: load list deals ${[...dealtSets].sort().join(", ")} / Hall of Beorn ${hobSets.join(", ")}`);
+    } else if (booklet.length === 0) local.push(`${id}: the booklet's Setup paragraph ${def.setupSpan} lists no encounter sets`);
     else if (def.deck) {
       // A Dream-chaser scenario: Hall of Beorn lists the sets of its first quest card only (no second deck), so the booklet's paragraph is the
       // list. Every set it names has a card in the load list, and every encounter card the load list deals is in one of them.
@@ -436,16 +449,16 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       continue;
     }
     preludes.set(id, product.sagaStart ? [] : normal.player.map((code) => ({ code })));
-    campaignCards[id] = campaignCard;
+    if (campaignCard !== undefined) campaignCards[id] = campaignCard;
     scenarios.push(
-      parseScenarioData({
+      parseAnyScenarioData({
         id,
         name: hob.Title,
         number: hob.Number,
         stages,
         encounterSets,
         cards: placed,
-        campaignCard,
+        ...(campaignCard !== undefined ? { campaignCard } : {}),
         campaignPlaced: [...campaignPlaced].sort(),
         ...(Object.keys(reprints).length > 0 ? { reprints } : {}),
         ...(life != null ? { life } : {}),

@@ -4,7 +4,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { scenarioCards } from "../../../src/catalog/scenario-data.ts";
-import { loadScenario } from "../load-scenarios.ts";
+import { loadAnyScenario } from "../load-scenarios.ts";
 import { DATA_DIR } from "../paths.ts";
 import { MEC108_CHANGED, MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED } from "../printed/scope.ts";
 import { cardgameToolsFile, fallbackUrls, lettersOf, PDF_PAGES, productsOfPacks } from "./pictures.ts";
@@ -107,7 +107,7 @@ describe("pictures", () => {
     const unpictured = new Set([...MEC108_CHANGED, ...MEC109_CHANGED, ...MEC112_CHANGED, ...MEC113_CHANGED, "11084", ...emce]);
     const missing: string[] = [];
     for (const id of readdirSync(path.join(DATA_DIR, "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {
-      const scenario = loadScenario(id);
+      const scenario = loadAnyScenario(id);
       for (const code of new Set([...scenario.stages, ...scenarioCards(scenario).map((card) => card.code), ...(scenario.campaignCard ? [scenario.campaignCard] : []), ...scenario.campaignPlaced])) {
         if (!pinned.has(code) && !unpictured.has(code)) missing.push(`${id} ${code}`);
       }

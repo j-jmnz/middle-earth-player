@@ -2,6 +2,7 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import { readAngmarAwakened } from "./setup-angmar-awakened.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
 import { readReturnOfTheKing } from "./setup-return-of-the-king.ts";
+import { readShadowsOfMirkwood } from "./setup-shadows-of-mirkwood.ts";
 import { readTwoTowers } from "./setup-two-towers.ts";
 import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
@@ -35,7 +36,7 @@ export type SetupClause =
   // "Attach 1 encounter card to each objective card."
   | { kind: "attachEncounterToObjectives"; count: number }
   // "Put Mendor into play."
-  | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" | "engagedFirstPlayer" }
+  | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" | "engagedFirstPlayer" | "guardian" }
   // "Attach X to a hero of the first player's choice." / "The first player attaches X to one of his heroes."
   // `anyPlayer`: "Attach Wormsbane to a hero, Broken side face-up" names no player.
   | { kind: "attachChosen"; codes: string[]; who: "firstPlayer" | "anyPlayer" }
@@ -140,7 +141,9 @@ export type SetupStep =
   | "mayBeHero" // "Amarthiúl may be included among a player's heroes": `to` the cards of that name
   | "reanimateTopCard" // "Each player reanimates the top card of his deck": mec108.reanimated-dead
   | "heroesBeginDamaged" // "Each hero begins the game with damage on them equal to the amount noted for them in the Campaign Log"
-  | "chooseItemBoons"; // "Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play": `codes` the excluded boon
+  | "chooseItemBoons" // "Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play": `codes` the excluded boon
+  // Shadows of Mirkwood (sotm.*, scripts/data/normalize/setup-shadows-of-mirkwood.ts).
+  | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck": `count` cards, `players` for each player
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 
@@ -154,7 +157,7 @@ export function codesOf(parsed: ParsedSetup, kinds: readonly SetupClause["kind"]
 
 // `without` is the sentence with every card name blanked out: what is left says whether the sentence is only a list of names.
 // `allCodesOf` returns every card that bears a name found in the sentence ("all copies of Galdor's Counsel": four cards of one name).
-export type NameIndex = { codesOf(sentence: string): string[]; allCodesOf(sentence: string): string[]; without(sentence: string): string; aliases: ReadonlyMap<string, string> };
+export type NameIndex = { cards: readonly Card[]; codesOf(sentence: string): string[]; allCodesOf(sentence: string): string[]; without(sentence: string): string; aliases: ReadonlyMap<string, string> };
 
 // A name as the matcher compares it: lowercase, accents and curly apostrophes folded ("Círdan's Blessing" is "Cirdan's Blessing" in a
 // source that drops the accent). Folding keeps every character's position, so a hit's offsets index the original sentence.
@@ -180,6 +183,7 @@ export function nameIndex(cards: readonly Card[], prefer: ReadonlySet<string>): 
   }
   const names = [...byName.keys()].sort((a, b) => b.length - a.length);
   return {
+    cards,
     aliases: new Map([...byName].map(([name, card]) => [name, card.code])),
     codesOf(sentence) {
       return scan(sentence).map((hit) => hit.code);
@@ -337,7 +341,7 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readShadowsOfMirkwood(sentence, names);
     if (campaignStep) {
       clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {

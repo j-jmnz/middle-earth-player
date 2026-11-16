@@ -1,0 +1,204 @@
+{
+  "id": "conflict-at-the-carrock",
+  "name": "Conflict at the Carrock",
+  "number": 2,
+  "stages": [
+    "02035",
+    "02036"
+  ],
+  "encounterSets": [
+    {
+      "name": "Conflict at the Carrock",
+      "count": 21
+    },
+    {
+      "name": "Journey Along the Anduin",
+      "count": 9
+    },
+    {
+      "name": "Wilderlands",
+      "count": 14
+    }
+  ],
+  "cards": [
+    {
+      "code": "02037",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02042",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02044",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02045",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02046",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02047",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02048",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "02049",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01111",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "01112",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01113",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01114",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01082",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01083",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01084",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01085",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01086",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01087",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01088",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02035",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02036",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02043",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "02038",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "02039",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "02040",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "02041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "02048",
+      "normal": 4,
+      "easy": 4,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q01.5",
+    "dragnEasy": "E01.5",
+    "hobSlug": "Conflict-at-the-Carrock"
+  }
+}

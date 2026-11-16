@@ -1,11 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 
 import index from "../../../data/campaigns/index.json";
 import entries from "../../../data/rules/entries.json";
 import { BOXES, bookletPageOf, bookletParams, boxOf, campaignIds, campaignOf, campaignOfScenario, scenarioName, scenarioNames, scenarioOf } from "./campaign-data";
 import { dealSeed } from "../nav/e2e";
+
+// The cycles built in data/ (campaign files of kind "cycle") and their scenarios.
+const CYCLE_FILES = readdirSync("data/campaigns")
+  .filter((name) => name !== "index.json")
+  .map((name) => JSON.parse(readFileSync(`data/campaigns/${name}`, "utf8")) as { id: string; kind?: string; scenarios: string[] })
+  .filter((file) => file.kind === "cycle");
+const CYCLES = new Set(CYCLE_FILES.map((file) => file.id));
+const CYCLE_SCENARIOS = new Set(CYCLE_FILES.flatMap((file) => file.scenarios));
 
 describe("campaign data on the phone", () => {
   it("lists the six scenarios of the Fellowship in book order, each readable", () => {
@@ -27,7 +35,8 @@ describe("campaign data on the phone", () => {
 
 describe("the registry", () => {
   it("holds every playable campaign data/campaigns/index.json lists, and nothing else that is built", () => {
-    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).sort();
+    // A cycle's file (Shadows of Mirkwood: no campaign card, played standalone) is not in the registry until the app reads cycles.
+    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json" && !CYCLES.has(name.replace(/\.json$/, ""))).map((name) => name.replace(/\.json$/, "")).sort();
     expect([...campaignIds()].sort()).toEqual(built);
     for (const entry of index) {
       const campaign = campaignOf(entry.id);
@@ -39,7 +48,7 @@ describe("the registry", () => {
   });
 
   it("holds every scenario file, and each campaign's scenarios are all in it", () => {
-    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).sort();
+    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).filter((id) => !CYCLE_SCENARIOS.has(id)).sort();
     for (const id of files) expect(scenarioOf(id)?.id, id).toBe(id);
     for (const id of campaignIds()) for (const scenario of campaignOf(id)?.scenarios ?? []) expect(files, `${id}: ${scenario}`).toContain(scenario);
   });

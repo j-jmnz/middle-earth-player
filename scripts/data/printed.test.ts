@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
+import { dealtCodes, ledgerPending, loadAnyScenario, loadCampaigns } from "./load-scenarios.ts";
 import { keyOf, loadLedger, mergeLedgers, verifyScans } from "./printed/ledger.ts";
 import { starterPrints } from "../../src/screens/deck/starter-decks.ts";
 import { KNOWN_ERRORS, MEC109_CHANGED, scanTargets, scopeCodes, starterCodes } from "./printed/scope.ts";
@@ -18,7 +19,10 @@ describe("ledger scope", () => {
 
 describe("printed-text ledger", () => {
   it("has an entry for each side of each card in scope", () => {
-    const missing = scanTargets().filter((target) => !ledger.byKey.has(keyOf(target.code, target.side))).map((target) => `${target.code}.${target.side}`);
+    // A cycle's cards are scanned (the sync reads the whole scope) and join the ledger check once its ledger is seeded (ledgerPending).
+    const pending = loadCampaigns().filter((campaign) => ledgerPending(campaign));
+    const unseeded = dealtCodes(pending, pending.flatMap((campaign) => campaign.scenarios).map((id) => loadAnyScenario(id)), { nightmare: false });
+    const missing = scanTargets().filter((target) => !unseeded.has(target.code) && !ledger.byKey.has(keyOf(target.code, target.side))).map((target) => `${target.code}.${target.side}`);
     expect(missing).toEqual([]);
     expect(scopeCodes().length).toBeGreaterThan(80);
   });

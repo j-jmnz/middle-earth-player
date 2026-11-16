@@ -1,5 +1,5 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
-import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
+import type { CampaignData, AnyScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { PRODUCTS, type CampaignDef } from "../campaign-defs.ts";
 
 // The RingsDB twin packs (PRODUCTS): DragnCards names the Fellowship boxes by product, RingsDB by these pack codes.
@@ -32,7 +32,7 @@ export function indexCards(cards: readonly Card[]): { byCode: Map<string, Card>;
  */
 export function campaignsOf(
   campaignDefs: readonly CampaignDef[],
-  scenarios: readonly ScenarioData[],
+  scenarios: readonly AnyScenarioData[],
   campaignCards: Readonly<Record<string, string>>,
   preludes: ReadonlyMap<string, { code: string }[]>,
 ): { data: CampaignData; def: CampaignDef }[] {
@@ -42,8 +42,10 @@ export function campaignsOf(
       id: def.id,
       name: def.name,
       scenarios: built.map((scenario) => scenario.id),
-      campaignCards: Object.fromEntries(built.map((scenario) => [scenario.id, campaignCards[scenario.id] ?? ""])),
-      bookletId: def.bookletId,
+      ...(def.kind === "cycle" ? { kind: "cycle" as const } : {}),
+      // A cycle's scenarios have no campaign card (the file leaves the field out, which reads as empty).
+      campaignCards: Object.fromEntries(built.flatMap((scenario) => (campaignCards[scenario.id] !== undefined ? [[scenario.id, campaignCards[scenario.id]]] : def.kind === "cycle" ? [] : [[scenario.id, ""]]))),
+      ...(def.bookletId !== undefined ? { bookletId: def.bookletId } : {}),
       saga: def.saga,
       prelude: preludes.get(built[0]?.id ?? "") ?? [],
       starterDecks: [],

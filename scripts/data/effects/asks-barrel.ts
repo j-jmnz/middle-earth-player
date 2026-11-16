@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-import type { ScenarioData } from "../../../src/catalog/scenario-data.ts";
+import type { AnyScenarioData } from "../../../src/catalog/scenario-data.ts";
 
 // The barrel of the asks files (src/play/words/asks/index.ts): the choice words a scenario keeps as data beside its records (src/play/words/asks.ts). Metro cannot glob, so pnpm data build lists them, by scenario id: a game reads only its own scenario's file (asks.ts), never a merge of them. A top-level file of
 // src/play/words/asks/ that exports ASKS is named for the scenario whose records it words; a file named for no scenario fails the build.
@@ -14,7 +14,7 @@ export function asksFileNames(dir: string): string[] {
     .sort();
 }
 
-export function checkAsksNames(names: readonly string[], scenarios: readonly Pick<ScenarioData, "id">[]): void {
+export function checkAsksNames(names: readonly string[], scenarios: readonly Pick<AnyScenarioData, "id">[]): void {
   const known = new Set(scenarios.map((scenario) => scenario.id));
   const unknown = names.filter((name) => !known.has(name));
   if (unknown.length > 0) throw new Error(`src/play/words/asks/${unknown.join(".ts, ")}.ts is named for no scenario in data/: rename it to a scenario id`);

@@ -1799,7 +1799,9 @@ Forced effects in the current window run in timestamp order. Responses are offer
 | Card database, scenario load lists by pile, framework steps, automation snippets, card art | DragnCards LOTR plugin |
 | Every Nightmare card's text and stats | Hall of Beorn export |
 | Every Nightmare card's picture, each deck's card list (checked against Hall of Beorn's copies) | The Nightmare proxies on Google Drive (`nightmare`, user decision 2026-10-30) |
-| Procedures and definitions | MEC109 booklet, core-set Learn to Play, the campaign rulebooks, Rules Reference, FAQ, Easy mode, campaign log, and the keyword rules of two rulesheets (Heirs of Númenor, Wilds of Rhovanion) (PDFs, extracted per page) |
+| Procedures and definitions | MEC109 booklet, core-set Learn to Play, the campaign rulebooks, Rules Reference, FAQ, Easy mode, campaign log, the keyword rules of two rulesheets (Heirs of Númenor, Wilds of Rhovanion), and four Shadows of Mirkwood Adventure Pack rulesheets (their encounter sets and special rules: `sotm.*`) (PDFs, extracted per page) |
+
+The Shadows of Mirkwood cycle has no booklet and no campaign card: the rulesheets of A Journey to Rhosgobel, The Hills of Emyn Muil, The Dead Marshes and Return to Mirkwood are pinned and their encounter-set paragraphs are the scenario's `setupSpan`; The Hunt for Gollum's and Conflict at the Carrock's rulesheets hold their text as outlines (no text layer), so those two scenarios' sets are Hall of Beorn's, checked against the sets of the cards the DragnCards load list deals. Every scenario's piles are checked against the stage 1A card's printed Setup line.
 
 Sources disagree. The build cross-checks them (Hall of Beorn counts against the DragnCards load lists, piles against the quest card's Setup text) and a scenario that fails a check is not written. Each resolved disagreement is a row in `data/overrides.json` with its reason and source. Do not hand-edit generated data such as `data/scenarios/*.json`: fix the source or add an override with its reason.
 

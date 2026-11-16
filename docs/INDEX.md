@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.1K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.3K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 3
   - 53–66 Non-goals (~590)
@@ -138,11 +138,11 @@ Read the sections your task touches.
     - 1773–1782 Player side quests, contracts and saga cards (~430)
     - 1783–1786 Window stack (~100)
     - 1787–1790 Coverage test (~270)
-  - 1791–1811 Data sources (~530)
-  - 1812–1830 Card images (~1.2K) ← 9
-  - 1831–1856 Persistence and shipping (~2.6K) ← 6
-  - 1857–1898 Screens (~4.9K) ← 1
-    - 1883–1898 Table screen (~1.8K) ← 3
+  - 1791–1813 Data sources (~700) ← 2
+  - 1814–1832 Card images (~1.2K) ← 9
+  - 1833–1858 Persistence and shipping (~2.6K) ← 6
+  - 1859–1900 Screens (~4.9K) ← 1
+    - 1885–1900 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~57.1K tok)
   - 5–8 Overview (~150) ← 1
   - 9–23 Top bar (~3.1K) ← 4
@@ -307,7 +307,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
 - `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Modules (1); architecture.md, Repository map (1)
-- `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
+- `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Data sources (2); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1)
