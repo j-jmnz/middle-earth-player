@@ -56,6 +56,8 @@ const nightmareSchema = z.strictObject({
   cards: z
     .array(z.strictObject({ code: z.string().min(1), copies: z.number().int().positive(), pile: z.enum(NIGHTMARE_PILES), perPlayer: z.number().int().positive().optional() }))
     .min(1),
+  // The deck's quest cards (side A codes), which the build records and does not place.
+  questCards: z.array(z.string().min(1)).min(1).optional(),
 });
 export type NightmareData = z.infer<typeof nightmareSchema>;
 

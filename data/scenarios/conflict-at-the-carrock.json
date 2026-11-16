@@ -200,5 +200,140 @@
     "dragnNormal": "Q01.5",
     "dragnEasy": "E01.5",
     "hobSlug": "Conflict-at-the-Carrock"
+  },
+  "nightmare": {
+    "setupCard": "900501",
+    "removed": [
+      {
+        "code": "01081",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01083",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01085",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01086",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01087",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01088",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01111",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01113",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02037",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02038",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "02039",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "02040",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "02041",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "02045",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "02046",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "02049",
+        "copies": 1,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900502",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "900503",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "900504",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "900505",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "900506",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "900507",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "900508",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900509",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900510",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ],
+    "questCards": [
+      "900511"
+    ]
   }
 }

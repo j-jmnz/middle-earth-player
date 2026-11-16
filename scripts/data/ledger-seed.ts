@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import type { Card } from "../../src/catalog/card-facts.ts";
 import { runScript, type Log } from "../log.ts";
 import { loadCards } from "./load-cards.ts";
+import { isNightmareCard, nightmareDeckOf, nightmareDeckOfCode } from "./nightmare-defs.ts";
 import { dealtCodes, loadAnyScenario, loadCampaigns } from "./load-scenarios.ts";
 import { DATA_DIR } from "./paths.ts";
 import { keyOf, ledgerSchema, loadLedger, type Ledger, type LedgerEntry } from "./printed/ledger.ts";
@@ -13,6 +14,8 @@ import { scanTargets, type ScanTarget } from "./printed/scope.ts";
 // `pnpm data ledger-seed <scenario-id>`: writes the ledger entries a scenario's cards are missing, from the source text (Hall of Beorn's, through data/cards),
 // with `readBy` empty and the pinned scan named (data/sources.json). Every seeded line is still read against its scan before the scenario is playable: the
 // effect coverage test refuses a playable scenario's card whose entry has no `readBy`. Run `pnpm data sync scans` first when the scenario's scans are not pinned.
+// `--nightmare` seeds the scenario's Nightmare deck instead (data/printed/nightmare.json): a Nightmare card's scan is its proxy picture, pinned under `pictures/`
+// by `pnpm data sync nightmare`, which is read when `scans/` does not hold it yet.
 
 export const SEED_CONVENTIONS = [
   "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
@@ -39,9 +42,18 @@ export function seedEntry(card: Card, target: ScanTarget, scan: { url: string; s
 type Pins = ReadonlyMap<string, { url: string; sha256: string }>;
 
 /** data/sources.json's pinned scans by "<code>.<side>". */
-export function pinnedScans(sourcesFile = path.join(DATA_DIR, "sources.json")): Pins {
+export function pinnedScans(sourcesFile = path.join(DATA_DIR, "sources.json"), { nightmare = false }: { nightmare?: boolean } = {}): Pins {
   const sources = JSON.parse(readFileSync(sourcesFile, "utf8")) as { sources: Record<string, { files: { path: string; url: string; sha256: string }[] }> };
-  return new Map((sources.sources.scans?.files ?? []).map((file) => [file.path.replace(/^scans\//, "").replace(/\.(jpg|png)$/, ""), { url: file.url, sha256: file.sha256 }]));
+  const keyed = (kind: string) => (sources.sources[kind]?.files ?? []).map((file) => [file.path.replace(/^[a-z]+\//, "").replace(/\.(jpg|png)$/, ""), { url: file.url, sha256: file.sha256 }] as const);
+  // A Nightmare card's proxy picture is pinned by the `nightmare` source (sources/nightmare.ts), as its scan; the scans' own pin, once synced, wins.
+  return new Map([...(nightmare ? keyed("nightmare") : []), ...keyed("scans")]);
+}
+
+/** The codes of a scenario's Nightmare deck: its setup card and its cards. */
+export function nightmareDeckCodes(scenarioId: string, cards: readonly Card[]): Set<string> {
+  const deck = nightmareDeckOf(scenarioId);
+  if (!deck) throw new Error(`The scenario ${scenarioId} has no Nightmare deck (scripts/data/nightmare-defs.ts)`);
+  return new Set(cards.filter((card) => isNightmareCard(card) && nightmareDeckOfCode(card.code) === deck).map((card) => card.code));
 }
 
 /** The entries to add: every scanned side of the codes that no ledger holds yet, in code and side order. A side with no pinned scan is reported, not seeded. */
@@ -61,6 +73,11 @@ export function seedEntries(codes: ReadonlySet<string>, held: Ledger, cards: rea
   return { entries, unpinned };
 }
 
+/** The indent a ledger file is written with (nightmare.json uses one space), so seeding leaves the entries it holds byte-identical. */
+export function indentOf(raw: string | null): number {
+  return /^( +)"/m.exec(raw ?? "")?.[1]?.length ?? 2;
+}
+
 /** `file` with the seeded entries appended (a new file takes the conventions). An entry the file already holds is never rewritten. */
 export function withSeeded(file: unknown | null, campaign: string, seeded: readonly LedgerEntry[]): { campaign: string; conventions: string[]; entries: LedgerEntry[] } {
   const current = file === null ? { campaign, conventions: SEED_CONVENTIONS, entries: [] } : ledgerSchema.parse(file);
@@ -71,18 +88,21 @@ export function withSeeded(file: unknown | null, campaign: string, seeded: reado
 
 function main(log: Log): void {
   const id = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
-  if (!id) throw new Error("Usage: pnpm data ledger-seed <scenario-id>");
+  const nightmare = process.argv.includes("--nightmare");
+  if (!id) throw new Error("Usage: pnpm data ledger-seed <scenario-id> [--nightmare]");
   const campaign = loadCampaigns().find((one) => one.scenarios.includes(id));
-  if (!campaign) throw new Error(`No built campaign or cycle holds the scenario ${id}`);
-  const scenario = loadAnyScenario(id);
-  const file = path.join(DATA_DIR, "printed", `${campaign.id}.json`);
-  const existing = existsSync(file) ? (JSON.parse(readFileSync(file, "utf8")) as unknown) : null;
-  const codes = dealtCodes(campaign, [scenario], { nightmare: false });
-  const { entries, unpinned } = seedEntries(codes, loadLedger(), loadCards(), pinnedScans());
-  for (const key of unpinned) log.warn(`${key} has no pinned scan: run pnpm data sync scans`);
-  const next = withSeeded(existing, campaign.id, entries);
-  writeFileSync(file, `${JSON.stringify(next, null, 2)}\n`);
-  log.info(`${id}: ${entries.length} sides seeded into ${path.relative(process.cwd(), file)} (${next.entries.length} in all), readBy empty`);
+  if (!campaign && !nightmare) throw new Error(`No built campaign or cycle holds the scenario ${id}`);
+  const cards = loadCards();
+  const ledgerId = nightmare ? "nightmare" : (campaign?.id ?? id);
+  const file = path.join(DATA_DIR, "printed", `${ledgerId}.json`);
+  const raw = existsSync(file) ? readFileSync(file, "utf8") : null;
+  const existing = raw === null ? null : (JSON.parse(raw) as unknown);
+  const codes = nightmare ? nightmareDeckCodes(id, cards) : dealtCodes(campaign as NonNullable<typeof campaign>, [loadAnyScenario(id)], { nightmare: false });
+  const { entries, unpinned } = seedEntries(codes, loadLedger(), cards, pinnedScans(undefined, { nightmare }));
+  for (const key of unpinned) log.warn(`${key} has no pinned scan: run pnpm data sync ${nightmare ? "nightmare" : "scans"}`);
+  const next = withSeeded(existing, ledgerId, entries);
+  writeFileSync(file, `${JSON.stringify(next, null, indentOf(raw))}\n`);
+  log.info(`${id}${nightmare ? " (Nightmare)" : ""}: ${entries.length} sides seeded into ${path.relative(process.cwd(), file)} (${next.entries.length} in all), readBy empty`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) void runScript("data:ledger-seed", main);

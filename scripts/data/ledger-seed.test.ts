@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { loadCards } from "./load-cards.ts";
 import { loadLedger, keyOf } from "./printed/ledger.ts";
-import { pinnedScans, seedEntries, seedEntry, withSeeded } from "./ledger-seed.ts";
+import { indentOf, nightmareDeckCodes, pinnedScans, seedEntries, seedEntry, withSeeded } from "./ledger-seed.ts";
 
 // `pnpm data ledger-seed`: the entries a scenario's cards are missing, from the source text, readBy empty.
 const cards = loadCards();
@@ -49,5 +49,24 @@ describe("ledger seed", () => {
     const again = withSeeded(edited, "x", entries);
     expect(again.entries).toEqual(edited.entries);
     expect(again.conventions.length).toBeGreaterThan(0);
+  });
+
+  it("seeds a scenario's Nightmare deck from its proxy picture pins", () => {
+    const codes = nightmareDeckCodes("the-hunt-for-gollum", cards);
+    expect([...codes].sort()[0]).toBe("900401");
+    const { entries, unpinned } = seedEntries(new Set(["900401", "900402"]), { campaign: "none", entries: [], byKey: new Map() }, cards, pinnedScans(undefined, { nightmare: true }));
+    expect(unpinned).toEqual([]);
+    expect(entries.map((entry) => keyOf(entry.code, entry.side))).toEqual(["900401.A", "900401.B", "900402.A"]);
+    expect(entries.every((entry) => entry.printing === "Nightmare" && entry.readBy === "")).toBe(true);
+  });
+
+  it("refuses a scenario with no Nightmare deck", () => {
+    expect(() => nightmareDeckCodes("the-oath", cards)).toThrow(/no Nightmare deck/);
+  });
+
+  it("writes a file with the indent it already has", () => {
+    expect(indentOf('{\n "campaign": "x"\n}\n')).toBe(1);
+    expect(indentOf('{\n  "campaign": "x"\n}\n')).toBe(2);
+    expect(indentOf(null)).toBe(2);
   });
 });

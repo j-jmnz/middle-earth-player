@@ -2093,6 +2093,1627 @@
    "misprints": [],
    "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
+  },
+  {
+   "code": "900401",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1-NGThP7MhVABziy4_fJ0TAFVc86fymHn&export=download&confirm=t",
+    "sha256": "b24f02ce5399ab9b04962d0b2003e65dcc7146c197739fb130f40291abf03a1e"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Forced: At the end of the refresh phase, choose an unclaimed Clue card not attached to a Mordor enemy and attach it to a Mordor enemy, if able. (If it was guarded, detach the encounter guarding it first. The newly attached Mordor enemy is now guarding it.)",
+    "If at any point there are four or more Clue cards attached to Mordor enemies, the players lose the game."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900401",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1YZ0i977-sO7sb8dcVtGwb7FGQ_yNrIv0&export=download&confirm=t",
+    "sha256": "3eb86678c2d577d22ddaf6323649f77d88c3ef8ce9bbbb7d12f8d711b6247e4a"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for The Hunt for Gollum scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "2x River Ninglor",
+    "1x The Eaves of Mirkwood",
+    "2x False Lead",
+    "2x Misty Mountain Goblins",
+    "2x Banks of the Anduin",
+    "3x Gladden Fields",
+    "3x Eastern Crows",
+    "2x Treacherous Fog",
+    "3x Evil Storm",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Hunt for Gollum encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hunt-for-gollum.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [
+    {
+     "line": 4,
+     "printed": "1x Eaves of Mirkwood"
+    }
+   ],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "The card prints 'Eaves of Mirkwood' without 'The', the title of the scenario's card being The Eaves of Mirkwood; written with it so the removal resolves by title."
+  },
+  {
+   "code": "900402",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1d7eH-v2nn_fpchaiTRbmYGLWQGDS2H3I&export=download&confirm=t",
+    "sha256": "a0a686d3f6231e9bc98036858e680e09083a1d94936c7d5709be3d9d09a1f2d0"
+   },
+   "lines": [
+    "Forced: When a card effect instructs a player to \"look\" at cards in the encounter deck and Ravenous Hawk is among those cards, that player must put Ravenous Hawk into play engaged with him. (This does not satisfy the Forced effect of stage 1B or 2B)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks; Hall of Beorn has single quotes."
+  },
+  {
+   "code": "900403",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1qddlnsFzyidnKTU5gEhcs0UrZ6TrXHYi&export=download&confirm=t",
+    "sha256": "0b2c68c85f7f50f206e254fd175fae698b4c02cb2d80bb3b7e5802330143741c"
+   },
+   "lines": [
+    "Forced: At the beginning of the refresh phase, if Hunting Warg entered play this round, search the encounter deck and discard pile for 1 copy of Hunters from Mordor and add it to the staging area, if able. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900404",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Xn9ehMos8mhQwwedIAhVcDIsTB59qohj&export=download&confirm=t",
+    "sha256": "8ef6f376d61dedb1c97570525d4e489853e6f6c1b281b65939da69c1fb4e41e6"
+   },
+   "lines": [
+    "Each player who does not control at least 1 Clue card cannot draw cards through card effects.",
+    "Shadow: If you do not control at least 1 Clue card, discard all cards from your hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900405",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1c1YdISYB2ug64JShW-xFzui5nu4G9TvA&export=download&confirm=t",
+    "sha256": "e33fdf12b3a18a7671e23b51a2dc7baa7b26dc3b1fa0c712fc1efad43fc02337"
+   },
+   "lines": [
+    "Each Mordor enemy with at least 1 Clue card attached gets +2 Defense.",
+    "Shadow: Attacking enemy gets +1 Defense for each Clue card in play until the end of the round."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900406",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1QFOLY8-qA7EPLX86jM7TK5f9NbIUV2sU&export=download&confirm=t",
+    "sha256": "18c4cc859d92024a91b82084e92a9ad4bf673b53f2b188c7470b3e0d35fdd4d7"
+   },
+   "lines": [
+    "Progress cannot be placed on Dark Pools while it is in the staging area.",
+    "Forced: After Dark Pools becomes the active location, each player must discard an ally with the highest printed cost among the allies he controls."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900407",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1EUONRP87ZJycCZZXDk6zeid-2JzAmMhk&export=download&confirm=t",
+    "sha256": "6f89ecd6b3b7f99a9c5b62697c2dca63f03fb2e8613975a72c59230f50254d20"
+   },
+   "lines": [
+    "When Revealed: Search the encounter discard pile for a Clue card and attach it to a Mordor enemy in play, if able. If no card is attached by this effect, The Enemy's Trail gains surge.",
+    "Shadow: Search the encounter discard pile for a Clue card and attach it to a Mordor enemy in play, if able."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900408",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1336T0B6O4eh7BsfizpmwWAAFOzzwH55t&export=download&confirm=t",
+    "sha256": "c8874634f406dc2cfd33e964ea101bebb4b2cf4496d542e6591d07e44c7b2d08"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: The first player chooses a Clue card attached to a hero and attaches it to a Mordor enemy in play, if able.",
+    "Shadow: Damage from this attack must be applied to a hero you control with a Clue card attached, if able."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900409",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1B0FcodYbI93mbVLxh5PslLZcr2VKtJbK&export=download&confirm=t",
+    "sha256": "dc148092a5e4fce5e4a59a4c9ef8589eecc981d564c6aa22fb5d0f21b6149d67"
+   },
+   "lines": [
+    "When Revealed: Attach to the active location and remove all progress from that location. (Counts as a Condition attachment with the text: \"Limit 1 per location. Attached location contributes its Threat during the quest phase as if it were in the staging area.\")",
+    "If The Trail Goes Cold does not attach to a location as a result of its effect, it gains surge."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'as a result of its effect'; Hall of Beorn has 'this effect'. The card's quotation marks are double."
+  },
+  {
+   "code": "900501",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1nLYJcsZj7RCovfT8ocq5TO05u4-W4NHg&export=download&confirm=t",
+    "sha256": "1e0b5d8087a2828a410d0c6ab65778ce018fa18cbad94b091d6a1044d55ac5f2"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Stage 1A should read, \"Remove 5 unique Troll cards\" instead of 4.",
+    "Stage 2B should read, \"When Revealed: Place Louis, Morris, Rupert and Stuart into the staging area.\"",
+    "Forced: At the end of the quest phase, if no progress was placed on the current quest this phase, place 1 progress on the current quest (bypassing the active location).",
+    "Response: After defeating a unique Troll enemy, you may choose and discard 1 \"Sacked!\" card from play."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks and 'Response'; Hall of Beorn has single quotes and the typo 'Reponse'."
+  },
+  {
+   "code": "900501",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1pPW7aoRMmAdt5toi63FJ7lViTz32qobs&export=download&confirm=t",
+    "sha256": "184ac563f3febe9c9f1cdb2b46c769a5fd431ccc01fbbc61597955df96b8ca14"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for the Conflict at the Carrock scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "1x Grimbeorn the Old",
+    "1x Louis",
+    "1x Morris",
+    "1x Stuart",
+    "1x Rupert",
+    "3x Bee Pastures",
+    "3x Oak-wood Grove",
+    "1x Roasted Slowly",
+    "3x Misty Mountain Goblins",
+    "2x Banks of the Anduin",
+    "1x Wolf Rider",
+    "2x Goblin Sniper",
+    "2x Wargs",
+    "2x Despair",
+    "2x The Brown Lands",
+    "2x The East Bight",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Conflict at the Carrock encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 14,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 15,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 16,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 17,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 18,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 19,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 20,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/conflict-at-the-carrock.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900502",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1qCGa_7GJFmiQAVFu4Nzbk5YBWrJcoeq7&export=download&confirm=t",
+    "sha256": "364d2bd0d986e3294e56e90949d0c21f26ee642c64a123617df5ab8a89eeb0ae"
+   },
+   "lines": [
+    "While Savage Hill-troll is in the victory display, each Troll enemy gets +1 hit point.",
+    "Shadow: If attacking enemy is a Troll, defending character does not ready during the refresh phase this round."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900503",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1K09x-23OXD_ZeWix5AGzoKB02M-iFuKG&export=download&confirm=t",
+    "sha256": "ef5e1c204d741ab6120436de9e6e0b976f131ef77b3cfbc27a599f92beab2693"
+   },
+   "lines": [
+    "Forced: After Rob & Bob makes its first attack each round, if there are two or more players, it engages the next player and makes an additional attack (discard and deal a new shadow card for this attack)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints the title and the text as 'Rob & Bob'; Hall of Beorn has 'Rob and Bob'."
+  },
+  {
+   "code": "900504",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1twUqPo1Y2IzNL_0u6t5Mp7WzbXeu7bQI&export=download&confirm=t",
+    "sha256": "47d3eb84732b42b3edbfa761b56e05b050777115f957b6568755c0396eac4fdd"
+   },
+   "lines": [
+    "Forced: After Louis attacks, the defending player must raise his threat by 3.",
+    "While Louis is in the victory display, each Troll enemy gains, \"Forced: After this enemy attacks, the defending player must raise his threat by 1.\""
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks; Hall of Beorn has single quotes."
+  },
+  {
+   "code": "900505",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1I4LgYZJQU8zJk8LrxoYikD1e_XAOOj8x&export=download&confirm=t",
+    "sha256": "08b7dd03d350b9d9337ec9444de3477ba2135ee6af77b836d7188f8a77091479"
+   },
+   "lines": [
+    "Immune to player events.",
+    "While Morris is in the victory display, each Troll enemy gets +1 Attack and gains \"Immune to player events\"."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks, with the period after the closing mark; Hall of Beorn has single quotes and the period inside."
+  },
+  {
+   "code": "900506",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1ZLn_neiOaRMQ9lH9JFg1ArHrrdc0zzcj&export=download&confirm=t",
+    "sha256": "e0d785723c0c0a2813b01a62275a5d828ae6a1a4fe296c4a38e375b25031e048"
+   },
+   "lines": [
+    "Rupert's Defense cannot be reduced.",
+    "While Rupert is in the victory display, the Defense of each Troll enemy cannot be reduced."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900507",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Biru3sSWhZuP3KN7ju-qp014LVzfmo0W&export=download&confirm=t",
+    "sha256": "fdf4b2e935879948a6cf666150373ecc98effce36f91c8ccc44f4fde1c439f29"
+   },
+   "lines": [
+    "Cannot have player attachments.",
+    "While Stuart is in the victory display, each Troll enemy gets +1 Defense and gains \"Cannot have player attachments.\""
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks; Hall of Beorn has single quotes."
+  },
+  {
+   "code": "900508",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1oEYVbzIdKp7kUcHRXdmeR-FtPSkhv5p-&export=download&confirm=t",
+    "sha256": "cd8287a1c9c36035fb22440322c2160364482b481ca97f935a82df9bc79b7895"
+   },
+   "lines": [
+    "While Troll Lair is in the staging area, players cannot reduce their threat.",
+    "Shadow: If attacking enemy is a Troll, remove 4 damage tokens from it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900509",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1-Sk4JbugOPQAuu4tsG74usNkmifQj1_1&export=download&confirm=t",
+    "sha256": "ff3cade4c171c3c5274c4c045b274ad6805edeeeb3ec32c520afd59dbc1db893"
+   },
+   "lines": [
+    "Forced: After any amount of progress is placed on Hives and Hives, deal 1 damage to each character in play.",
+    "Shadow: Attacking enemy gets +2 Attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900510",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1jXXOhskXcwFmvCqyy0jyZ6Fi4oLpzhpc&export=download&confirm=t",
+    "sha256": "d1fb05434c6ce795529f8859717d0f7291a2161c8e4bc070ef50c507e56de50d"
+   },
+   "lines": [
+    "When Revealed: The first player chooses a hero in any player's discard pile and removes that hero from the game. Then, heal all damage from each Troll enemy in play. If no damage is removed from any Troll enemy as a result of this effect, Time for Supper gains surge."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900511",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1lj8xaNM3H44iVw1UKITVo2fmQI6kSw_k&export=download&confirm=t",
+    "sha256": "46578d6de3228965e5f5bd2f9d1d22ba39d0fa1f6fbfdcf84e32d34473c29324"
+   },
+   "lines": [
+    "When Revealed: Add Rob & Bob to the staging area. Then, each player must search the encounter deck and discard pile for a non-unique Troll enemy and add it to the staging area, if able. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'Rob & Bob'; Hall of Beorn has 'Rob and Bob'."
+  },
+  {
+   "code": "900511",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1tAb4QebV1raHMIVOKPfZR5rjyPp-7ZK6&export=download&confirm=t",
+    "sha256": "fa73e371d9006707e654b2cf8f2d61d44a7ee6d949bb6e6fe1baa3586bd81311"
+   },
+   "lines": [
+    "When Rob & Bob have been defeated, the players have rescued Grimbeorn the Old from certain death, and won the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'Rob & Bob' and 'Grimbeorn'; Hall of Beorn has 'Rob and Bob' and the typo 'Grimbeon'."
+  },
+  {
+   "code": "900601",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1yHQX1rSt4GvdhLUa7e4BbRDn7IDgOPEM&export=download&confirm=t",
+    "sha256": "0357558bec6b93df134fdd6583b879748d5182d5652ebc31572f3b53e5b75d2d"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Setup: Search the encounter deck for 1 copy of Goblin Eagle-hunter and add it to the staging area. Then shuffle the encounter deck.",
+    "Forced: The first Creature enemy revealed during each quest phase gains surge.",
+    "Response: After an Athelas card is placed in the discard pile, you may shuffle it into the encounter deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900601",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=16iq81NybFzaMwoDul44lyCwhyqxxJbXM&export=download&confirm=t",
+    "sha256": "65438cae9ca7d2bd55d37c5bbe6fb588b3de4b6fcafdcea6d325120434c953be"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for A Journey to Rhosgobel scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "4x Forest Grove",
+    "1x Exhaustion",
+    "2x Swarming Insects",
+    "1x Festering Wounds",
+    "3x Mountains of Mirkwood",
+    "1x Chieftan Ufthak",
+    "2x Dol Guldur Beastmaster",
+    "1x Driven by Shadow",
+    "1x The Necromancer's Reach",
+    "2x Necromancer's Pass",
+    "2x Enchanted Stream",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard A Journey to Rhosgobel encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 14,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 15,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/a-journey-to-rhosgobel.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900602",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1W_cQCMS3__TKG5lOPoHpOCwqr6iiro49&export=download&confirm=t",
+    "sha256": "fea851ef37b91649ba23054ca30cb903a06ec6f665851d30b65c0d7942829b4c"
+   },
+   "lines": [
+    "Goblin Eagle-hunter gets +1 hit point per player.",
+    "Forced: At the end of the combat phase, deal 1 damage to Wilyador.",
+    "Shadow: If Wilyador has 10 or less damage on him, deal 2 damage to Wilyador."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints the period; Hall of Beorn has none."
+  },
+  {
+   "code": "900603",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Q9EpfW6QVhwRFfQzqqCycyRRXEr9h0Zk&export=download&confirm=t",
+    "sha256": "65a70085dc9bf589e373ca42f836b32a3c51acb6ed94415d47a3ca353234da77"
+   },
+   "lines": [
+    "While Treetop Bird-eater is engaged with a player, characters controlled by that player cannot be healed.",
+    "Forced: At the beginning of the encounter phase, Treetop Bird-eater engages the player who controls Wilyador (regardless of threat)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900604",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1O044rtbBqUyvt7O-GRjVQOkNr1d1Zek8&export=download&confirm=t",
+    "sha256": "222197e37dd6b85fa4d8d0e537cae1585ffe44036d5e52e89872ac731ed4c70b"
+   },
+   "lines": [
+    "Dark-wood Grove gets +1 Threat and +1 quest point for each Athelas card in play.",
+    "Shadow: If defending player controls at least 1 Athelas card, attacking enemy makes an additional attack after this one."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900605",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=18JtqZDsOkMq5rek39PgPbjGQ4W1wma4Z&export=download&confirm=t",
+    "sha256": "c8e759ae17b2281635407001c1c74bd5fe9ebc4460e219a666b4482f32f9698e"
+   },
+   "lines": [
+    "While Labyrinthine Woods is in the staging area, Creature enemies get +1 Threat and +1 Attack.",
+    "Shadow: After this attack, attacking enemy engages the next player and makes an additional attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'an additional attack'; Hall of Beorn has 'an immediate attack'."
+  },
+  {
+   "code": "900606",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1RnEfpcdTe7cXTyr-4VFMWjd4Xzk0e3ie&export=download&confirm=t",
+    "sha256": "1d7407a8a533efbafe90e0dbd5de5b06f3ddbfa299aa21709687f4edce3e65cb"
+   },
+   "lines": [
+    "While Pitch-dark Thicket is the active location, all characters lose the ranged keyword.",
+    "Shadow: Attacking enemy cannot be attacked by characters with the ranged keyword until the end of the phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900607",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1vGT1iiJVOaY5GU6ViixGlVdqF-D3bGZm&export=download&confirm=t",
+    "sha256": "f5661668e56ee761d21996eab6e6b489bd3106425e3fb794a3fc5d31ddce48ae"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Attach to an Eagle character. (Counts as a Condition attachment with the text: \"Limit 1 per character. Attached character loses the Eagle trait, and takes 1 damage each time it readies.\")",
+    "Shadow: Resolve the \"when revealed\" effect of Shot from the Sky."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks; Hall of Beorn has single quotes."
+  },
+  {
+   "code": "900608",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1IsReAa9AxjbfskkGauxBO5eIqeWc91bM&export=download&confirm=t",
+    "sha256": "ba9824d97df91bf63622570231a1b87799fb66080e404606bbc363e9487fac6c"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Attach to Wilyador. (Counts as a Condition attachment with the text: \"Forced: When attached character is healed by a card effect other than Athelas, the amount of damage healed is reduced to 1. Then, discard Noxious Supplies.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks; Hall of Beorn has single quotes."
+  },
+  {
+   "code": "900701",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1ArVdWaRebfuiss9O_6zhmZCDnn0fVNs5&export=download&confirm=t",
+    "sha256": "91218dc9eb50e7f06f1f980899870e43162cc626313b2059941cdbbcc88b5ce6"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "No more than 1 progress may be placed on each location in the staging area each round."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'You are playing Nightmare mode.' and 'may be placed'; Hall of Beorn has 'in Nightmare mode' and 'can be placed'."
+  },
+  {
+   "code": "900701",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1F_Vc4nAwrv4bQBJM5RBxx-_pnNkeiijU&export=download&confirm=t",
+    "sha256": "920334e73dea3c7717b4f496d30297d477bd6c9dfcf89901f8d112d3127fe94f"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for The Hills of Emyn Muil scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "1x The East Wall of Rohan",
+    "1x The North Stair",
+    "2x The Shores of Nen Hithoel",
+    "4x The Highlands",
+    "2x Slick Footing",
+    "2x Impassable Chasm",
+    "2x Dol Guldur Orcs",
+    "1x Chieftan Ufthak",
+    "2x Dol Guldur Beastmaster",
+    "2x The Necromancer's Reach",
+    "2x Necromancer's Pass",
+    "2x Enchanted Stream",
+    "3x Evil Storm",
+    "2x Pursued by Shadow",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Hills of Emyn Muil encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 14,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 15,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 16,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 17,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 18,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-hills-of-emyn-muil.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900702",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1N_GdMtN64pG9lVgH7ffDM1YMPrFTYduU&export=download&confirm=t",
+    "sha256": "335c1a3f537d3c6a3c9388d681eda694c1a7b66b5d8d9d8289a00009dde1c3d1"
+   },
+   "lines": [
+    "Forced: After the players travel to a location, Tunneling Nameless Thing engages the first player.",
+    "If there is no active location, return Tunneling Nameless Thing to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900703",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1-8F5XoYHVYDxViZ57klC7Xq5ZsdQnzIw&export=download&confirm=t",
+    "sha256": "a627cc89182fb23ab3e85d6f7fc3783a5d9c383e0801595fc87b69afe4087f8f"
+   },
+   "lines": [
+    "Orc Interceptor gets +1 Threat and +1 Attack for each resource token on it.",
+    "Forced: After a location leaves play as an explored location, place a resource token on Orc Interceptor."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900704",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=19DIH0nbrkF6gua7pGknRtn-ZmXUzr_mj&export=download&confirm=t",
+    "sha256": "130f5996086854d0543a99944d8cc4e18d282fa2b7f24ed4a85ab1a0c788ae4a"
+   },
+   "lines": [
+    "Forced: After a character commits to the quest, deal 1 damage to that character if it has not been dealt damage by another copy of Brambles and Thorns this round."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900705",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1bJRrkOHdd_Mq-v0KQ_jneY88zIRyvfU8&export=download&confirm=t",
+    "sha256": "028b1e652538aca25e2001843c137ee623178e6328357819fb02f02580a4cb8a"
+   },
+   "lines": [
+    "While Sarn Gebir Rapids is the active location, the \"when revealed\" effects of Hazard cards cannot be canceled."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks; Hall of Beorn has single quotes."
+  },
+  {
+   "code": "900706",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1XY_52x0iYg8dyGzn3Q1x-nT1JyB01Efi&export=download&confirm=t",
+    "sha256": "2851ac82579274ec877447f6041fa2e9b501cf22de69f39add05edc57777e392"
+   },
+   "lines": [
+    "When Revealed: Each player must either increase his threat by 5, or reveal an additional encounter card from the encounter deck and add it to the staging area.",
+    "Shadow: Attacking enemy gets +X Attack. X is the Threat of the active location."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900707",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1FOeyyaSMe4JW8tZLbLXb7nRCYYP8MPKk&export=download&confirm=t",
+    "sha256": "4b0ce7726ba26493305b50ef837abfad4b9e85510f66d42f8a9a122493ca254d"
+   },
+   "lines": [
+    "Doomed 2.",
+    "When Revealed: Remove all progress from each Emyn Muil location in play. Each Emyn Muil location gets +2 Threat until the end of the round.",
+    "Shadow: Remove all progress from each Emyn Muil location in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints the keyword line 'Doomed 2.', which Hall of Beorn leaves out."
+  },
+  {
+   "code": "900708",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1y7WlwMxYXOgxsz20wgmWxldolHtB6owP&export=download&confirm=t",
+    "sha256": "c8d1d6e4a0df9e6d07a8794ca361d57396b2adc91d7630501ba921c4957c3a7b"
+   },
+   "lines": [
+    "Surge. Doomed 2.",
+    "When Revealed: Shuffle all Hazard cards in the encounter discard pile back into the encounter deck.",
+    "Shadow: Shuffle all Hazard cards in the encounter discard pile back into the encounter deck. Then, deal another shadow card for this attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints the keyword line 'Surge. Doomed 2.' (Hall of Beorn leaves it out) and 'in the encounter discard pile' (Hall of Beorn has 'from the encounter discard pile')."
+  },
+  {
+   "code": "900709",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1DvFdc1EIOjC4r0mM7F2TQ8QHIfd9EoJZ&export=download&confirm=t",
+    "sha256": "86c494809de0e2f2006e2ba3d58e9fc240b0e3dad24f9b17960f0d62ddb98e84"
+   },
+   "lines": [
+    "When Revealed: Discard a random Emyn Muil location from the victory display."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900801",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1hOs36VQ1kuELyoAAHaGJk0AcSOWE6Wnn&export=download&confirm=t",
+    "sha256": "cbaa03ac4997e1350aed7ff9f3f47e69729e80dd51052113cf9a124095751010"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Players cannot reduce their threat.",
+    "Setup: Search the encounter deck for The Mere of Dead Faces, and add it to the staging area. Then, shuffle the encounter deck.",
+    "Forced: After Gollum is placed in the discard pile, shuffle him into the encounter deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'the staging area'; Hall of Beorn has the typo 'the stage area'."
+  },
+  {
+   "code": "900801",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1CFKjUUqyiXC5Qg006QF1aanZnQRaOSvn&export=download&confirm=t",
+    "sha256": "2da180930dc67e536bf3fe19d9e567674a68bff78acc2a6b6e3925eb658defb0"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for The Dead Marshes scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "1x A Wisp of Pale Sheen",
+    "1x Through the Mist",
+    "2x Giant Marsh Worm",
+    "4x Fens and Mires",
+    "3x Eastern Crows",
+    "2x Pursued by Shadow",
+    "2x Treacherous Fog",
+    "1x Wolf Rider",
+    "2x Hill Troll",
+    "2x Goblin Sniper",
+    "2x Wargs",
+    "2x Despair",
+    "2x The Brown Lands",
+    "2x The East Bight",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Dead Marshes encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 14,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 15,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 16,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 17,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 18,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-dead-marshes.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'Giant Marsh Worm', the title of the scenario's card; Hall of Beorn has 'Great Marsh Worm'."
+  },
+  {
+   "code": "900802",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1c2iSj89RwKpWKjWbhls-7ndxroiwFGWK&export=download&confirm=t",
+    "sha256": "8e3c7e076013d90ce7942d7f2c19370b45dc3463673f1bb471cdc95e52522b26"
+   },
+   "lines": [
+    "X is the number of resource tokens here. Cannot leave the staging area.",
+    "If Gollum is not in play, any resource tokens that would be placed on Gollum are placed here instead.",
+    "Forced: After Gollum enters play, place 2 resource tokens on Gollum, then move all resource tokens from The Mere of Dead Faces to Gollum."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900803",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1ay03aCPINkU1iXMST5fgJigZqehTjJPr&export=download&confirm=t",
+    "sha256": "5c22b13f721b8b1bf3ca932e9a3ee40068613c4a4896384b7a55da24014f4ff0"
+   },
+   "lines": [
+    "While Stagnant Quagmire is in play, it adds its Escape value to all escape tests.",
+    "Escape: 2",
+    "Shadow: Perform an escape test, dealing 1 card from the encounter deck. If this test is failed, discard the defending character."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'from the encounter deck'; Hall of Beorn leaves out 'from'. The card prints 'discard defending character'; the line keeps the printed wording."
+  },
+  {
+   "code": "900804",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1O8QRRmfeMDr0H-Zv41Dds2ZN9f6vMeE8&export=download&confirm=t",
+    "sha256": "0ad8eaefa309a81d9aea4996740fb8e0b4550f4bfa03f141d09c7474e8c26b45"
+   },
+   "lines": [
+    "Forced: After a character commits to an escape test, deal 1 damage to that character.",
+    "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if attacking enemy is Undead.)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'commits'; Hall of Beorn has the typo 'commit'."
+  },
+  {
+   "code": "900805",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1LhDYkxoHeffTgbb9_0TGgUDsTXNuQz3Q&export=download&confirm=t",
+    "sha256": "ce27334168ea822aafcaaf5acd0f6deff4ef70a077d141aeba0ddc5914340627"
+   },
+   "lines": [
+    "Forced: After Marsh-wight engages a player, that player makes an escape test, dealing 3 cards from the encounter deck. If this test is failed, place 2 resource tokens on Gollum and Marsh-wight makes an immediate attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints '2 resource tokens' and 'Marsh-wight'; Hall of Beorn has '2 resources' and the typo 'Marsh-wigth'."
+  },
+  {
+   "code": "900806",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=152WpUOdkmY5QV9yVp61a1_tmrgogCbLW&export=download&confirm=t",
+    "sha256": "b5aef5424e6259e4a38803b5ee9055f3cf159b7cf41c430ec4619b853c214a10"
+   },
+   "lines": [
+    "Forced: After Lost Soul of Lórien is destroyed, attach it to a hero with 1 or more Willpower, if able. (Counts as a Condition attachment with the text: \"Limit 1 per hero. Attached hero's Willpower is reduced to 0.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks and the accent in Lórien; Hall of Beorn has single quotes and a garbled character."
+  },
+  {
+   "code": "900807",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1bPlT1z9C5tdDy95ss8ELk7BPkhY5Q4z0&export=download&confirm=t",
+    "sha256": "19fd0a4a08b2c82d219185882f4e3ea5809f769ed20f37b697b86ac583cb2a36"
+   },
+   "lines": [
+    "While Ill-fated Guard is engaged with a player, that player cannot commit more than 1 character to each escape test.",
+    "Shadow: Discard all attachments from each character you control with 3 or more Willpower."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900808",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1dQ0l4nsjgKp0FVcILjxmx_hFWVK8lR5v&export=download&confirm=t",
+    "sha256": "ee522136ab0bbef0598289690b98572ace4dfcc55fac5091a10508274a206604"
+   },
+   "lines": [
+    "When Revealed: Each player makes an escape test, dealing 1 card from the encounter deck. Each player who fails this test must either discard a hero he controls from play or raise his threat by 5.",
+    "Escape: 5"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'discard a hero he controls from play'; Hall of Beorn leaves out 'he controls'."
+  },
+  {
+   "code": "900809",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1F2k5v9ja0aTMpeyOE3xxLCY1ndNbkJ9R&export=download&confirm=t",
+    "sha256": "2df90d46670bec46741a369ea2887fc63ca9e55a588d4a68358c445a7d4f94d4"
+   },
+   "lines": [
+    "When Revealed: The first player makes an escape test counting Defense instead of Willpower, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and deal 1 damage to each character in play.",
+    "Escape: 3"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'instead'; Hall of Beorn has the typo 'intead'."
+  },
+  {
+   "code": "900810",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1YPgvkjxAkZu3KVCd7KkAofJ1Jn8NhJRj&export=download&confirm=t",
+    "sha256": "0ab464d7d048ba0486f837cf3985d481f0f773fc193ed69f99e31a8ca11a65dc"
+   },
+   "lines": [
+    "When Revealed: Return the top X Undead enemies in the encounter discard pile to the staging area, where X is the number of players. If no enemies were returned to the staging area as a result of this effect, Devilry of the Dark Land gains surge.",
+    "Escape: 10"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900901",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1etSdL9Fz9Zkp3qBjNclOkS-hJKcPk3Xc&export=download&confirm=t",
+    "sha256": "3f37560713f785c6871b951c795e67c9c784e39bc983009cb54d4bc24bff0d62"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Forced: At the beginning of the quest phase, the player who is guarding Gollum must either exhaust a hero he controls or resolve the \"when revealed\" effect of the topmost Tantrum card in the encounter discard pile.",
+    "Forced: When Stage 4A is revealed, search the encounter deck and discard pile for 1 copy of Attercop, Attercop and add it to the staging area, if able. Shuffle the encounter deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints double quotation marks; Hall of Beorn has single quotes."
+  },
+  {
+   "code": "900901",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1VfU0T1oOtbRi2es3qBuWlYBcwDaWNJ-o&export=download&confirm=t",
+    "sha256": "d28b7a41afff097366b6ab9b06f87e9cde1abce9b5355bedc61c0943f5a4fb1f"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for the Return to Mirkwood scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "3x Woodman's Glade",
+    "3x Wood Elf Path",
+    "3x Mountains of Mirkwood",
+    "2x Goblin Sniper",
+    "1x Marsh Adder",
+    "2x Wargs",
+    "2x Despair",
+    "2x The Brown Lands",
+    "2x The East Bight",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Return to Mirkwood encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/return-to-mirkwood.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900902",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1bHXgFy4I8-8mu2nyn3F5tH003bqAhk57&export=download&confirm=t",
+    "sha256": "39d78818f8b015696d28eb347beb7b4941a9f4aa0c1d80ffa69efbe63f8d52c7"
+   },
+   "lines": [
+    "When Ambushing Orcs is dealt a shadow card that targets the player guarding Gollum, that shadow card also targets each other player."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints the closing period; Hall of Beorn has none."
+  },
+  {
+   "code": "900903",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=10JoU5LK8agEtfWj9O6HNmjUSVGErviuf&export=download&confirm=t",
+    "sha256": "ac1e8fcfea1cd119f10e1a381b813c3d2c792fa1a2c4ce0c70612254fa8c9dd6"
+   },
+   "lines": [
+    "Cannot be optionally engaged.",
+    "Forced: After the player guarding Gollum changes, Pursuing Warg-rider engages the player guarding Gollum and makes an immediate attack against that player."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900904",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1y9LOO3uqVah1uDscoUKpFpHmZon_8aQe&export=download&confirm=t",
+    "sha256": "b7b4d05236339345676fd94f2ad91eb9dd4e0e228d762680106c72aebf0461e8"
+   },
+   "lines": [
+    "When Revealed: The player guarding Gollum must either exhaust a hero he controls, or Web-spinner gains surge.",
+    "Shadow: The player guarding Gollum must exhaust a character he controls."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints the comma before 'or'; Hall of Beorn has none."
+  },
+  {
+   "code": "900905",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1X9jKaebIDhGma8Bg5cETuc0GW70TqAp3&export=download&confirm=t",
+    "sha256": "e730991e96c74f442f1394458bfa2b638c700555a886490b834a60f0248ff207"
+   },
+   "lines": [
+    "Progress cannot be placed on Deceptive Path while it is in the staging area.",
+    "Forced: After Deceptive Path becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from the top of the encounter deck until a location is discarded. Reveal that location and make it the active location. Then, discard Deceptive Path."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900906",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1s9Scr8orhNg_MwkHUOdB5Xh-XRpcOL78&export=download&confirm=t",
+    "sha256": "f7785eb3adb006ff5205ed2eb2ea7108016b9970692d52c16426142c71910a02"
+   },
+   "lines": [
+    "When Revealed: Reveal the topmost Spider enemy in the encounter discard pile and add it to the staging area.",
+    "Shadow: The player guarding Gollum must discard all resources from each of his heroes' resource pools."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "900907",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Ohui0KWk4NwRKraGa4Py4g1fOMnV36Dc&export=download&confirm=t",
+    "sha256": "4bbfe2111963664a01db4d4f5a9cd6369bc6f8d11a630ffbcd5222107b40c986"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Attach Isolation to the current quest. (Counts as a Condition attachment with the text: \"All characters lose the ranged and sentinel keywords. The player guarding Gollum cannot choose a new player to guard Gollum.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints 'lose' and double quotation marks; Hall of Beorn has 'lost' and single quotes."
+  },
+  {
+   "code": "900908",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1c8A0zErcNNKfTr7iEWYkSUH4JKr6oa7c&export=download&confirm=t",
+    "sha256": "9376fd707e36e6269356e10a6a82c32ef13cc13ab4118abdd9f7093be13b8c47"
+   },
+   "lines": [
+    "When Revealed: Discard all attachments controlled by the player guarding Gollum. Then, remove all cards in that player's discard pile from the game. If no attachments are discarded as a result of this effect, Befouled Equipment gains surge.",
+    "Shadow: Discard all attachments controlled by the player guarding Gollum."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints the comma after 'Then'; Hall of Beorn has none."
+  },
+  {
+   "code": "900909",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1UQFKodGMfsSCVg8Lp-jFwbpXQtWmuV7Q&export=download&confirm=t",
+    "sha256": "870ea7efbc880f96511d692355e8332f166ae00b1720d5e75feb520d5672d198"
+   },
+   "lines": [
+    "When Revealed: The player guarding Gollum must either reveal the topmost Tantrum card in the encounter discard pile, or reveal 2 additional encounter cards from the encounter deck.",
+    "Shadow: Deal the topmost Tantrum card in the encounter discard pile as a new shadow card for this attack, if able."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null,
+   "notes": "Card prints the comma before 'or'; Hall of Beorn has none."
   }
  ]
 }

@@ -208,5 +208,97 @@
     "dragnNormal": "Q01.9",
     "dragnEasy": "E01.9",
     "hobSlug": "Return-to-Mirkwood"
+  },
+  "nightmare": {
+    "setupCard": "900901",
+    "removed": [
+      {
+        "code": "01078",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01083",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01084",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01085",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01086",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01087",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01088",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02133",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "02134",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900902",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900903",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900904",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900905",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900906",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900907",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900908",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900909",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

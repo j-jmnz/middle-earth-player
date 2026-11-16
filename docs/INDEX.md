@@ -131,7 +131,7 @@ Read the sections your task touches.
     - 1560–1597 The Tower of Cirith Ungol (~4.4K)
     - 1598–1634 The Black Gate Opens (~4.4K) ← 2
     - 1635–1663 Mount Doom (~4.3K)
-  - 1664–1672 Nightmare (~410) ← 19
+  - 1664–1672 Nightmare (~410) ← 20
   - 1673–1711 Deckbuilding (~2.0K)
   - 1712–1790 Effects (~3.2K)
     - 1714–1772 Three layers (~2.4K) ← 10
@@ -216,7 +216,7 @@ Read the sections your task touches.
     - 460–465 Booklet (~280) ← 2
     - 466–469 Database (~20)
   - 470–489 States (~620)
-- `docs/development.md` — Development (~1.9K tok)
+- `docs/development.md` — Development (~2.0K tok)
 - `docs/releasing.md` — Releasing (~2.6K tok)
 
 ## Agent procedures
@@ -307,7 +307,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
 - `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Modules (1); architecture.md, Repository map (1)
-- `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Data sources (2); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
+- `scripts/data`: brief.md, Nightmare (5); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Data sources (2); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1)

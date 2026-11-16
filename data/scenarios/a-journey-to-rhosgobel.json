@@ -189,5 +189,102 @@
     "dragnNormal": "Q01.6",
     "dragnEasy": "E01.6",
     "hobSlug": "A-Journey-to-Rhosgobel"
+  },
+  "nightmare": {
+    "setupCard": "900601",
+    "removed": [
+      {
+        "code": "01078",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01090",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01091",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01092",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01093",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01094",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01095",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02066",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "02067",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02068",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02069",
+        "copies": 1,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900602",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900603",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900604",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900605",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900606",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900607",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900608",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ]
   }
 }

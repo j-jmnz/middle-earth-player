@@ -13,6 +13,8 @@ import { loadCards } from "./load-cards.ts";
 import { loadAnyScenario, loadCampaign, loadScenarioDefinitions, scenarioOrder } from "./load-scenarios.ts";
 import { DATA_DIR } from "./paths.ts";
 import { scenarioSlug } from "./campaign-defs.ts";
+import { NIGHTMARE_DECKS } from "./nightmare-defs.ts";
+import { keyOf, loadLedger } from "./printed/ledger.ts";
 
 const cards = loadCards();
 const byCode = new Map(cards.map((card) => [card.code, card]));
@@ -112,5 +114,54 @@ describe("The Shadows of Mirkwood cycle", () => {
     expect(rules.get("sotm.ally-objective-wilyador")).toContain("If Wilyador leaves play for any reason, the players have lost the game");
     expect(rules.get("sotm.escape-test")).toContain("the escape test is failed");
     expect(rules.get("sotm.guarding-gollum")).toContain("If Gollum is destroyed, or leaves play for any reason, the players have lost the game");
+  });
+});
+
+// Each scenario's Nightmare deck (docs/brief.md, Nightmare): the setup card, the copies its side B removes (the totals are the printed lists') and the copies of the deck shuffled in.
+const NIGHTMARE = {
+  "the-hunt-for-gollum": { prefix: "9004", setup: "900401", removed: 20, added: 19, setAside: [] },
+  "conflict-at-the-carrock": { prefix: "9005", setup: "900501", removed: 28, added: 18, setAside: ["02038", "02039", "02040", "02041"] },
+  "a-journey-to-rhosgobel": { prefix: "9006", setup: "900601", removed: 20, added: 19, setAside: [] },
+  "the-hills-of-emyn-muil": { prefix: "9007", setup: "900701", removed: 28, added: 19, setAside: [] },
+  "the-dead-marshes": { prefix: "9008", setup: "900801", removed: 28, added: 19, setAside: [] },
+  "return-to-mirkwood": { prefix: "9009", setup: "900901", removed: 20, added: 19, setAside: [] },
+} as const;
+
+describe("The Shadows of Mirkwood Nightmare decks", () => {
+  const ledger = loadLedger();
+
+  it.each(Object.entries(NIGHTMARE))("%s carries its deck, and every removal on the setup card resolves to a card the scenario deals", (id, pin) => {
+    expect(NIGHTMARE_DECKS.find((deck) => deck.prefix === pin.prefix)?.scenario).toBe(id);
+    const scenario = loadAnyScenario(id);
+    const nightmare = scenario.nightmare;
+    expect(nightmare?.setupCard).toBe(pin.setup);
+    expect(byCode.get(pin.setup)?.type).toBe("nightmare");
+    const dealt = new Map<string, number>();
+    for (const card of scenario.cards) if (card.pile !== "staging" || card.normal > 0) dealt.set(`${card.code}:${card.pile}`, card.normal);
+    expect(nightmare?.removed.reduce((sum, item) => sum + item.copies, 0)).toBe(pin.removed);
+    for (const item of nightmare?.removed ?? []) expect(dealt.get(`${item.code}:${item.pile}`) ?? 0, `${id} ${item.code}`).toBeGreaterThanOrEqual(item.copies);
+    expect(nightmare?.cards.reduce((sum, card) => sum + card.copies, 0)).toBe(pin.added);
+    expect(nightmare?.removed.filter((item) => item.pile === "setAside").map((item) => item.code).sort()).toEqual([...pin.setAside]);
+  });
+
+  it("records Conflict at the Carrock's Nightmare quest card, Grimbeorn's Folly (stage 3), and no other deck's", () => {
+    expect(loadAnyScenario("conflict-at-the-carrock").nightmare?.questCards).toEqual(["900511"]);
+    expect(byCode.get("900511")).toMatchObject({ name: "Grimbeorn's Folly", type: "quest", stage: "3A" });
+    for (const id of Object.keys(NIGHTMARE).filter((one) => one !== "conflict-at-the-carrock")) expect(loadAnyScenario(id).nightmare?.questCards, id).toBeUndefined();
+  });
+
+  it("reads every side of every card of the six decks from its Nightmare proxy picture, the card's printed words over Hall of Beorn's", () => {
+    const sides = Object.values(NIGHTMARE).flatMap((pin) => cards.filter((card) => card.code.startsWith(pin.prefix) && card.code.length === pin.prefix.length + 2).flatMap((card) => (card.back ? [`${card.code}.A`, `${card.code}.B`] : [`${card.code}.A`])));
+    expect(sides).toHaveLength(63);
+    for (const key of sides) {
+      const entry = ledger.byKey.get(key);
+      expect(entry, key).toBeDefined();
+      expect(entry?.readBy, key).toBe("Claude Code, read from the Nightmare proxy picture");
+      expect(entry?.printing, key).toBe("Nightmare");
+    }
+    // Printed words that differ from Hall of Beorn's text: a typo, a dropped keyword line, double quotation marks.
+    expect(ledger.byKey.get(keyOf("900801", "B"))?.lines).toContain("2x Giant Marsh Worm");
+    expect(ledger.byKey.get(keyOf("900707", "A"))?.lines[0]).toBe("Doomed 2.");
+    expect(ledger.byKey.get(keyOf("900503", "A"))?.lines[0]).toContain("Rob & Bob");
   });
 });

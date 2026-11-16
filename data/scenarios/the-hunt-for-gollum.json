@@ -165,5 +165,97 @@
     "dragnNormal": "Q01.4",
     "dragnEasy": "E01.4",
     "hobSlug": "The-Hunt-for-Gollum"
+  },
+  "nightmare": {
+    "setupCard": "900401",
+    "removed": [
+      {
+        "code": "01111",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01113",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01114",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01115",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01116",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01118",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02016",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02017",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02022",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900402",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900403",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900404",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900405",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900406",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900407",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900408",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900409",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

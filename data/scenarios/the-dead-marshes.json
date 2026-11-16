@@ -170,5 +170,127 @@
     "dragnNormal": "Q01.8",
     "dragnEasy": "E01.8",
     "hobSlug": "The-Dead-Marshes"
+  },
+  "nightmare": {
+    "setupCard": "900801",
+    "removed": [
+      {
+        "code": "01081",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01082",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01083",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01085",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01086",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01087",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01088",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01115",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01117",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01118",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02108",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02110",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02112",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02115",
+        "copies": 4,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900802",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "900803",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900804",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900805",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900806",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900807",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900808",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "900809",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900810",
+        "copies": 1,
+        "pile": "encounter"
+      }
+    ]
   }
 }

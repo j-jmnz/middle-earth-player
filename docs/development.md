@@ -59,7 +59,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm data sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. It is the only command that uses the network. `scans` and `pictures` run only when you name them, after `data build`. |
 | `pnpm data build` | Builds `data/`, `src/effects/generated/` and the game icons from `data/raw/`, offline and deterministically. |
 | `pnpm data check` | Rebuilds into a temporary directory and fails on any difference. |
-| `pnpm data ledger-seed <scenario-id>` | Writes the scenario's missing printed-text ledger entries from the source text, `readBy` empty and the pinned scan named. Each is read against its scan before the scenario is playable. |
+| `pnpm data ledger-seed <scenario-id> [--nightmare]` | Writes the scenario's missing printed-text ledger entries from the source text, `readBy` empty and the pinned scan named. Each is read against its scan before the scenario is playable. `--nightmare` seeds its Nightmare deck into `data/printed/nightmare.json` (the proxy pictures `pnpm data sync nightmare` pins). |
 | `pnpm data query "<sql>"` | Queries the `cards`, `scenario_cards` and `rules` tables in memory. |
 | `pnpm effects draft <scenario \| deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line no record covers yet. |
 | `pnpm effects open` | Regenerates `src/effects/open-lines.ts`. |
