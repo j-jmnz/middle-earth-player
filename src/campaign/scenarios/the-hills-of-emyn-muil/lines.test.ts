@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { Effect } from "../../../catalog/boundary.ts";
+import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { allyCard, finish, first, idsOf, legalIntents, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
@@ -83,6 +84,30 @@ describe("02082:B:2 the stage cannot be defeated before the locations are gone a
     expect(waiting.stageCleared).not.toBe(true);
     const free = table({ stage: "02082", victory: TWENTY });
     expect(placeQuestProgress(syncConstants(free.state, free.ctx), 1, free.cards, [], gate(free)).stageCleared).toBe(true);
+  });
+});
+
+describe("02082:B:1 resolves after the revealed card's own effects", () => {
+  const surged = (code: string, layout: Layout): boolean => {
+    const made = table({ stage: "02082", phase: "Quest", deck: ["f0", "f0", "f0"], ...layout });
+    const state = revealFromTop(made.state, made.ctx, code, []).state;
+    return idsOf(state, "f0").some((id) => state.cards[id]?.zone === "staging");
+  };
+
+  it("02082:B:1 sees the location Impassable Chasm returned to the staging area, so the stage gives no surge then; the Chasm gains its own", () => {
+    expect(surged("02091", { active: "place" })).toBe(false);
+    expect(surged("02091", {})).toBe(true);
+  });
+});
+
+describe("900703:A:2 Orc Interceptor hears an explored location once", () => {
+  it("900703:A:2 places one resource token when the quest explores the active location", () => {
+    const made = table({ phase: "Quest", active: "place", engaged: ["900703"] });
+    let run = start(updateCard(made.state, first(made.state, "place"), { progress: 1 }));
+    run = send(run, { type: "Commit", cardIds: [made.hero, made.hero2] } as PlayerIntent, made.ctx);
+    run = finish(send(run, { type: "Pass" }, made.ctx), made.ctx);
+    expect(zoneOf(run.state, "place")).toBe("encounterDiscard");
+    expect(run.state.cards[first(run.state, "900703")]?.resources).toBe(1);
   });
 });
 
