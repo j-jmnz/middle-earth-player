@@ -429,7 +429,7 @@ On a tablet: medium is a reading column (`ScreenScroll max="readable"`) with the
 
 ### Packs and pack cards
 
-Scene `calm`. Packs (from Cards): round Back (`packs-back`), the title and `ListRow`s. Pack cards: round Back (`pack-back`), the pack name, rows with thumb and collector code detail. An unknown or empty pack says so in a muted sentence. Deck import (`deck-import.tsx`, opened from Decks) uses the same look; its pinned group headings keep their full-width band and pad their text to the column.
+Scene `calm`. Packs (from Cards): round Back (`packs-back`), the title and `ListRow`s. Pack cards: round Back (`pack-back`), the pack name, rows with thumb and collector code detail. An unknown or empty pack says so in a muted sentence. Deck import (`deck-import.tsx`, opened from Decks) uses the same look, and a successful import goes back to Decks with the toast "Imported Road to Rivendell", which goes on ". Dropped Steward of Gondor." when cards were dropped; its pinned group headings keep their full-width band and pad their text to the column.
 
 On a tablet: the titles and the empty sentences sit in a 640 `Column`, and the rows in a `useListGutter` inset.
 

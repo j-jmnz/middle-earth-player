@@ -5,7 +5,7 @@ import { View } from "react-native";
 
 import { formatDeckRefusal } from "../../catalog/deck-save";
 import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchField, Section, SphereMark, markedSphere, type MarkedSphere } from "../kit/chrome";
-import { editSavedDeck, startNewDeck } from "../deck/draft";
+import { startNewDeck } from "../deck/draft";
 import { savedDeckName } from "../deck/status";
 import { listDecks, readDeck, writeDeck } from "../deck/store";
 import { buildDecklist, cardUrl, deckRefusal, droppedSentence, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
@@ -143,8 +143,8 @@ export default function DeckImportScreen() {
     router.push({ pathname: "/deck/[id]", params: { id: "new" } });
   }
 
-  // Saves an imported deck, ready to play or not, and opens it in the editor, which names what was dropped and what the
-  // deck still lacks. A hero listed twice is refused: the list itself is wrong.
+  // Saves an imported deck, ready to play or not, and goes back to the deck list. A hero listed twice is refused: the list
+  // itself is wrong.
   function save(built: BuiltDecklist, names: readonly string[]): void {
     if (built.heroLimit) {
       setMessage(formatDeckRefusal({ cardName: built.heroLimit.cardName, rule: "Deck limit is 1." }));
@@ -152,12 +152,12 @@ export default function DeckImportScreen() {
     }
     const name = savedDeckName(built.name, listDecks(user).map((deck) => deck.name));
     const id = writeDeck(user, { id: null, name, heroes: built.heroes, cards: built.cards });
-    const row = readDeck(user, id);
-    if (!row) return;
+    if (!readDeck(user, id)) return;
     opening.current = true;
-    editSavedDeck(row, droppedSentence(names));
-    showToast(`Imported ${name}`, { carry: true });
-    router.replace({ pathname: "/deck/[id]", params: { id } });
+    // Back on the deck list, which reads the new deck on focus; the toast names what was dropped.
+    const dropped = droppedSentence(names);
+    showToast(dropped ? `Imported ${name}. ${dropped}` : `Imported ${name}`, { carry: true });
+    goBack(router, "/decks");
   }
 
   // The heroes' spheres, once each, in hero order.
