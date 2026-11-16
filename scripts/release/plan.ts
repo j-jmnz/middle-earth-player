@@ -19,6 +19,7 @@ import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf
 //   --notes <file>         writes the notes there instead of printing them
 //   --apk <file>           adds the APK's name and SHA-256 to the notes; --cert-sha256 <hex> adds its signing certificate
 //   --ipa <file>           adds the IPA's name and SHA-256
+//   --desktop <file>       adds a desktop installer's name and SHA-256; repeat it for each of the three OSes' files
 //   --dry-run              a branch other than main or release/vX.Y only warns, so the pipeline can be tried from any branch
 //   --github-output        writes tag, version and previous_tag to $GITHUB_OUTPUT and the notes to $GITHUB_STEP_SUMMARY
 // TESTFLIGHT_URL (the repository variable of that name, set while the optional TestFlight channel runs) adds its public link.
@@ -38,6 +39,18 @@ function tryGit(args: string[]): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+/** Every value of a flag given more than once (`--desktop a --desktop b`). */
+export function flagValues(args: readonly string[], name: string): string[] {
+  const values: string[] = [];
+  args.forEach((arg, at) => {
+    if (arg !== name) return;
+    const value = args[at + 1];
+    if (!value || value.startsWith("--")) throw new Error(`${name} needs a value`);
+    values.push(value);
+  });
+  return values;
 }
 
 function flag(args: string[], name: string): string | undefined {
@@ -141,6 +154,7 @@ async function main(log: Log): Promise<void> {
   const apk = apkFile ? { name: path.basename(apkFile), sha256: await fileSha256(apkFile), certificateSha256: flag(args, "--cert-sha256") } : undefined;
   const ipaFile = flag(args, "--ipa");
   const ipa = ipaFile ? { name: path.basename(ipaFile), sha256: await fileSha256(ipaFile) } : undefined;
+  const desktop = await Promise.all(flagValues(args, "--desktop").map(async (file) => ({ name: path.basename(file), sha256: await fileSha256(file) })));
   const notes = renderNotes({
     tag,
     previousTag: previous,
@@ -151,6 +165,7 @@ async function main(log: Log): Promise<void> {
     reach: previous ? reach(previous) : undefined,
     apk,
     ipa,
+    desktop: desktop.length > 0 ? desktop : undefined,
     testflightUrl: process.env.TESTFLIGHT_URL || undefined,
   });
 

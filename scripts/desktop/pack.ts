@@ -30,7 +30,7 @@ async function main(log: Log): Promise<void> {
   const electronVersion = (createRequire(import.meta.url)("electron/package.json") as { version: string }).version;
   const args = builderArgs(version, electronVersion, process.platform, extra);
   log.info(`pnpm ${args.join(" ")} (app ${path.relative(ROOT, APP_DIR)}, output ${path.relative(ROOT, OUT_DIR)})`);
-  const child = spawnSync("pnpm", args, { cwd: ROOT, stdio: "inherit" });
+  const child = spawnSync("pnpm", args, { cwd: ROOT, stdio: "inherit", shell: process.platform === "win32" });
   if (child.status !== 0) throw new Error(`electron-builder failed (${child.status ?? child.signal})`);
 }
 

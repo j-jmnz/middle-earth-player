@@ -71,4 +71,26 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(renderNotes(base)).toContain(`[Add to Obtainium](${url})`);
     expect(readFileSync(new URL("../../README.md", import.meta.url), "utf8")).toContain(`[Add to Obtainium](${url})`);
   });
+
+  it("gives a Windows, a Mac and a Linux install line, and each desktop file's checksum", () => {
+    const notes = renderNotes({
+      ...base,
+      desktop: [
+        { name: "middle-earth-player-v0.4.0-win-x64.exe", sha256: "aa11" },
+        { name: "middle-earth-player-v0.4.0-mac-universal.dmg", sha256: "bb22" },
+        { name: "middle-earth-player-v0.4.0-linux-x64.AppImage", sha256: "cc33" },
+      ],
+    });
+    expect(notes).toContain("- Windows: download the `-win-x64.exe` installer");
+    expect(notes).toContain("SmartScreen warns first: choose More info, then Run anyway");
+    expect(notes).toContain("- Mac: download the `.dmg`");
+    expect(notes).toContain("right-click it and choose Open");
+    expect(notes).toContain("- Linux: download the `.AppImage`");
+    expect(notes).toContain("\n`middle-earth-player-v0.4.0-win-x64.exe` SHA-256: `aa11`\n");
+    expect(notes).toContain("\n`middle-earth-player-v0.4.0-mac-universal.dmg` SHA-256: `bb22`\n");
+    expect(notes).toContain("\n`middle-earth-player-v0.4.0-linux-x64.AppImage` SHA-256: `cc33`\n");
+    // The install lines are there before any file is built, as the Android and iPhone ones are.
+    expect(renderNotes(base)).toContain("- Windows: download");
+    expect(renderNotes(base)).not.toContain("SHA-256");
+  });
 });

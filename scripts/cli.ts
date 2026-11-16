@@ -64,7 +64,8 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     dev: { steps: [{ script: "desktop/dev.ts" }], about: "opens Electron on the Metro web server (desktop/policy.ts allows localhost:8081 in this mode only)" },
     build: { steps: [{ script: "desktop/build.ts" }], about: "assets, the web export with EXPO_PUBLIC_DESKTOP=1 and the shell's bundle, in desktop/build (--skip-assets, --optional)" },
     pack: { steps: [{ script: "desktop/pack.ts" }], about: "electron-builder for this OS into desktop/out (APP_VERSION sets the version; --skip-build, --dir)" },
-    smoke: { steps: [{ script: "checks/desktop-smoke.ts" }], about: "launches the desktop app on a seeded export and checks it (--skip-build, --app <packed app>)" },
+    smoke: { steps: [{ script: "checks/desktop-smoke.ts" }], about: "launches the desktop app on a seeded export and checks it (--skip-build, --app <packed app>, --require-bundle, --expect-version)" },
+    stage: { steps: [{ script: "desktop/stage.ts" }], about: "the release job's installers from desktop/out, with a .sha256 each and the 2 GiB check (--tag, --out, --suffix, --github-output)" },
   },
   doc: {
     index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },

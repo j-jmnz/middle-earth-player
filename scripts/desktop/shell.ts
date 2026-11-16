@@ -70,6 +70,7 @@ export function exportDesktopWeb(log: Log, { out, env }: ExportOptions): void {
   log.step(`expo export -p web (desktop) to ${path.relative(ROOT, out)}`, () => {
     execFileSync("pnpm", ["exec", "expo", "export", "-p", "web", "--output-dir", out], {
       cwd: ROOT,
+      shell: process.platform === "win32",
       stdio: ["ignore", "ignore", "inherit"],
       env: { ...process.env, EXPO_PUBLIC_DESKTOP: "1", EXPO_NO_TELEMETRY: "1", EXPO_OFFLINE: "1", CI: "1", ...env },
     });
@@ -79,6 +80,6 @@ export function exportDesktopWeb(log: Log, { out, env }: ExportOptions): void {
 /** Runs `pnpm assets <packs>` (every pack when none is named). */
 export function packAssets(log: Log, packs: readonly string[], extra: readonly string[] = []): void {
   log.step(`pnpm assets ${packs.join(" ")}`.trim(), () => {
-    execFileSync("pnpm", ["assets", ...packs, ...extra], { cwd: ROOT, stdio: ["ignore", "ignore", "inherit"] });
+    execFileSync("pnpm", ["assets", ...packs, ...extra], { cwd: ROOT, stdio: ["ignore", "ignore", "inherit"], shell: process.platform === "win32" });
   });
 }

@@ -7,8 +7,9 @@
 //   - a Blob download (the Settings backup) is offered through a save dialog with its name;
 //   - no request left app:// (every request the window made is counted), no CSP violation or page error came up, and then a navigation away and a request to another host are refused;
 //   - after closing and opening the app again on the same profile, the campaign list still shows the seeded save.
-// Flags: --skip-build reuses the last export and bundle; --app <path> launches a packed app (an installer's unpacked app or an AppImage) instead of the checkout's, which
-// has no seeded export, so the seeded checks are skipped. On Linux without a display the script runs itself under xvfb-run.
+// Flags (scripts/desktop/smoke-args.ts): --skip-build reuses the last export and bundle; --app <path> launches a packed app (an installer's unpacked app or an AppImage)
+// instead of the checkout's, which has no seeded export, so the seeded checks are skipped; with --require-bundle the picture and booklet checks must pass instead of being skipped
+// for want of local packs, and --expect-version <x.y.z> fails unless the app reports it (the release job's launch check). On Linux without a display the script runs itself under xvfb-run.
 // The renderer sandbox is off for the run on Linux (--no-sandbox): a container runs as root and a CI runner may forbid the user namespaces the sandbox needs.
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
@@ -21,6 +22,7 @@ import sharp from "sharp";
 
 import { APP_ORIGIN, DESKTOP_API } from "../../desktop/identity.ts";
 import { duration, runScript, type Log } from "../log.ts";
+import { parseSmokeArgs } from "../desktop/smoke-args.ts";
 import { APP_DIR, bundleShell, desktopVersion, exportDesktopWeb, packAssets, ROOT, WEB_E2E_DIR } from "../desktop/shell.ts";
 
 const ELECTRON = createRequire(import.meta.url)("electron") as string;
@@ -204,9 +206,7 @@ async function listText(page: Page): Promise<string> {
 }
 
 async function main(log: Log): Promise<void> {
-  const args = process.argv.slice(2);
-  const appAt = args.indexOf("--app");
-  const packed = appAt >= 0 ? path.resolve(args[appAt + 1] ?? "") : null;
+  const { packed, skipBuild, requireBundle, expectVersion } = parseSmokeArgs(process.argv.slice(2));
   if (packed !== null && !existsSync(packed)) throw new Error(`--app ${packed} does not exist`);
   if (process.platform === "linux" && !process.env["DISPLAY"]) {
     log.info("no display: running under xvfb-run");
@@ -215,7 +215,7 @@ async function main(log: Log): Promise<void> {
     process.exitCode = child.status ?? 1;
     return;
   }
-  if (packed === null && !args.includes("--skip-build")) {
+  if (packed === null && !skipBuild) {
     packAssets(log, ["catalog", "canvaskit", "pdfjs"]);
     exportDesktopWeb(log, { out: WEB_E2E_DIR, env: { EXPO_PUBLIC_E2E_SEED: "1" } });
     await bundleShell(log, desktopVersion(undefined));
@@ -230,6 +230,13 @@ async function main(log: Log): Promise<void> {
     session = await launch(log, { packed, userData });
     const first = session;
     await check(results, log, "isolation and preload", () => isolation(first));
+    if (expectVersion !== null) {
+      await check(results, log, "reports the tag's version", async () => {
+        const version = await first.app.evaluate(({ app }) => app.getVersion());
+        assert(version === expectVersion, `the app reports ${version}, not ${expectVersion}`);
+        return version;
+      });
+    }
     let fresh = "";
     let seeded = "";
     if (packed === null) {
@@ -244,9 +251,9 @@ async function main(log: Log): Promise<void> {
     } else {
       skip(results, log, "seed and table", "a packed app carries no seeded export");
     }
-    if (scansPacked()) await check(results, log, "picture from the bundle", () => picture(first));
+    if (requireBundle || scansPacked()) await check(results, log, "picture from the bundle", () => picture(first));
     else skip(results, log, "picture from the bundle", "no scans packed");
-    if (bookletsPacked()) await check(results, log, "booklet page renders", () => booklet(first));
+    if (requireBundle || bookletsPacked()) await check(results, log, "booklet page renders", () => booklet(first));
     else skip(results, log, "booklet page renders", "no booklets packed");
     await check(results, log, "no request left app://", async () => {
       const left = first.requests.filter((url) => !url.startsWith(`${APP_ORIGIN}/`) && !url.startsWith("data:") && !url.startsWith("blob:"));
