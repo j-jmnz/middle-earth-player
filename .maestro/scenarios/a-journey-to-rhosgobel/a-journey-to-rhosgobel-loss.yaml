@@ -1,0 +1,12 @@
+appId: com.middleearth.player
+tags:
+  - scenario
+---
+# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `rhosgobel-lost` (scripts/e2e/shadows-of-mirkwood/a-journey-to-rhosgobel.ts): a real two-handed
+# standalone game of A Journey to Rhosgobel, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
+# The steps are the shared subflow's (.maestro/subflows/standalone-loss.yaml); add this scenario's own assertions after the call.
+- runFlow:
+    file: ../../subflows/standalone-loss.yaml
+    env:
+      FIXTURE: rhosgobel-lost
+# TODO: this scenario's own assertions on the outcome screen after the loss (the reason).
