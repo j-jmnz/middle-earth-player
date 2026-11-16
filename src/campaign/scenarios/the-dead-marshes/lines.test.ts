@@ -462,7 +462,7 @@ describe("900808 Candles of Corpses with a lone hero", () => {
     let state = made.state;
     // Only dh1 stays a hero of the seat.
     for (const id of state.seats[0]?.heroes ?? []) if (state.cards[id]?.code !== "dh1") state = updateCard(state, id, { zone: "discard" });
-    state = { ...state, seats: state.seats.map((seat, index) => (index === 0 ? { ...seat, heroes: seat.heroes.filter((id) => state.cards[id]?.code === "dh1") } : seat)) };
+    state = { ...state, seats: [{ ...state.seats[0]!, heroes: (state.seats[0]?.heroes ?? []).filter((id) => state.cards[id]?.code === "dh1") }, ...state.seats.slice(1)] as unknown as ScenarioState["seats"] };
     const run = playTest(made, revealFromTop(state, made.ctx, "900808", [] as EngineStep[]).state, [[]]);
     expect(run.state.window).toMatchObject({ kind: "choose", seat: 0 });
     let done = send(run, { type: "Choose", optionId: "discard" }, made.ctx);

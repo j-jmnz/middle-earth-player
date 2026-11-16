@@ -48,10 +48,10 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 02108:A:1 (front): When Revealed: Place 2 resource tokens on Gollum. Any player may exhaust a Lore hero to reduce this effect to 1 resource token.
   02108:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the effect's X grows by 1
+    - if any of: (there is a objective (any player controls) named "Gollum" to choose) or (the card in play titled "The Mere of Dead Faces" holds the flag redirectResources): the effect's X grows by 1
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "reduce" (only if all of: (any of: (there is a objective (any player controls) named "Gollum" to choose) or (the card in play titled "The Mere of Dead Faces" holds the flag redirectResources)) and (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a ready lore hero (you control) to choose)):
+        * option "reduce" (only if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a ready lore hero (you control) to choose)):
           - choose ready lore hero (you control)
           - exhaust the picked card
           - the effect's X grows by -1

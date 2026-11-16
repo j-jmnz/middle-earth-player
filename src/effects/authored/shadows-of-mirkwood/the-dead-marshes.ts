@@ -69,9 +69,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "02108",
     lines: ["02108:A:1"],
     timing: "whenRevealed",
-    // X is 1 while the reduction is still open: the player who takes it brings X to 0, and the tokens are 1 + X.
+    // X is 1 while the reduction is still open (only when the tokens will land: Gollum in play, or the Mere holding them): the player who takes it brings X to 0, and the tokens are 1 + X.
     instructions: [
-      { verb: "AddToX", amount: 1 },
+      { verb: "AddToX", amount: 1, when: TOKENS_LAND },
       {
         verb: "ForEachPlayer",
         order: "firstFirst",
@@ -80,7 +80,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
             verb: "Choose",
             who: "actor",
             options: [
-              { id: "reduce", requires: { kind: "all", conditions: [TOKENS_LAND, { kind: "x", min: 1 }, { kind: "canPick", pick: LORE_HERO }] }, instructions: [{ verb: "Pick", pick: LORE_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "AddToX", amount: -1 }] },
+              { id: "reduce", requires: { kind: "all", conditions: [{ kind: "x", min: 1 }, { kind: "canPick", pick: LORE_HERO }] }, instructions: [{ verb: "Pick", pick: LORE_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "AddToX", amount: -1 }] },
               { id: "keep", instructions: [] },
             ],
           },
