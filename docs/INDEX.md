@@ -11,7 +11,7 @@ Read whole.
 - `CLAUDE.md` — Claude Code (~2.7K tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~960 tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~990 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
 - `.claude/rules/release-standards.md` — Release standards (~1.0K tok)
 
@@ -24,7 +24,7 @@ Each agent reads its own file.
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.1K tok)
 - `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~1.0K tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.5K tok)
-- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.2K tok)
+- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.1K tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
 ## Product, code and design
@@ -237,7 +237,7 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
   - 57–70 Shared files (~300)
   - 71–85 Approach (~680) ← 1
   - 86–124 Scenario procedure (~1.9K) ← 31
-  - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
+  - 125–134 Commit often (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
   - 150–156 Merge (~140) ← 1
   - 157–163 Commit (~140)
@@ -310,7 +310,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
-- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1)
+- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
 - `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/showcase`: design-system.md, Color (1)
 - `scripts/tools`: agents/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1); development.md, Commands (1)

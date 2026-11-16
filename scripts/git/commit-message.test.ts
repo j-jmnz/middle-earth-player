@@ -18,6 +18,13 @@ describe("commit subjects (.claude/rules/commit-standards.md, Subject line)", ()
     expect(subjectProblem("fix: Close the period.")).toMatch(/period/);
   });
 
+  it("refuses a trailing checkpoint marker but not a summary about the game's checkpoint", () => {
+    for (const subject of ["feat: Helm's Deep Defense keyword, checkpoint", "feat: Engine half (checkpoint)", "fix: Goldens - Checkpoint"]) {
+      expect(subjectProblem(subject)).toMatch(/checkpoint marker/);
+    }
+    expect(subjectProblem("fix: Continue reads the checkpoint written on a pause")).toBeUndefined();
+  });
+
   it("reads a message file's subject past blank and comment lines", () => {
     expect(subjectOf("\n# Please enter the commit message\nrepo: Add the hook\n\nBody\n")).toBe("repo: Add the hook");
   });

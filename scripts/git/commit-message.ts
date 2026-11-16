@@ -19,12 +19,16 @@ export const SUBJECT_MAX = 72;
 const SUBJECT = new RegExp(`^(${COMMIT_TYPES.join("|")}): \\S`);
 // Subjects git writes for `commit --fixup`, `--squash` and `--fixup=amend:`; a rebase folds them away.
 const AUTOSQUASH = /^(fixup|squash|amend)! /;
+// A trailing "checkpoint" marker (", checkpoint", "(checkpoint)", "- checkpoint"): the subject says what the step did
+// instead (commit-standards.md, Commit often). A summary about the game's checkpoint, which ends in no such marker, passes.
+const CHECKPOINT_MARKER = /(?:[,;:–—-]\s*|\(\s*)checkpoint\s*\)?$/i;
 
 /** What is wrong with a commit subject, or undefined when it follows the standard. */
 export function subjectProblem(subject: string): string | undefined {
   if (!SUBJECT.test(subject)) return `"${subject}" does not start with "<type>: " (types: ${COMMIT_TYPES.join(", ")})`;
   if (subject.length > SUBJECT_MAX) return `"${subject}" is ${subject.length} characters; the limit is ${SUBJECT_MAX}`;
   if (subject.endsWith(".")) return `"${subject}" ends with a period`;
+  if (CHECKPOINT_MARKER.test(subject)) return `"${subject}" ends with a checkpoint marker; say what the step did`;
   return undefined;
 }
 
