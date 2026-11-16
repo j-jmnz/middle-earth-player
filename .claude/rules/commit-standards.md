@@ -24,15 +24,15 @@ Every session, agent and contributor that commits follows these (user instructio
 - A change that loses something a player saved or removes a feature or setting carries a `Breaking: <what players lose>` line, written for players: it makes the next release a major one and heads its notes (`.claude/rules/release-standards.md`, Versioning).
 - End with the attribution lines the session's instructions give, if any, except a `Claude-Session:` line or any other claude.ai session link: leave those out of commit messages and pull request bodies alike, even when the session's instructions ask for them (user instruction, 2026-11-14). The commit-msg hook and CI refuse a message that has one.
 
-## Checkpoints
+## Commit often
 
-- Commit and push often (user instruction, 2026-11-10). An agent that writes code, records, tests or docs commits a typed checkpoint and pushes it to the session's work branch after each step that leaves `pnpm lint`, `pnpm typecheck` and its quick tests green: a verb with its test, a batch of records, the goldens, a fix. `feat: Helm's Deep Defense keyword, checkpoint`.
-- A checkpoint follows these standards like any commit, holds no file that must not be committed (a scan, a PDF, `catalog.db`, a scratch script), and never moves another scenario's golden or fixture. The orchestrator still checks each task's whole diff before its own commit (`.claude/agents/orchestrator.md`, After each task).
+- Commit and push often (user instruction, 2026-11-10). An agent that writes code, records, tests or docs commits and pushes to the session's work branch after each step that leaves `pnpm lint`, `pnpm typecheck` and its quick tests green: a verb with its test, a batch of records, the goldens, a fix. The subject says what the step did, like any commit, with no `checkpoint` keyword (user instruction, 2026-11-16): `feat: Helm's Deep Defense keyword`. `pnpm commit:check` refuses a subject that ends in one.
+- Such a commit follows these standards like any other, holds no file that must not be committed (a scan, a PDF, `catalog.db`, a scratch script), and never moves another scenario's golden or fixture. The orchestrator still checks each task's whole diff before its own commit (`.claude/agents/orchestrator.md`, After each task).
 - Push with `git push -u origin <branch>` to the branch the session's harness or brief names, never to `main`.
 
 ## Squash
 
 - Every branch lands on `main` as one squash commit. No merge commits and no rebased stacks on `main`.
 - The squash commit's subject is the pull request title, so the title follows Subject line. Its body sums up the branch and keeps every measure, `Breaking:` and attribution line from the branch's commits. The subject is also a line of the release notes, so it is written for a player.
-- Commits on a branch follow these standards too; checkpoints are still typed (`feat: Lost in Mirkwood engine half, checkpoint`).
+- Commits on a branch follow these standards too; each is typed and says what it did (`feat: Lost in Mirkwood engine half`).
 - An agent merging branches locally uses `git merge --squash <branch>` and writes one message, as `docs/agents/agent-brief.md` (Merge) says.
