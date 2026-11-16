@@ -16,7 +16,7 @@ import { lastPickedSeat } from "../families/play/refs.ts";
 import { familyAttached } from "./family-hooks.ts";
 import { controlledShips, defendingShip } from "../families/sea/campaign.ts";
 import { discardRestricted } from "../families/objectives/claimed.ts";
-import { printedOf } from "../core/printed.ts";
+import { isPlayerType, printedOf } from "../core/printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { Frame, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
@@ -209,8 +209,13 @@ function applyTargeted(
 
 /** The card attaches to its host, faceup, and the families hear it (the Ship objective a Taking on Water attaches to is noted by the sea family). */
 export function attachSelf(state: ScenarioState, id: string, host: string, ctx: ReduceContext): ScenarioState {
-  if (!state.cards[id]) return state;
-  const attached = attachTo(moveCard(state, id, { zone: "attached" }), id, host);
+  const card = state.cards[id];
+  if (!card) return state;
+  // A player card its player controls (a contract, 22134:A:2) stays in that player's play area, attached, as a played attachment does;
+  // an encounter card is attached under nobody's control.
+  const seat = card.controller;
+  const player = seat != null && isPlayerType(printedOf(ctx.cards, card.code));
+  const attached = attachTo(moveCard(state, id, player ? { zone: "play", seat } : { zone: "attached" }), id, host);
   return familyAttached(updateCard(attached, id, { face: "up" }), id, host, ctx);
 }
 

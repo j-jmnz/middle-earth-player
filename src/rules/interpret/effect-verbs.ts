@@ -14,7 +14,7 @@ import { notePlaced, progressRoom, reducedProgress } from "../families/south/loc
 import { announceLeftPlay } from "../quest/stage-reveal.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
-import { readyBarred } from "../core/holder-classes.ts";
+import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { byPlayerCards, lastPicked, seatOf } from "./player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
@@ -90,7 +90,7 @@ export function applyTargetVerb(
   if (!id || !state.cards[id]) return state;
   switch (instruction.verb) {
     case "ReadyHero":
-      return readyBarred(state, id, byPlayerCards(state, sourceId, ctx)) ? state : updateCard(state, id, { exhausted: false });
+      return readyBarred(state, id, byPlayerCards(state, sourceId, ctx)) ? state : updateCard(state, id, readyPatch(state, id));
     case "BarAttack": {
       const barred = instruction.scope === "any" ? (state.cards[id]?.controller ?? seat) : seat;
       if (!sourceId) return state;

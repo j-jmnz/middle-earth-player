@@ -73,11 +73,11 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.4K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.7K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~590)
-  - 67–87 Decisions (~840)
+  - 67–87 Decisions (~860)
   - 88–117 Stack (~950)
   - 118–135 Performance and feel (~750)
   - 136–153 Repository layout (~440)
@@ -133,9 +133,9 @@ Read the sections your task touches.
     - 1635–1663 Mount Doom (~4.3K)
   - 1664–1672 Nightmare (~410) ← 19
   - 1673–1713 Deckbuilding (~2.1K)
-  - 1714–1793 Effects (~3.3K)
+  - 1714–1793 Effects (~3.6K)
     - 1716–1774 Three layers (~2.4K) ← 10
-    - 1775–1785 Player side quests, contracts and saga cards (~580) ← 1
+    - 1775–1785 Player side quests, contracts and saga cards (~850) ← 1
     - 1786–1789 Window stack (~100)
     - 1790–1793 Coverage test (~270)
   - 1794–1814 Data sources (~530)
@@ -261,19 +261,19 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~13.6K tok)
+- `docs/phases/STATUS.md` — Phase status (~13.7K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–282 Open items (~12.5K)
+  - 22–283 Open items (~12.5K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
     - 35–76 Fixtures and Maestro (~2.3K)
     - 77–115 Rules and engine (~1.6K)
     - 116–236 Rules and engine (Angmar Awakened) (~5.3K)
-    - 237–262 Screens and code (~1.6K)
-    - 263–282 Rules and engine (The Two Towers) (~1.4K)
-  - 283–303 Standing decisions (~700)
+    - 237–263 Screens and code (~1.7K)
+    - 264–283 Rules and engine (The Two Towers) (~1.4K)
+  - 284–304 Standing decisions (~720)
 
 ## Live plans
 

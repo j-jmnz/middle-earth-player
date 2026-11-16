@@ -123,6 +123,18 @@ export function readDecklistBody(payload: unknown): DecklistBody | null {
   return { name: record.name, heroes, slots, ...(side && Object.keys(side).length > 0 ? { side } : {}) };
 }
 
+// RingsDB lists the ally a Messenger of the King deck turns into a hero (22134:A:2) as a "(MotK)" hero, coded 99 and the ally's code
+// (9901014 is Faramir, 01014). Those stand-ins are not cards (data/overrides.json, outOfScope): the import reads each as its ally, a
+// copy in the deck for the contract's Setup to put into play.
+const MOTK_HERO = /^99(\d{5})$/;
+
+/** The ally a RingsDB "(MotK)" hero stands for, when the pool holds it, else null. */
+export function motkAlly(code: string, pool: ReadonlyMap<string, PoolFact>): string | null {
+  const ally = MOTK_HERO.exec(code)?.[1];
+  const fact = ally ? pool.get(ally) : undefined;
+  return ally && fact?.deckLegal && fact.typeCode === "ally" ? ally : null;
+}
+
 export function buildDecklist(
   body: DecklistBody,
   pool: ReadonlyMap<string, PoolFact>,
@@ -144,6 +156,11 @@ export function buildDecklist(
 
   function take(code: string, count: number): void {
     const fact = pool.get(code);
+    const ally = !fact || !fact.deckLegal ? motkAlly(code, pool) : null;
+    if (ally) {
+      take(ally, 1);
+      return;
+    }
     if (!fact || !fact.deckLegal) {
       droppedCodes.push(code);
       return;
