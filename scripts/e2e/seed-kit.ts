@@ -44,17 +44,27 @@ export function playDealt(
   seed: number,
   limit: number,
   answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent,
-  stop: (state: ScenarioState, played: number) => boolean = () => false,
+  stop?: (state: ScenarioState, played: number) => boolean,
 ): { intents: PlayerIntent[]; state: ScenarioState } {
   const dealt = deal(save, world, loadout, seed);
   if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
   const resumed = resume(dealt.save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
-  const ctx = contextOf(world);
-  let state = resumed.state;
+  return playOut(resumed.state, contextOf(world), limit, answer, stop);
+}
+
+/** Plays `from` with `answer` until the scenario is lost or its stage is cleared, `stop` says so, or `limit` intents; throws when the reducer refuses an answer. */
+function playOut(
+  from: ScenarioState,
+  ctx: ReduceContext,
+  limit: number,
+  answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent,
+  stop: ((state: ScenarioState, played: number) => boolean) | undefined,
+): { intents: PlayerIntent[]; state: ScenarioState } {
+  let state = from;
   const intents: PlayerIntent[] = [];
   const memory = new Set<string>();
-  for (let turn = 0; turn < limit && !state.lost && !state.stageCleared && !stop(state, intents.length); turn += 1) {
+  for (let turn = 0; turn < limit && !state.lost && !state.stageCleared && !stop?.(state, intents.length); turn += 1) {
     const intent = answer(state, ctx, memory);
     const result = reduce(state, intent, ctx);
     if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
@@ -136,33 +146,15 @@ export function playStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>,
   if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
   const resumed = resumeStandalone(dealt.game, world);
   if (!resumed.ok) throw new Error(resumed.reason);
-  const ctx = contextOf(world);
-  let state = resumed.state;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < (spec.limit ?? 8000) && !state.lost && !state.stageCleared && !spec.stop?.(state, intents.length); turn += 1) {
-    const intent = spec.answer(state, ctx, memory);
-    const result = reduce(state, intent, ctx);
-    if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
-    state = result.state;
-    intents.push(intent);
-  }
-  return { loadout, intents, state };
+  return { loadout, ...playOut(resumed.state, contextOf(world), spec.limit ?? 8000, spec.answer, spec.stop) };
 }
 
-/** `firstSeed` for a cycle scenario's standalone games: the first seed (1 to the count in `seedsVar`, 100 by default) whose game `wanted` accepts, or null with a warning. */
-export function firstStandaloneSeed<S extends 1 | 2>(say: Log, spec: StandaloneSeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): StandaloneSeedFixture<S> | null {
-  const limit = Math.max(Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
-  for (let seed = 1; seed <= limit; seed += 1) {
-    const game = playStandaloneSeed(spec, seed);
-    const outcome = game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "parked";
-    say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${outcome}`);
-    if (!wanted(game.state)) continue;
-    say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${outcome}`);
-    return { campaignId: spec.campaignId, seatCount: spec.seatCount, loadout: game.loadout, seed, intents: game.intents };
-  }
-  say.warn(`no ${label} game found in ${limit} seeds`);
-  return null;
+/** The Maestro fixtures of a cycle scenario: the first seed whose two-handed standalone game wins (`<prefix>-won`) and the first whose game loses (`<prefix>-lost`), each parked on its end; one not found is left out. */
+export function standaloneWonLost<P extends string>(say: Log, prefix: P, spec: StandaloneSeedSpec<2>, seedsVar: string): Partial<Record<`${P}-won` | `${P}-lost`, StandaloneSeedFixture<2>>> {
+  const won = firstStandaloneSeed(say, spec, seedsVar, (state) => state.stageCleared && !state.lost, `${prefix}-won`);
+  const lost = firstStandaloneSeed(say, spec, seedsVar, (state) => state.lost, `${prefix}-lost`);
+  const found: Record<string, StandaloneSeedFixture<2>> = { ...(won ? { [`${prefix}-won`]: won } : {}), ...(lost ? { [`${prefix}-lost`]: lost } : {}) };
+  return found as Partial<Record<`${P}-won` | `${P}-lost`, StandaloneSeedFixture<2>>>;
 }
 
 /** The seed the committed fixture `label` was found at (src/campaign/fixtures/<scenario-id>.json, keyed by the fixture's name), or 0 when none is committed. */
@@ -173,16 +165,13 @@ export function committedSeed(scenarioId: string, label: string): number {
   return typeof entry?.seed === "number" ? entry.seed : 0;
 }
 
-/**
- * The first seed, from 1 to the count in the environment variable `seedsVar` (the spec's `seeds`, else 100, by default), whose game
- * `wanted` accepts. Null, with a warning, when none is. The search always reaches the seed of the fixture already committed under
- * `label`, so a bare rerun writes the same fixture: the games are deterministic, and a committed fixture found with a raised seed count
- * (`oath-won` at seed 909) is not lost to the default, nor is a fixture that chains from it.
- */
-export function firstSeed<S extends 1 | 2>(say: Log, spec: SeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): SeedFixture<S> | null {
+/** What `firstSeed` and `firstStandaloneSeed` search over: a game played from a seed, with the loadout that dealt it. */
+type SeedSearch = { campaignId: string; scenarioId: string; seatCount: 1 | 2; seeds?: number };
+
+function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { loadout: L; intents: PlayerIntent[]; state: ScenarioState }, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string) {
   const limit = Math.max(Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
   for (let seed = 1; seed <= limit; seed += 1) {
-    const game = playSeed(spec, seed);
+    const game = play(seed);
     const outcome = game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "parked";
     say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${outcome}`);
     if (!wanted(game.state)) continue;
@@ -191,6 +180,23 @@ export function firstSeed<S extends 1 | 2>(say: Log, spec: SeedSpec<S>, seedsVar
   }
   say.warn(`no ${label} game found in ${limit} seeds`);
   return null;
+}
+
+/**
+ * The first seed, from 1 to the count in the environment variable `seedsVar` (the spec's `seeds`, else 100, by default), whose game
+ * `wanted` accepts. Null, with a warning, when none is. The search always reaches the seed of the fixture already committed under
+ * `label`, so a bare rerun writes the same fixture: the games are deterministic, and a committed fixture found with a raised seed count
+ * (`oath-won` at seed 909) is not lost to the default, nor is a fixture that chains from it.
+ */
+export function firstSeed<S extends 1 | 2>(say: Log, spec: SeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): SeedFixture<S> | null {
+  const found = searchSeeds(say, spec, (seed) => playSeed(spec, seed), seedsVar, wanted, label);
+  return found ? { ...found, seatCount: spec.seatCount } : null;
+}
+
+/** `firstSeed` for a cycle scenario's standalone games. */
+export function firstStandaloneSeed<S extends 1 | 2>(say: Log, spec: StandaloneSeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): StandaloneSeedFixture<S> | null {
+  const found = searchSeeds(say, spec, (seed) => playStandaloneSeed(spec, seed), seedsVar, wanted, label);
+  return found ? { ...found, seatCount: spec.seatCount } : null;
 }
 
 /** A part whose golden is played for the log of the playthrough that won it. */

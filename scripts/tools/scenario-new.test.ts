@@ -128,7 +128,8 @@ describe("pnpm scenario new", () => {
     expect(text("game.ts")).toContain("standaloneGame<");
     expect(text("game.ts")).toContain(`loadAnyScenario("${id}")`);
     expect(text("golden.test.ts")).toContain("standalone: true");
-    expect(text("standalone.test.ts")).toContain("toBeUndefined()");
+    expect(text(`shadows-of-mirkwood/${id}.ts`)).toContain("standaloneWonLost(");
+    expect(text("standalone.test.ts")).toContain("it.todo(");
     expect(text(`${id}.yaml`)).toContain("subflows/standalone-win.yaml");
     expect(text(`${id}-loss.yaml`)).toContain("subflows/standalone-loss.yaml");
     const registry = plan?.edits.find((edit) => edit.file === "src/campaign/fixtures/registry.ts");

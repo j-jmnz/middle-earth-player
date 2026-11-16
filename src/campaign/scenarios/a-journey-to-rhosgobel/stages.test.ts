@@ -1,36 +1,14 @@
 // Rules: rr.setup, rr.first-player, rr.quest-advancement, rr.winning-the-game, sotm.setup-a-journey-to-rhosgobel, sotm.ally-objective-wilyador (data/rules/entries.json); ledger lines 02060:A:1, 02064:A:1, 900601:A:2, 02062:B:2.
-// A Journey to Rhosgobel from its start: Wilyador joins the first player with 2 damage on him, Rhosgobel waits in the staging area, and the Nightmare deck adds the Goblin Eagle-hunter; stage 3 has no quest points and resolves when it is revealed.
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+// A Journey to Rhosgobel from its start: Wilyador joins the first player with 2 damage on him, Rhosgobel waits in the staging area, and the Nightmare deck adds the Goblin Eagle-hunter; stage 3 prints 0 quest points and resolves when it is revealed.
 import { describe, expect, it } from "vitest";
 
-import { EFFECTS } from "../../../effects/index.ts";
-import { expectOk } from "../../../rules/core/test-fixture.ts";
+import { coreSpiritGame } from "../../../../test/harness/core-spirit-game.ts";
+
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
-import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
-import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
-import prebuilt from "../../../../data/decks/prebuilt.json" with { type: "json" };
 
-import { contextOf } from "../../session.ts";
-import { buildStart } from "../../start.ts";
-import { loadWorld } from "../../world.ts";
 
-const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-const campaign = loadCampaign("shadows-of-mirkwood");
-const core = prebuilt.find((entry) => entry.id === "core-spirit");
-const heroes = core?.heroes ?? [];
-const deck = core?.cards.flatMap((card) => Array.from({ length: card.count }, () => card.code)) ?? [];
 
-function game(difficulty: "Normal" | "Nightmare", seatCount: 1 | 2 = 1) {
-  const world = loadWorld(catalog, campaign, loadAnyScenario("a-journey-to-rhosgobel"), EFFECTS, [...heroes, ...deck]);
-  const ctx = contextOf(world);
-  const seats = Array.from({ length: seatCount }, () => ({ heroes, deck }));
-  const start = buildStart({ campaign, scenario: world.scenario, seatCount, seed: 1, threatModifier: 0, seats, difficulty, effects: world.effects, mode: "standalone" });
-  let state = startScenario(start, ctx);
-  while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
-  return { state, ctx };
-}
+const game = (difficulty: "Normal" | "Nightmare", seatCount: 1 | 2 = 1) => coreSpiritGame("shadows-of-mirkwood", "a-journey-to-rhosgobel", difficulty, seatCount);
 
 const where = (state: ScenarioState, code: string) => Object.values(state.cards).filter((card) => card.code === code);
 

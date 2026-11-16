@@ -1,39 +1,19 @@
 // Rules: rr.quest-advancement, rr.winning-the-game, rr.setup, rr.search (data/rules/entries.json); ledger lines 02036:B:2, 900511:A:1.
 // The quest cards of Conflict at the Carrock: two stages on Normal and Easy (defeating Against the Trolls wins), three on Nightmare, whose quest card Grimbeorn's Folly is dealt after them (nightmare.questCards, src/campaign/start.ts).
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
-import { EFFECTS } from "../../../effects/index.ts";
+import { coreSpiritGame } from "../../../../test/harness/core-spirit-game.ts";
+
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
-import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
+import { reduce } from "../../../rules/engine/reduce.ts";
 import { advanceStage } from "../../../rules/quest/quest.ts";
 import { afterProgress } from "../../../rules/quest/stage-reveal.ts";
-import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
-import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
-import prebuilt from "../../../../data/decks/prebuilt.json" with { type: "json" };
 
-import { contextOf } from "../../session.ts";
-import { buildStart } from "../../start.ts";
-import { loadWorld } from "../../world.ts";
 
-const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-const campaign = loadCampaign("shadows-of-mirkwood");
-const core = prebuilt.find((entry) => entry.id === "core-spirit");
-const heroes = core?.heroes ?? [];
-const deck = core?.cards.flatMap((card) => Array.from({ length: card.count }, () => card.code)) ?? [];
 
-function game(difficulty: "Normal" | "Nightmare", seatCount: 1 | 2 = 1) {
-  const world = loadWorld(catalog, campaign, loadAnyScenario("conflict-at-the-carrock"), EFFECTS, [...heroes, ...deck]);
-  const ctx = contextOf(world);
-  const seats = Array.from({ length: seatCount }, () => ({ heroes, deck }));
-  const start = buildStart({ campaign, scenario: world.scenario, seatCount, seed: 1, threatModifier: 0, seats, difficulty, effects: world.effects, mode: "standalone" });
-  let state = startScenario(start, ctx);
-  while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
-  return { state, ctx };
-}
+const game = (difficulty: "Normal" | "Nightmare", seatCount: 1 | 2 = 1) => coreSpiritGame("shadows-of-mirkwood", "conflict-at-the-carrock", difficulty, seatCount);
 
 const codesOf = (state: ScenarioState, ids: readonly string[]) => ids.map((id) => state.cards[id]?.code);
 const codeAt = (state: ScenarioState, id: string | null | undefined) => (id ? state.cards[id]?.code : undefined);

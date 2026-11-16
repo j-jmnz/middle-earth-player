@@ -3,22 +3,10 @@
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
 // The saved decklists' policy is the goldens' one (test/scenarios/return-to-mirkwood/game.ts, returnmirkwoodIntent) with the auto-player's card play and Responses: one hero of a seat quests, the others stay ready to defend the guard, the seats engage and attack
 // together, a choice takes the first option (surge in place of exhausting a hero, Gollum when a character is to be exhausted). The seeds searched are RETURNMIRKWOOD_SEEDS.
-import type { StandaloneLoadout } from "../../../src/campaign/standalone.ts";
-import type { PlayerIntent, ScenarioState } from "../../../src/rules/engine/reduce.ts";
-
 import { DEFAULT_POLICY, returnmirkwoodIntent } from "../../../test/scenarios/return-to-mirkwood/game.ts";
 import { createLog } from "../../log.ts";
-import { firstStandaloneSeed } from "../seed-kit.ts";
+import { standaloneWonLost } from "../seed-kit.ts";
 
 const say = createLog("e2e-returnmirkwood");
 
-export type ReturnmirkwoodFixture = { campaignId: string; seatCount: 2; loadout: StandaloneLoadout; seed: number; intents: PlayerIntent[] };
-export type ReturnmirkwoodFixtureName = "returnmirkwood-won" | "returnmirkwood-lost";
-
-export async function returnmirkwoodFixtures(): Promise<Partial<Record<ReturnmirkwoodFixtureName, ReturnmirkwoodFixture>>> {
-  const find = (wanted: (state: ScenarioState) => boolean, label: string): ReturnmirkwoodFixture | null =>
-    firstStandaloneSeed(say, { campaignId: "shadows-of-mirkwood", scenarioId: "return-to-mirkwood", seatCount: 2, answer: (state: ScenarioState, ctx: Parameters<typeof returnmirkwoodIntent>[1], memory: Set<string>) => returnmirkwoodIntent(state, ctx, memory, DEFAULT_POLICY, { scout: "", prefer: "", protect: "", play: true, act: true }) }, "RETURNMIRKWOOD_SEEDS", wanted, label);
-  const won = find((state) => state.stageCleared && !state.lost, "returnmirkwood-won");
-  const lost = find((state) => state.lost, "returnmirkwood-lost");
-  return { ...(won ? { "returnmirkwood-won": won } : {}), ...(lost ? { "returnmirkwood-lost": lost } : {}) };
-}
+export const returnmirkwoodFixtures = async () => standaloneWonLost(say, "returnmirkwood", { campaignId: "shadows-of-mirkwood", scenarioId: "return-to-mirkwood", seatCount: 2, answer: (state, ctx, memory) => returnmirkwoodIntent(state, ctx, memory, DEFAULT_POLICY, { scout: "", prefer: "", protect: "", play: true, act: true }) }, "RETURNMIRKWOOD_SEEDS");

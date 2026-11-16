@@ -1,6 +1,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/log.ts";
+import { isPlayable } from "../../src/campaign/playable.ts";
+import { runOf } from "../../src/campaign/runs.ts";
 import { completedRounds, scoreOf } from "../../src/campaign/score.ts";
 import { campaignPath, nextStep, type PathNode } from "../../src/campaign/path.ts";
 import { tableDigest } from "../../src/campaign/digest.ts";
@@ -13,6 +15,7 @@ import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import type { Cause } from "../../src/rules/core/cause.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
+import { ENGINE_VERSION } from "../../src/rules/engine/version.ts";
 
 import { causeProblems, NUMBER_STEPS } from "./cause-check.ts";
 import type { CampaignGoldenBase, PlayedGame } from "./game-kit.ts";
@@ -101,6 +104,11 @@ export function checksOf(game: Pick<PlayedGame, "kept" | "intents" | "checks">, 
   });
 }
 
+// The record a standalone game writes when it ends (src/campaign/runs.ts): no campaign, the cycle as its box, nothing earned.
+function standaloneRun(spec: { campaign: CampaignData }, state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>) {
+  return runOf({ id: "run-1", kind: "standalone", refId: "game-1", campaignId: null, box: spec.campaign.id, state, cards, heroes: [["q1", "q2", "q3"]], reward: null, startedAt: 100, endedAt: 200, activeMs: null, engineVersion: ENGINE_VERSION });
+}
+
 export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extends PlayedGame = PlayedGame>(spec: GoldenSuiteSpec<G, D, P>): void {
   const worlds = new Map<D, SuiteWorld>();
   const games = new Map<string, P>();
@@ -131,6 +139,15 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
   }
 
   describe(`golden: a whole game of ${spec.title}`, () => {
+    if (spec.standalone) {
+      it("is a part of its cycle with no campaign card, and is playable", () => {
+        expect(spec.campaign.kind).toBe("cycle");
+        expect(index).toBeGreaterThanOrEqual(0);
+        expect(spec.scenario.campaignCard).toBeUndefined();
+        expect(isPlayable(spec.scenario.id)).toBe(true);
+      });
+    }
+
     it("plays the same intents to the same state on fixed seeds", async () => {
       const out = spec.goldens.map((golden) => {
         const played = games.get(golden.name);
@@ -180,6 +197,10 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
           expect(Number.isInteger(scoreOf(state, world.cards).score)).toBe(true);
           expect(spec.campaign.kind).toBe("cycle");
           expect(spec.campaign.scenarios[index]).toBe(spec.scenario.id);
+          expect(Object.values(state.cards).some((card) => card.zone === "campaign")).toBe(false);
+          expect(state.resolutionLog.xp).toBeUndefined();
+          const score = scoreOf(state, world.cards);
+          expect(standaloneRun(spec, state, world.cards), golden.name).toMatchObject({ result: "won", lossCause: null, rounds: score.rounds, score: score.score, reward: null, scenarioId: spec.scenario.id, seatCount: state.seatCount });
           return;
         }
         const xp = spec.expectedXp?.(state, golden, world);
@@ -218,6 +239,7 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         if (spec.standalone) {
           // A lost standalone game ends with its reason and the rounds completed; there is no Resolution.
           expect(resolutionResult(state)).toBeNull();
+          expect(standaloneRun(spec, state, cards), golden.name).toMatchObject({ result: "lost", lossCause: state.lossReason, score: null, reward: null });
           spec.lost?.(state, golden, worldOf(golden), game(golden));
           return;
         }

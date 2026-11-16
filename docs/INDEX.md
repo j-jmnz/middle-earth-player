@@ -52,7 +52,7 @@ Read the sections your task touches.
   - 222–225 Support (~90)
   - 226–241 Attribution (~410)
   - 242–245 License (~50)
-- `docs/architecture.md` — Architecture (~24.5K tok)
+- `docs/architecture.md` — Architecture (~24.6K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
@@ -71,9 +71,9 @@ Read the sections your task touches.
   - 319–324 Images (~940) ← 6
   - 325–377 Screens (~3.9K) ← 1
   - 378–383 Catalog build (~410)
-  - 384–401 Tests (~2.2K) ← 5
+  - 384–401 Tests (~2.3K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~213.7K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~213.8K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~630) ← 3
   - 54–67 Non-goals (~590)
@@ -131,7 +131,7 @@ Read the sections your task touches.
     - 1563–1600 The Tower of Cirith Ungol (~4.4K)
     - 1601–1637 The Black Gate Opens (~4.4K) ← 2
     - 1638–1666 Mount Doom (~4.3K)
-  - 1667–1805 Shadows of Mirkwood (~14.0K) ← 2
+  - 1667–1805 Shadows of Mirkwood (~14.1K) ← 2
     - 1675–1696 The Hunt for Gollum (~2.1K) ← 1
     - 1697–1716 Conflict at the Carrock (~2.4K) ← 2
     - 1717–1742 A Journey to Rhosgobel (~2.9K) ← 1

@@ -118,7 +118,6 @@ describe.skip("${facts.name} golden (open: scaffold)", () => {
 
 /** scripts/e2e/<cycle folder>/<id>.ts for a scenario of a cycle. */
 export function cycleSeedFinderFile(facts: Facts): string {
-  const P = pascal(facts.short);
   const c = camel(facts.short);
   const U = upper(facts.short);
   const depth = facts.finderRel.split("/").length - 1;
@@ -129,26 +128,14 @@ export function cycleSeedFinderFile(facts: Facts): string {
 // Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. \`${facts.short}-won\` is the first seed that wins, parked on the win (the outcome screen is one tap away); \`${facts.short}-lost\` the first that loses,
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
 // TODO: say which answers the saved decklists' policy gives the scenario's questions.
-import type { StandaloneLoadout } from "${root}src/campaign/standalone.ts";
-import type { PlayerIntent, ScenarioState } from "${root}src/rules/engine/reduce.ts";
-
 import { nextIntent } from "${root}test/harness/auto-player.ts";
 import { createLog } from "${scripts}log.ts";
-import { firstStandaloneSeed } from "${e2e}seed-kit.ts";
+import { standaloneWonLost } from "${e2e}seed-kit.ts";
 
 const say = createLog("e2e-${facts.short}");
 
-export type ${P}Fixture = { campaignId: string; seatCount: 2; loadout: StandaloneLoadout; seed: number; intents: PlayerIntent[] };
-export type ${P}FixtureName = "${facts.short}-won" | "${facts.short}-lost";
-
-export async function ${c}Fixtures(): Promise<Partial<Record<${P}FixtureName, ${P}Fixture>>> {
-  const find = (wanted: (state: ScenarioState) => boolean, label: string): ${P}Fixture | null =>
-    // TODO: the scenario's own answers in place of the saved decklists' policy, when the scenario needs them (scripts/e2e/temple-of-the-deceived.ts is the pattern).
-    firstStandaloneSeed(say, { campaignId: "${facts.campaignId}", scenarioId: "${facts.id}", seatCount: 2, answer: (state: ScenarioState, ctx: Parameters<typeof nextIntent>[1], memory: Set<string>) => nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory) }, "${U}_SEEDS", wanted, label);
-  const won = find((state) => state.stageCleared && !state.lost, "${facts.short}-won");
-  const lost = find((state) => state.lost, "${facts.short}-lost");
-  return { ...(won ? { "${facts.short}-won": won } : {}), ...(lost ? { "${facts.short}-lost": lost } : {}) };
-}
+// TODO: the scenario's own answers in place of the saved decklists' policy, when the scenario needs them (scripts/e2e/temple-of-the-deceived.ts is the pattern).
+export const ${c}Fixtures = async () => standaloneWonLost(say, "${facts.short}", { campaignId: "${facts.campaignId}", scenarioId: "${facts.id}", seatCount: 2, answer: (state, ctx, memory) => nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory) }, "${U}_SEEDS");
 `;
 }
 
@@ -170,29 +157,15 @@ tags:
 `;
 }
 
-/** src/campaign/scenarios/<id>/standalone.test.ts: a cycle scenario's test in place of the campaign test. */
+/** src/campaign/scenarios/<id>/standalone.test.ts: what is a cycle scenario's own in the standalone game (the cycle checks are the golden suite's). */
 export function standaloneTestFile(facts: Facts): string {
-  const c = camel(facts.short);
   return `// Rules: TODO name the rule ids the scenario implements (data/rules/entries.json).
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
-import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
-
-const cycle = loadCampaign("${facts.campaignId}");
-const ${c} = loadAnyScenario("${facts.id}");
-
-// ${facts.name} in the ${facts.campaignId} cycle (part ${facts.part}). A cycle has no Campaign Mode: the scenario has no campaign card, no log, no XP and no next part, and is played standalone only. The first check
-// reads data/; the todos are what the standalone test of every cycle scenario shows (src/campaign/standalone-game.test.ts and src/campaign/cycle-shell.test.ts are the pattern).
+// What is ${facts.name}'s own in the standalone game. The cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a standalone run with nothing earned, the loss reasons) are the golden suite's
+// (test/harness/golden-suite.ts, standalone: true).
 // TODO: turn each into a test once the scenario's records exist.
 describe("${facts.name} in the ${facts.campaignId} cycle", () => {
-  it("is part ${facts.part} of the cycle and has no campaign card", () => {
-    expect(cycle.kind).toBe("cycle");
-    expect(cycle.scenarios.indexOf(${c}.id)).toBe(${facts.part - 1});
-    expect(${c}.campaignCard).toBeUndefined();
-  });
-
-  it.todo("is playable (src/campaign/playable.ts), and the Scenarios tab lists it in the cycle's fold");
-  it.todo("deals standalone with nothing from a campaign: no checklist, no log, no Resolution to follow on a win");
   it.todo("deals its Nightmare deck on Nightmare when every card of it has a record (src/campaign/playable.ts)");
 });
 `;
