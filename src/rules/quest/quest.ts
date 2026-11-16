@@ -175,16 +175,17 @@ export function resolveQuest(
     for (const seat of hearing) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat, ...(stamped ? { amount: threat - willpower } : {}) });
   }
   // A full stage whose progress an explored location's Forced effect may cancel advances once it has resolved (advanceFreed; families/wizardry/progress.ts).
-  const ready = overflowWaits(next, steps, started, cards) ? next : withView(next, only, (view) => advanceReady(view, cards, steps, canAdvance));
+  const ready = overflowWaits(next, steps, started, cards) ? next : withView(next, only, (view) => advanceReady(view, cards, steps, canAdvance, started));
   return only == null ? clearCommitted(ready) : ready;
 }
 
-// A stage that is full and was held back advances as soon as it is allowed to.
-function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
+// A stage that is full and was held back advances as soon as it is allowed to; a 0-point one that arrived in this resolution first resolves its When Revealed.
+function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate, started: number): ScenarioState {
   const stage = state.questStage ? state.cards[state.questStage] : undefined;
   if (!stage || state.stageCleared) return state;
   const points = questPointsOf(state, stage, cards);
   if (points == null || stage.progress < points || !canAdvance(state)) return state;
+  if (points === 0 && stage.progress === 0 && steps.slice(started).some((step) => step.kind === "advance" && step.cardId === stage.id)) return state;
   return advanceStage(state, cards, steps, canAdvance);
 }
 
@@ -327,8 +328,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     steps.push({ kind: "advance", cardId: nextId });
     const arrived = next.cards[nextId];
     const points = arrived ? questPointsOf(next, arrived, cards) : null;
-    // A stage that arrives with 0 quest points (Surprise Attack, 41005:B:2, prints 0 and adds 4 for each enemy in play) is not met at once: its When Revealed
-    // effects have not resolved yet, and the check comes with the next progress it takes (advanceReady, placeQuestProgress).
+    // A stage that arrives with 0 quest points (Surprise Attack, 41005:B:2, or Return to Rhosgobel, 02062:B:1) is not met at once: its When Revealed effects have not resolved yet (advanceReady, placeQuestProgress).
     if (points == null || points === 0 || (arrived?.progress ?? 0) < points || !canAdvance(next)) return next;
   }
   return { ...next, stageCleared: true };

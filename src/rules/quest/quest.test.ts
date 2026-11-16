@@ -215,6 +215,14 @@ describe("quest resolution", () => {
     expect(resolved.state.seats[0].threat).toBe(8);
   });
 
+  it("leaves a stage that prints 0 quest points where it arrived: its When Revealed resolves before the quest checks it", () => {
+    const { state, cards } = atCommit({ willpower: 5, threat: 3, stages: ["stage-1", "stage-2", "stage-3"], stagePoints: 1, nextStage: true, nextPoints: 0, laterPoints: 2 });
+    const resolved = expectOk(reduce(state, { type: "Pass" }, { effects: [], cards }));
+    expect(resolved.state.cards[resolved.state.questStage ?? ""]?.code).toBe("stage-2");
+    expect(resolved.state.stageCleared).toBe(false);
+    expect(resolved.state.questDeck.map((id) => resolved.state.cards[id]?.code)).toEqual(["stage-3"]);
+  });
+
   it("sets a stage-cleared flag when the last stage is met", () => {
     const { state, cards } = atCommit({ willpower: 5, threat: 8, stages: ["stage-1"], stagePoints: 1 });
     const resolved = expectOk(reduce(state, { type: "Pass" }, { effects: [], cards }));

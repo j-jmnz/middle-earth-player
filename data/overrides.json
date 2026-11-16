@@ -326,16 +326,6 @@
     },
     {
       "match": {
-        "code": "02062"
-      },
-      "set": {
-        "questPoints": null
-      },
-      "reason": "Hall of Beorn lists 0 quest points for Return to Rhosgobel, and the scan of side B prints 0 in its quest points box. It is the last stage and no progress is ever placed on it: its When Revealed heals Wilyador and then wins or loses the game (02062:B:1, 02062:B:2). A stage with 0 quest points would be completed as the quest phase that reveals it ends, before that effect resolves, so it is read as having none.",
-      "source": "scan 02062.B, data/printed/shadows-of-mirkwood.json; HoB QuestCards.json lists 0"
-    },
-    {
-      "match": {
         "code": "12041"
       },
       "set": {

@@ -39,7 +39,7 @@ describe("A Journey to Rhosgobel golden", () => {
         expect(cardsOf(state, "900602").some((card) => card.zone === "staging"), golden.name).toBe(golden.difficulty === "Nightmare");
       },
     },
-    wins: "ends when Return to Rhosgobel heals Wilyador completely (stage 3 has no quest points), settles at once with a score and earns nothing",
+    wins: "ends when Return to Rhosgobel heals Wilyador completely (stage 3 prints 0 quest points), settles at once with a score and earns nothing",
     won(state, golden) {
       expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("02062");
       // Wilyador is whole and the Athelas that healed him are on the heroes that claimed them.

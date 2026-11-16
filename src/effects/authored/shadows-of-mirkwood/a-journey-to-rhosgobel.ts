@@ -54,7 +54,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       ],
     },
     { id: "02061:forced:1", cardCode: "02061", lines: ["02061:B:2"], timing: "forced", trigger: "healed", subject: WILYADOR, instructions: [{ verb: "RemoveFromGame", card: "other" }] },
-    // 02062 Return to Rhosgobel (stage 3, no quest points). When Revealed: 5 wounds are healed from Wilyador for each Athelas objective the players control, one heal for each, as an Athelas heal; then, if he is completely healed the players win,
+    // 02062 Return to Rhosgobel (stage 3, 0 quest points). When Revealed: 5 wounds are healed from Wilyador for each Athelas objective the players control, one heal for each, as an Athelas heal; then, if he is completely healed the players win,
     // otherwise they lose (a heal that was blocked healed nothing).
     {
       id: "02062:whenRevealed:1",
