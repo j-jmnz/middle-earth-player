@@ -20,7 +20,7 @@ import { printedOf } from "../core/printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { Frame, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
-import { seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
+import { seatFor, shuffleEncounterDeck, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { gameReads } from "../core/game-reads.ts";
@@ -114,7 +114,7 @@ export function distinctByCode(state: ScenarioState, ids: readonly string[]): st
 function picksOne(instruction: Instruction): boolean {
   if (instruction.verb === "ReturnToStaging") return instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose";
   // "Add each Nazgûl enemy found": every match goes, and nobody chooses.
-  if (instruction.verb === "SearchMove") return instruction.each !== true;
+  if (instruction.verb === "SearchMove" || instruction.verb === "ShuffleIntoDeck") return instruction.each !== true;
   return true;
 }
 
@@ -194,6 +194,9 @@ function applyTargeted(
     case "SearchReveal":
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first, undefined, instruction.to === "engaged", state.cards[first]?.zone === "encounterDiscard") : state;
     case "ShuffleIntoDeck":
+      // Every copy goes into the deck, which is shuffled once.
+      if (instruction.each === true) return ids.length > 0 ? shuffleEncounterDeck(ids.reduce((next, id) => (next.cards[id] ? updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down" }) : next), state)) : state;
+      return first ? shuffleIntoEncounterDeck(state, first) : state;
     case "ShuffleOutOfPlayIntoEncounterDeck":
       return first ? shuffleIntoEncounterDeck(state, first) : state;
     case "DiscardRestricted":

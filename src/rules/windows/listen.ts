@@ -6,6 +6,7 @@ import { triggerHears } from "../families/play/hooks.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { matchesPick } from "../interpret/pick.ts";
 import type { CardInstance, GameEvent, ScenarioState } from "../core/state.ts";
+import { flagged } from "../core/state.ts";
 
 // Effect records by card code, built once per effect list: the triggers, constants and Actions look a card's records up
 // many times a step, and the list holds every card's.
@@ -63,6 +64,8 @@ export function hears(state: ScenarioState, effect: Effect, listener: CardInstan
   if (!triggerHears(effect.trigger, event.trigger)) return false;
   // A card whose printed text box is blank has none of its abilities (rr.blank).
   if (textBlank(state, listener.id, ctx.cards)) return false;
+  // A character that cannot trigger its effect cannot use its own Responses (Sacked!, 02048:A:1).
+  if (effect.timing === "response" && flagged(state, listener.id, "cannotTriggerEffects")) return false;
   if (effect.byEncounterDeck && !event.fromDeck) return false;
   if (effect.notFromDiscard && event.fromDiscard) return false;
   // An event stamped with the clock is heard only by cards that were in play when it occurred (rr.forced: a Forced effect must be in play and active at the time its trigger occurs).

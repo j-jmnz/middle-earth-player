@@ -304,6 +304,8 @@ export const effectSchema = z.strictObject({
   // This Action, Response or Forced effect of a card that is not an event is used from its owner's hand, and only there ("put ~ into play
   // from your hand", rr.in-play-and-out-of-play: an ability that refers to being used from an out-of-play area; Lost in the Wild's Forced effect, 18026:A:1).
   fromHand: z.literal(true).optional(),
+  // This Forced effect of a card works from the victory display and only there ("While Louis is in the victory display, each Troll enemy gains: Forced: ...", 900504:A:2; rr.in-play-and-out-of-play: an ability that refers to the out-of-play area it works from).
+  fromVictory: z.literal(true).optional(),
   // A "revealed" event is heard only when the encounter deck itself revealed the card (staging, a surge, the top card;
   // rr.staging), not when a player searched for it and revealed it ("as it is revealed by the encounter deck", 01006:A:1).
   byEncounterDeck: z.literal(true).optional(),

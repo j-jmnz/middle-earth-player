@@ -14,7 +14,7 @@ import { destroyCard, modifiedStat } from "../../core/keywords.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { flagged, inPlay, livingSeats } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { giveControl } from "./control.ts";
 import { lastPlayer } from "../sea/players.ts";
@@ -86,7 +86,10 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
     if (instruction.verb === "ControlledBy") {
       const id = instruction.card === "host" ? source.host : source.id;
       const holder = instruction.who === "lastPlayer" ? lastPlayer(next) : next.firstPlayer;
-      if (id && next.cards[id]?.controller !== holder) next = giveControl(next, id, holder);
+      const held = id ? next.cards[id] : undefined;
+      // An objective ally in the staging area joins the first player's play area, faceup and ready (Grimbeorn the Old, 02037:A:2).
+      if (id && held?.zone === "staging") next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
+      else if (id && held?.controller !== holder) next = giveControl(next, id, holder);
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {
       next = destroyCard(next, source.id, ctx.cards, steps);
     }

@@ -10,10 +10,20 @@ import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
 
-/** Notes progress placed on the current quest card, when the table asks for it. Every other game's state is returned as it was. */
+/**
+ * Notes progress placed on the current quest card, when the table asks for it. `trackQuestProgress` keeps the note to the end of the phase; `noteQuestProgress` notes only the quest phase's progress and keeps it to the end of the round, so a Forced effect at the end of the quest phase still reads it (the phase's modifiers end first).
+ * Every other game's state is returned as it was.
+ */
 export function noteQuestPhase(state: ScenarioState, amount: number): ScenarioState {
-  if (amount <= 0 || !flagged(state, "table", "trackQuestProgress")) return state;
-  return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questProgressPhase", amount, until: "endOfPhase" }] };
+  if (amount <= 0) return state;
+  if (flagged(state, "table", "trackQuestProgress")) return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questProgressPhase", amount, until: "endOfPhase" }] };
+  if (state.phase !== "Quest" || !flagged(state, "table", "noteQuestProgress")) return state;
+  return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questProgressPhase", amount, until: "endOfRound" }] };
+}
+
+/** The `questProgressNoted` condition: some progress was placed on the current quest card this phase and noted (the table holds `trackQuestProgress`, or `noteQuestProgress` and the phase is the quest phase). */
+export function questProgressNoted(state: ScenarioState): boolean {
+  return state.modifiers.some((modifier) => modifier.stat === "questProgressPhase" && modifier.instanceId === "table");
 }
 
 /** CancelPhaseProgress: the progress noted this phase comes off the current quest card (no more than it holds) and the note is cleared. */

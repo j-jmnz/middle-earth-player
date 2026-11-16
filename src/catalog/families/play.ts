@@ -119,6 +119,7 @@ const TRIGGERS = [
 // `heroType`: the holder loses the ally card type and gains the hero card type (Sword-thain): it is among its controller's
 // heroes while it holds the flag. `threatCeiling` (on "seat:N"): while the seat's threat is higher than the amount, it is
 // treated as the amount ("treat your threat as if it is 20"); the dial does not move.
-const FLAGS = ["heroType", "threatCeiling"] as const;
+// `cannotTriggerEffects`: the holder cannot initiate its own Action and Response abilities ("Attached hero cannot ... trigger its effect", 02048:A:1); its constant and Forced abilities still work.
+const FLAGS = ["heroType", "threatCeiling", "cannotTriggerEffects"] as const;
 
 export const manifest = { name: "play", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

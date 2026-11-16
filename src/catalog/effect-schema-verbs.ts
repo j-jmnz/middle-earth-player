@@ -172,8 +172,8 @@ export const simpleVerbs = [
   verb("ShuffleEncounterDeck"),
   // Setup: each player draws this many fewer cards in the starting hand (and in a mulligan redraw).
   z.strictObject({ verb: z.literal("ReduceOpeningHand"), amount: z.number().int().positive(), ...when }),
-  // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles.
-  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, ...when }),
+  // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles. With `each`, every matching card goes and the deck is shuffled once ("shuffle all copies of the \"Sacked!\" card from the discard pile back into the encounter deck", 02041:A:1).
+  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it. `cost`: the search is a Travel cost the players must be able to pay, so it needs a card to find ("Travel: The first player searches ... for a Warg enemy", 10024:A:2; rr.travel); read by the angmar family. `to: "engaged"`: the enemy found is revealed and put into play engaged with the revealing player instead of staged ("reveal it, and put it into play engaged with you", 143065:A:2).
   // `deckOnly`: the encounter deck alone is searched, not its discard pile ("Search the encounter deck for 1 copy of Prison Cell", 10039:A:2).
   z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }),
@@ -221,8 +221,9 @@ export const simpleVerbs = [
       // of the players tied for the highest), or (`highestThreatCost`, "Attach to the hero with the highest threat cost", 41043:A:2) the hero
       // with the highest printed threat cost among every hero in play (the first player chooses among those tied), or (`picked`, "attach this
       // card to one of that player's heroes", 900106:A:1) a hero of the player the effect picked, who chooses it.
+      // or (`firstPlayer`, "Attach to a hero with no \"Sacked!\" cards attached controlled by the first player", 02048:A:1) a hero the first player controls, chosen by the first player.
       // or (`mostAttachments`, "Attach to the hero with the most attachments without Weighed Down attached", 18027:A:1) the hero with the most attachments among those the card is not on yet; the first player chooses among heroes tied.
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked", "mostAttachments"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked", "mostAttachments", "firstPlayer"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
         // "Attach to a Warrior hero." (143015:A:2): only a hero with this printed trait (rr.attachment-cards: a play restriction is checked as the attachment enters play).
         trait: z.string().min(1).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),

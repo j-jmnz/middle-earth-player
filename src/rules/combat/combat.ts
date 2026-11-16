@@ -20,7 +20,7 @@ import { titleBarred } from "../families/nightmare/guards.ts";
 import { ruleCause } from "../core/cause.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { undefendedExtras } from "../families/defense/damage.ts";
-import { markDefender, moreDefenders } from "../families/defense/defenders.ts";
+import { markDefender, moreDefenders, staysReadyToDefend } from "../families/defense/defenders.ts";
 import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { countsDefense, struck } from "../families/attack/strike.ts";
@@ -190,7 +190,7 @@ export function applyDefense(
   if (!attack || !state.cards[attack.enemyId] || !state.cards[defenderId]) return state;
   // A character with "does not exhaust to defend" stays ready (rr.exhausted). Its declaration is announced ("After ~ is
   // declared as a defender").
-  const ready = flagged(state, defenderId, "noExhaustDefend");
+  const ready = staysReadyToDefend(state, defenderId, ctx);
   const declaredState = ready ? state : updateCard(state, defenderId, { exhausted: true });
   const exhausted: ScenarioState = markDefender(
     {

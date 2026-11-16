@@ -40,7 +40,7 @@ export function highestThreatSeats(state: ScenarioState): number[] {
 export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, { verb: "AttachSelf" }>["to"], itemSeat: number, cards: ReadonlyMap<string, PrintedCard>): string[] {
   if (to.kind !== "hero") return [];
   // `picked`: the caller passes the picked player as `itemSeat` (effect-frames.ts attachSeat).
-  const seats = to.control === "any" || to.control === "highestThreatCost" || to.control === "mostAttachments" ? livingSeats(state) : to.control === "highestThreat" ? highestThreatSeats(state) : [itemSeat];
+  const seats = to.control === "firstPlayer" ? [state.firstPlayer] : to.control === "any" || to.control === "highestThreatCost" || to.control === "mostAttachments" ? livingSeats(state) : to.control === "highestThreat" ? highestThreatSeats(state) : [itemSeat];
   const printed = (id: string): PrintedCard => printedOf(cards, state.cards[id]?.code ?? "");
   const heroes = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []);
   const top = to.control === "highestThreatCost" ? Math.max(...heroes.map((id) => printed(id).threat ?? 0)) : null;
@@ -52,7 +52,7 @@ export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, {
 export function attachHostChooser(state: ScenarioState, instruction: Instruction, itemSeat: number): number {
   if (instruction.verb === "AttachSelf" && instruction.to.kind === "ship") return state.firstPlayer;
   if (instruction.verb !== "AttachSelf" || instruction.to.kind !== "hero") return itemSeat;
-  if (instruction.to.control === "any" || instruction.to.control === "highestThreatCost" || instruction.to.control === "mostAttachments") return state.firstPlayer;
+  if (instruction.to.control === "any" || instruction.to.control === "highestThreatCost" || instruction.to.control === "mostAttachments" || instruction.to.control === "firstPlayer") return state.firstPlayer;
   if (instruction.to.control !== "highestThreat") return itemSeat;
   const highest = highestThreatSeats(state);
   return highest.length === 1 ? (highest[0] ?? itemSeat) : highest.length > 1 ? state.firstPlayer : itemSeat;

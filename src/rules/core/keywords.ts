@@ -56,7 +56,7 @@ export function modifiedStat(
   // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
   let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
   let set: number | null = null;
-  // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2).
+  // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2), or its Defense (900506:A:1).
   let floor = total;
   for (const modifier of state.modifiers) {
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
@@ -78,7 +78,7 @@ export function modifiedStat(
   total += perDamage(state, instance, printed, stat);
   if (stat === "threat") total += threatPerHostWillpower(state, instance, printed, cards);
   const lowered = set ?? total;
-  const value = stat === "willpower" && lowered < floor && flagged(state, instance.id, "cannotReduceWillpower") ? floor : lowered;
+  const value = lowered < floor && ((stat === "willpower" && flagged(state, instance.id, "cannotReduceWillpower")) || (stat === "defense" && flagged(state, instance.id, "cannotReduceDefense"))) ? floor : lowered;
   return CARD_STATS.has(stat) ? Math.max(0, value) : value;
 }
 

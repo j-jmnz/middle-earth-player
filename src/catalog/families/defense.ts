@@ -129,6 +129,10 @@ const FLAGS = [
   // On an enemy: the combat damage its attack deals beyond the remaining hit points of the character it damages is assigned as an
   // increase to its controller's threat (Hill Troll, 01082:A:1). The damage still goes on the character.
   "excessToThreat",
+  // The holder does not exhaust to defend against enemies with the Trait of the modifier's `when` (`defendingAgainst`): "Grimbeorn the Old does not exhaust to defend against Troll enemies" (02037:A:1).
+  "noExhaustDefendVersus",
+  // On an enemy: its Defense cannot be reduced, whatever lowers it (900506:A:1); increases still count.
+  "cannotReduceDefense",
 ] as const;
 
 export const manifest = { name: "defense", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

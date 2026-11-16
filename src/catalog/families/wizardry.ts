@@ -25,6 +25,8 @@ const TRIGGERS = [
 const FLAGS = [
   // On the table: the progress placed on the current quest card is noted until the end of the phase, for CancelPhaseProgress (143080:B:2). Only a game that holds it keeps the note.
   "trackQuestProgress",
+  // On the table: the progress placed on the current quest card is noted while the quest phase lasts, to the end of the round, for the condition `questProgressNoted` alone (900501:A:4): the overflow of an explored location does not wait, and a Forced effect at the end of the quest phase still reads it.
+  "noteQuestProgress",
   // The note itself, a modifier on the table that the end of the phase clears (the engine writes it; no record names it).
   "questProgressPhase",
 ] as const;

@@ -25,7 +25,7 @@ import { refillsAnyTime } from "../families/nightmare/guards.ts";
 import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
-import { flagged, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
 import { attachTo, cardsUnder, discardFromHand, moveCard, turnedUp } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
@@ -372,8 +372,10 @@ function discardTarget(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
+  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" || kind === "other" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
+  // The other card an event names (the character an attack damaged, 02042:A:1) may already have left play: nothing is discarded twice.
+  if (kind === "other" && !inPlay(state.cards[id]?.zone ?? "removed")) return state;
   // "Unique locations cannot be discarded from play by encounter card effects" (12193:B:1): the card holds the flag.
   if (flagged(state, id, "cannotBeDiscardedByEncounter") && isEncounterCardEffect(state, ctx.cards, focus.sourceId)) return state;
   return destroyCard(state, id, ctx.cards, steps);
