@@ -20,7 +20,7 @@ For iOS you need macOS and Xcode. For Android you need Android Studio, SDK Platf
 pnpm assets
 ```
 
-`pnpm assets` runs `assets catalog`, `assets canvaskit`, `assets booklets` and `assets scans`. The first time `assets scans` runs, it downloads every pinned card picture into `.cache/` (about 5 GB), checks each one's sha256, and writes 1200 px copies to `assets/scans/`. Later runs only pack the pictures that changed. `pnpm start`, `pnpm android` and `pnpm ios` run it for you first. It rewrites `src/screens/images/scan-map.ts`; don't commit that change.
+`pnpm assets` runs `assets catalog`, `assets canvaskit`, `assets pdfjs`, `assets booklets` and `assets scans`. The first time `assets scans` runs, it downloads every pinned card picture into `.cache/` (about 5 GB), checks each one's sha256, and writes 1200 px copies to `assets/scans/`. Later runs only pack the pictures that changed. `pnpm start`, `pnpm android` and `pnpm ios` run it for you first. It rewrites `src/screens/images/scan-map.ts`; don't commit that change.
 
 For a release build, which works offline with all its data bundled:
 
@@ -65,9 +65,10 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm scenario new <scenario-id>` | Writes and registers the skeleton files for a new scenario. Try `--dry-run` first. |
 | `pnpm scenario pack <scenario-id>` | Writes `.agent/pack/<id>.md`, the context a scenario author reads: vocabulary, schema entries, cookbook sections and drafts. |
 | `pnpm scenario fixtures [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
-| `pnpm assets` | Runs `catalog`, `canvaskit`, `booklets` and `scans` in that order. `start`, `android`, `ios` and the native release builds run it for you (`start` with `--optional`). |
+| `pnpm assets` | Runs `catalog`, `canvaskit`, `pdfjs`, `booklets` and `scans` in that order. `start`, `android`, `ios` and the native release builds run it for you (`start` with `--optional`). |
 | `pnpm assets catalog` | Writes `assets/catalog.db`, which is never committed, and `src/catalog/version.ts`, which is. |
 | `pnpm assets canvaskit` | Copies CanvasKit's wasm to `public/canvaskit.wasm` (gitignored), which the web build loads to draw the table. `pnpm web` and `pnpm test a11y` run it with `catalog`. |
+| `pnpm assets pdfjs` | Copies pdf.js's worker and data (CMaps, standard fonts, ICC profiles, wasm decoders) to `public/pdfjs` (gitignored), which the web booklet reader loads. `pnpm web` runs it. |
 | `pnpm assets scans` / `pnpm assets booklets` | Packs the card pictures or the booklet PDFs into `assets/`. |
 | `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators. It needs macOS, Xcode and Maestro. |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet. `--publish` replaces the `showcase` branch with them. |

@@ -35,3 +35,5 @@ The fonts in `assets/fonts/`, and the web build's copies in `public/fonts/`, are
 ## Dependencies
 
 The npm dependencies keep their own licenses, which you can find in each package under `node_modules/`.
+
+The web and desktop builds ship [pdf.js](https://github.com/mozilla/pdf.js) (`pdfjs-dist`, Apache License 2.0, Copyright Mozilla Foundation) to read the booklets: its worker, CMaps, standard fonts, ICC profiles and wasm decoders are copied to `public/pdfjs` by `pnpm assets pdfjs`, and its license text is `node_modules/pdfjs-dist/LICENSE`. The standard fonts it carries (Foxit and Liberation) keep the licenses in that package.

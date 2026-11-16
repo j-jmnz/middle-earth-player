@@ -21,12 +21,14 @@ const catalog: Step = { script: "build/catalog.ts" };
 const booklets: Step = { script: "build/pack-booklets.ts" };
 const scans: Step = { script: "build/pack-scans.ts" };
 const canvaskit: Step = { script: "build/pack-canvaskit.ts" };
+const pdfjs: Step = { script: "build/pack-pdfjs.ts" };
 
 export const GROUPS: Record<string, Record<string, Command>> = {
   assets: {
-    all: { steps: [catalog, canvaskit, booklets, scans], about: "catalog, canvaskit, booklets and scans in order (`--optional` lets a pack fail)" },
+    all: { steps: [catalog, canvaskit, pdfjs, booklets, scans], about: "catalog, canvaskit, pdfjs, booklets and scans in order (`--optional` lets a pack fail)" },
     catalog: { steps: [catalog], about: "writes assets/catalog.db and src/catalog/version.ts" },
     canvaskit: { steps: [canvaskit], about: "copies CanvasKit's wasm to public/canvaskit.wasm for the web table" },
+    pdfjs: { steps: [pdfjs], about: "copies pdf.js's worker and data to public/pdfjs for the web booklet reader" },
     booklets: { steps: [booklets], about: "packs the booklet PDFs into assets/booklets" },
     scans: { steps: [scans], about: "packs every card picture into assets/scans" },
     capture: { steps: [{ script: "showcase/capture.ts" }], about: "takes the README showcase's captures on the iOS simulators (--app <App.app>, macOS)" },

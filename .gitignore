@@ -56,6 +56,9 @@ modules/*/android/.cxx/
 # generated data and local caches
 # CanvasKit's wasm, copied by pnpm assets canvaskit
 public/canvaskit.wasm
+
+# pdf.js's worker and data, copied by pnpm assets pdfjs
+public/pdfjs/
 .cache/
 assets/catalog.db
 agent-tools/

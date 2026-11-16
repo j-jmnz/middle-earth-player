@@ -21,8 +21,12 @@ console.log(
     ? "booklets: bundling the packed PDFs from assets/booklets"
     : "booklets: not packed, so this bundle carries none. Run pnpm assets booklets, then restart Metro with --clear.",
 );
+// The web has no native module for the booklet reader: `booklet-pdf` resolves to the pdf.js reader on the web platform only
+// (src/screens/booklets/web/pdf-module.ts), so the screens that import it need no web branch and the phone's bundle never sees it.
+const webBookletPdf = path.join(__dirname, "src/screens/booklets/web/pdf-module.ts");
 const resolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (platform === "web" && moduleName === "booklet-pdf") return { type: "sourceFile", filePath: webBookletPdf };
   const resolved = (resolveRequest ?? context.resolveRequest)(context, moduleName, platform);
   if (resolved.type === "sourceFile" && resolved.filePath === bookletStub && fs.existsSync(bookletMap)) {
     return { type: "sourceFile", filePath: bookletMap };
