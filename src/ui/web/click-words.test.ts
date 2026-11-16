@@ -13,6 +13,14 @@ describe("clickWords", () => {
     expect(clickWords("When tapped")).toBe("When clicked");
   });
 
+  it("words a double tap as a click, a hold as a right click and a tap-or-swipe as a click", () => {
+    expect(clickWords("Double tap to show the card")).toBe("Click to show the card");
+    expect(clickWords("double tap to open")).toBe("click to open");
+    expect(clickWords("Hold a card to read it.")).toBe("Right-click a card to read it.");
+    expect(clickWords("When tapped keeps it until you tap or swipe it, or the next one replaces it.")).toBe("When clicked keeps it until you click it, or the next one replaces it.");
+    expect(clickChildren("Hold a card to read it.")).toBe("Right-click a card to read it.");
+  });
+
   it("leaves other words alone", () => {
     expect(clickWords("Tapestry of the tapering Tapir")).toBe("Tapestry of the tapering Tapir");
     expect(clickWords("Exhaust a hero")).toBe("Exhaust a hero");

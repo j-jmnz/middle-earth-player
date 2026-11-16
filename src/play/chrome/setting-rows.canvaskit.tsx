@@ -6,7 +6,7 @@ import { View } from "react-native";
 
 import { TextButton } from "../../ui/buttons.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
 import { useReduceMotion } from "../../ui/motion-run.ts";
 import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
@@ -19,6 +19,9 @@ export { ChoiceRow, SettingChoice, SettingGroup, type SettingGroupId };
 
 // Table as a list, worded for a browser and the desktop app (the phone's line names TalkBack, VoiceOver and Switch Access): a screen reader a browser cannot detect and keyboard play.
 const TABLE_LIST_LINE = "Lists the table's cards and choices as text, in place of the drawn table. Follow screen reader does it only while the app is told a screen reader is on; Always does it for a screen reader a browser cannot detect, for keyboard play, or if you prefer it.";
+
+// A computer has no battery to spare and no vibration motor: the lines drop their battery clauses and the Haptics row is left out (a browser or the desktop app never vibrates).
+const noBattery = (line: string): string => line.replace(/ (Off saves|Uses more) battery\./, "");
 
 /**
  * The groups: Display (Theme, UI scale, Strong outlines), Performance (Card pictures, Moving fog: the two switches whose only job is to ease
@@ -66,7 +69,7 @@ export function SettingsRows({
       {groups.includes("performance") ? (
         <SettingGroup title="Performance" note={PERFORMANCE_LINE} testID={id("performance")} first={first && top === "performance"}>
           <ChoiceRow title="Card pictures" detail={QUALITY_LINE} id={id("quality")} options={CARD_QUALITY_OPTIONS} words={QUALITY_WORDS} value={settings.cardQuality} onChange={(cardQuality) => onChange({ cardQuality })} />
-          <SettingSwitch roomy label="Moving fog" detail={fogLine(light, reduced)} dim={fogStill} value={settings.fogDrift} onChange={(fogDrift) => onChange({ fogDrift })} testID={id("fog")} />
+          <SettingSwitch roomy label="Moving fog" detail={noBattery(fogLine(light, reduced))} dim={fogStill} value={settings.fogDrift} onChange={(fogDrift) => onChange({ fogDrift })} testID={id("fog")} />
         </SettingGroup>
       ) : null}
 
@@ -76,7 +79,6 @@ export function SettingsRows({
           <ChoiceRow title="Reduce motion" detail={REDUCE_MOTION_LINE} id={id("reduce-motion")} options={REDUCE_MOTION_OPTIONS} words={REDUCE_MOTION_WORDS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} />
           <ChoiceRow title="Banner closes" detail={BANNER_CLOSES_LINE} id={id("banner-closes")} options={BANNER_CLOSES_OPTIONS} words={BANNER_CLOSES_WORDS} value={settings.bannerCloses} onChange={(bannerCloses) => onChange({ bannerCloses })} />
           <SettingSwitch roomy label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={id("spotlight")} />
-          <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />
         </SettingGroup>
       ) : null}
 
@@ -86,7 +88,7 @@ export function SettingsRows({
           {stops ? <SettingSwitch roomy label="Stops on" detail={STOPS_LINE} value={settings.stopsOn} onChange={(stopsOn) => onChange({ stopsOn })} testID={id("stops")} /> : null}
           <ChoiceRow title="Table as a list" detail={TABLE_LIST_LINE} id={id("table-list")} options={TABLE_LIST_OPTIONS} words={TABLE_LIST_WORDS} value={settings.tableAsList} onChange={(tableAsList) => onChange({ tableAsList })} />
           <ChoiceRow title="Confirm time" detail={CONFIRM_TIME_LINE} id={id("confirm-time")} options={CONFIRM_TIME_OPTIONS} words={CONFIRM_TIME_WORDS} value={settings.confirmTime} onChange={(confirmTime) => onChange({ confirmTime })} />
-          <SettingSwitch roomy label="Keep screen awake" detail={AWAKE_LINE} value={settings.keepAwake} onChange={(keepAwake) => onChange({ keepAwake })} testID={id("awake")} />
+          <SettingSwitch roomy label="Keep screen awake" detail={noBattery(AWAKE_LINE)} value={settings.keepAwake} onChange={(keepAwake) => onChange({ keepAwake })} testID={id("awake")} />
           <SettingChoice title="Responses used every time" detail={always.length > 0 ? ALWAYS_LINE : ALWAYS_EMPTY_LINE} testID={id("always")}>
             {always.length === 0 ? (
               <Text testID={id("always-none")} className="text-label text-muted">

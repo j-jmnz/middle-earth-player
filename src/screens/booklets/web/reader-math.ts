@@ -37,7 +37,7 @@ export function zoomAfterWheel(zoom: number, deltaPixels: number): number {
 
 export const ZOOM_STEP = 1.25;
 
-export type KeyAction = "next" | "previous" | "first" | "last" | "zoomIn" | "zoomOut" | "zoomReset";
+export type KeyAction = "next" | "previous" | "first" | "last" | "zoomIn" | "zoomOut" | "zoomReset" | "close";
 
 /** What a key does in the reader; null for every other key, which keeps its own job (Tab, scrolling, the browser's shortcuts). */
 export function keyAction(key: string, modifiers: { ctrl: boolean; meta: boolean; alt: boolean; shift: boolean }): KeyAction | null {
@@ -63,6 +63,9 @@ export function keyAction(key: string, modifiers: { ctrl: boolean; meta: boolean
       return "zoomOut";
     case "0":
       return "zoomReset";
+    // The desktop and the web have no Back button of the phone's: Escape closes the booklet, as it backs out of the table.
+    case "Escape":
+      return "close";
     default:
       return null;
   }

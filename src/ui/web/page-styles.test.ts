@@ -10,6 +10,15 @@ describe("pageCss", () => {
     expect(pageCss(1.3)).toContain("outline: 2.6px solid");
   });
 
+  it("rounds a fold header's ring to its face and lifts it above the section's body", () => {
+    expect(pageCss(1)).toContain('[role="button"][data-testid^="section-"]:focus-visible { position: relative; z-index: 1; border-radius: 12px; }');
+    expect(pageCss(1.3)).toContain("border-radius: 15.6px;");
+  });
+
+  it("keeps the ring's room under the booklet's Close button", () => {
+    expect(pageCss(1)).toContain(":has(> [data-testid=\"booklet-close\"]) { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4px); }");
+  });
+
   it("pads the dock's 26 pt pill to 44 pt, 9 pt above and below at Medium and the phone's own slop at a larger scale", () => {
     expect(pageCss(1)).toContain("top: -9px; bottom: -9px; left: -6px; right: -12px;");
     expect(pageCss(1.3)).toContain(`top: -11.7px; bottom: -11.7px; left: -7.8px; right: -15.6px;`);

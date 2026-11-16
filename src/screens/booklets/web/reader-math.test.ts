@@ -46,6 +46,11 @@ describe("keys", () => {
     expect(keyAction("End", none)).toBe("last");
   });
 
+  it("closes with Escape", () => {
+    expect(keyAction("Escape", none)).toBe("close");
+    expect(keyAction("Escape", { ...none, ctrl: true })).toBeNull();
+  });
+
   it("zooms with plus, minus and zero, and leaves scrolling and the browser's shortcuts alone", () => {
     expect(keyAction("+", none)).toBe("zoomIn");
     expect(keyAction("-", none)).toBe("zoomOut");

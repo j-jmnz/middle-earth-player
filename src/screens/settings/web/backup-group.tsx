@@ -1,16 +1,17 @@
 // The Saves group of Settings on the web and the desktop (docs/brief.md, Screens, Settings): Back up saves and Restore from a backup. A phone's saves are in the system's own backup,
 // so the phone's Settings has no such group. Restore asks in place before it replaces anything (ask-in-place.tsx) and refuses a file with a sentence.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 
 import { SettingChoice, SettingGroup } from "../../../play/chrome/setting-rows";
 import { AskInPlace } from "../../kit/ask-in-place";
 import { Label, TextButton } from "../../kit/chrome";
 import { useDatabases } from "../../data/databases";
-import { backUp, pickBackup, restore, type Say } from "./backup-run";
+import { clearRestored, peekRestored, restoredLine } from "./backup-note";
+import { backUp, pickBackup, restore, type Picked, type Say } from "./backup-run";
 
 const BACKUP_LINE = "Saves every campaign, game, deck and run on this computer to a file. It is made only when you ask, and it stays where you save it.";
-const RESTORE_LINE = "Puts the games from a backup file back on this computer. A file from a newer version of the app is refused.";
+const RESTORE_LINE = "Replaces the campaigns, games, decks, runs and settings on this computer with the ones in a backup file. A file from a newer version of the app is refused.";
 
 function reloadPage(): void {
   window.location.reload();
@@ -19,8 +20,16 @@ function reloadPage(): void {
 export function BackupGroup() {
   const { user } = useDatabases();
   const [busy, setBusy] = useState(false);
-  const [said, setSaid] = useState<Say | null>(null);
-  const [picked, setPicked] = useState<Uint8Array | null>(null);
+  // A restore reloads the page, which loses what it said: the restored file's name was left for this page (backup-note.ts) and is said once.
+  const [said, setSaid] = useState<Say | null>(() => {
+    const name = peekRestored();
+    return name ? { text: restoredLine(name), failed: false } : null;
+  });
+  const [picked, setPicked] = useState<Picked | null>(null);
+
+  useEffect(() => {
+    clearRestored();
+  }, []);
 
   const onBackUp = async () => {
     setBusy(true);
@@ -31,15 +40,16 @@ export function BackupGroup() {
   const onPick = async () => {
     setSaid(null);
     const result = await pickBackup();
-    if (result instanceof Uint8Array) setPicked(result);
-    else if (result) setSaid(result);
+    if (!result) return;
+    if ("bytes" in result) setPicked(result);
+    else setSaid(result);
   };
   const onRestore = async () => {
-    const bytes = picked;
-    if (!bytes) return;
+    const file = picked;
+    if (!file) return;
     setBusy(true);
     setPicked(null);
-    setSaid(await restore(user, bytes, reloadPage));
+    setSaid(await restore(user, file, reloadPage));
     setBusy(false);
   };
 
@@ -54,9 +64,9 @@ export function BackupGroup() {
         {picked ? (
           <AskInPlace
             testID="app-settings-backup-ask"
-            sentence="This replaces every campaign and game on this computer."
-            confirm={{ label: "Replace", testID: "app-settings-backup-confirm", accessibilityLabel: "Replace every campaign and game with the backup", onPress: onRestore }}
-            keep={{ testID: "app-settings-backup-keep", accessibilityLabel: "Keep my games", onPress: () => setPicked(null) }}
+            sentence={`This replaces every campaign, game, deck, run and setting on this computer with the ones in ${picked.name}.`}
+            confirm={{ label: "Replace", testID: "app-settings-backup-confirm", accessibilityLabel: `Replace everything on this computer with ${picked.name}`, onPress: onRestore }}
+            keep={{ testID: "app-settings-backup-keep", accessibilityLabel: "Keep what is on this computer", onPress: () => setPicked(null) }}
           />
         ) : (
           <View className="-mx-3 items-start">

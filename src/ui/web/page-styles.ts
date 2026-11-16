@@ -5,8 +5,11 @@
 //     browser's outline out inline while it shows, which wins over this rule, so a focused control wears one ring.
 //   - The dock's "i" (`dock-more`) hit area. The phone pads the 26 pt pill to a 44 pt target with `hitSlop`, which react-native-web ignores, so a pseudo-element reaches
 //     the same slop (top and bottom to 44 pt, 6 pt left, 12 pt right: table-dock.tsx) without moving the pill or the line's words.
+//   - The fold headers (`section-<id>`, kit/fold-section.tsx): their Pressable is a plain box around a rounded face, so the ring follows the face's 12 pt radius, and it
+//     stands above the section's body, which would otherwise paint over the ring's lower edge.
+//   - The booklet's Close button sits on the window's bottom edge (routes/booklet/[id].tsx, which has no web variant): its bar keeps the ring's room below it.
 // One stylesheet, written once and rewritten when the UI scale changes.
-import { RING_OFFSET, RING_WIDTH } from "../focus-ring-style.ts";
+import { RING_OFFSET, RING_WIDTH, ringRoom } from "../focus-ring-style.ts";
 import { tableSettings, type UiScaleOption } from "../table-settings.ts";
 import { touchSlop, uiFactor } from "../ui-scale.ts";
 
@@ -25,6 +28,8 @@ export function pageCss(scale: number): string {
   const tall = px(touchSlop(scale, PILL * scale));
   return [
     `${FOCUSED} { outline: ${px(RING_WIDTH * scale)} solid rgb(var(--accentHigh)); outline-offset: ${px(RING_OFFSET * scale)}; }`,
+    `[role="button"][data-testid^="section-"]:focus-visible { position: relative; z-index: 1; border-radius: ${px(12 * scale)}; }`,
+    `:has(> [data-testid="booklet-close"]) { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + ${px(ringRoom(scale))}); }`,
     `[data-testid="dock-more"] { position: relative; }`,
     `[data-testid="dock-more"]::after { content: ""; position: absolute; top: -${tall}; bottom: -${tall}; left: -${px(6 * scale)}; right: -${px(12 * scale)}; }`,
   ].join("\n");

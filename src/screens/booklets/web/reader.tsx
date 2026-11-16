@@ -7,7 +7,9 @@ import { View } from "react-native";
 import { BodyText } from "../../kit/chrome";
 import { TextButton } from "../../../ui/buttons";
 import { Text } from "../../../ui/text";
+import { ringRoom } from "../../../ui/focus-ring-style";
 import { useTableTokens } from "../../../ui/use-table-tokens";
+import { useUiScale } from "../../../ui/ui-scale";
 import type { BookletPdfViewProps } from "booklet-pdf";
 
 import { openPdf } from "./open-pdf";
@@ -32,12 +34,19 @@ function applyAnchor(scroller: HTMLElement, anchor: Anchor): void {
   scroller.scrollTop = anchor.fy * scroller.scrollHeight - anchor.py;
 }
 
+// Escape is the booklet screen's Close: the reader presses that button, so the screen's own path (back, or home when nothing opened it) runs and the route file needs no web branch.
+function pressClose(): void {
+  document.querySelector<HTMLElement>('[data-testid="booklet-close"]')?.click();
+}
+
 function describe(error: unknown): string {
   return error instanceof Error && error.message ? error.message : "The page could not be drawn.";
 }
 
 export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testID }: BookletPdfViewProps) {
   const t = useTableTokens();
+  // The room a keyboard's focus ring takes outside its control: the toolbar and the page region keep it, so no ring is cut by the window, the toolbar's edge or the page frame.
+  const room = ringRoom(useUiScale());
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [page, setPage] = useState(startPage);
   const [seenStart, setSeenStart] = useState(startPage);
@@ -95,14 +104,14 @@ export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testI
   useEffect(() => {
     const element = frame.current;
     if (!element) return;
-    const measure = () => setArea({ width: Math.max(1, element.clientWidth - 2 * MARGIN), height: Math.max(1, element.clientHeight - 2 * MARGIN) });
+    const measure = () => setArea({ width: Math.max(1, element.clientWidth - 2 * (MARGIN + room)), height: Math.max(1, element.clientHeight - 2 * (MARGIN + room)) });
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [room]);
 
   useEffect(() => {
     if (renderer) report(shown, pageCount);
@@ -177,7 +186,7 @@ export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testI
     };
   }, []);
 
-  function act(action: KeyAction): void {
+  function act(action: Exclude<KeyAction, "close">): void {
     if (action === "next") turn(shown + 1);
     else if (action === "previous") turn(shown - 1);
     else if (action === "first") turn(1);
@@ -190,12 +199,13 @@ export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testI
   // The keys turn pages and zoom while the reader is mounted, with no click on the page first; a key typed in a field is left alone, and Space pressed on a
   // button is that button's own.
   const onKey = useEffectEvent((event: KeyboardEvent) => {
-    if (!renderer || event.defaultPrevented || typingIn(event.target)) return;
+    if (event.defaultPrevented || typingIn(event.target)) return;
     const control = event.target instanceof Element && event.key === " " && event.target.closest("button, a, [role=button]") !== null;
     const action = control ? null : keyAction(event.key, { ctrl: event.ctrlKey, meta: event.metaKey, alt: event.altKey, shift: event.shiftKey });
-    if (!action) return;
+    if (!action || (!renderer && action !== "close")) return;
     event.preventDefault();
-    act(action);
+    if (action === "close") pressClose();
+    else act(action);
   });
 
   useEffect(() => {
@@ -211,7 +221,7 @@ export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testI
 
   return (
     <View style={style} testID={testID}>
-      <View className="flex-row items-center justify-between px-2" style={{ backgroundColor: t.dusk }}>
+      <View className="flex-row items-center justify-between px-2" style={{ backgroundColor: t.dusk, paddingVertical: room, paddingHorizontal: Math.max(8, room) }}>
         <View className="flex-row items-center">
           <TextButton label="Previous" accessibilityLabel="Previous page" testID="booklet-prev" tone="accent" disabled={!renderer || shown <= 1} onPress={() => act("previous")} />
           <TextButton label="Next" accessibilityLabel="Next page" testID="booklet-next" tone="accent" disabled={!renderer || shown >= pageCount} onPress={() => act("next")} />
@@ -231,7 +241,7 @@ export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testI
           aria-label={label}
           aria-busy={renderer ? undefined : true}
           tabIndex={0}
-          style={{ position: "absolute", inset: 0, overflow: "auto", display: "flex", padding: MARGIN, boxSizing: "border-box" }}
+          style={{ position: "absolute", inset: room, overflow: "auto", display: "flex", padding: MARGIN, boxSizing: "border-box" }}
         >
           <canvas ref={canvas} role="img" aria-label={label} data-testid="booklet-page" style={{ display: renderer ? "block" : "none", margin: "auto", flex: "none" }} />
           {renderer ? null : (

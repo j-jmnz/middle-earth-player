@@ -3,6 +3,7 @@ import type { ExpoSQLiteDatabase } from "drizzle-orm/expo-sqlite";
 
 import { backupFileName, hasSqliteHeader, REFUSALS } from "./backup-file";
 import { exportBackup, restoreBackup } from "./backup-db";
+import { rememberRestored } from "./backup-note";
 import { downloadBytes, pickBackupFile } from "./backup-io";
 
 export type Say = { text: string; failed: boolean };
@@ -19,22 +20,25 @@ export async function backUp(user: ExpoSQLiteDatabase, now: Date): Promise<Say> 
   }
 }
 
-/** The picked file's bytes, null when the picker was closed, or the sentence when it is plainly not a backup. */
-export async function pickBackup(): Promise<Uint8Array | Say | null> {
+export type Picked = { bytes: Uint8Array; name: string };
+
+/** The picked file (its bytes and its name), null when the picker was closed, or the sentence when it is plainly not a backup. */
+export async function pickBackup(): Promise<Picked | Say | null> {
   const file = await pickBackupFile();
   if (!file) return null;
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
-    return hasSqliteHeader(bytes) ? bytes : { text: REFUSALS.notDatabase, failed: true };
+    return hasSqliteHeader(bytes) ? { bytes, name: file.name } : { text: REFUSALS.notDatabase, failed: true };
   } catch {
     return { text: REFUSALS.damaged, failed: true };
   }
 }
 
-/** Restore the picked bytes. `reload` runs after an accepted restore so every screen reads the restored games. */
-export async function restore(user: ExpoSQLiteDatabase, bytes: Uint8Array, reload: () => void): Promise<Say> {
+/** Restore the picked file. `reload` runs after an accepted restore so every screen reads the restored games; the file's name is left for the page that opens after it. */
+export async function restore(user: ExpoSQLiteDatabase, { bytes, name }: Picked, reload: () => void): Promise<Say> {
   const result = await restoreBackup(user, bytes);
   if (!result.ok) return { text: REFUSALS[result.reason], failed: true };
+  rememberRestored(name);
   reload();
   return { text: "Restored. The app is reloading.", failed: false };
 }

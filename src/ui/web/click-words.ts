@@ -4,7 +4,12 @@
 // (a screen reader's labels and hints keep the platform's words: "Double tap" is a screen reader's gesture).
 import type { ReactNode } from "react";
 
+// The sentences whose gesture has no mouse twin by a plain swap come first: a double tap is a click (a mouse has no use for two), a hold is a right click, and a swipe has no click at all.
 const WORDS: readonly (readonly [RegExp, string])[] = [
+  [/\bDouble tap to\b/g, "Click to"],
+  [/\bdouble tap to\b/g, "click to"],
+  [/\bHold a card to read it\b/g, "Right-click a card to read it"],
+  [/\btap or swipe it\b/g, "click it"],
   [/\bTap\b/g, "Click"],
   [/\btap\b/g, "click"],
   [/\btapped\b/g, "clicked"],
@@ -19,7 +24,7 @@ export function clickWords(text: string): string {
 
 /** A Text's children with every string worded for a mouse; a node that holds no such word is returned as it was (the same object, so nothing re-renders for it). */
 export function clickChildren(children: ReactNode): ReactNode {
-  if (typeof children === "string") return children.includes("ap") ? clickWords(children) : children;
+  if (typeof children === "string") return /ap|Hold/.test(children) ? clickWords(children) : children;
   if (!Array.isArray(children)) return children;
   let changed = false;
   const said = children.map((child: ReactNode) => {
