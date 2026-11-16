@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.2K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~204.3K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~204.7K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~630) ← 3
   - 54–67 Non-goals (~590)
@@ -131,21 +131,21 @@ Read the sections your task touches.
     - 1562–1599 The Tower of Cirith Ungol (~4.4K)
     - 1600–1636 The Black Gate Opens (~4.4K) ← 2
     - 1637–1665 Mount Doom (~4.3K)
-  - 1666–1714 Shadows of Mirkwood (~4.8K) ← 2
+  - 1666–1715 Shadows of Mirkwood (~5.2K) ← 2
     - 1674–1695 The Hunt for Gollum (~2.1K) ← 1
-    - 1696–1714 Conflict at the Carrock (~2.0K) ← 1
-  - 1715–1723 Nightmare (~410) ← 20
-  - 1724–1762 Deckbuilding (~2.0K)
-  - 1763–1841 Effects (~3.2K)
-    - 1765–1823 Three layers (~2.4K) ← 10
-    - 1824–1833 Player side quests, contracts and saga cards (~430)
-    - 1834–1837 Window stack (~100)
-    - 1838–1841 Coverage test (~270)
-  - 1842–1864 Data sources (~700) ← 2
-  - 1865–1883 Card images (~1.2K) ← 9
-  - 1884–1909 Persistence and shipping (~2.6K) ← 6
-  - 1910–1951 Screens (~5.0K) ← 1
-    - 1936–1951 Table screen (~1.8K) ← 3
+    - 1696–1715 Conflict at the Carrock (~2.4K) ← 2
+  - 1716–1724 Nightmare (~410) ← 20
+  - 1725–1763 Deckbuilding (~2.0K)
+  - 1764–1842 Effects (~3.2K)
+    - 1766–1824 Three layers (~2.4K) ← 10
+    - 1825–1834 Player side quests, contracts and saga cards (~430)
+    - 1835–1838 Window stack (~100)
+    - 1839–1842 Coverage test (~270)
+  - 1843–1865 Data sources (~700) ← 2
+  - 1866–1884 Card images (~1.2K) ← 9
+  - 1885–1910 Persistence and shipping (~2.6K) ← 6
+  - 1911–1952 Screens (~5.0K) ← 1
+    - 1937–1952 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~57.1K tok)
   - 5–8 Overview (~150) ← 1
   - 9–23 Top bar (~3.1K) ← 4
@@ -321,7 +321,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Return of the King (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Angmar Awakened (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Conflict at the Carrock (1); brief.md, Nightmare (1); brief.md, The Hunt for Gollum (1)
 - `src/play`: design-system-table.md, Choice tray (43); design-system-table.md, Spotlight (29); design-system-table.md, Cards (26); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
-- `src/rules`: brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); brief.md, Angmar Awakened (2); architecture.md, State (1); brief.md, Escape from Mount Gram (1); brief.md, The Black Gate Opens (1); brief.md, The Return of the King (1)
+- `src/rules`: brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); brief.md, Angmar Awakened (2); architecture.md, State (1); brief.md, Conflict at the Carrock (1); brief.md, Escape from Mount Gram (1); brief.md, The Black Gate Opens (1); brief.md, The Return of the King (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Briefing (6); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Settings (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); brief.md, Persistence and shipping (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Screens (1); brief.md, Shadows of Mirkwood (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
 - `src/ui`: design-system.md, Settings (4); design-system.md, Type (4); design-system.md, Components (3); design-system-table.md, Screen reader (2); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Surfaces (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

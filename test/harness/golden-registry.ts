@@ -50,7 +50,7 @@ import * as rhudaur from "../scenarios/the-treachery-of-rhudaur/game.ts";
 import * as dum from "../scenarios/the-battle-of-carn-dum/game.ts";
 import * as realm from "../scenarios/the-dread-realm/game.ts";
 import * as gollum from "../scenarios/the-hunt-for-gollum/game.ts";
-// import * as carrock from "../scenarios/conflict-at-the-carrock/game.ts";
+import * as carrock from "../scenarios/conflict-at-the-carrock/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -127,5 +127,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
   // Shadows of Mirkwood, a cycle (standalone games, no Campaign Mode), after the campaigns: `pnpm scenario new` adds each scenario's entry here, in pack order.
   entry("the-hunt-for-gollum", "The Hunt for Gollum", gollum.GOLLUM_GOLDENS, gollum.gollumWorld, gollum.playGolden),
-  // entry("conflict-at-the-carrock", "Conflict at the Carrock", carrock.CARROCK_GOLDENS, carrock.carrockWorld, carrock.playGolden),
+  entry("conflict-at-the-carrock", "Conflict at the Carrock", carrock.CARROCK_GOLDENS, carrock.carrockWorld, carrock.playGolden),
 ];

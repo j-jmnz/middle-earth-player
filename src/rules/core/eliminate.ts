@@ -60,6 +60,8 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     if (next.pendingAttack?.seat === index) {
       const between = next.pendingAttack.awaiting != null && next.window?.kind === "frameAction";
       next = { ...next, pendingAttack: null, window: next.window?.kind === "defense" || between ? null : next.window };
+      // A defense window an event frame holds aside (the Forced effect that eliminated the seat ran after the attack began: Muck Adder's discard of the last hero, 02042:A:1, with a Wolf Rider shadow attack already begun) is dropped, not given back.
+      next = { ...next, stack: next.stack.filter((frame) => !(frame.data.kind === "resume" && frame.data.window.kind === "defense" && frame.data.window.seat === index)) };
     }
     if (next.window?.kind === "chooseEnemy" && next.window.seat === index) next = { ...next, window: null };
     if (next.pendingStrike?.seat === index) {
