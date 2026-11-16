@@ -84,12 +84,16 @@ jobs:
     needs: plan
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # The cache keys this job used, which the cleanup job keeps.
+    outputs:
+      caches: ${{ steps.pack.outputs.caches }}
     steps:
       # The downloaded pictures and their packed copies need more room than the runner leaves free.
       - name: Free disk space
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/node_modules /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL "$AGENT_TOOLSDIRECTORY/PyPy"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/pack-assets
+      - id: pack
+        uses: ./.github/actions/pack-assets
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: assets
@@ -116,6 +120,8 @@ jobs:
       # app.config.js stamps the version and versionCode from this.
       APP_VERSION: ${{ needs.plan.outputs.version }}
       APK_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.apk
+    outputs:
+      caches: ${{ steps.caches.outputs.keys }}
     steps:
       # The native build needs more room than the runner leaves free, but not until Gradle runs, so the deletion goes on
       # behind the next steps; the build waits for it.
@@ -127,7 +133,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: ./.github/actions/install
+      - id: install
+        uses: ./.github/actions/install
       # Gradle installs the NDK React Native pins and the Android Gradle plugin's default CMake (3.22.1, which no module
       # overrides) while it configures, about a minute; this starts the same install behind the next steps, and the build
       # waits for it. If it fails, Gradle installs them itself.
@@ -146,8 +153,20 @@ jobs:
           cache-disabled: true
       # The build caches (docs/releasing.md, Caches). ccache keeps the compiled C++ of every native module, Gradle's home
       # keeps the dependencies and its build cache the outputs of the cacheable tasks, and Metro keeps its transforms.
-      - name: Point the build caches at the runner
+      - id: caches
+        name: Point the build caches at the runner
+        env:
+          PNPM_KEY: ${{ steps.install.outputs.key }}
         run: |
+          # Every key this job saves under, named once here; the cleanup job keeps these and deletes what they replace.
+          lock="${{ hashFiles('pnpm-lock.yaml') }}"
+          metro="metro-android-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-$GITHUB_SHA"
+          {
+            echo "ccache=ccache-android-$lock"
+            echo "gradle=gradle-deps-$lock"
+            echo "metro=$metro"
+            echo "keys=$PNPM_KEY ccache-android-$lock gradle-deps-$lock $metro"
+          } >> "$GITHUB_OUTPUT"
           {
             echo "CCACHE_DIR=$RUNNER_TEMP/ccache"
             echo "CCACHE_MAXSIZE=1G"
@@ -164,7 +183,7 @@ jobs:
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/ccache
-          key: ccache-android-${{ hashFiles('pnpm-lock.yaml') }}
+          key: ${{ steps.caches.outputs.ccache }}
           restore-keys: ccache-android-
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -174,7 +193,7 @@ jobs:
             ~/.gradle/caches/modules-2
             ~/.gradle/caches/build-cache-1
             ~/.gradle/wrapper/dists
-          key: gradle-deps-${{ hashFiles('pnpm-lock.yaml') }}
+          key: ${{ steps.caches.outputs.gradle }}
           restore-keys: gradle-deps-
       # Metro reads the restored transforms and writes the ones this build used to its output directory, which is saved
       # under this commit, so the next release starts from them.
@@ -182,7 +201,7 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/metro
-          key: metro-android-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-${{ github.sha }}
+          key: ${{ steps.caches.outputs.metro }}
           restore-keys: |
             metro-android-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-
             metro-android-
@@ -263,7 +282,7 @@ jobs:
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/metro
-          key: metro-android-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-${{ github.sha }}
+          key: ${{ steps.caches.outputs.metro }}
 
   ios:
     needs: [plan]
@@ -280,17 +299,22 @@ jobs:
       IPA_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    outputs:
+      caches: ${{ steps.caches.outputs.keys }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: latest-stable
-      - uses: ./.github/actions/install
+      - id: install
+        uses: ./.github/actions/install
       # The build caches (docs/releasing.md, Caches): ccache keeps the compiled C, C++ and Objective-C of every pod, keyed
       # on the Xcode build as well, Metro keeps its transforms, and the CocoaPods and React Native download caches keep
       # the prebuilt React Native, its dependencies and Hermes.
       - id: caches
         name: Point the build caches at the runner
+        env:
+          PNPM_KEY: ${{ steps.install.outputs.key }}
         run: |
           command -v ccache > /dev/null || brew install ccache
           # Xcode starts ccache itself (C_COMPILER_LAUNCHER, in Archive) and may not hand it this job's environment, so
@@ -305,24 +329,34 @@ jobs:
             echo "EXPO_METRO_CACHE_RESTORE_DIR=$RUNNER_TEMP/metro-restored"
             echo "EXPO_METRO_CACHE_OUTPUT_DIR=$RUNNER_TEMP/metro"
           } >> "$GITHUB_ENV"
-          echo "xcode=$(xcodebuild -version | tr -s ' \n' '-' | sed 's/-$//')" >> "$GITHUB_OUTPUT"
+          xcode=$(xcodebuild -version | tr -s ' \n' '-' | sed 's/-$//')
+          # Every key this job saves under, named once here; the cleanup job keeps these and deletes what they replace.
+          lock="${{ hashFiles('pnpm-lock.yaml') }}"
+          metro="metro-ios-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-$GITHUB_SHA"
+          {
+            echo "xcode=$xcode"
+            echo "ccache=ccache-ios-launcher-$xcode-$lock"
+            echo "pods=pods-$lock"
+            echo "metro=$metro"
+            echo "keys=$PNPM_KEY ccache-ios-launcher-$xcode-$lock pods-$lock $metro"
+          } >> "$GITHUB_OUTPUT"
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/Library/Caches/ccache
-          key: ccache-ios-launcher-${{ steps.caches.outputs.xcode }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: ${{ steps.caches.outputs.ccache }}
           restore-keys: ccache-ios-launcher-${{ steps.caches.outputs.xcode }}-
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/Library/Caches/CocoaPods
             ~/Library/Caches/ReactNative
-          key: pods-${{ hashFiles('pnpm-lock.yaml') }}
+          key: ${{ steps.caches.outputs.pods }}
           restore-keys: pods-
       - id: metro
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/metro
-          key: metro-ios-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-${{ github.sha }}
+          key: ${{ steps.caches.outputs.metro }}
           restore-keys: |
             metro-ios-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-
             metro-ios-
@@ -403,7 +437,7 @@ jobs:
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/metro
-          key: metro-ios-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-${{ github.sha }}
+          key: ${{ steps.caches.outputs.metro }}
       - if: env.SIGNED == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -411,6 +445,24 @@ jobs:
           path: ${{ runner.temp }}/testflight/
           retention-days: 14
           compression-level: 0
+
+  # Deletes the cache entries this run's keys replaced, on this run's branch only, once both builds have saved theirs; a
+  # dry run tidies its own branch (docs/releasing.md, Caches).
+  cleanup:
+    needs: [assets, android, ios]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/scripts
+      - name: Delete the replaced caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEEP: ${{ needs.assets.outputs.caches }} ${{ needs.android.outputs.caches }} ${{ needs.ios.outputs.caches }}
+        run: .github/scripts/prune-caches.sh
 
   publish:
     needs: [plan, checks, assets, android, ios]

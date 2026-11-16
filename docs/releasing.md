@@ -27,6 +27,7 @@ Preview with `git fetch --tags && pnpm release plan --dry-run` (prints the tag a
    - `ios` runs on macOS with the latest stable Xcode: `expo prebuild --platform ios`, then one `xcodebuild archive`. Its app, zipped in `Payload/`, is `middle-earth-player-v<version>.ipa`, uploaded with its `.sha256` as the `ios` artifact; it is unsigned, since SideStore and AltStore sign it on the player's device. The IPA must stay under the 2 GiB asset limit too. With TestFlight set up, the archive is signed automatically through the App Store Connect API key and also exported for App Store Connect, as the `testflight` artifact.
 5. `publish` (not on a dry run) needs the checks, the `assets` job and both builds. It plans again with `--expect` (so the tag cannot have moved), writes the notes with the APK's and the IPA's SHA-256 and the APK's signing certificate fingerprint, writes the SideStore and AltStore source (`pnpm release source`, `scripts/release/sideload-source.ts`), and runs `gh release create`, which makes the tag on the built commit and attaches the APK, the IPA, their `.sha256` files and `source.json`. Players add the source once, at `https://github.com/j-jmnz/middle-earth-player/releases/latest/download/source.json`; GitHub sends that URL to the newest release's file, so SideStore and AltStore offer each release as an update. A patch from a release branch is not marked Latest.
 6. `testflight` (only with TestFlight set up) follows `publish`. fastlane's `pilot` uploads the IPA, waits for Apple to process it, sets What to Test from the release notes, and gives the build to the external TestFlight group, which sends the first build of each version to Apple's Beta App Review (usually within a day). Testers get the build when the review passes.
+7. `cleanup` follows both builds and the `assets` job, on dry runs too, and deletes the cache entries their keys replaced (Caches).
 
 One release runs at a time; a second start waits.
 
@@ -43,7 +44,14 @@ Each build restores what an earlier run built, so most releases compile only wha
 | `pods-` | `ios` | lockfile | The CocoaPods download cache and React Native's prebuilt core, dependencies and Hermes. |
 | `metro-android-`, `metro-ios-` | `android`, `ios` | lockfile, `babel.config.js`, `metro.config.js`, commit | The Metro transforms the last build used (`EXPO_METRO_CACHE_RESTORE_DIR` and `EXPO_METRO_CACHE_OUTPUT_DIR`, read by `@expo/metro-config`). |
 
-Each build prints ccache's hit rate after it compiles. A release from `main` reads only `main`'s entries; a dry run from another branch can read them but writes its own. The caches share the repository's 10 GB, and GitHub drops the least recently used entry beyond it. Deleting an entry (Actions, Caches) is safe: the next run is as slow as one without it and saves it again.
+Each build prints ccache's hit rate after it compiles. A release from `main` reads only `main`'s entries; a dry run from another branch can read them but writes its own. The caches share the repository's 10 GB, and GitHub drops the least recently used entry beyond it, and any entry unused for 7 days.
+
+Stale entries are deleted as they are replaced:
+
+- `release.yml`'s `cleanup` job (`.github/scripts/prune-caches.sh`) deletes, on the run's own branch, every entry of the families above whose key the run did not use, once the key that replaces it exists, and every entry under a name the workflow no longer saves. It lists what it deleted in the run's summary.
+- `.github/workflows/pull-request-caches.yml` deletes a pull request's own entries (`refs/pull/<number>/merge`) when it closes.
+
+Deleting an entry by hand (Actions, Caches) is safe too: the next run is as slow as one without it and saves it again.
 
 ## Signing
 
