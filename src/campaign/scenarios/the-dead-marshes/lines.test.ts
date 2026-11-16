@@ -111,6 +111,23 @@ describe("02106:B:2 The final test", () => {
     expect(state.lost).toBeFalsy();
   });
 
+  it("02106:B:2 a test passed that this stage's own effect did not make (a treachery's, Gollum's) does not win while the stage is current", () => {
+    const made = table({ stage: "02106", staging: [{ code: "02107", resources: 1 }], deck: ["f0", "f0", "f0"] });
+    const nightfall = revealAndPlay(made, "02109", [["dh1"]]);
+    // The test was passed (no token on Gollum, threat unchanged) and the game goes on.
+    expect(tokens(nightfall.state, "02107")).toBe(1);
+    expect(nightfall.state.stageCleared).toBeFalsy();
+    expect(nightfall.state.lost).toBeFalsy();
+    // Gollum's own end-of-phase test is a party test, passed the same way.
+    const questing = table({ stage: "02106", phase: "Quest", staging: [{ code: "02107", resources: 1 }], deck: ["f0", "f0", "f0"] });
+    const quest = start(settle(fireForced({ ...questing.state, window: null }, { trigger: "endOfPhase", seat: 0, phase: "Quest" }, questing.ctx, []), questing.ctx, []));
+    expect(quest.state.window?.kind).toBe("escapeCommit");
+    const gollum = playTest(questing, quest.state, [["dh1"]]);
+    expect(gollum.state.stageCleared).toBeFalsy();
+    // Then the stage's own test, passed, wins.
+    expect(won([["dh1"]], { staging: [{ code: "02107", resources: 1 }], deck: ["f0"] }).stageCleared).toBe(true);
+  });
+
   it("02106:B:2 a test that is tied or lost does not win", () => {
     const state = won([["dh1"]], { staging: [{ code: "02107", resources: 1 }], deck: ["02109"] });
     expect(state.stageCleared).toBeFalsy();
@@ -176,6 +193,17 @@ describe("02108:A:1 A Wisp of Pale Sheen", () => {
     const asked = reveal(made, tired);
     // The first player's only choice is "keep", so it is made without asking: the second player is asked.
     expect(asked.state.window).toMatchObject({ kind: "choose", seat: 1 });
+  });
+
+  it("02108:A:1 on Nightmare with Gollum out of play and the Mere in staging, the reduction is offered and the tokens land on the Mere", () => {
+    const { made, state } = wisp({ staging: ["900802"] }, ["lore1"]);
+    const asked = reveal(made, state);
+    expect(asked.state.window).toMatchObject({ kind: "choose", seat: 0 });
+    const done = send(asked, { type: "Choose", optionId: "reduce" }, made.ctx);
+    expect(tokens(done.state, "900802")).toBe(1);
+    expect(done.state.cards[first(done.state, "lore1")]?.exhausted).toBe(true);
+    const kept = send(reveal(made, state), { type: "Choose", optionId: "keep" }, made.ctx);
+    expect(tokens(kept.state, "900802")).toBe(2);
   });
 
   it("02108:A:1 offers no reduction while Gollum is out of play, and places no token", () => {
@@ -425,6 +453,23 @@ describe("900808 Candles of Corpses", () => {
     const discarded = choose(made, picking, picking.state.window?.kind === "choose" ? (picking.state.window.options[0] ?? "") : "");
     // The hero goes to its owner's discard pile (a discard, not a destroy), and the player asked to discard a hero is no longer asked.
     expect(discarded.state.cards[idOf(discarded.state, "dh1")]?.zone === "discard" || discarded.state.cards[idOf(discarded.state, "dh2")]?.zone === "discard").toBe(true);
+  });
+});
+
+describe("900808 Candles of Corpses with a lone hero", () => {
+  it("900808:A:1 a player who fails with one hero may discard it, and the hero goes to its owner's discard pile", () => {
+    const made = table({ stage: "02105", deck: ["02111", "02111"] });
+    let state = made.state;
+    // Only dh1 stays a hero of the seat.
+    for (const id of state.seats[0]?.heroes ?? []) if (state.cards[id]?.code !== "dh1") state = updateCard(state, id, { zone: "discard" });
+    state = { ...state, seats: state.seats.map((seat, index) => (index === 0 ? { ...seat, heroes: seat.heroes.filter((id) => state.cards[id]?.code === "dh1") } : seat)) };
+    const run = playTest(made, revealFromTop(state, made.ctx, "900808", [] as EngineStep[]).state, [[]]);
+    expect(run.state.window).toMatchObject({ kind: "choose", seat: 0 });
+    let done = send(run, { type: "Choose", optionId: "discard" }, made.ctx);
+    // With one hero there is nothing to pick between.
+    if (done.state.window?.kind === "choose") done = send(done, { type: "Choose", optionId: done.state.window.options[0] ?? "" }, made.ctx);
+    expect(done.state.cards[idOf(done.state, "dh1")]?.zone).toBe("discard");
+    expect(done.state.seats[0]?.heroes).toEqual([]);
   });
 });
 

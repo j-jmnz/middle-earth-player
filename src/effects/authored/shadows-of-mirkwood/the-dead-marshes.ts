@@ -7,6 +7,8 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 const GOLLUM_CODE = "02107";
 const GOLLUM: PickSpec = { type: "objective", control: "any", names: ["Gollum"] };
 const GOLLUM_IN_PLAY: Condition = { kind: "canPick", pick: GOLLUM };
+// Where the tokens of a Wisp will land: on Gollum, or on the Mere of Dead Faces while he is out of play (Nightmare, 900802:A:2).
+const TOKENS_LAND: Condition = { kind: "any", conditions: [GOLLUM_IN_PLAY, { kind: "namedFlag", name: "The Mere of Dead Faces", stat: "redirectResources" }] };
 const GOLLUM_ABSENT: Condition = { kind: "not", condition: GOLLUM_IN_PLAY };
 const FAILED: Condition = { kind: "lastEscapeFailed" };
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
@@ -61,7 +63,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "EscapeTest", who: "party", cards: { players: true } }, { verb: "PlaceResourceTokens", amount: 2, on: "self", when: FAILED }],
   },
 
-  // 02108 A Wisp of Pale Sheen. 2 resource tokens on Gollum; any player, the first player first, may exhaust a Lore hero they control to reduce them to 1 (one reduction at most, offered only while Gollum is in play). Escape 4.
+  // 02108 A Wisp of Pale Sheen. 2 resource tokens on Gollum; any player, the first player first, may exhaust a Lore hero they control to reduce them to 1 (one reduction at most, offered whenever the tokens will land: Gollum in play, or the Mere of Dead Faces holding them instead). Escape 4.
   {
     id: "02108:whenRevealed:1",
     cardCode: "02108",
@@ -78,7 +80,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
             verb: "Choose",
             who: "actor",
             options: [
-              { id: "reduce", requires: { kind: "all", conditions: [GOLLUM_IN_PLAY, { kind: "x", min: 1 }, { kind: "canPick", pick: LORE_HERO }] }, instructions: [{ verb: "Pick", pick: LORE_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "AddToX", amount: -1 }] },
+              { id: "reduce", requires: { kind: "all", conditions: [TOKENS_LAND, { kind: "x", min: 1 }, { kind: "canPick", pick: LORE_HERO }] }, instructions: [{ verb: "Pick", pick: LORE_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "AddToX", amount: -1 }] },
               { id: "keep", instructions: [] },
             ],
           },

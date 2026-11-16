@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
     - the effect's X grows by 1
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "reduce" (only if all of: (there is a objective (any player controls) named "Gollum" to choose) and (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a ready lore hero (you control) to choose)):
+        * option "reduce" (only if all of: (any of: (there is a objective (any player controls) named "Gollum" to choose) or (the card in play titled "The Mere of Dead Faces" holds the flag redirectResources)) and (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a ready lore hero (you control) to choose)):
           - choose ready lore hero (you control)
           - exhaust the picked card
           - the effect's X grows by -1
@@ -149,4 +149,4 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
   02115:constant:1: Constant
     - this card counts Escape 2 while it is dealt for an escape test (it does nothing in play)
 
-(rendered pieces: 96 by template, 0 as JSON)
+(rendered pieces: 98 by template, 0 as JSON)
