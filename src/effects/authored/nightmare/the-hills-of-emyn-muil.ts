@@ -5,7 +5,6 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 // keep the Hazards coming (Hazardous Terrain shuffles them back, Sarn Gebir Rapids makes their When Revealed effects uncancelable) and take progress back (Blast of Savage Wind, Retraced Steps).
 // Rules: rr.forced, rr.lasting-effects, faq.lasting-effects, rr.cancel, rr.first-player, rr.victory, rr.damage, rr.active-location (data/rules/entries.json).
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
-const NO_ACTIVE_LOCATION: Condition = { kind: "not", condition: { kind: "canPick", pick: { type: "location", control: "any", active: true } } };
 const EMYN_MUIL_LOCATION: PickSpec = { type: "location", control: "any", trait: "Emyn Muil" };
 const ANY_LOCATION: PickSpec = { type: "location", control: "any" };
 // "Shuffle all Hazard cards in the encounter discard pile back into the encounter deck" (900708:A:2, A:3).
