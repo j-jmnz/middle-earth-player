@@ -8,7 +8,7 @@ Your campaigns, games, logs, decks, notes and settings are saved only in the app
 
 In a web browser the saves are in the browser's private file storage for the app (OPFS); in the desktop app they are in the app's own profile folder on your computer (a folder named `Middle-Earth Player` under your system's application-data folder: `%APPDATA%` on Windows, `~/Library/Application Support` on macOS, `~/.config` on Linux), together with a small file that remembers where its window was. Neither is sent anywhere. In a browser or the desktop app, Settings can write a backup of `user.db` to a file (`middle-earth-player-<date>.backup`) and read one back. The file is made only when you tap Back up saves, holds every campaign, game, deck, run and setting you have saved, and goes to the folder your browser or system downloads to. The app never uploads it, so it leaves your computer only if you move it.
 
-Your phone's backup (iCloud or Google) may include these saves. That copy goes to your Apple or Google account, not to this project. Uninstalling the app deletes everything it saved.
+Your phone's backup (iCloud or Google) may include these saves. That copy goes to your Apple or Google account, not to this project. Uninstalling the app on a phone deletes everything it saved. On a computer, removing the app leaves its profile folder in place, so a reinstall finds your saves; delete the folder to remove them.
 
 ## Network connections
 
@@ -18,11 +18,13 @@ The browser build of the app has no bundled pictures, so it also loads each card
 
 ## Permissions
 
-On Android the app asks for `INTERNET`, for deck import, and `VIBRATE`, for haptics. On iPhone and iPad it asks for none. It never uses the camera, microphone, location, contacts or photos.
+On Android the app asks for `INTERNET`, for deck import, and `VIBRATE`, for haptics. On iPhone and iPad it asks for none. The desktop app asks for none and denies every permission request its window receives. It never uses the camera, microphone, location, contacts or photos.
 
 ## Installing
 
 Installing the APK, or installing the iOS app through SideStore or AltStore, sends this project nothing. SideStore and AltStore sign the app with your Apple ID on your own device, under their own privacy policies, and your Apple ID never reaches this project.
+
+The desktop installers (a Windows installer or zip, a Mac disk image, a Linux AppImage or `.deb`) come from this project's GitHub Releases page, are not signed by Microsoft or Apple, and send this project nothing when you run them. A Windows or Mac system may check an unsigned download with its own services under its vendor's policy; that is the system's check, not the app's.
 
 If you install through TestFlight, Apple handles that under [Apple's privacy policy](https://www.apple.com/legal/privacy/). Any feedback or crash reports you send through TestFlight go to the maintainer and are used only to fix the app.
 
@@ -32,7 +34,7 @@ The app collects no data from anyone, children included.
 
 ## Checking this yourself
 
-The code is open, and [SECURITY.md](SECURITY.md) names the files behind each point above. You can inspect a release APK with [Exodus Privacy](https://reports.exodus-privacy.eu.org), which lists its permissions and any tracking libraries, or simply play a game in airplane mode.
+The code is open, and [SECURITY.md](SECURITY.md) names the files behind each point above. You can inspect a release APK with [Exodus Privacy](https://reports.exodus-privacy.eu.org), which lists its permissions and any tracking libraries, or simply play a game in airplane mode, on a phone or on a computer.
 
 ## Changes and contact
 

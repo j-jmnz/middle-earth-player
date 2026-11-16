@@ -8,12 +8,12 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~2.7K tok)
+- `CLAUDE.md` — Claude Code (~2.8K tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~960 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
-- `.claude/rules/release-standards.md` — Release standards (~1.0K tok)
+- `.claude/rules/release-standards.md` — Release standards (~1.1K tok)
 
 ## Agents
 
@@ -31,119 +31,120 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` (~5.2K tok)
-  - 31–83 Features (~920)
-    - 48–66 Themes (~320)
-    - 67–83 Campaigns (~200)
-  - 84–89 Private by design (~180)
-  - 90–93 Accessibility (~140)
-  - 94–149 Install (~1.2K)
-    - 98–103 Requirements (~100)
-    - 104–123 Android (~440)
-    - 124–136 iPhone and iPad (~350)
-    - 137–140 Check a download (optional) (~60)
-    - 141–149 If something goes wrong (~210)
-  - 150–171 Roadmap (~630)
-  - 172–221 Get involved (~970)
-    - 183–188 AI-assisted development (~150)
-    - 189–198 Project structure (~210)
-    - 199–212 Local setup (~170)
-    - 213–221 Documentation (~160)
-  - 222–225 Support (~90)
-  - 226–241 Attribution (~410)
-  - 242–245 License (~50)
-- `docs/architecture.md` — Architecture (~26.8K tok)
-  - 7–41 Stack (~1.1K)
-  - 42–77 Processes (~680)
-  - 78–161 Modules (~2.4K) ← 3
-    - 126–161 Repository map (~960) ← 1
-  - 162–187 State (~1.1K) ← 9
-  - 188–209 Play loop (~250)
-  - 210–235 Engine (~5.9K)
-    - 224–235 Mechanic families (~5.0K) ← 5
-  - 236–241 Effects (~600) ← 5
-  - 242–274 Scenario definition (~800)
-  - 275–321 Persistence (~3.3K) ← 3
-    - 298–301 Open games across an update (~50)
-    - 302–308 Open game rows (~650)
-    - 309–314 Opening a game (~350)
-    - 315–321 Continue, Restart and the checkpoint (~380)
-  - 322–327 Images (~980) ← 6
-  - 328–382 Screens (~4.8K) ← 1
-  - 383–394 Desktop (~1.1K) ← 1
-  - 395–400 Catalog build (~410)
-  - 401–418 Tests (~2.0K) ← 5
-  - 419–434 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.5K tok)
+- `README.md` (~6.0K tok)
+  - 31–84 Features (~960)
+    - 49–67 Themes (~320)
+    - 68–84 Campaigns (~200)
+  - 85–90 Private by design (~210)
+  - 91–94 Accessibility (~170)
+  - 95–163 Install (~1.8K)
+    - 99–105 Requirements (~140)
+    - 106–125 Android (~440)
+    - 126–138 iPhone and iPad (~350)
+    - 139–148 Windows, macOS and Linux (~420)
+    - 149–152 Check a download (optional) (~80)
+    - 153–163 If something goes wrong (~300)
+  - 164–185 Roadmap (~630)
+  - 186–237 Get involved (~1.0K)
+    - 197–202 AI-assisted development (~150)
+    - 203–213 Project structure (~250)
+    - 214–228 Local setup (~180)
+    - 229–237 Documentation (~160)
+  - 238–241 Support (~90)
+  - 242–257 Attribution (~410)
+  - 258–261 License (~50)
+- `docs/architecture.md` — Architecture (~27.2K tok)
+  - 7–42 Stack (~1.3K)
+  - 43–78 Processes (~680)
+  - 79–162 Modules (~2.4K) ← 3
+    - 127–162 Repository map (~960) ← 1
+  - 163–188 State (~1.1K) ← 9
+  - 189–210 Play loop (~250)
+  - 211–236 Engine (~5.9K)
+    - 225–236 Mechanic families (~5.0K) ← 5
+  - 237–242 Effects (~600) ← 5
+  - 243–275 Scenario definition (~800)
+  - 276–322 Persistence (~3.3K) ← 3
+    - 299–302 Open games across an update (~50)
+    - 303–309 Open game rows (~650)
+    - 310–315 Opening a game (~350)
+    - 316–322 Continue, Restart and the checkpoint (~380)
+  - 323–328 Images (~980) ← 6
+  - 329–383 Screens (~5.0K) ← 5
+  - 384–395 Desktop (~1.1K) ← 4
+  - 396–401 Catalog build (~410)
+  - 402–419 Tests (~2.0K) ← 5
+  - 420–435 Performance (~1.2K) ← 4
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~200.2K tok)
   - 17–40 Sections (~490)
-  - 41–52 Product (~590) ← 3
-  - 53–66 Non-goals (~590)
+  - 41–52 Product (~670) ← 3
+  - 53–66 Non-goals (~600)
   - 67–87 Decisions (~840)
-  - 88–117 Stack (~950)
-  - 118–135 Performance and feel (~750)
-  - 136–153 Repository layout (~440)
-  - 154–383 Domain (~9.7K)
-    - 156–244 Campaign (~2.2K) ← 1
-    - 245–259 Mirkwood campaign cards and carry-over (~890)
-    - 260–271 Standalone play (~830) ← 1
-    - 272–283 Scenario state (~540)
-    - 284–316 The engine plays the game (~2.1K) ← 4
-    - 317–324 Engine steps (~180)
-    - 325–353 Core round (~1.3K) ← 1
-    - 354–383 Keywords implemented once (~1.6K)
-  - 384–541 Fellowship of the Ring (~10.6K)
-    - 408–422 Scenario 1 resolution (~370)
-    - 423–436 A Knife in the Dark (~1.6K) ← 1
-    - 437–440 Hide tests (~130)
-    - 441–464 Flight to the Ford burden deck and life (~1.6K) ← 1
-    - 465–479 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
-    - 480–495 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
-    - 496–519 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
-    - 520–541 Seeded decks (~660)
-  - 542–641 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
-    - 560–573 Passage Through Mirkwood (~1.6K)
-    - 574–587 Journey Along the Anduin (~2.1K)
-    - 588–608 Escape from Dol Guldur (~2.7K)
-    - 609–623 The Oath (~2.4K)
-    - 624–641 The Caves of Nibin-Dûm (~2.4K)
-  - 642–700 Dream-chaser (~16.2K) ← 4
-  - 701–728 Ered Mithrin (~16.4K) ← 7
-  - 729–1289 Angmar Awakened (~69.4K) ← 6
-    - 752–786 Intruders in Chetwood (~3.5K)
-    - 787–817 The Weather Hills (~3.9K)
-    - 818–853 Deadmen's Dike (~4.5K)
-    - 854–884 The Weather Hills (~3.9K)
-    - 885–923 Deadmen's Dike (~5.8K)
-    - 924–960 The Wastes of Eriador (~4.8K)
-    - 961–995 Escape from Mount Gram (~3.2K) ← 1
-    - 996–1026 The Weather Hills (~3.9K)
-    - 1027–1065 Deadmen's Dike (~5.8K)
-    - 1066–1102 The Wastes of Eriador (~4.8K)
-    - 1103–1146 Escape from Mount Gram (~5.3K)
-    - 1147–1183 Across the Ettenmoors (~5.0K)
-    - 1184–1222 The Treachery of Rhudaur (~4.3K)
-    - 1223–1258 The Battle of Carn Dûm (~4.7K)
-    - 1259–1289 The Dread Realm (~4.2K)
-  - 1290–1427 The Two Towers (~16.4K) ← 20
-  - 1428–1663 The Return of the King (~28.2K) ← 22
-    - 1456–1481 The Passing of the Grey Company (~2.7K)
-    - 1482–1513 The Siege of Gondor (~4.1K)
-    - 1514–1559 The Battle of the Pelennor Fields (~5.8K)
-    - 1560–1597 The Tower of Cirith Ungol (~4.4K)
-    - 1598–1634 The Black Gate Opens (~4.4K) ← 2
-    - 1635–1663 Mount Doom (~4.3K)
-  - 1664–1672 Nightmare (~410) ← 19
-  - 1673–1711 Deckbuilding (~2.0K)
-  - 1712–1790 Effects (~3.2K)
-    - 1714–1772 Three layers (~2.4K) ← 10
-    - 1773–1782 Player side quests, contracts and saga cards (~430)
-    - 1783–1786 Window stack (~100)
-    - 1787–1790 Coverage test (~270)
-  - 1791–1811 Data sources (~530)
-  - 1812–1830 Card images (~1.3K) ← 9
-  - 1831–1858 Persistence and shipping (~3.0K) ← 9
-  - 1859–1900 Screens (~5.0K) ← 2
-    - 1885–1900 Table screen (~1.8K) ← 3
+  - 88–120 Stack (~1.2K)
+  - 121–138 Performance and feel (~750)
+  - 139–157 Repository layout (~500)
+  - 158–387 Domain (~9.7K)
+    - 160–248 Campaign (~2.2K) ← 1
+    - 249–263 Mirkwood campaign cards and carry-over (~890)
+    - 264–275 Standalone play (~830) ← 1
+    - 276–287 Scenario state (~540)
+    - 288–320 The engine plays the game (~2.1K) ← 4
+    - 321–328 Engine steps (~180)
+    - 329–357 Core round (~1.3K) ← 1
+    - 358–387 Keywords implemented once (~1.6K)
+  - 388–545 Fellowship of the Ring (~10.6K)
+    - 412–426 Scenario 1 resolution (~370)
+    - 427–440 A Knife in the Dark (~1.6K) ← 1
+    - 441–444 Hide tests (~130)
+    - 445–468 Flight to the Ford burden deck and life (~1.6K) ← 1
+    - 469–483 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
+    - 484–499 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
+    - 500–523 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
+    - 524–545 Seeded decks (~660)
+  - 546–645 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
+    - 564–577 Passage Through Mirkwood (~1.6K)
+    - 578–591 Journey Along the Anduin (~2.1K)
+    - 592–612 Escape from Dol Guldur (~2.7K)
+    - 613–627 The Oath (~2.4K)
+    - 628–645 The Caves of Nibin-Dûm (~2.4K)
+  - 646–704 Dream-chaser (~16.2K) ← 4
+  - 705–732 Ered Mithrin (~16.4K) ← 7
+  - 733–1293 Angmar Awakened (~69.4K) ← 6
+    - 756–790 Intruders in Chetwood (~3.5K)
+    - 791–821 The Weather Hills (~3.9K)
+    - 822–857 Deadmen's Dike (~4.5K)
+    - 858–888 The Weather Hills (~3.9K)
+    - 889–927 Deadmen's Dike (~5.8K)
+    - 928–964 The Wastes of Eriador (~4.8K)
+    - 965–999 Escape from Mount Gram (~3.2K) ← 1
+    - 1000–1030 The Weather Hills (~3.9K)
+    - 1031–1069 Deadmen's Dike (~5.8K)
+    - 1070–1106 The Wastes of Eriador (~4.8K)
+    - 1107–1150 Escape from Mount Gram (~5.3K)
+    - 1151–1187 Across the Ettenmoors (~5.0K)
+    - 1188–1226 The Treachery of Rhudaur (~4.3K)
+    - 1227–1262 The Battle of Carn Dûm (~4.7K)
+    - 1263–1293 The Dread Realm (~4.2K)
+  - 1294–1431 The Two Towers (~16.4K) ← 20
+  - 1432–1667 The Return of the King (~28.2K) ← 22
+    - 1460–1485 The Passing of the Grey Company (~2.7K)
+    - 1486–1517 The Siege of Gondor (~4.1K)
+    - 1518–1563 The Battle of the Pelennor Fields (~5.8K)
+    - 1564–1601 The Tower of Cirith Ungol (~4.4K)
+    - 1602–1638 The Black Gate Opens (~4.4K) ← 2
+    - 1639–1667 Mount Doom (~4.3K)
+  - 1668–1676 Nightmare (~410) ← 19
+  - 1677–1715 Deckbuilding (~2.0K)
+  - 1716–1794 Effects (~3.2K)
+    - 1718–1776 Three layers (~2.4K) ← 10
+    - 1777–1786 Player side quests, contracts and saga cards (~430)
+    - 1787–1790 Window stack (~100)
+    - 1791–1794 Coverage test (~270)
+  - 1795–1815 Data sources (~530)
+  - 1816–1834 Card images (~1.3K) ← 9
+  - 1835–1862 Persistence and shipping (~3.2K) ← 9
+  - 1863–1904 Screens (~5.1K) ← 2
+    - 1889–1904 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~58.4K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.1K) ← 4
@@ -223,7 +224,7 @@ Read the sections your task touches.
   - 5–19 Start a release (~290) ← 1
   - 20–35 Jobs (~1.6K) ← 4
   - 36–60 Caches (~750)
-  - 61–95 Signing (~940) ← 1
+  - 61–95 Signing (~940) ← 3
     - 65–68 Desktop signing (optional) (~180)
     - 69–82 Android key (~250) ← 1
     - 83–95 TestFlight (optional) (~420) ← 1
@@ -264,19 +265,20 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~13.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~14.0K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–282 Open items (~12.4K)
+  - 22–290 Open items (~12.7K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
-    - 35–76 Fixtures and Maestro (~2.3K)
-    - 77–116 Rules and engine (~1.6K)
-    - 117–237 Rules and engine (Angmar Awakened) (~5.3K)
-    - 238–262 Screens and code (~1.6K)
-    - 263–282 Rules and engine (The Two Towers) (~1.4K)
-  - 283–303 Standing decisions (~700)
+    - 35–42 Desktop (~250)
+    - 43–84 Fixtures and Maestro (~2.3K)
+    - 85–124 Rules and engine (~1.6K)
+    - 125–245 Rules and engine (Angmar Awakened) (~5.3K)
+    - 246–270 Screens and code (~1.6K)
+    - 271–290 Rules and engine (The Two Towers) (~1.4K)
+  - 291–315 Standing decisions (~910)
 
 ## Live plans
 
@@ -284,8 +286,8 @@ Read when a task names the plan.
 
 - `docs/plans/desktop.md` — Plan: Desktop app (Electron) for Windows, macOS and Linux (~5.2K tok)
   - 3–16 Context (~370)
-  - 17–26 Decisions taken (~430) ← 2
-  - 27–39 What does not move (~600) ← 6
+  - 17–26 Decisions taken (~430) ← 1
+  - 27–39 What does not move (~600) ← 4
   - 40–57 A. The drawn table on web (go/no-go gate) (~840)
   - 58–64 B. Offline pictures and booklets on web (~500) ← 2
   - 65–74 C. Mouse, keyboard and window (~400)

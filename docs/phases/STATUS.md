@@ -32,6 +32,14 @@ No phase is open.
 - The first release with the open-game checks (world hash, per-move checks, checkpoints) carries no card, campaign or engine change, so open games convert cleanly (`docs/brief.md`, Persistence and shipping).
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
+### Desktop
+- Frame time on the drawn table was measured only in a GPU-less sandbox (software rendering); measure idle, a card motion and a spotlight on real hardware before the first desktop release (`docs/architecture.md`, Desktop).
+- The burn's runtime shader does not compile on CanvasKit, so the web and the desktop use its fade, drop and darken fallback (accepted).
+- A booklet missing on the desktop reads "This booklet is not on this phone.": route files cannot have `.canvaskit` variants, so the wording is the phone's. Pending user decision.
+- A failed web save is retried only by the next successful save: catching it in `src/screens/data/game-store.ts` would change the phone bundle. Pending user decision.
+- Windows and macOS packaging has been proven only in CI (`docs/releasing.md`); open each packed app by hand on each OS once before the first release.
+- `pnpm test a11y` failed on the Cards screen with React error #520 when last run by the desktop sections; not re-run since.
+
 ### Fixtures and Maestro
 - `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.
 - `dum-won` is not committed: no seed in 600 wins The Battle of Carn Dûm with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-carn-dum/the-battle-of-carn-dum.yaml` cannot run.
@@ -300,3 +308,7 @@ No phase is open.
 - A rule reading no official ruling, rule span or agreed community answer settles takes the agent's recommendation, recorded in `docs/brief.md` as "agent recommendation (no ruling found)"; it is not an open item (user, 2026-11-12).
 - One scenario pipeline; no more A/B tests (user decision, 2026-11-08). The procedure is in `docs/agents/agent-brief.md` (Scenario procedure).
 - An open game is never dropped by the app: after an update the player chooses Continue (from the saved table, checked against the engine) or Restart (user decision, 2026-11-11).
+- Desktop builds are unsigned: Windows Authenticode is an optional step behind secrets and macOS notarization is not wired (user decision, 2026-11-16; `docs/releasing.md`, Signing).
+- The desktop origin `app://middle-earth-player` and Electron's `userData` name never change after the first release: OPFS is per origin, so a change loses every save (user decision, 2026-11-16; `desktop/identity.ts`).
+- The desktop and web work never changes phone or iPad code: phone-only files stay byte for byte as on `main` and the Android bundle stays identical, checked by `pnpm test phone-bundle` and `scripts/checks/phone-files.test.ts` (user instruction, 2026-11-16; `docs/architecture.md`, Screens).
+- Saves stay synchronous on desktop and web, as on the phone; the web waits for the database on a 15 s clock deadline (user instruction, 2026-11-16).

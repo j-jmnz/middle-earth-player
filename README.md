@@ -1,7 +1,7 @@
 <div align="center">
   <img src=".github/readme/icon.png" width="128" height="128" alt="Middle-Earth Player app icon: the One Ring glowing on black">
   <h1>Middle-Earth Player</h1>
-  <p><strong>The Lord of the Rings: The Card Game, solo, on your phone.</strong><br>Offline, private, free and open source.</p>
+  <p><strong>The Lord of the Rings: The Card Game, solo, on your phone or computer.</strong><br>Offline, private, free and open source.</p>
   <p>
     <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3E5A48"></a>
     <a href="https://www.bestpractices.dev/projects/16744"><img src="https://www.bestpractices.dev/projects/16744/badge"></a>
@@ -19,7 +19,7 @@
   </p>
 </div>
 
-Middle-Earth Player lets you play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android phone. The app handles the rules, the encounter deck and the bookkeeping, so you can concentrate on your decisions.
+Middle-Earth Player lets you play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android phone, or on a Windows, macOS or Linux computer. The app handles the rules, the encounter deck and the bookkeeping, so you can concentrate on your decisions.
 
 > [!IMPORTANT]
 > This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
@@ -37,6 +37,7 @@ Middle-Earth Player lets you play The Lord of the Rings: The Card Game solo on a
 - **Let the app run the rules.** The engine applies every rule and card effect and works out every number. You choose from the legal moves it offers, and Undo takes a move back.
 - **Choose your challenge.** Play on Easy or Normal, and try Nightmare mode on the scenarios that have it.
 - **Play true solo or two-handed.** Run one seat, or two seats on the same device.
+- **Use a mouse and keyboard.** On a computer the table answers the pointer (hover lifts a card, the wheel steps through the hand, right click opens a preview) and the keys (Escape and Z).
 - **Build your decks.** The deck builder has the full player-card pool and the official pre-built decks, and it imports any public deck from a RingsDB link.
 
   <img src=".github/readme/decks.webp" width="480" alt="The deck list with the pre-built decks, then the Elves of Lórien deck open in the editor with its heroes, allies, attachments, threat and cost curve">
@@ -83,23 +84,24 @@ There is no online multiplayer, and there won't be: the app is built for one dev
 
 ## Private by design
 
-There are no accounts, and the app does no tracking, shows no ads, and sends no analytics or crash reports. Cards, rules, booklets and card art all ship inside the app, so you can play anywhere. The only time it goes online is when you import a deck from RingsDB. Your saves live in the app's private storage and disappear when you delete the app. On Android the app asks for two permissions, `INTERNET` and `VIBRATE`; on iOS it asks for none.
+There are no accounts, and the app does no tracking, shows no ads, and sends no analytics or crash reports. Cards, rules, booklets and card art all ship inside the app, so you can play anywhere. The only time it goes online is when you import a deck from RingsDB. Your saves live in the app's private storage: a phone deletes them with the app, and a computer keeps them in the app's profile folder until you delete it. On Android the app asks for two permissions, `INTERNET` and `VIBRATE`; on iOS and on the desktop it asks for none.
 
 You don't have to take this on trust. [PRIVACY.md](PRIVACY.md) is the full policy, and [SECURITY.md](SECURITY.md) names the code behind each of these promises, describes how the build and release pipeline is locked down, and explains how to report a vulnerability.
 
 ## Accessibility
 
-You can play a full game with VoiceOver or TalkBack: with a screen reader on, the table turns into a list of zones and cards. Settings let you use that list table without a reader, and adjust text size, contrast, motion, how long banners and confirmations wait, and whether titles use a plain typeface. The app aims for WCAG 2.2 AA and the Game Accessibility Guidelines, but it hasn't been audited and makes no claim of conformance. [ACCESSIBILITY.md](ACCESSIBILITY.md) describes what is supported and the gaps that remain.
+You can play a full game with VoiceOver or TalkBack: with a screen reader on, the table turns into a list of zones and cards. On a computer the same happens with NVDA, Narrator, VoiceOver for Mac or Orca, and the desktop app works with the keyboard and the mouse. Settings let you use that list table without a reader, and adjust text size, contrast, motion, how long banners and confirmations wait, and whether titles use a plain typeface. The app aims for WCAG 2.2 AA and the Game Accessibility Guidelines, but it hasn't been audited and makes no claim of conformance. [ACCESSIBILITY.md](ACCESSIBILITY.md) describes what is supported and the gaps that remain.
 
 ## Install
 
-The app isn't on the Play Store or the App Store. On Android you install the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-player/releases). On an iPhone or iPad you install the IPA through SideStore or AltStore, which sign it with your own Apple ID. It's free, and once it's installed it never needs a network connection.
+The app isn't on the Play Store, the App Store or any other store. On Android you install the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-player/releases). On an iPhone or iPad you install the IPA through SideStore or AltStore, which sign it with your own Apple ID. On Windows, macOS or Linux you download the installer for your system from the same page. It's free, and once it's installed it never needs a network connection.
 
 ### Requirements
 
 - An Android phone running Android 7.0 or later, on a 64-bit processor.
 - Or an iPhone or iPad running iOS or iPadOS 15.1 or later, a free Apple ID, and SideStore or AltStore Classic. You need a computer once, for the setup. AltStore also needs AltServer running on that computer to refresh the app each week.
-- Wi-Fi, and free space of at least twice the download size.
+- Or a 64-bit Windows PC, a Mac (Apple silicon or Intel) or a 64-bit x86 Linux PC.
+- Wi-Fi, and free space of at least twice the download size. The desktop installers are large, because every card picture and booklet is inside them.
 
 ### Android
 
@@ -134,14 +136,26 @@ An app signed with a free Apple ID stays valid for 7 days. SideStore and AltStor
 
 If a release's notes include a TestFlight link, you can use that instead: install [TestFlight](https://apps.apple.com/app/testflight/id899247664), open the link, tap Accept, then Install. TestFlight builds never need refreshing, but they expire 90 days after they are published.
 
+### Windows, macOS and Linux
+
+The desktop builds are not signed by Microsoft or Apple, so the first launch shows a warning. Under Assets on the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest), download the file for your system:
+
+- **Windows (64-bit):** `middle-earth-player-v<version>-win-x64.exe` is the installer. Run it, and when SmartScreen says "Windows protected your PC", choose More info, then Run anyway. `middle-earth-player-v<version>-win-x64.zip` is the portable version: unzip it anywhere and run `Middle-Earth Player.exe` from the folder, with the same SmartScreen step.
+- **macOS:** `middle-earth-player-v<version>-mac-universal.dmg` runs on Apple silicon and Intel Macs. Open it and drag Middle-Earth Player to Applications. The first time, right-click the app, choose Open, then choose Open again; a double-click is refused for an app Apple hasn't signed. On macOS 15 or later that step is gone: try to open the app once, then go to System Settings, Privacy & Security and choose Open Anyway.
+- **Linux (x86-64):** `middle-earth-player-v<version>-linux-x64.AppImage` runs after `chmod +x` on it. Or install `middle-earth-player-v<version>-linux-x64.deb` with your package manager, for example `sudo apt install ./middle-earth-player-v<version>-linux-x64.deb`.
+
+Your saves stay on that computer, in the app's profile folder ([PRIVACY.md](PRIVACY.md) says where). To update, install the newer release over the old one. To move your campaigns to another computer, or to keep a copy, use Settings, Back up saves, and on the other computer Restore from a backup. The app never updates itself and never goes online but for a RingsDB deck import.
+
 ### Check a download (optional)
 
-Each release's notes give the APK's SHA-256 and the fingerprint of its signing certificate. You can check the file with `sha256sum` on Linux, `shasum -a 256` on macOS or `certutil -hashfile <file> SHA256` on Windows.
+Each release's notes give the SHA-256 of every file, and a `.sha256` file sits beside each download. The notes also give the fingerprint of the APK's signing certificate. You can check a file with `sha256sum` on Linux, `shasum -a 256` on macOS or `certutil -hashfile <file> SHA256` on Windows.
 
 ### If something goes wrong
 
 - Android says "App not installed": the phone is 32-bit or older than Android 7.0, it is short of space, or a copy you built yourself is already installed. In the last case, uninstall that copy first, knowing its saves go with it.
 - The download stops or won't open: download it again over Wi-Fi.
+- On a Mac, "Middle-Earth Player can't be opened" or "is damaged": right-click the app and choose Open instead of double-clicking. If it still refuses, run `xattr -dr com.apple.quarantine /Applications/Middle-Earth\ Player.app` in Terminal once.
+- On Linux the AppImage won't start: it needs FUSE 2 on some systems (`libfuse2`), or run it with `--appimage-extract-and-run`.
 - On iOS, the app stops opening after a few days: its signature has expired. Refresh it in SideStore or AltStore, with AltServer running on the same Wi-Fi if you use AltStore.
 - You've hit the app limit: remove a sideloaded app you no longer use.
 - The TestFlight beta is full: use SideStore or AltStore instead.
@@ -192,9 +206,10 @@ Nothing lands until CI passes the tests, lint, the type check and the data check
 - `data/printed/` records the lines printed on each card, read from its scan. This is the card text the app uses.
 - Each printed line is implemented by an effect record, generated in `src/effects/generated/` or hand-written in `src/effects/authored/`. A scenario becomes playable once every line it deals has a record.
 - `src/rules/` is the rules engine: a pure reducer, split by mechanic family.
+- `desktop/` is the Electron shell that packs the web build into the Windows, macOS and Linux apps.
 - When sources disagree, [.claude/rules/authority.md](./.claude/rules/authority.md) says which one wins.
 
-The stack is Expo SDK 58, Expo Router, Skia, Reanimated, NativeWind, SQLite with Drizzle, Zustand and Zod. [docs/architecture.md](docs/architecture.md) goes into detail.
+The stack is Expo SDK 58, Expo Router, Skia, Reanimated, NativeWind, SQLite with Drizzle, Zustand and Zod, with Electron for the desktop app. [docs/architecture.md](docs/architecture.md) goes into detail.
 
 ### Local setup
 
@@ -206,6 +221,7 @@ cd middle-earth-player
 pnpm install
 pnpm test        # no network or prebuilt database needed
 pnpm web         # opens the app in a browser; narrow the window to phone width
+pnpm desktop dev # opens the app in the Electron desktop shell
 ```
 
 Before you push, run `pnpm lint` and `pnpm typecheck` as well. [docs/development.md](docs/development.md) covers phone builds, the Maestro flows and every `pnpm` command.

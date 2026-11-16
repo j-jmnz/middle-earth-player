@@ -19,7 +19,8 @@ Every session, agent and contributor that branches, tags or releases follows the
 
 - Only the release workflow (`.github/workflows/release.yml`) creates a `v*` tag or a GitHub release. Do not tag, push a tag or draft a release by hand.
 - A tag is never moved, deleted or reused. A bad release is followed by a fixed patch release; edit the bad one's notes to say what is wrong with it.
-- Every release ships on both platforms from the tagged commit, after the same checks as `test.yml`, on its GitHub release: a signed APK, signed with the one release key so each release installs over the last and keeps the player's saves, and an unsigned IPA with the SideStore and AltStore source (`source.json`), which players sign with their own Apple ID. TestFlight is an optional extra that runs only while its Apple setup is in place (user decision, 2026-11-06). `docs/releasing.md` (Signing) sets them up.
+- Every release ships on five targets from the tagged commit, after the same checks as `test.yml`, on its GitHub release: a signed APK, signed with the one release key so each release installs over the last and keeps the player's saves; an unsigned IPA with the SideStore and AltStore source (`source.json`), which players sign with their own Apple ID; and the desktop app for Windows (an NSIS installer and a portable zip), macOS (a universal `.dmg`) and Linux (an AppImage and a `.deb`), unsigned, each with a `.sha256` file beside it (user decision, 2026-11-16). TestFlight is an optional extra that runs only while its Apple setup is in place (user decision, 2026-11-06). `docs/releasing.md` (Signing) sets them up.
+- The desktop app's origin (`app://middle-earth-player`) and its profile folder name never change after the first release, since a saved game lives under them (`docs/architecture.md`, Desktop).
 - While TestFlight is on, a release is cut at least every 90 days, since a TestFlight build expires 90 days after upload.
 
 ## Release notes
