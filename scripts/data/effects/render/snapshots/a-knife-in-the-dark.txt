@@ -318,7 +318,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141069:A:2 (front): Forced: When Ringwraith attacks, deal it an additional shadow card if The One Ring is exhausted.
   141069:forced:1: Forced when this enemy attacks, before the defender is declared
     only if the card with code 141085 in play is exhausted
-    - [json DealShadow {"verb":"DealShadow","additional":true}]
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 141069:A:3 (shadow): Shadow: Shuffle this card into the encounter deck.
   141069:shadow:1: Shadow
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 242 by template, 34 as JSON)
+(rendered pieces: 243 by template, 33 as JSON)

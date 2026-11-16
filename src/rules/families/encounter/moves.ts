@@ -117,6 +117,8 @@ export function moveEncounter(
     case "removed":
       return moveCard(leavePlay(next, id, ctx, steps), id, { zone: "removed" });
     case "staging": {
+      // A treachery card taken from the encounter discard pile stays there: it is not added to the staging area, and a ResolveWhenRevealed after it resolves its When Revealed effects ("move the top card of the encounter discard pile to the staging area. Resolve any 'when revealed' effects on that card", 02086:A:1).
+      if (card.zone === "encounterDiscard" && typeOf(next, id, ctx) === "treachery") return next;
       const staged = updateCard(moveCard(next, id, stagingDest(next, seat)), id, { face: "up", controller: null });
       if (wasInPlay) return staged;
       // Put into the staging area from out of play: it is added to the staging area and enters play.
@@ -147,10 +149,10 @@ export function travelThere(state: ScenarioState, id: string, ctx: ReduceContext
   return travelNow(next, id, ctx, steps) ?? state;
 }
 
-// The encounter discard pile goes back into the encounter deck, which is shuffled.
-export function shuffleDiscardIn(state: ScenarioState): ScenarioState {
+// The encounter discard pile goes back into the encounter deck, which is shuffled; with a `trait`, only the cards with that trait do ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
+export function shuffleDiscardIn(state: ScenarioState, ctx?: ReduceContext, trait?: string): ScenarioState {
   let next = state;
-  for (const id of [...state.encounterDiscard]) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  for (const id of [...state.encounterDiscard]) if (trait == null || (ctx != null && hasTrait(state, id, trait, ctx))) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
   return shuffleEncounterDeck(next);
 }
 

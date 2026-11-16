@@ -91,6 +91,10 @@ const VERBS = [
   // no `resourcesAdded` is announced ("Add 1 resource token to each Dol Guldur location in play", 900302:A:1; "place 1 resource token on
   // Dungeon Labyrinth for each player in the game", 900306:A:2).
   z.strictObject({ verb: z.literal("PlaceResourceTokens"), amount: positiveAmountSchema, on: cardRefSchema, ...when }),
+  // Deals `amount` damage to the card the reference names (the answered event's subject by default) unless a card with the source's title has already dealt it damage this round ("deal 1 damage to that character if it has not been dealt damage by another copy of
+  // Brambles and Thorns this round", 900704:A:1). When damage is dealt (the card's damage grew: a shield or cap that prevented it all leaves it undealt) the card is marked for the round by that title (the flag `damagedByTitle`), so each copy that resolves
+  // afterwards finds it marked. Read by nightmare/damage-once.ts.
+  z.strictObject({ verb: z.literal("DamageOncePerRound"), amount: z.number().int().positive(), target: cardRefSchema.optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -124,6 +128,8 @@ const FLAGS = [
   // you are engaged with this enemy, you cannot attack or deal damage (through effects) to enemies with a title other than Marshland
   // Outlaws", 900202:A:1). Read by combat.ts canAttack and the DamageCard verb (families/nightmare/guards.ts).
   "attackOnlyTitle",
+  // On a card, until the end of the round: a card with the modifier's source's title dealt it damage this round (DamageOncePerRound, 900704:A:1).
+  "damagedByTitle",
 ] as const;
 
 export const manifest = { name: "nightmare", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

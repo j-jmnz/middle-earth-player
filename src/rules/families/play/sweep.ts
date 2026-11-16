@@ -12,6 +12,8 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard, modifiedStat } from "../../core/keywords.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
+import { gameReads } from "../../core/game-reads.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
@@ -19,7 +21,7 @@ import { moveCard } from "../../core/zones.ts";
 import { giveControl } from "./control.ts";
 import { lastPlayer } from "../sea/players.ts";
 
-type Codes = { swept: ReadonlySet<string>; hero: ReadonlySet<string> };
+type Codes = { swept: ReadonlySet<string>; hero: ReadonlySet<string>; returning: ReadonlySet<string> };
 
 const CODES = new WeakMap<readonly Effect[], Codes>();
 
@@ -32,6 +34,7 @@ function sweptCodes(ctx: ReduceContext): Codes {
     known = {
       swept: having((instruction) => instruction.verb === "ControlledBy" || instruction.verb === "DiscardWhen"),
       hero: having((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "heroType"),
+      returning: having((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "returnsWithoutActive"),
     };
     CODES.set(ctx.effects, known);
   }
@@ -65,6 +68,23 @@ function heroSavers(state: ScenarioState, codes: ReadonlySet<string>): ScenarioS
   return seats.length > 0 ? { ...rest, heroSavers: seats } : rest;
 }
 
+// An engaged enemy that holds returnsWithoutActive goes back to the staging area while no location is active (900702:A:2). A standing state, not an event: it holds whenever the slot is empty, so the enemy cannot stay engaged by any route.
+function returnWithoutActive(state: ScenarioState, ctx: ReduceContext, codes: ReadonlySet<string>): ScenarioState {
+  if (state.activeLocation != null || state.secondActiveLocation != null) return state;
+  const engaged = livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? []).filter((id) => codes.has(state.cards[id]?.code ?? ""));
+  if (engaged.length === 0) return state;
+  const synced = syncConstants(state, ctx);
+  const leaving = engaged.filter((id) => flagged(synced, id, "returnsWithoutActive"));
+  if (leaving.length === 0) return synced;
+  let next = synced;
+  for (const id of leaving) {
+    next = updateCard(moveCard(next, id, { zone: "staging" }), id, { controller: null });
+    // "After an enemy enters the staging area" hears an engaged enemy that comes back (146017:A:1).
+    if (gameReads(next, ctx, '"trigger":"returnedToStaging"')) next = queueEvent(next, { trigger: "returnedToStaging", seat: state.firstPlayer, cardId: id });
+  }
+  return next;
+}
+
 export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.lost) return state;
   const codes = sweptCodes(ctx);
@@ -72,6 +92,10 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
   // A seat that waited for an ally to gain the hero card type and has no hero after all is eliminated now.
   if (next.heroSavers?.some((seat) => (next.seats[seat]?.heroes.length ?? 1) === 0)) next = eliminateEmpties(next, steps, true);
   next = heroSavers(next, codes.hero);
+  if (codes.returning.size > 0) {
+    const returned = returnWithoutActive(next, ctx, codes.returning);
+    if (returned !== next) return returned;
+  }
   if (codes.swept.size === 0 || !Object.values(next.cards).some((card) => codes.swept.has(card.code) && inPlay(card.zone))) return next;
   // A stat is read with the constants as they are now ("-1 Willpower for each damaged hero you control").
   const synced = syncConstants(next, ctx);

@@ -103,3 +103,17 @@ export function removeAllProgress(state: ScenarioState, instruction: Verb<"Remov
   const ids = instruction.pick ? pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx) : [refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId))];
   return ids.reduce((current, id) => takeProgressOff(current, id, current.cards[id ?? ""]?.progress ?? 0, steps), state);
 }
+
+// RemoveProgressEach: up to `amount` progress comes off each matching card in play; the effect's X is the total taken off (02093:A:1).
+export function removeProgressEach(state: ScenarioState, instruction: Verb<"RemoveProgressEach">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
+  let next = state;
+  let total = 0;
+  for (const id of pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx)) {
+    const had = next.cards[id]?.progress ?? 0;
+    next = takeProgressOff(next, id, amount, steps);
+    total += had - (next.cards[id]?.progress ?? 0);
+  }
+  const data = topFrame(next)?.data;
+  return data?.kind === "effect" ? patchTop(next, { data: { ...data, x: total } }) : next;
+}

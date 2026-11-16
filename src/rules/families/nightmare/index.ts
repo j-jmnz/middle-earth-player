@@ -27,6 +27,7 @@ import { cancelsReveal } from "../encounter/cancel.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { engageOutOfPlay, moveResourceFromHeroes, placeResourceTokens, returnToStage, takeHeroPrisoner, takeMorePrisoners } from "./dungeon.ts";
+import { damageOncePerRound } from "./damage-once.ts";
 import { listenerInPlay } from "./guards.ts";
 import { seatThreat } from "../play/hooks.ts";
 import { markPicked } from "../play/refs.ts";
@@ -41,6 +42,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   switch (instruction.verb) {
     case "AttachToQuest":
       return attachToQuest(state, focus);
+    case "DamageOncePerRound":
+      return damageOncePerRound(state, instruction, focus, ctx, steps);
     case "SearchToStaging":
       return searchToStaging(state, instruction.code, ctx);
     case "AttackActor":
@@ -317,4 +320,4 @@ function pickMost(
   return markPicked(state, chosen ?? "");
 }
 
-export const manifest: RulesFamily = { name: "nightmare", verbs: ["AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens"], run };
+export const manifest: RulesFamily = { name: "nightmare", verbs: ["AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens", "DamageOncePerRound"], run };

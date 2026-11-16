@@ -178,7 +178,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19015:A:1 (front): While Mountain Pass is in the staging area, the 'when revealed' effects of Weather treachery cards cannot be canceled.
   19015:constant:1: Constant
     only if this card is in the staging area
-    - [json UncancelableWhenRevealed {"verb":"UncancelableWhenRevealed","trait":"Weather"}]
+    - while this card is in play (under its condition), the When Revealed effects of Weather cards cannot be canceled
 
 ## 19016 Dwarven Door
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -390,4 +390,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 290 by template, 49 as JSON)
+(rendered pieces: 291 by template, 48 as JSON)

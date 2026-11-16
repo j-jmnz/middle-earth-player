@@ -13,6 +13,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PlaceMireToken"), on: cardRefSchema, amount: positiveAmountSchema, ...when }),
   // "Return a random location from the victory display to the staging area" (144020:A:2): one location in the victory display, chosen with the game's seed, is added to the staging area (it is not revealed; it left play with no tokens). Nothing happens with none there.
   z.strictObject({ verb: z.literal("ReturnRandomVictoryLocation"), ...when }),
+  // "Discard a random Emyn Muil location from the victory display" (900709:A:1): one location of the victory display with this Trait, chosen with the game's seed, goes to the encounter discard pile (it can come back from there; its Victory points leave the display). Nothing happens with none there.
+  z.strictObject({ verb: z.literal("DiscardRandomVictoryLocation"), trait: z.string().min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [

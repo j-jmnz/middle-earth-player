@@ -70,6 +70,8 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   safeActive: (c) => ({ text: c.is === false ? "no location with the safe keyword is the active location" : "a location with the safe keyword is the active location", read: ["is"] }),
   setAsideHas: (c) => ({ text: `a copy of the card with code ${str(c.code)} is set aside, out of play`, read: ["code"] }),
   searchable: (c) => ({ text: `the encounter deck or its discard pile holds ${withArticle(`${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.type === "string" ? (c.type === "encounter-side-quest" ? "side quest" : str(c.type)) : "card"}`)}${typeof c.code === "string" ? ` with code ${c.code}` : ""}${c.deckOnly === true ? " (the deck alone)" : ""}${c.victory === true ? " (the victory display too)" : ""}`, read: ["trait", "type", "code", "deckOnly", "victory"] }),
+  firstTreachery: () => ({ text: "the card the event is about is the first treachery the encounter deck revealed this quest phase", read: [] }),
+  victoryPoints: (c) => ({ text: `the victory display holds at least ${str(c.min)} Victory points`, read: ["min"] }),
   stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress`, read: ["min"] }),
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),

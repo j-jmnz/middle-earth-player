@@ -32,7 +32,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146025:A:3 (front): While Towers of the Teeth is the active location, players cannot play allies.
   146025:constant:2: Constant
     only if this card is the active location
-    - [json CannotPlay {"verb":"CannotPlay","pick":{"type":"card","control":"you","cardType":"ally"},"anyPlayer":true}]
+    - no player can play, or put into play, a card (you control) of card type ally
 
 ## 146026 Beleaguered Hills
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 207 by template, 25 as JSON)
+(rendered pieces: 209 by template, 24 as JSON)

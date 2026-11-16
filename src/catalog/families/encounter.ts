@@ -66,8 +66,8 @@ const VERBS = [
   // no collection (docs/brief.md): the collection holds every card the game knows, so a copy of `code` is made when neither the deck nor the pile
   // has one. The deck is shuffled by a ShuffleEncounterDeck after it (the line says so).
   z.strictObject({ verb: z.literal("SearchCollection"), code: z.string().min(1), to: z.literal("staging"), ...when }),
-  // The encounter discard pile is shuffled into the encounter deck.
-  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), ...when }),
+  // The encounter discard pile is shuffled into the encounter deck; with `trait`, only the cards of that printed or gained Trait go back and the deck is shuffled ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
+  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), trait: z.string().min(1).optional(), ...when }),
 
   // Every location in the victory display goes back into the encounter deck, which is then shuffled ("Shuffle all locations in the victory display into the encounter deck", 144066:A:1). They lose nothing they had: a card in the display has no tokens.
   z.strictObject({ verb: z.literal("ShuffleVictoryIntoEncounterDeck"), ...when }),

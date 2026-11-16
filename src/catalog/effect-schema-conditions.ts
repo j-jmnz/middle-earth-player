@@ -49,6 +49,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),
   // The source card is attached to a card the actor controls ("After you fail a Fortitude test, exhaust attached hero", 146057:A:1): an encounter card attached to a hero is controlled by nobody, so the Forced effect's actor, the player the event happened to, is compared with the host's controller.
   z.strictObject({ kind: z.literal("hostControlledByActor") }),
+  // The card the answered event is about is the first treachery the encounter deck revealed in this quest phase, whatever that card did ("the first treachery card revealed during the quest phase", 02082:B:1). The engine marks the card as it is revealed (mount-doom/treachery.ts), before the Forced effects
+  // that hear the reveal, and only in a game with a record that reads this condition. Read by the mount-doom family.
+  z.strictObject({ kind: z.literal("firstTreachery") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
@@ -281,6 +284,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("damageReached"), nth: z.number().int().positive() }),
   // The current quest card holds at least `min` progress tokens ("While there are at least 8 progress tokens on this stage", 41007:B:1).
   z.strictObject({ kind: z.literal("stageProgress"), min: z.number().int().positive() }),
+  // The cards in the victory display are worth at least `min` Victory points together ("they have collected at least 20 victory points", 02082:B:2; rr.victory). Read by rules/interpret/conditions.ts, the sum the score takes (src/campaign/score.ts).
+  z.strictObject({ kind: z.literal("victoryPoints"), min: z.number().int().positive() }),
   // The running effect's X is at least the remaining hit points of the picked card (its hit points less its damage): "If the printed cost of the
   // discarded card is equal to or higher than the remaining hit points of the exhausted character" (41038:A:1). False with no picked card.
   z.strictObject({ kind: z.literal("xReachesRemaining") }),

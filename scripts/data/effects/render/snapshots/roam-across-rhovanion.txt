@@ -246,7 +246,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19048:B:1 (back): The "when revealed" effects of treachery cards cannot be canceled.
   19048:constant:1: Constant
-    - [json UncancelableWhenRevealed {"verb":"UncancelableWhenRevealed","cardType":"treachery"}]
+    - while this card is in play (under its condition), the When Revealed effects of treachery cards cannot be canceled
 
 19048:B:2 (back): Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A.
   19048:forced:1: Forced on the event questCardDefeated (heard about this card)
@@ -424,4 +424,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19055:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) named "Urdug")
     - engage this card
 
-(rendered pieces: 315 by template, 30 as JSON)
+(rendered pieces: 316 by template, 29 as JSON)

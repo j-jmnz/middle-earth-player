@@ -155,6 +155,11 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
         const pick = instructions.find((other) => other.verb === "Pick");
         return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
       }
+      // "The first player must discard 1 event card from his hand to travel here" (02088:A:1): the card discarded is picked, so the cost cannot be paid without one.
+      if (instruction.verb === "DiscardPicked") {
+        const pick = instructions.find((other) => other.verb === "Pick");
+        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.firstPlayer, [], locationId, ctx).length === 0;
+      }
       if (instruction.verb !== "Exhaust" || (instruction.target?.kind !== "byCode" && instruction.target?.kind !== "byName")) return false;
       return readyNamedCard(state, ctx, instruction.target, instruction.who === "firstPlayer" ? state.firstPlayer : null) == null;
     });

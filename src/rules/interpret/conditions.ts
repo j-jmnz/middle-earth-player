@@ -17,6 +17,7 @@ import { distinctTraitCount, flaggedTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
 import { headOf, inAreaOf } from "../families/breaking/areas.ts";
+import { victoryPointsOf } from "../core/printed-stat.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
 import { defendingAgainst } from "../families/angmar/combat.ts";
 import { effectsOf } from "../windows/listen.ts";
@@ -108,7 +109,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "setAsideHas":
+    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "setAsideHas":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -351,6 +352,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const stage = state.questStage ? state.cards[state.questStage] : undefined;
       return stage != null && stage.progress >= condition.min;
     }
+    case "victoryPoints":
+      return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, ctx.cards), 0) >= condition.min;
     case "xReachesRemaining": {
       const picked = scope.picked?.at(-1);
       const card = picked ? state.cards[picked] : undefined;

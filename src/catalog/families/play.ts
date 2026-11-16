@@ -125,6 +125,7 @@ const TRIGGERS = [
 // `cannotTriggerEffects`: the holder cannot initiate its own Action and Response abilities ("Attached hero cannot ... trigger its effect", 02048:A:1); its constant and Forced abilities still work.
 // `healCapPerEffect` (on the card): no heal effect takes more than this much damage off it ("Wilyador cannot be healed of more than 5 wounds by a single effect", 02064:A:3). `healReducedToOne` (on the host, from an attachment): a heal
 // of the host by a card effect other than an Athelas heal takes off 1 damage, and then the attachment is discarded ("the amount of damage healed is reduced to 1. Then, discard Noxious Supplies", 900608:A:2).
-const FLAGS = ["heroType", "threatCeiling", "cannotTriggerEffects", "healCapPerEffect", "healReducedToOne"] as const;
+// `returnsWithoutActive` (on an enemy): while no location is the active location, an engaged holder goes back to the staging area at once, whatever engaged it ("If there is no active location, return ~ to the staging area", 900702:A:2; the settle sweep, families/play/sweep.ts).
+const FLAGS = ["heroType", "threatCeiling", "cannotTriggerEffects", "healCapPerEffect", "healReducedToOne", "returnsWithoutActive"] as const;
 
 export const manifest = { name: "play", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

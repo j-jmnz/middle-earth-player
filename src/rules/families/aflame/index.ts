@@ -17,7 +17,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SearchAflame":
       return searchAflame(state, instruction, focus, ctx, steps);
     case "EngageFirstPlayer":
-      return engageFirstPlayer(state, focus, steps);
+      return engageFirstPlayer(state, focus, steps, instruction.moves === true);
     case "StageSetAside":
       return stageSetAside(state, instruction, focus, ctx, steps);
     case "RemoveNamedFromGame":

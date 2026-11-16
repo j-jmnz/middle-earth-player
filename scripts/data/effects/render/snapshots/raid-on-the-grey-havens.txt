@@ -265,7 +265,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11065:A:1 (front): Forced: When Corsair Infiltrator attacks, deal it 1 additional shadow card for each resource on it.
   11065:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - repeat resources of this card times:
-      - [json DealShadow {"verb":"DealShadow","additional":true}]
+      - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 11065:A:2 (front): Forced: After the engaged player collects resources at the beginning of the resource phase, that player moves 1 resource from one of his heroes' pools to Corsair Infiltrator.
   11065:forced:2: Forced on the event resourcesCollected (event happened to the controller)
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 289 by template, 45 as JSON)
+(rendered pieces: 290 by template, 44 as JSON)
