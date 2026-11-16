@@ -5,6 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
+import { frameScope, refCard } from "../../interpret/amounts.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { fallenBase, FALLEN_SUFFIX } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -32,6 +33,7 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
     case "ReturnFallenHero":
       return returnFallen(state);
     case "RemoveFromGame":
+      if (instruction.card) return removeCard(state, refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)), steps);
       return instruction.self ? (focus.sourceId ? moveCard(state, focus.sourceId, { zone: "removed" }) : state) : removeFromGame(state, lastPicked(state));
     case "LockFirstPlayer":
       return focus.sourceId ? addTableModifier(state, { stat: "firstPlayerLocked", amount: 1, until: "endOfGame" }, focus) : state;
@@ -108,6 +110,13 @@ function returnFallen(state: ScenarioState): ScenarioState {
 }
 
 // The last picked card leaves the game, and the campaign pool (142074:A:2).
+// A card leaves the game where it lies (the card an event names, 02061:B:2): a character leaves play and its attachments with it; a seat left with no hero is eliminated.
+function removeCard(state: ScenarioState, id: string | null, steps: EngineStep[]): ScenarioState {
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card || card.zone === "removed") return state;
+  return eliminateEmpties(moveCard(state, id, { zone: "removed" }), steps);
+}
+
 function removeFromGame(state: ScenarioState, id: string): ScenarioState {
   const card = state.cards[id];
   if (!card || card.zone === "removed") return state;

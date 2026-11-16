@@ -8,6 +8,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { askTarget } from "../../windows/choices.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -158,10 +159,12 @@ function enterThenNext(state: ScenarioState, id: string, seat: number, base: Omi
 
 // PlaceDamage: damage tokens on the card, none of it dealt ("enters play with 1 damage on it"). The sweep destroys a character
 // whose damage reaches its hit points (rr.hit-points).
-export function placeTokens(state: ScenarioState, instruction: Extract<Instruction, { verb: "PlaceDamage" }>, focus: Focus, steps: EngineStep[]): ScenarioState {
+export function placeTokens(state: ScenarioState, instruction: Extract<Instruction, { verb: "PlaceDamage" }>, focus: Focus, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const id = namedCard(state, instruction.card ?? "self", focus);
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || !inPlay(card.zone)) return state;
-  steps.push({ kind: "damage", targetId: id, amount: instruction.amount, cause: currentCause(steps, UNATTRIBUTED) });
-  return updateCard(state, id, { damage: card.damage + instruction.amount });
+  const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
+  if (amount <= 0) return state;
+  steps.push({ kind: "damage", targetId: id, amount, cause: currentCause(steps, UNATTRIBUTED) });
+  return updateCard(state, id, { damage: card.damage + amount });
 }

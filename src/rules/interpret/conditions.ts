@@ -421,6 +421,7 @@ function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLo
 
 export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
+  if (trait === "Eagle" && instance != null && flagged(state, id, "losesEagle")) return false;
   return (
     instance != null &&
     ((printedOf(ctx.cards, instance.code).traits.includes(trait) && !flagged(state, id, "blanksTraits")) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait) || countedTraits(state, id, ctx).includes(trait))

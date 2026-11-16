@@ -7,7 +7,7 @@ import type { CardRef, Effect, Instruction, PickSpec } from "../../../catalog/bo
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
-import { beginEnemyAttack } from "../../combat/combat.ts";
+import { beginEnemyAttack, characters } from "../../combat/combat.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import { attackBarred } from "../../interpret/constants.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -241,7 +241,9 @@ function engageSeatWith(state: ScenarioState, instruction: Extract<Instruction, 
   const id = focus.sourceId;
   const enemy = id ? state.cards[id] : undefined;
   if (!id || !enemy || !inPlay(enemy.zone)) return state;
-  const seats = livingSeats(state).filter((seat) => (state.seats[seat]?.engaged ?? []).some((other) => other !== id && matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)));
+  const holds = (seat: number): boolean =>
+    instruction.controls === true ? characters(state, seat, ctx.cards).some((other) => matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)) : (state.seats[seat]?.engaged ?? []).some((other) => other !== id && matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx));
+  const seats = livingSeats(state).filter(holds);
   if (seats.length === 0 || (enemy.zone === "engaged" && enemy.controller != null && seats.includes(enemy.controller))) return state;
   const options = seats.map((seat) => `seat:${seat}`);
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;

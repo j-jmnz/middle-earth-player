@@ -31,7 +31,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SwitchActor":
       return switchActor(state);
     case "PlaceDamage":
-      return placeTokens(state, instruction, focus, steps);
+      return placeTokens(state, instruction, focus, steps, ctx);
     case "SpendFrom":
       return spendFrom(state, instruction, focus, ctx);
     case "DiscardSameTitle":

@@ -96,6 +96,8 @@ const FLAGS = [
   "noNonTreasureResources",
   // The holder (an enemy) deals no damage in the attack it makes ("this attack deals no damage").
   "dealsNoDamage",
+  // The holder loses the Eagle trait ("Attached character loses the Eagle trait", 900607:A:2): hasTrait reads no Eagle trait on it, whether printed or gained.
+  "losesEagle",
 ] as const;
 
 export const manifest = { name: "misc", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

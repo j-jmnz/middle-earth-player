@@ -293,6 +293,8 @@ export const pickSchema = z.strictObject({
   guardsSubject: z.boolean().optional(),
   // A card with at least this many Restricted attachments on it ("each of your heroes has at least 2 restricted attachments").
   restrictedAttachments: z.number().int().positive().optional(),
+  // The play family's filter (src/rules/families/play/pick.ts): the character with more damage on it than each other character in play, a tie for the most matching none ("If a character (including Wilyador) has more damage than each other character", 02068:A:2).
+  soleMostDamaged: z.literal(true).optional(),
   // The nightmare family's filters (read in src/rules/interpret/pick.ts): a character whose current Willpower is at most this, a value below 0
   // counting as 0 ("is discarded if its Willpower is 0", 900102:A:1).
   maxWillpower: z.number().int().min(0).optional(),

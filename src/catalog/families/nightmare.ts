@@ -51,7 +51,8 @@ const VERBS = [
   // The source enemy engages a player who is engaged with an enemy that matches `pick` ("Anduin Troll Spawn engages a player engaged with a
   // Hill Troll", 900203:A:2); the first player chooses among several (rr.first-player). Nothing happens when no player is, or when the source
   // is already engaged with one who is. `seat` is engine use: the player chosen.
-  z.strictObject({ verb: z.literal("EngageSeatWith"), pick: pickSchema, ...when }),
+  // `controls`: the player is one who controls a card in play that matches `pick` ("engages the player who controls Wilyador", 900603:A:2), whatever it is engaged with now: an enemy engaged with another player leaves that one.
+  z.strictObject({ verb: z.literal("EngageSeatWith"), pick: pickSchema, controls: z.literal(true).optional(), ...when }),
   // The enemy with the most printed hit points in the victory display and the encounter discard pile becomes the picked card; the first player
   // chooses among a tie ("Search the victory display and encounter discard pile for the enemy with the most hit points", 900207:A:1). Nothing
   // is picked with no enemy there.

@@ -77,8 +77,9 @@ export const simpleVerbs = [
   // Places progress tokens on the picked location, on every location in the staging area, on the source or the active
   // location. A full location is explored. `host`: the location the source is attached to.
   z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: positiveAmountSchema, target: z.enum(["picked", "eachStagingLocation", "self", "activeLocation", "subject", "host"]), ...when }),
-  // Heals damage from the picked card (or `target`): `amount`, or all of it.
-  z.strictObject({ verb: z.literal("Heal"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), target: cardRefSchema.optional(), ...when }),
+  // Heals damage from the picked card (or `target`): `amount`, or all of it. The `healed` event names the card whose effect healed (its other card). `athelas`: the heal counts as an Athelas heal, which an attachment that
+  // reduces heals "other than Athelas" leaves alone (02062:B:1, 900608:A:2).
+  z.strictObject({ verb: z.literal("Heal"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), target: cardRefSchema.optional(), athelas: z.literal(true).optional(), ...when }),
   // Puts the picked card (or `target`) on top or at the bottom of its owner's deck, or shuffles it in. A card leaving play this
   // way leaves play.
   z.strictObject({ verb: z.literal("PutOnDeck"), position: z.enum(["top", "bottom", "shuffle"]), target: cardRefSchema.optional(), ...when }),
