@@ -1,5 +1,5 @@
 // Rules: rr.constant-ability, rr.step-6-4-1, rr.travel, rr.first-player (data/rules/entries.json).
-import type { Instruction } from "../../catalog/boundary.ts";
+import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
 import { constantInstructions, memoOf, type StateMemo } from "./constant-records.ts";
@@ -9,7 +9,7 @@ import { recordsOfFace } from "../families/dreamchaser/faces.ts";
 import { grantedTravel } from "../families/grapple/travel.ts";
 import { familyForcedTravel, familyTravelUnpayable } from "./family-hooks.ts";
 import { modifiedStat } from "../core/keywords.ts";
-import { pickCandidates } from "./pick.ts";
+import { countMatching, pickCandidates } from "./pick.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { guardsTitled } from "../families/objectives/pick.ts";
 import { guardedSafeLocation } from "../families/angmar/safe.ts";
@@ -17,7 +17,7 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; unlessControls?: PickSpec };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -49,6 +49,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
       ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
+      ...(instruction.unlessControls ? { unlessControls: instruction.unlessControls } : {}),
     });
   }
   return found;
@@ -213,4 +214,10 @@ export function restrictedAttachments(state: ScenarioState, hostId: string, ctx:
 // How many restricted attachments the card counts as having: one each, two for a card that "counts as 2 Restricted attachments".
 export function restrictedLoad(state: ScenarioState, hostId: string, ctx: ReduceContext): number {
   return restrictedAttachments(state, hostId, ctx).reduce((sum, id) => sum + Math.max(1, heldAmount(state, id, "countsAsRestricted")), 0);
+}
+
+// Whether the seat is barred by a "commit" or "draw" rule: it controls no card that matches the rule's `unlessControls` filter, read from its own side (02013:B:1 "Any player who does not control a hero with at least 1 Clue objective attached cannot commit
+// characters to this quest"; 900404:A:1 "Each player who does not control at least 1 Clue card cannot draw cards through card effects").
+export function seatBarred(state: ScenarioState, ctx: ReduceContext, seat: number, what: "commit" | "draw"): boolean {
+  return restricted(state, ctx, what).some((rule) => rule.unlessControls != null && countMatching(state, rule.unlessControls, seat, rule.sourceId, ctx) === 0);
 }

@@ -9,7 +9,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
-import { attachTo, moveCard } from "../../core/zones.ts";
+import { attachTo, moveCard, unhost } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 
 export function attachGuard(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttachGuard" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
@@ -21,7 +21,9 @@ export function attachGuard(state: ScenarioState, instruction: Extract<Instructi
   if (!guardId || !objectiveId || !guard || !objective || guardId === objectiveId) return state;
   if (objective.zone !== "staging" || printedOf(ctx.cards, objective.code).type !== "objective") return state;
   if (guard.zone !== "staging" && guard.zone !== "engaged") return state;
-  return guardWith(state, guardId, objectiveId);
+  // The objective's own guards are detached first and stay in the staging area as the cards they are (900401:A:2).
+  const freed = instruction.replaceGuards ? objective.attachments.filter((id) => id !== guardId && state.cards[id]?.guard === true).reduce((current, id) => unhost(current, id), state) : state;
+  return guardWith(freed, guardId, objectiveId, instruction.stayEngaged === true);
 }
 
 /** The encounter card `guardId` (in the staging area, or engaged and returned to it) becomes the guard of `objectiveId`: attached to it, staying in the staging area. `stayEngaged`: an engaged guard keeps its engagement (nothing moves it, 12189:B:2). */

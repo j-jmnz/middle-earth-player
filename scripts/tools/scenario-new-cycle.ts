@@ -165,8 +165,7 @@ tags:
 - runFlow:
     file: ../../subflows/standalone-${kind}.yaml
     env:
-      FIXTURE: ${facts.short}-${name}
-      SCENARIO_ID: ${facts.id}
+      FIXTURE: ${facts.short}-${name}${kind === "win" ? `\n      SCENARIO_ID: ${facts.id}` : ""}
 # TODO: this scenario's own assertions on the ${kind === "win" ? "outcome screen after the win (the score)" : "outcome screen after the loss (the reason)"}.
 `;
 }

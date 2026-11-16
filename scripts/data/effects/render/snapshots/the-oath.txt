@@ -233,8 +233,8 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41022:A:1 (front): When Revealed: Discard the top card of each player's deck. Until the end of the phase, increase Goblintown Scavengers' Threat by the total printed cost of all cards discarded in this way.
   41022:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json SetX {"verb":"SetX","value":0}]
-      - [json DiscardTopOfDeck {"verb":"DiscardTopOfDeck"}]
+      - the effect's X is set to 0
+      - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
       - this card: stat threat X, until the end of the phase
 
 ## 41023 Wild Wargs
@@ -317,4 +317,4 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:resolution:1: Resolution
     - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
 
-(rendered pieces: 182 by template, 9 as JSON)
+(rendered pieces: 184 by template, 7 as JSON)

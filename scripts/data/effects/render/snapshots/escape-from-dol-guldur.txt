@@ -82,7 +82,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01108:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Gandalf's Map to a hero you control. (Counts as an attachment. If detached, return Gandalf's Map to the staging area.)
   01108:action:1: Action (cost: raise your threat by 2)
-    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -104,7 +104,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01109:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Dungeon Torch to a hero you control. (Counts as an attachment. If detached, return Dungeon Torch to the staging area.)
   01109:action:1: Action (cost: raise your threat by 2)
-    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -125,7 +125,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01110:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Shadow Key to a hero you control. (Counts as an attachment. If detached, return Shadow Key to the staging area.)
   01110:action:1: Action (cost: raise your threat by 2)
-    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -221,4 +221,4 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - [json CarryOver {"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}}]
     - [json CarryOver {"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]
 
-(rendered pieces: 118 by template, 24 as JSON)
+(rendered pieces: 121 by template, 21 as JSON)

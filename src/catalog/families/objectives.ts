@@ -24,7 +24,9 @@ const VERBS = [
   // "Attach X to that objective, guarding it" (12121:A:1, 12126:A:3, 12127:A:3, 12133:A:1): the encounter card `guard` (the source by default), in the staging area or engaged
   // (an engaged one returns to the staging area first, 12133:A:1), is attached to the objective `to` (the last picked card by default) as its guard (rr.guarded). It stays
   // in the staging area, counts its Threat there, and leaves the objective when it leaves play. A guard that already guards another objective is moved and frees that one.
-  z.strictObject({ verb: z.literal("AttachGuard"), guard: cardRefSchema.optional(), to: cardRefSchema.optional(), ...when }),
+  // `replaceGuards`: the objective's own guards are detached first and stay in the staging area as the cards they are ("If it was guarded, detach the encounter guarding it first", 900401:A:2). `stayEngaged`: an engaged guard keeps its
+  // engagement (the card never says to return it, 900401:A:2: agent recommendation).
+  z.strictObject({ verb: z.literal("AttachGuard"), guard: cardRefSchema.optional(), to: cardRefSchema.optional(), replaceGuards: z.literal(true).optional(), stayEngaged: z.literal(true).optional(), ...when }),
   // A constant (12134:A:2 to 12137:A:2, "If ~ is free of encounters, add it to the staging area, controlled by the players"): the source objective in the staging area is controlled
   // by the players as soon as it is free of encounters and no effect is resolving (the settle sweep, families/objectives/control.ts): it is marked `claimed`, with no controller,
   // so it stays in the staging area. It does nothing when run.
@@ -36,6 +38,10 @@ const TRIGGERS = [
   "claimed",
 ] as const;
 
-const FLAGS = [] as const;
+const FLAGS = [
+  // On a claimed objective: when the hero it is attached to leaves play, the objective returns to the top of the encounter deck instead of the staging area ("Forced: After attached hero is damaged or leaves play, return this card to the top of the
+  // encounter deck", 02014:A:2). Read where a card's attachments are released (families/objectives/claimed.ts).
+  "returnsToEncounterDeck",
+] as const;
 
 export const manifest = { name: "objectives", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -75,6 +75,9 @@ const VERBS = [
   // progress token from the current quest", 01111:A:1). RemoveQuestProgress counts progress per player instead. With `each` the progress comes off every quest card in play, the main quest card, each encounter side quest in the staging area and each player side quest
   // ("remove 2 progress from each quest card in play", 10100:A:1).
   z.strictObject({ verb: z.literal("RemoveProgressFromQuest"), amount: positiveAmountSchema, each: z.literal(true).optional(), ...when }),
+  // Removes all the progress tokens from the card `target` (the picked card by default), or from each card in play that matches `pick`, read from the actor's side ("Remove all progress tokens from all Riverland locations", 02023:A:2; "remove all progress from that
+  // location", 900409:A:1). A card with none is left as it is.
+  z.strictObject({ verb: z.literal("RemoveAllProgress"), target: cardRefSchema.optional(), pick: pickSchema.optional(), ...when }),
   // Places `amount` progress tokens on the last picked quest card (a pick with `questCard`): the actor's current quest stage (the active location does not take it: the card is named), an encounter side quest in the staging area or a player side quest in a quest area
   // ("place 1 progress token on a quest card in play", 10176:A:1). A full side quest is defeated as usual; a stage that rescues captured cards instead (10039:B:1) rescues.
   z.strictObject({ verb: z.literal("PlaceProgressOnQuestCard"), amount: positiveAmountSchema, ...when }),

@@ -247,7 +247,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     only if it is the Encounter phase
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if 0 is less than resources of this card: for the acting player, the top card(s) of the evilCreatures deck go to the staging area
-    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
+    - 1 resource(s) come off the resource pool of this card (discarded, not spent)
 
 18066:B:3 (back): This stage cannot be defeated while an enemy from the Evil Creatures deck is in play.
   18066:constant:1: Constant
@@ -332,4 +332,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 201 by template, 24 as JSON)
+(rendered pieces: 202 by template, 23 as JSON)

@@ -530,7 +530,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 906206:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, shuffle 1 out of play Ringwraith into the encounter deck.
   906206:forced:1: Forced at the end of the round
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
+    - 1 resource(s) come off the resource pool of this card (discarded, not spent)
     - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069","when":{"kind":"not","condition":{"kind":"matches","card":"self","pick":{"type":"location","control":"any","hasResources":true}}}}]
 
 ## 906207 Forsaken Inn
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 240 by template, 36 as JSON)
+(rendered pieces: 241 by template, 35 as JSON)

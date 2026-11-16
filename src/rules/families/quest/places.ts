@@ -11,6 +11,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier, modifiedStat } from "../../core/keywords.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
 import { isLocationId } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
@@ -95,4 +96,10 @@ export function lowerCardThreat(state: ScenarioState, instruction: Verb<"LowerCa
 export function removeProgressFromQuest(state: ScenarioState, instruction: Verb<"RemoveProgressFromQuest">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   return instruction.each ? removeProgressFromEachQuest(state, amount, focus.seat, ctx, steps, currentCause(steps, UNATTRIBUTED)) : takeProgressOff(state, state.questStage, amount, steps);
+}
+
+// RemoveAllProgress: every progress token comes off the card named (the picked card by default), or off each card in play that matches the filter, read from the actor's side (02023:A:2, 900409:A:1).
+export function removeAllProgress(state: ScenarioState, instruction: Verb<"RemoveAllProgress">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const ids = instruction.pick ? pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx) : [refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId))];
+  return ids.reduce((current, id) => takeProgressOff(current, id, current.cards[id ?? ""]?.progress ?? 0, steps), state);
 }

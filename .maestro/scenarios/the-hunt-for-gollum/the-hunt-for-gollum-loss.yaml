@@ -9,5 +9,4 @@ tags:
     file: ../../subflows/standalone-loss.yaml
     env:
       FIXTURE: gollum-lost
-      SCENARIO_ID: the-hunt-for-gollum
 # TODO: this scenario's own assertions on the outcome screen after the loss (the reason).

@@ -14,7 +14,7 @@ import { scenarioDefinition } from "../../catalog/scenario-data.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { blankScenario } from "../../rules/core/state.ts";
 import { loadCards } from "../../../scripts/data/load-cards.ts";
-import { dealtCodes, loadCampaigns, loadScenario } from "../../../scripts/data/load-scenarios.ts";
+import { dealtCodes, loadAnyScenario, loadCampaigns, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { ROOT } from "../../../scripts/data/paths.ts";
 import { asksPlayer, walk } from "../../../test/harness/record-walk.ts";
 import { judgeBranch, judgePick } from "../../../test/harness/words-judge.ts";
@@ -53,7 +53,7 @@ const campaigns = loadCampaigns();
 const dump = process.env.WORDS_DUMP;
 
 describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
-  const scenario = loadScenario(id);
+  const scenario = loadAnyScenario(id);
   const codes = dealtCodes(campaigns, [scenario], { nightmare: true });
   const records = EFFECTS.filter((effect) => codes.has(effect.cardCode));
   const names: ChoiceNames = { card: (key) => cards.get(key)?.name ?? key, code: (code) => cards.get(code)?.name ?? code };

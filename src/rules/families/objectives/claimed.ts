@@ -2,7 +2,7 @@
 //
 // "Discarded objective cards are returned to the staging area": a claimed objective that is discarded, or that loses its hero, goes
 // back to the staging area instead of a discard pile. Every place that sends a card away asks here (one decision, not four).
-import { updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
+import { flagged, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import type { Destination } from "../../core/zones.ts";
 import { moveCard } from "../../core/zones.ts";
 
@@ -22,4 +22,12 @@ export function sendAway(state: ScenarioState, id: string, otherwise: Destinatio
 export function discardRestricted(state: ScenarioState, id: string): ScenarioState {
   const owner = state.cards[id]?.controller;
   return owner != null ? sendAway(state, id, { zone: "discard", seat: owner }) : state;
+}
+
+// A claimed objective that says it returns to the top of the encounter deck when its hero leaves play (the flag `returnsToEncounterDeck`, "Forced: After attached hero is damaged or leaves play, return this card to the top of the encounter deck", 02014:A:2) goes there
+// facedown, controlled by nobody; null for any other card.
+export function returnedToDeck(state: ScenarioState, id: string): ScenarioState | null {
+  if (!state.cards[id]?.claimed || !flagged(state, id, "returnsToEncounterDeck")) return null;
+  const moved = updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  return { ...moved, encounterDeck: [id, ...moved.encounterDeck.filter((entry) => entry !== id)] };
 }

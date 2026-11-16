@@ -456,8 +456,8 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each location (any player controls) in the staging area only [also {"uncharted":true}]: stat threat 1, until the end of the phase
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each ally (any player controls) that is an objective, with resources on it:
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
 
-(rendered pieces: 248 by template, 64 as JSON)
+(rendered pieces: 250 by template, 62 as JSON)

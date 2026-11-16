@@ -129,6 +129,10 @@ const TRIGGERS = [
   "firstLocationRevealed",
   // About the seat: an encounter card effect raised its threat (the event's amount is how much).
   "encounterThreatRaised",
+  // About an encounter card in the encounter deck: a card effect made a player look at the cards of the encounter deck and this card is among them (`seat` is the player looking). A Forced effect of the card with `subject: "self"` hears it from the deck ("Forced: When a card
+  // effect instructs a player to "look" at cards in the encounter deck and Ravenous Hawk is among those cards, that player must put Ravenous Hawk into play engaged with him", 900402:A:1). The card leaves the cards the effect looked at, so it does not count
+  // for what the effect picks or discards among them.
+  "lookedAt",
 ] as const;
 
 const FLAGS = [
@@ -154,6 +158,8 @@ const FLAGS = [
   "encounterUncancelable",
   // On a card in the staging area: nothing moves it out of the staging area ("Uglúk cannot leave the staging area", 143069:B:2): moveCard refuses a move to another zone, as cannotEnterStaging refuses one into it.
   "cannotLeaveStaging",
+  // On a card in play until the end of the round: it entered play this round ("if Hunting Warg entered play this round", 900403:A:1), set by a Forced effect that hears `encounterEnteredPlay` and read by the condition `flag` with holder `self`.
+  "enteredThisRound",
 ] as const;
 
 export const manifest = { name: "encounter", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

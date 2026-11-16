@@ -1,5 +1,5 @@
 import type { Effect, ScenarioDefinition } from "../../src/catalog/boundary.ts";
-import { campaignScenario, scenarioDefinition, type CampaignData, type ScenarioData } from "../../src/catalog/scenario-data.ts";
+import { campaignScenario, scenarioDefinition, type AnyScenarioData, type CampaignData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
 import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
@@ -11,7 +11,7 @@ import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.
 import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
 import { markCapture } from "../../src/rules/families/captured/entry.ts";
 
-import { gameCodes, loadCampaigns, loadScenario } from "../../scripts/data/load-scenarios.ts";
+import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
 
 import { addStandIns, entry, fillerRecord, HERO, HERO2, HERO3, idOf, idsOf, opening, type Entry, type ScenePhase } from "./scene-kit.ts";
@@ -77,21 +77,21 @@ const dealtTo = (item: Dealt, seat: number): boolean => typeof item === "string"
 export type LayoutTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string; seat1Hero: string | null; definition: ScenarioDefinition; cards: Map<string, PrintedCard> };
 
 // The printed cards are shared by every table of the scenario and never changed: each table takes its own copy (a table's context may be handed to code that adds stand-ins).
-type Loaded = { data: ScenarioData; dealt: ScenarioData; campaign: CampaignData; cards: ReadonlyMap<string, PrintedCard> };
+type Loaded = { data: AnyScenarioData; dealt: AnyScenarioData; campaign: CampaignData; cards: ReadonlyMap<string, PrintedCard> };
 const LOADED = new Map<string, Loaded>();
 
 // The saga hero or the attachments the first player starts the scenario with (The One Ring in The Passage of the Marshes), so a layout can place them.
-const sagaStartCodes = (data: ScenarioData): string[] => (data.sagaStart ? ("hero" in data.sagaStart ? [data.sagaStart.hero] : [...data.sagaStart.attached]) : []);
+const sagaStartCodes = (data: AnyScenarioData): string[] => (data.sagaStart ? ("hero" in data.sagaStart ? [data.sagaStart.hero] : [...data.sagaStart.attached]) : []);
 
 // The scenario's data, its campaign and the printed cards it deals (and the stand-ins), read once for each scenario.
 function loadedWorld(scenarioId: string): Loaded {
   const known = LOADED.get(scenarioId);
   if (known) return known;
-  const data = loadScenario(scenarioId);
+  const data = loadAnyScenario(scenarioId);
   const campaign = loadCampaigns().find((one) => one.scenarios.includes(scenarioId));
   if (!campaign) throw new Error(`no campaign plays ${scenarioId}`);
   const dealt = campaignScenario(data);
-  const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, dealt.campaignCard, ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data)]);
+  const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, ...(dealt.campaignCard !== undefined ? [dealt.campaignCard] : []), ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data), ...(data.nightmare ? [data.nightmare.setupCard, ...data.nightmare.cards.map((card) => card.code)] : [])]);
   const byCode = new Map(loadCards().map((card) => [card.code, card]));
   const cards = new Map<string, PrintedCard>();
   for (const code of codes) {
@@ -160,7 +160,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const item of layout.engaged ?? []) put(entry(item).code, { zone: "engaged", seat: seatOf(item) }, item);
   for (const code of layout.victory ?? []) put(code, { zone: "victory" });
   if (layout.active) put(layout.active, { zone: "activeLocation" });
-  if (layout.campaign) put(world.dealt.campaignCard, { zone: "campaign" });
+  if (layout.campaign && world.dealt.campaignCard !== undefined) put(world.dealt.campaignCard, { zone: "campaign" });
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);

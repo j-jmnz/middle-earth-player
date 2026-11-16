@@ -270,9 +270,9 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     only if all of: (it is the Quest phase) and (this card is the active location)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each ally (any player controls) named "Captain Sahír" or "Na'asiyah":
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - for each hero (any player controls):
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - the first player chooses one of:
       * option "flip":
         - [json FlipDoubleSided {"verb":"FlipDoubleSided"}]
@@ -362,4 +362,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 194 by template, 50 as JSON)
+(rendered pieces: 196 by template, 48 as JSON)

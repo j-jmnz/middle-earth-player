@@ -10,7 +10,7 @@ import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlaye
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
-import { claimedDestination } from "../families/objectives/claimed.ts";
+import { claimedDestination, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
@@ -369,6 +369,13 @@ export function releaseAttachments(
     const returned = returnAttachedEnemy(next, attachmentId);
     if (returned) {
       next = returned;
+      continue;
+    }
+    // A claimed objective that returns to the top of the encounter deck when its hero leaves play (Signs of Gollum, families/objectives/claimed.ts).
+    const toDeck = returnedToDeck(next, attachmentId);
+    if (toDeck) {
+      next = toDeck;
+      steps.push({ kind: "destroy", targetId: attachmentId });
       continue;
     }
     const printed = printedOf(cards, attachment.code);

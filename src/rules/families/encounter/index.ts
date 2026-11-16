@@ -31,7 +31,7 @@ const WATCH_STATS = { threatZero: "watchThreatZero", damage: "watchDamage", disc
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "LookAtTop":
-      return lookAtTop(state, instruction, focus.seat, ctx, focus.sourceId);
+      return lookAtTop(state, instruction, focus.seat, ctx, focus.sourceId, steps);
     case "PickEncounter":
     case "ArrangeEncounter":
     case "PayResources":

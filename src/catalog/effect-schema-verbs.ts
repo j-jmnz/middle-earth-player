@@ -256,7 +256,7 @@ export const simpleVerbs = [
   // active location the players must travel to it and nowhere else, if able (01088:A:1).
   z.strictObject({
     verb: z.literal("Restrict"),
-    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly"]),
+    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly", "commit", "draw"]),
     // With "travel" on a card that is not the location: the players cannot travel to the location with this code ("The players cannot travel to The Old Ford unless there is at least 5 progress here", 18068:B:1).
     location: z.string().min(1).optional(),
     // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
@@ -273,6 +273,9 @@ export const simpleVerbs = [
     // With "defend": only the allies whose printed hit points are fewer than the source's cannot defend ("Allies with fewer printed hit points than Uruk-hai
     // Captain cannot defend against Uruk-hai Captain", 142069:A:2).
     belowSourceHitPoints: z.boolean().optional(),
+    // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
+    // draws, not card effects). The pick is read from each player's side.
+    unlessControls: pickSchema.optional(),
     ...when,
   }),
   // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's

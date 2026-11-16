@@ -21,7 +21,7 @@ import { hasKeyword } from "../core/keywords.ts";
 import { attachmentTargets, discardPlayable, playReason, playWindowReason } from "../player/planning.ts";
 import { resolutionIntents, resolutionReason } from "../setup/resolution.ts";
 import { optionalEnemies, stagingLocations } from "../quest/quest.ts";
-import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, travelProgressReason } from "../interpret/restrictions.ts";
+import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, travelProgressReason, seatBarred } from "../interpret/restrictions.ts";
 import { flagged, modifierActive, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
 import { sideQuestReason } from "../families/sidequests/quest.ts";
@@ -257,6 +257,8 @@ function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] 
 function committers(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
   // "Do not commit characters to the quest" (143078:B:1).
   if (state.modifiers.length > 0 && flagged(state, "table", "cannotCommit")) return [];
+  // "Any player who does not control a hero with at least 1 Clue objective attached cannot commit characters to this quest" (02013:B:1).
+  if (seatBarred(state, ctx, seat, "commit")) return [];
   return characters(state, seat, ctx.cards).filter((id) => {
     const instance = state.cards[id];
     // "Can commit to quests while exhausted" (11009:A:1).

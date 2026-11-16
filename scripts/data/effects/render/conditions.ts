@@ -45,6 +45,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   threat: (c) => ({ text: `the actor's threat is ${range(c.min, c.max)}`, read: ["min", "max"] }),
   inPlay: (c) => ({ text: `the card with code ${str(c.code)} ${c.is === true ? "is" : "is not"} in play`, read: ["code", "is"] }),
   faceUp: (c) => ({ text: `this card shows side ${str(c.side)}`, read: ["side"] }),
+  freeOfEncounters: () => ({ text: "no encounter card is attached to this card (it is free of encounters)", read: [] }),
   firstPlayer: () => ({ text: "the actor holds the first player token", read: [] }),
   otherPlayer: () => ({ text: "another player is still in the game", read: [] }),
   handHasCard: () => ({ text: "the actor has a card in hand", read: [] }),

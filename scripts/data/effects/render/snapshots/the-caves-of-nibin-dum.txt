@@ -201,7 +201,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41034:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json LookAtTop {"verb":"LookAtTop","count":3}]
+    - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
     - [json BottomOtherLooked {"verb":"BottomOtherLooked"}]
     - the acting player reveals an encounter card
@@ -257,8 +257,8 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - for each player, first player first:
       - choose ready character (you control)
       - exhaust the picked card
-      - [json SetX {"verb":"SetX","value":0}]
-      - [json DiscardTopOfDeck {"verb":"DiscardTopOfDeck"}]
+      - the effect's X is set to 0
+      - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
       - then, if [json condition {"kind":"xReachesRemaining"}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 ## 41039 Lost in the Dark
@@ -308,4 +308,4 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
     - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
 
-(rendered pieces: 175 by template, 16 as JSON)
+(rendered pieces: 178 by template, 13 as JSON)

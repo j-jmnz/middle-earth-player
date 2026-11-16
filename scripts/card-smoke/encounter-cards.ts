@@ -1,4 +1,4 @@
-import type { ScenarioData } from "../../src/catalog/scenario-data.ts";
+import type { AnyScenarioData } from "../../src/catalog/scenario-data.ts";
 import { printedOf } from "../../src/rules/core/printed.ts";
 import { updateCard } from "../../src/rules/core/state.ts";
 import { spawn } from "../../src/rules/core/zones.ts";
@@ -34,7 +34,7 @@ export const ATTACKER = "f0";
 export type DealtCard = { code: string; pile: string };
 
 /** Every encounter-side card the scenario deals (its piles, its Nightmare deck, the other side of a two-code card) and its quest cards, each once. */
-export function encounterCards(scenario: ScenarioData): { cards: DealtCard[]; stages: string[] } {
+export function encounterCards(scenario: AnyScenarioData): { cards: DealtCard[]; stages: string[] } {
   const cards = new Map<string, string>();
   const stages = new Set<string>(scenario.stages);
   for (const placement of [...scenario.cards, ...(scenario.nightmare?.cards ?? [])]) {

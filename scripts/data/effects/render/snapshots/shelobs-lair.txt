@@ -232,9 +232,9 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144059:A:2 (front): Action: Exhaust a character with a Weapon attachment to place 3 progress on Blocked Tunnel. (Any player may trigger this effect.)
   144059:action:1: Action (any player may use it)
-    only if there is a ready character (you control) [also {"hasAttachment":{"trait":"Weapon"}}] to choose
+    only if there is a ready character (you control) with a Weapon card attached to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose ready character (you control) [also {"hasAttachment":{"trait":"Weapon"}}]
+    - choose ready character (you control) with a Weapon card attached
     - exhaust the picked card
     - place 3 progress on this card
 
@@ -370,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 241 by template, 13 as JSON)
+(rendered pieces: 243 by template, 11 as JSON)

@@ -405,5 +405,8 @@ export function undefendedTargets(state: ScenarioState, seat: number, cards: Car
   const heroes = heroIds(state, seat);
   const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
   // A character another card lets take it for this player (08093), whoever controls that character.
-  return [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))];
+  const all = [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))];
+  // A shadow effect says the damage must go on one of these heroes (families/south/watcher.ts, 900408:A:3).
+  const only = state.pendingAttack?.onlyHeroes;
+  return only ? all.filter((id) => only.includes(id)) : all;
 }

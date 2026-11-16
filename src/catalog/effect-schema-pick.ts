@@ -212,6 +212,14 @@ export const pickSchema = z.strictObject({
   // "each unguarded objective in the staging area", 12121:A:1). `isGuard`: an enemy attached to an objective as its guard (`false`: "an enemy that is not currently guarding an objective", 12133:A:1).
   hasGuard: z.boolean().optional(),
   isGuard: z.boolean().optional(),
+  // An objective guarded by an enemy attached to it with this trait (`guardedByTrait`), or by none (`notGuardedByTrait`): "a Clue card not attached to a Mordor enemy" (900401:A:2), "Clue cards attached to Mordor enemies" (900401:A:3).
+  guardedByTrait: z.string().min(1).optional(),
+  notGuardedByTrait: z.string().min(1).optional(),
+  // An enemy attached as the guard of an objective with this trait: a Mordor enemy "with at least 1 Clue card attached" (900405:A:1; the Clue is the guarded objective, the enemy its guard).
+  guardsTrait: z.string().min(1).optional(),
+  // A character committed to this round's quest, though the quest's resolution already cleared its commitment: "any hero committed to the quest" in the Response to the players questing successfully (02014:A:2). Read in a game whose
+  // records read `questSucceeded` (families/costs/pay.ts noteEvent keeps who committed).
+  questedThisRound: z.literal(true).optional(),
   // A character whose code the Campaign Log marks "determined" (`campaignFacts.angmar.determined`, Angmar Awakened): "each character who is 'determined' in the Campaign Log" (10172:A:1). Read by the angmar family.
   determined: z.literal(true).optional(),
   // A Reanimated Dead (The Dread Realm, mec108.reanimated-dead): a player card facedown as an Undead enemy ("each Reanimated Dead", 101160:A:1). Read by the angmar family.
