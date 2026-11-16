@@ -1071,7 +1071,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1085,8 +1085,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only a quotation; no ability."
     },
     {
       "code": "02106",
@@ -1099,8 +1100,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02106",
@@ -1116,7 +1118,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1133,7 +1135,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1145,12 +1147,14 @@
         "sha256": "6dec54183fb310cf1cba2a47866645ca97e396bb801406e5c6a8d353d092c8be"
       },
       "lines": [
-        "When Revealed: Place 2 resource tokens on Gollum. Any player may exhaust a Lore hero to reduce this effect to 1 resource token.Escape: 4"
+        "When Revealed: Place 2 resource tokens on Gollum. Any player may exhaust a Lore hero to reduce this effect to 1 resource token.",
+        "Escape: 4"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the printed Escape value into the last sentence; the card prints 'Escape: N' as its own paragraph."
     },
     {
       "code": "02109",
@@ -1161,12 +1165,14 @@
         "sha256": "c65976dcf4b7c769bc899541038e5d3463a2e2ce08e4471f2d622053f7bc1c8a"
       },
       "lines": [
-        "When Revealed: The first player makes an escape test, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 2.Escape: 2"
+        "When Revealed: The first player makes an escape test, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 2.",
+        "Escape: 2"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the printed Escape value into the last sentence; the card prints 'Escape: N' as its own paragraph."
     },
     {
       "code": "02110",
@@ -1177,12 +1183,14 @@
         "sha256": "a88f91238c31ac45c41cb9ba84d6fb27f85e7ed84ad494fef00460849f1cd328"
       },
       "lines": [
-        "When Revealed: The first player makes an escape test counting Attack instead of Willpower, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 1.Escape: 3"
+        "When Revealed: The first player makes an escape test counting Attack instead of Willpower, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 1.",
+        "Escape: 3"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the printed Escape value into the last sentence; the card prints 'Escape: N' as its own paragraph."
     },
     {
       "code": "02111",
@@ -1193,12 +1201,14 @@
         "sha256": "80e4d503c5d39afa85e6f8c82cbeb42310965741590d84a90570b3f09e1fcebd"
       },
       "lines": [
-        "When Revealed: Each player must make an escape test, dealing 2 cards from the encounter deck for each test. Each player that fails this test places 1 resource token on Gollum, and raises his threat by 1.Escape: 5"
+        "When Revealed: Each player must make an escape test, dealing 2 cards from the encounter deck for each test. Each player that fails this test places 1 resource token on Gollum, and raises his threat by 1.",
+        "Escape: 5"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the printed Escape value into the last sentence; the card prints 'Escape: N' as its own paragraph."
     },
     {
       "code": "02112",
@@ -1209,12 +1219,14 @@
         "sha256": "6a3a60703b0bb3104aeb41e73a436846d22ac8a1926c3023b9a21b02d592a0cb"
       },
       "lines": [
-        "Forced: Remove 2 damage from Giant Marsh Worm at the end of each round.Escape: 2"
+        "Forced: Remove 2 damage from Giant Marsh Worm at the end of each round.",
+        "Escape: 2"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the printed Escape value into the last sentence; the card prints 'Escape: N' as its own paragraph."
     },
     {
       "code": "02113",
@@ -1225,12 +1237,14 @@
         "sha256": "554d09a0382e24d88557e45175d385fc29c55a8dcbea032aa38724e207717fd9"
       },
       "lines": [
-        "When Revealed: Place 1 resource token on Gollum for each location card in the staging area.Escape: 2"
+        "When Revealed: Place 1 resource token on Gollum for each location card in the staging area.",
+        "Escape: 2"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the printed Escape value into the last sentence; the card prints 'Escape: N' as its own paragraph."
     },
     {
       "code": "02114",
@@ -1241,12 +1255,14 @@
         "sha256": "a89c4578f542bd8a630cde30c0e0ae9f03cc930a7545763d7d7df2f768828c7d"
       },
       "lines": [
-        "While The Heart of the Marshes is the active location, all cards dealt from the encounter deck for escape tests get +1 Escape. (Cards receive this bonus even if they do not have a printed escape value.)Escape: 1"
+        "While The Heart of the Marshes is the active location, all cards dealt from the encounter deck for escape tests get +1 Escape. (Cards receive this bonus even if they do not have a printed escape value.)",
+        "Escape: 1"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the printed Escape value into the last sentence; the card prints 'Escape: N' as its own paragraph."
     },
     {
       "code": "02115",
@@ -1257,12 +1273,14 @@
         "sha256": "2b46b4e5ab613738ed800e514c0e8d4edbf44ac28b2f3b94b45fe800881046bd"
       },
       "lines": [
-        "Forced: After the players travel to this location, place 1 resource token on Gollum.Escape: 2"
+        "Forced: After the players travel to this location, place 1 resource token on Gollum.",
+        "Escape: 2"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the printed Escape value into the last sentence; the card prints 'Escape: N' as its own paragraph."
     },
     {
       "code": "02126",
@@ -1277,7 +1295,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1291,8 +1309,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02127",
@@ -1305,8 +1324,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02127",
@@ -1317,13 +1337,14 @@
         "sha256": "f48eb2147135a07fee5f1ad1f3d37f9fe126dad9aa1166dbc03290f8397ee7af"
       },
       "lines": [
-        "The player guarding Gollum cannot commit characters to this quest (unless he is the only player in the game).",
+        "The player guarding Gollum cannot commit characters to this quest (unless he is the only player remaining in the game).",
         "If the players quest unsuccessfully, Gollum escapes and the players have lost the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text reads 'only player in the game'; the card prints 'only player remaining in the game'."
     },
     {
       "code": "02128",
@@ -1336,8 +1357,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02128",
@@ -1352,7 +1374,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1366,8 +1388,9 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Prints only flavor text; no ability."
     },
     {
       "code": "02129",
@@ -1378,13 +1401,14 @@
         "sha256": "a522d9a33f3cfb9849e7fba63d0de7a9164ebb85abdb21e4a1d9ae2bd3d4b430"
       },
       "lines": [
-        "Forced: At the beginning of the combat phase, all enemies in play enage the player guarding Gollum.",
-        "Player cannot defeat this stage if there are any enemies in play. If players defeat this stage, they have won the game."
+        "Forced: At the beginning of the combat phase, all enemies in play engage the player guarding Gollum.",
+        "Players cannot defeat this stage if there are any enemies in play. If players defeat this stage, they have won the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text misspells 'enage' and reads 'Player cannot defeat this stage'; the card prints 'engage' and 'Players cannot defeat this stage'."
     },
     {
       "code": "02130",
@@ -1400,7 +1424,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1417,8 +1441,9 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The card's title prints 'The Spiders' Ring'; its text prints 'The Spider's Ring', as the lines have it."
     },
     {
       "code": "02132",
@@ -1433,7 +1458,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1445,12 +1470,14 @@
         "sha256": "b7338c40ade070187ace1c665d3961c33a97d1c9ba19e6fbe15b846f640ac1d6"
       },
       "lines": [
-        "Travel: The player guarding Gollum must exhaust a hero he controls to travel to Woodman's Glade.Response: After exploring Woodman's Glade, reduce the threat of each player not guarding Gollum by 2."
+        "Travel: The player guarding Gollum must exhaust a hero he controls to travel to Woodman's Glade.",
+        "Response: After exploring Woodman's Glade, reduce the threat of each player not guarding Gollum by 2."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
-      "confirmedBy": null
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's text runs the Travel and Response paragraphs together; the card prints two."
     },
     {
       "code": "02134",
@@ -1465,7 +1492,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1482,7 +1509,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1499,7 +1526,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1516,7 +1543,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1533,7 +1560,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1549,7 +1576,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     }
   ]

@@ -34,6 +34,14 @@ describe("ledger seed", () => {
     expect(entry.lines).toEqual(["Guarded.", `Response: it's "here".`, "Shadow: x."]);
   });
 
+  it("puts a printed Escape value on its own line", () => {
+    const card = cards.find((one) => one.code === "02108");
+    const target = { code: "02108", side: "A" as const, printing: "TDM", urls: [] };
+    const entry = seedEntry(card as NonNullable<typeof card>, target, { url: "https://x.test/a.jpg", sha256: "0".repeat(64) });
+    expect(entry.lines).toHaveLength(2);
+    expect(entry.lines[1]).toBe("Escape: 4");
+  });
+
   it("appends to a file without rewriting what it holds", () => {
     const { entries } = seedEntries(new Set(["02011"]), { campaign: "none", entries: [], byKey: new Map() }, cards, pins);
     const once = withSeeded(null, "x", entries);

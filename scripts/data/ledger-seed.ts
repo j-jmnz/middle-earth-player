@@ -22,10 +22,10 @@ export const SEED_CONVENTIONS = [
   "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword.",
 ];
 
-// Source text to ledger lines: one per source line, straight apostrophes and quotes.
+// Source text to ledger lines: one per source line, straight apostrophes and quotes. Hall of Beorn runs a printed Escape value (The Dead Marshes) into the sentence above it.
 function linesOf(...texts: (string | null | undefined)[]): string[] {
   return texts
-    .flatMap((text) => (text ?? "").split("\n"))
+    .flatMap((text) => (text ?? "").replace(/([.)])(Escape: \d+)$/, "$1\n$2").split("\n"))
     .map((line) => line.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').trim())
     .filter((line) => line !== "");
 }
