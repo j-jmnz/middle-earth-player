@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the harad deck
     - for each player, first player first:
-      - if not (the actor holds the first player token): the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"nonUnique":true,"different":true}]
+      - if not (the actor holds the first player token): the acting player finds one non-unique location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 144068:B:1 (back): Forced: At the beginning of the quest phase, reveal the top facedown card from under The Cross-roads and add it to the staging area.

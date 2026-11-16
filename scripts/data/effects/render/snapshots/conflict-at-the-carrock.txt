@@ -1,0 +1,213 @@
+Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 02035 Grimbeorn's Quest; quest: 02036 Against the Trolls; staging: 02043 The Carrock; setAside: 02038 Louis; setAside: 02039 Morris; setAside: 02040 Stuart; setAside: 02041 Rupert)
+
+## 02035 Grimbeorn's Quest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02035:A:1 (front): Setup: Add The Carrock to the staging area. Remove 4 unique Troll cards and 4 copies of the "Sacked!" card from the encounter deck and set them aside, out of play. Then shuffle 1 "Sacked!" card per player back into the encounter deck.
+  02035:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - one set-aside copy of the card with code 02048 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter deck
+
+02035:B:1 (back): Forced: After placing the 7th progress token on Grimbeorn's Quest, The Carrock becomes the active location. Discard the previous active location from play.
+  02035:forced:1: Forced on the event questCardDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the active location
+    - then, if there is a location (any player controls) in the staging area only, named "The Carrock" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "The Carrock"
+    - then, if there is a location (any player controls) in the staging area only, named "The Carrock" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+
+## 02036 Against the Trolls
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02036:B:1 (back): When Revealed: Place the unique Troll cards previously set aside into the staging area.
+  02036:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 02038 joins the staging area (it is not revealed)
+    - one set-aside card with code 02039 joins the staging area (it is not revealed)
+    - one set-aside card with code 02040 joins the staging area (it is not revealed)
+    - one set-aside card with code 02041 joins the staging area (it is not revealed)
+
+02036:B:2 (back): Players cannot defeat this stage if there are any Troll enemies in play.
+  02036:constant:1: Constant
+    only if there is Troll enemy in play (in the staging area or engaged)
+    - the players cannot defeat this stage while this holds
+
+## 02037 Grimbeorn the Old
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02037:A:1 (front): Grimbeorn the Old does not exhaust to defend against Troll enemies.
+  02037:constant:1: Constant
+    - if the card holding this stat (its host, or this card itself) is the declared defender of the attack against a Troll enemy: this card: stat noExhaustDefendVersus 1, while this card is in play
+
+02037:A:2 (front): If Grimbeorn the Old has 8 or more resource tokens on him, he joins the first player as an ally.
+  02037:constant:2: Constant
+    only if the card with code 02037 in play holds at least 8 resource token(s)
+    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area)
+
+02037:A:3 (front): Action: Spend 1 Leadership resource to place that resource on Grimbeorn the Old.
+  02037:action:1: Action (cost: pay 1 leadership resource(s); any player may use it)
+    - place 1 resource tokens on this card
+
+## 02038 Louis
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+02038:A:1 (front): While Louis is engaged with a player, all Troll enemies gain, "Forced: After this enemy attacks, the defending player must raise his threat by 3."
+  02038:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about Troll enemy (any player controls) or in the staging area)
+    only if this card is engaged with the player
+    - raise threat by 3 (the player the event is about)
+
+02038:A:2 (front): Response: After defeating Louis, you may choose and discard 1 "Sacked!" card from play.
+  02038:response:1: Response after an enemy is destroyed (heard about this card)
+    only if there is a attachment (any player controls) named "Sacked!" to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) named "Sacked!"
+    - discard the picked card
+
+## 02039 Morris
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+02039:A:1 (front): While Morris is engaged with a player, all Troll enemies get +1 Attack.
+  02039:constant:1: Constant
+    only if this card is engaged with the player
+    - each Troll enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+
+02039:A:2 (front): Response: After defeating Morris, you may choose and discard 1 "Sacked!" card from play.
+  02039:response:1: Response after an enemy is destroyed (heard about this card)
+    only if there is a attachment (any player controls) named "Sacked!" to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) named "Sacked!"
+    - discard the picked card
+
+## 02040 Stuart
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+02040:A:1 (front): While Stuart is engaged with a player, all Troll enemies get +1 Defense.
+  02040:constant:1: Constant
+    only if this card is engaged with the player
+    - each Troll enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
+
+02040:A:2 (front): Response: After defeating Stuart, you may choose and discard 1 "Sacked!" card from play.
+  02040:response:1: Response after an enemy is destroyed (heard about this card)
+    only if there is a attachment (any player controls) named "Sacked!" to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) named "Sacked!"
+    - discard the picked card
+
+## 02041 Rupert
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+02041:A:1 (front): Forced: After Rupert attacks, shuffle all copies of the "Sacked!" card from the discard pile back into the encounter deck.
+  02041:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    - every card with code 02048 in the encounter discard pile goes back into the encounter deck, which is shuffled (nothing with none there)
+
+02041:A:2 (front): Response: After defeating Rupert, you may choose and discard 1 "Sacked!" card from play.
+  02041:response:1: Response after an enemy is destroyed (heard about this card)
+    only if there is a attachment (any player controls) named "Sacked!" to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) named "Sacked!"
+    - discard the picked card
+
+## 02042 Muck Adder
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02042:A:1 (front): Forced: If Muck Adder damages a character, discard that character from play.
+  02042:forced:1: Forced on the event attackDamagedCharacter (heard about this card)
+    - discard the event's other card
+
+02042:A:2 (shadow): Shadow: Defending character gets -1 Defense for the duration of this attack.
+  02042:shadow:1: Shadow
+    - the defender: stat defense -1, until the end of the attack
+
+## 02043 The Carrock
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+02043:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+02043:A:2 (front): Players cannot travel to The Carrock except through quest card effects.
+  02043:constant:1: Constant
+    - the players cannot travel to the location with code 02043 while this holds
+
+02043:A:3 (front): While The Carrock is the active location, Troll enemies get +1 Attack and +1 Defense.
+  02043:constant:2: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Troll enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+    - each Troll enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
+
+## 02044 River Langflood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02044:A:1 (front): While it is in the staging area, River Langflood gets +1 Threat for each Troll enemy in play.
+  02044:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat threat the number of Troll enemy (any player controls) or in the staging area, while this card is in play
+
+## 02045 Bee Pastures
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02045:A:1 (front): Response: After you travel to Bee Pastures, search the encounter deck and discard pile for Grimbeorn the Old and add him to the staging area. Then, shuffle the encounter deck.
+  02045:response:1: Response after the players travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 02037 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 02046 Oak-wood Grove
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02046:A:1 (front): While Oak-wood Grove is the active location, resource tokens from any sphere may be spent as Leadership resource tokens.
+  02046:constant:1: Constant
+    only if this card is the active location
+    - each hero (any player controls): stat leadershipIcon 1, while this card is in play
+
+## 02047 A Frightened Beast
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02047:A:1 (front): When Revealed: Each player raises his threat by the total Threat of all cards in the staging area. Any player may choose to discard from play 1 Creature ally card he controls to cancel this effect.
+  02047:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if there is a Creature ally (you control) to choose):
+          - choose Creature ally (you control)
+          - discard the picked card
+          - the effect being resolved is canceled: nothing after this resolves
+        * option "keep":
+    - raise threat by the total Threat of all cards in the staging area now (each player)
+
+## 02048 Sacked!
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+02048:A:1 (front): When Revealed: Attach to a hero with no "Sacked!" cards attached controlled by the first player. (Cannot be canceled.) Counts as a Condition attachment with the text: "Attached hero cannot attack, defend, commit to a quest, trigger its effect, or collect resources."
+  02048:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
+  02048:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - this attachment may be attached to a hero (limit 1 of it per host)
+    - its host: stat cannotAttack 1, while this card is in play
+    - its host: stat cannotDefend 1, while this card is in play
+    - its host: stat cannotQuest 1, while this card is in play
+    - its host: stat cannotTriggerEffects 1, while this card is in play
+    - its host: stat noCollection 1, while this card is in play
+
+02048:A:2 (shadow): Shadow: If attacking enemy is a Troll, resolve this card's "when revealed" effect.
+  02048:shadow:1: Shadow
+    - if the attacking enemy is a Troll enemy (any player controls): the When Revealed effects of this card resolve as if it had just been revealed
+
+## 02049 Roasted Slowly
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02049:A:1 (front): When Revealed: Destroy all heroes with the card "Sacked!" attached. Then, shuffle Roasted Slowly back into the encounter deck.
+  02049:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each hero (any player controls) with an attachment named "Sacked!":
+      - discard the picked card
+    - this card is shuffled into the encounter deck
+
+02049:A:2 (shadow): Shadow: If attacking enemy is a Troll, remove 2 damage tokens from it.
+  02049:shadow:1: Shadow
+    - if the attacking enemy is a Troll enemy (any player controls): heal 2 damage from the attacking enemy
+
+(rendered pieces: 130 by template, 0 as JSON)

@@ -277,7 +277,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if all of: (the card the event is about had enough progress to be explored) and (there is a card (any player controls) [also {"burden":true}] to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (any player controls) [also {"burden":true}]
-    - [json RemoveFromGame {"verb":"RemoveFromGame"}]
+    - the last picked card is removed from the game
     - shuffle the encounter deck
 
 ## 142075 The Argonath
@@ -433,4 +433,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 198 by template, 48 as JSON)
+(rendered pieces: 199 by template, 47 as JSON)

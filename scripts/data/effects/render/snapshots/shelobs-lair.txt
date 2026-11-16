@@ -228,7 +228,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144059:A:1 (front): When Revealed: Make Blocked Tunnel the active location, returning any other active location to the staging area.
   144059:whenRevealed:1: When revealed
-    - [json MakeActive {"verb":"MakeActive","target":"self"}]
+    - this card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
 
 144059:A:2 (front): Action: Exhaust a character with a Weapon attachment to place 3 progress on Blocked Tunnel. (Any player may trigger this effect.)
   144059:action:1: Action (any player may use it)
@@ -370,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 243 by template, 11 as JSON)
+(rendered pieces: 244 by template, 10 as JSON)

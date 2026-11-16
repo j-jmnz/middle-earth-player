@@ -114,7 +114,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141027:B:1 (back): If there are no Nazgûl enemies in play, the players win the game.
   141027:constant:1: Constant
-    only if [json condition {"kind":"enemyInPlay","trait":"Nazgûl","is":false}]
+    only if there is no Nazgûl enemy in play (in the staging area or engaged)
     - the players win the game
 
 ## 141044 A Knife in the Dark
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 241 by template, 35 as JSON)
+(rendered pieces: 242 by template, 34 as JSON)

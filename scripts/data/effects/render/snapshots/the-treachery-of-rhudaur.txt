@@ -345,7 +345,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10114:A:2 (front): Attached character gets +1 Defense while defending against Undead enemies.
   10114:constant:1: Constant
-    - if its host is the declared defender of the attack against a Undead enemy: its host: stat defense 1, while this card is in play
+    - if the card holding this stat (its host, or this card itself) is the declared defender of the attack against a Undead enemy: its host: stat defense 1, while this card is in play
 
 ## 10184 The Treachery of Rhudaur
 
@@ -403,7 +403,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
   10187:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - its host: stat defense 1, while this card is in play
-    - then, if its host is the declared defender of the attack against a Undead enemy (checked when this step runs, after the steps above; not tied to whether they did anything): its host: stat defense 1, while this card is in play
+    - then, if the card holding this stat (its host, or this card itself) is the declared defender of the attack against a Undead enemy (checked when this step runs, after the steps above; not tied to whether they did anything): its host: stat defense 1, while this card is in play
 
 10187:A:3 (front): Response: After you play Orders from Angmar, discard a non-unique Undead enemy with 2 or less remaining hit points.
   10187:response:1: Response after this card is played (heard about this card)

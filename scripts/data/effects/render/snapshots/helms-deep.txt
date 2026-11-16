@@ -281,7 +281,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     - [json SearchToStaging {"verb":"SearchToStaging","code":"143041"}]
     - shuffle the encounter deck
     - then, if there is a location (any player controls) in the staging area only, named "Helm's Gate" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "Helm's Gate"
-    - [json MakeActive {"verb":"MakeActive","when":{"kind":"canPick","pick":{"type":"location","control":"any","stagingOnly":true,"names":["Helm's Gate"]}}}]
+    - then, if there is a location (any player controls) in the staging area only, named "Helm's Gate" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
 
 143074:B:1 (back): Defense.
   143074:constant:1: Constant
@@ -330,7 +330,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143076:B:2 (back): If there are no enemies in play, the players win the game.
   143076:constant:2: Constant
-    only if [json condition {"kind":"enemyInPlay","is":false}]
+    only if there is no enemy in play (in the staging area or engaged)
     - the players win the game
 
-(rendered pieces: 173 by template, 17 as JSON)
+(rendered pieces: 177 by template, 15 as JSON)

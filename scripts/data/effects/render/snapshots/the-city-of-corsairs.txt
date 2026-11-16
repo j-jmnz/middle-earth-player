@@ -164,9 +164,9 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12149:A:1 (front): When Revealed: Search the encounter deck for The Shattered Monument and Captain Sahír, and set them aside, out of play. Each player searches the encounter deck for 1 enemy and 1 location, and adds them to the staging area. If the Stormcaller was not destroyed at stage 1, add 1 resource to each Raider enemy in play.
   12149:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideFromDeck {"verb":"SetAsideFromDeck","code":"12158"}]
-    - [json SetAsideFromDeck {"verb":"SetAsideFromDeck","code":"12159"}]
-    - [json SetAsideFromDeck {"verb":"SetAsideFromDeck","code":"110129"}]
+    - the copy of the card with code 12158 in the encounter deck is set aside, out of play
+    - the copy of the card with code 12159 in the encounter deck is set aside, out of play
+    - the copy of the card with code 110129 in the encounter deck is set aside, out of play
     - for each player, first player first:
       - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
       - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
@@ -412,4 +412,4 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
       - the acting player assigns the resource tokens on Raider enemy (any player controls) engaged with you damage among the character (you control), one at a time
     - then, if the number of Raider enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 258 by template, 43 as JSON)
+(rendered pieces: 261 by template, 40 as JSON)

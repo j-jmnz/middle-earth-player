@@ -316,7 +316,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
         - shuffle the encounter discard pile into the encounter deck
         - the acting player reveals resources of this card encounter cards, one after the other, each in a staging of its own
         - for each objective (any player controls) in the staging area only, named "Ent of Fangorn":
-          - [json RemoveFromGame {"verb":"RemoveFromGame"}]
+          - the last picked card is removed from the game
       * option "stay":
 
 ## 143079 Breaking Isengard
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 243 by template, 13 as JSON)
+(rendered pieces: 244 by template, 12 as JSON)

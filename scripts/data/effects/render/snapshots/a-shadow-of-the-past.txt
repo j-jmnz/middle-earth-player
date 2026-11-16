@@ -177,7 +177,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141038:A:1 (front): Forced: After a player fails a Hide test, shuffle a Nazgûl enemy from the discard pile into the encounter deck, if able.
   141038:forced:1: Forced on the event hideFailed
-    - [json ShuffleIntoDeck {"verb":"ShuffleIntoDeck","trait":"Nazgûl"}]
+    - one Nazgûl card in the encounter discard pile goes back into the encounter deck, which is shuffled (nothing with none there)
 
 141038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player failed a Hide test this round).
   141038:shadow:1: Shadow
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 213 by template, 45 as JSON)
+(rendered pieces: 214 by template, 44 as JSON)

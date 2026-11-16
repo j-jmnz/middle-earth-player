@@ -12,7 +12,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09016:A:2 (front): The first player gains control of Iârion.
   09016:constant:2: Constant
-    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area)
 
 09016:A:3 (front): Response: After a side quest is revealed from the encounter deck, ready Iârion.
   09016:response:1: Response after a card is revealed (heard about card (any player controls) of card type encounter-side-quest; not for a card found in the encounter discard pile)
@@ -322,9 +322,9 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 10157:A:2 (front): Response: Add Iârion's Pendant to the victory display to cancel the 'when revealed' effects of a card that was just revealed from the encounter deck, or to cancel a shadow effect just triggered.
   10157:response:1: Response on the event whenRevealedPending (heard about card (any player controls); cost: [json cost {"kind":"addSelfToVictory"}])
-    - [json CancelEffect {"verb":"CancelEffect"}]
+    - the effect being resolved is canceled: nothing after this resolves
   10157:response:2: Response on the event shadowPending (cost: [json cost {"kind":"addSelfToVictory"}])
-    - [json CancelEffect {"verb":"CancelEffect"}]
+    - the effect being resolved is canceled: nothing after this resolves
 
 ## 10158 Protect the Innocent
 
@@ -342,4 +342,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 201 by template, 12 as JSON)
+(rendered pieces: 204 by template, 9 as JSON)

@@ -50,7 +50,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "enemyDestroyed",
     subject: { type: "enemy", control: "any", trait: "Troll", unique: true },
     condition: SACKED_IN_PLAY,
-    instructions: [{ verb: "Pick", pick: SACKED }, { verb: "DiscardPicked" }],
+    instructions: [{ verb: "Pick", pick: SACKED }, { verb: "Discard", target: { kind: "picked" } }],
   },
   // 900502 Savage Hill-troll. While it is in the victory display each Troll enemy gets +1 hit point. Shadow: against a Troll, the defending character does not ready in the refresh phase of this round.
   { id: "900502:constant:1", cardCode: "900502", lines: ["900502:A:1"], timing: "constant", condition: IN_VICTORY, instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: 1, until: "whileSourceInPlay", holders: TROLL }] },

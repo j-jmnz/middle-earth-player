@@ -35,7 +35,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141029:B:2 (back): While at least 1 Nazgûl enemy is in play, Race to Rivendell gets +15 quest points.
   141029:constant:1: Constant
-    only if [json condition {"kind":"enemyInPlay","trait":"Nazgûl","is":true}]
+    only if there is Nazgûl enemy in play (in the staging area or engaged)
     - this card: stat questPoints 15, while this card is in play
 
 141029:B:3 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
@@ -304,4 +304,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141084:shadow:1: Shadow
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 125 by template, 29 as JSON)
+(rendered pieces: 126 by template, 28 as JSON)

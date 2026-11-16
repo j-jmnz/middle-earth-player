@@ -1,5 +1,5 @@
 import type { Effect, ScenarioDefinition } from "../../src/catalog/boundary.ts";
-import { campaignScenario, scenarioDefinition, type AnyScenarioData, type CampaignData } from "../../src/catalog/scenario-data.ts";
+import { campaignScenario, scenarioDefinition, stageOf, type AnyScenarioData, type CampaignData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
 import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
@@ -118,7 +118,10 @@ export function printedIn(scenarioId: string, code: string): PrintedCard | undef
 export function tableFromLayout(scenarioId: string, layout: Layout = {}, options: { effects?: readonly Effect[] } = {}): LayoutTable {
   const world = loadedWorld(scenarioId);
   const effects = options.effects ?? EFFECTS;
-  const definition = scenarioDefinition(world.dealt, world.campaign, effects);
+  // A layout that names a Nightmare quest card as its stage (Grimbeorn's Folly) has it after the printed stages, as the Nightmare deal does (src/campaign/start.ts).
+  const printedDefinition = scenarioDefinition(world.dealt, world.campaign, effects);
+  const nightmareStages = world.dealt.nightmare?.questCards ?? [];
+  const definition = layout.stage != null && nightmareStages.includes(layout.stage) ? { ...printedDefinition, stages: [...printedDefinition.stages, ...nightmareStages.map((code) => stageOf(code, effects))] } : printedDefinition;
   const cards = new Map(world.cards);
   const ctx: ReduceContext = { effects: [...effects, fillerRecord("filler")], cards };
   const stages = definition.stages.map((stage) => stage.code);

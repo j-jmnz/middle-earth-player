@@ -16,7 +16,7 @@ const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const ENGAGED: Condition = { kind: "sourceIn", zone: "engaged" };
 const TROLLS_SET_ASIDE = ["02038", "02039", "02040", "02041"] as const;
 // "Response: After defeating X, you may choose and discard 1 'Sacked!' card from play" (02038..02041, 900501:A:5): the first player answers it (the card is an encounter card); nothing to discard, no offer.
-const DISCARD_SACKED: Pick<Effect, "condition" | "instructions"> = { condition: { kind: "canPick", pick: SACKED }, instructions: [{ verb: "Pick", pick: SACKED }, { verb: "DiscardPicked" }] };
+const DISCARD_SACKED: Pick<Effect, "condition" | "instructions"> = { condition: { kind: "canPick", pick: SACKED }, instructions: [{ verb: "Pick", pick: SACKED }, { verb: "Discard", target: { kind: "picked" } }] };
 const THREAT_STAT = (stat: "attack" | "defense"): Effect["instructions"] => [{ verb: "ModifyStat", stat, amount: 1, until: "whileSourceInPlay", holders: TROLL }];
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
