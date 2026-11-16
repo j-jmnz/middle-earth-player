@@ -6,7 +6,7 @@ import { bytes, runScript, type Log } from "../log.ts";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
-/** Where the web build serves CanvasKit's wasm from (src/ui/skia-web.ts loads it by this name). Gitignored: `pnpm assets canvaskit` writes it. */
+/** Where the web build serves CanvasKit's wasm from (src/ui/skia/skia-web.ts loads it by this name). Gitignored: `pnpm assets canvaskit` writes it. */
 export const CANVASKIT_PUBLIC = path.join(ROOT, "public", "canvaskit.wasm");
 
 /**

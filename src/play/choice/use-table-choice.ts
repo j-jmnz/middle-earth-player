@@ -15,7 +15,7 @@ import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";
 import type { Moment } from "../store/outcome.ts";
 import { readoutFor, type Readout } from "../readouts/readout.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
-import { useCanvasKit } from "../../ui/skia-web.ts";
+import { useCanvasKit } from "../../ui/skia/skia-web.ts";
 import { hidesFace, actingSeat, isDead, isLooked, onTableFor } from "../store/selectors.ts";
 import { dropOutcome, targetFromKey } from "../store/selection.ts";
 import { cannotPay } from "./why.ts";

@@ -38,7 +38,7 @@ A task that cannot keep one of these stops and reports.
 
 ## A. The drawn table on web (go/no-go gate)
 
-1. **Load CanvasKit locally.** New `assets` step copies `node_modules/canvaskit-wasm/bin/full/canvaskit.wasm` to `public/canvaskit.wasm` (gitignored). New `src/ui/skia-web.ts`: one module store (`useSyncExternalStore`) around `LoadSkiaWeb({ locateFile: () => "/canvaskit.wasm" })`, started after first paint from `src/screens/routes/_layout.tsx`, web only.
+1. **Load CanvasKit locally.** New `assets` step copies `node_modules/canvaskit-wasm/bin/full/canvaskit.wasm` to `public/canvaskit.wasm` (gitignored). New `src/ui/skia/skia-web.ts`: one module store (`useSyncExternalStore`) around `LoadSkiaWeb({ locateFile: () => "/canvaskit.wasm" })`, started after first paint from `src/screens/routes/_layout.tsx`, web only.
 2. **Web entry points become gates.** The Skia files keep their `.native.tsx` names (several have pure-logic `.ts` siblings of the same stem, so a rename collides). Each web sibling waits for the store, then lazy-imports its `.native.tsx` by explicit path, so no Skia module is evaluated before CanvasKit or during the static render:
    - `src/play/canvas/table-canvas.tsx` → `table-canvas.native.tsx` (the list table there is deleted; while CanvasKit loads it shows the reader table, step 5).
    - `src/play/spotlight/layer.tsx` → `layer.native.tsx`; `use-spotlight.ts` `CANVAS` becomes true on web.
