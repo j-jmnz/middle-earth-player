@@ -48,10 +48,10 @@ describe("The Shadows of Mirkwood cycle", () => {
     expect(Object.keys(raw)).not.toContain("prelude");
   });
 
-  it("is listed once, as a cycle with six scenarios and no box, first by release, and is not playable until a scenario is", () => {
+  it("is listed once, as a cycle with six scenarios and no box, first by release, and is playable once a scenario is (The Hunt for Gollum)", () => {
     const rows = index.filter((entry) => entry.id === "shadows-of-mirkwood");
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({ kind: "cycle", scenarioCount: 6, playable: false, box: null, position: 1 });
+    expect(rows[0]).toMatchObject({ kind: "cycle", scenarioCount: 6, playable: true, box: null, position: 1 });
   });
 
   it("builds the six scenario files, each named for its Hall of Beorn title, in release order after the campaigns", () => {
