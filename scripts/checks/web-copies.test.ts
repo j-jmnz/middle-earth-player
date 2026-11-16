@@ -42,6 +42,27 @@ const COPIES: readonly { phone: string; web: string; from?: string; edits: reado
       ["      ) : null}\n    </>\n", '      ) : null}\n\n      {groups.includes("table") ? extra : null}\n    </>\n'],
     ],
   },
+  {
+    phone: "src/ui/text.tsx",
+    web: "src/ui/web/text.canvaskit.tsx",
+    from: "// Bold Text (the phone's",
+    edits: [
+      ["export function Text({ className, ...props }:", "export function Text({ className, children, ...props }:"],
+      ["  return <NativeText className={face} {...props} />;\n", "  return (\n    <NativeText className={face} {...props}>\n      {clickChildren(children)}\n    </NativeText>\n  );\n"],
+    ],
+  },
+  {
+    phone: "src/screens/settings/store.ts",
+    web: "src/screens/settings/store.canvaskit.ts",
+    from: "/**\n * Loads the table settings",
+    edits: [],
+  },
+  {
+    phone: "src/screens/data/database-error.tsx",
+    web: "src/screens/data/database-error.canvaskit.tsx",
+    from: "export class DatabaseBoundary",
+    edits: [],
+  },
 ];
 
 describe("web variants that copy a phone file", () => {

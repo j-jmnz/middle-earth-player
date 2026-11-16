@@ -1,7 +1,7 @@
 // The web booklet reader: the web's `BookletPdf` view (pdf-module.ts), with the props of the phone's native one (`BookletPdfViewProps`). pdf.js draws
 // one page at a time onto a canvas (render.ts); the wheel, the keys and the buttons turn pages, Ctrl+wheel and the buttons zoom. It reads one local
 // file, reports the page like the native view and does not annotate, search or read the text; a screen reader hears the page number, not the page.
-import { useEffect, useEffectEvent, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { View } from "react-native";
 
 import { BodyText } from "../../kit/chrome";
@@ -11,6 +11,7 @@ import { useTableTokens } from "../../../ui/use-table-tokens";
 import type { BookletPdfViewProps } from "booklet-pdf";
 
 import { openPdf } from "./open-pdf";
+import { typingIn } from "../../../play/canvas/table-keys";
 import { clampPage, clampZoom, keyAction, stepWheel, wheelIdle, wheelPixels, zoomAfterWheel, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP, type KeyAction, type WheelState } from "./reader-math";
 import { PageRenderer, showPage, type Area } from "./render";
 
@@ -184,13 +185,24 @@ export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testI
     else zoomTo(ZOOM_MIN, null, null);
   }
 
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
-    if (!renderer) return;
-    const action = keyAction(event.key, { ctrl: event.ctrlKey, meta: event.metaKey, alt: event.altKey, shift: event.shiftKey });
+  // The keys turn pages and zoom while the reader is mounted, with no click on the page first; a key typed in a field is left alone, and Space pressed on a
+  // button is that button's own.
+  const onKey = useEffectEvent((event: KeyboardEvent) => {
+    if (!renderer || event.defaultPrevented || typingIn(event.target)) return;
+    const control = event.target instanceof Element && event.key === " " && event.target.closest("button, a, [role=button]") !== null;
+    const action = control ? null : keyAction(event.key, { ctrl: event.ctrlKey, meta: event.metaKey, alt: event.altKey, shift: event.shiftKey });
     if (!action) return;
     event.preventDefault();
     act(action);
-  }
+  });
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => onKey(event);
+    window.addEventListener("keydown", listener);
+    return () => {
+      window.removeEventListener("keydown", listener);
+    };
+  }, []);
 
   const label = renderer ? `Page ${shown} of ${pageCount}` : "Opening the booklet";
   const problem = failure ?? drawError;
@@ -217,7 +229,6 @@ export function WebBookletPdf({ uri, page: startPage, onPageChange, style, testI
           aria-label={label}
           aria-busy={renderer ? undefined : true}
           tabIndex={0}
-          onKeyDown={onKeyDown}
           style={{ position: "absolute", inset: 0, overflow: "auto", display: "flex", padding: MARGIN, boxSizing: "border-box" }}
         >
           <canvas ref={canvas} role="img" aria-label={label} data-testid="booklet-page" style={{ display: renderer ? "block" : "none", margin: "auto", flex: "none" }} />
