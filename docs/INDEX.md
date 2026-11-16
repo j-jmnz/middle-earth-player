@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.0K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.1K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~590)
@@ -132,7 +132,7 @@ Read the sections your task touches.
     - 1598–1634 The Black Gate Opens (~4.4K) ← 2
     - 1635–1663 Mount Doom (~4.3K)
   - 1664–1672 Nightmare (~410) ← 19
-  - 1673–1711 Deckbuilding (~1.9K)
+  - 1673–1711 Deckbuilding (~2.0K)
   - 1712–1790 Effects (~3.2K)
     - 1714–1772 Three layers (~2.4K) ← 10
     - 1773–1782 Player side quests, contracts and saga cards (~430)

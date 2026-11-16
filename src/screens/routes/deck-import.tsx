@@ -8,7 +8,7 @@ import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchFi
 import { editSavedDeck, startNewDeck } from "../deck/draft";
 import { savedDeckName } from "../deck/status";
 import { listDecks, readDeck, writeDeck } from "../deck/store";
-import { buildDecklist, cardUrl, droppedSentence, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
+import { buildDecklist, cardUrl, deckRefusal, droppedSentence, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
 import { useDatabases } from "../data/databases";
 import { poolOf } from "../pool/cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
@@ -25,6 +25,9 @@ class RingsDbFailure extends Error {
     this.failure = failure;
   }
 }
+
+const PRIVATE_DECK = "That deck is not shared. Its owner turns on Share my decks in their RingsDB account settings.";
+const MISSING_DECK = "RingsDB has no deck with that number.";
 
 async function readJson(url: string): Promise<unknown> {
   let response: Response;
@@ -105,6 +108,12 @@ export default function DeckImportScreen() {
       const fetched = await fetchJson(ringsDbUrl(ref));
       if (fetched && "failure" in fetched) {
         setMessage(fetchFailureMessage(ref, fetched.failure));
+        return;
+      }
+      // A deck its owner does not share, or an unknown id, comes back as a refusal with status 200, not an error status.
+      const refusal = fetched ? deckRefusal(fetched.payload) : null;
+      if (refusal) {
+        setMessage(refusal === "private" ? PRIVATE_DECK : MISSING_DECK);
         return;
       }
       const body = fetched ? readDecklistBody(fetched.payload) : null;

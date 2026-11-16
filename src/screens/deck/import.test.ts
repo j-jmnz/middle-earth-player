@@ -10,6 +10,7 @@ import {
   prebuiltList,
   prebuiltDetail,
   prebuiltRows,
+  deckRefusal,
   readDecklistBody,
   ringsDbUrl,
   type PoolFact,
@@ -37,11 +38,12 @@ describe("parseDecklistRef", () => {
     expect(parseDecklistRef("http://ringsdb.com/api/public/decklist/4821.json?x=1")).toEqual(decklist("4821"));
   });
 
-  it("accepts the two ringsdb.com deck URLs", () => {
+  it("accepts the ringsdb.com deck URLs", () => {
     expect(parseDecklistRef("https://ringsdb.com/deck/view/4821")).toEqual(deck("4821"));
     expect(parseDecklistRef("https://ringsdb.com/deck/view/4821/")).toEqual(deck("4821"));
     expect(parseDecklistRef("https://www.ringsdb.com/deck/view/4821/road-to-rivendell")).toEqual(deck("4821"));
     expect(parseDecklistRef("https://ringsdb.com/api/public/deck/4821.json")).toEqual(deck("4821"));
+    expect(parseDecklistRef("https://ringsdb.com/api/oauth2/deck/load/4821")).toEqual(deck("4821"));
   });
 
   it("refuses anything else", () => {
@@ -56,9 +58,26 @@ describe("parseDecklistRef", () => {
 });
 
 describe("ringsDbUrl", () => {
-  it("names the public JSON of each kind", () => {
+  it("names the public decklist JSON and the deck load URL", () => {
     expect(ringsDbUrl({ kind: "decklist", id: "4821" })).toBe("https://ringsdb.com/api/public/decklist/4821.json");
-    expect(ringsDbUrl({ kind: "deck", id: "4821" })).toBe("https://ringsdb.com/api/public/deck/4821.json");
+    expect(ringsDbUrl({ kind: "deck", id: "4821" })).toBe("https://ringsdb.com/api/oauth2/deck/load/4821");
+  });
+});
+
+describe("deckRefusal", () => {
+  // The two refusals ringsdb.com/api/oauth2/deck/load/{id} returns, with status 200.
+  it("tells an unshared deck from an unknown id", () => {
+    const unshared = {
+      success: false,
+      error: 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.',
+    };
+    expect(deckRefusal(unshared)).toBe("private");
+    expect(deckRefusal({ success: false, error: "Deck not found." })).toBe("missing");
+  });
+
+  it("passes a deck through", () => {
+    expect(deckRefusal({ id: 705936, name: "Road", heroes: {}, slots: {} })).toBeNull();
+    expect(deckRefusal(null)).toBeNull();
   });
 });
 
