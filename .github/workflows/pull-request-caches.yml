@@ -1,0 +1,27 @@
+name: pull request caches
+
+# test.yml's caches for a pull request are saved under refs/pull/<number>/merge and serve only that pull request, so they
+# are deleted when it closes (docs/releasing.md, Caches). pull_request_target gives a token that may delete them for a pull
+# request from a fork too; the job checks out nothing and runs no code from the pull request.
+on:
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  actions: write
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete the pull request's caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF: refs/pull/${{ github.event.pull_request.number }}/merge
+        run: |
+          caches="repos/$GITHUB_REPOSITORY/actions/caches"
+          gh api --paginate -X GET "$caches" -f ref="$REF" -f per_page=100 --jq '.actions_caches[] | "\(.id) \(.key)"' |
+            while read -r id key; do
+              gh api -X DELETE "$caches/$id" --silent
+              echo "deleted $key"
+            done

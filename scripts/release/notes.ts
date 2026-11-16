@@ -1,4 +1,4 @@
-import { sourceUrl } from "./sideload-source.ts";
+import { BUNDLE_ID, sourceUrl } from "./sideload-source.ts";
 import { joinNames } from "./reach.ts";
 import type { Change, CommitType } from "./version.ts";
 
@@ -29,6 +29,13 @@ const SECTIONS: readonly { type: CommitType; title: string }[] = [
   { type: "refactor", title: "Under the hood" },
 ];
 
+/** The link that adds the app to Obtainium, which then installs each release from the Releases page (README, Install). The
+ * Android package is the iOS bundle id. */
+export function obtainiumUrl(repository: string): string {
+  const app = { id: BUNDLE_ID, url: `https://github.com/${repository}`, author: repository.split("/")[0], name: "Middle-Earth Player" };
+  return `https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/${encodeURIComponent(JSON.stringify(app))}`;
+}
+
 export function renderNotes(input: NotesInput): string {
   const out: string[] = [];
   const warnings = input.changes.flatMap((change) => change.breaking);
@@ -47,6 +54,7 @@ export function renderNotes(input: NotesInput): string {
     "## Install",
     "",
     "- Android: download the `.apk` below and open it. Allow your browser or file manager to install unknown apps when it asks. It installs over an earlier release and keeps your campaigns.",
+    `- Android, with automatic updates: install [Obtainium](https://obtainium.imranr.dev), then tap [Add to Obtainium](${obtainiumUrl(input.repository)}) on your phone, or add \`https://github.com/${input.repository}\` in Obtainium yourself. It installs each new release over the last and keeps your campaigns.`,
     `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle-Earth Player from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The README (Install) has the steps.`,
   );
   if (input.testflightUrl) out.push(`- Or join the TestFlight beta through [its public link](${input.testflightUrl}); a release reaches it once Apple has reviewed the build.`);
