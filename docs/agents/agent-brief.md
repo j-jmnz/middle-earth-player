@@ -122,13 +122,13 @@ Each is cited in `docs/brief.md`.
 
 **Screen half exit:** the scenario's words and widgets are written and tested, its Maestro win and loss flows are written, and no control types damage, resources, threat, progress, or life.
 
-## Checkpoints (API usage limits can stop you mid-task)
+## Commit often (API usage limits can stop you mid-task)
 
 - Keep a handover file at `docs/handover/<F>.md`: what is done, what is in progress, design decisions, next steps, and the
   lines still open, enough for a fresh agent to continue.
 - After each meaningful step (a mechanic implemented with its tests passing, a batch of records written), commit on your
-  worktree branch with a typed checkpoint message (`.claude/rules/commit-standards.md`, Squash; restore `src/effects/open-lines.ts` first), handover file included. If
-  you sense you are running long, checkpoint first. Then push the worktree branch to GitHub (the user allows extra
+  worktree branch with a typed message that says what the step did (`.claude/rules/commit-standards.md`, Commit often; restore `src/effects/open-lines.ts` first), handover file included. If
+  you sense you are running long, commit first. Then push the worktree branch to GitHub (the user allows extra
   branches): `git push -u origin HEAD:refs/heads/wip/<F>`, retrying on network errors (2s, 4s, 8s, 16s). Never push to
   `<BASE>` or `main`. Your final commit deletes `docs/handover/<F>.md`.
 

@@ -1,10 +1,16 @@
 name: Pack the app's assets
 description: Installs the dependencies and packs the catalog, the booklets and every card picture into assets/, as each native build needs (docs/releasing.md, Jobs).
 
+outputs:
+  caches:
+    description: The cache keys a successful pack used (the pnpm store and the pictures), which the release workflow's cleanup job keeps.
+    value: ${{ steps.install.outputs.key }} ${{ steps.key.outputs.scans }}
+
 runs:
   using: composite
   steps:
-    - uses: ./.github/actions/install
+    - id: install
+      uses: ./.github/actions/install
     # pdftoppm renders the campaign, boon and burden cards from FFG's PDFs (scripts/build/pack-scans.ts).
     - if: runner.os == 'Linux'
       shell: bash
