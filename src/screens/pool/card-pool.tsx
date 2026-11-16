@@ -345,10 +345,8 @@ export function CardPoolBody({
   );
 }
 
-// The bar's count: the deck's ("3 heroes · 47 of 50 cards"), or the side deck's ("12 cards", or "9 of 14 loot" while the deck's
-// contract builds a loot deck from it).
-function sidePileLine(side: boolean, count: number, loot: { found: number; size: number } | null, deckLine: string): string {
-  if (!side) return deckLine;
+// The bar's count of the side deck: "12 cards", or "9 of 14 loot" while the deck's contract builds a loot deck from it.
+function sideDeckLine(count: number, loot: { found: number; size: number } | null): string {
   if (loot) return `${loot.found} of ${loot.size} loot`;
   return `${count} ${count === 1 ? "card" : "cards"}`;
 }
@@ -412,7 +410,7 @@ export function CardPool({
                 <View className="flex-row items-baseline justify-between">
                   <Text className="text-label text-muted">{side ? "Side deck" : "Deck"}</Text>
                   <Text testID="pool-deck-count" className="text-label text-bone" numberOfLines={1}>
-                    {sidePileLine(side, sideCount, loot ? { found: lootFound, size: loot.size } : null, deckCountLine({ heroes, cards: deckCards }))}
+                    {side ? sideDeckLine(sideCount, loot ? { found: lootFound, size: loot.size } : null) : deckCountLine({ heroes, cards: deckCards })}
                   </Text>
                 </View>
                 {side && !loot ? null : (

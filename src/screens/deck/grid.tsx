@@ -6,7 +6,7 @@ import { Pressable, View } from "react-native";
 
 import { TextButton, ToggleChip } from "../kit/chrome";
 import { CountStepper } from "../kit/count-stepper";
-import { announceDraftChange, changeDraftCount, draftAddRefused, type DraftPicks, type DraftPile, type TitleLookup } from "./draft";
+import { announceDraftChange, changeDraftCount, draftAddRefused, targetPicks, type DraftPicks, type DraftPile, type TitleLookup } from "./draft";
 import type { DeckSectionRow } from "./status";
 import { CardThumb, useCardPreview } from "../images/picture";
 import { usePalette } from "../kit/palette-hook";
@@ -90,7 +90,7 @@ export function sideRows(cards: readonly EditorCard[], cols: number, note: strin
 export function refusedCodes(picks: DraftPicks, deckCards: readonly EditorCard[], lookup: TitleLookup): ReadonlySet<string> {
   const out = new Set<string>();
   for (const card of deckCards) {
-    const held = card.pile === "side" ? { heroes: [], cards: picks.side } : picks;
+    const held = targetPicks(picks, card.pile);
     if (draftAddRefused(held, { code: card.code, name: card.name, typeCode: card.typeCode ?? "", deckLimit: card.deckLimit }, lookup, card.pile)) out.add(refusedKey(card));
   }
   return out;

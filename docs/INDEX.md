@@ -52,7 +52,7 @@ Read the sections your task touches.
   - 222–225 Support (~90)
   - 226–241 Attribution (~410)
   - 242–245 License (~50)
-- `docs/architecture.md` — Architecture (~24.3K tok)
+- `docs/architecture.md` — Architecture (~24.4K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
@@ -63,9 +63,9 @@ Read the sections your task touches.
     - 223–234 Mechanic families (~5.0K) ← 5
   - 235–240 Effects (~600) ← 5
   - 241–273 Scenario definition (~800)
-  - 274–318 Persistence (~3.0K) ← 1
+  - 274–318 Persistence (~3.1K) ← 1
     - 295–298 Open games across an update (~50)
-    - 299–305 Open game rows (~650)
+    - 299–305 Open game rows (~660)
     - 306–311 Opening a game (~350)
     - 312–318 Continue, Restart and the checkpoint (~380)
   - 319–324 Images (~940) ← 6
@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.3K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.4K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~590)
@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 1673–1713 Deckbuilding (~2.1K)
   - 1714–1793 Effects (~3.3K)
     - 1716–1774 Three layers (~2.4K) ← 10
-    - 1775–1785 Player side quests, contracts and saga cards (~550)
+    - 1775–1785 Player side quests, contracts and saga cards (~580) ← 1
     - 1786–1789 Window stack (~100)
     - 1790–1793 Coverage test (~270)
   - 1794–1814 Data sources (~530)
@@ -261,19 +261,19 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~13.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~13.6K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–281 Open items (~12.4K)
+  - 22–282 Open items (~12.5K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
     - 35–76 Fixtures and Maestro (~2.3K)
     - 77–115 Rules and engine (~1.6K)
     - 116–236 Rules and engine (Angmar Awakened) (~5.3K)
-    - 237–261 Screens and code (~1.6K)
-    - 262–281 Rules and engine (The Two Towers) (~1.4K)
-  - 282–302 Standing decisions (~700)
+    - 237–262 Screens and code (~1.6K)
+    - 263–282 Rules and engine (The Two Towers) (~1.4K)
+  - 283–303 Standing decisions (~700)
 
 ## Live plans
 

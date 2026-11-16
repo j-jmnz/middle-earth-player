@@ -272,7 +272,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
     // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
-    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId)) : null,
+    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId)) : null,
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
@@ -326,8 +326,7 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
-  if (held.length > 0) return heldWords(held.map((other) => printedOf(ctx.cards, other.code).name));
-  return lootMark(game, ctx, cardId);
+  return held.length > 0 ? heldWords(held.map((other) => printedOf(ctx.cards, other.code).name)) : null;
 }
 
 // The Burglar's Turn (22024:B:2): the attachments a location guards as loot, "2 loot"; on the contract, the cards left in its
@@ -335,7 +334,12 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
 function lootMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
   if (!game.lootDecks) return null;
   const card = game.cards[cardId];
-  if (card && card.controller != null && printedOf(ctx.cards, card.code).type === "contract" && game.lootDecks[card.controller]) return lootDeckWords(game.lootDecks[card.controller]?.length ?? 0);
+  if (card && printedOf(ctx.cards, card.code).type === "contract") {
+    // Only the contract whose player chose a loot deck: another seat's contract has none (its entry is an empty list).
+    const seat = card.controller;
+    const chose = seat != null && (game.lootPlan?.[seat]?.length ?? 0) > 0;
+    return chose ? lootDeckWords(game.lootDecks[seat]?.length ?? 0) : null;
+  }
   const guarded = lootUnder(game, cardId);
   return guarded.length > 0 ? lootGuardWords(guarded.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name)) : null;
 }

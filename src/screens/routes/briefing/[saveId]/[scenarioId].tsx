@@ -19,7 +19,7 @@ import { recordUnclosedRun } from "../../../session/table-session";
 import { dealSeed } from "../../../nav/e2e";
 import { needWords } from "../../../briefing/words";
 import { NeedChoices } from "../../../briefing/need-choices";
-import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, expandSide, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
 import { SeatPicker } from "../../../briefing/seat-picker";
 import { heroFace } from "../../../art/hero-tile";
 import { routeCode } from "../../../nav/route-code";
@@ -76,8 +76,8 @@ export default function Briefing() {
     () =>
       Array.from({ length: seatCount }, (_, index) => {
         const deck = savedDecks.find((item) => item.id === picked[index]);
-        const side = expandSide(deck);
-        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck), ...(side.length > 0 ? { side } : {}) };
+        // The side deck goes with every new deal, empty or not (BriefingSeat).
+        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck?.cards), side: expand(deck?.side) };
       }),
     [seatCount, savedDecks, picked],
   );
@@ -151,7 +151,7 @@ export default function Briefing() {
     const stored = {
       scenarioId: scenario?.id ?? "",
       difficulty,
-      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck], ...(seat.side ? { side: [...seat.side] } : {}) })),
+      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck], side: [...(seat.side ?? [])] })),
       ringBearer,
       choices: [...choices],
       acceptPenalty: accepted,

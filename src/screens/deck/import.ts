@@ -168,12 +168,14 @@ export function buildDecklist(
     if (code in body.heroes && (!fact || fact.typeCode === "hero")) continue;
     take(code, count);
   }
-  // The side deck keeps the deck-legal cards that are not heroes or contracts; the rest are dropped and named like the deck's.
+  // The side deck keeps the deck-legal cards that are not heroes or contracts. A hero or a contract there is left out without a word
+  // (a product's sideboard holds its spare heroes); a card outside the pool is dropped and named like the deck's, once.
   for (const [code, count] of Object.entries(body.side ?? {})) {
     const fact = pool.get(code);
     if (count < 1) continue;
-    if (!fact || !fact.deckLegal || fact.typeCode === "hero" || fact.typeCode === "contract") droppedCodes.push(code);
-    else side.push({ code, count });
+    if (!fact || !fact.deckLegal) {
+      if (!droppedCodes.includes(code)) droppedCodes.push(code);
+    } else if (fact.typeCode !== "hero" && fact.typeCode !== "contract") side.push({ code, count });
   }
 
   return { name: body.name, heroes, cards, side, droppedCodes, heroLimit };

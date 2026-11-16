@@ -32,5 +32,8 @@ describe("loot pills on the table (22024:B:2)", () => {
     const contract = Object.values(traveled.cards).find((card) => card.code === "22024")!;
     expect(slotNumbers(traveled, ctx, contract.id).under).toMatchObject({ text: "2 left", speech: "2 cards left in the loot deck" });
     expect(slotNumbers(traveled, ctx, made.id).under?.text).toBe("1 loot");
+    // A contract whose player chose no loot deck (another seat's, two-handed) has no pill.
+    const unchosen: ScenarioState = { ...traveled, lootPlan: [[]] };
+    expect(slotNumbers(unchosen, ctx, contract.id).under).toBeNull();
   });
 });

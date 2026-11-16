@@ -102,15 +102,15 @@ describe("buildDecklist", () => {
       name: "Road",
       heroes: { "141002": 1, "141003": 1 },
       slots: { "01073": 3, "141004": 1, "99999": 2 },
-      sideslots: { "01073": 3, "141002": 1, "01026": 1 },
+      sideslots: { "01073": 3, "141002": 1, "01026": 1, "99999": 1 },
     });
     expect(body?.name).toBe("Road");
     const built = buildDecklist(body!, pool);
     expect(built.heroes).toEqual(["141002", "141003", "141004"]);
     expect(built.cards).toEqual([{ code: "01073", count: 3 }]);
-    // A hero and a card that is not deck-legal are no side deck cards.
+    // A hero is left out of the side deck without a word; a card outside the pool is dropped and named once.
     expect(built.side).toEqual([{ code: "01073", count: 3 }]);
-    expect(built.droppedCodes).toEqual(["99999", "141002", "01026"]);
+    expect(built.droppedCodes).toEqual(["99999", "01026"]);
     expect(built.heroLimit).toBeNull();
     expect(droppedSentence(["99999"])).toBe("Dropped 99999.");
   });

@@ -64,6 +64,12 @@ describe("The Burglar's Turn's loot deck from the side deck (22024:A:2)", () => 
     expect(seat?.loot).toEqual(loot.slice(0, 14));
   });
 
+  it("still deals a loadout stored before side decks, with no loot deck", () => {
+    const { side: _, ...old } = loadout([]).seats[0]!;
+    const start = standaloneStart(world, 1, { ...loadout([]), seats: [old] }, 1);
+    expect(start.seats[0]?.loot).toBeUndefined();
+  });
+
   it("deals the 14 as the loot deck and flips the contract", () => {
     const start = standaloneStart(world, 1, loadout(loot.slice(0, 14)), 1);
     const ctx = contextOf(world);

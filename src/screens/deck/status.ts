@@ -1,6 +1,6 @@
-import { deckRulesOf } from "../../catalog/deck-rules";
-import { deckSaveRefusal, formatDeckRefusal, type DeckSaveCard, type DeckSaveRefusal } from "../../catalog/deck-save";
-import { lootCodes, lootRefusal, lootRuleOf, lootWords, type LootRule } from "../../catalog/loot";
+import { deckReadyRefusal } from "../../catalog/deck-ready";
+import { formatDeckRefusal, type DeckSaveCard, type DeckSaveRefusal } from "../../catalog/deck-save";
+import { lootCodes, lootRuleOf, lootWords, type LootRule } from "../../catalog/loot";
 import { EFFECTS } from "../../effects";
 
 // What the deck screens say about a deck: whether it is ready to play, its counts, and its cards grouped by type. A deck
@@ -38,12 +38,7 @@ export function deckCardCount(cards: DeckContent["cards"]): number {
  * loot deck (The Burglar's Turn) also needs its cards in the side deck (src/catalog/loot.ts).
  */
 export function deckRefusal(deck: DeckContent, faces: ReadonlyMap<string, DeckSaveCard>): DeckSaveRefusal | null {
-  const codes = deck.cards.map((card) => card.code);
-  // The rules of the deck's contract, if it has one (a contract prints deckbuilding rules on its side A).
-  const refusal = deckSaveRefusal(deck.heroes, deck.cards, faces, [], deckRulesOf(EFFECTS, codes));
-  if (refusal) return refusal;
-  const loot = lootRuleOf(EFFECTS, codes);
-  return loot ? lootRefusal(loot, deck.side ?? [], faces) : null;
+  return deckReadyRefusal(deck.heroes, deck.cards, faces, EFFECTS, deck.side ?? []);
 }
 
 /** The loot deck the deck's contract builds from its side deck (The Burglar's Turn), or null when it has no such contract. */

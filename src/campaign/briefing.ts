@@ -3,8 +3,9 @@
 // into either the opening start the checklist produces or the sentences that refuse it. Pure: the screen shows what
 // this returns and deals only when `dealable` is true.
 import { deckRulesOf, heroLimit } from "../catalog/deck-rules.ts";
-import { deckSaveRefusal, formatDeckRefusal } from "../catalog/deck-save.ts";
-import { lootCodes, lootRefusal, lootRuleOf } from "../catalog/loot.ts";
+import { deckReadyRefusal } from "../catalog/deck-ready.ts";
+import { formatDeckRefusal } from "../catalog/deck-save.ts";
+import { lootCodes, lootRuleOf } from "../catalog/loot.ts";
 import { placementsAt, recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
 import { printedOf } from "../rules/core/printed.ts";
 import type { StartScenario } from "../rules/setup/setup.ts";
@@ -23,7 +24,8 @@ import type { World } from "./world.ts";
 import { wilderlandFacts } from "./wilderland.ts";
 import { xpFacts, type ModeCard } from "./xp.ts";
 
-// `side`: the saved deck's side deck, one code per copy (absent for none).
+// `side`: the saved deck's side deck, one code per copy. A new deal always carries it (empty for none); a loadout stored before side
+// decks has none, and its loot deck is not asked for (src/catalog/deck-ready.ts).
 export type BriefingSeat = { deckId: string | null; heroes: readonly string[]; deck: readonly string[]; side?: readonly string[] | undefined };
 
 export type BriefingInput = {
@@ -138,11 +140,10 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
     } else if (world.deckFacts) {
       // A deck saves before it is ready to play (rr.deckbuilding); it is not dealt until it is. A contract's deckbuilding rules apply.
       // A treasure the log records is no deck card for this check: it is outside the 50 card minimum (emce.treasure); validateLoadout admits or refuses it.
-      const refusal = deckSaveRefusal(seat.heroes, deckCounts(seat.deck.filter((code) => world.cards.get(code)?.campaignKind !== "treasure")), world.deckFacts, [], deckRulesOf(world.effects, seat.deck));
       // A contract that builds a loot deck needs it in the side deck (src/catalog/loot.ts).
-      const rule = lootRuleOf(world.effects, seat.deck);
-      const short = refusal ?? (rule ? lootRefusal(rule, deckCounts(seat.side ?? []), world.deckFacts) : null);
-      if (short) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(short)}` });
+      const side = seat.side ? deckCounts(seat.side) : undefined;
+      const refusal = deckReadyRefusal(seat.heroes, deckCounts(seat.deck.filter((code) => world.cards.get(code)?.campaignKind !== "treasure")), world.deckFacts, world.effects, side);
+      if (refusal) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(refusal)}` });
     }
     for (const code of seat.heroes) {
       if (fallen.includes(code)) problems.push({ rule: "A fallen hero cannot start", message: `${nameOf(code)} is a fallen hero and cannot start.` });
