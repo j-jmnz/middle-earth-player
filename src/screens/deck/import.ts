@@ -29,8 +29,8 @@ export type BuiltDecklist = {
 export type RingsDbRef = { kind: "decklist" | "deck"; id: string };
 
 /**
- * A decimal id (a decklist), a ringsdb.com decklist or deck view URL (with or without its slug), or the public decklist or
- * deck JSON URL.
+ * A decimal id (a decklist), a ringsdb.com decklist or deck view URL (with or without its slug), the public decklist or
+ * deck JSON URL, or the deck load URL.
  */
 export function parseDecklistRef(input: string): RingsDbRef | null {
   const trimmed = input.trim();
@@ -48,12 +48,49 @@ export function parseDecklistRef(input: string): RingsDbRef | null {
   if (view?.[1] && view[2]) return { kind: view[1] === "deck" ? "deck" : "decklist", id: view[2] };
   const api = /^\/api\/public\/(decklist|deck)\/(\d+)\.json$/.exec(url.pathname);
   if (api?.[1] && api[2]) return { kind: api[1] === "deck" ? "deck" : "decklist", id: api[2] };
+  const load = /^\/api\/oauth2\/deck\/load\/(\d+)\/?$/.exec(url.pathname);
+  if (load?.[1]) return { kind: "deck", id: load[1] };
   return null;
 }
 
-/** The public JSON for a ref. A deck's payload has the decklist's `name`, `heroes` and `slots`. */
+/**
+ * The JSON for a ref. A decklist comes from the public API. RingsDB answers 404 on /api/public/deck for every deck, shared
+ * or not, so a deck comes from the deck load URL, which needs no sign-in for a shared deck. Both payloads have `name`,
+ * `heroes` and `slots`.
+ */
 export function ringsDbUrl(ref: RingsDbRef): string {
-  return `https://ringsdb.com/api/public/${ref.kind}/${ref.id}.json`;
+  if (ref.kind === "deck") return `https://ringsdb.com/api/oauth2/deck/load/${ref.id}`;
+  return `https://ringsdb.com/api/public/decklist/${ref.id}.json`;
+}
+
+/** Why RingsDB refused a deck: its owner does not share their decks, or there is no deck with that id. */
+export type DeckRefusal = "private" | "missing";
+
+/**
+ * The deck load URL refuses with status 200 and `{ success: false, error }`: "Deck not found." for an unknown id, and a
+ * sentence asking the owner to enable "Share my decks" otherwise. Null for anything else, a deck included.
+ */
+export function deckRefusal(payload: unknown): DeckRefusal | null {
+  if (typeof payload !== "object" || payload === null) return null;
+  const record = payload as { success?: unknown; error?: unknown };
+  if (record.success !== false) return null;
+  return typeof record.error === "string" && /not found/i.test(record.error) ? "missing" : "private";
+}
+
+/** How a RingsDB request went wrong: no answer at all, or an answer with an error status. */
+export type FetchFailure = { kind: "no-answer" } | { kind: "status"; status: number };
+
+/**
+ * What the import screen says when RingsDB answers with no deck or decklist at all. A deck's own refusals come back with
+ * status 200 (`deckRefusal`); a 401, 403 or 404 on a deck is read as a refusal too, so it names both fixes. Only a refusal
+ * mentions sharing: a request that got no answer, or a server error, says so instead.
+ */
+export function fetchFailureMessage(ref: RingsDbRef, failure: FetchFailure): string {
+  if (failure.kind === "no-answer") return "RingsDB did not respond. Check your connection and try again.";
+  const refused = failure.status === 401 || failure.status === 403 || failure.status === 404;
+  if (!refused) return `RingsDB could not send that ${ref.kind} (error ${failure.status}). Try again later.`;
+  if (ref.kind === "decklist") return "RingsDB has no published decklist with that number.";
+  return "RingsDB would not send that deck. Check the link is your own deck's page, and that Share my decks is on and saved in your RingsDB account settings.";
 }
 
 export function cardUrl(code: string): string {

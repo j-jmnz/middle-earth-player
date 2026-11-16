@@ -5,10 +5,10 @@ import { View } from "react-native";
 
 import { formatDeckRefusal } from "../../catalog/deck-save";
 import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchField, Section, SphereMark, markedSphere, type MarkedSphere } from "../kit/chrome";
-import { editSavedDeck, startNewDeck } from "../deck/draft";
+import { startNewDeck } from "../deck/draft";
 import { savedDeckName } from "../deck/status";
 import { listDecks, readDeck, writeDeck } from "../deck/store";
-import { buildDecklist, cardUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type PrebuiltRow } from "../deck/import";
+import { buildDecklist, cardUrl, deckRefusal, droppedSentence, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
 import { useDatabases } from "../data/databases";
 import { poolOf } from "../pool/cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
@@ -17,12 +17,26 @@ import { goBack } from "../nav/go-back";
 import { useListGutter } from "../nav/list-gutter";
 import { showToast } from "../kit/toast";
 
-const FETCH_FAILURE = "RingsDB did not respond.";
-const PRIVATE_DECK = "RingsDB did not return that deck. Make it public in its RingsDB sharing settings.";
+// A failed request, read by fetchFailureMessage (deck/import.ts).
+class RingsDbFailure extends Error {
+  readonly failure: FetchFailure;
+  constructor(failure: FetchFailure) {
+    super("RingsDB request failed");
+    this.failure = failure;
+  }
+}
+
+const PRIVATE_DECK = "That deck is not shared. Its owner turns on Share my decks in their RingsDB account settings.";
+const MISSING_DECK = "RingsDB has no deck with that number.";
 
 async function readJson(url: string): Promise<unknown> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(FETCH_FAILURE);
+  let response: Response;
+  try {
+    response = await fetch(url);
+  } catch {
+    throw new RingsDbFailure({ kind: "no-answer" });
+  }
+  if (!response.ok) throw new RingsDbFailure({ kind: "status", status: response.status });
   return response.json() as Promise<unknown>;
 }
 
@@ -40,12 +54,12 @@ async function droppedName(code: string): Promise<string> {
 }
 
 // The try/catch and try/finally below live here because the React Compiler cannot compile them inside a component.
-// The deck or decklist as fetched, or null when the request failed.
-async function fetchJson(url: string): Promise<{ payload: unknown } | null> {
+// The deck or decklist as fetched, how the request failed, or null when the answer was not JSON.
+async function fetchJson(url: string): Promise<{ payload: unknown } | { failure: FetchFailure } | null> {
   try {
     return { payload: await readJson(url) };
-  } catch {
-    return null;
+  } catch (error) {
+    return error instanceof RingsDbFailure ? { failure: error.failure } : null;
   }
 }
 
@@ -92,12 +106,17 @@ export default function DeckImportScreen() {
     }
     await whileBusy(setBusy, async () => {
       const fetched = await fetchJson(ringsDbUrl(ref));
-      if (!fetched) {
-        // RingsDB answers 404 for a deck its owner does not share, so the likely fix is the sharing setting.
-        setMessage(ref.kind === "deck" ? PRIVATE_DECK : FETCH_FAILURE);
+      if (fetched && "failure" in fetched) {
+        setMessage(fetchFailureMessage(ref, fetched.failure));
         return;
       }
-      const body = readDecklistBody(fetched.payload);
+      // A deck its owner does not share, or an unknown id, comes back as a refusal with status 200, not an error status.
+      const refusal = fetched ? deckRefusal(fetched.payload) : null;
+      if (refusal) {
+        setMessage(refusal === "private" ? PRIVATE_DECK : MISSING_DECK);
+        return;
+      }
+      const body = fetched ? readDecklistBody(fetched.payload) : null;
       if (!body) {
         setMessage("That decklist could not be read.");
         return;
@@ -124,8 +143,8 @@ export default function DeckImportScreen() {
     router.push({ pathname: "/deck/[id]", params: { id: "new" } });
   }
 
-  // Saves an imported deck, ready to play or not, and opens it in the editor, which names what was dropped and what the
-  // deck still lacks. A hero listed twice is refused: the list itself is wrong.
+  // Saves an imported deck, ready to play or not, and goes back to the deck list. A hero listed twice is refused: the list
+  // itself is wrong.
   function save(built: BuiltDecklist, names: readonly string[]): void {
     if (built.heroLimit) {
       setMessage(formatDeckRefusal({ cardName: built.heroLimit.cardName, rule: "Deck limit is 1." }));
@@ -133,12 +152,12 @@ export default function DeckImportScreen() {
     }
     const name = savedDeckName(built.name, listDecks(user).map((deck) => deck.name));
     const id = writeDeck(user, { id: null, name, heroes: built.heroes, cards: built.cards });
-    const row = readDeck(user, id);
-    if (!row) return;
+    if (!readDeck(user, id)) return;
     opening.current = true;
-    editSavedDeck(row, droppedSentence(names));
-    showToast(`Imported ${name}`, { carry: true });
-    router.replace({ pathname: "/deck/[id]", params: { id } });
+    // Back on the deck list, which reads the new deck on focus; the toast names what was dropped.
+    const dropped = droppedSentence(names);
+    showToast(dropped ? `Imported ${name}. ${dropped}` : `Imported ${name}`, { carry: true });
+    goBack(router, "/decks");
   }
 
   // The heroes' spheres, once each, in hero order.
@@ -154,7 +173,7 @@ export default function DeckImportScreen() {
       </View>
       <Section title="RingsDB" className="mt-4" />
       <View className="flex-row">
-        <SearchField testID="deck-import-input" value={value} onChangeText={setValue} placeholder="RingsDB deck or decklist" accessibilityLabel="RingsDB deck or decklist link, or decklist number" search={false} />
+        <SearchField testID="deck-import-input" value={value} onChangeText={setValue} placeholder="RingsDB URL or decklist ID" accessibilityLabel="RingsDB deck or decklist link, or decklist number" search={false} />
       </View>
       {message ? (
         <BodyText tone="danger" className="mt-4">

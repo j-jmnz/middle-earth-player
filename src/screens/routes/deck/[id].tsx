@@ -136,8 +136,10 @@ export default function DeckEditor() {
     showToast(`Saved ${name}`, { carry: true });
   }
 
+  // Save is disabled while there is nothing to save: a saved deck as user.db has it, or a new deck with no hero or card.
   function onSave(): void {
-    if (dirty || !draft.saved) save();
+    if (!dirty) return;
+    save();
     release();
     goBack(router, "/decks");
   }
@@ -274,7 +276,7 @@ export default function DeckEditor() {
         <View className="flex-row items-center gap-2.5" style={{ paddingLeft: insets.left }}>
           <View className="flex-1">{status}</View>
           <View className="flex-1">
-            <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} />
+            <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} disabled={!dirty} />
           </View>
         </View>
       ) : (
@@ -286,7 +288,7 @@ export default function DeckEditor() {
               <SecondaryButton testID="deck-add" label="Add cards" onPress={() => addOfType(null)} />
             </View>
             <View className="flex-1">
-              <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} />
+              <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} disabled={!dirty} />
             </View>
           </View>
         </View>

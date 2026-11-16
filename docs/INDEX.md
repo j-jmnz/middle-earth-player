@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~198.9K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~199.1K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~590)
@@ -132,7 +132,7 @@ Read the sections your task touches.
     - 1598–1634 The Black Gate Opens (~4.4K) ← 2
     - 1635–1663 Mount Doom (~4.3K)
   - 1664–1672 Nightmare (~410) ← 19
-  - 1673–1711 Deckbuilding (~1.9K)
+  - 1673–1711 Deckbuilding (~2.0K)
   - 1712–1790 Effects (~3.2K)
     - 1714–1772 Three layers (~2.4K) ← 10
     - 1773–1782 Player side quests, contracts and saga cards (~430)
@@ -176,7 +176,7 @@ Read the sections your task touches.
   - 357–368 Banner (~750) ← 5
   - 369–388 Screen reader (~2.8K) ← 17
   - 389–392 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~30.4K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~30.5K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -191,7 +191,7 @@ Read the sections your task touches.
   - 231–245 Icons (~480) ← 7
   - 246–264 Card art (~740) ← 2
   - 265–279 Tablets (~510) ← 13
-  - 280–469 Screens (~17.2K)
+  - 280–469 Screens (~17.3K)
     - 284–289 Splash (~210) ← 3
     - 290–293 App icon (~80)
     - 294–309 Campaigns (campaign list) (~1.5K) ← 6
@@ -206,10 +206,10 @@ Read the sections your task touches.
     - 376–379 Table opens stale (~750) ← 4
     - 380–393 Resolution and standalone outcome (~1.9K) ← 2
     - 394–403 Decks (~920) ← 2
-    - 404–413 Deck builder (deck editor) (~850) ← 3
+    - 404–413 Deck builder (deck editor) (~870) ← 3
     - 414–423 Card pool (the Cards tab) (~770) ← 3
     - 424–429 Card (~490) ← 2
-    - 430–435 Packs and pack cards (~130)
+    - 430–435 Packs and pack cards (~170)
     - 436–449 Settings (~940) ← 11
     - 450–455 Rules (~470) ← 1
     - 456–459 Rule (~220) ← 1
