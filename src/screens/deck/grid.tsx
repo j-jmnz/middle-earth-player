@@ -71,15 +71,14 @@ export function gridRows(rows: readonly DeckSectionRow<EditorCard>[], cols: numb
 
 /**
  * The side deck's rows: its heading, the line that says what it is for (`note`), then its cards by name in rows of `cols`, or the
- * empty row.
+ * empty row. An empty side deck no contract asks for (`asked` false) is its heading alone, with its Add: most decks never use one.
  */
-export function sideRows(cards: readonly EditorCard[], cols: number, note: string): EditorRow[] {
+export function sideRows(cards: readonly EditorCard[], cols: number, note: string, asked: boolean): EditorRow[] {
   const sorted = [...cards].sort((left, right) => left.name.localeCompare(right.name) || left.code.localeCompare(right.code));
   const count = sorted.reduce((sum, card) => sum + card.count, 0);
-  const head: EditorRow[] = [
-    { kind: "type", key: "type-side", type: "side", title: "Side deck", count },
-    { kind: "note", key: "note-side", text: note },
-  ];
+  const heading: EditorRow = { kind: "type", key: "type-side", type: "side", title: "Side deck", count };
+  if (sorted.length === 0 && !asked) return [heading];
+  const head: EditorRow[] = [heading, { kind: "note", key: "note-side", text: note }];
   if (sorted.length === 0) return [...head, { kind: "empty", key: "empty-side", type: "side", title: "Side deck" }];
   return [...head, ...gridRows(sorted.map((card) => ({ kind: "card" as const, key: `side-${card.code}`, card })), cols)];
 }
@@ -181,6 +180,7 @@ export const DeckCardCell = memo(function DeckCardCell({ card, width, full, look
           name={card.name}
           count={card.count}
           full={full}
+          where={side ? "side deck" : undefined}
           ids={side ? { dec: `count-dec-side-${card.code}`, count: `count-side-${card.code}`, inc: `count-inc-side-${card.code}` } : undefined}
           onChange={(delta) => announceDraftChange(changeDraftCount(card.code, card.name, card.deckLimit, delta, lookup, card.pile))}
         />

@@ -30,7 +30,7 @@ describe("loot pills on the table (22024:B:2)", () => {
     const active: ScenarioState = updateCard({ ...made.state, activeLocation: made.id }, made.id, { zone: "activeLocation" });
     const traveled = synced(run(queueEvent(synced(active, ctx), { trigger: "traveled", seat: 0, subject: made.id }), ctx), ctx);
     const contract = Object.values(traveled.cards).find((card) => card.code === "22024")!;
-    expect(slotNumbers(traveled, ctx, contract.id).under).toMatchObject({ text: "2 loot", speech: "2 cards left in the loot deck" });
+    expect(slotNumbers(traveled, ctx, contract.id).under).toMatchObject({ text: "2 left", speech: "2 cards left in the loot deck" });
     expect(slotNumbers(traveled, ctx, made.id).under?.text).toBe("1 loot");
   });
 });

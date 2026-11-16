@@ -9,6 +9,6 @@ describe("loot pills (22024:B:2)", () => {
 
   it("counts the loot deck", () => {
     expect(lootDeckWords(1).speech).toBe("1 card left in the loot deck");
-    expect(lootDeckWords(0)).toEqual({ text: "0 loot", loses: false, speech: "No cards left in the loot deck" });
+    expect(lootDeckWords(0)).toEqual({ text: "0 left", loses: false, speech: "No cards left in the loot deck" });
   });
 });

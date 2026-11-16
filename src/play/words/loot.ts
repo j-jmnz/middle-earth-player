@@ -6,7 +6,7 @@ export function lootGuardWords(names: readonly string[]): { text: string; loses:
   return { text: `${names.length} loot`, loses: false, speech: `${names.join(" and ")} guarding it as loot` };
 }
 
-/** "11 loot" on the contract, and "11 cards left in the loot deck" after its name. */
+/** "11 left" on the contract, and "11 cards left in the loot deck" after its name. */
 export function lootDeckWords(left: number): { text: string; loses: boolean; speech: string } {
-  return { text: `${left} loot`, loses: false, speech: `${left === 0 ? "No cards" : left === 1 ? "1 card" : `${left} cards`} left in the loot deck` };
+  return { text: `${left} left`, loses: false, speech: `${left === 0 ? "No cards" : left === 1 ? "1 card" : `${left} cards`} left in the loot deck` };
 }

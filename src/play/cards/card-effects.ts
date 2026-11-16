@@ -331,7 +331,7 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
 }
 
 // The Burglar's Turn (22024:B:2): the attachments a location guards as loot, "2 loot"; on the contract, the cards left in its
-// controller's loot deck. Only in a game that dealt a loot deck.
+// controller's loot deck, "11 left". Only in a game that dealt a loot deck.
 function lootMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
   if (!game.lootDecks) return null;
   const card = game.cards[cardId];

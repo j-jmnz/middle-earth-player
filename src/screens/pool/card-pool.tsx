@@ -5,7 +5,8 @@ import { Pressable, ScrollView, View } from "react-native";
 
 import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, ToggleChip, sphereWord } from "../kit/chrome";
 import { draftAddRefused, draftCopyCount, setDraftTarget, targetPicks, useDeckDraft, type DraftPile, type TitleLookup } from "../deck/draft";
-import { deckCardCount, deckCountLine, DECK_MINIMUM } from "../deck/status";
+import { deckCardCount, deckCountLine, deckLootRule, DECK_MINIMUM } from "../deck/status";
+import { lootCodes } from "../../catalog/loot";
 import { useDatabases } from "../data/databases";
 import { enqueueImageDownloads } from "../images/queue";
 import { useListPreview } from "./list-preview";
@@ -239,15 +240,20 @@ export function CardPoolBody({
       const loss = inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null;
       const count = draftCopyCount(draft, item.code, item.typeCode);
       const full = draftAddRefused(draft, item, lookup, target);
+      const side = target === "side";
+      // A hero or a contract has no stepper while adding to the side deck: it never goes there.
+      const offSide = side && (item.typeCode === "hero" || item.typeCode === "contract");
+      const stepper = adding && !offSide;
       if (!grid) {
-        return <PoolCardRow item={item} adding={adding} loss={loss} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
+        return <PoolCardRow item={item} adding={stepper} side={side} loss={loss} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
       }
       return (
         <PoolCardCell
           item={item}
           width={cellWidth}
           offset={gridOffset(index, columns, scale)}
-          adding={adding}
+          adding={stepper}
+          side={side}
           loss={loss}
           count={count}
           full={full}
@@ -339,6 +345,14 @@ export function CardPoolBody({
   );
 }
 
+// The bar's count: the deck's ("3 heroes · 47 of 50 cards"), or the side deck's ("12 cards", or "9 of 14 loot" while the deck's
+// contract builds a loot deck from it).
+function sidePileLine(side: boolean, count: number, loot: { found: number; size: number } | null, deckLine: string): string {
+  if (!side) return deckLine;
+  if (loot) return `${loot.found} of ${loot.size} loot`;
+  return `${count} ${count === 1 ? "card" : "cards"}`;
+}
+
 // The two piles the pool adds to while adding, by name.
 const PILE_WORDS = ["Deck", "Side deck"] as const;
 
@@ -377,9 +391,14 @@ export function CardPool({
 }) {
   const heroes = useDeckDraft((current) => current.heroes);
   const deckCards = useDeckDraft((current) => current.cards);
-  const sideCount = useDeckDraft((current) => deckCardCount(current.side));
+  const sideCards = useDeckDraft((current) => current.side);
   const side = useDeckDraft((current) => current.target === "side");
   const preview = useListPreview();
+  const { catalog } = useDatabases();
+  // With The Burglar's Turn in the deck, the side deck's bar counts the loot deck against its size (src/catalog/loot.ts).
+  const loot = useMemo(() => deckLootRule(deckCards), [deckCards]);
+  const lootFound = loot ? lootCodes(loot, sideCards, poolOf(catalog).byCode).length : 0;
+  const sideCount = deckCardCount(sideCards);
   return (
     <Screen scene="calm">
       <View className="min-h-0 flex-1">
@@ -393,12 +412,12 @@ export function CardPool({
                 <View className="flex-row items-baseline justify-between">
                   <Text className="text-label text-muted">{side ? "Side deck" : "Deck"}</Text>
                   <Text testID="pool-deck-count" className="text-label text-bone" numberOfLines={1}>
-                    {side ? `${sideCount} ${sideCount === 1 ? "card" : "cards"}` : deckCountLine({ heroes, cards: deckCards })}
+                    {sidePileLine(side, sideCount, loot ? { found: lootFound, size: loot.size } : null, deckCountLine({ heroes, cards: deckCards }))}
                   </Text>
                 </View>
-                {side ? null : (
+                {side && !loot ? null : (
                   <View className="mt-1.5">
-                    <ProgressBar value={deckCardCount(deckCards)} max={DECK_MINIMUM} />
+                    <ProgressBar value={side ? lootFound : deckCardCount(deckCards)} max={side && loot ? loot.size : DECK_MINIMUM} />
                   </View>
                 )}
               </View>

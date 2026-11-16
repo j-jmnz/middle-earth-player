@@ -56,7 +56,7 @@ export function deckLootRule(cards: DeckContent["cards"]): LootRule | null {
  * ("The Burglar's Turn takes its loot deck from here: 14 different Item or Artifact attachments, 9 so far."), or what a side deck is.
  */
 export function sideDeckNote(loot: LootRule | null, side: DeckContent["cards"], faces: ReadonlyMap<string, DeckSaveCard>): string {
-  if (!loot) return "Cards kept with the deck but not in it. A contract that chooses cards from your collection takes them from here.";
+  if (!loot) return "Cards kept with the deck but not in it. A contract that takes cards from outside the deck takes them from here.";
   const name = faces.get(loot.cardCode)?.name ?? "The contract";
   return `${name} takes its loot deck from here: ${lootWords(loot)}, ${lootCodes(loot, side, faces).length} so far.`;
 }

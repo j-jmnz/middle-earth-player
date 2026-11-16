@@ -115,7 +115,7 @@ export default function DeckEditor() {
     { kind: "type", key: "type-hero", type: "hero", title: "Heroes", count: draft.heroes.length },
     { kind: "heroes", key: "heroes" },
     ...gridRows(sections, cols),
-    ...sideRows(sideCards, cols, sideDeckNote(loot, draft.side, faces)),
+    ...sideRows(sideCards, cols, sideDeckNote(loot, draft.side, faces), loot != null),
   ];
   const readiness = deckReadiness(draft, faces);
   // The cards whose printed text the app does not apply: a line under the readiness, and the loss on each row.
@@ -197,7 +197,9 @@ export default function DeckEditor() {
   );
 
   // The headings the jump chips lead to, with the row each starts at.
-  const jumps: Jump[] = rows.flatMap((row, index) => (row.kind === "type" ? [{ key: row.key, title: row.title, count: row.type === "hero" ? heroes.length : row.count, index }] : []));
+  // An empty side deck no contract asks for gets no chip.
+  const quietSide = loot == null && draft.side.length === 0;
+  const jumps: Jump[] = rows.flatMap((row, index) => (row.kind === "type" && !(row.type === "side" && quietSide) ? [{ key: row.key, title: row.title, count: row.type === "hero" ? heroes.length : row.count, index }] : []));
   // The page's side padding. Compact is the phone's. Medium keeps the rows (and the glance's words) in a reading column; expanded,
   // the deck is the left pane: it starts at the screen's edge and its rows stop 24 short of the pane's edge, in line with the bar's buttons.
   const base = { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right };

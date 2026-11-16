@@ -143,7 +143,7 @@ Read the sections your task touches.
   - 1834–1859 Persistence and shipping (~2.6K) ← 6
   - 1860–1901 Screens (~4.9K) ← 1
     - 1886–1901 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~57.1K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~57.3K tok)
   - 5–8 Overview (~150) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -151,32 +151,32 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–106 Cards (~20.5K) ← 27
-  - 107–112 The Sailing test (~690) ← 5
-  - 113–126 The Island Map (~1.8K) ← 8
-  - 127–130 Tokens and effects (~360)
-  - 131–145 Piles (~2.0K) ← 7
-  - 146–151 Marks of the open moment (~400) ← 1
-  - 152–222 Motion (~3.3K) ← 7
-  - 223–248 Spotlight (~2.5K) ← 33
-  - 249–254 Gestures (~620) ← 4
-  - 255–258 Hold, slide and release (~940)
-  - 259–264 Peeking at the other seat (~600) ← 1
-  - 265–284 Command column (~2.6K) ← 11
-  - 285–288 Two taps (~420) ← 2
-  - 289–292 One answer, one tap (~240)
-  - 293–296 Stops and Always use (~250)
-  - 297–300 Guide (~120)
-  - 301–317 Choice tray (~5.6K) ← 48
-  - 318–332 Reading panels (~1.6K) ← 5
-  - 333–342 Phase carousel (~680)
-  - 343–348 Quest advance (~530) ← 1
-  - 349–352 Undo (~150)
-  - 353–356 Haptics (~280)
-  - 357–368 Banner (~750) ← 5
-  - 369–388 Screen reader (~2.8K) ← 17
-  - 389–392 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~30.6K tok)
+  - 59–107 Cards (~20.6K) ← 27
+  - 108–113 The Sailing test (~690) ← 5
+  - 114–127 The Island Map (~1.8K) ← 8
+  - 128–131 Tokens and effects (~360)
+  - 132–146 Piles (~2.0K) ← 7
+  - 147–152 Marks of the open moment (~400) ← 1
+  - 153–223 Motion (~3.3K) ← 7
+  - 224–249 Spotlight (~2.5K) ← 33
+  - 250–255 Gestures (~620) ← 4
+  - 256–259 Hold, slide and release (~940)
+  - 260–265 Peeking at the other seat (~600) ← 1
+  - 266–285 Command column (~2.6K) ← 11
+  - 286–289 Two taps (~420) ← 2
+  - 290–293 One answer, one tap (~240)
+  - 294–297 Stops and Always use (~250)
+  - 298–301 Guide (~120)
+  - 302–318 Choice tray (~5.6K) ← 48
+  - 319–333 Reading panels (~1.6K) ← 5
+  - 334–343 Phase carousel (~680)
+  - 344–349 Quest advance (~530) ← 1
+  - 350–353 Undo (~150)
+  - 354–357 Haptics (~280)
+  - 358–369 Banner (~750) ← 5
+  - 370–389 Screen reader (~2.8K) ← 17
+  - 390–393 Android Back (~90)
+- `docs/design-system.md` — Design system — Carved Stone (~30.7K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -191,7 +191,7 @@ Read the sections your task touches.
   - 231–245 Icons (~480) ← 7
   - 246–264 Card art (~740) ← 2
   - 265–279 Tablets (~510) ← 13
-  - 280–469 Screens (~17.5K)
+  - 280–469 Screens (~17.6K)
     - 284–289 Splash (~210) ← 3
     - 290–293 App icon (~80)
     - 294–309 Campaigns (campaign list) (~1.5K) ← 6
@@ -206,8 +206,8 @@ Read the sections your task touches.
     - 376–379 Table opens stale (~750) ← 4
     - 380–393 Resolution and standalone outcome (~1.9K) ← 2
     - 394–403 Decks (~920) ← 2
-    - 404–413 Deck builder (deck editor) (~970) ← 3
-    - 414–423 Card pool (the Cards tab) (~830) ← 3
+    - 404–413 Deck builder (deck editor) (~1.0K) ← 3
+    - 414–423 Card pool (the Cards tab) (~890) ← 3
     - 424–429 Card (~490) ← 2
     - 430–435 Packs and pack cards (~170)
     - 436–449 Settings (~940) ← 11
