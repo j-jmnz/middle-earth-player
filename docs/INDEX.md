@@ -52,7 +52,7 @@ Read the sections your task touches.
   - 222–225 Support (~90)
   - 226–241 Attribution (~410)
   - 242–245 License (~50)
-- `docs/architecture.md` — Architecture (~24.6K tok)
+- `docs/architecture.md` — Architecture (~24.7K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
@@ -69,7 +69,7 @@ Read the sections your task touches.
     - 306–311 Opening a game (~350)
     - 312–318 Continue, Restart and the checkpoint (~380)
   - 319–324 Images (~940) ← 6
-  - 325–379 Screens (~4.2K) ← 1
+  - 325–379 Screens (~4.3K) ← 1
   - 380–385 Catalog build (~410)
   - 386–403 Tests (~2.0K) ← 5
   - 404–419 Performance (~1.2K) ← 4
@@ -143,8 +143,8 @@ Read the sections your task touches.
   - 1831–1856 Persistence and shipping (~2.6K) ← 6
   - 1857–1898 Screens (~4.9K) ← 1
     - 1883–1898 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~57.2K tok)
-  - 5–8 Overview (~150) ← 1
+- `docs/design-system-table.md` — Design system — Table (landscape) (~57.4K tok)
+  - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
   - 28–35 Quest scale (~830) ← 2
@@ -158,7 +158,7 @@ Read the sections your task touches.
   - 131–145 Piles (~2.0K) ← 7
   - 146–151 Marks of the open moment (~400) ← 1
   - 152–222 Motion (~3.3K) ← 7
-  - 223–248 Spotlight (~2.5K) ← 33
+  - 223–248 Spotlight (~2.6K) ← 33
   - 249–254 Gestures (~620) ← 4
   - 255–258 Hold, slide and release (~940)
   - 259–264 Peeking at the other seat (~610) ← 1
