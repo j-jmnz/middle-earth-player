@@ -47,7 +47,7 @@ export default function Collection() {
   function renderRow({ item }: { item: CollectionRow }) {
     if (item.kind === "heading") {
       return (
-        <View accessibilityRole="header" className="px-6 pb-1 pt-4" style={pad}>
+        <View className="px-6 pb-1 pt-4" style={pad}>
           <Section title={item.title} />
         </View>
       );

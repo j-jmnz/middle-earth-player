@@ -4,7 +4,7 @@
 import { z } from "zod";
 
 export const collectionSetSchema = z.object({
-  // Stable: a saved collection names packs, not sets, but a route and a testID name the set.
+  // Stable: a saved collection names packs, not sets, but a testID and the pool's Pack or cycle filter name the set.
   id: z.string().regex(/^[a-z0-9-]+$/),
   // The heading the screen files it under ("Cycles"); sets with the same heading sit together, in the file's order.
   heading: z.string().min(1),
@@ -12,7 +12,7 @@ export const collectionSetSchema = z.object({
   name: z.string().min(1),
   // Its name on its own, outside the Collection screen ("Core Set (2011)"): the pool's Pack or cycle chooser.
   title: z.string().min(1),
-  // A short line before the card count: the year, or the revised product that holds the same cards.
+  // A short line before the card count: the year, the revised product that holds the same cards, or what kind of pack it is.
   detail: z.string().min(1).nullable(),
   // Catalog pack codes. A card is in the set when any of its printings is in one of them.
   packs: z.array(z.string().min(1)).min(1),
@@ -45,17 +45,20 @@ export function claimedPacks(sets: readonly CollectionSet[]): ReadonlySet<string
   return new Set(sets.flatMap((set) => set.packs));
 }
 
+/** A pool row as far as the collection reads it: the pack of its first printing, and every pack it is printed in. */
+export type PrintedRow = { packCode: string; packCodes: readonly string[] };
+
+/** The packs a card is printed in: `packCodes`, or its one pack for a row built without them. */
+export function printedIn(row: PrintedRow): readonly string[] {
+  return row.packCodes.length > 0 ? row.packCodes : [row.packCode];
+}
+
 /**
  * The packs that hold a deck-legal card: every pack one of the rows is printed in. A pack outside it (a Campaign Expansion, a
  * scenario pack of encounter cards only) gives the player nothing to build with, so no screen lists it.
  */
-export function deckPacks(rows: readonly { packCode: string; packCodes: readonly string[] }[]): ReadonlySet<string> {
-  const out = new Set<string>();
-  for (const row of rows) {
-    out.add(row.packCode);
-    for (const code of row.packCodes) out.add(code);
-  }
-  return out;
+export function deckPacks(rows: readonly PrintedRow[]): ReadonlySet<string> {
+  return new Set(rows.flatMap(printedIn));
 }
 
 export type SetOwnership = "all" | "some" | "none";
@@ -81,8 +84,7 @@ export function unownedCodes(
   const out = new Set<string>();
   if (notOwned.size === 0) return out;
   for (const row of rows) {
-    const codes = row.packCodes.length > 0 ? row.packCodes : [row.packCode];
-    if (!ownsCard(codes, claimed, notOwned)) out.add(row.code);
+    if (!ownsCard(printedIn(row), claimed, notOwned)) out.add(row.code);
   }
   return out;
 }

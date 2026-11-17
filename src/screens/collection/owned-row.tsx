@@ -125,11 +125,12 @@ export function OwnedRow({
         <Pressable
           testID={`${testID}-owned`}
           accessibilityRole="switch"
-          accessibilityLabel={`Own ${label}`}
+          // A switch has no mixed state on the web, so the line ("3 of 7 packs") is heard with the name.
+          accessibilityLabel={`Own ${label}, ${detail}`}
           accessibilityState={{ checked }}
           aria-checked={checked}
           onPress={() => onSwitch(!on)}
-          className="items-center justify-center"
+          className="items-center justify-center self-stretch"
           style={{ minHeight: touch(s, 44), paddingLeft: 10 * s, paddingRight: 12 * s }}
         >
           <SwitchMark value={on} mixed={mixed} paper={false} />

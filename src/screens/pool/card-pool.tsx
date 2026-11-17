@@ -221,7 +221,8 @@ export function CardPoolBody({
   const notOwnedList = useNotOwned();
   const notOwned = useMemo(() => new Set(notOwnedList), [notOwnedList]);
   const unowned = useMemo(() => unownedCodes(rows, collectionPacks(), notOwned), [rows, notOwned]);
-  const collectionSet = notOwned.size > 0;
+  // Keyed on the cards, not the saved packs: a pack switched off that holds no deck-legal card leaves everything owned.
+  const collectionSet = unowned.size > 0;
   const [search, setSearch] = useState("");
   // The field shows each keystroke at once; the list catches up when React has time, so typing never waits on the grid.
   const query = useDeferredValue(search);

@@ -182,7 +182,7 @@ Read the sections your task touches.
   - 374–385 Banner (~750) ← 5
   - 386–405 Screen reader (~3.0K) ← 19
   - 406–409 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~33.1K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~33.2K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
   - 35–45 Performance (~720) ← 4
@@ -216,7 +216,7 @@ Read the sections your task touches.
     - 410–419 Deck builder (deck editor) (~1.1K) ← 3
     - 420–429 Card pool (the Cards tab) (~1.1K) ← 3
     - 430–435 Card (~490) ← 2
-    - 436–447 Collection (~500) ← 3
+    - 436–447 Collection (~530) ← 3
     - 448–451 Deck import (~120)
     - 452–466 Settings (~1.5K) ← 15
     - 467–472 Rules (~470) ← 1

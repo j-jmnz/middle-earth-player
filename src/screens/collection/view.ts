@@ -1,6 +1,6 @@
 // What the Collection screen says (docs/design-system.md, Collection): the list under its headings, each row's line and the tally
 // over the list. Pure, so the words are tested without a screen.
-import { collectionHeadings, type CollectionSet, type SetOwnership } from "../../catalog/collection";
+import { collectionHeadings, printedIn, type CollectionSet, type PrintedRow, type SetOwnership } from "../../catalog/collection";
 
 /** The words on a card outside the collection: the pool's line and strip, the deck editor's strip. */
 export const NOT_OWNED = "Not owned";
@@ -22,12 +22,6 @@ export type CollectionEntry = {
 };
 
 export type CollectionRow = { kind: "heading"; title: string } | { kind: "set"; entry: CollectionEntry };
-
-type PrintedRow = { packCode: string; packCodes: readonly string[] };
-
-function printedIn(row: PrintedRow): readonly string[] {
-  return row.packCodes.length > 0 ? row.packCodes : [row.packCode];
-}
 
 /** How many deck-legal cards each set holds: a card counts in every set one of its printings is in. */
 export function setCardCounts(rows: readonly PrintedRow[], sets: readonly CollectionSet[]): ReadonlyMap<string, number> {
@@ -83,7 +77,7 @@ export function collectionRows(sets: readonly CollectionSet[], rows: readonly Pr
 }
 
 /** "75 cards". Every card the Collection counts is a deck-legal player card. */
-export function cardWords(count: number): string {
+function cardWords(count: number): string {
   return `${count.toLocaleString("en-US")} ${count === 1 ? "card" : "cards"}`;
 }
 

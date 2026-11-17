@@ -15,7 +15,7 @@ import { palettes, type Palette } from "./palette.js";
 import type { MarkedSphere } from "./sphere-mark";
 import { Text } from "../../ui/text";
 
-/** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a fold that is open. */
+/** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a row that unfolds and up while it is unfolded. */
 export function Chevron({ direction = "left", color, size = 10 }: { direction?: "left" | "right" | "down" | "up"; color?: string; size?: number }) {
   const palette = usePalette();
   const s = useUiScale();
