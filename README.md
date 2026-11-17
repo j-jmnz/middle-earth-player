@@ -37,7 +37,7 @@ Play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android pho
 
 <table>
   <tr>
-    <td width="33%"><img src=".github/readme/table.webp" alt="Combat on the game board: Haldir of Lórien's attack on the Black Rider is blocked, the rest of the table dimmed behind it"></td>
+    <td width="33%"><img src=".github/readme/table.webp" alt="Combat on the game table: Haldir of Lórien attacks the Black Rider, whose 4 Defense blocks his 4 Attack, with the rest of the table dimmed behind them"></td>
     <td width="33%"><img src=".github/readme/campaign-path.webp" alt="The Return of the King's campaign path, The Passing of the Grey Company at the start of the road"></td>
     <td width="33%"><img src=".github/readme/deck-builder.webp" alt="The Elves of Lórien deck open in the deck builder: its heroes, allies, attachments, threat and cost curve"></td>
   </tr>
@@ -56,7 +56,7 @@ Play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android pho
     <td width="50%" valign="top"><strong>The app runs the rules</strong><br>It applies every rule and card effect and works out every number. You choose from the legal moves it offers, and Undo takes a move back.</td>
   </tr>
   <tr>
-    <td valign="top"><strong>Easy, Normal or Nightmare</strong><br>Nightmare on every scenario that has it. Play true solo, or two seats on the same device.</td>
+    <td valign="top"><strong>Easy, Normal or Nightmare</strong><br>Play on Easy or Normal, or on Nightmare where a scenario has it. Run one seat, or two on the same device.</td>
     <td valign="top"><strong>Deck builder</strong><br>The full player-card pool and the official pre-built decks, and any public deck imported from a RingsDB link.</td>
   </tr>
   <tr>
@@ -64,7 +64,7 @@ Play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android pho
     <td valign="top"><strong>Card art included</strong><br>Every picture ships with the app, so nothing needs downloading.</td>
   </tr>
   <tr>
-    <td valign="top"><strong>Mouse and keyboard</strong><br>On a computer, hover lifts a card, the wheel steps through the hand, right click opens a preview, and Escape and Z work.</td>
+    <td valign="top"><strong>Mouse and keyboard</strong><br>On a computer, hover lifts a card, the wheel steps through the hand and right click opens a preview. Escape closes a panel and Z is Undo.</td>
     <td valign="top"><strong>Screen readers</strong><br>With VoiceOver, TalkBack, NVDA, Narrator or Orca on, the table becomes a list of zones and cards.</td>
   </tr>
 </table>
