@@ -60,6 +60,7 @@ import muilFixtures from "./fixtures/the-hills-of-emyn-muil.json";
 import deadmarshesFixtures from "./fixtures/the-dead-marshes.json";
 import returnmirkwoodFixtures from "./fixtures/return-to-mirkwood.json";
 import pitFixtures from "./fixtures/into-the-pit.json";
+import levelFixtures from "./fixtures/the-seventh-level.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -138,6 +139,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-dead-marshes": deadmarshesFixtures,
   "return-to-mirkwood": returnmirkwoodFixtures,
   "into-the-pit": pitFixtures,
+  "the-seventh-level": levelFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
