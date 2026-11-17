@@ -25,7 +25,7 @@ import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "../core/printed
 import { activeFor, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { heldAmount, inPlay, livingSeats } from "../core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats } from "../core/state.ts";
 import { canDeclareDefender, isDefending } from "../families/defense/defenders.ts";
 import { facedownShadow } from "../families/defense/shadow.ts";
 import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
@@ -242,6 +242,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // Every defender of the attack in progress, the extra ones too (rr.multiple-defenders).
   if (spec.defending && !isDefending(state, id)) return false;
   if (spec.canDefend && !canDeclareDefender(state, id, ctx.cards)) return false;
+  if (spec.canExhaust && (instance.exhausted || flagged(state, id, "cannotExhaust"))) return false;
   if (spec.facedownShadow && !facedownShadow(state, id)) return false;
   if (spec.attackingEnemy != null && (state.pendingAttack?.enemyId === id) !== spec.attackingEnemy) return false;
   if (spec.hasAttachment) {

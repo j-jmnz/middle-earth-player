@@ -53,6 +53,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["committed"], pick.committed === true ? "committed to the quest" : pick.committed === false ? "not committed to the quest" : null);
   note(["attacking"], pick.attacking === true ? "attacking" : null);
   note(["defending"], pick.defending === true ? "defending" : null);
+  note(["canExhaust"], pick.canExhaust === true ? "that can exhaust (not held by a rule that stops it exhausting)" : null);
   note(["hasResources"], pick.hasResources === true ? "with resources on it" : null);
   note(["affectable"], pick.affectable === true ? "that a card effect can affect (not one immune to card effects)" : null);
   note(["progress"], pick.progress === true ? "with progress on it" : pick.progress === false ? "with no progress on it" : null);

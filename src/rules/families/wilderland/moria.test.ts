@@ -1,4 +1,4 @@
-// Rules: dwd.creating-the-quest-deck, dwd.bypassing-a-quest-card, dwd.immune-to-ranged-damage, dwd.the-nameless-fear, rr.cancel, rr.victory, rr.player-elimination (data/rules/entries.json); ledger lines 03070:A:1, 03070:B:1, 03026:A:1, 03074:B:1, 03075:B:2, 03075:B:3, 03025:A:3, 03027:A:1, 03042:A:1, 03073:B:1, 03028:A:1, 901201:A:2, 901202:B:1, 901207:A:1.
+// Rules: dwd.creating-the-quest-deck, dwd.bypassing-a-quest-card, dwd.immune-to-ranged-damage, dwd.the-nameless-fear, rr.cancel, rr.victory, rr.player-elimination (data/rules/entries.json); ledger lines 03070:A:1, 03070:B:1, 03026:A:1, 03074:B:1, 03075:B:2, 03075:B:3, 03025:A:3, 03027:A:1, 03042:A:1, 03073:B:1, 03028:A:1, 901201:A:2, 901202:B:1, 901207:A:1, 901209:A:3.
 // The quest-deck verbs, flags and amounts Flight from Moria adds, on the family's fixture table: stages 2 that arrive side A and flip as the staging step begins (FlipCurrentQuest `resolve`), RevealNewStage, ChooseStageToFlip, ShuffleStageFromVictory,
 // DiscardTopEliminating, the bypass cost and shuffle, and the flags cannotExhaust, immuneToRangedDamage and ignoresWillpower.
 import { describe, expect, it } from "vitest";

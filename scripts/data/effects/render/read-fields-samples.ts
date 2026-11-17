@@ -36,6 +36,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ChooseStageToFlip: [{ verb: "ChooseStageToFlip", count: 2 }],
   ShuffleStageFromVictory: [{ verb: "ShuffleStageFromVictory", code: "03071" }],
   DiscardTopEliminating: [{ verb: "DiscardTopEliminating", type: "treachery" }],
+  AddShadowToVictory: [{ verb: "AddShadowToVictory", code: "901209" }],
   Heal: [{ verb: "Heal", amount: 2, target: "self", athelas: true }, { verb: "Heal", all: true, target: "self" }],
   Exhaust: [{ verb: "Exhaust", target: "picked", who: "actor" }],
   Ready: [{ verb: "Ready", target: "picked" }],

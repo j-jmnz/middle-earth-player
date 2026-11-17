@@ -15,8 +15,9 @@ const GOBLIN_SPEARMAN = "03031";
 const SHADOWED_CORRIDOR_COST = 2;
 const QUESTING_CHARACTER: PickSpec = { type: "character", control: "any", committed: true };
 const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]) => ({ verb: "ForEachPlayer" as const, order: "firstFirst" as const, instructions });
-// Dismay and Fear: another questing character is left to remove, and the Willpower removed so far is still below The Nameless Fear's Threat.
-const REMOVING: Condition = { kind: "all", conditions: [{ kind: "less", left: { x: true }, right: FEAR_THREAT }, { kind: "canPick", pick: { ...QUESTING_CHARACTER, who: "firstPlayer" } }] };
+// Dismay and Fear: the Willpower removed so far is still below The Nameless Fear's Threat, and another questing character is left to remove. The removal and the count read only the first part: they follow the Pick, and the character picked last may be the last one.
+const BELOW_THREAT: Condition = { kind: "less", left: { x: true }, right: FEAR_THREAT };
+const REMOVING: Condition = { kind: "all", conditions: [BELOW_THREAT, { kind: "canPick", pick: { ...QUESTING_CHARACTER, who: "firstPlayer" } }] };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 901201 setup card. A:2: a bypassed stage is shuffled into the quest deck, which is shuffled, and the top stage is revealed (the stage can come straight back). A:3: while Escape from Darkness is the current quest the Refresh Action of Abandoned Tools can be used once a round.
@@ -131,8 +132,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
         times: { count: QUESTING_CHARACTER },
         instructions: [
           { verb: "Pick", pick: { ...QUESTING_CHARACTER, who: "firstPlayer" }, when: REMOVING },
-          { verb: "AddToX", amount: { stat: "willpower", of: "picked" }, when: REMOVING },
-          { verb: "RemoveFromQuest", when: REMOVING },
+          { verb: "RemoveFromQuest", when: BELOW_THREAT },
+          { verb: "AddToX", amount: { stat: "willpower", of: "picked" }, when: BELOW_THREAT },
         ],
       },
     ],
@@ -147,7 +148,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 901209 An Evil Fortune (Surge and Doomed 1 are keywords). When Revealed: it goes to the victory display. Shadow: when the attack destroys a character it goes to the victory display.
   { id: "901209:whenRevealed:1", cardCode: "901209", lines: ["901209:A:2"], timing: "whenRevealed", instructions: [{ verb: "AddSourceToVictory" }] },
-  { id: "901209:shadow:1", cardCode: "901209", lines: ["901209:A:3"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "AddSourceToVictory", when: { kind: "x", min: 1 } }] }] },
+  { id: "901209:shadow:1", cardCode: "901209", lines: ["901209:A:3"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "AddShadowToVictory", code: "901209", when: { kind: "x", min: 1 } }] }] },
 ]);
 
 export const AUTHORED_REPLACES: readonly string[] = [];

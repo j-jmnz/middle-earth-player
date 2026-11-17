@@ -42,6 +42,8 @@ export type Layout = {
   seed?: number;
   stage?: string;
   progress?: number;
+  // The side the current quest stage shows (B by default; A for a stage 2 of a quest deck that has not flipped yet, 03070:A:1).
+  side?: "A" | "B";
   // A code, or a code with its tokens.
   active?: Entry;
   // The Nightmare setup card, side A faceup next to the quest deck, with its tokens (901001:A:2 counts on it).
@@ -137,7 +139,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const code of stages) {
     const index = stages.indexOf(code);
     const placed = index === at ? { zone: "questStage" as const } : index > at ? { zone: "questDeck" as const } : { zone: "setAside" as const };
-    const spawned = spawn(state, code, placed, placed.zone === "questStage" ? "B" : "A");
+    const spawned = spawn(state, code, placed, placed.zone === "questStage" ? (layout.side ?? "B") : "A");
     state = code === stage ? updateCard(spawned.state, spawned.id, { progress: layout.progress ?? 0 }) : spawned.state;
   }
   const first = spawn(state, HERO, { zone: "heroes", seat: 0 });

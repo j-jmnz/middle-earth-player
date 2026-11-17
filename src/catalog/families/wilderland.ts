@@ -240,6 +240,8 @@ const VERBS = [
   // "Each player discards 1 card from the top of the encounter deck. If the card is a treachery card, the discarding player is eliminated from the game" (03075:B:2): each living player in turn order discards the top card of the encounter deck (a deck that ran out is reset first,
   // rr.running-out-of-cards); the card is discarded, not revealed, and a card of `type` eliminates the player who discarded it before the next player discards.
   z.strictObject({ verb: z.literal("DiscardTopEliminating"), type: z.literal("treachery"), ...when }),
+  // "If this attack destroys a character, add this card to the victory display" (901209:A:3): run by an AfterAttack, whose source is the attacking enemy, so the shadow card is found among the shadow cards the enemy holds, by its `code`.
+  z.strictObject({ verb: z.literal("AddShadowToVictory"), code, ...when }),
   // "Flip Wormsbane to its Reforged side" (19122:A:3): the card in play with the code `code` shows its other side `into`, staying where it lies with its tokens and attachments (the old side is kept as the card's other side).
   // With `attachTo: "picked"` it then moves to the hero last picked, leaving the card it was attached to.
   // With `entersPlay` the new side enters play: it hears "After X enters play" ("After Savage Counter-attack enters play", 09072:A:1; mec112.gollum-smeagol).

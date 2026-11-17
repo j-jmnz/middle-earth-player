@@ -25,7 +25,7 @@ const FIRST_PLAYER: Condition = { kind: "firstPlayer" };
 const NOT_FIRST_PLAYER: Condition = { kind: "not", condition: FIRST_PLAYER };
 const QUESTING_CHARACTER: PickSpec = { type: "character", control: "you", committed: true };
 // A hero any player controls that carries Abandoned Tools.
-const HERO_WITH_TOOLS: PickSpec = { type: "hero", control: "any", hasAttachment: { names: ["Abandoned Tools"] }, state: "ready" };
+const HERO_WITH_TOOLS: PickSpec = { type: "hero", control: "any", hasAttachment: { names: ["Abandoned Tools"] }, state: "ready", canExhaust: true };
 const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]) => ({ verb: "ForEachPlayer" as const, order: "firstFirst" as const, instructions });
 // "Each player reveals 1 card" for the line printed as 03064:B:1 is a copy; this is the same record where a card prints it with its own wording.
 const REVEAL_ONE_EACH = EACH_PLAYER([{ verb: "RevealEncounter" }]);
@@ -114,8 +114,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["03029:A:2"],
       timing: "action",
       anyPlayer: true,
-      condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "freeOfEncounters" }, { kind: "canPick", pick: { type: "hero", control: "you", state: "ready" } }] },
-      instructions: [{ verb: "Pick", pick: { type: "hero", control: "you", state: "ready" } }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
+      condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "freeOfEncounters" }, { kind: "canPick", pick: { type: "hero", control: "you", state: "ready", canExhaust: true } }] },
+      instructions: [{ verb: "Pick", pick: { type: "hero", control: "you", state: "ready", canExhaust: true } }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
     },
 
     // 03042 Great Cave-troll (Victory 3). A:1: characters that attack it by the ranged keyword deal it no damage (dwd.immune-to-ranged-damage). A:2: the Nazgûl of Dol Guldur's line.

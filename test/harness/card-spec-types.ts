@@ -33,6 +33,9 @@ export type Expect =
   | { expect: "stat"; code: string; name: StatName; value: number }
   | { expect: "flag"; code: string; name: FlagName; value: boolean }
   | { expect: "zone"; code: string; zone: string }
+  | { expect: "committed"; code: string; value: boolean }
+  | { expect: "count"; code: string; zone: string; value: number }
+  | { expect: "side"; code: string; side: "A" | "B" }
   | { expect: "progressOn"; code: string; value: number }
   | { expect: "resourcesOn"; code: string; value: number }
   | { expect: "damageOn"; code: string; value: number }
