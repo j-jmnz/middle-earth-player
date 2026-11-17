@@ -132,7 +132,7 @@ Read the sections your task touches.
     - 1771–1791 The Dead Marshes (~2.1K) ← 2
     - 1792–1815 Return to Mirkwood (~2.3K) ← 4
   - 1816–1843 Standalone scenarios (~2.8K) ← 1
-    - 1820–1843 The Massing at Osgiliath (~2.5K)
+    - 1820–1843 The Massing at Osgiliath (~2.5K) ← 1
   - 1844–1852 Nightmare (~410) ← 21
   - 1853–1893 Deckbuilding (~2.1K)
   - 1894–1973 Effects (~3.7K)
@@ -266,21 +266,22 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~14.6K tok)
+- `docs/phases/STATUS.md` — Phase status (~15.1K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–298 Open items (~13.2K)
+  - 22–305 Open items (~13.7K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
     - 35–42 Desktop (~310)
-    - 43–86 Fixtures and Maestro (~2.4K)
-    - 87–125 Rules and engine (~1.6K)
-    - 126–246 Rules and engine (Angmar Awakened) (~5.3K)
-    - 247–271 Screens and code (~1.6K)
-    - 272–291 Rules and engine (The Two Towers) (~1.4K)
-    - 292–298 Rules and engine (Shadows of Mirkwood) (~380)
-  - 299–324 Standing decisions (~940)
+    - 43–87 Fixtures and Maestro (~2.5K)
+    - 88–126 Rules and engine (~1.6K)
+    - 127–247 Rules and engine (Angmar Awakened) (~5.3K)
+    - 248–272 Screens and code (~1.6K)
+    - 273–292 Rules and engine (The Two Towers) (~1.4K)
+    - 293–299 Rules and engine (Shadows of Mirkwood) (~380)
+    - 300–305 Rules and engine (Standalone scenarios) (~430)
+  - 306–331 Standing decisions (~940)
 
 ## Live plans
 

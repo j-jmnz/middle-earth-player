@@ -22,7 +22,7 @@ No phase is open.
 ## Open items
 
 ### Reviews
-- Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, and the card frames' ux fix. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
+- Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, the card frames' ux fix, and The Massing at Osgiliath. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
 
 ### README
 - The README showcase (`scripts/showcase/`): a first full capture run on a Mac or the showcase workflow, its contact sheet checked and failed flows fixed; then a Screens section, each shot a `<picture>` (Rivendell capture for GitHub's light theme, Ringwraiths otherwise) with the captions and alt text of `scripts/showcase/shots.ts`.
@@ -41,6 +41,7 @@ No phase is open.
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
+- `osgiliath-won` is not committed: no seed in 1200 wins The Massing at Osgiliath with the saved decklists (their heroes fall by round 2 to 4). Until it exists `.maestro/scenarios/the-massing-at-osgiliath/the-massing-at-osgiliath.yaml` cannot run.
 - `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50). Until it exists `.maestro/scenarios/conflict-at-the-carrock/conflict-at-the-carrock.yaml` cannot run.
 - `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists. Until it exists `.maestro/scenarios/return-to-mirkwood/return-to-mirkwood.yaml` cannot run.
 - `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.
@@ -295,6 +296,12 @@ No phase is open.
 - A discarded shadow card keeps its `host` (`detach` in `src/rules/core/zones.ts`); clearing it changes every `golden.json` (the field only), so it waits for an all-scenario engine bump. Workarounds: `src/rules/families/encounter/moves.ts` (a move to the active location) and `inspectTargets` in `src/play/store/selectors.ts`.
 - The Nightmare decks are not in `pnpm effects render --all`, so their renders have no snapshot (`scripts/data/effects/render/snapshots`).
 - Renderer gaps, Shadows of Mirkwood (behaviour proven by spec rows and line tests): a pick or count of `control: any` does not say it reaches the staging area; the final-stage win (02013:B:2); `activeThreat`, `returnsToEncounterDeck`, `cannotTriggerEffects`, `progressCap`, `returnsWithoutActive`, `undefendedToHolder`, `shadowHitsAll` and `treacheryHitsAll` show as flags; "engaged with a player" reads "the player"; victory-display stats read "while in play"; the seat a Response or a next player is counted from; `escapePassed` heard only from its own test (02106:B:2); a self-only travel bar reads "any location" (02065:A:3).
+
+### Rules and engine (Standalone scenarios)
+- The Massing at Osgiliath has no rulesheet and no official ruling; its readings are in `docs/brief.md` (The Massing at Osgiliath). Agent recommendations, not user-confirmed: Snaga Scouts engages every copy (00002:A:1), Wainriders' threat per damage placed (00004:A:1), Wolves from Mordor (00003:A:1), Wainrider Captain's "top Scout" (00005:A:1), Morgulduin (00009:A:1), Pelennor Fields charged once and satisfied by the raise (00010:A:1), Cut Off's discard offered only when payable (00012:A:3), Ranger of Ithilien's shadow (00015:A:2), Through the Ruins' count (00017:B:2), Anduin Crossing's once a round and its quest-phase timing (00018:B:3).
+- The Massing at Osgiliath, community only, not user-confirmed: Easy deals the Normal deck; Ranger of Ithilien enters committed in the quest phase (00015:A:1); Anduin Crossing's discard-or-commit-nothing (00018:B:3).
+- The Battle of Lake-town's codes 00004 to 00024 repeat The Massing at Osgiliath's (Hall of Beorn numbering); adding it needs a `productCodes` rule.
+- Renderer gaps, The Massing at Osgiliath (behaviour proven by spec rows and line tests): `noPlayerAttachments` (00001:A:1) and `damageToThreat` (00004:A:1) show as flags; the Witch-king's chooser and raised threat read "the acting player" and "the player the event is about", not the defending player (00001:A:3); the defenders' removal from combat (00007:A:2) and the old active location's return to staging (00009:A:2) do not print; `noEffectProgress` does not say it covers the quest and the active location, effect progress only (00018:B:1); Anduin Crossing's "ally named Ranger of Ithilien" filter does not say it takes the objective ally (00018:B:3).
 
 ## Standing decisions
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.
