@@ -3,7 +3,7 @@
 import type { Amount, Instruction } from "../../../catalog/boundary.ts";
 import { frameScope, resolveAmount } from "../../../rules/interpret/amounts.ts";
 import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
+import { livingSeats, type ScenarioState } from "../../../rules/core/state.ts";
 
 import type { ChoiceNames, PickWords } from "../choice.ts";
 import { commandX } from "../command.ts";
@@ -131,6 +131,15 @@ export function aflamePickWords(pick: Instruction, next: Instruction | undefined
   switch (pick.verb) {
     case "SearchAflame":
       return { verb: "Add", prompt: `${host}: choose the Aflame location to add to the staging area. They are tied on the highest Aflame value.` };
+    case "EngageLowestThreat": {
+      // Snaga Scouts (00002:A:1): the first player chooses among the players tied for the lowest threat, for every copy. Not owned: the first player answers for the group.
+      if (!game) return null;
+      const threat = (seat: number) => game.seats[seat]?.threat ?? 0;
+      const lowest = Math.min(...livingSeats(game).map(threat));
+      const tied = livingSeats(game).filter((seat) => threat(seat) === lowest).map((seat) => `Player ${seat + 1}`);
+      const who = tied.length > 2 ? `${tied.slice(0, -1).join(", ")} and ${tied[tied.length - 1]}` : tied.join(" and ");
+      return { verb: "Engage", prompt: `${host}: ${who} are tied for the lowest threat (${lowest}). Choose the player every copy engages.` };
+    }
     case "HealLocations":
       // One damage at a time, so the prompt counts them: "Damage 2 of 4".
       return { verb: "Heal", prompt: `${host}: choose the location that has 1 damage removed${typeof pick.amount === "number" ? ` (damage ${(pick.healed ?? 0) + 1} of ${pick.amount})` : ""}.` };
