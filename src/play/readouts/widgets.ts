@@ -9,7 +9,9 @@ import { stageOf } from "../../rules/families/breaking/areas.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { headingStepOf, type HeadingStep } from "../dream-chaser/heading.ts";
+import { guardianLocked, guardianSeat } from "../../rules/families/guardian/seats.ts";
 import { captiveDialWords } from "../words/scenarios/ungol.ts";
+import { guardianHeldWords } from "../words/scenarios/guardian.ts";
 import { gollumHeld } from "./marshes.ts";
 
 export type WidgetReadouts = {
@@ -68,7 +70,7 @@ export function heldDial(game: ScenarioState, nameOf: (code: string) => string):
 
 /**
  * Every seat's held dial: the one `heldDial` finds, and a seat with a Captive of The Uruk-hai (mec112.pursuit, families/captives): "Legolas is a Captive under To Isengard!" or "Legolas is a Captive held by Grishnákh".
- * A seat that holds two things says both. `isEnemy` tells an enemy holder from the card the Captives lie under. The seat that holds the card Gollum / Sméagol of The Passage of the Marshes says so too (readouts/marshes.ts).
+ * A seat that holds two things says both. `isEnemy` tells an enemy holder from the card the Captives lie under. The seat that holds the card Gollum / Sméagol of The Passage of the Marshes says so too (readouts/marshes.ts), and the seat guarding Gollum in Return to Mirkwood (`guardianHeld`, below).
  */
 export function heldDials(game: ScenarioState, nameOf: (code: string) => string, isEnemy: (code: string) => boolean): readonly HeldDial[] {
   const dials = new Map<number, HeldDial>();
@@ -81,11 +83,21 @@ export function heldDials(game: ScenarioState, nameOf: (code: string) => string,
     const before = dials.get(card.owner);
     dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: before?.mark ?? "hero" });
   }
-  for (const gollum of gollumHeld(game)) {
+  for (const gollum of [...gollumHeld(game), ...guardianHeld(game)]) {
     const before = dials.get(gollum.seat);
     dials.set(gollum.seat, { seat: gollum.seat, words: before ? `${before.words}. ${gollum.words}` : gollum.words, mark: before?.mark ?? gollum.mark });
   }
   return [...dials.values()];
+}
+
+/**
+ * The held mark of the seat guarding Gollum in Return to Mirkwood (docs/design-system-table.md, Top bar, Held marks; 02126:A:1, `sotm.guarding-gollum`): the seat that controls the Gollum objective ally wears the hero mark, and its dial says it guards him and, while a card says the guard
+ * cannot change, that it cannot. The engine decided both (`guardianSeat`, `guardianLocked`); none while nobody guards him (any other scenario, or before Setup places him).
+ */
+export function guardianHeld(game: ScenarioState): readonly HeldDial[] {
+  const seat = guardianSeat(game);
+  if (seat == null) return [];
+  return [{ seat, words: guardianHeldWords(game.seatCount > 1 ? `Player ${seat + 1}` : "you", guardianLocked(game)), mark: "hero" }];
 }
 
 /** What a prisoner's name says wherever it is shown: the dial, the preview, the list. */

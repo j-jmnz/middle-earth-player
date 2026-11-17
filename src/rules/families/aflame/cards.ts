@@ -9,10 +9,10 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
-import { engageEnemy } from "../../quest/quest.ts";
+import { engageEnemy, engageWith } from "../../quest/quest.ts";
 import type { Earned } from "../../core/campaign-state.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { printedOf } from "../../core/printed.ts";
 import { moveCard } from "../../core/zones.ts";
 import { effectData, moveEncounter, setAsideNamed } from "../encounter/moves.ts";
@@ -49,9 +49,12 @@ export function searchAflame(state: ScenarioState, instruction: Verb<"SearchAfla
   return moveEncounter(state, chosen, "staging", focus.seat, ctx, steps);
 }
 
-/** EngageFirstPlayer: the source enemy, in the staging area, engages the first player. */
-export function engageFirstPlayer(state: ScenarioState, focus: Focus, steps: EngineStep[]): ScenarioState {
-  return focus.sourceId ? engageEnemy(state, state.firstPlayer, focus.sourceId, steps) : state;
+/** EngageFirstPlayer: the source enemy, in the staging area, engages the first player; with `moves`, one engaged with another player moves to the first player (nothing stops it unless it cannot be engaged). */
+export function engageFirstPlayer(state: ScenarioState, focus: Focus, steps: EngineStep[], moves = false): ScenarioState {
+  if (!focus.sourceId) return state;
+  const enemy = state.cards[focus.sourceId];
+  if (moves && enemy?.zone === "engaged" && enemy.controller !== state.firstPlayer) return flagged(state, focus.sourceId, "cannotBeEngaged") ? state : engageWith(state, state.firstPlayer, focus.sourceId, steps);
+  return engageEnemy(state, state.firstPlayer, focus.sourceId, steps);
 }
 
 /** HealLocations: one damage at a time comes off the location the first player chooses among those in play with damage, until `amount` is removed or none holds damage. With one such location the rest comes off at once. */

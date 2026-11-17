@@ -12,7 +12,7 @@ import type { Difficulty } from "../../../../catalog/scenario-data";
 import { EFFECTS } from "../../../../effects";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
 import { SeatPicker } from "../../../briefing/seat-picker";
-import { bookletParams, campaignOfScenario, scenarioOf } from "../../../data/campaign-data";
+import { bookletOf, campaignOfScenario, scenarioOf } from "../../../data/campaign-data";
 import { BodyText, Section, Segmented } from "../../../kit/chrome";
 import { useDatabases } from "../../../data/databases";
 import { dealSeed } from "../../../nav/e2e";
@@ -40,6 +40,8 @@ export default function StandaloneBriefing() {
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
   // The box the scenario is printed in decides the campaign flags (saga, booklet) a standalone game follows.
   const campaign = scenarioId ? campaignOfScenario(scenarioId) : null;
+  // A cycle's scenario has no booklet to open.
+  const booklet = campaign ? bookletOf(campaign.id, scenarioId) : null;
   const briefingDecks = useBriefingDecks(campaign?.saga ?? false);
   const { savedDecks, candidates } = briefingDecks;
 
@@ -47,14 +49,15 @@ export default function StandaloneBriefing() {
     () =>
       Array.from({ length: seatCount }, (_, index) => {
         const deck = savedDecks.find((item) => item.id === picked[index]);
-        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck) };
+        // The side deck goes with every new deal, empty or not (BriefingSeat).
+        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck?.cards), side: expand(deck?.side) };
       }),
     [seatCount, savedDecks, picked],
   );
 
   // The world is built from the scenario and these codes (the Ring-bearers, every saved deck's heroes, the picked decks' cards), as one
   // string: a deck list read again on focus, or a pick of the same cards, keeps the world instead of loading it again.
-  const codeKey = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)])].sort().join("\0");
+  const codeKey = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => [...seat.deck, ...(seat.side ?? [])])])].sort().join("\0");
   const world = useMemo(() => {
     if (!campaign || !scenario) return null;
     return loadWorld(catalog, campaign, scenario, EFFECTS, codeKey === "" ? [] : codeKey.split("\0"));
@@ -69,7 +72,7 @@ export default function StandaloneBriefing() {
     scenarioId,
     backLabel: "Scenarios",
     onBack: () => goBack(router, "/scenarios"),
-    ...(campaign ? { onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(campaign.id, scenarioId) }) } : {}),
+    ...(booklet ? { onBooklet: () => router.push({ pathname: "/booklet/[id]", params: booklet }) } : {}),
   } as const;
   if (!campaign || !scenario || !world || !input || !result || !facts) {
     return (
@@ -93,7 +96,7 @@ export default function StandaloneBriefing() {
     const loadout: StandaloneLoadout = {
       scenarioId: scenario.id,
       difficulty,
-      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck] })),
+      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck], side: [...(seat.side ?? [])] })),
       ringBearer,
     };
     try {

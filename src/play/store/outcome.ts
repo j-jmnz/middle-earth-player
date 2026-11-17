@@ -16,6 +16,7 @@ import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
 import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scenarios/gundabad-beats.ts";
+import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -232,6 +233,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         open(1, step.success ? "Fortitude test passed" : "Fortitude test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`, "willpower");
         return;
+      case "escapeTest":
+        open(1, escapeResultTitle(step.success, step.seat, after.seatCount > 1), step.success ? "good" : "bad");
+        line(escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape), step.stat ?? "willpower");
+        return;
       case "hideTest":
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against threat ${step.threat}`, "willpower");
@@ -322,6 +327,8 @@ export function intentWords(intent: PlayerIntent, card: (cardId: string) => stri
       return `${listed(intent.cardIds, card)} committed to the Hide test`;
     case "CommitFortitude":
       return `${listed(intent.cardIds, card)} committed to the Fortitude test`;
+    case "CommitEscape":
+      return `${listed(intent.cardIds, card)} committed to the escape test`;
     case "Travel":
       return `Traveled to ${card(intent.locationId)}`;
     case "DeclineTravel":

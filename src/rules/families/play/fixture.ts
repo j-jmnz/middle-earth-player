@@ -70,6 +70,7 @@ export const PLAY_CARDS = cardMap([
   event("22056", "Horns! Horns! Horns!", "leadership"),
   ally("22057", "Soldier of Isengard", "leadership", ["Dunland"], { keywords: { doomed: 2 } }),
   ally("22117", "Wilyador", "spirit", ["Creature", "Eagle"], { isUnique: true }),
+  ally("wil", "Wilyador", "spirit", ["Creature", "Eagle"], { isUnique: true, health: 20 }),
   event("132010", "Desperate Alliance", "leadership"),
   ally("145005", "Prince Imrahil", "leadership", ["Gondor", "Noble"], { isUnique: true, cost: 3 }),
   ally("144007", "Gamling", "spirit", ["Rohan"], { isUnique: true }),

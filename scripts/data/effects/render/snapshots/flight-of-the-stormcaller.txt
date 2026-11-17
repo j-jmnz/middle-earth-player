@@ -299,12 +299,12 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     only if this card is engaged with the player
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the card the event is about is a hero (any player controls) with resources on it: place 1 resource tokens on this card
-    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"subject","when":{"kind":"matches","card":"subject","pick":{"type":"hero","control":"any","hasResources":true}}}]
+    - then, if the card the event is about is a hero (any player controls) with resources on it (checked when this step runs, after the steps above; not tied to whether they did anything): 1 resource(s) come off the resource pool of the card the event is about (discarded, not spent)
   12023:forced:2: Forced on the event committedToSailing (heard about hero (you control); event happened to the controller)
     only if this card is engaged with the player
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the card the event is about is a hero (any player controls) with resources on it: place 1 resource tokens on this card
-    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"subject","when":{"kind":"matches","card":"subject","pick":{"type":"hero","control":"any","hasResources":true}}}]
+    - then, if the card the event is about is a hero (any player controls) with resources on it (checked when this step runs, after the steps above; not tied to whether they did anything): 1 resource(s) come off the resource pool of the card the event is about (discarded, not spent)
 
 ## 12024 Serpent's Blade
 (the scenario deals it into the corsairDeck pile; the piles place it, no record does)
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     only if [json condition {"kind":"heading","is":"offCourse"}]
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 144 by template, 49 as JSON)
+(rendered pieces: 150 by template, 47 as JSON)

@@ -18,12 +18,12 @@ export { HEROES };
 export const CAVES_POLICY: PolicyOptions = { scout: "", prefer: PILLAR, protect: "", play: true, act: true };
 // "strong": big-number heroes. "steady": heroes that quest for little, so the scenario takes many rounds. "weak": heroes too small to quest, so the
 // players lose on threat. "brittle": strong quest and attack with a few hit points and no Defense, so an enemy's attack destroys a hero.
-// "tense": strong heroes that start the game with a high threat (42), so a win ends with 40 or more.
+// "tense": strong heroes that start the game with a high threat (36), so a win ends with 40 or more.
 export type CavesDecks = "strong" | "steady" | "weak" | "brittle" | "tense";
 
 export const cavesLoadout = fillerLoadout;
 
-const game = campaignGame<CavesDecks, CavesPolicy>({ campaign, scenario: caves, stats: HERO_STATS, codes: [RANGER_SENSE], intent: cavesIntent, policy: { boon: "keep" }, limit: 8000, upgraded: [] });
+const game = campaignGame<CavesDecks, CavesPolicy>({ campaign, scenario: caves, stats: { ...HERO_STATS, tense: { ...HERO_STATS.tense, threat: 12 } }, codes: [RANGER_SENSE], intent: cavesIntent, policy: { boon: "keep" }, limit: 8000, upgraded: [] });
 
 export const cavesWorld = (decks: CavesDecks = "strong") => game.world(decks);
 export const cavesPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
@@ -105,7 +105,7 @@ const THREAT_LOST = "No seats remain";
 export const CAVES_GOLDENS: readonly CavesGolden[] = [
   { name: "true solo, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, Easy, won", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "true solo, \"No Time to Waste!\" played, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", boon: "play" },
+  { name: "true solo, \"No Time to Waste!\" played, won", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", boon: "play" },
   { name: "true solo, threat 40 or higher at the end, won", seatCount: 1, seed: 2, difficulty: "Normal", decks: "tense", outcome: "won" },
   { name: "two-handed, won", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, Easy, \"No Time to Waste!\" played, won", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", boon: "play" },

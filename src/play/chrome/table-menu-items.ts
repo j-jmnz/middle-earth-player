@@ -25,9 +25,10 @@ export type MenuItem = {
 /**
  * The menu's rows in order: what opens over the table (Log, Rules, Booklet, the scenario's Setup card, Table settings), Resign, then, apart at the foot, Leave the table
  * with its door mark and no more words (user request, 2026-10-27); a screen reader still hears where it goes and that the game is saved.
+ * `without` leaves out the rows a game has nothing behind: Booklet for a cycle's scenario, the Setup card where there is none.
  */
-export function menuItems(nav: MenuNav): readonly MenuItem[] {
-  return [
+export function menuItems(nav: MenuNav, without?: readonly MenuItemId[]): readonly MenuItem[] {
+  const rows: MenuItem[] = [
     { id: "log", testID: "log-open", label: "Log", accessibilityLabel: "This round's log", icon: null },
     { id: "rules", testID: "rules-open", label: "Rules", accessibilityLabel: "Look up a rule", icon: null },
     { id: "booklet", testID: "booklet-open", label: "Booklet", accessibilityLabel: "Open the booklet", icon: null },
@@ -47,4 +48,5 @@ export function menuItems(nav: MenuNav): readonly MenuItem[] {
       tone: "danger",
     },
   ];
+  return without ? rows.filter((row) => !without.includes(row.id)) : rows;
 }

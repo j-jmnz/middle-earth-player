@@ -44,7 +44,7 @@ function watchtowerCards(choose: Choose): Watch | null {
   const place = steps.find((step) => step.verb === "PlaceResourceTokens");
   const remove = steps.find((step) => step.verb === "RemoveProgressFrom");
   const resource = pick?.verb === "Pick" ? pick.pick.names?.[0] : undefined;
-  return resource != null && place?.verb === "PlaceResourceTokens" && remove?.verb === "RemoveProgressFrom" ? { resource, progress: remove.named, placed: place.amount, removed: remove.amount } : null;
+  return resource != null && place?.verb === "PlaceResourceTokens" && remove?.verb === "RemoveProgressFrom" && remove.named != null ? { resource, progress: remove.named, placed: place.amount, removed: remove.amount } : null;
 }
 
 const progressOf = (game: ScenarioState, ctx: ReduceContext, title: string): number => game.cards[namedInPlay(game, title, ctx) ?? ""]?.progress ?? 0;

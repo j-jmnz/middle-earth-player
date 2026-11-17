@@ -1,5 +1,5 @@
 // Rules: rr.constant-ability, rr.step-6-4-1, rr.travel, rr.first-player (data/rules/entries.json).
-import type { Instruction } from "../../catalog/boundary.ts";
+import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
 import { constantInstructions, memoOf, type StateMemo } from "./constant-records.ts";
@@ -9,15 +9,17 @@ import { recordsOfFace } from "../families/dreamchaser/faces.ts";
 import { grantedTravel } from "../families/grapple/travel.ts";
 import { familyForcedTravel, familyTravelUnpayable } from "./family-hooks.ts";
 import { modifiedStat } from "../core/keywords.ts";
-import { pickCandidates } from "./pick.ts";
+import { countMatching, pickCandidates } from "./pick.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { guardsTitled } from "../families/objectives/pick.ts";
+import { guardianSeat } from "../families/guardian/seats.ts";
 import { guardedSafeLocation } from "../families/angmar/safe.ts";
+import { flightDefenseBarred } from "../families/attack/flight.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -49,6 +51,9 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
       ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
+      ...(instruction.unlessControls ? { unlessControls: instruction.unlessControls } : {}),
+      ...(instruction.guardian ? { guardian: true as const } : {}),
+      ...(instruction.exceptAlone ? { exceptAlone: true as const } : {}),
     });
   }
   return found;
@@ -140,7 +145,9 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       if (instruction.verb === "ForEachPlayer") {
         const cost = instruction.instructions.find((inner) => inner.verb === "Pick");
         const exhausts = instruction.instructions.some((inner) => inner.verb === "Exhaust");
-        return cost?.verb === "Pick" && exhausts && livingSeats(state).some((seat) => pickCandidates(state, cost.pick, seat, [], locationId, ctx).length === 0);
+        // `seats: "guardian"` (02133:A:1): only the player guarding Gollum pays.
+        const payers = instruction.seats === "guardian" ? livingSeats(state).filter((seat) => seat === guardianSeat(state)) : livingSeats(state);
+        return cost?.verb === "Pick" && exhausts && payers.some((seat) => pickCandidates(state, cost.pick, seat, [], locationId, ctx).length === 0);
       }
       // "Remove 4 damage from Cracked Pillar to travel here" (41028:A:2): the location must hold that much damage.
       if (instruction.verb === "Heal" && instruction.target === "self" && typeof instruction.amount === "number") return (state.cards[locationId]?.damage ?? 0) < instruction.amount;
@@ -152,6 +159,11 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       if (instruction.verb === "Exhaust" && instruction.target?.kind === "picked") {
         const pick = instructions.find((other) => other.verb === "Pick");
         return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
+      }
+      // "The first player must discard 1 event card from his hand to travel here" (02088:A:1): the card discarded is picked, so the cost cannot be paid without one.
+      if (instruction.verb === "DiscardPicked") {
+        const pick = instructions.find((other) => other.verb === "Pick");
+        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.firstPlayer, [], locationId, ctx).length === 0;
       }
       if (instruction.verb !== "Exhaust" || (instruction.target?.kind !== "byCode" && instruction.target?.kind !== "byName")) return false;
       return readyNamedCard(state, ctx, instruction.target, instruction.who === "firstPlayer" ? state.firstPlayer : null) == null;
@@ -183,6 +195,8 @@ export function defenseBlocked(state: ScenarioState, ctx: ReduceContext, defende
   const attack = state.pendingAttack;
   const defender = state.cards[defenderId];
   if (!attack || !defender) return false;
+  // "Only Eagle characters or characters with ranged can ... defend against Mirkwood Flock" (02070:A:1).
+  if (flightDefenseBarred(state, attack.enemyId, defenderId, ctx.cards)) return true;
   return restricted(state, ctx, "defend").some(
     (rule) =>
       rule.sourceId === attack.enemyId &&
@@ -213,4 +227,15 @@ export function restrictedAttachments(state: ScenarioState, hostId: string, ctx:
 // How many restricted attachments the card counts as having: one each, two for a card that "counts as 2 Restricted attachments".
 export function restrictedLoad(state: ScenarioState, hostId: string, ctx: ReduceContext): number {
   return restrictedAttachments(state, hostId, ctx).reduce((sum, id) => sum + Math.max(1, heldAmount(state, id, "countsAsRestricted")), 0);
+}
+
+// Whether the seat is barred by a "commit" or "draw" rule: it controls no card that matches the rule's `unlessControls` filter, read from its own side (02013:B:1 "Any player who does not control a hero with at least 1 Clue objective attached cannot commit
+// characters to this quest"; 900404:A:1 "Each player who does not control at least 1 Clue card cannot draw cards through card effects").
+// A rule with `guardian` binds the player guarding Gollum (02127:B:1, 02128:B:1), unless `exceptAlone` and he is the only player left in the game.
+export function seatBarred(state: ScenarioState, ctx: ReduceContext, seat: number, what: "commit" | "draw" | "playFromHand"): boolean {
+  return restricted(state, ctx, what).some(
+    (rule) =>
+      (rule.unlessControls != null && countMatching(state, rule.unlessControls, seat, rule.sourceId, ctx) === 0) ||
+      (rule.guardian === true && guardianSeat(state) === seat && !(rule.exceptAlone === true && livingSeats(state).length === 1)),
+  );
 }

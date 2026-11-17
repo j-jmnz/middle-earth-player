@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { bytes, runScript, type Log } from "../log.ts";
-import { dealtCodes, loadCampaigns, loadScenario } from "../data/load-scenarios.ts";
+import { dealtCodes, loadCampaigns, loadAnyScenario } from "../data/load-scenarios.ts";
 import { ROOT } from "../data/paths.ts";
 import { sectionText } from "../docs/index.ts";
 
@@ -243,7 +243,7 @@ function main(log: Log): void {
   if (!existsSync(vocabularyPath)) throw new Error(`${DRAFTS_DIR}/vocabulary.md is missing: run pnpm effects draft ${id} first`);
   // Only the drafts of the scenario's own cards: with --no-draft the folder may hold another scenario's.
   const present = readdirSync(draftsDir).filter((name) => name.endsWith(".md") && name !== "vocabulary.md").sort();
-  const { kept, others } = draftsOfScenario(present, dealtCodes(loadCampaigns(), [loadScenario(id)], { nightmare: true }));
+  const { kept, others } = draftsOfScenario(present, dealtCodes(loadCampaigns(), [loadAnyScenario(id)], { nightmare: true }));
   if (others.length > 0) log.warn(`${DRAFTS_DIR} holds ${others.length} draft${others.length === 1 ? "" : "s"} of cards ${id} does not deal (${others.join(", ")}): left out of the pack. Run without --no-draft to rewrite the folder for ${id}.`);
   const drafts = kept.map((name) => ({ name, text: readFileSync(path.join(draftsDir, name), "utf8") }));
   const sources = new Map<string, string>([

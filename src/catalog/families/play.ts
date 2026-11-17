@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
+import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
@@ -71,7 +72,9 @@ const VERBS = [
   }),
   // Constant: while the source is in play the card (the source, or its host) is controlled by the first player ("The first
   // player gains control of attached ally"; `lastPlayer`: "The last player gains control of Na'asiyah", 11079:A:1, dcce.last-player). The engine moves it whenever the first player changes.
-  z.strictObject({ verb: z.literal("ControlledBy"), who: z.enum(["firstPlayer", "lastPlayer"]), card: z.enum(["self", "host"]), ...when }),
+  // `intoPlay` (with `card: self`): an objective ally in the staging area joins that player's play area, faceup and ready, once, and stays with him when the first player token moves ("he joins the first player as an ally", 02037:A:2); without it a card in the staging area is left where it is.
+  // `follows` (with `intoPlay`): after it has joined, the card passes to each new first player as the token moves ("The first player gains control of Wilyador, as an ally", 02064:A:1; sotm.ally-objective-wilyador).
+  z.strictObject({ verb: z.literal("ControlledBy"), who: z.enum(["firstPlayer", "lastPlayer"]), card: z.enum(["self", "host"]), intoPlay: z.literal(true).optional(), follows: z.literal(true).optional(), ...when }),
   // The actor takes the first player token: they are the first player from now on (rr.first-player).
   z.strictObject({ verb: z.literal("TakeFirstPlayer"), ...when }),
   // Each player raises their threat by `amount` from the doomed keyword the source gains (rr.doomed-x): "You may give ~
@@ -93,8 +96,8 @@ const VERBS = [
   // less").
   z.strictObject({ verb: z.literal("DiscardWhen"), stat: z.enum(["willpower", "attack", "defense", "hitPoints"]), max: z.number().int(), ...when }),
   // Places damage tokens on the card (the source by default) without dealing damage: nothing answers or cancels them ("enters
-  // play with 1 damage on it"). A character with damage at its hit points is destroyed (rr.hit-points).
-  z.strictObject({ verb: z.literal("PlaceDamage"), amount: z.number().int().positive(), card: card.optional(), ...when }),
+  // play with 1 damage on it"). A character with damage at its hit points is destroyed (rr.hit-points). The amount may be read ("X is the number of players", 02061:B:1).
+  z.strictObject({ verb: z.literal("PlaceDamage"), amount: positiveAmountSchema, card: card.optional(), ...when }),
   // The actor spends `amount` resources from the pool of the card (the last picked by default): nothing is spent when it holds
   // fewer ("Spend 1 resource from a Rohan hero's resource pool").
   z.strictObject({ verb: z.literal("SpendFrom"), amount: z.number().int().positive(), card: card.optional(), ...when }),
@@ -119,6 +122,10 @@ const TRIGGERS = [
 // `heroType`: the holder loses the ally card type and gains the hero card type (Sword-thain): it is among its controller's
 // heroes while it holds the flag. `threatCeiling` (on "seat:N"): while the seat's threat is higher than the amount, it is
 // treated as the amount ("treat your threat as if it is 20"); the dial does not move.
-const FLAGS = ["heroType", "threatCeiling"] as const;
+// `cannotTriggerEffects`: the holder cannot initiate its own Action and Response abilities ("Attached hero cannot ... trigger its effect", 02048:A:1); its constant and Forced abilities still work.
+// `healCapPerEffect` (on the card): no heal effect takes more than this much damage off it ("Wilyador cannot be healed of more than 5 wounds by a single effect", 02064:A:3). `healReducedToOne` (on the host, from an attachment): a heal
+// of the host by a card effect other than an Athelas heal takes off 1 damage, and then the attachment is discarded ("the amount of damage healed is reduced to 1. Then, discard Noxious Supplies", 900608:A:2).
+// `returnsWithoutActive` (on an enemy): while no location is the active location, an engaged holder goes back to the staging area at once, whatever engaged it ("If there is no active location, return ~ to the staging area", 900702:A:2; the settle sweep, families/play/sweep.ts).
+const FLAGS = ["heroType", "threatCeiling", "cannotTriggerEffects", "healCapPerEffect", "healReducedToOne", "returnsWithoutActive"] as const;
 
 export const manifest = { name: "play", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

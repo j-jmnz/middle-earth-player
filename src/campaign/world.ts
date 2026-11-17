@@ -7,7 +7,7 @@ import { collectionVerbs, type Effect } from "../catalog/boundary.ts";
 import { contentVersion } from "../catalog/content-hash.ts";
 import type { DeckSaveCard } from "../catalog/deck-save.ts";
 import { cards } from "../catalog/schema.ts";
-import { campaignGameCodes, recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
+import { campaignGameCodes, recordInstructions, scenarioCards, type AnyScenarioData, type CampaignData } from "../catalog/scenario-data.ts";
 import { ORC_GUARD_CODE, printedOf, type PrintedCard } from "../rules/core/printed.ts";
 
 import type { CampaignLog } from "./log.ts";
@@ -16,7 +16,8 @@ import { printedFromRow, printedMap, type CatalogRow } from "./cards.ts";
 
 export type World = {
   campaign: CampaignData;
-  scenario: ScenarioData;
+  // A cycle's scenario (Shadows of Mirkwood) has no campaign card and no campaign: it is played standalone only.
+  scenario: AnyScenarioData;
   effects: readonly Effect[];
   cards: ReadonlyMap<string, PrintedCard>;
   // The encounter set of each card the catalog knows, for the briefing's per-set counts.
@@ -63,9 +64,9 @@ function instructionCodes(effects: readonly Effect[], card: string): string[] {
 
 // The catalog codes a scenario needs to be dealt and resolved: its piles and its Nightmare deck, its campaign card and what that card names,
 // the campaign prelude, and any extra codes the caller holds (the heroes and decks of a loadout, the pool).
-export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], extra: Iterable<string> = []): string[] {
+export function worldCodes(campaign: CampaignData, scenario: AnyScenarioData, effects: readonly Effect[], extra: Iterable<string> = []): string[] {
   const codes = new Set<string>(campaign.prelude.map((card) => card.code));
-  codes.add(scenario.campaignCard);
+  if (scenario.campaignCard !== undefined) codes.add(scenario.campaignCard);
   // The saga hero a scenario grants and what it attaches to the Ring-bearer (ScenarioData.sagaStart).
   if (scenario.sagaStart) for (const code of "hero" in scenario.sagaStart ? [scenario.sagaStart.hero] : scenario.sagaStart.attached) codes.add(code);
   // A card with two catalog codes (the Stormcaller Elite) is dealt as its first side; the other side is in the world for the flip.
@@ -80,8 +81,9 @@ export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effec
   if (scenario.nightmare) {
     codes.add(scenario.nightmare.setupCard);
     for (const card of scenario.nightmare.cards) codes.add(card.code);
+    for (const code of scenario.nightmare.questCards ?? []) codes.add(code);
   }
-  for (const code of instructionCodes(effects, scenario.campaignCard)) codes.add(code);
+  if (scenario.campaignCard !== undefined) for (const code of instructionCodes(effects, scenario.campaignCard)) codes.add(code);
   for (const code of extra) codes.add(code);
   return [...codes];
 }
@@ -93,18 +95,19 @@ export function logCodes(log: CampaignLog): string[] {
 
 // The codes of a deal's loadout: the Ring-bearer and the heroes and cards of each seat's deck. Shared by what the table opens with (a save's
 // log adds its own) and what a deal stamps, so both hash the same cards (worldHash).
-export function dealtCodes(loadout: { ringBearer: string | null; seats: readonly { heroes: readonly string[]; deck: readonly string[] }[] } | null): string[] {
+export function dealtCodes(loadout: { ringBearer: string | null; seats: readonly { heroes: readonly string[]; deck: readonly string[]; side?: readonly string[] | undefined }[] } | null): string[] {
   if (!loadout) return [];
-  return [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
+  // The side deck's cards too: a contract can deal them (The Burglar's Turn's loot deck).
+  return [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck, ...(seat.side ?? [])])];
 }
 
 // Every code a game can reach, which loadWorld loads and worldHash hashes: worldCodes, `extra`, and the cards its records take from the collection by code.
-export function gameCodes(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], extra: Iterable<string> = []): string[] {
+export function gameCodes(campaign: CampaignData, scenario: AnyScenarioData, effects: readonly Effect[], extra: Iterable<string> = []): string[] {
   const dealt = worldCodes(campaign, scenario, effects, extra);
   return [...new Set([...dealt, ...collectionTaken(effects, new Set(dealt))])];
 }
 
-export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], rows: readonly CatalogRow[]): World {
+export function worldFrom(campaign: CampaignData, scenario: AnyScenarioData, effects: readonly Effect[], rows: readonly CatalogRow[]): World {
   const sets = new Map<string, string>();
   const deckFacts = new Map<string, DeckSaveCard>();
   const copies = new Map<string, number>();
@@ -116,7 +119,7 @@ export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effect
   const printed = printedMap(rows);
   // The campaign card is dealt as an engine card only for the scenario being played, and only when it has an ability that works
   // while the scenario is played (141056:A:2), which the engine places beside the quest deck (families/burden/campaign.ts).
-  for (const row of rows) if (row.code === scenario.campaignCard && row.typeCode === "campaign") printed.set(row.code, printedFromRow(row));
+  for (const row of rows) if (scenario.campaignCard !== undefined && row.code === scenario.campaignCard && row.typeCode === "campaign") printed.set(row.code, printedFromRow(row));
   // The Orc Guard a deck card becomes (01107:A:1) is no card of the catalog: the engine makes it, and the table names it.
   printed.set(ORC_GUARD_CODE, printedOf(printed, ORC_GUARD_CODE));
   return { campaign, scenario, effects, cards: printed, sets, deckFacts, copies };
@@ -176,7 +179,7 @@ function collectionTaken(effects: readonly Effect[], codes: ReadonlySet<string>)
 export function loadWorld<TRun>(
   catalog: BaseSQLiteDatabase<"sync", TRun>,
   campaign: CampaignData,
-  scenario: ScenarioData,
+  scenario: AnyScenarioData,
   effects: readonly Effect[],
   extra: Iterable<string> = [],
 ): World {

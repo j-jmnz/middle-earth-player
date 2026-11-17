@@ -79,7 +79,8 @@ export type TableNav = {
   backAccessibilityLabel: string;
   back: Href;
   outcome: Href;
-  booklet: { id: string; page?: string };
+  // Null for a scenario with no booklet (a cycle's): the menu has no Booklet row.
+  booklet: { id: string; page?: string } | null;
 };
 
 /** What the table draws from: the opened world, the reducer context, and each card's picture source and text. */
@@ -181,7 +182,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           router.push("/glossary");
           return;
         case "booklet":
-          router.push({ pathname: "/booklet/[id]", params: nav.booklet });
+          if (nav.booklet) router.push({ pathname: "/booklet/[id]", params: nav.booklet });
           return;
         case "setup":
           setPreview(null);
@@ -290,7 +291,9 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
     : null;
   const shown = previewed?.cards[previewed.start];
   // The setup card: the scenario's campaign card on its Setup side (rr.campaign-cards), then the Nightmare setup card on Nightmare.
-  const setupCards = setupShown ? [session.world.scenario.campaignCard, ...setupCodes(game)].map((code) => ({ code, ...describe(code) })) : [];
+  // The menu's rows a game has nothing behind: no booklet (a cycle's scenario), no setup card (no campaign card, no Nightmare deck).
+  const menuWithout: readonly MenuItemId[] = [...(nav.booklet ? [] : (["booklet"] as const)), ...(session.world.scenario.campaignCard !== undefined || setupCodes(game).length > 0 ? [] : (["setup"] as const))];
+  const setupCards = setupShown ? [...(session.world.scenario.campaignCard === undefined ? [] : [session.world.scenario.campaignCard]), ...setupCodes(game)].map((code) => ({ code, ...describe(code) })) : [];
 
   // The stack locks the table to landscape, but iPadOS can still give the app a portrait window (a resizable window, Split
   // View). The table is not laid out for one, so it asks to be turned.
@@ -483,7 +486,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
-      <TableMenu open={menuOpen} nav={nav} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <TableMenu open={menuOpen} nav={nav} without={menuWithout} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable, result: choice.readout?.result, refusal }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );

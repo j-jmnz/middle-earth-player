@@ -50,6 +50,12 @@ export const RULE_PDFS = [
     ["otd", "hobbit_on_the_doorstep_rulesheet.pdf"],
     ["hon", "heirs-of-numenor_rules.pdf"],
     ["wor", "mec65_web_the-wilds-of_rhovanion_rules.pdf"],
+    // Shadows of Mirkwood's Adventure Pack rulesheets: the encounter sets of the scenario and its special rules. The Hunt for Gollum's and Conflict at the Carrock's rulesheets
+    // (rulesheet-thehuntforgollum.pdf, rulesheet-conflictatthecarrock.pdf) hold their text as outlines with no text layer, so no span can be read from them.
+    ["jtr", "a-journey-to-rhosgobel-rules.pdf"],
+    ["hoem", "the_hills_of_emyn_muil_rulesheet.pdf"],
+    ["tdm", "the_dead_marshes_rulesheet.pdf"],
+    ["rtm", "return_to_mirkwood_rulesheet.pdf"],
     ["community-eomer-eowyn", "mec_communitydecklists_eomerandeowyn-compressed.pdf"],
     ["community-red-arrow", "mec_communitydecklists_theredarrow-compressed.pdf"],
     ["community-noldor", "mec_communitydecklists_theswordsofthenoldor-compressed.pdf"],

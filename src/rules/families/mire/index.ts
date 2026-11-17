@@ -8,6 +8,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { heldAmount, inPlay } from "../../core/state.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { moveEncounter, typeOf } from "../encounter/moves.ts";
@@ -59,6 +60,15 @@ export function returnRandomVictory(state: ScenarioState, focus: Focus, ctx: Red
   return chosen ? moveEncounter({ ...state, seedCursor: shuffled.cursor }, chosen, "staging", focus.seat, ctx, steps) : state;
 }
 
+/** DiscardRandomVictoryLocation: a location of the victory display with the Trait, chosen with the seed, goes to the encounter discard pile (900709:A:1). */
+export function discardRandomVictory(state: ScenarioState, trait: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const locations = state.victory.filter((id) => typeOf(state, id, ctx) === "location" && hasTrait(state, id, trait, ctx));
+  if (locations.length === 0) return state;
+  const shuffled = shuffleIds(locations, state.seed, state.seedCursor);
+  const chosen = shuffled.ids[0];
+  return chosen ? moveEncounter({ ...state, seedCursor: shuffled.cursor }, chosen, "discard", focus.seat, ctx, steps) : state;
+}
+
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "PlaceMireToken": {
@@ -67,9 +77,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "ReturnRandomVictoryLocation":
       return returnRandomVictory(state, focus, ctx, steps);
+    case "DiscardRandomVictoryLocation":
+      return discardRandomVictory(state, instruction.trait, focus, ctx, steps);
     default:
       return null;
   }
 }
 
-export const manifest: RulesFamily = { name: "mire", verbs: ["PlaceMireToken", "ReturnRandomVictoryLocation"], run };
+export const manifest: RulesFamily = { name: "mire", verbs: ["PlaceMireToken", "ReturnRandomVictoryLocation", "DiscardRandomVictoryLocation"], run };

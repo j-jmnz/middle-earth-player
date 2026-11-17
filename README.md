@@ -80,6 +80,14 @@ All eight official campaigns from the revised, repackaged products are playable.
 | Dream-chaser | Dream-chaser Campaign Expansion | 9 |
 | Ered Mithrin | Ered Mithrin Campaign Expansion | 9 |
 
+### Cycles
+
+A cycle's scenarios belong to no campaign, so you play them one at a time from the Scenarios tab, on Easy, Normal or Nightmare.
+
+| Cycle | Products | Scenarios |
+| --- | --- | --- |
+| Shadows of Mirkwood | The Hunt for Gollum to Return to Mirkwood (six Adventure Packs) | 6 |
+
 There is no online multiplayer, and there won't be: the app is built for one device.
 
 ## Private by design
@@ -165,12 +173,11 @@ Each release's notes give the SHA-256 of every file, and a `.sha256` file sits b
 
 The goal is every official campaign and scenario, followed by the fan-made content from [A Long-extended Party](https://alongextendedparty.com) (ALeP).
 
-With the official campaigns done, the cycles come next. A cycle is a group of scenarios that belongs to no campaign, so its scenarios are played standalone only. Each cycle waits under Coming later in the app until at least one of its scenarios is playable (`data/overrides.json`, campaigns). They come in release order, going by the US release of the product that starts each one:
+With the official campaigns done, the cycles come next. A cycle is a group of scenarios that belongs to no campaign, so its scenarios are played standalone only, from the Scenarios tab. The Shadows of Mirkwood cycle is playable: The Hunt for Gollum, Conflict at the Carrock, A Journey to Rhosgobel, The Hills of Emyn Muil, The Dead Marshes and Return to Mirkwood, each on Easy, Normal and Nightmare. The rest wait under Coming later in the app until at least one of their scenarios is playable (`data/overrides.json`, campaigns). They come in release order, going by the US release of the product that starts each one:
 
 <details>
 <summary>The cycles, in order</summary>
 
-- The Shadows of Mirkwood cycle: The Hunt for Gollum, Conflict at the Carrock, A Journey to Rhosgobel, The Hills of Emyn Muil, The Dead Marshes, Return to Mirkwood.
 - The Standalone scenarios cycle: The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
 - The Dwarrowdelf cycle: Into the Pit, The Seventh Level, Flight from Moria, The Redhorn Gate, Road to Rivendell, The Watcher in the Water, The Long Dark, Foundations of Stone, Shadow and Flame.
 - The Hobbit cycle (the two Hobbit saga boxes): "We Must Away, Ere Break of Day", Over the Misty Mountains Grim, Dungeons Deep and Caverns Dim, Flies and Spiders, The Lonely Mountain, The Battle of Five Armies.

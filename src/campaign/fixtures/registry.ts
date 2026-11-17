@@ -8,6 +8,8 @@
 // (`won`, `lost` and `duo` are scenario 1 from an empty log; `knife-lost` starts from the log `won` writes; the rest are
 // two-handed games of one scenario, parked on its win or loss, and a part after the first starts from the log the earlier
 // parts' wins write). The names with `showcase` are the README's captures, parked on a full table.
+// An entry with `kind: "standalone"` is a scenario of a cycle (Shadows of Mirkwood): it has no log and no earlier part, so each of its saves is
+// one open standalone game (a loadout of saved decks, a seed and the intents) parked on its win or loss, and the e2e route opens its table.
 export const FIXTURE_REGISTRY = [
   { scenarioId: "a-shadow-of-the-past", file: "scenario-1", names: ["won", "lost", "duo", "past-showcase-board"] },
   { scenarioId: "a-knife-in-the-dark", names: ["knife-lost"] },
@@ -55,7 +57,22 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "the-treachery-of-rhudaur", names: ["rhudaur-won", "rhudaur-lost"] },
   { scenarioId: "the-battle-of-carn-dum", names: ["dum-won", "dum-lost"] },
   { scenarioId: "the-dread-realm", names: ["realm-won", "realm-lost"] },
-] as const satisfies readonly { scenarioId: string; file?: string; names: readonly string[] }[];
+  { scenarioId: "the-hunt-for-gollum", kind: "standalone", names: ["gollum-won", "gollum-lost"] },
+  { scenarioId: "conflict-at-the-carrock", kind: "standalone", names: ["carrock-won", "carrock-lost"] },
+  { scenarioId: "a-journey-to-rhosgobel", kind: "standalone", names: ["rhosgobel-won", "rhosgobel-lost"] },
+  { scenarioId: "the-hills-of-emyn-muil", kind: "standalone", names: ["muil-won", "muil-lost"] },
+  { scenarioId: "the-dead-marshes", kind: "standalone", names: ["deadmarshes-won", "deadmarshes-lost"] },
+  { scenarioId: "return-to-mirkwood", kind: "standalone", names: ["returnmirkwood-won", "returnmirkwood-lost"] },
+] as const satisfies readonly { scenarioId: string; file?: string; kind?: "standalone"; names: readonly string[] }[];
+
+// The entries as plain data, for code that reads `kind` and `file` whichever entries carry them.
+type EntryShape = { scenarioId: string; file?: string; kind?: "standalone"; names: readonly string[] };
+const ENTRIES: readonly EntryShape[] = FIXTURE_REGISTRY;
+
+/** The fixture a name is: a campaign save, or (a scenario of a cycle) one open standalone game. */
+export function fixtureKindOf(name: string): "campaign" | "standalone" {
+  return ENTRIES.some((entry) => entry.kind === "standalone" && entry.names.includes(name)) ? "standalone" : "campaign";
+}
 
 export type FixtureScenarioId = (typeof FIXTURE_REGISTRY)[number]["scenarioId"];
 export type FixtureName = (typeof FIXTURE_REGISTRY)[number]["names"][number];

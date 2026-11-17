@@ -86,7 +86,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
       * option "damage" (only if there is a location (any player controls) [also {"aflame":true}] to choose):
         - choose location (any player controls) chosen by the first player [also {"aflame":true}]
         - deal 2 damage to the picked card
-      * option "search" (only if [json condition {"kind":"encounterHas","piles":"deckAndDiscard","cardType":"location","aflame":true}]):
+      * option "search" (only if the encounter discard pile or deck holds a location with the Aflame keyword):
         - [json SearchAflame {"verb":"SearchAflame"}]
 
 ## 11041 Sahír's Ravager
@@ -145,7 +145,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - the first player chooses one of:
       * option "damage":
         - deal 3 damage to this card
-      * option "discard" (only if [json condition {"kind":"encounterHas","piles":"discard","cardType":"enemy"}]):
+      * option "discard" (only if the encounter discard pile holds a enemy):
         - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
         - the picked card goes to the staging area (it is not revealed)
 
@@ -154,7 +154,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): choose character (any player controls) defending
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
-    - [json MoveResources {"verb":"MoveResources","all":true,"when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Raider"}}}]
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): move all the resource tokens from the card picked before the last to the last card picked
 
 ## 11045 White Ship
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -256,7 +256,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
   11064:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; event happened to the controller)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
-    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - place 1 resource tokens on this card
 
 ## 11065 Corsair Infiltrator
@@ -265,14 +265,14 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11065:A:1 (front): Forced: When Corsair Infiltrator attacks, deal it 1 additional shadow card for each resource on it.
   11065:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - repeat resources of this card times:
-      - [json DealShadow {"verb":"DealShadow","additional":true}]
+      - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 11065:A:2 (front): Forced: After the engaged player collects resources at the beginning of the resource phase, that player moves 1 resource from one of his heroes' pools to Corsair Infiltrator.
   11065:forced:2: Forced on the event resourcesCollected (event happened to the controller)
     only if all of: (this card is engaged with the player) and (there is a hero (you control) with resources on it to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
-    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - place 1 resource tokens on this card
 
 ## 11066 Raid Leader
@@ -295,7 +295,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
     - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","notTrait":"Ship"}]
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 11067:A:2 (shadow): Shadow: If the attacking enemy is a Raider, place 2 resources on it.
   11067:shadow:1: Shadow
@@ -324,7 +324,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11077:A:1 (front): The first player gains control of Captain Sahír.
   11077:constant:1: Constant
-    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+    - this card is controlled by the first player while this holds
 
 11077:A:2 (front): Captain Sahír gets +1 Willpower and +1 Attack for each resource on him (max +6).
   11077:constant:2: Constant
@@ -337,7 +337,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if there is a hero (you control) with resources on it to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
-    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - place 1 resource tokens on this card
 
 11077:A:4 (front): If Captain Sahír leaves play, the players lose.
@@ -363,19 +363,19 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - this card: stat attack resources of this card, until the end of the attack
     - this card: stat defense resources of this card, until the end of the attack
     - later, when the attack ends:
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
+      - 1 resource(s) come off the resource pool of this card (discarded, not spent)
   11078:forced:3: Forced when this enemy attacks, before the defender is declared (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat attack resources of this card, until the end of the attack
     - this card: stat defense resources of this card, until the end of the attack
     - when the attack in progress ends:
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
+      - 1 resource(s) come off the resource pool of this card (discarded, not spent)
 
 ## 11079 Na'asiyah
 
 11079:A:1 (front): The last player gains control of Na'asiyah.
   11079:constant:1: Constant
-    - [json ControlledBy {"verb":"ControlledBy","who":"lastPlayer","card":"self"}]
+    - this card is controlled by the last player while this holds
 
 11079:A:2 (front): Action: While Na'asiyah is attacking or defending, spend 1 resource from her to give her +2 Attack or +2 Defense for this attack.
   11079:action:2: Action (cost: pay 1 resource(s) from this card's pool)
@@ -391,7 +391,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if there is a hero (you control) with resources on it to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
-    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - place 1 resource tokens on this card
 
 11079:A:4 (front): If Na'asiyah leaves play, the players lose.
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 281 by template, 53 as JSON)
+(rendered pieces: 296 by template, 40 as JSON)

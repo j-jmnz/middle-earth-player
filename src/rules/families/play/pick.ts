@@ -4,6 +4,7 @@
 // hero", 22035:A:2). A trait an attachment gives counts (hasTrait).
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
+import { characters } from "../../combat/combat.ts";
 import { grantedTraits, hasTrait } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
@@ -16,7 +17,18 @@ function matchesHeroSphere(state: ScenarioState, id: string, seat: number, ctx: 
   return (state.seats[seat]?.heroes ?? []).some((hero) => printedOf(ctx.cards, state.cards[hero]?.code ?? "").sphere === sphere);
 }
 
+// `soleMostDamaged`: this character has damage on it and more than every other character of every player in play, Wilyador and the heroes and allies alike.
+function hasMostDamage(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const own = state.cards[id]?.damage ?? 0;
+  if (own <= 0) return false;
+  for (let seat = 0; seat < state.seatCount; seat += 1) {
+    for (const other of characters(state, seat, ctx.cards)) if (other !== id && (state.cards[other]?.damage ?? 0) >= own) return false;
+  }
+  return true;
+}
+
 export function playPickMatches(state: ScenarioState, id: string, spec: PickSpec, sourceId: string | null, ctx: ReduceContext, seat: number): boolean {
+  if (spec.soleMostDamaged && !hasMostDamage(state, id, ctx)) return false;
   if (spec.heroSphere && !matchesHeroSphere(state, id, seat, ctx)) return false;
   if (spec.sharesTrait !== "self" && spec.sharesTrait !== "host") return true;
   const source = sourceId ? state.cards[sourceId] : undefined;

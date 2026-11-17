@@ -55,6 +55,8 @@ export function lineTimings(line: string): Set<string> {
   if (quoted != null && !LABEL.test(quoted.trim())) allowed.add("triggered");
   // An unlabelled line that calls itself an action is one ("Any player may trigger this action", Ceorl 12058:A:1).
   if (/trigger this action/i.test(line)) allowed.add("action");
+  // A Travel line that bars the trip until something is done ("Travel: Players must complete stage one of this quest before they can travel to Rhosgobel", 02065:A:3) is also a constant: the engine checks it while the card is in play.
+  if (label === "travel" && /\bbefore they can travel\b/.test(line)) allowed.add("constant");
   // An objective ally that "The first player gains control of" it is put into play by the campaign pool at the start of a scenario (Mendor, 01135:A:2).
   if (/^The first player gains control of /.test(line.trim())) allowed.add("campaignSetup");
   // A lead-in that is not a timing label ("All Troll enemies gain the text: ...", 900201:A:2) leaves the line unlabelled.

@@ -38,6 +38,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     sync: { steps: [{ script: "data/sync.ts" }], about: "refreshes data/raw and .cache (the only networked command)" },
     build: { steps: [{ script: "data/build.ts" }], about: "builds data/ and the generated code from data/raw, offline" },
     check: { steps: [{ script: "data/check.ts" }], about: "rebuilds into a temporary directory and fails on any difference" },
+    "ledger-seed": { steps: [{ script: "data/ledger-seed.ts" }], about: "writes a scenario's missing ledger entries from the source text, readBy empty (<scenario-id> [--nightmare] for its Nightmare deck)" },
     query: { steps: [{ script: "data/query.ts", node: ["--disable-warning=ExperimentalWarning"] }], about: "runs SQL over cards, scenario_cards and rules" },
   },
   effects: {

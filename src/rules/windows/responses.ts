@@ -19,6 +19,7 @@ import { payUsage, controllerSeat, offerable, usable, usageReason } from "../pla
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { announceAbility, announcePlayerAbility } from "../families/deck/pressure.ts";
 import { isPlayerCardEffect } from "../core/keywords.ts";
+import { guardianSeat } from "../families/guardian/seats.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
@@ -50,7 +51,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
       const fromHand = costOfKind(effect, "playEvent") != null || effect.fromHand === true;
       if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
       // "The engaged player may ...": the seat the event happened to answers it, whoever controls the card (12125:A:3).
-      const answering = effect.answeredBy === "eventSeat" ? event.seat : seat;
+      const answering = effect.answeredBy === "eventSeat" ? event.seat : effect.answeredBy === "guardian" ? guardianSeat(state) : seat;
       if (answering == null || !order.includes(answering) || (locked != null && answering !== locked)) continue;
       // `other`: the second card the event names ("After a Trap card you control is attached to an enemy": the new host).
       const scope = { actor: answering, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.phase ? { phase: event.phase } : {}), ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}), ...(event.other ? { other: event.other } : {}) };

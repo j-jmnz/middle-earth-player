@@ -134,6 +134,13 @@ export function shuffleDiscardIn(state: ScenarioState, instruction: Verb<"Shuffl
   return shuffleSeatDeck(next, seat);
 }
 
+// RemoveDiscardFromGame: every card in the actor's discard pile is removed from the game (900908:A:1), in discard order.
+export function removeDiscardFromGame(state: ScenarioState, focus: Focus): ScenarioState {
+  let next = state;
+  for (const id of [...(state.seats[focus.seat]?.discard ?? [])]) next = moveCard(next, id, { zone: "removed" });
+  return next;
+}
+
 // ShuffleHandIntoDeck: the actor's hand (but the card resolving) goes into their deck, which is shuffled; X is how many.
 export function shuffleHandIn(state: ScenarioState, focus: Focus): ScenarioState {
   const hand = (state.seats[focus.seat]?.hand ?? []).filter((id) => id !== focus.sourceId);

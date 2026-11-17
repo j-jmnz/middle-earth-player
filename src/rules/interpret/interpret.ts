@@ -19,7 +19,7 @@ import { travelNow } from "../quest/travel.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { flagged, heldAmount, updateCard } from "../core/state.ts";
 import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
-import { readyNamedCard } from "./restrictions.ts";
+import { readyNamedCard, seatBarred } from "./restrictions.ts";
 import { withFrame } from "../windows/windows.ts";
 import { moveCard, turnedUp } from "../core/zones.ts";
 import { shadowFace } from "../families/defense/shadow.ts";
@@ -170,15 +170,16 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
 export function drawOpeningHand(state: ScenarioState, seat: number, steps: EngineStep[], ctx: ReduceContext, cause: Cause = ruleCause("rr.setup")): ScenarioState {
   let next = state;
   const count = Math.max(0, 6 - state.openingHandReduction);
-  next = drawMany(next, seat, count, steps, cause, ctx);
+  next = drawMany(next, seat, count, steps, cause, ctx, false, false, true);
   return next;
 }
 
 // A draw of `count` cards: one draw action, which Iron Shackles on the deck replaces as a whole (families/dungeon/deck.ts).
 // An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either. `bottom`: the cards come off the bottom of the deck.
-// `byPlayerCard`: a player card's effect draws them, which a card that hears the draw can ask (143059:A:1).
-export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false, byPlayerCard = false): ScenarioState {
-  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
+// `byPlayerCard`: a player card's effect draws them, which a card that hears the draw can ask (143059:A:1). `framework`: the framework draws them (the opening hand, the resource phase's draw), which a rule about drawing "through card effects" does not
+// bar (900404:A:1).
+export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false, byPlayerCard = false, framework = false): ScenarioState {
+  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0 || (!framework && seatBarred(state, ctx, seat, "draw"))) return state;
   const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback, bottom));
   return announceEnteredHand(state, announceDraw(state, drawn, seat, ctx, byPlayerCard), seat, ctx);
 }

@@ -18,10 +18,11 @@ function openUser() {
 describe("deck store", () => {
   it("saves a deck that is not ready to play, and rewrites it under the same id", () => {
     const user = openUser();
-    const id = writeDeck(user, { id: null, name: "  Hobbits ", heroes: ["141002"], cards: [{ code: "01073", count: 1 }] }, 1000);
-    expect(readDeck(user, id)).toEqual({ id, name: "Hobbits", heroes: ["141002"], cards: [{ code: "01073", count: 1 }], updatedAt: 1000 });
+    const id = writeDeck(user, { id: null, name: "  Hobbits ", heroes: ["141002"], cards: [{ code: "01073", count: 1 }], side: [{ code: "01080", count: 2 }] }, 1000);
+    expect(readDeck(user, id)).toEqual({ id, name: "Hobbits", heroes: ["141002"], cards: [{ code: "01073", count: 1 }], side: [{ code: "01080", count: 2 }], updatedAt: 1000 });
     expect(writeDeck(user, { id, name: "Halflings", heroes: [], cards: [] }, 2000)).toBe(id);
-    expect(readDeck(user, id)).toMatchObject({ name: "Halflings", heroes: [], cards: [], updatedAt: 2000 });
+    // A write with no side deck clears it.
+    expect(readDeck(user, id)).toMatchObject({ name: "Halflings", heroes: [], cards: [], side: [], updatedAt: 2000 });
     expect(listDecks(user)).toHaveLength(1);
   });
 
@@ -54,7 +55,7 @@ describe("deck store", () => {
     writeDeck(user, { id: STEALTH_ID, name: "Changed", heroes: [], cards: [] }, 5000);
     resetStarterDeck(user, STEALTH_ID);
     const printed = starterDeck(STEALTH_ID);
-    expect(readDeck(user, STEALTH_ID)).toEqual({ ...printed, updatedAt: null });
+    expect(readDeck(user, STEALTH_ID)).toEqual({ ...printed, side: [], updatedAt: null });
   });
 });
 

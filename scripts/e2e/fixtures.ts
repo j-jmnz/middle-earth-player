@@ -24,7 +24,8 @@
 // Every other scenario's fixtures (the names are in src/campaign/fixtures/registry.ts) are written by the scenario's own seed finder
 // in this folder, to src/campaign/fixtures/<scenario-id>.json, in campaign order (data/campaigns): a part after the first is dealt from
 // the log the earlier part's won game writes, so it takes that game from the ones written before it. A game the seeds did not find
-// is left out of its file.
+// is left out of its file. A scenario of a cycle (a registry entry of kind "standalone", Shadows of Mirkwood) has no log and no earlier part: its finder writes
+// one open standalone game for each name (a loadout of saved decks, a seed and the intents), and the e2e route opens it on its table.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its list with
@@ -47,11 +48,11 @@ import { hideCommitLimit } from "../../src/rules/families/nightmare/guards.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
-import { loadCampaign, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
+import { loadAnyScenario, loadCampaign, loadCampaignsInOrder, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
 import { prebuiltDeck } from "./seed-kit.ts";
 import { WRITERS, isChained, type Chained, type Written } from "./writers.ts";
 import { pastShowcase } from "./showcase-past.ts";
-import { FIXTURE_REGISTRY, fixtureFile, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
+import { FIXTURE_REGISTRY, fixtureFile, fixtureKindOf, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
@@ -397,7 +398,10 @@ async function writeChained(dir: string, only: Chained | null): Promise<void> {
       if (existsSync(file)) Object.assign(written, JSON.parse(readFileSync(file, "utf8")) as Written);
       continue;
     }
-    const name = loadScenario(entry.scenarioId).name;
+    // A standalone entry is a scenario of a cycle, and only that.
+    const cycle = loadCampaignsInOrder().find((one) => one.scenarios.includes(entry.scenarioId))?.kind === "cycle";
+    if (cycle !== (fixtureKindOf(entry.names[0] ?? "") === "standalone")) throw new Error(`${entry.scenarioId}: its fixture entry is ${cycle ? "of a cycle's scenario, so it needs kind \"standalone\"" : "of a campaign's scenario, so it takes no kind"}`);
+    const name = loadAnyScenario(entry.scenarioId).name;
     const games = await say.stepAsync(`play ${name}'s fixtures`, async () => WRITERS[entry.scenarioId](written));
     Object.assign(written, games);
     writeFileSync(file, `${JSON.stringify(games)}\n`);

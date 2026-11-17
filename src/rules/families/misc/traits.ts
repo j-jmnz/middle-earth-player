@@ -19,6 +19,11 @@ export function flaggedTrait(state: ScenarioState, id: string, trait: string): b
   return false;
 }
 
+/** A Trait the holder loses, printed or gained ("Attached character loses the Eagle trait", 900607:A:2): the flag `losesEagle`. */
+export function lostTrait(state: ScenarioState, id: string, trait: string): boolean {
+  return trait === "Eagle" && flagged(state, id, "losesEagle");
+}
+
 // "When counting the number of Dwarf characters you control, Bombur counts as two": the extra cards a count of Dwarf characters
 // gets from the cards that hold countsAsTwoDwarves.
 export function countsExtra(state: ScenarioState, found: readonly string[], spec: { trait?: string | undefined; control: string }): number {

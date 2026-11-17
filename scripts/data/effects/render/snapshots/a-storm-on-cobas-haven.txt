@@ -169,8 +169,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - the acting player finds one Ship enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - then, if the number of player (any player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Ship enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
-    - for each objective (any player controls) in the staging area only [also {"hasGuard":false}]:
-      - choose non-unique Ship enemy (any player controls) in the staging area only [also {"isGuard":false}]
+    - for each objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters):
+      - choose non-unique Ship enemy (any player controls) in the staging area only, that is not guarding an objective
       - the picked card becomes the guard of the card picked before, attached to it in the staging area
 
 12121:B:1: Sailing.
@@ -183,7 +183,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12121:B:3 (back): You cannot advance while at least 1 objective is guarded by an encounter.
   12121:constant:2: Constant
-    only if the number of objective (any player controls) in the staging area only [also {"hasGuard":true}] is at least 1
+    only if the number of objective (any player controls) in the staging area only, that has an encounter card attached as its guard is at least 1
     - the players cannot defeat this stage while this holds
 
 ## 12122 Break Through the Fleet!
@@ -273,9 +273,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12126:A:3 (front): While Siege Ship is in the staging area, it gains: "Forced: At the end of the quest phase, if Siege Ship is not guarding an objective and there is an unguarded objective in the staging area, attach Siege Ship to that objective, guarding it."
   12126:forced:1: Forced at the end of the phase
-    only if all of: (it is the Quest phase) and (this card is in the staging area) and (this card is a enemy (any player controls) [also {"isGuard":false}]) and (there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose)
+    only if all of: (it is the Quest phase) and (this card is in the staging area) and (this card is a enemy (any player controls) that is not guarding an objective) and (there is a objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose objective (any player controls) in the staging area only [also {"hasGuard":false}]
+    - choose objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters)
     - this card becomes the guard of the picked card, attached to it in the staging area
 
 ## 12127 Heavy Cruiser
@@ -321,9 +321,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12129:A:2 (front): Response: After you travel to Belfalas Islet, choose a Ship enemy that is not guarding an objective. While Belfalas Islet is the active location, the chosen enemy is considered to be out of play.
   12129:response:1: Response after the players travel (heard about this card)
-    only if there is a Ship enemy (any player controls) or in the staging area [also {"isGuard":false}] to choose
+    only if there is a Ship enemy (any player controls) or in the staging area, that is not guarding an objective to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose Ship enemy (any player controls) or in the staging area [also {"isGuard":false}]
+    - choose Ship enemy (any player controls) or in the staging area, that is not guarding an objective
     - [json ConsiderOutOfPlay {"verb":"ConsiderOutOfPlay"}]
 
 ## 12130 Cobas Haven
@@ -372,11 +372,11 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12133:A:1 (front): When Revealed: Choose a Ship enemy that is not currently guarding an objective. Attach that enemy to an unguarded objective in the staging area, guarding it (return that enemy to the staging area if it is engaged). If no Ship enemy is returned to the staging area by this effect, The Raiders' Assault gains surge.
   12133:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose: choose Ship enemy (any player controls) or in the staging area [also {"isGuard":false}]
-    - then, if there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
-    - choose objective (any player controls) in the staging area only [also {"hasGuard":false}]
+    - if there is a objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) to choose: choose Ship enemy (any player controls) or in the staging area, that is not guarding an objective
+    - then, if there is a objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+    - choose objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters)
     - the card picked before becomes the guard of the picked card, attached to it in the staging area
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 12134 Sea-ward Tower
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -444,4 +444,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus -4, while this card is in play
 
-(rendered pieces: 190 by template, 76 as JSON)
+(rendered pieces: 203 by template, 63 as JSON)

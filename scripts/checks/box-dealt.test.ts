@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { loadCards } from "../data/load-cards.ts";
-import { dealtCodes, loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
+import { dealtCodes, loadCampaignsInOrder, loadAnyScenario } from "../data/load-scenarios.ts";
 import { boxPacks, undealtBoxCards } from "./box-dealt.ts";
 
 // Every card with text in the packs a campaign's encounter cards come from, of a non-player type or a boon or burden,
@@ -18,14 +18,14 @@ const EXCEPTIONS: Readonly<Record<string, string>> = {
 
 const cards = loadCards();
 const campaigns = loadCampaignsInOrder();
-const scenarios = [...new Set(campaigns.flatMap((campaign) => campaign.scenarios))].map((id) => loadScenario(id));
+const scenarios = [...new Set(campaigns.flatMap((campaign) => campaign.scenarios))].map((id) => loadAnyScenario(id));
 const dealt = dealtCodes(campaigns, scenarios);
 
 function packsOf(scenarioIds: readonly string[]): Set<string> {
   return boxPacks(cards, loadScenarios(scenarioIds).flatMap((scenario) => scenario.cards.map((card) => card.code)));
 }
 function loadScenarios(ids: readonly string[]) {
-  return ids.map((id) => loadScenario(id));
+  return ids.map((id) => loadAnyScenario(id));
 }
 
 describe("box-wide dealt check", () => {

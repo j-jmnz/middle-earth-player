@@ -3,8 +3,10 @@
 // into either the opening start the checklist produces or the sentences that refuse it. Pure: the screen shows what
 // this returns and deals only when `dealable` is true.
 import { deckRulesOf, heroLimit } from "../catalog/deck-rules.ts";
-import { deckSaveRefusal, formatDeckRefusal } from "../catalog/deck-save.ts";
-import { placementsAt, recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
+import { deckReadyRefusal } from "../catalog/deck-ready.ts";
+import { formatDeckRefusal } from "../catalog/deck-save.ts";
+import { lootCodes, lootRuleOf } from "../catalog/loot.ts";
+import { placementsAt, recordInstructions, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import { printedOf } from "../rules/core/printed.ts";
 import type { StartScenario } from "../rules/setup/setup.ts";
 
@@ -22,7 +24,9 @@ import type { World } from "./world.ts";
 import { wilderlandFacts } from "./wilderland.ts";
 import { xpFacts, type ModeCard } from "./xp.ts";
 
-export type BriefingSeat = { deckId: string | null; heroes: readonly string[]; deck: readonly string[] };
+// `side`: the saved deck's side deck, one code per copy. A new deal always carries it (empty for none); a loadout stored before side
+// decks has none, and its loot deck is not asked for (src/catalog/deck-ready.ts).
+export type BriefingSeat = { deckId: string | null; heroes: readonly string[]; deck: readonly string[]; side?: readonly string[] | undefined };
 
 export type BriefingInput = {
   world: World;
@@ -79,11 +83,14 @@ export function deckHasRingBearer(world: World, seat: BriefingSeat | undefined):
 // The loadout the saga rules and the checklist read: the saved deck's heroes, and in front of them the slot's hero when the
 // deck brings no Ring-bearer, or the ☺ hero the scenario grants the first player (☺ Aragorn: mec112.setting-up-the-game). A fallen hero is
 // not special-cased here: step 2 of the checklist names it.
+// A seat's contract takes its loot deck from the side deck (The Burglar's Turn): the cards that qualify, one of each title.
 export function loadoutOf(input: LoadoutInput): LoadoutSeat[] {
   const role = sagaRole(input.world);
   return input.seats.slice(0, input.seatCount).map((seat, index) => {
     const slot = role.kind === "ringBearer" && index === 0 && input.ringBearer && !deckHasRingBearer(input.world, seat) ? [input.ringBearer] : role.kind === "hero" && index === 0 && !seat.heroes.includes(role.hero) ? [role.hero] : [];
-    return { heroes: [...slot, ...seat.heroes], deck: seat.deck };
+    const rule = lootRuleOf(input.world.effects, seat.deck);
+    const loot = rule && input.world.deckFacts ? lootCodes(rule, deckCounts(seat.side ?? []), input.world.deckFacts) : [];
+    return { heroes: [...slot, ...seat.heroes], deck: seat.deck, ...(loot.length > 0 ? { loot } : {}) };
   });
 }
 
@@ -133,7 +140,9 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
     } else if (world.deckFacts) {
       // A deck saves before it is ready to play (rr.deckbuilding); it is not dealt until it is. A contract's deckbuilding rules apply.
       // A treasure the log records is no deck card for this check: it is outside the 50 card minimum (emce.treasure); validateLoadout admits or refuses it.
-      const refusal = deckSaveRefusal(seat.heroes, deckCounts(seat.deck.filter((code) => world.cards.get(code)?.campaignKind !== "treasure")), world.deckFacts, [], deckRulesOf(world.effects, seat.deck));
+      // A contract that builds a loot deck needs it in the side deck (src/catalog/loot.ts).
+      const side = seat.side ? deckCounts(seat.side) : undefined;
+      const refusal = deckReadyRefusal(seat.heroes, deckCounts(seat.deck.filter((code) => world.cards.get(code)?.campaignKind !== "treasure")), world.deckFacts, world.effects, side);
       if (refusal) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(refusal)}` });
     }
     for (const code of seat.heroes) {
@@ -164,15 +173,28 @@ export function difficultyProblems(world: World, difficulty: Difficulty): Proble
   return [{ rule: "Nightmare not playable yet", message: world.scenario.nightmare ? `${name} on Nightmare is not playable yet: some of its Nightmare cards have no effect record.` : `${name} has no Nightmare deck.` }];
 }
 
+// The scenario of a campaign deal. A cycle scenario has no Campaign Mode: it is played standalone only.
+function campaignScenarioOf(world: World): ScenarioData {
+  const { scenario } = world;
+  if (scenario.campaignCard === undefined) throw new Error(`${scenario.id} is a cycle scenario: it has no campaign deal`);
+  return scenario;
+}
+
+// Whether the scenario's campaign card waives the hero-change penalty; a cycle scenario has no campaign card.
+function waivesPenalty(world: World): boolean {
+  const card = world.scenario.campaignCard;
+  return card !== undefined && recordInstructions(world.effects, card, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty");
+}
+
 export function briefing(input: BriefingInput): Briefing {
   const { world, log } = input;
   const { problems, loadout } = check(input);
   const needsRingBearer = needsRingBearerSlot(world, input.seats[0]);
-  const waived = recordInstructions(world.effects, world.scenario.campaignCard, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty");
+  const waived = waivesPenalty(world);
   const empty: Briefing = { problems, needs: null, needsRingBearer, penaltyAdded: 0, penaltyWaived: waived, steps: [], dealable: false };
   if (problems.length > 0) return empty;
 
-  const plan = checklist({ log, scenario: world.scenario, seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
+  const plan = checklist({ log, scenario: campaignScenarioOf(world), seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
   if (!plan.ok) {
     return { ...empty, needs: plan.needs, problems: plan.errors.map((message) => ({ rule: "Campaign Setup Checklist", message })) };
   }
@@ -193,7 +215,7 @@ export function checklistPlan(input: BriefingInput): Extract<ChecklistPlan, { ok
   const { problems, loadout } = check(input);
   if (problems.length > 0) throw new Error(problems.map((problem) => problem.message).join(" "));
   const { world, log } = input;
-  const plan = checklist({ log, scenario: world.scenario, seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
+  const plan = checklist({ log, scenario: campaignScenarioOf(world), seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
   if (!plan.ok) throw new Error(plan.errors.join(" ") || "The campaign card asks for a choice");
   return plan;
 }
@@ -255,11 +277,11 @@ export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMo
   if (scenario.cards.some((card) => card.pile === "burden")) rules.push("Burden deck");
   if (scenario.widgets.secondActiveLocation) rules.push("Second active location");
   if (scenario.widgets.perSeatStaging) rules.push("Separate staging areas");
-  if (mode === "campaign" && recordInstructions(world.effects, scenario.campaignCard, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty")) rules.push("No hero-change penalty");
+  if (mode === "campaign" && waivesPenalty(world)) rules.push("No hero-change penalty");
   return {
     number: scenario.number,
     name: printedScenarioName(scenario.name),
-    stages: scenario.stages.map((code) => (world.cards.has(code) ? printedOf(world.cards, code).name : code)),
+    stages: [...scenario.stages, ...(difficulty === "Nightmare" ? (scenario.nightmare?.questCards ?? []) : [])].map((code) => (world.cards.has(code) ? printedOf(world.cards, code).name : code)),
     sets,
     deckSize: encounter.reduce((sum, card) => sum + countOf(card), 0),
     rules,

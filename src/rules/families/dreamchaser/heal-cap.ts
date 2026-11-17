@@ -8,7 +8,8 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { heldLeast, updateCard } from "../../core/state.ts";
+import { flagged, heldLeast, updateCard } from "../../core/state.ts";
+import { healReducer, perEffectCap, type HealBy } from "../play/heal.ts";
 
 function isCharacter(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const card = state.cards[id];
@@ -28,10 +29,14 @@ export function noteHealed(state: ScenarioState, id: string, amount: number, ctx
   return { ...state, roundHealed: { ...state.roundHealed, [id]: (state.roundHealed?.[id] ?? 0) + amount } };
 }
 
-// Damage comes off a card: as much of `amount` as is on it and the cap allows, the damage removed and noted for the cap. Every verb that heals a card goes through here, so the cap is read and noted in one place.
-export function healDamage(state: ScenarioState, id: string, amount: number, ctx: ReduceContext): { state: ScenarioState; healed: number } {
+// Damage comes off a card: as much of `amount` as is on it and the caps allow, the damage removed and noted for the cap. Every verb that heals a card goes through here, so the caps are read and noted in one place: a card
+// that cannot be healed loses nothing, a per-effect cap (`healCapPerEffect`) and a reduction to 1 (`healReducedToOne`, `reducer` is the attachment to discard afterward) shape the one heal (families/play/heal.ts).
+export function healDamage(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, by?: HealBy): { state: ScenarioState; healed: number; reducer?: string } {
   const card = state.cards[id];
-  const healed = card ? healAllowed(state, id, Math.min(card.damage, amount), ctx) : 0;
-  if (!card || healed <= 0) return { state, healed: 0 };
-  return { state: noteHealed(updateCard(state, id, { damage: card.damage - healed }), id, healed, ctx), healed };
+  if (!card || card.damage <= 0 || amount <= 0 || flagged(state, id, "cannotBeHealed")) return { state, healed: 0 };
+  const reducer = healReducer(state, id, by, ctx);
+  const wanted = perEffectCap(state, id, Math.min(card.damage, amount));
+  const healed = healAllowed(state, id, reducer ? Math.min(wanted, 1) : wanted, ctx);
+  if (healed <= 0) return { state, healed: 0 };
+  return { state: noteHealed(updateCard(state, id, { damage: card.damage - healed }), id, healed, ctx), healed, ...(reducer ? { reducer } : {}) };
 }

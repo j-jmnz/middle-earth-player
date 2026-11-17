@@ -10,7 +10,7 @@ import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlaye
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
-import { claimedDestination } from "../families/objectives/claimed.ts";
+import { claimedDestination, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
@@ -56,7 +56,7 @@ export function modifiedStat(
   // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
   let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
   let set: number | null = null;
-  // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2).
+  // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2), or its Defense (900506:A:1).
   let floor = total;
   for (const modifier of state.modifiers) {
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
@@ -78,7 +78,7 @@ export function modifiedStat(
   total += perDamage(state, instance, printed, stat);
   if (stat === "threat") total += threatPerHostWillpower(state, instance, printed, cards);
   const lowered = set ?? total;
-  const value = stat === "willpower" && lowered < floor && flagged(state, instance.id, "cannotReduceWillpower") ? floor : lowered;
+  const value = lowered < floor && ((stat === "willpower" && flagged(state, instance.id, "cannotReduceWillpower")) || (stat === "defense" && flagged(state, instance.id, "cannotReduceDefense"))) ? floor : lowered;
   return CARD_STATS.has(stat) ? Math.max(0, value) : value;
 }
 
@@ -176,7 +176,7 @@ export function lowerThreat(state: ScenarioState, seat: number, amount: number, 
 // Immune to player card effects: printed, or gained while a card says so (`immuneToPlayerCards`, families/nightmare.ts, 906201:A:2).
 // `source` is the printed player card whose effect it is, when known: "Immune to non-Fellowship player card effects" (`immuneToNonFellowship`, 144075:A:1) lets a Fellowship card's effect through. Every path a player card's effect takes (a pick, an attachment host, damage, the enemy list) asks this one predicate.
 export function playerCardEffectCanChoose(printed: PrintedCard, state?: ScenarioState, id?: string, source?: PrintedCard | null): boolean {
-  if (state && id && flagged(state, id, "immuneToPlayerCards")) return false;
+  if (state && id && (flagged(state, id, "immuneToPlayerCards") || flagged(state, id, "immuneToCardEffects"))) return false;
   if (state && id && source && isPlayerType(source) && source.sphere !== "fellowship" && flagged(state, id, "immuneToNonFellowship")) return false;
   return !printed.keywords.immuneToPlayerCardEffects;
 }
@@ -274,7 +274,7 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
 
 // A hero, ally or enemy whose damage reached its hit points: the cards attached to it hear it ("When attached enemy is destroyed", families/attachments/hold.ts), it is
 // destroyed, and Responses and Forced effects hear that a hero or ally (rr.destroy) or an enemy was destroyed. Damage and the sweep below both end this way.
-function destroyAndAnnounce(state: ScenarioState, instance: CardInstance, printed: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
+export function destroyAndAnnounce(state: ScenarioState, instance: CardInstance, printed: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
   let next = state;
   if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, instance.id, printed.type === "hero" ? cards : undefined);
   next = destroyCard(next, instance.id, cards, steps, false, true);
@@ -371,9 +371,16 @@ export function releaseAttachments(
       next = returned;
       continue;
     }
+    // A claimed objective that returns to the top of the encounter deck when its hero leaves play (Signs of Gollum, families/objectives/claimed.ts).
+    const toDeck = returnedToDeck(next, attachmentId);
+    if (toDeck) {
+      next = toDeck;
+      steps.push({ kind: "destroy", targetId: attachmentId });
+      continue;
+    }
     const printed = printedOf(cards, attachment.code);
     const dest: Destination =
-      cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent
+      (cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent) || flagged(next, attachmentId, "removedWithHost")
         ? { zone: "removed" }
         : defeatedDestination(attachment, printed);
     next = moveCard(next, attachmentId, dest);
@@ -432,6 +439,7 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   const blank = textBlank(state, id, cards) && !keywordsKept(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
   if (keyword === "ranged" && flagged(state, id, "loseRanged")) return false;
+  if (keyword === "sentinel" && flagged(state, id, "loseSentinel")) return false;
   if (!blank && printed.keywords[keyword]) return true;
   return (keyword === "sentinel" || keyword === "ranged") && flagged(state, id, keyword);
 }

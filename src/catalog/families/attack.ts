@@ -66,6 +66,10 @@ const FLAGS = [
   "drawOnAttackDestroy",
   // On a seat (engine use): the player engaged an enemy this round, for the `engagedThisRound` condition.
   "engagedThisRound",
+  // On an enemy: only characters with the Eagle trait or the Ranged keyword can attack or defend against it ("Only Eagle characters or characters with ranged can attack or defend against Mirkwood Flock", 02070:A:1).
+  "eagleOrRangedOnly",
+  // On an enemy, until the modifier ends: a character with the Ranged keyword cannot be declared as an attacker against it ("cannot be attacked by characters with the ranged keyword until the end of the phase", 900606:A:2).
+  "cannotBeAttackedByRanged",
 ] as const;
 
 export const manifest = { name: "attack", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

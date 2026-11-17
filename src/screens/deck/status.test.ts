@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DeckSaveCard } from "../../catalog/deck-save";
-import { copyDeckName, costCurve, deckContentsPhrase, deckCountLine, deckReadiness, deckShortLine, deckSections, newDeckName, savedDeckName, shortToShow, sphereSplit, startingThreat } from "./status.ts";
+import { copyDeckName, costCurve, deckContentsPhrase, deckCountLine, deckLootRule, deckReadiness, sideDeckNote, deckShortLine, deckSections, newDeckName, savedDeckName, shortToShow, sphereSplit, startingThreat } from "./status.ts";
 
 function fact(name: string, typeCode: string, deckLimit: number | null = 3): DeckSaveCard {
   return { name, typeCode, sphereCode: "lore", deckLimit, deckLegal: true, traits: null };
@@ -35,6 +35,33 @@ describe("deckReadiness", () => {
 
   it("names the card and the rule for any other refusal", () => {
     expect(deckReadiness({ name: "x", heroes: ["h1"], cards: [...allies, { code: "zz", count: 1 }] }, facts)).toEqual({ ready: false, text: "zz: Not a deck-legal card." });
+  });
+});
+
+// The Burglar's Turn (22024:A:2) takes its loot deck from the side deck (src/catalog/loot.ts).
+describe("a contract's loot deck", () => {
+  const faces = new Map(facts);
+  faces.set("22024", { ...fact("The Burglar's Turn", "contract", 1), sphereCode: "neutral" });
+  const items = Array.from({ length: 15 }, (_, at) => {
+    const code = `i${at}`;
+    faces.set(code, { ...fact(`Item ${at}`, "attachment"), traits: at % 2 === 0 ? "Item. Armor." : "Artifact." });
+    return { code, count: 1 };
+  });
+  faces.set("weapon", { ...fact("Spear", "attachment"), traits: "Weapon." });
+  const deck = (side: { code: string; count: number }[]) => ({ name: "x", heroes: ["h1"], cards: [...allies, { code: "22024", count: 1 }], side });
+  const loot = deckLootRule(deck([]).cards);
+
+  it("needs at least 14 different Item or Artifact attachments in the side deck", () => {
+    expect(deckReadiness(deck(items.slice(0, 13)), faces)).toEqual({ ready: false, text: "The Burglar's Turn: The side deck needs at least 14 different Item or Artifact attachments for the loot deck (it has 13)." });
+    expect(deckReadiness(deck([...items.slice(0, 14), { code: "weapon", count: 2 }]), faces).ready).toBe(true);
+    // More than 14: the player leaves the rest out at Setup.
+    expect(deckReadiness(deck(items), faces).ready).toBe(true);
+  });
+
+  it("says in the editor how much of the loot deck the side deck holds", () => {
+    expect(sideDeckNote(loot, items.slice(0, 9), faces)).toBe("The Burglar's Turn takes its loot deck from here: 14 different Item or Artifact attachments, 9 so far.");
+    expect(sideDeckNote(loot, items, faces)).toBe("The Burglar's Turn takes its loot deck from here: 14 different Item or Artifact attachments, 15 so far: you leave 1 out at Setup.");
+    expect(sideDeckNote(null, [], faces)).toMatch(/^Cards kept with the deck but not in it/);
   });
 });
 

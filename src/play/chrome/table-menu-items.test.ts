@@ -11,6 +11,11 @@ describe("table menu rows", () => {
     expect(rows.map((row) => row.tone)).toEqual([undefined, undefined, undefined, undefined, undefined, "danger", "danger"]);
   });
 
+  it("leaves out the rows a game has nothing behind: no Booklet and no Setup card for a cycle's scenario on Normal", () => {
+    const rows = menuItems({ backLabel: "Scenarios", backAccessibilityLabel: "Back to the scenarios" }, ["booklet", "setup"]);
+    expect(rows.map((row) => row.id)).toEqual(["log", "rules", "settings", "resign", "leave"]);
+  });
+
   it("shows Leave the table with its door mark alone, and says where it goes and that the game is saved to a screen reader", () => {
     const leave = (backLabel: string, backAccessibilityLabel: string) => menuItems({ backLabel, backAccessibilityLabel }).find((row) => row.id === "leave");
     const scenarios = leave("Scenarios", "Back to the scenarios");

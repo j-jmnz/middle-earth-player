@@ -20,13 +20,14 @@ import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { topFrame } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { lowerCardThreat, makeActive, moveProgress, removeProgressFromQuest } from "./places.ts";
+import { lowerCardThreat, makeActive, moveProgress, removeAllProgress, removeProgressEach, removeProgressFromQuest } from "./places.ts";
 import { playerSource, raiseQuestThreat, resetThreat } from "./threat.ts";
 import { advanceStage } from "../../quest/quest.ts";
 import { bottomStage, keepStage, lookedStages, shuffleStages } from "./order.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import { placeProgressOnQuestCard } from "./quest-card.ts";
+import { resetSweep } from "./reset.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -86,6 +87,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return lookAtStages(state, instruction, focus, ctx, steps);
     case "RemoveProgressFromQuest":
       return removeProgressFromQuest(state, instruction, focus, ctx, steps);
+    case "RemoveAllProgress":
+      return removeAllProgress(state, instruction, focus, ctx, steps);
+    case "RemoveProgressEach":
+      return removeProgressEach(state, instruction, focus, ctx, steps);
     case "PlaceProgressOnQuestCard":
       return placeProgressOnQuestCard(state, instruction, focus, ctx, steps);
     default:
@@ -175,4 +180,4 @@ function removeProgressUnpayable(state: ScenarioState, instruction: Instruction,
   return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < needed;
 }
 
-export const manifest: RulesFamily = { name: "quest", travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest", "PlaceProgressOnQuestCard"], run };
+export const manifest: RulesFamily = { name: "quest", settle: { sweep: resetSweep }, travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest", "RemoveAllProgress", "RemoveProgressEach", "PlaceProgressOnQuestCard"], run };

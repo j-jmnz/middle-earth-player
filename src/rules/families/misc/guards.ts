@@ -13,6 +13,7 @@ import { flagged } from "../../core/state.ts";
 // the source has none of it. A rule (no source card) is not a card effect.
 export function immuneToSource(state: ScenarioState, targetId: string, sourceId: string | null, ctx: ReduceContext): boolean {
   if (!sourceId || sourceId === targetId || state.modifiers.length === 0 || !state.cards[sourceId]) return false;
+  if (flagged(state, targetId, "immuneToCardEffects")) return true;
   if (flagged(state, targetId, "immuneToNonMaster") && !hasTrait(state, sourceId, "Master", ctx)) return true;
   if (flagged(state, targetId, "immuneToNonGollum") && !hasTrait(state, sourceId, "Gollum", ctx)) return true;
   return false;

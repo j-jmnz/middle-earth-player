@@ -2,7 +2,8 @@
 // names the holders of a constant modifier, and says which cards a trigger hears about.
 import { z } from "zod";
 
-export const whoSchema = z.enum(["actor", "firstPlayer"]);
+// "guardian": the player guarding Gollum (Return to Mirkwood, sotm.guarding-gollum; src/rules/families/guardian/). Resolved by `seatFor` (src/rules/interpret/verbs.ts) and by a Choose (src/rules/windows/choices.ts).
+export const whoSchema = z.enum(["actor", "firstPlayer", "guardian"]);
 
 export const sphereSchema = z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]);
 
@@ -121,7 +122,12 @@ export const pickSchema = z.strictObject({
   attachedTo: z.enum(["source", "host", "activeLocation", "defender"]).optional(),
   // An attachment on a card of this type controlled by the chooser (`you`), by another player (`other`) or by anyone ("a Weapon
   // card attached to a hero you control", "an attachment on a hero you control").
-  on: z.strictObject({ type: z.enum(["hero", "character"]), control: z.enum(["you", "other", "any"]) }).optional(),
+  on: z.strictObject({
+    type: z.enum(["hero", "character"]),
+    control: z.enum(["you", "other", "any"]),
+    // The host's current Willpower is at least this ("each character you control with 3 or more Willpower", 900807:A:2).
+    minWillpower: z.number().int().min(0).optional(),
+  }).optional(),
   // Not the card the source is attached to ("each other questing character" on an attachment).
   notHost: z.boolean().optional(),
   // An enemy that engaged a player this round (a Shadow card: "if it was engaged this round", 142026:A:3).
@@ -212,6 +218,14 @@ export const pickSchema = z.strictObject({
   // "each unguarded objective in the staging area", 12121:A:1). `isGuard`: an enemy attached to an objective as its guard (`false`: "an enemy that is not currently guarding an objective", 12133:A:1).
   hasGuard: z.boolean().optional(),
   isGuard: z.boolean().optional(),
+  // An objective guarded by an enemy attached to it with this trait (`guardedByTrait`), or by none (`notGuardedByTrait`): "a Clue card not attached to a Mordor enemy" (900401:A:2), "Clue cards attached to Mordor enemies" (900401:A:3).
+  guardedByTrait: z.string().min(1).optional(),
+  notGuardedByTrait: z.string().min(1).optional(),
+  // An enemy attached as the guard of an objective with this trait: a Mordor enemy "with at least 1 Clue card attached" (900405:A:1; the Clue is the guarded objective, the enemy its guard).
+  guardsTrait: z.string().min(1).optional(),
+  // A character committed to this round's quest, though the quest's resolution already cleared its commitment: "any hero committed to the quest" in the Response to the players questing successfully (02014:A:2). Read in a game whose
+  // records read `questSucceeded` (families/costs/pay.ts noteEvent keeps who committed).
+  questedThisRound: z.literal(true).optional(),
   // A character whose code the Campaign Log marks "determined" (`campaignFacts.angmar.determined`, Angmar Awakened): "each character who is 'determined' in the Campaign Log" (10172:A:1). Read by the angmar family.
   determined: z.literal(true).optional(),
   // A Reanimated Dead (The Dread Realm, mec108.reanimated-dead): a player card facedown as an Undead enemy ("each Reanimated Dead", 101160:A:1). Read by the angmar family.
@@ -285,6 +299,8 @@ export const pickSchema = z.strictObject({
   guardsSubject: z.boolean().optional(),
   // A card with at least this many Restricted attachments on it ("each of your heroes has at least 2 restricted attachments").
   restrictedAttachments: z.number().int().positive().optional(),
+  // The play family's filter (src/rules/families/play/pick.ts): the character with more damage on it than each other character in play, a tie for the most matching none ("If a character (including Wilyador) has more damage than each other character", 02068:A:2).
+  soleMostDamaged: z.literal(true).optional(),
   // The nightmare family's filters (read in src/rules/interpret/pick.ts): a character whose current Willpower is at most this, a value below 0
   // counting as 0 ("is discarded if its Willpower is 0", 900102:A:1).
   maxWillpower: z.number().int().min(0).optional(),

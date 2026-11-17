@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
+import { verbFlags } from "../verb-flags.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
@@ -42,7 +43,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("EncounterKeyword"), ...when }),
   // Shuffles one set-aside copy of the card with this code into the encounter deck ("Shuffle 1 of your set aside Ranger of the
   // North allies into the encounter deck"): the actor's own copy with `own`, any player's otherwise. Nothing happens with none.
-  z.strictObject({ verb: z.literal("ShuffleSetAsideIntoEncounterDeck"), code: z.string().min(1), own: z.boolean().optional(), ...when }),
+  // Run by a quest card's Setup inside its ForEachPlayer ("shuffle 1 'Sacked!' card per player back into the encounter deck", 02035:A:1).
+  verbFlags(z.strictObject({ verb: z.literal("ShuffleSetAsideIntoEncounterDeck"), code: z.string().min(1), own: z.boolean().optional(), ...when }), { setupRuns: "inForEachPlayer" }),
   // The source card, an Encounter-keyword player card just revealed into the staging area, enters the play area of the player
   // `who` names (the last picked player, the actor or the first player): ready, or `committed` to the quest, still its owner's card.
   z.strictObject({ verb: z.literal("TakeRevealedCard"), who: z.enum(["picked", "actor", "firstPlayer"]), committed: z.boolean().optional(), ...when }),
@@ -50,8 +52,10 @@ const VERBS = [
   // it. A contract's records name their side in their line ids (`21074:B:1`) and carry a `faceUp` condition for it.
   z.strictObject({ verb: z.literal("FlipCard"), ...when }),
   // The actor's loot deck is built from the cards they chose at deckbuilding (StartSeat.loot), shuffled and set aside under the
-  // contract (The Burglar's Turn, src/rules/families/sidequests/loot.ts).
-  z.strictObject({ verb: z.literal("BuildLootDeck"), ...when }),
+  // contract (The Burglar's Turn, src/rules/families/sidequests/loot.ts). `size` different cards of `type` with one of `traits`
+  // ("Choose 14 different Item or Artifact attachments"): the deck screens and the briefing take them from the deck's side deck
+  // (src/catalog/loot.ts).
+  z.strictObject({ verb: z.literal("BuildLootDeck"), size: z.number().int().positive(), type: z.string().min(1), traits: z.array(z.string().min(1)).min(1), ...when }),
   // The top card of the actor's loot deck is attached faceup to the location the answered event is about, as a guarded objective:
   // out of play under that location until it is explored.
   z.strictObject({ verb: z.literal("AttachLoot"), ...when }),

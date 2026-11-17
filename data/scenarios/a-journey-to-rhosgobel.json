@@ -1,0 +1,290 @@
+{
+  "id": "a-journey-to-rhosgobel",
+  "name": "A Journey to Rhosgobel",
+  "number": 3,
+  "stages": [
+    "02060",
+    "02061",
+    "02062"
+  ],
+  "encounterSets": [
+    {
+      "name": "A Journey to Rhosgobel",
+      "count": 27
+    },
+    {
+      "name": "Spiders of Mirkwood",
+      "count": 12
+    },
+    {
+      "name": "Dol Guldur Orcs",
+      "count": 14
+    }
+  ],
+  "cards": [
+    {
+      "code": "02063",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "02066",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "02067",
+      "normal": 4,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02068",
+      "normal": 4,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02069",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02070",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "02071",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "01074",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01075",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01076",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01077",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01078",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "01079",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01080",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01089",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "01090",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01091",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01092",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01093",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01094",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01095",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02060",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02061",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02062",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02064",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "02065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q01.6",
+    "dragnEasy": "E01.6",
+    "hobSlug": "A-Journey-to-Rhosgobel"
+  },
+  "nightmare": {
+    "setupCard": "900601",
+    "removed": [
+      {
+        "code": "01078",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01090",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01091",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01092",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01093",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01094",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01095",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02066",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "02067",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02068",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02069",
+        "copies": 1,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900602",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900603",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900604",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900605",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900606",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900607",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900608",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

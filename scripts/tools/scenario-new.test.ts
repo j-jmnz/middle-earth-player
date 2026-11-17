@@ -114,6 +114,29 @@ describe("pnpm scenario new", () => {
     expect(cli(id, "--dry-run").output).toContain(`src/effects/authored/return-of-the-king/${id}.ts`);
   });
 
+  // A scenario of a cycle (Shadows of Mirkwood) is standalone only: no campaign card, no campaign test, a standalone test, standalone fixtures and flows.
+  it.each(["the-hunt-for-gollum", "conflict-at-the-carrock"])("plans the standalone skeletons of the cycle scenario %s", (id) => {
+    const view = without(id);
+    const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
+    expect(problems).toEqual([]);
+    const files = plan?.files.map((item) => item.file) ?? [];
+    expect(files).toContain(`src/campaign/scenarios/${id}/standalone.test.ts`);
+    expect(files).not.toContain(`src/campaign/scenarios/${id}/campaign.test.ts`);
+    expect(files).toContain(`scripts/e2e/shadows-of-mirkwood/${id}.ts`);
+    expect(files).toContain(`src/effects/authored/shadows-of-mirkwood/${id}.ts`);
+    const text = (name: string): string => plan?.files.find((item) => item.file.endsWith(name))?.text ?? "";
+    expect(text("game.ts")).toContain("standaloneGame<");
+    expect(text("game.ts")).toContain(`loadAnyScenario("${id}")`);
+    expect(text("golden.test.ts")).toContain("standalone: true");
+    expect(text(`shadows-of-mirkwood/${id}.ts`)).toContain("standaloneWonLost(");
+    expect(text("standalone.test.ts")).toContain("it.todo(");
+    expect(text(`${id}.yaml`)).toContain("subflows/standalone-win.yaml");
+    expect(text(`${id}-loss.yaml`)).toContain("subflows/standalone-loss.yaml");
+    const registry = plan?.edits.find((edit) => edit.file === "src/campaign/fixtures/registry.ts");
+    expect(registry?.after).toContain(`scenarioId: "${id}", kind: "standalone"`);
+    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
+  });
+
   it("refuses a short name that is not an identifier", () => {
     const view = without("the-drowned-ruins");
     const { plan, problems } = planScenario("the-drowned-ruins", { short: "dr-ruins" }, view.repo, view.exists);

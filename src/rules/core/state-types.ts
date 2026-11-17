@@ -19,6 +19,8 @@ export type {
   FrameData,
   FrameName,
   GameEvent,
+  EscapeData,
+  EscapeResult,
   FortitudeData,
   FortitudeResult,
   HideData,
@@ -85,6 +87,9 @@ export type CardInstance = {
   code: string;
   zone: ZoneName;
   exhausted: boolean;
+  // The phase the card was last readied in, `<round>:<phase>`, kept only while it cannot be readied more than once per phase
+  // (readyOncePerPhase, 22134:B:2). Absent otherwise.
+  readiedIn?: string;
   damage: number;
   progress: number;
   resources: number;
@@ -225,6 +230,7 @@ export type Window =
   | { kind: "playerAttack"; targets?: readonly string[] }
   | { kind: "hideCommit"; seat: number }
   | { kind: "fortitudeCommit"; seat: number }
+  | { kind: "escapeCommit"; seat: number }
   | { kind: "frameAction" }
   | { kind: "choose"; seat: number; options: readonly string[] }
   | { kind: "cancelOffer"; seat: number }
@@ -348,6 +354,8 @@ export type ScenarioState = {
   stagesReached?: readonly string[];
   // The defeated stage waits for the first player to choose the next one (LookAtStages): "due" until its record is pushed, "asking" while it runs.
   stageChoice?: "due" | "asking";
+  // The final stage that holds the win (the flag `holdsWin`, 02106:B:2) was defeated and waits for its own Forced effect to win or reset the quest (`holdStage`, families/quest/branch.ts). Absent otherwise.
+  stageHeld?: string;
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];
   resolution: ScenarioDefinition["resolution"];

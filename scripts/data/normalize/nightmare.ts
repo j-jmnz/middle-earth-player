@@ -96,8 +96,9 @@ export function nightmareOf(scenarioId: string, placed: readonly Placement[], ca
     const left = takeFromPiles(code, line.copies, takeable, slots, removed, byCode, problem);
     if (left > 0 && line.copies <= copiesOf(code)) problem(`could not take ${left} of the ${line.copies} ${line.name} it removes`);
   }
-  if (own.some((card) => card.type === "quest")) problem(`deck ${deck.set} prints quest cards, which the build does not place yet`);
+  // A quest card of the deck (Conflict at the Carrock's Grimbeorn's Folly, stage 3) is recorded, not placed: which stage it stands in for is the scenario's rule.
+  const questCards = own.filter((card) => card.type === "quest").map((card) => card.code).sort();
   removed.sort((a, b) => a.code.localeCompare(b.code) || a.pile.localeCompare(b.pile));
   const cardsOut = slots.filter((card) => card.copies > 0).sort((a, b) => a.code.localeCompare(b.code) || a.pile.localeCompare(b.pile));
-  return { data: { setupCard: setupCard.code, removed, cards: cardsOut }, problems };
+  return { data: { setupCard: setupCard.code, removed, cards: cardsOut, ...(questCards.length > 0 ? { questCards } : {}) }, problems };
 }

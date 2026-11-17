@@ -1,0 +1,170 @@
+Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; quest: 02061 Radagast's Request; quest: 02062 Return to Rhosgobel; staging: 02064 Wilyador; staging: 02065 Rhosgobel)
+
+## 02060 The Wounded Eagle
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02060:A:1 (front): Setup: Search the encounter deck for Rhosgobel and Wilyador, and add them to the staging area with 2 damage tokens on Wilyador. Then, shuffle the encounter deck.
+  02060:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 2 damage token(s) on the card in play with code 02064 (placed, not dealt: nothing cancels or reduces them)
+    - shuffle the encounter deck
+
+## 02061 Radagast's Request
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02061:B:1 (back): Response: After the quest phase begins, the first player may place X damage tokens on Wilyador to look at the top 3 cards of the encounter deck. Reveal and add 1 of these cards to the staging area, and discard the other 2. X is the number of players in the game.
+  02061:response:1: Response when a phase begins
+    only if all of: (it is the Quest phase) and (there is a character (any player controls) named "Wilyador" to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) named "Wilyador"
+    - place the number of players damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+    - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
+    - the cards looked at, but the picked one, go to the encounter discard pile faceup; the picked card is then the top card of the encounter deck
+    - the acting player reveals an encounter card
+
+02061:B:2 (back): Forced: After a card effect heals Wilyador, remove that card from the game.
+  02061:forced:1: Forced on the event healed (heard about character (any player controls) named "Wilyador")
+    - the event's other card is removed from the game
+
+## 02062 Return to Rhosgobel
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02062:B:1 (back): When Revealed: Heal 5 wounds from Wilyador for each Athelas objective card the players control.
+  02062:whenRevealed:1: When revealed (record also names 02062:B:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each objective (any player controls) named "Athelas", that is claimed (attached to a character a player controls):
+      - choose character (any player controls) named "Wilyador"
+      - heal 5 damage from the picked card (counts as an Athelas heal, which Noxious Supplies does not reduce)
+    - then, if there is a undamaged character (any player controls) named "Wilyador" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
+    - then, if not (there is a undamaged character (any player controls) named "Wilyador" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Wilyador was not healed)
+
+02062:B:2 (back): If Wilyador is completely healed when this effect resolves, Wilyador survives and the players have won the game. Otherwise, the players have lost the game.
+  02062:whenRevealed:1: When revealed (record also names 02062:B:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each objective (any player controls) named "Athelas", that is claimed (attached to a character a player controls):
+      - choose character (any player controls) named "Wilyador"
+      - heal 5 damage from the picked card (counts as an Athelas heal, which Noxious Supplies does not reduce)
+    - then, if there is a undamaged character (any player controls) named "Wilyador" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
+    - then, if not (there is a undamaged character (any player controls) named "Wilyador" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Wilyador was not healed)
+
+## 02063 Athelas
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02063:A:1 (front): Guarded.
+  02063:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+
+02063:A:2 (front): Action: Exhaust a hero to claim this objective if it has no encounters attached. Then, attach Athelas to that hero.
+  02063:action:1: Action (any player may use it)
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+
+## 02064 Wilyador
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+02064:A:1 (front): No attachments. The first player gains control of Wilyador, as an ally.
+  02064:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area, faceup and ready), and passes to each new first player when the token moves
+
+02064:A:2 (front): Forced: At the end of each round, Wilyador suffers 2 damage.
+  02064:forced:1: Forced at the end of the round
+    - deal 2 damage to this card
+
+02064:A:3 (front): Wilyador cannot be healed of more than 5 wounds by a single effect. If Wilyador leaves play, the players have lost the game.
+  02064:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat healCapPerEffect 5, while this card is in play
+    - this card: stat lossOnLeavingPlay 1, while this card is in play
+
+## 02065 Rhosgobel
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+02065:A:1 (front): X is the number of players in the game.
+  02065:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+02065:A:2 (front): While Rhosgobel is in the staging area, Wilyador cannot be healed.
+  02065:constant:2: Constant
+    only if this card is in the staging area
+    - each character (any player controls) named "Wilyador": stat cannotBeHealed 1, while this card is in play
+
+02065:A:3 (front): Travel: Players must complete stage one of this quest before they can travel to Rhosgobel.
+  02065:constant:3: Constant
+    only if the players are on stage 1
+    - the players cannot travel to any location while this holds
+
+## 02066 Forest Grove
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02066:A:1 (front): Response: After the players explore Forest Grove, search the encounter deck and discard pile for 1 Athelas objective, and add it to the staging area. Then, shuffle the encounter deck.
+  02066:response:1: Response on the event locationExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 02063 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 02067 Exhaustion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02067:A:1 (front): When Revealed: Deal 2 damage to each exhausted character.
+  02067:whenRevealed:1: When revealed
+    - deal 2 damage to each exhausted character (any player controls)
+
+02067:A:2 (shadow): Shadow: Deal 1 damage to each exhausted character.
+  02067:shadow:1: Shadow
+    - deal 1 damage to each exhausted character (any player controls)
+
+## 02068 Swarming Insects
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02068:A:1 (front): When Revealed: Deal 1 damage to each character without any attachments.
+  02068:whenRevealed:1: When revealed
+    - deal 1 damage to each character (any player controls) with no attachment of any kind
+
+02068:A:2 (shadow): Shadow: If a character (including Wilyador) has more damage than each other character, deal 3 additional damage to that character.
+  02068:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) with more damage than each other character in play (a tie for the most matches none)
+    - then, if there is a character (any player controls) with more damage than each other character in play (a tie for the most matches none) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
+
+## 02069 Festering Wounds
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02069:A:1 (front): When Revealed: Deal 2 damage to each wounded character.
+  02069:whenRevealed:1: When revealed
+    - deal 2 damage to each damaged character (any player controls)
+
+02069:A:2 (shadow): Shadow: Deal 1 damage to each wounded character. (2 damage instead if this attack is undefended.)
+  02069:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): deal 1 damage to each damaged character (any player controls)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each damaged character (any player controls)
+
+## 02070 Mirkwood Flock
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02070:A:1 (front): Only Eagle characters or characters with ranged can attack or defend against Mirkwood Flock.
+  02070:constant:1: Constant
+    - this card: stat eagleOrRangedOnly 1, while this card is in play
+
+02070:A:2 (shadow): Shadow: If this attack is undefended, the damage must be placed on Wilyador.
+  02070:shadow:1: Shadow
+    - if the attack has no defender: the damage of this attack, if undefended, must go on a character (any player controls) named "Wilyador" in play, whoever controls it, if able (a defended attack still damages its defender)
+
+## 02071 Black Forest Bats
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02071:A:1 (front): Only Eagle characters or characters with ranged can attack or defend against Black Forest Bats.
+  02071:constant:1: Constant
+    - this card: stat eagleOrRangedOnly 1, while this card is in play
+
+02071:A:2 (shadow): Shadow: If this attack is undefended, the damage must be placed on Wilyador.
+  02071:shadow:1: Shadow
+    - if the attack has no defender: the damage of this attack, if undefended, must go on a character (any player controls) named "Wilyador" in play, whoever controls it, if able (a defended attack still damages its defender)
+
+(rendered pieces: 116 by template, 0 as JSON)

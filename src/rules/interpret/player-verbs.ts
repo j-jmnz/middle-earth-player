@@ -15,12 +15,12 @@ import { shuffleIds } from "../core/seed.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { lowerThreatByEffect, playerSource } from "../families/quest/threat.ts";
-import { placeDamage } from "../core/keywords.ts";
+import { destroyCard, placeDamage } from "../core/keywords.ts";
 import { stagingLocations } from "../quest/quest.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
 import { printedOf, type PrintedCard } from "../core/printed.ts";
-import { readyBarred } from "../core/holder-classes.ts";
+import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { attachTo, discardFromHand, moveCard } from "../core/zones.ts";
@@ -91,11 +91,11 @@ export function runPlayerVerb(
       }
       if (instruction.target === "host") {
         const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
-        return hostId && state.cards[hostId] && !readyBarred(state, hostId, byPlayerCards(state, focus.sourceId, ctx)) ? updateCard(state, hostId, { exhausted: false }) : state;
+        return hostId && state.cards[hostId] && !readyBarred(state, hostId, byPlayerCards(state, focus.sourceId, ctx)) ? updateCard(state, hostId, readyPatch(state, hostId)) : state;
       }
       if (instruction.target !== "allCharacters") return null;
       let next = state;
-      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) if (!readyBarred(state, id, byPlayerCards(state, focus.sourceId, ctx))) next = updateCard(next, id, { exhausted: false });
+      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) if (!readyBarred(state, id, byPlayerCards(state, focus.sourceId, ctx))) next = updateCard(next, id, readyPatch(next, id));
       return next;
     }
     case "Exhaust": {
@@ -110,11 +110,13 @@ export function runPlayerVerb(
       const card = state.cards[id];
       if (!card || card.damage <= 0 || healBlocked(state, id)) return state;
       // "No more than 1 damage can be healed from each character each round" (145033:A:1) leaves what room the cap has.
-      const healed = healDamage(state, id, instruction.all ? card.damage : resolveAmount(state, instruction.amount ?? 1, scope, ctx), ctx);
+      const healed = healDamage(state, id, instruction.all ? card.damage : resolveAmount(state, instruction.amount ?? 1, scope, ctx), ctx, { sourceId: focus.sourceId, ...(instruction.athelas ? { athelas: true } : {}) });
       if (healed.healed <= 0) return state;
       // The step records the damage removed as a negative amount, the way a progress removal is recorded (the table's log).
       steps.push({ kind: "damage", targetId: id, amount: -healed.healed, cause: currentCause(steps, UNATTRIBUTED) });
-      return queueEvent(healed.state, { trigger: "healed", seat: card.controller, cardId: id, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+      // The card whose effect healed is the event's other card (Radagast's Request removes it from the game, 02061:B:2); an attachment that reduced the heal is discarded after it (900608:A:2).
+      const announced = queueEvent(healed.state, { trigger: "healed", seat: card.controller, cardId: id, ...(focus.sourceId && focus.sourceId !== id ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+      return healed.reducer ? destroyCard(announced, healed.reducer, ctx.cards, steps) : announced;
     }
     case "PutOnDeck": {
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
@@ -326,7 +328,7 @@ export function readyCard(state: ScenarioState, id: string, byPlayerCard = false
   const card = state.cards[id];
   // "Your cards cannot ready for the remainder of the round" (cannotReady, 900103:A:1).
   if (!card?.exhausted || readyBarred(state, id, byPlayerCard ? cards : undefined)) return state;
-  return queueEvent(updateCard(state, id, { exhausted: false }), { trigger: "readied", seat: card.controller, cardId: id, ...(byPlayerCard ? { byPlayerCard: true } : {}) });
+  return queueEvent(updateCard(state, id, readyPatch(state, id)), { trigger: "readied", seat: card.controller, cardId: id, ...(byPlayerCard ? { byPlayerCard: true } : {}) });
 }
 
 export function exhaustCard(state: ScenarioState, id: string): ScenarioState {

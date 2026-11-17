@@ -1,6 +1,6 @@
 import type { Condition, Effect, Instruction, Limit } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
-import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
+import type { AnyScenarioData, CampaignData } from "../../../src/catalog/scenario-data.ts";
 import { selfNamed as selfNamedBy } from "../../../src/catalog/self-named.ts";
 import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
@@ -18,13 +18,13 @@ export type Segment = { card: Card; index: number; side: "front" | "back" | "sha
 export type Unmatched = Segment & { timing: string | null; number: number; form?: "constant" | "triggered" };
 
 // The box's cards (what the scenarios deal and both starter lists) as opposed to the rest of the player pool.
-export function boxCodes(campaign: CampaignData | readonly CampaignData[], scenarios: readonly ScenarioData[]): Set<string> {
+export function boxCodes(campaign: CampaignData | readonly CampaignData[], scenarios: readonly AnyScenarioData[]): Set<string> {
   return new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign)]);
 }
 
 // The generated effects file each box card's records are written to: the campaign of the box that prints the scenario
 // dealing it (PRODUCTS, scripts/data/campaign-defs.ts), else the Fellowship's (its starter lists and prelude).
-export function boxOwners(campaigns: readonly CampaignData[], scenarios: readonly ScenarioData[]): Map<string, string> {
+export function boxOwners(campaigns: readonly CampaignData[], scenarios: readonly AnyScenarioData[]): Map<string, string> {
   const owners = new Map<string, string>();
   const home = new Map(scenarioDefs().map((def) => [def.id, productOf(def.product).home]));
   for (const scenario of scenarios) {
@@ -179,7 +179,7 @@ export function segmentsOf(card: Card, ledger: Ledger): Segment[] {
 
 // The cards templates read: what the scenarios deal, both starter lists, and every deck-legal player card (user decision,
 // 2026-10-26: the whole pool is automated). The ledger passed in holds the pool's lines (withPool).
-export function generateEffects(cards: readonly Card[], scenarios: readonly ScenarioData[], campaign: CampaignData | readonly CampaignData[], ledger: Ledger): Generated {
+export function generateEffects(cards: readonly Card[], scenarios: readonly AnyScenarioData[], campaign: CampaignData | readonly CampaignData[], ledger: Ledger): Generated {
   const wanted = new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign), ...cards.filter(isPoolCard).map((card) => card.code)]);
   const scope = cards.filter((card) => wanted.has(card.code)).sort((a, b) => a.code.localeCompare(b.code));
   const setAside = new Set(scenarios.flatMap((scenario) => scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code)));

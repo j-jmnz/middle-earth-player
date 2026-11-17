@@ -9,7 +9,8 @@ import { sameTitle, type TitleBan } from "./saga.ts";
 // them runs, and a Fellowship-sphere hero is refused (mec109.the-fellowship-sphere: "can only be used when playing the
 // scenarios in the saga expansions").
 
-export type LoadoutSeat = { heroes: readonly string[]; deck: readonly string[] };
+// `loot`: the loot deck the seat's contract takes from its side deck (The Burglar's Turn, src/catalog/loot.ts). Absent for none.
+export type LoadoutSeat = { heroes: readonly string[]; deck: readonly string[]; loot?: readonly string[] };
 
 // A hero a campaign refuses in a scenario, with the rule that says so. Campaign Mode only: a standalone game is not bound by it.
 export type HeroBan = { code: string; name: string; rule: string };

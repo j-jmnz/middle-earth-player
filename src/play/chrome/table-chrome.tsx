@@ -437,12 +437,12 @@ function EyeMark({ testID, s }: { testID: string; s: number }) {
   );
 }
 
-/** A log or banner line's mark: the game icon for threat, willpower and attack, the token art for damage, progress, resources. */
+/** A log or banner line's mark: the game icon for threat, willpower, attack and defense, the token art for damage, progress, resources. */
 export function LineMark({ mark, tint = "ink", size }: { mark: LogMark; tint?: "ink" | "bone"; size?: number }) {
   const s = useUiScale();
   // The default is Medium's 16 times the UI scale; a caller that passes a size has scaled it.
   if (size == null) size = 16 * s;
   if (!mark) return <View style={{ width: size }} />;
-  if (mark === "threat" || mark === "willpower" || mark === "attack") return <GameIcon name={mark} size={size} tint={tint} />;
+  if (mark === "threat" || mark === "willpower" || mark === "attack" || mark === "defense") return <GameIcon name={mark} size={size} tint={tint} />;
   return <GameIcon name={mark} size={size} />;
 }

@@ -149,7 +149,7 @@ function optionalEnv(flow: Flow): Set<string> {
 }
 
 const SCENARIO_IDS = readdirSync(path.join(ROOT, "data", "scenarios")).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -".json".length));
-const CAMPAIGNS = readdirSync(path.join(ROOT, "data", "campaigns")).filter((name) => name.endsWith(".json")).map((name) => JSON.parse(readFileSync(path.join(ROOT, "data", "campaigns", name), "utf8")) as { id: string; scenarios?: string[] }).filter((item): item is { id: string; scenarios: string[] } => Array.isArray(item.scenarios));
+const CAMPAIGNS = readdirSync(path.join(ROOT, "data", "campaigns")).filter((name) => name.endsWith(".json")).map((name) => JSON.parse(readFileSync(path.join(ROOT, "data", "campaigns", name), "utf8")) as { id: string; kind?: string; scenarios?: string[] }).filter((item): item is { id: string; kind?: string; scenarios: string[] } => Array.isArray(item.scenarios));
 const FIXTURE_NAMES = new Set<string>(FIXTURE_REGISTRY.flatMap((entry) => entry.names));
 // Names that older flows open and no script writes: the fixture route opens nothing for them, so those flows cannot run until a fixture or a change to the flow exists.
 const UNWRITTEN = new Set(["breaking-solo", "breaking-pair", "breaking-won", "breaking-lost", "ford-start", "ford-won", "ford-lost", "south-start", "south-stage-4", "south-won", "south-lost", "moria-won", "moria-lost", "moria-pairs"]);
@@ -275,12 +275,12 @@ describe("the Maestro flows", () => {
 
   // The line under the road that says the next part is coming soon is true only while that part is not playable, so a part becoming playable
   // fails here (and in the coverage check) until the flow of the part before it stops asserting it. A flow under scenarios/<id>/ is about that scenario;
-  // a top-level flow (features/) names none and is skipped. A scenario in two campaigns has a follower in each, and each is checked.
+  // a top-level flow (features/) names none and is skipped. A scenario in two campaigns has a follower in each, and each is checked. A cycle has no road (no campaign path), so its scenarios have no such line and are skipped.
   it("assert path-soon only on a part followed by one the app cannot deal, and every such part's flows assert it", () => {
     const assertsSoon = (flow: Flow): boolean => uses(flow, "assertVisible").some((call) => asMap(call).id === "path-soon");
     const scenarioOf = (flow: Flow): string | null => /^scenarios\/([^/]+)\/[^/]+$/.exec(flow.rel)?.[1] ?? null;
     const followersOf = (id: string): { campaign: string; next: string | undefined }[] =>
-      CAMPAIGNS.filter((item) => item.scenarios.includes(id)).map((item) => ({ campaign: item.id, next: item.scenarios[item.scenarios.indexOf(id) + 1] }));
+      CAMPAIGNS.filter((item) => item.kind !== "cycle" && item.scenarios.includes(id)).map((item) => ({ campaign: item.id, next: item.scenarios[item.scenarios.indexOf(id) + 1] }));
     for (const flow of RUNNABLE.filter(assertsSoon)) {
       const id = scenarioOf(flow);
       expect(id, `${flow.rel} asserts path-soon but is not under scenarios/<scenario-id>/`).not.toBeNull();
@@ -288,7 +288,7 @@ describe("the Maestro flows", () => {
       expect(followers.length, `${flow.rel}: ${id} is in no campaign`).toBeGreaterThan(0);
       for (const { campaign, next } of followers) expect(next != null && !isPlayable(next), `${flow.rel} asserts path-soon, so the part after ${id} in ${campaign} must not be playable`).toBe(true);
     }
-    for (const item of CAMPAIGNS) {
+    for (const item of CAMPAIGNS.filter((one) => one.kind !== "cycle")) {
       item.scenarios.forEach((id, index) => {
         const next = item.scenarios[index + 1];
         if (next == null || isPlayable(next) || !isPlayable(id)) return;

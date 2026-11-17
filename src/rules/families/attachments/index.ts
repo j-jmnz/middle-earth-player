@@ -28,7 +28,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "GuardWith":
       return guardWith(state, instruction, focus, ctx, steps);
     case "HealAmong":
-      return healAmong(state, instruction, focus, ctx);
+      return healAmong(state, instruction, focus, ctx, steps);
     case "ChooseAttackers":
       return declareAttack(state, instruction, focus, ctx, steps);
     case "QuestProgressFirst":

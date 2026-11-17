@@ -9,7 +9,7 @@ import { outOfPlayChoices } from "./search.ts";
 import { scheduleDelayed } from "../windows/delayed.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { destroyCard, isEncounterCardEffect, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../core/keywords.ts";
+import { destroyAndAnnounce, destroyCard, isEncounterCardEffect, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import { eliminateEmpties } from "../core/eliminate.ts";
 import { lastPicked, otherSeat, seatsFor } from "./player-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -25,7 +25,7 @@ import { refillsAnyTime } from "../families/nightmare/guards.ts";
 import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
-import { flagged, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
 import { attachTo, cardsUnder, discardFromHand, moveCard, turnedUp } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
@@ -33,12 +33,15 @@ import { noteEncounterThreat } from "../families/encounter/reveal.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
 import { isGollum } from "../families/gollum/index.ts";
+import { guardianSeat } from "../families/guardian/seats.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
 // "otherPlayer" is the next seat in the game after the actor; with no other player it is the actor.
-export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | "otherPlayer" | undefined, actor: number): number {
+export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | "otherPlayer" | "guardian" | undefined, actor: number): number {
   if (who === "otherPlayer") return otherSeat(state, actor) ?? actor;
+  // "guardian": the player guarding Gollum (sotm.guarding-gollum), the actor when nobody does.
+  if (who === "guardian") return guardianSeat(state) ?? actor;
   return who === "firstPlayer" ? state.firstPlayer : actor;
 }
 
@@ -177,10 +180,21 @@ export function runExtraVerb(
         if (instruction.trait && !hasTrait(state, id, instruction.trait, ctx)) continue;
         next = engageEnemy(next, seat, id, steps);
       }
+      // Enemies engaged with another player move to the seat, in play order (02129:B:1).
+      if (instruction.inPlay === true && !next.seats[seat]?.eliminated) {
+        for (const other of livingSeats(next)) {
+          if (other === seat) continue;
+          for (const id of [...(next.seats[other]?.engaged ?? [])]) {
+            if (next.cards[id]?.zone === "engaged" && !flagged(next, id, "cannotBeEngaged")) next = engageWith(next, seat, id, steps);
+          }
+        }
+      }
       return next;
     }
     case "Discard":
       return discardTarget(state, instruction.target.kind, focus, ctx, steps);
+    case "Destroy":
+      return discardTarget(state, instruction.target.kind, focus, ctx, steps, true);
     case "UncommitAll": {
       const seat = seatFor(state, instruction.who, focus.seat);
       let next = state;
@@ -276,6 +290,8 @@ export function raiseFor(
   for (const seat of seats) {
     const count = instruction.perCommitted ? committedHeroes(next, seat, instruction.perCommitted.exceptSphere, ctx) : 1;
     next = raiseThreat(next, seat, amount * count, steps, currentCause(steps, UNATTRIBUTED));
+    // A raise of the starting threat (22134:A:2) moves the starting threat level a card may reduce back to (04053:A:2).
+    if (instruction.starting && next.startingThreat) next = { ...next, startingThreat: next.startingThreat.map((level, at) => (at === seat ? level + amount * count : level)) };
     // "After your threat is raised by an encounter card effect" (08062:A:1).
     next = noteEncounterThreat(next, seat, amount * count, focus.sourceId, ctx);
   }
@@ -371,22 +387,32 @@ function discardTarget(
   focus: VerbFocus,
   ctx: ReduceContext,
   steps: EngineStep[],
+  destroy = false,
 ): ScenarioState {
-  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
+  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" || kind === "other" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
+  // The other card an event names (the character an attack damaged, 02042:A:1) may already have left play: nothing is discarded twice.
+  if (kind === "other" && !inPlay(state.cards[id]?.zone ?? "removed")) return state;
   // "Unique locations cannot be discarded from play by encounter card effects" (12193:B:1): the card holds the flag.
   if (flagged(state, id, "cannotBeDiscardedByEncounter") && isEncounterCardEffect(state, ctx.cards, focus.sourceId)) return state;
+  if (destroy) {
+    const instance = state.cards[id];
+    return instance && inPlay(instance.zone) ? destroyAndAnnounce(state, instance, printedOf(ctx.cards, instance.code), ctx.cards, steps) : state;
+  }
   return destroyCard(state, id, ctx.cards, steps);
 }
 
-// The reveal frame of the source card keeps the surge it was given for the rest of that reveal.
+// The reveal frame of the source card counts each separate instance of surge it was given (rr.surge) for the rest of that reveal.
 export function markSurge(state: ScenarioState, sourceId: string | null): ScenarioState {
   for (let index = state.stack.length - 1; index >= 0; index -= 1) {
     const frame = state.stack[index];
     if (frame?.frame !== "reveal" || frame.cardId !== sourceId || frame.data.kind !== "reveal") continue;
-    const stack = state.stack.map((entry, at) =>
-      at === index && entry.data.kind === "reveal" ? { ...entry, data: { ...entry.data, surge: true } } : entry,
-    );
+    // The first grant sets `surge`; each later grant is another separate instance (`extraSurge`).
+    const stack = state.stack.map((entry, at) => {
+      if (at !== index || entry.data.kind !== "reveal") return entry;
+      const data = entry.data;
+      return { ...entry, data: data.surge ? { ...data, extraSurge: (data.extraSurge ?? 0) + 1 } : { ...data, surge: true } };
+    });
     return { ...state, stack };
   }
   return state;

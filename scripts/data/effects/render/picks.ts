@@ -1,4 +1,5 @@
 // Pick filters: the noun phrase a Pick, a count or a holder names ("enemy in play (any player) named \"Urdug\""). `src/catalog/effect-schema-pick.ts` owns the keys.
+import { onWords } from "./escape.ts";
 import { done, isObj, joinAnd, jsonOf, quoted, str, type Ctx, type Obj } from "./kit.ts";
 
 export type PickRenderer = (pick: unknown, ctx: Ctx) => string;
@@ -65,8 +66,19 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["isHost"], pick.isHost === true ? "that this card is attached to" : null);
   note(["hasShadow"], pick.hasShadow === true ? "with a shadow card" : null);
   note(["looked"], pick.looked === true ? "among the cards this effect looked at or discarded" : null);
+  note(["soleMostDamaged"], pick.soleMostDamaged === true ? "with more damage than each other character in play (a tie for the most matches none)" : null);
+  note(["attached"], pick.attached === true ? "that is attached to another card" : pick.attached === false ? "that is attached to no card" : null);
   const attached = isObj(pick.hasAttachment) && Array.isArray(pick.hasAttachment.names) && Object.keys(pick.hasAttachment).every((key) => key === "names" || key === "none") ? pick.hasAttachment : null;
-  note(["hasAttachment"], attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : null);
+  const attachedNone = isObj(pick.hasAttachment) && pick.hasAttachment.none === true && Object.keys(pick.hasAttachment).length === 1;
+  const attachedTrait = isObj(pick.hasAttachment) && typeof pick.hasAttachment.trait === "string" && Object.keys(pick.hasAttachment).length === 1 ? pick.hasAttachment.trait : null;
+  note(["hasAttachment"], attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : attachedTrait ? `with a ${attachedTrait} card attached` : attachedNone ? "with no attachment of any kind" : null);
+  note(["active"], pick.active === true ? "that is the active location" : null);
+  note(["hasGuard"], pick.hasGuard === true ? "that has an encounter card attached as its guard" : pick.hasGuard === false ? "that has no encounter card attached (free of encounters)" : null);
+  note(["isGuard"], pick.isGuard === true ? "that is attached to an objective as its guard" : pick.isGuard === false ? "that is not guarding an objective" : null);
+  note(["questedThisRound"], pick.questedThisRound === true ? "that was committed to this round's quest (the quest's resolution already cleared the commitment)" : null);
+  note(["guardedByTrait"], typeof pick.guardedByTrait === "string" ? `guarded by (attached to) a ${pick.guardedByTrait} enemy` : null);
+  note(["notGuardedByTrait"], typeof pick.notGuardedByTrait === "string" ? `not guarded by (attached to) a ${pick.notGuardedByTrait} enemy` : null);
+  note(["guardsTrait"], typeof pick.guardsTrait === "string" ? `attached as the guard of a ${pick.guardsTrait} objective` : null);
   note(["controlled"], pick.controlled === true ? "that is claimed (attached to a character a player controls)" : null);
   note(["questCard"], pick.questCard === true ? "that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)" : null);
   note(["maxHitPointsLeft"], typeof pick.maxHitPointsLeft === "number" ? `with ${pick.maxHitPointsLeft} or fewer hit points remaining` : null);
@@ -78,6 +90,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["copyOfDefender"], pick.copyOfDefender === true ? "with the title of the defending character" : null);
   note(["minDamage"], typeof pick.minDamage === "number" ? `with at least ${pick.minDamage} damage on it` : null);
   note(["aboveThreat"], pick.aboveThreat === true ? "with an engagement cost higher than the chooser's threat" : null);
+  note(["on"], onWords(pick.on));
   note(["other"], pick.other === true ? "other than this card" : null);
   note(["different"], pick.different === true ? "other than the cards this effect already picked" : null);
   note(["guardsObjectiveLocation"], pick.guardsObjectiveLocation === true ? "attached to an objective-location as its guard" : null);

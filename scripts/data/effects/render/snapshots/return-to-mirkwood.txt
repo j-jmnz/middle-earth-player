@@ -1,0 +1,189 @@
+Scenario piles that place cards with no record (quest: 02126 Through the Forest; quest: 02127 Escape Attempt; quest: 02128 To the Elvin King's Halls; quest: 02129 Ambush; setAside: 02130 Gollum)
+
+## 02126 Through the Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02126:A:1 (front): Setup: Search the encounter deck for Gollum. Choose a player to guard Gollum at the start of the game, and place Gollum in front of that player. Then shuffle the encounter deck. Reveal 1 card per player from the encounter deck, and add it to the staging area.
+  02126:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls) chosen by the first player
+    - the card with code 02130, in the encounter deck or set aside, enters play in front of the player last picked (the first player when none is), ready: that player guards Gollum
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+## 02127 Escape Attempt
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02127:B:1 (back): The player guarding Gollum cannot commit characters to this quest (unless he is the only player remaining in the game).
+  02127:constant:1: Constant
+    - the player guarding Gollum cannot commit characters to the quest, unless he is the only player remaining in the game
+
+02127:B:2 (back): If the players quest unsuccessfully, Gollum escapes and the players have lost the game.
+  02127:triggered:1: Triggered (mandatory, not printed as Forced) after the players quest unsuccessfully
+    - the players lose the game (Gollum escaped)
+
+## 02128 To the Elvin King's Halls
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02128:B:1 (back): The player guarding Gollum cannot play cards from his hand.
+  02128:constant:1: Constant
+    - the player guarding Gollum cannot play cards from his hand (a card put into play is not played)
+
+## 02129 Ambush
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02129:B:1 (back): Forced: At the beginning of the combat phase, all enemies in play engage the player guarding Gollum.
+  02129:forced:1: Forced when a phase begins
+    only if it is the Combat phase
+    - the player guarding Gollum engages every enemy in play, the ones in the staging area and the ones engaged with another player
+
+02129:B:2 (back): Players cannot defeat this stage if there are any enemies in play. If players defeat this stage, they have won the game.
+  02129:constant:1: Constant
+    only if there is enemy in play (in the staging area or engaged)
+    - the players cannot defeat this stage while this holds
+
+## 02130 Gollum
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+02130:A:1 (front): Damage from undefended attacks against you must be dealt to Gollum. If Gollum is destroyed, or if the player guarding Gollum is eliminated, the players have lost the game.
+  02130:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat undefendedToHolder 1, while this card is in play
+    - this card: stat lossOnLeavingPlay 1, while this card is in play
+    - this card: stat cannotAttack 1, while this card is in play
+    - this card: stat cannotDefend 1, while this card is in play
+    - this card: stat cannotQuest 1, while this card is in play
+
+02130:A:2 (front): Forced: At the end of each round, raise the threat of the player guarding Gollum by 3. Then, that player may choose a new player to guard Gollum.
+  02130:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - raise threat by 3 (the acting player)
+    - the player guarding Gollum chooses one of:
+      * option "change" (only if the player guarding Gollum may choose a new player: no card says he cannot change and another player is still in the game):
+        - choose player (another player controls)
+        - the player last picked becomes the player guarding Gollum: Gollum, with what is attached to him, goes to that player (nothing when a card says the guard cannot change, or that player already guards him)
+      * option "keep":
+
+## 02131 The Spiders' Ring
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02131:A:1 (front): While The Spider's Ring is the active location, the player guarding Gollum cannot change.
+  02131:constant:1: Constant
+    only if this card is the active location
+    - the table: stat guardianLocked 1, while this card is in play
+
+02131:A:2 (shadow): Shadow: If this attack is undefended, return any current active location to the staging area. The Spider's Ring becomes the active location.
+  02131:shadow:1: Shadow
+    - if the attack has no defender: this card becomes the active location
+
+## 02132 Dry Watercourse
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02132:A:1 (front): While Dry Watercourse is the active location, all treachery card effects that target the player guarding Gollum also target each other player.
+  02132:constant:1: Constant
+    only if this card is the active location
+    - the table: stat treacheryHitsAll 1, while this card is in play
+
+## 02133 Woodman's Glade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02133:A:1 (front): Travel: The player guarding Gollum must exhaust a hero he controls to travel to Woodman's Glade.
+  02133:travel:1: Travel
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - choose ready hero (you control)
+      - exhaust the picked card
+
+02133:A:2 (front): Response: After exploring Woodman's Glade, reduce the threat of each player not guarding Gollum by 2.
+  02133:response:1: Response on the event activeExplored (heard about this card)
+    - for each player not guarding Gollum, first player first:
+      - lower threat by 2 (the acting player)
+
+## 02134 Wood Elf Path
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02134:A:1 (front): Response: After the players travel to Wood Elf Path, the player guarding Gollum may choose a new player to guard him.
+  02134:response:1: Response after the players travel (answered by the player guarding Gollum)
+    only if the player guarding Gollum may choose a new player: no card says he cannot change and another player is still in the game
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (another player controls)
+    - the player last picked becomes the player guarding Gollum: Gollum, with what is attached to him, goes to that player (nothing when a card says the guard cannot change, or that player already guards him)
+
+## 02135 Gollum's Anguish
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02135:A:1 (front): When Revealed: Raise the threat of the player guarding Gollum by 8. That player must choose a new player to guard Gollum, if able.
+  02135:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - raise threat by 8 (the acting player)
+    - the player guarding Gollum chooses one of:
+      * option "change" (only if the player guarding Gollum may choose a new player: no card says he cannot change and another player is still in the game):
+        - choose player (another player controls)
+        - the player last picked becomes the player guarding Gollum: Gollum, with what is attached to him, goes to that player (nothing when a card says the guard cannot change, or that player already guards him)
+
+02135:A:2 (shadow): Shadow: Raise the threat of the player guarding Gollum by 4.
+  02135:shadow:1: Shadow
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - raise threat by 4 (the acting player)
+
+## 02136 Gollum's Bite
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02136:A:1 (front): When Revealed: Deal 4 damage to a hero controlled by the player guarding Gollum. That player must choose a new player to guard Gollum, if able.
+  02136:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - choose hero (you control)
+      - deal 4 damage to the picked card
+    - the player guarding Gollum chooses one of:
+      * option "change" (only if the player guarding Gollum may choose a new player: no card says he cannot change and another player is still in the game):
+        - choose player (another player controls)
+        - the player last picked becomes the player guarding Gollum: Gollum, with what is attached to him, goes to that player (nothing when a card says the guard cannot change, or that player already guards him)
+
+02136:A:2 (shadow): Shadow: Deal 2 damage to a hero controlled by the player guarding Gollum.
+  02136:shadow:1: Shadow
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - choose hero (you control)
+      - deal 2 damage to the picked card
+
+## 02137 Wasted Provisions
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02137:A:1 (front): When Revealed: Discard the top 10 cards from the deck of the player guarding Gollum. That player must choose a new player to guard Gollum, if able.
+  02137:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - the top 10 card(s) of the acting player's deck go to their discard pile
+    - the player guarding Gollum chooses one of:
+      * option "change" (only if the player guarding Gollum may choose a new player: no card says he cannot change and another player is still in the game):
+        - choose player (another player controls)
+        - the player last picked becomes the player guarding Gollum: Gollum, with what is attached to him, goes to that player (nothing when a card says the guard cannot change, or that player already guards him)
+
+02137:A:2 (shadow): Shadow: Discard the top 5 cards from the deck of the player guarding Gollum.
+  02137:shadow:1: Shadow
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - the top 5 card(s) of the acting player's deck go to their discard pile
+
+## 02138 Mirkwood Bats
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02138:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+02138:A:2 (front): Forced: After Mirkwood Bats engages a player, deal 1 damage to each character controlled by the player guarding Gollum.
+  02138:forced:1: Forced after an enemy engages a player (heard about this card)
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - for each character (you control):
+        - deal 1 damage to the picked card
+
+## 02139 Attercop, Attercop
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02139:A:1 (front): Forced: At the beginning of the encounter phase, Attercop, Attercop automatically engages the player guarding Gollum, regardless of his threat.
+  02139:forced:1: Forced when a phase begins
+    only if it is the Encounter phase
+    - this enemy engages the player who controls a character (you control) named "Gollum" (the first player chooses among several; nothing when it is already engaged with that player; an enemy engaged with another player leaves that player)
+
+(rendered pieces: 106 by template, 0 as JSON)

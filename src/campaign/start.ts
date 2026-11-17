@@ -1,5 +1,5 @@
 import { setupRoleVerbs, type Effect, type ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCards, encounterCodes, questDeckCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCards, encounterCodes, questDeckCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, stageOf, unchartedCodes, type AnyScenarioData, type CampaignData, type Difficulty } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
@@ -14,7 +14,7 @@ export type PlayMode = "campaign" | "standalone";
 
 export type StartInput = {
   campaign: CampaignData;
-  scenario: ScenarioData;
+  scenario: AnyScenarioData;
   seatCount: 1 | 2;
   seed: number;
   threatModifier: number;
@@ -95,7 +95,7 @@ export function buildStart(start: StartInput): StartScenario {
     const side = MODE_CARD_SIDE[input.modeCard];
     definition = { ...definition, modeCard: { code: MODE_CARD_CODE, side }, resolution: [...definition.resolution, ...sideInstructions(effects, MODE_CARD_CODE, side, "resolution")] };
   }
-  const campaignSetup = standalone ? [] : recordInstructions(effects, input.scenario.campaignCard, "campaignSetup");
+  const campaignSetup = standalone || input.scenario.campaignCard === undefined ? [] : recordInstructions(effects, input.scenario.campaignCard, "campaignSetup");
   // What the engine runs in Setup, in the campaign card's printed order: the Fellowship's two verbs and the Mirkwood ones (an
   // objective ally put into play, a card set aside). AttachChosen, AddToHandAfterMulligan and AddToPool are dealt by the checklist.
   const dealt = campaignSetup.filter((instruction) => DEALT_VERBS.has(instruction.verb));
@@ -115,7 +115,8 @@ export function buildStart(start: StartInput): StartScenario {
   const removedCaves = standalone ? [] : (input.removedFromCaves ?? []);
   const piles = removedCaves.length > 0 && dealtDecks.cavesDeck ? { ...dealtDecks, cavesDeck: withoutCards(dealtDecks.cavesDeck, removedCaves) } : dealtDecks;
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/brief.md, Nightmare).
-  if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
+  // Its quest cards (a stage after the last printed one) follow the printed stages in the quest deck.
+  if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard, stages: [...definition.stages, ...(input.scenario.nightmare?.questCards ?? []).map((code) => stageOf(code, effects))] };
   return {
     seatCount: input.seatCount,
     seed: input.seed,

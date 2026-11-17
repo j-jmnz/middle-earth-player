@@ -86,7 +86,7 @@ function claimObjective(state: ScenarioState, focus: Focus, ctx: ReduceContext, 
 export const manifest: RulesFamily = {
   name: "objectives",
   settle: { sweep: (state, ctx) => controlSweep(state, ctx) },
-  pick: (state, id, spec) => objectivesPickMatches(state, id, spec),
+  pick: (state, id, spec, _at, ctx) => objectivesPickMatches(state, id, spec, ctx),
   verbs: ["GuardObjective", "ClaimObjective", "AttachGuard", "ControlWhenFree"],
   run,
 };

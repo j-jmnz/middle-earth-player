@@ -12,7 +12,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09016:A:2 (front): The first player gains control of Iârion.
   09016:constant:2: Constant
-    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+    - this card is controlled by the first player while this holds
 
 09016:A:3 (front): Response: After a side quest is revealed from the encounter deck, ready Iârion.
   09016:response:1: Response after a card is revealed (heard about card (any player controls) of card type encounter-side-quest; not for a card found in the encounter discard pile)
@@ -97,7 +97,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area: for each enemy (any player controls) in the staging area only:
       - the picked enemy attacks the first player now, from the staging area
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one card with code 09017 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one card with code 09017 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 ## 09022 Surprising Speed
@@ -108,7 +108,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - return one enemy engaged with the acting player (that player picks which) to the staging area
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
     - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
 
 09022:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
@@ -322,15 +322,15 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 10157:A:2 (front): Response: Add Iârion's Pendant to the victory display to cancel the 'when revealed' effects of a card that was just revealed from the encounter deck, or to cancel a shadow effect just triggered.
   10157:response:1: Response on the event whenRevealedPending (heard about card (any player controls); cost: [json cost {"kind":"addSelfToVictory"}])
-    - [json CancelEffect {"verb":"CancelEffect"}]
+    - the effect being resolved is canceled: nothing after this resolves
   10157:response:2: Response on the event shadowPending (cost: [json cost {"kind":"addSelfToVictory"}])
-    - [json CancelEffect {"verb":"CancelEffect"}]
+    - the effect being resolved is canceled: nothing after this resolves
 
 ## 10158 Protect the Innocent
 
 10158:A:1 (front): Forced: After an attack damages a character, place 1 damage on Protect the Innocent.
   10158:forced:1: Forced on the event attackDamagedCharacter (heard about enemy (any player controls) or in the staging area)
-    - [json PlaceDamageOn {"verb":"PlaceDamageOn","code":"10158","amount":1}]
+    - place 1 damage token(s) on the card in play with code 10158 (placed, not dealt: nothing cancels or reduces them)
 
 10158:A:2 (front): When progress would be placed on Protect the Innocent, remove that much damage from it instead.
   10158:constant:1: Constant
@@ -342,4 +342,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 201 by template, 12 as JSON)
+(rendered pieces: 207 by template, 6 as JSON)

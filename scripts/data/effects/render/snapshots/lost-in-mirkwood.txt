@@ -138,9 +138,9 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18034:A:1 (front): Forced: At the end of the encounter phase, if Mirkwood Patrol is in the staging area with an unguarded objective-location, attach that objective-location to Mirkwood Patrol, guarding it.
   18034:forced:1: Forced at the end of the phase
-    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (there is a objective (any player controls) in the staging area only [also {"objectiveLocation":true,"hasGuard":false}] to choose)
+    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (there is a objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) [also {"objectiveLocation":true}] to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose objective (any player controls) in the staging area only [also {"objectiveLocation":true,"hasGuard":false}]
+    - choose objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) [also {"objectiveLocation":true}]
     - this card becomes the guard of the picked card, attached to it in the staging area
 
 18034:A:2 (shadow): Shadow: The defender cannot ready this round.
@@ -173,8 +173,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18036:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and +2 Defense until the end of the phase if it is guarding a card.
   18036:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if any of: (the attacking enemy is a enemy (any player controls) [also {"isGuard":true}]) or (the attacking enemy is a enemy (any player controls) [also {"guardsHero":true}]): the attacking enemy: stat attack 2, until the end of the phase
-    - then, if any of: (the attacking enemy is a enemy (any player controls) [also {"isGuard":true}]) or (the attacking enemy is a enemy (any player controls) [also {"guardsHero":true}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat defense 2, until the end of the phase
+    - if any of: (the attacking enemy is a enemy (any player controls) that is attached to an objective as its guard) or (the attacking enemy is a enemy (any player controls) [also {"guardsHero":true}]): the attacking enemy: stat attack 2, until the end of the phase
+    - then, if any of: (the attacking enemy is a enemy (any player controls) that is attached to an objective as its guard) or (the attacking enemy is a enemy (any player controls) [also {"guardsHero":true}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat defense 2, until the end of the phase
 
 ## 18037 Vastness of Mirkwood
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -245,7 +245,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - for each player, first player first:
       - raise threat by the resource tokens on hero (you control) (the acting player)
     - for each hero (any player controls):
-      - [json DiscardResources {"verb":"DiscardResources","all":true,"target":"picked"}]
+      - all the resources come off the resource pool of the picked card (discarded, not spent)
 
 18041:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender has an attachment).
   18041:shadow:1: Shadow
@@ -286,7 +286,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18072:B:1 (back): The first Spider enemy revealed each quest phase gains surge.
   18072:forced:1: Forced after a card is revealed (heard about Spider enemy (any player controls); limit once per phase; only when the encounter deck revealed it)
     only if it is the Quest phase
-    - [json GrantSurgeToSubject {"verb":"GrantSurgeToSubject"}]
+    - the card just revealed gains surge
 
 18072:B:2 (back): Forced: When a Spider enemy attacks and damages a character, that character cannot ready until the end of the round.
   18072:forced:2: Forced on the event damagedByAttack (heard about character (any player controls))
@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18073:B:1 (back): The first Orc enemy revealed each quest phase gains surge.
   18073:forced:1: Forced after a card is revealed (heard about Orc enemy (any player controls); limit once per phase; only when the encounter deck revealed it)
     only if it is the Quest phase
-    - [json GrantSurgeToSubject {"verb":"GrantSurgeToSubject"}]
+    - the card just revealed gains surge
 
 18073:B:2 (back): Forced: When an Orc enemy attacks and damages a character, that character's controller chooses and discards 1 card from his hand.
   18073:forced:2: Forced on the event damagedByAttack (heard about character (any player controls); event happened to the controller)
@@ -416,4 +416,4 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 245 by template, 49 as JSON)
+(rendered pieces: 250 by template, 44 as JSON)

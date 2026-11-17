@@ -11,7 +11,7 @@ import { freeRingBearers } from "./free.ts";
 import { assignDamage, discardEach, noneDiscarded } from "./damage.ts";
 import { assignFaceup } from "./faceup.ts";
 import { attachToActiveLocation, makeSetAsideActive, pickHighestEngagement, revealUntilThreat } from "./reveal.ts";
-import { attackFromStaging, markLocationDamage } from "./watcher.ts";
+import { attackFromStaging, markHeroDamage, markLocationDamage } from "./watcher.ts";
 import { damageLoss } from "./locations.ts";
 
 // The verbs src/catalog/families/south.ts adds, for The Ring Goes South: the second active location, the facedown Ring-bearer, the
@@ -36,6 +36,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return state;
     case "DamageActiveLocation":
       return markLocationDamage(state);
+    case "UndefendedDamageTo":
+      return markHeroDamage(state, instruction.pick, focus, ctx, instruction.character === true);
     case "AttackFromStaging":
       return attackFromStaging(state, instruction, focus, ctx, steps);
     case "PickHighestEngagement":
@@ -47,4 +49,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "south", settle: { before: (state, ctx) => damageLoss(state, ctx.cards), sweep: (state, ctx) => freeRingBearers(state, ctx) }, condition: (state, condition) => noneDiscarded(state, condition), verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "FreeRingBearer", "DamageActiveLocation", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };
+export const manifest: RulesFamily = { name: "south", settle: { before: (state, ctx) => damageLoss(state, ctx.cards), sweep: (state, ctx) => freeRingBearers(state, ctx) }, condition: (state, condition) => noneDiscarded(state, condition), verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "FreeRingBearer", "DamageActiveLocation", "UndefendedDamageTo", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };

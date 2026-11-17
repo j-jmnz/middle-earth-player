@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { normalCopiesByCode, scenarioCards } from "../../src/catalog/scenario-data.ts";
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { cardImageUrl } from "../../src/screens/images/policy.ts";
-import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
+import { loadCampaign, loadAnyScenario, loadScenario } from "../data/load-scenarios.ts";
 import { loadCards } from "../data/load-cards.ts";
 import { buildCatalog } from "./catalog.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -107,7 +107,7 @@ describe("built catalog", () => {
       const twoSided = new Set(loadCards().filter((card) => card.back != null).map((card) => card.code));
       const backless: string[] = [];
       for (const id of readdirSync(path.join("data", "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {
-        const scenario = loadScenario(id);
+        const scenario = loadAnyScenario(id);
         for (const code of new Set([...scenario.stages, ...scenarioCards(scenario).map((card) => card.code), ...(scenario.campaignCard ? [scenario.campaignCard] : []), ...scenario.campaignPlaced])) {
           if (!twoSided.has(code)) continue;
           const row = database.prepare("select back_imagesrc from cards where code = ?").get(code);

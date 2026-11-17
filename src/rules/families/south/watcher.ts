@@ -5,17 +5,18 @@
 // player, so it attacks every player once in the combat phase; Storm of Howls makes the enemy in the staging area with the highest
 // engagement cost attack the player who revealed it. The combat code asks `attackHere` instead of reading the enemy's zone.
 import { undefendedToCity } from "../pelennor/combat.ts";
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction, PickSpec } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { frameScope } from "../../interpret/amounts.ts";
 import { attackBarred } from "../../interpret/constants.ts";
-import { beginEnemyAttack } from "../../combat/combat.ts";
+import { beginEnemyAttack, characters } from "../../combat/combat.ts";
 import { dealAdditionalShadow, dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { lastPicked, seatsFor } from "../../interpret/player-verbs.ts";
+import { matchesPick } from "../../interpret/pick.ts";
 import type { PendingAttack, ScenarioState } from "../../core/state.ts";
-import { flagged } from "../../core/state.ts";
+import { flagged, livingSeats } from "../../core/state.ts";
 import { discardResolvedShadowOf, discardShadowOf } from "../../combat/shadow.ts";
 import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
@@ -118,6 +119,21 @@ export function attackNowFromStaging(state: ScenarioState, id: string, seat: num
 export function markLocationDamage(state: ScenarioState): ScenarioState {
   const attack = state.pendingAttack;
   return attack ? { ...state, pendingAttack: { ...attack, toLocation: true } } : state;
+}
+
+// UndefendedDamageTo: a shadow effect marks the attack in progress: its undefended damage must go on a hero that matches the filter, if the defending player has one (900408:A:3). The hero already named that does not match is replaced by the one that does, or the player
+// names the hero again among the matching ones (`onlyHeroes`, read by undefendedTargets). A defended attack is as it was.
+export function markHeroDamage(state: ScenarioState, pick: PickSpec, focus: Focus, ctx: ReduceContext, character = false): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack) return state;
+  // `character`: any player's character that matches (02070:A:2), in play; the defending player's heroes otherwise.
+  const pool = character ? livingSeats(state).flatMap((seat) => characters(state, seat, ctx.cards)) : (state.seats[attack.seat]?.heroes ?? []);
+  const only = pool.filter((id) => matchesPick(state, id, pick, { seat: attack.seat, sourceId: focus.sourceId, counting: true }, ctx));
+  if (only.length === 0) return state;
+  const named = attack.heroId;
+  const kept = named == null || named === "" || only.includes(named) ? named : only.length === 1 ? only[0] : undefined;
+  const { heroId: _named, ...rest } = attack;
+  return { ...state, pendingAttack: { ...rest, onlyHeroes: only, ...(kept != null ? { heroId: kept } : {}) } };
 }
 
 // The cards the damage of an undefended attack may be assigned to: the active locations when a shadow effect says it goes on one.

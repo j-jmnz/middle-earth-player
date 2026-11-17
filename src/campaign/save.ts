@@ -95,7 +95,9 @@ export const activeScenarioSchema = z.strictObject({
 export type StoredLoadout = {
   scenarioId: string;
   difficulty: Difficulty;
-  seats: { deckId: string | null; heroes: string[]; deck: string[] }[];
+  // `side`: the deck's side deck, one code per copy, where a contract finds its loot deck (src/catalog/loot.ts). Absent for none,
+  // and on a save written before side decks.
+  seats: { deckId: string | null; heroes: string[]; deck: string[]; side?: string[] | undefined }[];
   ringBearer: string | null;
   choices: string[];
   acceptPenalty: boolean;
@@ -107,7 +109,7 @@ export type StoredLoadout = {
 export const dealtLoadoutSchema = z.strictObject({
   scenarioId: z.string(),
   difficulty: z.enum(DIFFICULTIES),
-  seats: z.array(z.strictObject({ deckId: z.string().nullable(), heroes: z.array(z.string()), deck: z.array(z.string()) })),
+  seats: z.array(z.strictObject({ deckId: z.string().nullable(), heroes: z.array(z.string()), deck: z.array(z.string()), side: z.array(z.string()).optional() })),
   ringBearer: z.string().nullable(),
 });
 

@@ -27,7 +27,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "FlipCard":
       return flipCard(state, focus.sourceId);
     case "BuildLootDeck":
-      return buildLootDeck(state, focus);
+      return buildLootDeck(state, instruction, focus, steps);
     case "AttachLoot":
       return attachLoot(state, focus);
     case "TakeRevealedCard":

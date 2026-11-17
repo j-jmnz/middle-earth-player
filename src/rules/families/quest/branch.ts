@@ -1,10 +1,11 @@
-// Rules: rr.quest-cards-quest-deck, rr.quest-advancement (data/rules/entries.json); the branch is the printed Forced effect of 01120:B:1
-// ("proceed to one of the 2 \"A Chosen Path\" stages, at random").
+// Rules: rr.quest-cards-quest-deck, rr.quest-advancement, rr.winning-the-game (data/rules/entries.json); the branch is the printed Forced effect of 01120:B:1
+// ("proceed to one of the 2 \"A Chosen Path\" stages, at random"); holdStage serves 02106:B:1 and 02106:B:2.
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { gameReads } from "../../core/game-reads.ts";
+import { queueEvent } from "../../windows/queue.ts";
 
 // What advancing past the stage `code` does when the quest branches: the stage a branch leads to is the last one (its defeat wins the
 // game), and a stage that names a branch proceeds to one of its codes at random, the other copies leaving the game. `next` is the
@@ -77,4 +78,9 @@ export function noteSkippedStage(state: ScenarioState, newId: string, leftId: st
 // is queued only in a game that has such a card, so every other game's state stays as it was.
 export function questCardDefeatedHeard(state: ScenarioState, ctx: ReduceContext): boolean {
   return gameReads(state, ctx, '"trigger":"questCardDefeated"');
+}
+
+/** The final stage that holds the win is defeated: it stays the current quest card, marked held, and its own Forced effects hear that it was defeated (`questCardDefeated`). They win the game or reset the quest (`ReturnToStage`, which clears the mark); nothing else ends it. */
+export function holdStage(state: ScenarioState, id: string): ScenarioState {
+  return queueEvent({ ...state, stageHeld: id }, { trigger: "questCardDefeated", seat: null, subject: id });
 }

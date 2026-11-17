@@ -77,8 +77,9 @@ export const simpleVerbs = [
   // Places progress tokens on the picked location, on every location in the staging area, on the source or the active
   // location. A full location is explored. `host`: the location the source is attached to.
   z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: positiveAmountSchema, target: z.enum(["picked", "eachStagingLocation", "self", "activeLocation", "subject", "host"]), ...when }),
-  // Heals damage from the picked card (or `target`): `amount`, or all of it.
-  z.strictObject({ verb: z.literal("Heal"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), target: cardRefSchema.optional(), ...when }),
+  // Heals damage from the picked card (or `target`): `amount`, or all of it. The `healed` event names the card whose effect healed (its other card). `athelas`: the heal counts as an Athelas heal, which an attachment that
+  // reduces heals "other than Athelas" leaves alone (02062:B:1, 900608:A:2).
+  z.strictObject({ verb: z.literal("Heal"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), target: cardRefSchema.optional(), athelas: z.literal(true).optional(), ...when }),
   // Puts the picked card (or `target`) on top or at the bottom of its owner's deck, or shuffles it in. A card leaving play this
   // way leaves play.
   z.strictObject({ verb: z.literal("PutOnDeck"), position: z.enum(["top", "bottom", "shuffle"]), target: cardRefSchema.optional(), ...when }),
@@ -134,6 +135,8 @@ export const simpleVerbs = [
         exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
       })
       .optional(),
+    // The raise is part of the starting threat ("Add ... to your starting threat", 22134:A:2): the recorded starting threat level rises with it.
+    starting: z.literal(true).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("Travel"), to: z.literal("self").optional(), ...when }),
@@ -172,8 +175,8 @@ export const simpleVerbs = [
   verb("ShuffleEncounterDeck"),
   // Setup: each player draws this many fewer cards in the starting hand (and in a mulligan redraw).
   z.strictObject({ verb: z.literal("ReduceOpeningHand"), amount: z.number().int().positive(), ...when }),
-  // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles.
-  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, ...when }),
+  // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles. With `each`, every matching card goes and the deck is shuffled once ("shuffle all copies of the \"Sacked!\" card from the discard pile back into the encounter deck", 02041:A:1).
+  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it. `cost`: the search is a Travel cost the players must be able to pay, so it needs a card to find ("Travel: The first player searches ... for a Warg enemy", 10024:A:2; rr.travel); read by the angmar family. `to: "engaged"`: the enemy found is revealed and put into play engaged with the revealing player instead of staged ("reveal it, and put it into play engaged with you", 143065:A:2).
   // `deckOnly`: the encounter deck alone is searched, not its discard pile ("Search the encounter deck for 1 copy of Prison Cell", 10039:A:2).
   z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }),
@@ -205,13 +208,17 @@ export const simpleVerbs = [
     ...when,
   }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
   z.strictObject({ verb: z.literal("ReturnToStaging"), target: targetSchema, ...when }),
+  // Engages the enemies in the staging area with `who` (the player guarding Gollum with `guardian`). `inPlay`: every enemy in play, the ones engaged with another player too, which move to `who` ("all enemies in play engage the player guarding Gollum", 02129:B:1; rr.in-play-and-out-of-play).
   z.strictObject({
     verb: z.literal("EngageAll"),
     trait: z.string().min(1).optional(),
     who: whoSchema,
+    inPlay: z.literal(true).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("Discard"), target: targetSchema, ...when }),
+  // The card is destroyed (rr.destroy), not discarded: a hero or ally lies in its owner's discard pile and the table hears it was destroyed ("Destroy all heroes with the card 'Sacked!' attached", 02049:A:1).
+  z.strictObject({ verb: z.literal("Destroy"), target: targetSchema, ...when }),
   z.strictObject({
     verb: z.literal("AttachSelf"),
     to: z.discriminatedUnion("kind", [
@@ -221,16 +228,22 @@ export const simpleVerbs = [
       // of the players tied for the highest), or (`highestThreatCost`, "Attach to the hero with the highest threat cost", 41043:A:2) the hero
       // with the highest printed threat cost among every hero in play (the first player chooses among those tied), or (`picked`, "attach this
       // card to one of that player's heroes", 900106:A:1) a hero of the player the effect picked, who chooses it.
+      // or (`firstPlayer`, "Attach to a hero with no \"Sacked!\" cards attached controlled by the first player", 02048:A:1) a hero the first player controls, chosen by the first player.
       // or (`mostAttachments`, "Attach to the hero with the most attachments without Weighed Down attached", 18027:A:1) the hero with the most attachments among those the card is not on yet; the first player chooses among heroes tied.
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked", "mostAttachments"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked", "mostAttachments", "firstPlayer"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
         // "Attach to a Warrior hero." (143015:A:2): only a hero with this printed trait (rr.attachment-cards: a play restriction is checked as the attachment enters play).
-        trait: z.string().min(1).optional() }),
+        trait: z.string().min(1).optional(),
+        // "Attach it to a hero with 1 or more Willpower" (900806:A:1): only a hero whose current Willpower is at least this.
+        minWillpower: z.number().int().min(1).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),
       // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
       // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
       z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),
+      // A character (hero or ally, an objective ally included) of any player, chosen by the first player: with `trait`, one that has the Trait now ("Attach to an Eagle character", 900607:A:2; a character that lost it is not offered); with `name`, the
+      // character of that title ("Attach to Wilyador", 900608:A:2). A character that carries a copy is not offered, unless `unlimited` (the card has no limit per character). With none to host it the card is discarded.
+      z.strictObject({ kind: z.literal("character"), trait: z.string().min(1).optional(), name: z.string().min(1).optional(), unlimited: z.literal(true).optional() }),
     ]),
     ...when,
   }),
@@ -256,7 +269,7 @@ export const simpleVerbs = [
   // active location the players must travel to it and nowhere else, if able (01088:A:1).
   z.strictObject({
     verb: z.literal("Restrict"),
-    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly"]),
+    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly", "commit", "draw", "playFromHand"]),
     // With "travel" on a card that is not the location: the players cannot travel to the location with this code ("The players cannot travel to The Old Ford unless there is at least 5 progress here", 18068:B:1).
     location: z.string().min(1).optional(),
     // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
@@ -273,6 +286,13 @@ export const simpleVerbs = [
     // With "defend": only the allies whose printed hit points are fewer than the source's cannot defend ("Allies with fewer printed hit points than Uruk-hai
     // Captain cannot defend against Uruk-hai Captain", 142069:A:2).
     belowSourceHitPoints: z.boolean().optional(),
+    // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
+    // draws, not card effects). The pick is read from each player's side.
+    unlessControls: pickSchema.optional(),
+    // With "commit" and "playFromHand": the rule binds the player guarding Gollum only ("The player guarding Gollum cannot commit characters to this quest", 02127:B:1; "cannot play cards from his hand", 02128:B:1). "playFromHand" bars playing a card from the hand, not putting one into play
+    // (rr.play-and-put-into-play). `exceptAlone`: unless he is the only player remaining in the game. Read by src/rules/interpret/restrictions.ts (seatBarred) and src/rules/families/guardian/.
+    guardian: z.literal(true).optional(),
+    exceptAlone: z.literal(true).optional(),
     ...when,
   }),
   // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's

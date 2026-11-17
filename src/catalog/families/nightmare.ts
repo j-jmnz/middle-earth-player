@@ -6,6 +6,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // The source (a treachery being revealed) attaches to the current quest card ("When Revealed: Attach to the current quest", 906107:A:2).
@@ -15,8 +16,8 @@ const VERBS = [
   // The card with this code's printed title is searched for in the encounter deck, then its discard pile, then the victory display, and the
   // first copy found is added to the staging area ("searches the encounter deck, discard pile, and victory display for Khamûl the Easterling and
   // adds it to the staging area", 906101:A:2; rr.search). It is not revealed. Nothing happens when no copy is in those places. The deck is
-  // shuffled by a ShuffleEncounterDeck after it (the line says so).
-  z.strictObject({ verb: z.literal("SearchToStaging"), code: z.string().min(1), ...when }),
+  // shuffled by a ShuffleEncounterDeck after it (the line says so). In a quest card's Setup it runs at the top level ("Search the encounter deck for Gollum, and add it to the staging area", 02105:A:1).
+  verbFlags(z.strictObject({ verb: z.literal("SearchToStaging"), code: z.string().min(1), ...when }), { setupRuns: "top" }),
   // The source enemy attacks the actor now, as an attack outside the combat phase: from the staging area though it is not engaged, or while
   // it is engaged with the actor ("Southern Spy makes an immediate attack against you", 906203:A:1). It is dealt a shadow card of its own.
   // Nothing happens when it is engaged with another player or out of play.
@@ -47,11 +48,13 @@ const VERBS = [
   // A shadow effect: the topmost card of the encounter discard pile that has a Shadow effect is dealt to the attacking enemy as one more
   // shadow card, and resolves in this attack after the ones it has ("Deal and resolve the topmost Shadow effect in the encounter discard
   // pile for this attack", 900107:A:3; rr.step-6-4-2). Nothing happens with none there.
-  z.strictObject({ verb: z.literal("DealShadowFromDiscard"), ...when }),
+  // `trait`: the topmost card with this Trait that has a Shadow effect ("Deal the topmost Tantrum card in the encounter discard pile as a new shadow card for this attack, if able", 900909:A:2).
+  z.strictObject({ verb: z.literal("DealShadowFromDiscard"), trait: z.string().min(1).optional(), ...when }),
   // The source enemy engages a player who is engaged with an enemy that matches `pick` ("Anduin Troll Spawn engages a player engaged with a
   // Hill Troll", 900203:A:2); the first player chooses among several (rr.first-player). Nothing happens when no player is, or when the source
   // is already engaged with one who is. `seat` is engine use: the player chosen.
-  z.strictObject({ verb: z.literal("EngageSeatWith"), pick: pickSchema, ...when }),
+  // `controls`: the player is one who controls a card in play that matches `pick` ("engages the player who controls Wilyador", 900603:A:2), whatever it is engaged with now: an enemy engaged with another player leaves that one.
+  z.strictObject({ verb: z.literal("EngageSeatWith"), pick: pickSchema, controls: z.literal(true).optional(), ...when }),
   // The enemy with the most printed hit points in the victory display and the encounter discard pile becomes the picked card; the first player
   // chooses among a tie ("Search the victory display and encounter discard pile for the enemy with the most hit points", 900207:A:1). Nothing
   // is picked with no enemy there.
@@ -88,8 +91,13 @@ const VERBS = [
   z.strictObject({ verb: z.literal("MoveResourceFromHeroes"), to: cardRefSchema, ...when }),
   // Places `amount` resource tokens on the card the reference names, an encounter card: it is no hero's resource pool, so nothing collects it and
   // no `resourcesAdded` is announced ("Add 1 resource token to each Dol Guldur location in play", 900302:A:1; "place 1 resource token on
-  // Dungeon Labyrinth for each player in the game", 900306:A:2).
-  z.strictObject({ verb: z.literal("PlaceResourceTokens"), amount: positiveAmountSchema, on: cardRefSchema, ...when }),
+  // Dungeon Labyrinth for each player in the game", 900306:A:2). With `code` instead of `on`: the card in play with that code ("Place 2 resource tokens on Gollum", 02108:A:1); when none is in play the tokens go on a card in play that holds
+  // `redirectResources` ("If Gollum is not in play, any resource tokens that would be placed on Gollum are placed here instead", 900802:A:2), else nowhere.
+  z.strictObject({ verb: z.literal("PlaceResourceTokens"), amount: positiveAmountSchema, on: cardRefSchema.optional(), code: z.string().min(1).optional(), ...when }).refine((verb) => (verb.on == null) !== (verb.code == null), "PlaceResourceTokens names a card or a code, not both"),
+  // Deals `amount` damage to the card the reference names (the answered event's subject by default) unless a card with the source's title has already dealt it damage this round ("deal 1 damage to that character if it has not been dealt damage by another copy of
+  // Brambles and Thorns this round", 900704:A:1). When damage is dealt (the card's damage grew: a shield or cap that prevented it all leaves it undealt) the card is marked for the round by that title (the flag `damagedByTitle`), so each copy that resolves
+  // afterwards finds it marked. Read by nightmare/damage-once.ts.
+  z.strictObject({ verb: z.literal("DamageOncePerRound"), amount: z.number().int().positive(), target: cardRefSchema.optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -123,6 +131,8 @@ const FLAGS = [
   // you are engaged with this enemy, you cannot attack or deal damage (through effects) to enemies with a title other than Marshland
   // Outlaws", 900202:A:1). Read by combat.ts canAttack and the DamageCard verb (families/nightmare/guards.ts).
   "attackOnlyTitle",
+  // On a card, until the end of the round: a card with the modifier's source's title dealt it damage this round (DamageOncePerRound, 900704:A:1).
+  "damagedByTitle",
 ] as const;
 
 export const manifest = { name: "nightmare", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -284,6 +284,7 @@ function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<Pic
   if (!host || host.controller == null) return false;
   const type = cardTypeOf(host, printedOf(ctx.cards, host.code));
   if (on.type === "hero" ? type !== "hero" : type !== "hero" && type !== "ally") return false;
+  if (on.minWillpower != null && modifiedStat(state, host, "willpower", ctx.cards) < on.minWillpower) return false;
   return on.control === "any" || (on.control === "you") === (host.controller === asking);
 }
 

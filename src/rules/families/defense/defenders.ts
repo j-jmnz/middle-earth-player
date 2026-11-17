@@ -14,7 +14,8 @@ import { readyCard } from "../../interpret/player-verbs.ts";
 import { isCharacterType, printedOf, type PrintedCard, type Sphere } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
-import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, modifierActive, updateCard } from "../../core/state.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
 import { groupResources } from "./conditions.ts";
 import { noteAttackDamage } from "./damage.ts";
 import { combatDamage } from "./excess.ts";
@@ -25,6 +26,16 @@ type Cards = ReadonlyMap<string, PrintedCard>;
 
 // The triggers that read which defenders took damage: their marks are kept while some card listens to one of them.
 const MARKED = ["declaredDefender", "enemyAttacks", "defended", "defendedUnharmed", "defenderDestroyed"] as const;
+
+// Whether the defender stays ready as it is declared against the attack's enemy: it never exhausts to defend (`noExhaustDefend`), or the enemy has the Trait it does not exhaust against (`noExhaustDefendVersus`, 02037:A:1).
+export function staysReadyToDefend(state: ScenarioState, defenderId: string, ctx: ReduceContext): boolean {
+  if (flagged(state, defenderId, "noExhaustDefend")) return true;
+  const enemyId = state.pendingAttack?.enemyId;
+  if (enemyId == null) return false;
+  return state.modifiers.some(
+    (modifier) => modifier.stat === "noExhaustDefendVersus" && modifier.instanceId === defenderId && modifier.amount > 0 && modifierActive(state, modifier) && modifier.when?.kind === "defendingAgainst" && hasTrait(state, enemyId, modifier.when.trait, ctx),
+  );
+}
 
 export function withDefense(attack: PendingAttack, patch: Partial<AttackDefense>): PendingAttack {
   return { ...attack, defense: { ...attack.defense, ...patch } };
@@ -76,7 +87,7 @@ export function addDefender(state: ScenarioState, id: string, ctx: ReduceContext
   const attack = state.pendingAttack;
   const card = state.cards[id];
   if (!attack || !card || !inPlay(card.zone) || !isCharacterType(printedOf(ctx.cards, card.code)) || declaredDefenders(attack).includes(id)) return state;
-  const exhausted = card.exhausted || flagged(state, id, "noExhaustDefend") ? state : updateCard(state, id, { exhausted: true });
+  const exhausted = card.exhausted || staysReadyToDefend(state, id, ctx) ? state : updateCard(state, id, { exhausted: true });
   const current = exhausted.pendingAttack ?? attack;
   const joined: PendingAttack = current.defenderId ? withDefense(current, { extra: [...(current.defense?.extra ?? []), id] }) : { ...current, defenderId: id };
   const declared = queueEvent({ ...exhausted, pendingAttack: joined }, { trigger: "declaredDefender", seat: attack.seat, cardId: id, other: attack.enemyId });
