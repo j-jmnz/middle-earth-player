@@ -51,6 +51,7 @@ import { rhosgobelFixtures } from "./shadows-of-mirkwood/a-journey-to-rhosgobel.
 import { muilFixtures } from "./shadows-of-mirkwood/the-hills-of-emyn-muil.ts";
 import { deadmarshesFixtures } from "./shadows-of-mirkwood/the-dead-marshes.ts";
 import { returnmirkwoodFixtures } from "./shadows-of-mirkwood/return-to-mirkwood.ts";
+import { osgiliathFixtures } from "./the-massing-at-osgiliath.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -111,4 +112,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-hills-of-emyn-muil": () => muilFixtures(),
   "the-dead-marshes": () => deadmarshesFixtures(),
   "return-to-mirkwood": () => returnmirkwoodFixtures(),
+  "the-massing-at-osgiliath": () => osgiliathFixtures(),
 };

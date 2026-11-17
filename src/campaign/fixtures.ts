@@ -59,6 +59,7 @@ import rhosgobelFixtures from "./fixtures/a-journey-to-rhosgobel.json";
 import muilFixtures from "./fixtures/the-hills-of-emyn-muil.json";
 import deadmarshesFixtures from "./fixtures/the-dead-marshes.json";
 import returnmirkwoodFixtures from "./fixtures/return-to-mirkwood.json";
+import osgiliathFixtures from "./fixtures/the-massing-at-osgiliath.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -136,6 +137,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-hills-of-emyn-muil": muilFixtures,
   "the-dead-marshes": deadmarshesFixtures,
   "return-to-mirkwood": returnmirkwoodFixtures,
+  "the-massing-at-osgiliath": osgiliathFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
