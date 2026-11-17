@@ -110,6 +110,19 @@
     },
     {
       "match": {
+        "code": "00001"
+      },
+      "set": {
+        "traits": [
+          "Nazgûl",
+          "Captain"
+        ]
+      },
+      "reason": "Hall of Beorn's export garbles the trait as 'Nazg√l' (the encoding that also garbles 'Lórien' above). The scan prints 'Nazgûl. Captain.'; Nazgûl is the trait of every other Nazgûl card.",
+      "source": "scan 00001.A (data/printed/standalone-scenarios.json)"
+    },
+    {
+      "match": {
         "code": "12100"
       },
       "set": {

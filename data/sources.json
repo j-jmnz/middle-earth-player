@@ -20746,10 +20746,148 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "e052988ef4489eb6707c510d5678b9e89ba3cc7a66faeca1716ea3f7b398722c"
+        "value": "cbe5af867730352a7f46876f848732e6a50952ff7a3ae3eecd6bb3f3b6b7bc11"
       },
-      "fetchedAt": "2026-11-16T14:05:20.364Z",
+      "fetchedAt": "2026-11-17T13:52:10.891Z",
       "files": [
+        {
+          "path": "scans/00001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/The-Witch-king.jpg",
+          "sha256": "edc65a37e18e1f4f6dddea3fd635c66f83307800a6801890eebd75f4614be256",
+          "bytes": 148665
+        },
+        {
+          "path": "scans/00002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Snaga-Scouts.jpg",
+          "sha256": "5bb5339cda4daacad6f4bf07d5d90e8d358d0525221045205d26a2c4f70c4a4a",
+          "bytes": 148267
+        },
+        {
+          "path": "scans/00003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wolves-from-Mordor.jpg",
+          "sha256": "cd0f1265ea7c0a0338d2ffbb0fe09a76dca81158bb85146ecd19f47ef7958d4a",
+          "bytes": 148245
+        },
+        {
+          "path": "scans/00004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wainriders.jpg",
+          "sha256": "8e2770335f7bb259abae22f525c0127e878b718275ff4dbef7742716a56a1c0b",
+          "bytes": 148525
+        },
+        {
+          "path": "scans/00005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wainrider-Captain.jpg",
+          "sha256": "7ebdd7d81c43a7d4a5e8b8742b08924fe24e34eb9d3fb5ddf9e6bf1b89c1c04e",
+          "bytes": 151739
+        },
+        {
+          "path": "scans/00006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Uruk-Vanguard.jpg",
+          "sha256": "7b6322a4cce0a7302b309c7ae26c1846935eb8d0534f6e4bdfa0b2a826d18139",
+          "bytes": 150165
+        },
+        {
+          "path": "scans/00007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Captured-Watchtower.jpg",
+          "sha256": "e2f91976f49961b81a5d994a24cdca015705e99ca5eaa710e72ec427aaee1ab7",
+          "bytes": 146950
+        },
+        {
+          "path": "scans/00008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Emyn-Arnen-Overlook.jpg",
+          "sha256": "fbabc4f8ef93f7535aa9981b5d7e9ad79dd556e8f97e4b10050e33e659d8fe0e",
+          "bytes": 141269
+        },
+        {
+          "path": "scans/00009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Morgulduin.jpg",
+          "sha256": "a923a7e5ef99cab29bb98267d35acee7faaf5c16a4162e567f2bbe7b5f702c00",
+          "bytes": 158383
+        },
+        {
+          "path": "scans/00010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Pelennor-Fields.jpg",
+          "sha256": "94c76dfa07bf3b1318159c8b766f3c0fe64d4b667e713358a681693ad6b5d699",
+          "bytes": 150238
+        },
+        {
+          "path": "scans/00011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Ruins-of-Osgiliath.jpg",
+          "sha256": "7f56b63be137659c7bbd20758f7eb76327d74db7fb37b21e49bc8715a6abb469",
+          "bytes": 141889
+        },
+        {
+          "path": "scans/00012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Cut-Off.jpg",
+          "sha256": "739d0b3e527b94de07cf3e65638803ecfc6bbaa8426c45a7d2b386ec07745c00",
+          "bytes": 151767
+        },
+        {
+          "path": "scans/00013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Dark-Pursuit.jpg",
+          "sha256": "8f8fe6875a55912b9ed8fbf4be499226bd693b9b465c3117a647a7a6fbe4358a",
+          "bytes": 154763
+        },
+        {
+          "path": "scans/00014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Massing-at-Osgiliath.jpg",
+          "sha256": "c73d2bad7b41ab09379c35f5c9351bbd1a2b8ec90203f211484b70c8274c34ff",
+          "bytes": 150336
+        },
+        {
+          "path": "scans/00015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Ranger-of-Ithilien.jpg",
+          "sha256": "b60bf1a01b0cede84b430da209d3d5251653e23bd9498934cc4293b7a03231eb",
+          "bytes": 152222
+        },
+        {
+          "path": "scans/00016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Beyond-Expectations-1A.jpg",
+          "sha256": "d02359d589e7b7af4fc4eac054cf3ea20a9d71d210afe98298dc38241f04d427",
+          "bytes": 159527
+        },
+        {
+          "path": "scans/00016.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Beyond-Expectations-1B.jpg",
+          "sha256": "5383a9e6bf6ebb5184ce4af4fd0d399c37beebf736175e0df245a5086a590891",
+          "bytes": 139768
+        },
+        {
+          "path": "scans/00017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Through-the-Ruins-2A.jpg",
+          "sha256": "15be5405ccf6db787cc642e0c3a4a1418de97cc79ce4b3cbcf093d0e27e7b180",
+          "bytes": 137702
+        },
+        {
+          "path": "scans/00017.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Through-the-Ruins-2B.jpg",
+          "sha256": "485b5a07b5acacc5d64b33f46a1a76cd2709293910489435eef4d50b5958df2d",
+          "bytes": 140411
+        },
+        {
+          "path": "scans/00018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Anduin-Crossing-3A.jpg",
+          "sha256": "35bb83dd2a7ef62d2a633dc057b2c065db4fac48d68720934e8af71b33ad8e0e",
+          "bytes": 153383
+        },
+        {
+          "path": "scans/00018.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Anduin-Crossing-3B.jpg",
+          "sha256": "9c55aa63435cd28e2ec863c0bc9fb2278a6a5734700a674800eb3e3a47e6eb29",
+          "bytes": 144588
+        },
+        {
+          "path": "scans/00019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Race-to-Minas-Tirith-4A.jpg",
+          "sha256": "4c83f77fd6b0fe83e5e324fb6f85433404bdab54b68b67b0ed07990c7c2b22ed",
+          "bytes": 131873
+        },
+        {
+          "path": "scans/00019.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Race-to-Minas-Tirith-4B.jpg",
+          "sha256": "e422811f86be1a5cb22b65e16b30ad72afefd8a496fe3e907a80cdff0e76eb23",
+          "bytes": 125945
+        },
         {
           "path": "scans/01001.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Aragorn.jpg",

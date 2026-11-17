@@ -1,0 +1,390 @@
+{
+  "campaign": "standalone-scenarios",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+  ],
+  "entries": [
+    {
+      "code": "00001",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/The-Witch-king.jpg",
+        "sha256": "edc65a37e18e1f4f6dddea3fd635c66f83307800a6801890eebd75f4614be256"
+      },
+      "lines": [
+        "Players cannot play attachments on The Witch-king.",
+        "While The Witch-king is in the staging area, each character gets -1 Willpower.",
+        "Forced: After The Witch-king attacks, he returns to the staging area unless the defending player raises his threat by 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00002",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Snaga-Scouts.jpg",
+        "sha256": "5bb5339cda4daacad6f4bf07d5d90e8d358d0525221045205d26a2c4f70c4a4a"
+      },
+      "lines": [
+        "Forced: At the beginning of the encounter phase, all copies of Snaga Scouts engage the player with the lowest threat. (The first player chooses in case of a tie.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00003",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wolves-from-Mordor.jpg",
+        "sha256": "cd0f1265ea7c0a0338d2ffbb0fe09a76dca81158bb85146ecd19f47ef7958d4a"
+      },
+      "lines": [
+        "Forced: After Wolves from Mordor attack and destroy a character, shuffle Wolves from Mordor into the encounter deck.",
+        "Shadow: Deal 2 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00004",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wainriders.jpg",
+        "sha256": "8e2770335f7bb259abae22f525c0127e878b718275ff4dbef7742716a56a1c0b"
+      },
+      "lines": [
+        "Each damage dealt by Wainriders raises the defending player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00005",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wainrider-Captain.jpg",
+        "sha256": "7ebdd7d81c43a7d4a5e8b8742b08924fe24e34eb9d3fb5ddf9e6bf1b89c1c04e"
+      },
+      "lines": [
+        "When Revealed: Move the top Scout enemy from the encounter discard pile to the staging area. (Top 2 Scout enemies instead if the players have crossed the Anduin.)",
+        "Shadow: If this attack is undefended, attacking enemy gets +2 Attack if it is a Scout."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00006",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Uruk-Vanguard.jpg",
+        "sha256": "7b6322a4cce0a7302b309c7ae26c1846935eb8d0534f6e4bdfa0b2a826d18139"
+      },
+      "lines": [
+        "If the players have crossed the Anduin, Uruk Vanguard gets +3 Attack.",
+        "Shadow: attacking enemy gets +1 Attack. (+2 Attack instead if players have crossed the Anduin)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00007",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Captured-Watchtower.jpg",
+        "sha256": "e2f91976f49961b81a5d994a24cdca015705e99ca5eaa710e72ec427aaee1ab7"
+      },
+      "lines": [
+        "If the players have crossed the Anduin, Captured Watchtower gets +3 Threat.",
+        "Shadow: Remove all defending characters from combat. This attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00008",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Emyn-Arnen-Overlook.jpg",
+        "sha256": "fbabc4f8ef93f7535aa9981b5d7e9ad79dd556e8f97e4b10050e33e659d8fe0e"
+      },
+      "lines": [
+        "The first Scout enemy revealed from the encounter deck each round gains surge and doomed 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00009",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Morgulduin.jpg",
+        "sha256": "a923a7e5ef99cab29bb98267d35acee7faaf5c16a4162e567f2bbe7b5f702c00"
+      },
+      "lines": [
+        "While Morgulduin is the active Location, it gains: 'Forced: When a character commits to a Quest, deal 1 damage to that character.'",
+        "Shadow: If the players have not yet crossed the Anduin, return any current active location to the staging area. Morgulduin becomes the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00010",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Pelennor-Fields.jpg",
+        "sha256": "94c76dfa07bf3b1318159c8b766f3c0fe64d4b667e713358a681693ad6b5d699"
+      },
+      "lines": [
+        "If the players have crossed the Anduin, Pelennor Fields gains: 'When faced with the option to travel, the players must either travel to Pelennor Fields or raise each player's threat by 3.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00011",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Ruins-of-Osgiliath.jpg",
+        "sha256": "7f56b63be137659c7bbd20758f7eb76327d74db7fb37b21e49bc8715a6abb469"
+      },
+      "lines": [
+        "If the players have not crossed the Anduin, Ruins of Osgiliath gets +3 Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00012",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Cut-Off.jpg",
+        "sha256": "739d0b3e527b94de07cf3e65638803ecfc6bbaa8426c45a7d2b386ec07745c00"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player must discard all ally cards from his hand, if able.",
+        "Shadow: Defending player must discard 1 ally card from his hand or attacking enemy gets +3 Attack. (2 allies instead if this attack is undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00013",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Dark-Pursuit.jpg",
+        "sha256": "8f8fe6875a55912b9ed8fbf4be499226bd693b9b465c3117a647a7a6fbe4358a"
+      },
+      "lines": [
+        "When Revealed: Raise the total Threat of the staging area by 1 for each Scout enemy in play. If there are no Scout enemies in play, Dark Pursuit gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00014",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Massing-at-Osgiliath.jpg",
+        "sha256": "c73d2bad7b41ab09379c35f5c9351bbd1a2b8ec90203f211484b70c8274c34ff"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Until the end of the phase, each card revealed by the encounter deck gains doomed 1. (Doomed 3 instead if the players have crossed the Anduin.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00015",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Ranger-of-Ithilien.jpg",
+        "sha256": "b60bf1a01b0cede84b430da209d3d5251653e23bd9498934cc4293b7a03231eb"
+      },
+      "lines": [
+        "When Revealed: The first player takes control of Ranger of Ithilien, exhausted and committed to the quest. Then, Ranger of Ithilien gains surge.",
+        "Shadow: Deal 2 damage to attacking enemy. The defending player may exhaust a character he controls to take control of Ranger of Ithilien."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00016",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Beyond-Expectations-1A.jpg",
+        "sha256": "d02359d589e7b7af4fc4eac054cf3ea20a9d71d210afe98298dc38241f04d427"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area. Remove The Witch-king from the encounter deck and set him aside, out of play. Shuffle any unused Scout cards back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00016",
+      "side": "B",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Beyond-Expectations-1B.jpg",
+        "sha256": "5383a9e6bf6ebb5184ce4af4fd0d399c37beebf736175e0df245a5086a590891"
+      },
+      "lines": [
+        "Players cannot travel to West Bank locations."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00017",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Through-the-Ruins-2A.jpg",
+        "sha256": "15be5405ccf6db787cc642e0c3a4a1418de97cc79ce4b3cbcf093d0e27e7b180"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00017",
+      "side": "B",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Through-the-Ruins-2B.jpg",
+        "sha256": "485b5a07b5acacc5d64b33f46a1a76cd2709293910489435eef4d50b5958df2d"
+      },
+      "lines": [
+        "Players cannot travel to West Bank locations.",
+        "Each player cannot play or put into play more than 1 card from his hand each round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00018",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Anduin-Crossing-3A.jpg",
+        "sha256": "35bb83dd2a7ef62d2a633dc057b2c065db4fac48d68720934e8af71b33ad8e0e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00018",
+      "side": "B",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Anduin-Crossing-3B.jpg",
+        "sha256": "9c55aa63435cd28e2ec863c0bc9fb2278a6a5734700a674800eb3e3a47e6eb29"
+      },
+      "lines": [
+        "Progress tokens from card effects cannot be placed on this quest card or the active location.",
+        "Players cannot travel to East Bank or West Bank locations.",
+        "In order to commit characters to the quest, a player must first choose a hero or 1 Ranger of Ithilien card he controls. Discard each chosen card from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00019",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Race-to-Minas-Tirith-4A.jpg",
+        "sha256": "4c83f77fd6b0fe83e5e324fb6f85433404bdab54b68b67b0ed07990c7c2b22ed"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00019",
+      "side": "B",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Race-to-Minas-Tirith-4B.jpg",
+        "sha256": "e422811f86be1a5cb22b65e16b30ad72afefd8a496fe3e907a80cdff0e76eb23"
+      },
+      "lines": [
+        "When Revealed: Add The Witch-king to the staging area.",
+        "Players have now crossed the Anduin. Players cannot travel to East Bank locations.",
+        "If the players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    }
+  ]
+}
