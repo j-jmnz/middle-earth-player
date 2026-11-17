@@ -8,7 +8,7 @@ import { defendingAgainst } from "../families/angmar/combat.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
-import type { CardInstance, ScenarioState } from "./state.ts";
+import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
@@ -39,6 +39,12 @@ export { printedStat };
 // The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
 const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
 
+// A modifier a player card gives: its source is a player card (an attachment's bonus, a hero's ability, an event).
+function fromPlayerCard(state: ScenarioState, modifier: Modifier, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const source = state.cards[modifier.sourceId];
+  return source != null && isPlayerType(printedOf(cards, source.code));
+}
+
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
 // A set modifier overrides every other one, the most recent set winning (rr.modifiers).
 export function modifiedStat(
@@ -56,6 +62,8 @@ export function modifiedStat(
   // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
   let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
   let set: number | null = null;
+  // The table's noWillpowerGain, read once and only if a raise of Willpower is met.
+  let gainBarred: boolean | undefined;
   // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2), or its Defense (900506:A:1).
   let floor = total;
   for (const modifier of state.modifiers) {
@@ -70,6 +78,11 @@ export function modifiedStat(
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).
     if (modifier.when?.kind === "attacking" && !attackingHolds(state, modifier.when, instance, { effects: [], cards }, against)) continue;
+    // "Characters cannot gain Willpower from player card effects" (901306:A:1): a raise from a player card is not counted; a reduction is.
+    if (stat === "willpower" && !modifier.set && modifier.amount > 0) {
+      gainBarred ??= flagged(state, "table", "noWillpowerGain");
+      if (gainBarred && fromPlayerCard(state, modifier, cards)) continue;
+    }
     if (modifier.set) set = modifier.amount;
     else total += modifier.amount;
     if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
@@ -108,12 +121,14 @@ export function versusHighEngagement(
 
 // The holder is the enemy making the attack in progress and the character defending it has at most this many printed hit points (142071:A:2).
 // With `ally`, the defender is an ally (12054:A:2).
-export function versusDefender(state: ScenarioState, holder: CardInstance, versus: { maxHitPoints?: number; ally?: true }, cards: ReadonlyMap<string, PrintedCard>): boolean {
+export function versusDefender(state: ScenarioState, holder: CardInstance, versus: { maxHitPoints?: number; maxWillpower?: number; ally?: true }, cards: ReadonlyMap<string, PrintedCard>): boolean {
   const attack = state.pendingAttack;
   if (!attack || attack.enemyId !== holder.id || attack.defenderId == null || attack.undefended) return false;
   const defender = state.cards[attack.defenderId];
   const printed = defender ? printedOf(cards, defender.code) : null;
   if (printed == null || (versus.ally === true && cardTypeOf(defender!, printed) !== "ally")) return false;
+  // "if the defending character has less than 2 Willpower" (901303:A:1): its current Willpower, modifiers counted.
+  if (versus.maxWillpower != null && modifiedStat(state, defender!, "willpower", cards) > versus.maxWillpower) return false;
   return versus.maxHitPoints == null || (printed.health != null && printed.health <= versus.maxHitPoints);
 }
 

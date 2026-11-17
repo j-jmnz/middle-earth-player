@@ -16,7 +16,7 @@ import { exhaustCard, lastPicked, placePlayerDamage, readyCard, seatOf } from ".
 import { isCharacterType, isPlayerType, printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Modifier, QueueItem, ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { topFrame } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
@@ -126,12 +126,14 @@ function askNumber(state: ScenarioState, max: number, option: (n: number) => Sim
 }
 
 // The card commits to the quest without exhausting (rr.step-3-2 exhausts only for the commitment step itself), and the cards that
-// answer a commitment hear it. With `stat: "attack"` it quests with its Attack until the phase ends.
+// answer a commitment hear it; a character that cannot quest stays out. With `stat: "attack"` it quests with its Attack until the phase ends.
 function commitToQuest(state: ScenarioState, instruction: Verb<"CommitToQuest">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.committed || card.controller == null || (card.zone !== "heroes" && card.zone !== "play")) return state;
   if (!isCharacterType(printedOf(ctx.cards, card.code))) return state;
+  // A character that cannot quest ("Attached hero ... cannot commit to a quest", 04023:A:1) or a table where no character may commit (143078:B:1) is not committed by an effect either.
+  if (flagged(state, id, "cannotQuest") || flagged(state, "table", "cannotCommit")) return state;
   let next = updateCard(state, id, { committed: true });
   steps.push({ kind: "commit", cardId: id });
   if (instruction.stat === "attack") next = addModifier(next, id, focus.sourceId ?? id, "questsWithAttack", 1, "endOfPhase");

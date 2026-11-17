@@ -29,7 +29,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10039:A:2 (front): When Revealed: Search the encounter deck for 1 copy of Prison Cell, reveal it, and add it to your staging area. Then, capture an additional 2 cards from the top of your captured deck underneath that copy of Prison Cell.
   10039:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player searches the encounter deck and discard pile for a card, reveals it and adds it to the staging area [also {"code":"10046","deckOnly":true}]
+    - the acting player searches the encounter deck and discard pile for the card with code 10046, a a card, reveals it and adds it to the staging area [also {"deckOnly":true}]
     - [json CaptureFromDeck {"verb":"CaptureFromDeck","amount":2,"end":"top","under":{"code":"10046"}}]
 
 10039:B:1 (back): Any time players would place progress tokens on this quest, rescue an equal number of captured cards at random from underneath it instead. (Progress is placed on the active location before triggering this effect.)

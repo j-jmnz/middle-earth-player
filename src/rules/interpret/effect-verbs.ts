@@ -1,5 +1,6 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
+import { redirectProgress } from "../families/quest/blizzard.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "../quest/explore.ts";
@@ -117,10 +118,14 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   if (!location) return state;
   const points = questPointsOf(state, location, ctx.cards);
   // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south/locations.ts).
-  const placed = Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards));
-  if (placed <= 0) return state;
+  const wanted = Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards));
+  if (wanted <= 0) return state;
+  // A Blinding Blizzard in the staging area takes the progress a Snow location would (families/quest/blizzard.ts, 901307:A:2).
+  const redirected = redirectProgress(state, id, wanted, ctx.cards, steps);
+  const placed = redirected.remaining;
+  if (placed <= 0) return redirected.state;
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED), ...(placedBy != null ? { seat: placedBy } : {}) });
-  const next = notePlaced(updateCard(state, id, { progress: location.progress + placed }), id, placed);
+  const next = notePlaced(updateCard(redirected.state, id, { progress: location.progress + placed }), id, placed);
   // Under Exploration a location with progress equal to its quest points is not explored; it remains in play (dcce.exploration).
   if (points == null || location.progress + placed < points || exploring(next)) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);

@@ -127,6 +127,8 @@ export const pickSchema = z.strictObject({
     control: z.enum(["you", "other", "any"]),
     // The host's current Willpower is at least this ("each character you control with 3 or more Willpower", 900807:A:2).
     minWillpower: z.number().int().min(0).optional(),
+    // The host is committed to the quest ("an attachment from a questing character", 03054:A:1).
+    committed: z.boolean().optional(),
   }).optional(),
   // Not the card the source is attached to ("each other questing character" on an attachment).
   notHost: z.boolean().optional(),
@@ -323,6 +325,8 @@ export const pickSchema = z.strictObject({
   // Of the cards that match, only those with the highest Attack, as the table shows it ("the engaged Ship enemy with the highest Attack", 12131:A:1); every one of them when tied, and then the chooser decides.
   // Read by the sea family (src/rules/families/sea/ramming.ts).
   highestAttack: z.literal(true).optional(),
+  // Of the cards that match, only those with the highest current Willpower, as the table shows it ("discard the ally you control with the highest Willpower", 901304:A:2); every one of them when tied, and then the chooser decides. Read by src/rules/interpret/pick.ts.
+  highestWillpower: z.literal(true).optional(),
   // Of the cards that match, only those with the lowest Attack or the lowest Threat, as the table shows it ("the lowest Attack Harad enemy engaged with you", 144036:A:2; "the lowest Threat Harad enemy in the staging area", 144038:A:2); every one of them
   // when tied, and then the chooser (the player who reveals) decides. Read by the harad family (src/rules/families/harad/pick.ts).
   lowestAttack: z.literal(true).optional(),

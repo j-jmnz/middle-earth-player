@@ -339,7 +339,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12054:A:2 (front): Giant Arm gets +2 Attack when attacking allies.
   12054:constant:1: Constant
-    - if [json condition {"kind":"versusDefender","ally":true}]: this card: stat attack 2, while this card is in play
+    - if the card holding this stat is an enemy attacking a declared defender that is an ally: this card: stat attack 2, while this card is in play
 
 12054:A:3 (shadow): Shadow: After this attack, either put Giant Arm into play engaged with you and deal it a shadow card, or resolve its Grapple keyword.
   12054:shadow:1: Shadow
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 170 by template, 32 as JSON)
+(rendered pieces: 171 by template, 31 as JSON)

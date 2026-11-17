@@ -215,7 +215,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19047:A:1 (front): Setup: The first player takes control of Urdug, objective side face-up. Set each other objective and objective-ally aside, out of play. Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.
   19047:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"19052"}]
+    - the set-aside card with code 19052 enters play under the first player's control, ready
     - shuffle the encounter deck
     - for each player, first player first:
       - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
@@ -424,4 +424,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19055:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) named "Urdug")
     - engage this card
 
-(rendered pieces: 319 by template, 29 as JSON)
+(rendered pieces: 320 by template, 28 as JSON)

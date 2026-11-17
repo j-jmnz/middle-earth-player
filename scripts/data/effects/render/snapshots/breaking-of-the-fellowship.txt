@@ -226,7 +226,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142071:A:2 (front): Uruk-hai Tracker gets +2 Attack against characters with 2 or fewer printed hit points.
   142071:constant:1: Constant
-    - if [json condition {"kind":"versusDefender","maxHitPoints":2}]: this card: stat attack 2, while this card is in play
+    - if the card holding this stat is an enemy attacking a declared defender with 2 or fewer printed hit points: this card: stat attack 2, while this card is in play
 
 142071:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   142071:shadow:1: Shadow
@@ -433,4 +433,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 200 by template, 46 as JSON)
+(rendered pieces: 201 by template, 45 as JSON)

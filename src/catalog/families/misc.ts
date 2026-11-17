@@ -106,6 +106,9 @@ const FLAGS = [
   "dealsNoDamage",
   // The holder loses the Eagle trait ("Attached character loses the Eagle trait", 900607:A:2): hasTrait reads no Eagle trait on it, whether printed or gained.
   "losesEagle",
+  // On "table": the player cards in the victory display are worth no victory points ("During this game, player cards in the victory display do not count their victory points", 901301:A:2): victoryPointsOf (core/printed-stat.ts) reads 0 for them, in the
+  // stage's bar, the amount and the score.
+  "playerVictoryIgnored",
 ] as const;
 
 export const manifest = { name: "misc", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

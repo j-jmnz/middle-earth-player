@@ -115,7 +115,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
   03045:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the encounter discard pile holds a enemy): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - [json ActAs {"verb":"ActAs","who":"firstPlayer"}]
+    - the rest of the effect is carried out by the first player
     - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
     - then, if the encounter discard pile holds a enemy (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
@@ -356,4 +356,4 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
   03076:forced:3: Forced on the event questCardDefeated (heard about this card)
     - the players win the game
 
-(rendered pieces: 236 by template, 20 as JSON)
+(rendered pieces: 237 by template, 19 as JSON)

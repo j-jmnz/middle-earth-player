@@ -13,6 +13,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { flagged, heldAmount, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { exploring } from "../island/map.ts";
+import { redirectProgress } from "../quest/blizzard.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 export type Slot = "activeLocation" | "secondActiveLocation";
@@ -112,13 +113,22 @@ export function placeOnActive(state: ScenarioState, amount: number, cards: Cards
     const id = activeLocations(next).find((candidate) => hasQuestPoints(printedOf(cards, next.cards[candidate]?.code ?? "")) && progressRoom(next, candidate, cards) > 0);
     const location = id ? next.cards[id] : undefined;
     if (!id || !location) break;
-    const placed = Math.min(remaining, progressRoom(next, id, cards));
-    next = notePlaced(updateCard(next, id, { progress: location.progress + placed }), id, placed);
-    steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("rr.step-3-4") });
-    remaining -= placed;
-    const points = questPointsOf(next, location, cards);
-    // Under Exploration a location that is full stays in play (families/island/map.ts).
-    if (points != null && location.progress + placed >= points && !exploring(next)) next = destroyCard(next, id, cards, steps, true);
+    const wanted = Math.min(remaining, progressRoom(next, id, cards));
+    // A Blinding Blizzard takes the progress a Snow location would (901307:A:2): the location's whole share is spent, so the quest gets no more of the tokens.
+    const redirected = redirectProgress(next, id, wanted, cards, steps);
+    const placed = redirected.remaining;
+    const diverted = wanted - placed;
+    remaining -= diverted;
+    next = redirected.state;
+    if (placed > 0) {
+      next = notePlaced(updateCard(next, id, { progress: location.progress + placed }), id, placed);
+      steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("rr.step-3-4") });
+      remaining -= placed;
+      const points = questPointsOf(next, location, cards);
+      // Under Exploration a location that is full stays in play (families/island/map.ts).
+      if (points != null && location.progress + placed >= points && !exploring(next)) next = destroyCard(next, id, cards, steps, true);
+    }
+    if (diverted > 0) break;
   }
   return { state: next, remaining };
 }

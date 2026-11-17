@@ -19,7 +19,7 @@ import { patchTop } from "../../windows/windows.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import type { Focus } from "../index.ts";
 import { runEncounterItem } from "./items.ts";
-import { countTop, discardUntil, effectData, encounterCard, lookAtTop, moveEncounter, pushPicked, shuffleDiscardIn, shuffleVictoryIn, travelThere } from "./moves.ts";
+import { countTop, discardUntil, effectData, encounterCard, lookAtTop, moveEncounter, pushPicked, shuffleDiscardAndVictoryIn, shuffleDiscardIn, shuffleVictoryIn, travelThere } from "./moves.ts";
 import { answeredRaise } from "./reveal.ts";
 import { revealTopEnemies } from "./top-enemies.ts";
 import { searchCollection } from "./collection.ts";
@@ -66,7 +66,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ReturnFromDiscard":
       return returnFromDiscard(state, instruction, focus, ctx, steps);
     case "ShuffleEncounterDiscard":
-      return shuffleDiscardIn(state, ctx, instruction.trait, instruction.type, instruction.name);
+      return instruction.alsoVictory === true ? shuffleDiscardAndVictoryIn(state, ctx, instruction.trait, instruction.type, instruction.name) : shuffleDiscardIn(state, ctx, instruction.trait, instruction.type, instruction.name);
     case "DiscardUntil":
       return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait);
     case "ResolveWhenRevealed": {

@@ -134,7 +134,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19012:A:2 (front): Attached enemy or location is immune to player card effects.
   19012:constant:1: Constant
-    - each card (any player controls) [also {"attachedTo":"source"}]: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) attached to this card: stat immuneToPlayerCards 1, while this card is in play
 
 19012:A:3 (front): When Dragon Sign is free of encounters, add it to the victory display.
   19012:constant:2: Constant
@@ -390,4 +390,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 299 by template, 40 as JSON)
+(rendered pieces: 300 by template, 39 as JSON)
