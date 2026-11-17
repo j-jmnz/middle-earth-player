@@ -15,7 +15,7 @@ const UNDEFENDED: Condition = { kind: "undefended" };
 const IN_ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const CARADHRAS_IN_STAGING: PickSpec = { type: "location", control: "any", stagingOnly: true, names: ["Caradhras"] };
 const CARADHRAS_IS_ACTIVE: Condition = { kind: "matches", card: "activeLocation", pick: { type: "location", control: "any", names: ["Caradhras"] } };
-const CARADHRAS_NOT_STAGED: Condition = { kind: "not", condition: { kind: "canPick", pick: CARADHRAS_IN_STAGING } };
+const CARADHRAS_IN_DECK_OR_DISCARD: Condition = { kind: "searchable", code: CARADHRAS };
 const ATTACHMENT_ON_QUESTING_CHARACTER: PickSpec = { type: "attachment", control: "any", on: { type: "character", control: "any", committed: true }, who: "firstPlayer" };
 const FREEZING_COLD_ON_HOST: PickSpec = { type: "attachment", control: "any", names: [FREEZING_COLD], attachedTo: "host" };
 const MOUNTAIN_IN_STAGING: PickSpec = { type: "location", control: "any", stagingOnly: true, trait: "Mountain" };
@@ -122,8 +122,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       subject: "self",
       instructions: [
         { verb: "Discard", target: { kind: "activeLocation" }, when: { kind: "not", condition: CARADHRAS_IS_ACTIVE } },
-        // Only the one Caradhras exists: with it in the staging area (or active) the search finds nothing. The deck is shuffled before the search takes the card out of it, the same deck as shuffling after.
-        { verb: "ShuffleEncounterDeck", when: CARADHRAS_NOT_STAGED },
+        // The deck is shuffled only when Caradhras is searched out of the deck or its discard pile (the shuffle before the search leaves the same deck as one after); from the staging area or the victory display the deck keeps the order Fell Voices gave it.
+        { verb: "ShuffleEncounterDeck", when: CARADHRAS_IN_DECK_OR_DISCARD },
         { verb: "SearchMove", code: CARADHRAS, to: "staging", victory: true },
         { verb: "Pick", pick: CARADHRAS_IN_STAGING, when: { kind: "canPick", pick: CARADHRAS_IN_STAGING } },
         { verb: "MakeActive", when: { kind: "canPick", pick: CARADHRAS_IN_STAGING } },
@@ -169,15 +169,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     { id: "04015:constant:2", cardCode: CARADHRAS, lines: ["04015:A:2"], timing: "constant", instructions: [{ verb: "Restrict", what: "travel", location: CARADHRAS }] },
 
-    // 04016 Fanuidhol. While it is the active location every hero's Willpower counts only if its controller spends 1 resource from that hero's pool: a hero with no resource counts 0, and a player may keep a resource back. The question is asked at the end of the staging step
-    // (once Snowstorm, Avalanche! and the other effects of the staging step have run), in player order, for each committed hero with a resource (agent recommendation, docs/brief.md, The Redhorn Gate).
+    // 04016 Fanuidhol. While it is the active location every hero's Willpower counts only if its controller spends 1 resource from that hero's pool: a hero with no resource counts 0, and a player may keep a resource back. The question is asked when the quest total is counted
+    // (after the staging step and the action window that follows it), in player order, for each committed hero with a resource (docs/brief.md, The Redhorn Gate).
     { id: "04016:constant:1", cardCode: "04016", lines: ["04016:A:1"], timing: "constant", condition: IN_ACTIVE, instructions: [{ verb: "ModifyStat", stat: "willpowerCostsResource", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "any" } }] },
     {
       id: "04016:forced:1",
       cardCode: "04016",
       lines: ["04016:A:1"],
       timing: "forced",
-      trigger: "stagingStepEnds",
+      trigger: "questTotalCounted",
       condition: IN_ACTIVE,
       instructions: [
         {
@@ -192,7 +192,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
                   verb: "Choose",
                   who: "actor",
                   options: [
-                    { id: "pay", instructions: [{ verb: "DiscardResources", amount: 1, target: "picked" }, { verb: "ModifyStat", stat: "countsWillpower", amount: 1, until: "endOfPhase", target: "picked" }] },
+                    { id: "pay", instructions: [{ verb: "SpendResources", amount: 1, target: "picked" }, { verb: "ModifyStat", stat: "countsWillpower", amount: 1, until: "endOfPhase", target: "picked" }] },
                     { id: "keep", instructions: [] },
                   ],
                 },
@@ -249,7 +249,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       ],
     },
 
-    // 04021 Fallen Stones. When Revealed: the first player chooses to remove every progress token from play (on the current quest, the active location, the locations in the staging area and Blinding Blizzard), or to reveal 2 cards and add them to the staging area.
+    // 04021 Fallen Stones. When Revealed: the first player chooses to remove every progress token from play (on the current quest, the active location, the locations in the staging area, a side quest and Blinding Blizzard), or to reveal 2 cards and add them to the staging area.
     {
       id: "04021:whenRevealed:1",
       cardCode: "04021",
@@ -265,6 +265,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
               instructions: [
                 { verb: "RemoveAllProgress", pick: { type: "location", control: "any" } },
                 { verb: "RemoveAllProgress", target: "questStage" },
+                { verb: "RemoveAllProgress", pick: { type: "card", control: "any", cardType: "player-side-quest" } },
+                { verb: "RemoveAllProgress", pick: { type: "card", control: "any", cardType: "encounter-side-quest" } },
                 { verb: "RemoveAllProgress", pick: { type: "treachery", control: "any", names: ["Blinding Blizzard"] } },
               ],
             },
@@ -287,7 +289,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 04023 Freezing Cold. When Revealed: the first player attaches it to a hero he controls. It counts as a Condition attachment: the hero gets -2 Willpower and cannot commit to the quest, and with more than 1 copy attached it is discarded from play.
-    { id: "04023:whenRevealed:1", cardCode: "04023", lines: ["04023:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } }] },
+    { id: "04023:whenRevealed:1", cardCode: "04023", lines: ["04023:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer", unlimited: true } }] },
     {
       id: "04023:constant:1",
       cardCode: "04023",

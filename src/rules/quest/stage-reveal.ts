@@ -19,6 +19,7 @@ import { flagged, withMode, type ScenarioState } from "../core/state.ts";
 import { areaSeats, stageSeat } from "../families/breaking/areas.ts";
 import { payOwed } from "../families/breaking/progress.ts";
 import { fireForced } from "../windows/triggers.ts";
+import { heard } from "../families/quest/events.ts";
 import { announceStageRevealed } from "../families/nightmare/setup.ts";
 import { timeOnReveal } from "../families/angmar/time.ts";
 
@@ -27,6 +28,9 @@ import { timeOnReveal } from "../families/angmar/time.ts";
 // the phase. The phase does not end while a new stage is still resolving.
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.questResolved) return finish({ ...state, questResolved: false });
+  // The quest total is about to be counted: the cards that charge for a committed Willpower ask now, once, after the window that follows the staging step (rr.step-3-4).
+  const counted = announceQuestTotal(state, ctx, steps);
+  if (counted) return counted;
   // A location that may take the progress first asks the players once (Explorer's Almanac, families/attachments/quest.ts).
   const asked = askQuestProgress(state, ctx, steps);
   if (asked) return asked;
@@ -42,6 +46,13 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
   return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);
+}
+
+// "Forced: when the quest total is counted" (04016:A:1, Fanuidhol): fired once a phase, only in a game with a card that hears it (the marker is the table's `questTotalAnnounced`).
+function announceQuestTotal(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
+  if (!heard(state, ctx, "questTotalCounted") || flagged(state, "table", "questTotalAnnounced")) return null;
+  const marked: ScenarioState = { ...state, window: null, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questTotalAnnounced", amount: 1, until: "endOfPhase" }] };
+  return fireForced(marked, { trigger: "questTotalCounted", seat: null }, ctx, steps);
 }
 
 // A card in the game answers a failed quest with an X amount (Urdug's Gambit, 19051:B:2): the event carries the shortfall for it.
