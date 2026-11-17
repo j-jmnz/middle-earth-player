@@ -10,9 +10,9 @@
   <p>
     <a href="#android"><img alt="Android: APK" src="https://img.shields.io/badge/Android-APK-3E5A48?style=for-the-badge&logo=android&logoColor=white&labelColor=1E2328"></a>
     <a href="#iphone-and-ipad"><img alt="iPhone and iPad: SideStore or AltStore" src="https://img.shields.io/badge/iPhone%20%C2%B7%20iPad-SideStore-3E5A48?style=for-the-badge&logo=apple&logoColor=white&labelColor=1E2328"></a>
-    <a href="#windows-macos-and-linux"><img alt="Windows: installer" src="https://img.shields.io/badge/Windows-.exe-3E5A48?style=for-the-badge&logo=windows&logoColor=white&labelColor=1E2328"></a>
-    <a href="#windows-macos-and-linux"><img alt="macOS: disk image" src="https://img.shields.io/badge/macOS-.dmg-3E5A48?style=for-the-badge&logo=apple&logoColor=white&labelColor=1E2328"></a>
-    <a href="#windows-macos-and-linux"><img alt="Linux: AppImage" src="https://img.shields.io/badge/Linux-AppImage-3E5A48?style=for-the-badge&logo=linux&logoColor=white&labelColor=1E2328"></a>
+    <a href="#windows-macos-and-linux"><img alt="Windows: installer, experimental" src="https://img.shields.io/badge/Windows-.exe%20%C2%B7%20experimental-3E5A48?style=for-the-badge&logo=windows&logoColor=white&labelColor=1E2328"></a>
+    <a href="#windows-macos-and-linux"><img alt="macOS: disk image, experimental" src="https://img.shields.io/badge/macOS-.dmg%20%C2%B7%20experimental-3E5A48?style=for-the-badge&logo=apple&logoColor=white&labelColor=1E2328"></a>
+    <a href="#windows-macos-and-linux"><img alt="Linux: AppImage, experimental" src="https://img.shields.io/badge/Linux-AppImage%20%C2%B7%20experimental-3E5A48?style=for-the-badge&logo=linux&logoColor=white&labelColor=1E2328"></a>
   </p>
   <p>
     <a href="#install"><strong>Install</strong></a> ·
@@ -20,6 +20,9 @@
     <a href="#private-by-design"><strong>Privacy</strong></a> ·
     <a href="#get-involved"><strong>Get involved</strong></a> ·
     <a href="#support"><strong>Support</strong></a>
+  </p>
+  <p>
+    <a href="https://discord.gg/9tY2jVy32"><img alt="Join the Discord server" src="https://img.shields.io/badge/Discord-Join%20the%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=1E2328"></a>
   </p>
   <p>
     <a href="https://github.com/j-jmnz/middle-earth-player/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release"></a>
@@ -128,9 +131,9 @@ The app isn't in any app store. Get it from the [Releases page](https://github.c
 | --- | --- | --- |
 | Android | Android 7.0 or later, 64-bit | `.apk` |
 | iPhone, iPad | iOS 15.1 or later, a free Apple ID, and SideStore or AltStore Classic. A computer once, for setup. | `source.json` or `.ipa` |
-| Windows | 64-bit | `.exe` installer or portable `.zip` |
-| macOS | Apple silicon or Intel | `.dmg` |
-| Linux | 64-bit x86 | `.AppImage` or `.deb` |
+| Windows (experimental) | 64-bit | `.exe` installer or portable `.zip` |
+| macOS (experimental) | Apple silicon or Intel | `.dmg` |
+| Linux (experimental) | 64-bit x86 | `.AppImage` or `.deb` |
 
 Use Wi-Fi, and have twice the download size free. The desktop downloads are large because every card picture and booklet is inside.
 
@@ -180,7 +183,10 @@ If a release's notes have a TestFlight link, you can use that instead: install [
 
 <a name="windows-macos-and-linux"></a>
 <details>
-<summary><strong>Windows, macOS and Linux</strong></summary>
+<summary><strong>Windows, macOS and Linux</strong> (experimental)</summary>
+
+> [!WARNING]
+> The desktop apps are experimental. They are newer and less tested than the phone apps, so expect rough edges. If something breaks, [open an issue](https://github.com/j-jmnz/middle-earth-player/issues/new/choose) with your OS and the app version from Settings.
 
 The desktop apps aren't signed by Microsoft or Apple, so the first launch shows a warning. Download your file from Assets on the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest):
 
