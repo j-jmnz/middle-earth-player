@@ -42,7 +42,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   LowerThreat: [{ verb: "LowerThreat", amount: 2, who: "eachSeat" }],
   ReturnToStaging: [{ verb: "ReturnToStaging", target: "picked" }],
   EngageLastPlayer: [{ verb: "EngageLastPlayer" }],
-  AttachSetAside: [{ verb: "AttachSetAside", code: "03041", removeWhenLeaving: true }],
+  AttachSetAside: [{ verb: "AttachSetAside", code: "03041", removeWhenLeaving: true }, { verb: "AttachSetAside", code: "03024", claimed: true }],
   ReturnToStage: [{ verb: "ReturnToStage", stage: 2 }],
   RemoveAllProgress: [{ verb: "RemoveAllProgress", target: "self" }, { verb: "RemoveAllProgress", pick: HERO }],
   RemoveProgressEach: [{ verb: "RemoveProgressEach", amount: 1, pick: HERO }],
