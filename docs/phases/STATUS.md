@@ -14,10 +14,9 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ## Phases
 
-No phase is open.
-
 | Phase | Work | Status | Note |
 | --- | --- | --- | --- |
+| 62 | [Dwarrowdelf cycle](phase-62-dwarrowdelf.md) | active | 2026-11-17: data first, then the nine scenarios |
 
 ## Open items
 
