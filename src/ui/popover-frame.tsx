@@ -24,7 +24,8 @@ export type PressableRef = ComponentRef<typeof Pressable>;
 const ROW = 48;
 const FROM_SCALE = 0.96;
 // The frame's inner padding: rows sit this far inside its edge, so their pressed fill is a rounded plate of its own.
-const PAD = 6;
+export const POPOVER_PAD = 6;
+const PAD = POPOVER_PAD;
 
 export type PopoverRowItem = {
   testID: string;

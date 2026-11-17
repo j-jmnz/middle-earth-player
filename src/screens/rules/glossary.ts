@@ -5,6 +5,7 @@ import entries from "../../../data/rules/entries.json";
 import { parseRuleEntries, type RuleEntry } from "../../catalog/rule-entry";
 import { bookletName, type BookletId } from "../booklets/books";
 import { fold } from "../kit/fold";
+import type { RuleTip } from "../../play/cards/keyword-tip-types";
 
 export type GlossaryEntry = RuleEntry & { source: string };
 
@@ -117,7 +118,7 @@ export function scenarioRuleDoc(scenarioId: string, bookletId: string | undefine
  * What a keyword chip's bubble shows for a rule span: its paragraphs without the "See also:" line, where it is printed, and whether the
  * Rules tab can open it (a span of a document the glossary does not list cannot).
  */
-export function ruleTip(id: string): { paragraphs: readonly string[]; source: string; openable: boolean } | null {
+export function ruleTip(id: string): RuleTip | null {
   all ??= new Map(parsedEntries().map((entry) => [entry.id, entry]));
   const entry = all.get(id);
   const source = ruleSource(id);

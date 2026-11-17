@@ -1,4 +1,4 @@
-// Rules: rr.restricted, rr.resource-match (data/rules/entries.json).
+// Rules: rr.restricted, rr.resource-match, trg.secrecy (data/rules/entries.json).
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { resolveAmount } from "../interpret/amounts.ts";

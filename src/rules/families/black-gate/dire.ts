@@ -1,4 +1,4 @@
-// Rules: mec113.dire (data/rules/entries.json). While the main quest has the Dire keyword each player's threat elimination level is 99 and their threat cannot be reduced by more than 1 each round by non-boon player card effects.
+// Rules: mec113.dire, bts.valour (data/rules/entries.json). While the main quest has the Dire keyword each player's threat elimination level is 99 and their threat cannot be reduced by more than 1 each round by non-boon player card effects.
 // The keyword is a printed flag of the quest card (`dire`, catalog/keyword-line.ts); the table keeps it in `state.dire` so eliminateEmpties, which reads no card catalog, can ask for the level. The Valour threshold (80 under Dire, 40 otherwise) is read by the `threat` condition marked `valour` (interpret/conditions.ts).
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";

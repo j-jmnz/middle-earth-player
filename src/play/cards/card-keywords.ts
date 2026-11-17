@@ -3,11 +3,10 @@
 // A card's keywords as they stand now, for the table's card preview: the printed ones, the ones a card effect gives (Sentinel, Ranged, Surge,
 // Toughness, Archery, Immune, Phantom), and the printed ones an effect or a blank text box takes away. Every reading goes through the engine's own
 // reader where it has one (hasKeyword, hasPhantom, indestructible, playerCardEffectCanChoose, heldAmount); this file only puts the answers in a list.
-import { keywordsKept } from "../../rules/families/angmar/blank.ts";
-import { textBlank } from "../../rules/families/attachments/hold.ts";
+import { cardArchery } from "../../rules/combat/combat.ts";
+import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import { hasPhantom } from "../../rules/families/grey-company/phantom.ts";
-import { heldAmountByClass } from "../../rules/core/holder-classes.ts";
-import { hasKeyword, indestructible, playerCardEffectCanChoose } from "../../rules/core/keywords.ts";
+import { hasKeyword, indestructible, playerCardEffectCanChoose, printedKeywordsBlank, toughnessOf } from "../../rules/core/keywords.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { flagged, heldAmount } from "../../rules/core/state.ts";
@@ -18,7 +17,7 @@ import { KEYWORD_RULES, type KeywordKey } from "./keyword-rules.ts";
 export type CardKeyword = { key: KeywordKey; word: string; lost: boolean };
 
 // Keywords with a printed flag or value and no reader of their own: shown while the text counts, struck through when the card lost its keywords.
-const PRINTED_FLAGS = ["peril", "permanent", "battle", "siege", "sailing", "uncharted", "dire"] as const;
+const PRINTED_FLAGS = ["peril", "permanent", "battle", "siege", "sailing", "dire"] as const;
 const PRINTED_VALUES = ["hide", "secrecy", "boarding", "aflame"] as const;
 
 /** The card's keywords now, in KEYWORD_RULES' order. Empty for a card that is not in the game. */
@@ -28,7 +27,7 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   const printed = printedOf(ctx.cards, instance.code);
   const kw = printed.keywords;
   // A blank text box has none of its printed keywords unless a modifier keeps them (rr.blank); a card that lost its keywords has none of the printed ones.
-  const usable = !(textBlank(game, cardId, ctx.cards) && !keywordsKept(game, cardId, ctx.cards));
+  const usable = !printedKeywordsBlank(game, cardId, ctx.cards);
   const lostAll = flagged(game, cardId, "losesKeywords");
   const found = new Map<KeywordKey, CardKeyword>();
   const add = (key: KeywordKey, lost: boolean, value?: number) => {
@@ -41,6 +40,8 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
 
   for (const key of PRINTED_FLAGS) shown(key, kw[key] === true);
   for (const key of PRINTED_VALUES) shown(key, (kw[key] ?? 0) > 0, kw[key] ?? undefined);
+  // Uncharted is on the Lost Island side only (dcce.uncharted); the charted side of a double-sided location has none.
+  shown("uncharted", isLostIsland(instance, ctx));
   shown("grapple", kw.grapple != null);
   shown("doomed", (kw.doomed ?? 0) > 0, kw.doomed ?? undefined);
   shown("restricted", kw.restricted);
@@ -56,10 +57,11 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   }
 
   // A number a card effect adds to the printed one: Archery and Toughness show their sum.
-  const archery = heldAmountByClass(game, instance, printed, "archery");
+  const { keyword, own } = cardArchery(game, ctx.cards, instance);
+  const archery = keyword - (kw.archery ?? 0) + own;
   if (archery > 0) add("archery", false, (usable ? (kw.archery ?? 0) : 0) + archery);
   else shown("archery", (kw.archery ?? 0) > 0, kw.archery ?? undefined);
-  const toughness = printed.type === "enemy" ? heldAmount(game, cardId, "toughness") : 0;
+  const toughness = toughnessOf(game, cardId, printed) - (printed.type === "enemy" ? (kw.toughness ?? 0) : 0);
   if (toughness > 0) add("toughness", false, (usable ? (kw.toughness ?? 0) : 0) + toughness);
   else shown("toughness", (kw.toughness ?? 0) > 0, kw.toughness ?? undefined);
 

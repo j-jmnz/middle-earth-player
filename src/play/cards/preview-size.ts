@@ -35,13 +35,22 @@ export function tokenLines(tokens: string, width: number, scale = 1, text = 1): 
   return Math.max(1, Math.ceil(tokens.length / chars));
 }
 
+// A keyword chip's label line (text-label: 13 pt on a 17 pt line, ui tailwind config) and the capsule's vertical padding and border (keyword-tips.tsx).
+const CHIP_LINE_PX = 17;
+const CHIP_PAD_PX = 10;
+
+/** The height of the upright chip row, in screen points: a 44 pt target, or the capsule when the label's line at the phone's text size is taller. */
+export function chipRowHeight(scale = 1, text = 1): number {
+  return Math.max(touch(scale, 44), (CHIP_LINE_PX * text + CHIP_PAD_PX) * scale);
+}
+
 /**
  * The height the strip under an upright card takes, in screen points: the row of the cards with it (a 44 pt target and its 16 pt gap) and
- * the keyword chips' one row (a 44 pt target and its 8 pt gap), the tokens line (12 pt above it and `tokenRows` lines of it, each as tall as the phone's text size makes it). The card gives it up
+ * the keyword chips' one row (`chipRowHeight` and its 8 pt gap), the tokens line (12 pt above it and `tokenRows` lines of it, each as tall as the phone's text size makes it). The card gives it up
  * (`previewSize`), so a taller line at a larger text size takes it from the card, never from the controls.
  */
 export function previewStrip(a: { chips: boolean; tokenRows: number; keywords?: boolean }, scale = 1, text = 1): number {
-  return (a.chips ? touch(scale, 44) + 16 * scale : 0) + (a.keywords === true ? touch(scale, 44) + 8 * scale : 0) + (a.tokenRows > 0 ? 12 * scale + a.tokenRows * TOKEN_LINE_PX * scale * text : 0);
+  return (a.chips ? touch(scale, 44) + 16 * scale : 0) + (a.keywords === true ? chipRowHeight(scale, text) + 8 * scale : 0) + (a.tokenRows > 0 ? 12 * scale + a.tokenRows * TOKEN_LINE_PX * scale * text : 0);
 }
 
 /**

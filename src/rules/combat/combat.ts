@@ -8,7 +8,7 @@ import type { EngineStep } from "../core/intents.ts";
 import { hasKeyword, modifiedStat, placeDamage } from "../core/keywords.ts";
 import { heldAmountByClass } from "../core/holder-classes.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "../core/printed.ts";
-import type { ScenarioState } from "../core/state.ts";
+import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, heldAmount, livingSeats, updateCard } from "../core/state.ts";
 import { dealOneShadow, type ReduceContext } from "../interpret/interpret.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -30,20 +30,28 @@ import { offeredTargets, stagingAttackable, withCardTargets } from "../families/
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
+// The archery one card in play counts: `keyword` is its printed value and what effects added to it ("gains archery 4", dcce.archery; the effects of several
+// cards are cumulative), `own` what it gives itself (Archery X with X "the number of players at this stage", 142070:A:1; "+2 archery in the staging area",
+// 142078:A:1), which can be negative. The total below and the card preview's keyword chips both read it, so they say the same number.
+export function cardArchery(state: ScenarioState, cards: Cards, instance: CardInstance): { keyword: number; own: number } {
+  const printed = printedOf(cards, instance.code);
+  const keyword = (printed.keywords.archery ?? 0) + heldAmountByClass(state, instance, printed, "archery");
+  if (state.modifiers.length === 0) return { keyword, own: 0 };
+  // One player at each separate stage, the players in the game before that.
+  const players = flagged(state, instance.id, "archeryPlayers") ? (state.separate ? 1 : livingSeats(state).length) : 0;
+  return { keyword, own: heldAmount(state, instance.id, "archeryBonus") + players };
+}
+
 // The archery total. Once stages are separate it is calculated at each stage (mec109.multiple-staging-areas): `seat`'s staging area, its engaged
 // enemies and its stage.
 export function archeryTotal(state: ScenarioState, cards: Cards, seat?: number): number {
   const stage = seat != null && state.separate ? new Set([...(state.seats[seat]?.staging ?? []), ...(state.seats[seat]?.engaged ?? []), ...(state.seats[seat]?.stage ? [state.seats[seat]?.stage ?? ""] : [])]) : null;
-  // Archery X with X "the number of players at this stage" (142070:A:1): one player at each separate stage, the players in the game before that.
-  const players = state.separate ? 1 : livingSeats(state).length;
   let total = 0;
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (stage && !stage.has(instance.id))) continue;
-    // Archery gained ("gains archery 4", dcce.archery) adds to the printed value; the effects of several cards are cumulative.
-    const value = (printedOf(cards, instance.code).keywords.archery ?? 0) + heldAmountByClass(state, instance, printedOf(cards, instance.code), "archery");
-    if (value > 0) total += value;
-    // Archery a card in play gives itself (142070:A:1, 142078:A:1).
-    if (state.modifiers.length > 0) total += heldAmount(state, instance.id, "archeryBonus") + (flagged(state, instance.id, "archeryPlayers") ? players : 0);
+    const { keyword, own } = cardArchery(state, cards, instance);
+    if (keyword > 0) total += keyword;
+    total += own;
   }
   // Archery a seat's stage gains until the end of the round (142082:A:1).
   for (const index of livingSeats(state)) if (seat == null || index === seat) total += heldAmount(state, `seat:${index}`, "archeryBonus");

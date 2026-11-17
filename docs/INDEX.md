@@ -54,7 +54,7 @@ Read the sections your task touches.
   - 245–248 Support (~90)
   - 249–264 Attribution (~410)
   - 265–268 License (~50)
-- `docs/architecture.md` — Architecture (~27.7K tok)
+- `docs/architecture.md` — Architecture (~27.8K tok)
   - 7–42 Stack (~1.3K)
   - 43–78 Processes (~680)
   - 79–162 Modules (~2.4K) ← 3
@@ -153,7 +153,7 @@ Read the sections your task touches.
   - 1987–2014 Persistence and shipping (~3.2K) ← 10
   - 2015–2056 Screens (~5.1K) ← 2
     - 2041–2056 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~59.5K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~59.7K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
   - 24–27 Table menu (~490) ← 2
@@ -161,7 +161,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–109 Cards (~21.3K) ← 27
+  - 59–109 Cards (~21.6K) ← 27
   - 110–115 The Sailing test (~690) ← 5
   - 116–129 The Island Map (~1.8K) ← 8
   - 130–133 Tokens and effects (~360)

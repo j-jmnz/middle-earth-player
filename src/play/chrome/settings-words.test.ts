@@ -74,7 +74,7 @@ describe("the long details", () => {
   it("name the phone's own setting and say what each choice does", () => {
     expect(CONTRAST_LINE).toContain("while Increase Contrast is on");
     expect(TABLE_LIST_LINE).toContain("only while VoiceOver is on");
-    expect(TIMING_TIPS_LINE).toContain("Valour");
+    expect(TIMING_TIPS_LINE).toBe("On the table, a card's large view adds a chip for each timing word (When Revealed, Shadow, Forced, Response, Action, Travel, Setup, Valour). Tap one for its rule.");
     expect(SPEED_LINE).toContain("one and a half times as long");
     expect(TITLE_FACE_LINE).toContain("Plain draws them in the text's face, in semibold");
   });

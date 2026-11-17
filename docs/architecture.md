@@ -348,7 +348,7 @@ Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaign
 | Card pool | the deck-legal card rows, read and sorted once for the app run (`src/screens/pool/cache.ts`, shared with the deck import), then filtered in memory; `image_files`. One view (`src/screens/pool/card-pool.tsx`: `CardPoolBody`, and `CardPool` around it) is the Cards tab, the deck editor's `/pool?adding=1` and, in an expanded window, the pane beside the deck | the open deck draft, when adding |
 | Deck list | catalog, `decks` | `decks` (duplicate, delete, reset a starter) |
 | Packs | `packs`; a pack's cards | nothing |
-| Rules | `data/rules/entries.json`, parsed by `src/catalog/rule-entry.ts` (the one rule-span type the build, the table's causes and the glossary share), through `src/screens/rules/glossary.ts`: the Rules Reference, Learn to Play, FAQ, Easy Mode and MEC109 rule spans, searched in memory (`src/screens/rules/view.tsx`, also the `/glossary` route the table opens); the two books open the booklet route | nothing |
+| Rules | `data/rules/entries.json`, parsed by `src/catalog/rule-entry.ts` (the one rule-span type the build, the table's causes and the glossary share), through `src/screens/rules/glossary.ts`: the Rules Reference, Learn to Play, FAQ, Easy Mode, MEC109 and the other booklets' and rulesheets' rule spans (`trg`, `bts`, `jtr`, `hoem`, `tdm`, `rtm`, ...), searched in memory (`src/screens/rules/view.tsx`, also the `/glossary` route the table opens); the two books open the booklet route | nothing |
 | Deck | catalog, `decks` | `decks` |
 | Booklet | one `booklets` row and the file under `booklets/`; the import, the file copy and the reader view are in `src/screens/booklets/` | last page |
 

@@ -143,9 +143,17 @@ export function addModifier(
 }
 
 // The damage a card takes of `amount` once Toughness has reduced it (mec109.toughness): the printed keyword, and the Toughness the card holds from a card effect ("gains Toughness 2 until the end of the round", 143043:A:2).
+export function toughnessOf(state: ScenarioState, id: string, printed: PrintedCard): number {
+  return printed.type === "enemy" ? (printed.keywords.toughness ?? 0) + heldAmount(state, id, "toughness") : 0;
+}
+
 export function placedAmount(state: ScenarioState, id: string, printed: PrintedCard, amount: number): number {
-  const toughness = printed.type === "enemy" ? (printed.keywords.toughness ?? 0) + heldAmount(state, id, "toughness") : 0;
-  return Math.max(0, amount - toughness);
+  return Math.max(0, amount - toughnessOf(state, id, printed));
+}
+
+// Whether a card's printed keywords count: a card whose printed text box is blank has none of them, unless a keepsKeywords modifier says they stay (09054:A:1); one gained from another source stays (rr.blank).
+export function printedKeywordsBlank(state: ScenarioState, id: string, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  return textBlank(state, id, cards) && !keywordsKept(state, id, cards);
 }
 
 export function raiseThreat(
@@ -435,8 +443,7 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   const instance = state.cards[id];
   if (!instance) return false;
   const printed = printedOf(cards, instance.code);
-  // A card whose printed text box is blank has none of its printed keywords, unless a keepsKeywords modifier says they stay (09054:A:1); one gained from another source stays (rr.blank).
-  const blank = textBlank(state, id, cards) && !keywordsKept(state, id, cards);
+  const blank = printedKeywordsBlank(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
   if (keyword === "ranged" && flagged(state, id, "loseRanged")) return false;
   if (keyword === "sentinel" && flagged(state, id, "loseSentinel")) return false;
