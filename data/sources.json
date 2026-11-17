@@ -7,7 +7,7 @@
         "kind": "git",
         "value": "629db897de0c5a82a72610ff76e22dc01f59a4ac"
       },
-      "fetchedAt": "2026-10-26T00:33:38.812Z",
+      "fetchedAt": "2026-11-17T18:27:05.861Z",
       "files": [
         {
           "path": "raw/dragncards/cardDb.tsv",
@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "00f4e967633a5c4e4b46efdb64d7994bc0bf34815b4a0c767dbcb2544791acf5"
+        "value": "2b585a1c218eef05dbca52e5821a2e3e00e95b1be5924ffedd5e210a3aab99a0"
       },
-      "fetchedAt": "2026-11-17T13:42:38.619Z",
+      "fetchedAt": "2026-11-17T18:27:03.780Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -457,6 +457,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Massing-at-Osgiliath",
           "sha256": "bc2ac83b5eb1b3712d1484a1a4b13fbabb4e7dc93b2831485763a0f66f3ff6a2",
           "bytes": 11322
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Battle-of-Lake-town.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Battle-of-Lake-town",
+          "sha256": "5466ee6e248674d7ba8fc4577fc264912cb7dd3f5ac43a74747693b18d266373",
+          "bytes": 10840
         }
       ]
     },

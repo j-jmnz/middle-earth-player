@@ -2,11 +2,11 @@
   "id": "standalone-scenarios",
   "name": "Standalone scenarios",
   "scenarios": [
-    "the-massing-at-osgiliath"
+    "the-massing-at-osgiliath",
+    "the-battle-of-lake-town"
   ],
   "kind": "cycle",
   "later": [
-    "The Battle of Lake-town",
     "The Stone of Erech",
     "The Old Forest",
     "Fog on the Barrow-downs",

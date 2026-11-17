@@ -1563,6 +1563,14 @@
       "pile": "staging",
       "reason": "DragnCards loads the 12 Scout cards (4 copies of each of the 3 titles) set aside (Q99.01). The quest card Beyond Expectations (00016) prints \"Setup: Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area. ... Shuffle any unused Scout cards back into the encounter deck.\", so one copy of Wainriders per player is staged and the other copies of its 4 stay in the encounter deck.",
       "source": "dragncards preBuiltDecks.json (Q99.01); Beyond Expectations 00016 printed Setup; hallofbeorn Scenarios/The-Massing-at-Osgiliath"
+    },
+    {
+      "scenario": "the-battle-of-lake-town",
+      "code": "50207",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads Lake-town set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: ... Search the encounter deck for Lake-town and add it to the staging area.\", so it is a staged objective at the start of the game.",
+      "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; hallofbeorn Scenarios/The-Battle-of-Lake-town"
     }
   ],
   "scenarioRemovals": [
@@ -1834,6 +1842,12 @@
   ],
   "productCodes": [
     {
+      "set": "The Battle of Lake-town",
+      "prefix": "502",
+      "reason": "Hall of Beorn numbers The Battle of Lake-town's cards 00001 to 00024 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of TBoLT. A code must name one card, so the Massing keeps its codes and Lake-town's are 502 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 2 for the pack's position in it (50201 Terror from the Mountain, 50224 Esgaroth Wharf). A later standalone scenario whose codes collide takes 50 and its position the same way.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Battle of Lake-town, Number, RingsDbCardId); ringsdb.com packs (TBoLT, cycle 50, position 2; no cards listed)"
+    },
+    {
       "set": "The Dark of Mirkwood",
       "prefix": "410",
       "reason": "Hall of Beorn numbers The Dark of Mirkwood's cards 02001 to 02051, which are the codes RingsDB gives The Hunt for Gollum (02004 is Winged Guardian and also Surprise Attack). RingsDB lists the nine burden, boon and adaptation cards of the box as 41041 to 41049 (Stalking Goblin is 02041 in Hall of Beorn and 41041 in RingsDB). The code is therefore 410 and the two-digit collector number, for every card of the box, so the quest, encounter and campaign cards RingsDB does not list take the same pattern (After the Raid 41001, The Oath 41050).",
@@ -1889,6 +1903,12 @@
     }
   ],
   "dragnPackAliases": [
+    {
+      "dragncards": "The Battle of Lake-Town",
+      "pack": "TBoLT",
+      "reason": "DragnCards spells the pack \"The Battle of Lake-Town\" (capital T) where Hall of Beorn and the cards print \"The Battle of Lake-town\", so the row's pack does not name the product. Its collector numbers (1 to 24) and names are Hall of Beorn's own, so the row's number and name find the card in TBoLT.",
+      "source": "DragnCards preBuiltDecks.json (Q99.02) and cardDb.tsv (packName The Battle of Lake-Town, numberInPack); hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Battle of Lake-town, Number)"
+    },
     {
       "dragncards": "Core Set",
       "pack": "RevCore",

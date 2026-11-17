@@ -1,6 +1,6 @@
 import type { NameIndex, SetupClause } from "./setup-text.ts";
 
-// Rules: none printed outside the quest card (The Massing at Osgiliath has no rulesheet: docs/brief.md, Data sources).
+// Rules: none printed outside the quest card (The Massing at Osgiliath and The Battle of Lake-town have no rulesheet: docs/brief.md, Data sources).
 // The sentences of the Standalone scenarios' stage 1A cards that the other readers do not read. Each pattern is quoted from a Setup line, names the cards it moves, and
 // returns null for a sentence it does not read (or whose card names find no card), so the scenario stays unbuilt and a name is never dropped silently.
 export function readStandaloneScenarios(sentence: string, names: NameIndex): SetupClause[] | null {
@@ -14,6 +14,16 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     const copies = scouts.reduce((sum, card) => sum + (card.quantity ?? 0), 0);
     if (titles.size === 0 || copies !== Number(match[1]) || Number(match[3]) !== titles.size) return null;
     return [{ kind: "stage", codes: scouts.map((card) => card.code), perPlayer: 1, count: 0 }];
+  }
+  // The Battle of Lake-town: "Shuffle all copies of Smaug into a separate Smaug Deck": the nine Smaug cards (three titles, three copies each) are dealt out of the encounter deck. The data keeps them
+  // set aside (every copy) until the engine half gives the Smaug deck a pile of its own.
+  if (/^Shuffle all copies of Smaug into a separate Smaug Deck$/i.test(sentence)) {
+    const smaug = names.cards.filter((card) => card.type === "enemy" && /^Smaug\b/.test(card.name) && card.encounterSet === "The Battle of Lake-town");
+    return smaug.length === 0 ? null : [{ kind: "aside", codes: [...new Set(smaug.map((card) => card.code))], allCopies: true }];
+  }
+  // "Then reveal 1 card from the encounter deck per player, and add it to the staging area": the first player reveals one card for each player, as "Each player reveals 1 card" does.
+  if ((match = /^Then reveal (\d+|an?|one) cards? from the encounter deck per player, and add it to the staging area$/i.exec(sentence))) {
+    return [{ kind: "eachPlayerReveals", count: /^\d+$/.test(match[1] ?? "") ? Number(match[1]) : 1 }];
   }
   if ((match = /^Remove (.+?) from the encounter deck and set (?:him|her|it|them) aside, out of play$/.exec(sentence))) {
     const codes = names.codesOf(match[1] ?? "");
