@@ -176,6 +176,8 @@ export type WindowSheet = {
   pass: string | null;
   passNote: string | null;
   armed: string | null;
+  // Set when passing ends the player's phase rather than one window (planning): the dock draws Pass in gold (DockReach, table-choice.ts).
+  passReach?: "phase";
 };
 
 export type Sheet = PickSheet | MultiSheet | DistributeSheet | TriggerSheet | OutcomeSheet | WindowSheet;

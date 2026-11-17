@@ -139,6 +139,14 @@ export function accentSurface(pressed = false, t: TableTokens = dark): Surface {
   return darkened(look, pressed);
 }
 
+/**
+ * The dock's primary when it reaches past one window (End planning): the same soft vertical fill in gold, so it never reads as the
+ * silver Pass of one window (docs/design-system-table.md, Two taps). Pressed, it darkens about 8%.
+ */
+export function phaseSurface(pressed = false, t: TableTokens = dark): Surface {
+  return darkened({ backgroundColor: t.phaseMid, backgroundImage: linear(`${t.phaseTop} 0%, ${t.phaseMid} 55%, ${t.phaseDeep} 100%`) }, pressed);
+}
+
 /** The primary's plate: the accent surface. Its corners are the capsule's (CONTROL_RADIUS). */
 export const accentPlate = accentSurface;
 
