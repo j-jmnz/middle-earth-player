@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.cancel, rr.attachment-cards, rr.forced, rr.shadow-effects, rr.last-player, dwd.last-player, dwd.book-of-mazarbul, faq.progress-without-advancing (data/rules/entries.json); ledger lines 03022:A:1, 03024:A:2, 03031:A:1, 03033:A:2, 03034:A:1, 03034:A:2, 03068:B:3, 901102:A:2, 901104:A:2.
+// Rules: rr.damage, rr.cancel, rr.attachment-cards, rr.forced, rr.shadow-effects, dwd.last-player, dwd.book-of-mazarbul, faq.progress-without-advancing (data/rules/entries.json); ledger lines 03022:A:1, 03024:A:2, 03031:A:1, 03033:A:2, 03034:A:1, 03034:A:2, 03068:B:3, 901102:A:2, 901104:A:2.
 // The Seventh Level's records that need more than one row: the Book moving between heroes and returning to the staging area, Hidden Threat's last player, Plundered Armoury's attachments and the host they may go on, the lines whose row would pass without
 // the record (what a record leaves alone), and Orc Taskmaster's Forced on the real record.
 import { describe, expect, it } from "vitest";

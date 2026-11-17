@@ -11,8 +11,8 @@ const level = loadAnyScenario("the-seventh-level");
 // Test helper. A whole standalone game of The Seventh Level played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The third hero of the first player (q3) stays out of the quest and attacks; the players engage Overseer Maurûl first (Nightmare), then enemies one each after the optional step, enemies after the optional step, travel as the auto-player does and take the first option of every choice.
 export const LEVEL_POLICY: PolicyOptions = { scout: "q3", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type LevelDecks = "strong" | "weak" | "brittle";
+// "strong": big-number heroes that win; "steady": strong attackers that quest slowly, so a game has more than a round of play; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
+export type LevelDecks = "strong" | "steady" | "weak" | "brittle";
 
 export const levelLoadout = fillerLoadout;
 
@@ -59,13 +59,13 @@ export type LevelGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-seventh-level/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type LevelGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: LevelDecks; outcome: "won" | "lost"; policy?: Partial<LevelPolicy>; lossReason?: string };
 
-// The games to pin (about 600 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed, on Normal, Easy and Nightmare, and the two ways to lose: the threat of every player at 50 (heroes too weak to quest) and every hero
+// The games to pin (about 500 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed, on Normal, Easy and Nightmare, and the two ways to lose: the threat of every player at 50 (heroes too weak to quest) and every hero
 // destroyed (heroes too brittle for the Goblins). The strong heroes quest through Search for the Chamber and The Fate of Balin in two rounds (on Nightmare they engage Overseer Maurûl and destroy him together first, since he bars the stage).
 export const LEVEL_GOLDENS: readonly LevelGolden[] = [
-  { name: "solo win", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win", seatCount: 1, seed: 2, difficulty: "Normal", decks: "steady", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy two-handed win", seatCount: 2, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "Nightmare solo win", seatCount: 1, seed: 3, difficulty: "Nightmare", decks: "strong", outcome: "won" },
+  { name: "Nightmare solo win", seatCount: 1, seed: 5, difficulty: "Nightmare", decks: "steady", outcome: "won" },
   { name: "Nightmare two-handed win", seatCount: 2, seed: 2, difficulty: "Nightmare", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 5, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 6, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
