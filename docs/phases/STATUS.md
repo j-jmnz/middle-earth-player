@@ -288,6 +288,10 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Renderer gaps, Mount Doom (behaviour proven by spec rows): `firstPlayerTens`, `stageProgress`, `mostPerPlayer`, `DiscardUntil`, `MoveEncounterCard`, `AssignDamage`, `SearchMove`, `TravelTo`, `LimitEntries`, `UncancelableWhenRevealed`, `ChooseOption`, `EndCampaign` and the campaign verbs print as JSON, `other` as a bare flag (146043 to 146057, 146075:A:1, 146076, 146078:B:1, 146079).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
+### Rules and engine (Dwarrowdelf)
+- Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
+- The Nightmare data carries quest-card removals, but `questDeckCodes` still deals the whole Nightmare quest deck; each scenario's Build applies them.
+
 ### Rules and engine (Shadows of Mirkwood)
 - The rulesheets of The Hunt for Gollum and Conflict at the Carrock (MEC02, MEC03) have no text layer, so their rules have no span in `data/rules`; `docs/brief.md` (The Hunt for Gollum, Conflict at the Carrock) cites the PDFs.
 - Readings settled only by community discussion are marked so under each scenario in `docs/brief.md` (Shadows of Mirkwood). Not user-confirmed.
