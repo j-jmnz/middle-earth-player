@@ -183,7 +183,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41033:A:1 (front): Travel: Players must exhaust a Cave Torch to travel here.
   41033:travel:1: Travel
-    - exhaust the card with code 41029
+    - exhaust "Cave Torch"
 
 41033:A:2 (shadow): Shadow: Cancel all combat damage dealt to attacking enemy.
   41033:shadow:1: Shadow
