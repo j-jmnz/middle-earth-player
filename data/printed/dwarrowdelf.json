@@ -1,0 +1,3167 @@
+{
+  "campaign": "dwarrowdelf",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+  ],
+  "entries": [
+    {
+      "code": "03014",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Patrol-Leader.jpg",
+        "sha256": "7c1a8216438fcbb0ca9a0910d0fae6786b023e8d63216815cf5fdb67c9de55d8"
+      },
+      "lines": [
+        "Forced: Before Patrol Leader is dealt damage, discard the top card of the encounter deck. If the discarded card is an enemy, cancel that damage.",
+        "Shadow: Cancel all damage dealt to this enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03015",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Signs-of-Conflict.jpg",
+        "sha256": "c21543c24b7bf130e5e7c102287a1a46a84f8b8b6072b96c447dc9c6c66da673"
+      },
+      "lines": [
+        "Doomed 2. Surge.",
+        "Shadow: Defending player raises his threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03016",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/East-gate.jpg",
+        "sha256": "ad78fb8b9d490756899a4a929f75a2623a91c79ed53ab87ba790f96f31a45e59"
+      },
+      "lines": [
+        "Immune to card effects.",
+        "Players cannot optionally engage enemies and no engagement checks are made.",
+        "Forced: After East-gate leaves play as an explored location, add First Hall to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03017",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/First-Hall.jpg",
+        "sha256": "56729810ea6b00f5ffa5d1fe9daaf8ef176994505b6c6ac7df6c7b98459f7bbd"
+      },
+      "lines": [
+        "Travel: Each player must raise his threat by 3 to travel here.",
+        "Forced: After First Hall leaves play as an explored location, add Bridge of Khazad-dûm to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03018",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Bridge-of-Khazad-dûm.jpg",
+        "sha256": "0d4f3c3f77d402fb97f4f21203ca05b9db3a256c3ab1c72506a993b7c19d25bb"
+      },
+      "lines": [
+        "While Bridge of Khazad-dûm is the active location, players cannot play cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03019",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Stairs-of-Náin.jpg",
+        "sha256": "fc9e1f5aad9799a1b5f114f13c6e06ac57f1340887785c11400767dd251643c3"
+      },
+      "lines": [
+        "Travel: The first player must exhaust 1 character he controls to travel here.",
+        "Shadow: Defending player must choose and exhaust 1 character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03035",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Follower.jpg",
+        "sha256": "a3d6731b2b6c5e6ec63f357ec76645976d88c648ecaf2a56469049a1457c749e"
+      },
+      "lines": [
+        "When Revealed: Goblin Follower engages the last player.",
+        "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if attacking the last player.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03036",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Branching-Paths.jpg",
+        "sha256": "47ebf9c678db1fc085581dbe82fad907b3f9b091e96fc5ceccb30c3442e44d24"
+      },
+      "lines": [
+        "While Branching Paths is in the staging area, each Dark location gets +1 Threat.",
+        "Forced: After Branching Paths leaves play as an explored location, look at the top 3 cards of the encounter deck. Players must choose 1 of those to reveal and add to the staging area, moving the other 2 to the bottom of the deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03037",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Lightless-Passage.jpg",
+        "sha256": "eb09553035fe5f504871d9831469c20489a032877b765656bf6c27eab78a6e7f"
+      },
+      "lines": [
+        "Travel: Players must exhaust a Cave Torch to travel here.",
+        "Shadow: Cancel all combat damage dealt to attacking enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03038",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Zigil-Mineshaft.jpg",
+        "sha256": "e77a8af19e4c872c0f57ed012692666fb0ce12b0a2ed154ec8174133ba0ec8f9"
+      },
+      "lines": [
+        "Action: Raise each player's threat by 1 to place 1 progress token on Zigil Mineshaft."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03039",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Many-Roads.jpg",
+        "sha256": "58a1134f523b894473d1070e2452cf42871c714d50d44127de38640bba4b482d"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Shuffle all locations in the encounter discard pile back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03040",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Burning-Low.jpg",
+        "sha256": "a96cb5987331b75db4d280aaf52605eae4519a45c7d31a26ad381f19a445420d"
+      },
+      "lines": [
+        "When Revealed: Each enemy and location currently in the staging area gets +1 Threat until the end of the phase. (+3 Threat instead if it is a Dark location.) Players may exhaust a Cave Torch to cancel this effect.",
+        "Shadow: Attacking enemy gets +2 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03041",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Cave-Torch.jpg",
+        "sha256": "1b2d9631f7559ecec649c755439efb5c7ae738a75f4433d3c638fc5275a3fd67"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Action: Exhaust Cave Torch to place up to 3 progress tokens on a Dark location.",
+        "Forced: After Cave Torch exhausts, discard the top card of the encounter deck. If that card is an enemy, add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03048",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Cave-In.jpg",
+        "sha256": "b189d8cfbc7aa3a2425ca78f819c2e6a19937e26500fa128b20da71ac17470da"
+      },
+      "lines": [
+        "When Revealed: Remove all progress tokens from the current quest card and active location. If Cave In removed no progress tokens, it gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03049",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Crumbling-Ruin.jpg",
+        "sha256": "8dac170647d6946a42a33a8b3bf688e94c95d319721cb09fe7117ee0c198a283"
+      },
+      "lines": [
+        "When Revealed: Each player must exhaust a character and discard the top card of his deck, if able. If the printed cost of the discarded card is equal to or higher than the remaining hit points of the exhausted character, discard the exhausted character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03050",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Dark-and-Dreadful.jpg",
+        "sha256": "2d18c83e5db0dd8e8e16c882f1b08e33ba61838378f385e4fc0a73dffbc4fdec"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each exhausted character. (2 damage instead if the active location is a Dark location.)",
+        "Shadow: Deal 1 damage to the defending character. (Attacking enemy gets +2 Attack instead if this attack is undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03051",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Sudden-Pitfall.jpg",
+        "sha256": "2e56dbf141deba78e9c887467481ac7ea1025f5d30f48e72291ecb35d8e1d168"
+      },
+      "lines": [
+        "When Revealed: The first player must discard 1 questing character he controls, if able. This effect cannot be canceled.",
+        "Shadow: Discard the defending character from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03052",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Dreadful-Gap.jpg",
+        "sha256": "29267e0627ec72c0bddf6d56b914944081eb742ac7b97e541dfccfd3f1fe7a37"
+      },
+      "lines": [
+        "When Revealed: Immediately travel to Dreadful Gap. If another location is currently active, return it to the staging area.",
+        "X is the number of characters in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03053",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Fouled-Well.jpg",
+        "sha256": "7c55de12680caebf2da7195b516d8e69e4d4626424eb7690aaab95e8021a13d8"
+      },
+      "lines": [
+        "When Revealed: Each player may choose and discard 1 card at random from his hand. If all players did not discard 1 card, Fouled Well gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03060",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Scout.jpg",
+        "sha256": "c133b2783f17c5a4e96b18926f51ff37e1a78d95a8656f619e03933cded1e04d"
+      },
+      "lines": [
+        "Each player with a threat of 25 or higher cannot optionally engage Goblin Scout."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03061",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Swordsman.jpg",
+        "sha256": "4c410e54d6eaa74834065034aa5c7d77da3188f558b7dfc60c213cc28a97c10a"
+      },
+      "lines": [
+        "Goblin Swordsman gets +2 Attack if its attack is undefended.",
+        "Shadow: Add Goblin Swordsman to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03062",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Watchful-Eyes.jpg",
+        "sha256": "146ff2582339b2847da1105d07e9d4e131c5de042c1a6c2e14f4689275dd6087"
+      },
+      "lines": [
+        "When Revealed: The first player attaches Watchful Eyes to one of his heroes. (Counts as a Condition attachment with the text: \"Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck and add it to the staging area.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03063",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Tunnels.jpg",
+        "sha256": "2578019833381b6df171e70a64b1397727d4dae8b7b481a4aaa396814781fd0e"
+      },
+      "lines": [
+        "While Goblin Tunnels is in the staging area, it gains: \"Forced: After a Goblin is revealed from the encounter deck, remove a progress token from the current quest card.\"",
+        "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03064",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Entering-the-Mines-1A.jpg",
+        "sha256": "30fef5461e54cce3e3b9af6b287c16c9dbb44fec09e7b019c1f8eb448ce36cbd"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for East-gate and Cave Torch. Put East-gate into play as the active location, and have the first player attach Cave Torch to a hero of his choice. Set First Hall and Bridge of Khazad-dûm aside, out of play. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03064",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Entering-the-Mines-1B.jpg",
+        "sha256": "1b8533b72bb909e8ab9f2e8f9ece2d340326168f453a8e20b2ba94843ea6135f"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player, and add it to the staging area.",
+        "Players cannot advance to the next stage of the scenario unless Bridge of Khazad-dûm is in their victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03065",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Patrol-2A.jpg",
+        "sha256": "5139001920696c67326c569f3dab08a73f984ae3b77e0df68ce416bb2c57772e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03065",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Patrol-2B.jpg",
+        "sha256": "721bf9b466a1fd6928cc5ccba25062ba0f9e1c73080fafd4bdcdc6d440eefa6d"
+      },
+      "lines": [
+        "When Revealed: Each player must search the encounter deck and discard pile for 1 enemy of his choice, and add it to the staging area. One choice must be Patrol Leader, if able.",
+        "Forced: After an enemy is revealed from the encounter deck, discard it instead of adding it to the staging area.",
+        "If there are no enemies in play, immediately advance to the next stage of the scenario. (Players can also advance by placing 11 progress tokens on Goblin Patrol.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03066",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Way-Up-3A.jpg",
+        "sha256": "10c23ca611b64920c596fb924dc36f71f095dc447caba8c959b2ed2d11ac054d"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03066",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Way-Up-3B.jpg",
+        "sha256": "55b5256ab73c082b20ba7cada417658b9373b6a038f1258f235fa501d566452a"
+      },
+      "lines": [
+        "Heroes do not collect resources during the resource phase.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03020",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Cave-troll.jpg",
+        "sha256": "a7a65c446e48672cc6f4c24ee43db095c201cf8aefb716b65689722f7d17d496"
+      },
+      "lines": [
+        "For each excess point of combat damage dealt by Cave-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) you must damage another character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03021",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Orc-Horn-Blower.jpg",
+        "sha256": "e608ca41e04972bbefa3168bbfb2484ef3df6320d90adcbb83adc57aecfeefe2"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Reveal 1 card from the encounter deck and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03022",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Hidden-Threat.jpg",
+        "sha256": "3587fab470d4fc6b856e8a4f70d09ae2c0bf45e88f7f06a0754f073f90e49032"
+      },
+      "lines": [
+        "When Revealed: Each player must raise his threat by 1 for each enemy in the staging area. Then, the last player discards an attachment he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03023",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Upper-Hall.jpg",
+        "sha256": "961259130e882047f64ca6dd7785e4ea388b1935db937e5452d802cda03d672a"
+      },
+      "lines": [
+        "Doomed 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03024",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Book-of-Mazarbul.jpg",
+        "sha256": "9bf34b32f3843d61264bdc978aaa4bbe5ebb2b724ed3e5173c462cddd97e4fe6"
+      },
+      "lines": [
+        "Restricted.",
+        "Action: Exhaust a hero to claim this objective. Then, attach Book of Mazarbul to that hero. (If detached, return Book of Mazarbul to the staging area.)",
+        "Attached hero cannot attack and does not exhaust to commit to a quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03030",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Chieftain-of-the-Pit.jpg",
+        "sha256": "851643c14f3387b08a0e3a6417946c73e6f5cef179ddfe6b6eec81cb3621823d"
+      },
+      "lines": [
+        "When Revealed: Chieftain of the Pit gets +3 Attack until the end of the round.",
+        "Shadow: Attacking enemy attacks again after this attack. Deal it another shadow card for the next attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03031",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Spearman.jpg",
+        "sha256": "5213b40d18e14fc37ff4c2e5e773809ea3ed1dba2a325a8bb17dcb880be05498"
+      },
+      "lines": [
+        "Goblin Spearman gets +2 Attack if its attack is undefended.",
+        "Shadow: Add Goblin Spearman to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03032",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Archer.jpg",
+        "sha256": "d9a41c01d800d9ecb224880ab8b6b20edd0b46340c0919f1f21aee4f6be5ea5d"
+      },
+      "lines": [
+        "Players cannot optionally engage Goblin Archer.",
+        "Characters with ranged are eligible to attack Goblin Archer while it is in the staging area.",
+        "Forced: After an enemy is revealed from the encounter deck, the first player must deal 1 damage to 1 character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03033",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Undisturbed-Bones.jpg",
+        "sha256": "befcf734f0011208ba4ce73c3e77dbd088f5f0616a2b4d8834fdc0fac6b05bde"
+      },
+      "lines": [
+        "When Revealed: Each player must deal X damage to 1 ally he controls. X is the number of allies he controls.",
+        "Shadow: If the defending character is an ally, discard it from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03034",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Plundered-Armoury.jpg",
+        "sha256": "b8d4e4e23b3941a997555f0fe0554f6380d2c2a8ac45d9e9d83cd4359349d8e6"
+      },
+      "lines": [
+        "While Plundered Armoury is in the staging area, enemies get +1 Attack.",
+        "Response: After Plundered Armoury leaves play as an explored location, each player may attach a Weapon or Armour attachment from his hand to 1 character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03067",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-the-Chamber-1A.jpg",
+        "sha256": "958253ce6e38261acb2cc6a7aa067fcfdb07c2e60acbdc0a6aad17fe6363d709"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for Book of Mazarbul, and have the first player attach it to a hero of his choice. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03067",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-the-Chamber-1B.jpg",
+        "sha256": "0e4d9301fe08053ea5031df0cb016df95bee759b4372467d971d6c7dd698ffbd"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player, and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03068",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/The-Fate-of-Balin-2A.jpg",
+        "sha256": "2a1114ce8054859a3cef81c17a6a7be327c269c03b23f35adcb7b76d7564accc"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03068",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/The-Fate-of-Balin-2B.jpg",
+        "sha256": "5426140cb1aee1fc877234b12cdca3b1283f40165cf0e38a5365c0c57ceb2d58"
+      },
+      "lines": [
+        "When Revealed: Remove Book of Mazarbul from the game.",
+        "Forced: At the end of the staging step, reveal the top X cards of the encounter deck, adding all enemies to the staging area. Discard the other revealed cards without resolving them. X is the number of players.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03025",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/The-Nameless-Fear.jpg",
+        "sha256": "62e7a21eb7d6fa8ba34a34e91f885f79235d6e79b68d4b24762a43e47e0ff665"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "The Nameless Fear cannot engage or be engaged.",
+        "X is the number of victory points in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03026",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/New-Devilry.jpg",
+        "sha256": "0433906161e57a1b2a7e7ec6a6fbf1732d166fbdcaf8d515ef4464dabe78d1ec"
+      },
+      "lines": [
+        "When Revealed: If the players are not on stage 1, shuffle the current quest card into the quest deck, then reveal a new quest card. Otherwise, New Devilry gains surge.",
+        "Shadow: If this attack is undefended, raise your threat by The Nameless Fear's Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03027",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Shadow-of-Fear.jpg",
+        "sha256": "c53829df66799b6559334cc41c6cd7115e256671a25b222dccb17e99728ffd84"
+      },
+      "lines": [
+        "When Revealed: The first player attaches Shadow of Fear to one of his heroes. (Counts as a Condition attachment with the text: \"Limit 1 per hero. Attached hero cannot exhaust or ready and its text box is treated as if it were blank. Action: Pay 3 resources from attached hero's pool to discard this card.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03028",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Foe-Beyond.jpg",
+        "sha256": "f98c41ca6ac7427be71a89247c70742bec5d25ff575b5efec1d8b8ebef83a30d"
+      },
+      "lines": [
+        "When Revealed: The last player deals damage equal to The Nameless Fear's Attack to a hero he controls. This effect cannot be canceled.",
+        "Shadow: Deal damage equal to The Nameless Fear's Attack to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03029",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Abandoned-Tools.jpg",
+        "sha256": "e613720e1f0da5c82ab1c36c268dfa9620b2b6ecd406d508d49076daffdcb7f8"
+      },
+      "lines": [
+        "Guarded. Restricted.",
+        "Action: Exhaust a hero to claim this objective if it has no encounters attached. Then, attach Abandoned Tools to that hero. (If detached, return Abandoned Tools to the staging area.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03042",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Great-Cave-troll.jpg",
+        "sha256": "885776525a415f4db65f1bb9376c4fa5ff5ff1a3f205e95db2de2c022165bc73"
+      },
+      "lines": [
+        "Immune to ranged damage.",
+        "No attachments can be played on Great Cave-troll."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03043",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Orc-Drummer.jpg",
+        "sha256": "01cee258820863198ab21a31b6a6e830acd4c21f31aff975a2ee056ce7ac450b"
+      },
+      "lines": [
+        "While Orc Drummer is in the staging area, each enemy gets +X Threat. X is the number of players in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03044",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Stray-Goblin.jpg",
+        "sha256": "840f6ef7408ddfa70d363abf71584edc1b734008a7fc1c7994aaf1717618df4e"
+      },
+      "lines": [
+        "X is the number of players in the game.",
+        "Shadow: Attacking enemy gets +X Attack. X is the number of players in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03045",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Chance-Encounter.jpg",
+        "sha256": "ddf160517682113d2ec88c4605a40916713fce08ed14b9e1d1f61bc8c22e27aa"
+      },
+      "lines": [
+        "When Revealed: Put the top enemy in the encounter discard pile into play, engaged with the first player. If this effect put no enemies into play, Chance Encounter gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if engaged with the first player.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03046",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Massing-in-the-Deep.jpg",
+        "sha256": "fc412a420ab4493bce3702604bfc9383e62ab57da6a7ec6a9cd45cbc359954c5"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Reveal X additional cards from the encounter deck and add them to the staging area. X is the number of players in the game.",
+        "Shadow: Attacking enemy gets +X Attack. X is the number of players in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03047",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/The-Mountains'-Roots.jpg",
+        "sha256": "c219bedd3815940fe93145b7317dff8556afed906282834bda13166299d4a1d0"
+      },
+      "lines": [
+        "X is the number of players in the game.",
+        "Shadow: Attacking enemy gets +X Attack. X is the number of players in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03069",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Presence-in-the-Dark-1A.jpg",
+        "sha256": "2e0850fc66753f995da2929f9c3a32acdfb76e5c5810d50990f64f5e291568b4"
+      },
+      "lines": [
+        "Setup: Prepare the quest deck. Add The Nameless Fear to the staging area. Remove all copies of A Foe Beyond from the encounter deck. Then, shuffle 1 copy of A Foe Beyond per player back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03069",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Presence-in-the-Dark-1B.jpg",
+        "sha256": "02d0c4c6b253a1168d6a241917e7d444b499e16d182bd256748d65ae501dabd9"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player, and add it to the staging area. Then, add A Presence in the Dark to your victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03070",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Heading-Down-2A.jpg",
+        "sha256": "162da2750fc726f820d84eec0e2d7066228acea4384cf546e614b0041e46cd24"
+      },
+      "lines": [
+        "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03070",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Heading-Down-2B.jpg",
+        "sha256": "318f471ee77f9e5933e6e78e3e7672840e998984b0d697af6fdfccd0074e3d67"
+      },
+      "lines": [
+        "Forced: If Heading Up is in the player's victory display at the end of any quest phase, shuffle Heading Up back into the quest deck.",
+        "Players may bypass this quest card at the end of the combat phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03071",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Heading-Up-2A.jpg",
+        "sha256": "a935dba584303b8b37c8fd3e02d27e465336f074febb7ce3d98512b867349700"
+      },
+      "lines": [
+        "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03071",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Heading-Up-2B.jpg",
+        "sha256": "acd202ae5c445e2b390aad572a48702c6ea76455a6fcc39f9b352fff9340432a"
+      },
+      "lines": [
+        "Forced: If Heading Down is in the player's victory display at the end of any quest phase, shuffle Heading Down back into the quest deck.",
+        "Players may bypass this quest card at the end of the combat phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03072",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-A-Wrong-Turn-2A.jpg",
+        "sha256": "e348448a2ae870b67d69c192d2efb3f2cec030c4a2221681f4ca01cfc7e8068a"
+      },
+      "lines": [
+        "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03072",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-A-Wrong-Turn-2B.jpg",
+        "sha256": "2b06ff2b5cbe76ec95155ebf9a14fecac6a2fbbde04b44c7c9b93a024dcdfc7c"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player, and add it to the staging area.",
+        "Players may bypass this quest card at the end of the combat phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03073",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Narrow-Paths-2A.jpg",
+        "sha256": "a3d4336f05a4febd728e3bc90c27e0aca1bf3524ee9d150f6c70974069ff44c4"
+      },
+      "lines": [
+        "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03073",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Narrow-Paths-2B.jpg",
+        "sha256": "003a6f6169297946b079761b838f29e3b1da69cc38c6a6ed90b8a530e74acc30"
+      },
+      "lines": [
+        "When Revealed: Each player chooses 1 questing character he controls. Each questing character not chosen does not count its Willpower until the end of the turn.",
+        "Forced: After placing the 1st progress token on Narrow Paths, search the encounter deck and discard pile for Abandoned Tools and add it to the staging area, if able.",
+        "Players may bypass this quest card at the end of the combat phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03074",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Hasty-Council-2A.jpg",
+        "sha256": "b6686bbfd71fcfaf21a7abb9e91d55439250c8754b6e5052901a694f31896975"
+      },
+      "lines": [
+        "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03074",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Hasty-Council-2B.jpg",
+        "sha256": "aa0378c8273d144b80facb8b55c4ab419d6e36ffa5ba0e3512b9c78dcde52bf6"
+      },
+      "lines": [
+        "When Revealed: Shuffle all copies of A Foe Beyond from the encounter discard pile back into the encounter deck. Reveal the top 2 cards of the quest deck. Choose 1 to become the active quest (flipped to side 2B) and put the other on the bottom of the quest deck. Then, add Hasty Council to your victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03075",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Blocked-By-Shadow-2A.jpg",
+        "sha256": "8ef3dd58b8dcf275d76294161dc9affbae53d46442756ac4219aa3bdd4142584"
+      },
+      "lines": [
+        "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03075",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Blocked-By-Shadow-2B.jpg",
+        "sha256": "ce031a283058bb840312400bdbecbcd9df5069867ac00da5f4c1d604203ad989"
+      },
+      "lines": [
+        "When Revealed: The first player chooses 1 of the following:",
+        "• Each player discards 1 card from the top of the encounter deck. If the card is a treachery card, the discarding player is eliminated from the game.",
+        "• Reveals the next quest card, putting Blocked by Shadow on the bottom of the quest deck.",
+        "Players may bypass this quest card at the end of the combat phase.",
+        "If the players defeat this stage, they escape and win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03076",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Escape-from-Darkness-2A.jpg",
+        "sha256": "b0e46f26717e22f5f79723a28386d41de8fed8383c5b809573f04e5042aafcdd"
+      },
+      "lines": [
+        "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03076",
+      "side": "B",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Escape-from-Darkness-2B.jpg",
+        "sha256": "ae7a90a709e080e2d3974312f06c370f3cb86ca8d261920ca33875285e48eb62"
+      },
+      "lines": [
+        "Abandoned Tools gains: \"Refresh Action: Exhaust attached hero to put a progress token on Escape from Darkness.\"",
+        "Players may bypass this quest card at the end of the combat phase.",
+        "Progress tokens cannot be placed on Escape from Darkness except by Abandoned Tools.",
+        "If the players defeat this stage, they escape and win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03054",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Black-Uruks.jpg",
+        "sha256": "3753b28b49007c37653f5b90b5bf6bfa598aaadaa785fc339114e15516f5b717"
+      },
+      "lines": [
+        "When Revealed: The first player must choose and discard an attachment from a questing character, if able.",
+        "Shadow: If this attack is undefended, deal 2 additional shadow cards to attacking enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03055",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Mountain-Warg.jpg",
+        "sha256": "71ded46fdbd0ee03a255ccf3affaafd91b955c3f055f003ce47f11c59c1a04ff"
+      },
+      "lines": [
+        "If Mountain Warg is dealt a shadow card with no effect, return Mountain Warg to the staging area after it attacks.",
+        "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if a Mountain is the active location.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03056",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Bitter-Wind.jpg",
+        "sha256": "077896bd8e97c66495d4070f7e09cf915c7cced6301102c66a616f539341227f"
+      },
+      "lines": [
+        "When Revealed: The first player must discard 3 resources from each hero he controls.",
+        "Shadow: Defending player must discard 2 resources from each hero he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03057",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Knees-of-the-Mountain.jpg",
+        "sha256": "39b312432f675e31ed4153a9106468d5c4b94b3699f352f460e0b7f8cc582c56"
+      },
+      "lines": [
+        "While Knees of the Mountain is in the staging area, it gains: \"Forced: After an enemy engages a player, it gets +1 Attack until the end of the round.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03058",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Turbulent-Waters.jpg",
+        "sha256": "45212acb922028bc38ff081a93c94d1f2971437b46f023e2a2619cb63459caf3"
+      },
+      "lines": [
+        "While Turbulent Waters is the active location, players cannot optionally engage enemies."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03059",
+      "side": "A",
+      "printing": "KD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Warg-Lair.jpg",
+        "sha256": "c4b9837aa6a11e1f5f6a7fab3ff4a2409759bd097e826b4129ecc7f9a6dbcd6f"
+      },
+      "lines": [
+        "When Revealed: Search the encounter deck and discard pile for 1 copy of Mountain Warg and add it to the staging area, if able. Shuffle the encounter deck.",
+        "Response: After Warg Lair leaves play as an explored location, each player draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04011",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Up-the-Pass-1A.jpg",
+        "sha256": "cd70505def5966c33a717cde8e1f9053d075acaeb9a491d884aa25a8f5b79a4f"
+      },
+      "lines": [
+        "Setup: Add Caradhras to the staging area. Remove all copies of Snowstorm from the encounter deck and set them aside, out of play. Put Arwen Undómiel into play under the control of the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04011",
+      "side": "B",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Up-the-Pass-1B.jpg",
+        "sha256": "862c4ec1a2427ae037c87a27c764bece3ec27cb44865f1ac07c652ce868c983a"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 card from the encounter deck per player, and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04012",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Snowdrifts-2A.jpg",
+        "sha256": "817f15f8253bb78ec1662c502545a20de700eb792d641eead46089cd83cb7a9e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04012",
+      "side": "B",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Snowdrifts-2B.jpg",
+        "sha256": "257cbe229e99cabca445dd986ff75a6cfb450da18b4e93f72b90033f79050e8d"
+      },
+      "lines": [
+        "When Revealed: Shuffle 1 more copy of Snowstorm into the encounter deck than the number of players in the game.",
+        "Forced: After placing the 11th progress token on Snowdrifts, discard any active location. Caradhras becomes the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04013",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/The-Mountains'-Peaks-3A.jpg",
+        "sha256": "b3a1915c66951bb10ee1a9f4a683fb47c8378eddf121163b3a043fdafb057c66"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04013",
+      "side": "B",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/The-Mountains'-Peaks-3B.jpg",
+        "sha256": "7464ea43b63a9a4da81f0b46e3615b972ae04ea092ac91f609d9f5a75a3546b7"
+      },
+      "lines": [
+        "When Revealed: Shuffle all copies of Snowstorm in the encounter discard pile back into the encounter deck.",
+        "Characters are discarded from play if their Willpower is ever 0.",
+        "Players cannot defeat this stage unless they have 5 victory points.",
+        "If the players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04014",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Arwen-Undómiel.jpg",
+        "sha256": "7b9c74a2e983ae136adcbc11b54519efd1a9a9c5db59ef9ee53bee193dd08b08"
+      },
+      "lines": [
+        "The first player gains control of Arwen Undómiel, as an ally.",
+        "Response: After Arwen Undómiel exhausts, choose a hero. Add 1 resource to that hero's resource pool.",
+        "If Arwen Undómiel leaves play, the players are defeated."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04015",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Caradhras.jpg",
+        "sha256": "b4fb2ae8b8662dc218d99a0da64c5f5507713ff8a0b6287e90f4e0b501b08adb"
+      },
+      "lines": [
+        "While Caradhras is the active location, questing characters get -1 Willpower.",
+        "Players cannot travel to Caradhras except by quest card effects."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04016",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Fanuidhol.jpg",
+        "sha256": "e6c303f2b1c2574e58de90202b91d78c2f92ea66ad6a472a81fada81937985ad"
+      },
+      "lines": [
+        "While Fanuidhol is the active location, heroes must spend 1 resource from their resource pool to count their Willpower during the quest phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04017",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Celebdil.jpg",
+        "sha256": "ec9863d24322993300e9c10a8645674503bf5e7dea36f0ad64e4312260f3845f"
+      },
+      "lines": [
+        "While Celebdil is the active location, remove 2 progress tokens from it at the end of each round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04018",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/The-Dimrill-Stair.jpg",
+        "sha256": "af113b6314aa53638cfd313b259794aed009f1c5c52af5349380fbe1bb0097f8"
+      },
+      "lines": [
+        "Travel: Reshuffle all locations in the discard pile and victory display back into the encounter deck. If you reshuffled at least two locations, reduce each player's threat by 11 and discard all copies of Freezing Cold from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04019",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Rocky-Crags.jpg",
+        "sha256": "8dd42004633e0b2df87c448384930c5d5434908964b1d272861a83cc64093d8e"
+      },
+      "lines": [
+        "Travel: Each player must deal 2 damage to 1 character he controls to travel here.",
+        "Shadow: Attacking enemy gets +1 Attack for each progress token on the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04020",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Fell-Voices.jpg",
+        "sha256": "57387b0f05b6261b623c7856962c859a908c3935a7152440762d591a76b42bf8"
+      },
+      "lines": [
+        "When Revealed: Return the top 2 Snow cards in the encounter discard pile to the top of the encounter deck. If this effect returned less than 2 Snow treachery cards, Fell Voices gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04021",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Fallen-Stones.jpg",
+        "sha256": "aa04189816cface7a0cb0569d58795a894204766320cc05012a04ad89eeb66d3"
+      },
+      "lines": [
+        "When Revealed: The first player (choose 1): removes all progress tokens from play, or reveals 2 cards from the encounter deck and adds them to the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack for each progress token on the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04022",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Snowstorm.jpg",
+        "sha256": "c65958371e2246478a4722afc08cab88a3ad84ad8b0715ef116d52ea5cd4d80d"
+      },
+      "lines": [
+        "When Revealed: Each questing character gets -1 Willpower until the end of the phase.",
+        "Shadow: Until the end of the phase, characters defending this attack get -1 Willpower and are discarded if their Willpower is 0."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04023",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Freezing-Cold.jpg",
+        "sha256": "8f645b9524bcceeb81ab47865b5a5bf94d8bd9e99972d7102498eeb5ab88099d"
+      },
+      "lines": [
+        "When Revealed: The first player attaches this card to a hero he controls. Counts as a Condition attachment with the text: \"Attached hero gets -2 Willpower and cannot commit to a quest. If attached hero has more than 1 copy of Freezing Cold attached, discard attached hero from play.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04024",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Avalanche.jpg",
+        "sha256": "389e6a38b5d8ba402fbc3d9875a1c7f0e4503a5cbf059030c68848eb4b985fb8"
+      },
+      "lines": [
+        "When Revealed: Exhaust each ready character and if it is the quest phase commit them to the quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04025",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Mountain-Goblin.jpg",
+        "sha256": "c58a74e866bd2edbcaca576987abdf611d223b703d4a85e7663fd83cbb312c0a"
+      },
+      "lines": [
+        "Mountain Goblin gets +1 Attack for each Mountain location in the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the active location is a Mountain.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04026",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Mountain-Troll.jpg",
+        "sha256": "54cdfac57659592245803e59d7d322a7db1241b248e372e104e2d2372d5be47d"
+      },
+      "lines": [
+        "Mountain Troll gets +1 Attack for each Mountain location in the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the active location is a Mountain.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04027",
+      "side": "A",
+      "printing": "TRG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Snow-Warg.jpg",
+        "sha256": "922b3fe562a9d5585ca0a55920d38b5e4e4405e0dd7ca450207b192a60be2781"
+      },
+      "lines": [
+        "Allies cannot defend while Snow Warg is attacking.",
+        "Forced: After a character is declared as a defender against Snow Warg, deal 1 damage to the defending character, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04038",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Along-the-Misty-Mountains-1A.jpg",
+        "sha256": "0c0997420d38ad4a80fb67a85841142cdcae8e8f158f43424944ca60d10516ad"
+      },
+      "lines": [
+        "Setup: Put Arwen Undómiel into play under the control of the first player. Shuffle the encounter deck. Reveal 1 card from the encounter deck per player, and add them to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04038",
+      "side": "B",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Along-the-Misty-Mountains-1B.jpg",
+        "sha256": "e167a91c264a7a4762883d8d2f838eee23c89d1cfb709606a41a73135aef63c2"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04039",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Orc-Outpost-2A.jpg",
+        "sha256": "fd53900b76ffd23569c621c5ed48a9320dc148b663f05aeefbd112d406a309cf"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04039",
+      "side": "B",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Orc-Outpost-2B.jpg",
+        "sha256": "4de085480aa197b8fa45f26841e21985fab1d13bd75222becd384d706c1fee37"
+      },
+      "lines": [
+        "When Revealed: Search the encounter deck and discard pile for Goblin Gate and add it to the staging area, if able. Then, if there is no active location, Goblin Gate becomes the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04040",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Approaching-Rivendell-3A.jpg",
+        "sha256": "9eff5dc923088f3195ecb726eb31d4d8c2ecbf6c89a73dbdbc83e91dd31478c2"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04040",
+      "side": "B",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Approaching-Rivendell-3B.jpg",
+        "sha256": "7215fe817f246caf2acb4ef180477d034238d38e0c0f428e92976b81c91884f8"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 card from the encounter deck per player, and add it to the staging area.",
+        "Characters cannot be healed.",
+        "If the players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04041",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Arwen-Undómiel.jpg",
+        "sha256": "d77f9a3bde82ed11ee990896656beefc15ffb528a44c04e7056558b1e9161714"
+      },
+      "lines": [
+        "The first player gains control of Arwen Undómiel, as an ally.",
+        "Response: After Arwen Undómiel exhausts, choose a hero. Add 1 resource to that hero's resource pool.",
+        "If Arwen Undómiel leaves play, the players are defeated."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04042",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Ruined-Road.jpg",
+        "sha256": "60a070f1a4e94fcc4dbc0503cd1a1df8e6a665641b69b62e65c3cb20e8bed027"
+      },
+      "lines": [
+        "Response: After you travel to Ruined Road, the first player places 2 progress tokens on it or readies 1 hero he controls.",
+        "Shadow: Return attacking enemy to the staging area after it attacks."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04043",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Goblin-Gate.jpg",
+        "sha256": "81cd9bd3a640096bcb745c89830d2a507eba4f5dbee4715a5dc641c6cf2e72eb"
+      },
+      "lines": [
+        "While Goblin Gate is the active location, the first enemy revealed from the encounter deck each round gains ambush. If that enemy engages a player, it makes an immediate attack (deal and resolve a shadow card)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04044",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Pathless-Country.jpg",
+        "sha256": "2c22a3d792ebecf579a64b9cf2420042b1c64d43f7123f72e09b3932776bf036"
+      },
+      "lines": [
+        "Forced: After at least 1 progress token is placed on Pathless Country, remove 1 progress token from it.",
+        "Shadow: Deal 1 damage to each ally in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04045",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Barren-Hills.jpg",
+        "sha256": "8940917c35c71bffa9aec7b981ab91a22614c611fb068472dd7d92eae1e336df"
+      },
+      "lines": [
+        "While Barren Hills is the active location, ignore ambush.",
+        "Shadow: Return attacking enemy to the staging area after it attacks."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04046",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Sleeping-Sentry.jpg",
+        "sha256": "6f1b6a501e0b96b903138233f5c8712abc583d889129d5acd6d13fee6295cc75"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each exhausted character. Then, exhaust all ready characters.",
+        "Shadow: Defending player must discard all exhausted characters he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04047",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Followed-by-Night.jpg",
+        "sha256": "b8019e6a080ae04325eeebff20d98b56328903553861bade0857ce30d6807b78"
+      },
+      "lines": [
+        "When Revealed: The first player (choose 1): deals 1 damage to all allies in play and Followed by Night gains surge, or all enemies engaged with players make an immediate attack, if able.",
+        "Shadow: Return attacking enemy to the staging area after it attacks."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04048",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Orc-Ambush.jpg",
+        "sha256": "e1edcbbe77027b6266c0c1c763aa7b4f5951808d9e063c45ada37614982daafd"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: All Orc enemies in the staging area engage the first player. If there are no Orc enemies in the staging area, return all Orc enemies in the encounter discard pile to the staging area, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04049",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Goblin-Taskmaster.jpg",
+        "sha256": "eb712b4dc76f7443754ab6bb2c67cc8a977724f83c4faad73f17638d16400d61"
+      },
+      "lines": [
+        "Ambush.",
+        "Forced: After Goblin Taskmaster engages a player, that player deals 2 damage to 1 character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04050",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Orc-Raiders.jpg",
+        "sha256": "9547a71a812c8849a8f69f95a1bd03f5fff04dd540a927a5c7333abd83f1731e"
+      },
+      "lines": [
+        "Ambush.",
+        "Forced: After Orc Raiders engages a player, that player discards 2 attachments he controls, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04051",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Crebain.jpg",
+        "sha256": "b7eb5e5ca73c63f5450e1af1872dcf5f2e0ead1af25bcc42d39b2fb0f8038a8d"
+      },
+      "lines": [
+        "Surge.",
+        "While Crebain is in the staging area, encounter card effects cannot be canceled.",
+        "Shadow: Return attacking enemy to the staging area after it attacks."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04052",
+      "side": "A",
+      "printing": "RtR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Wild-Bear.jpg",
+        "sha256": "c3399bd5cd5ecfa3b4991dafee808253736f3c5849c5b266da9b074fb0137c3c"
+      },
+      "lines": [
+        "Ambush.",
+        "Forced: After Wild Bear engages a player, it makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "040076",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Wrapped.jpg",
+        "sha256": "18c5a70d6da2802d55a9b429f0a3283210ddc513887000088acf9a7cbb87c137"
+      },
+      "lines": [
+        "When Revealed: The first player attaches Wrapped! to a hero he controls. (Counts as a Tentacle attachment with the text: \"Limit 1 per hero. Attached hero cannot exhaust or ready. At the end of the round, discard attached hero from play. Combat Action: Exhaust a hero you control without a Tentacle attachment to discard Wrapped!.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04063",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/To-the-West-door-1A.jpg",
+        "sha256": "2be14619bb06cbda9b1eb941f50cc590d3988e917951d074e92c87788cb502fe"
+      },
+      "lines": [
+        "Setup: Remove The Watcher and Doors of Durin from the encounter deck and set them aside, out of play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04063",
+      "side": "B",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/To-the-West-door-1B.jpg",
+        "sha256": "7fa59ca65d82c8b284c1e06b73e13b25fa8fd9c6c2fa4655ddcf851ec8862987"
+      },
+      "lines": [
+        "When Revealed: Reveal cards from the encounter deck and add them to the staging area until there is at least X Threat in the staging area. X is twice the number of players in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04064",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/The-Seething-Lake-2A.jpg",
+        "sha256": "54dabea33f9620875fe57506a0b56376d479f1a1d4fbf996dee062a5c2b95745"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04064",
+      "side": "B",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/The-Seething-Lake-2B.jpg",
+        "sha256": "bb1ade9f6e5db3be70324f8c89a3379f8846a9f5683a3527b1a943da530fd26c"
+      },
+      "lines": [
+        "When Revealed: Add The Watcher to the staging area. Doors of Durin becomes the active location, moving any previous active location to the staging area. Shuffle all Tentacle cards in the encounter discard pile back into the encounter deck.",
+        "If the players have at least 3 victory points and defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04065",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Doors-of-Durin.jpg",
+        "sha256": "ae43767339ffb654eea51d85ba59c248673fecc75cd31dc678d47408337e1dd6"
+      },
+      "lines": [
+        "Progress tokens that would be placed on Doors of Durin are instead placed on the current quest card.",
+        "Action: Each player may discard any number of cards from his hand. Then, discard the top card of the encounter deck. If the first letter of the encounter card's title matches that of one of the discarded player cards, add Doors of Durin to your victory display. (Limit once per round.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04066",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Stair-Falls.jpg",
+        "sha256": "b60cf6f70c305794074048467b36d957fef60089bda04d2bf5b0bc539c35cac7"
+      },
+      "lines": [
+        "Travel: The first player must exhaust 2 characters to travel here.",
+        "Shadow: Remove 1 progress token from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04067",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Perilous-Swamp.jpg",
+        "sha256": "22cf90c3996989fb3162d40199aefb766ce1c2fbbddee8deecde8e536962805d"
+      },
+      "lines": [
+        "No more than 1 progress token can be placed on Perilous Swamp each round.",
+        "Shadow: Remove 1 progress token from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04068",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Makeshift-Passage.jpg",
+        "sha256": "67ec82b77aba377fbaccb675754fe843a8c00a853c3a1f3c0b5ea7f4bab6ba6e"
+      },
+      "lines": [
+        "Forced: After you travel to Makeshift Passage, place 2 progress tokens on the current quest card, bypassing any active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04069",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Stagnant-Creek.jpg",
+        "sha256": "2c969a554acb0c01787b82c9e35d5bc4ef6ce99925f71af96ab109ebb83cdaa3"
+      },
+      "lines": [
+        "When Revealed: Discard the top card of the encounter deck. If the discarded card is a Tentacle enemy, add that card to the staging area and raise each player's threat by 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04070",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Ill-Purpose.jpg",
+        "sha256": "a574250e5a9fd275547d962bad307e3e5d0db29c0793c3b417d3fe191afad48a"
+      },
+      "lines": [
+        "When Revealed: All enemies in the staging area engage the player with the highest threat. Then, each player raises his threat by the total Threat of all cards in the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if it is a Tentacle.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04071",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Disturbed-Waters.jpg",
+        "sha256": "8bb2b5fd48af735289288d4820a5c8cdfa65c5b50b8e4a0726fd919e4c7a67c0"
+      },
+      "lines": [
+        "Doomed 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04072",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/The-Watcher.jpg",
+        "sha256": "9d38ec2fe8a48625b6560563cda6a90b17a4a93b9b7ba3d03e0b502d1e7fdf14"
+      },
+      "lines": [
+        "Regenerate 2.",
+        "While there is another Tentacle enemy in play, The Watcher cannot be optionally engaged.",
+        "If The Watcher is in the staging area at the end of the combat phase, each player must deal 3 damage to 1 character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04073",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Grasping-Tentacle.jpg",
+        "sha256": "6e51d11c6cb17b9295ec7e1993fa2a00896df5b0743a218468e481f1d021e119"
+      },
+      "lines": [
+        "Forced: When Grasping Tentacle is attacked, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, attach this card to an attacking character as a Tentacle attachment with the text: \"Attached character's Attack and Defense are reduced to 0.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04074",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Thrashing-Tentacle.jpg",
+        "sha256": "edc39586f99bcff4baae99ab84ca2a626e1075a61fca60b18d8993e0899c8a3f"
+      },
+      "lines": [
+        "Forced: When Thrashing Tentacle is attacked, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, deal the damage from the attack to 1 character an attacking player controls (ignoring defense)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04075",
+      "side": "A",
+      "printing": "WitW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Striking-Tentacle.jpg",
+        "sha256": "706012db596f30b2cea645dd410852cd5b72f51ae6f531c158c7f750b7affc7f"
+      },
+      "lines": [
+        "Forced: When Striking Tentacle attacks, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, this attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04086",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Journey-in-the-Black-Pit-1A.jpg",
+        "sha256": "94782662a96522f63abdf969b056adee3bef6fba7b3606d6a07a6995eee44d1a"
+      },
+      "lines": [
+        "Setup: The first player attaches Cave Torch to a hero of his choice."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04086",
+      "side": "B",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Journey-in-the-Black-Pit-1B.jpg",
+        "sha256": "f1f544129ae7e75f0e21f8f7e2da7d1e729df33e89ea3a73ba92c0d76886ee30"
+      },
+      "lines": [
+        "When Revealed: Discard cards from the top of the encounter deck until you discard X locations, where X is one less than the number of players in the game (minimum of 1). Add those locations to the staging area, and shuffle the other discarded cards back into the encounter deck.",
+        "Each location gets +1 Threat. If the players quest unsuccessfully, trigger all \"Lost:\" effects in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04087",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Continuing-Eastward-2A.jpg",
+        "sha256": "ef0c742cace2a5ba045fde0267a2f3b60efd7245f49996570bc48f6a1b7924eb"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04087",
+      "side": "B",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Continuing-Eastward-2B.jpg",
+        "sha256": "7e770119294f7be226eae708f06a0db755ea9e177f086c67853ae29fce8329aa"
+      },
+      "lines": [
+        "When Revealed: The first player makes a locate test. If this test is failed, reveal cards from the encounter deck equal to the number of players in the game and add them to the staging area. Then, trigger all \"Lost:\" effects in play.",
+        "If the players quest unsuccessfully, trigger all \"Lost:\" effects in play.",
+        "If the players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04088",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Durin's-Greaves.jpg",
+        "sha256": "0e30d2c2f0869ee7759764e9458b2bbdb29f51442a91c2381ee8125cee7d6c72"
+      },
+      "lines": [
+        "When Revealed: The first player attaches Durin's Greaves to a hero of his choice as an attachment.",
+        "Attached hero gets +1 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04089",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Abandoned-Mine.jpg",
+        "sha256": "7fa608f6945bc11f0518dc9bf1be6ad5529ec0293064eee54aede9e29ec71232"
+      },
+      "lines": [
+        "Lost: Return the top 2 Goblin enemies in the encounter discard pile to the staging area, if able.",
+        "PASS."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04090",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Dwarven-Forge.jpg",
+        "sha256": "70af17e68501d890e5deffb8c415dc12408fdd4c9f53fcc262c154ead870ec5d"
+      },
+      "lines": [
+        "Lost: Each player must choose and discard 1 card from his hand.",
+        "PASS."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04091",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Silent-Caverns.jpg",
+        "sha256": "bc83cd03d5d88c63815f5c566df89aa0697e53a502393cba7e23a25811390f1f"
+      },
+      "lines": [
+        "Lost: Exhaust all characters.",
+        "PASS."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04092",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Twisting-Passage.jpg",
+        "sha256": "4d224abff2768a10527a5aa1e78a005618905ac71073e612249994298e7d5d82"
+      },
+      "lines": [
+        "Forced: Before placing progress tokens on Twisting Passage, the first player must make a locate test. If this test is failed, do not place any progress tokens on Twisting Passage and trigger all \"Lost:\" effects in play.",
+        "PASS."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04093",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Fatigue.jpg",
+        "sha256": "885ea59ad69b10090a9d1cc94cf1f0988ea8c07d9325647d6a0b8cbab6d955a3"
+      },
+      "lines": [
+        "When Revealed: Each player must exhaust 1 character he controls, if able. Then, if any player controls no unexhausted characters, Fatigue gains surge.",
+        "Shadow: The defending player must exhaust 1 character he controls, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04094",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Foul-Air.jpg",
+        "sha256": "eb849338f3d25201d44250273d5b22ea92cb40c572f2c28ff9b85f2a4c55358d"
+      },
+      "lines": [
+        "When Revealed: The first player makes a locate test. If this test is failed, deal 2 damage to all characters and trigger all \"Lost:\" effects in play.",
+        "PASS."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04095",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Gathering-Ground.jpg",
+        "sha256": "fc5a52e6b2d4724c11b9b6e3bee66b6d28c6ab42eace1475f7b728cc1c260fce"
+      },
+      "lines": [
+        "When Revealed: Attach this card to a location in the staging area with the highest combined threat and remaining quest points. (Counts as a Condition attachment with the text: \"Each enemy revealed from the encounter deck gains surge.\")",
+        "PASS."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04096",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Vast-and-Intricate.jpg",
+        "sha256": "7106a3bb9a2bd64f2d0bcbf703dc1869cf55a76ce3b34d93ec3e832c00e47bda"
+      },
+      "lines": [
+        "When Revealed: The first player makes a locate test. If this test is failed, raise each player's threat by 7, remove all progress tokens from play, and trigger all \"Lost:\" effects in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04097",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Cave-Spider.jpg",
+        "sha256": "df939c5dd42eecb7d2affc9ca81f9cf78a733f5f320e049ae5390d6089d13dc8"
+      },
+      "lines": [
+        "When Revealed: The first player draws 1 card. Then, that player must choose and discard 4 cards from his hand, if able.",
+        "Forced: After Cave Spider engages a player, that player must choose and discard 1 card from his hand, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04098",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Goblin-Sneak.jpg",
+        "sha256": "7bac4437d3187ce5cd41dbacffad0b244a9d6a4cfc5c710f8936de68ed3c1577"
+      },
+      "lines": [
+        "Forced: After Goblin Sneak engages a player, discard the top card of the encounter deck. If it is a treachery card, Goblin Sneak engages the next player, if able.",
+        "Shadow: Add Goblin Sneak to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04099",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Goblin-Warlord.jpg",
+        "sha256": "ed010d246802dee488c41f1b7405a2f404ace88c2b9e5f1ba9d9b36c188eac53"
+      },
+      "lines": [
+        "Lost: Each player must choose and discard 1 ally he controls from play, if able.",
+        "Shadow: Trigger all \"Lost:\" effects in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04100",
+      "side": "A",
+      "printing": "TLD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Rock-Adder.jpg",
+        "sha256": "a769e4c5017f2255b42b7fe9ec08c404a6dfdb73b7f84a01f4cb1062bee3afd9"
+      },
+      "lines": [
+        "Rock Adder cannot be attacked unless it has dealt at least 1 damage this round.",
+        "Shadow: If this attack is undefended, the defending player must discard 1 character he controls from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04111",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/The-Dripping-Walls-1A.jpg",
+        "sha256": "299feb2bc3726ef6b26a048c79c1ae5904f476ee989d33d775a029dac15561b1"
+      },
+      "lines": [
+        "Setup: Place the Foundations of Stone encounter set aside, out of play. The first player attaches Cave Torch to a hero of his choice."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04111",
+      "side": "B",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/The-Dripping-Walls-1B.jpg",
+        "sha256": "2571c5b92d96f0732a425959ebd3422d47a320519d74386b738068f651ac5bac"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 card from the encounter deck per player, and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04112",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/The-Water's-Edge-2A.jpg",
+        "sha256": "7046bac833f0ca60b1917f168323d7277ef7e08b95e1a89e494ad9b45a2ee0ba"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04112",
+      "side": "B",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/The-Water's-Edge-2B.jpg",
+        "sha256": "330d81f21a91d1c7ca8a5591a3f114767dfcf038359b42f26a6df974717f91d0"
+      },
+      "lines": [
+        "Forced: After a player commits characters to the quest, he must discard the top 2 cards of his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04113",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Washed-Away-3A.jpg",
+        "sha256": "fbd12ac61d95da56bd95645b0757485a543dc7e7dba43abc7c46a8219d7b3b8b"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04113",
+      "side": "B",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Washed-Away-3B.jpg",
+        "sha256": "e4cce533ac5f3c92ce51677313f63010b1d1f4517b4afef3ca65a8139b886bcc"
+      },
+      "lines": [
+        "When Revealed: Discard all Item, Armor, Weapon, Light cards and all encounter deck cards from play. Shuffle all enemy and treachery cards in the encounter discard pile together with the Foundations of Stone encounter set. This deck becomes the new encounter deck. Remove all other encounter deck cards from the game. Then, starting with the first player, each player draws a random stage 4 quest card. Remove all other stage 4 quest cards from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04114",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-Sheltered-Rocks-4A.jpg",
+        "sha256": "24c3a7bbe88ac66773ec280a50627428e0303d5b1dbb9d007b5920655613c65e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04114",
+      "side": "B",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-Sheltered-Rocks-4B.jpg",
+        "sha256": "848eb237b83ff31764a759ac8adac38f69462b6d36b8cab796aa3f6a72cdee38"
+      },
+      "lines": [
+        "When Revealed: Create your own staging area. Reveal 2 cards from the encounter deck and add them to your staging area.",
+        "Forced: After the 11th progress token is placed on Sheltered Rocks, join another player at the beginning of the travel phase. If you cannot join another player, all players continue on to stage 5 together."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04115",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-The-Endless-Caves-4A.jpg",
+        "sha256": "24c3a7bbe88ac66773ec280a50627428e0303d5b1dbb9d007b5920655613c65e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04115",
+      "side": "B",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-The-Endless-Caves-4B.jpg",
+        "sha256": "3c4c646f236930223856f31404b3cdb0cc913a4414e19f6e1081f1a3fdbbe72e"
+      },
+      "lines": [
+        "When Revealed: Create your own staging area. Discard all resources from your heroes.",
+        "Forced: After the 17th progress token is placed on The Endless Caves, join another player at the beginning of the travel phase. If you cannot join another player, all players continue on to stage 5 together."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04116",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-The-Shivering-Bank-4A.jpg",
+        "sha256": "24c3a7bbe88ac66773ec280a50627428e0303d5b1dbb9d007b5920655613c65e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04116",
+      "side": "B",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-The-Shivering-Bank-4B.jpg",
+        "sha256": "1a9a8b6896172d4c2e066f7e4bdd8246a5853b1f06e6e071e5ecef15bcedf561"
+      },
+      "lines": [
+        "When Revealed: Create your own staging area. Discard your hand. Reveal 2 cards from the encounter deck and add them to your staging area.",
+        "Forced: After the 7th progress token is placed on The Shivering Bank, join another player at the beginning of the travel phase. If you cannot join another player, all players continue on to stage 5 together."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04117",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-Old-One-Lair-4A.jpg",
+        "sha256": "24c3a7bbe88ac66773ec280a50627428e0303d5b1dbb9d007b5920655613c65e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04117",
+      "side": "B",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-Old-One-Lair-4B.jpg",
+        "sha256": "f165fd74a22283c61173e97f09656f2c0200d6a260ce39766939db92cb1c414c"
+      },
+      "lines": [
+        "When Revealed: Create your own staging area. Reveal 4 cards from the encounter deck and add them to your staging area.",
+        "Forced: After the 5th progress token is placed on Old One Lair, join another player at the beginning of the travel phase. If you cannot join another player, all players continue on to stage 5 together."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04118",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Out-of-the-Depths-5A.jpg",
+        "sha256": "e9b863f956bf86f9673ff82f71413e542a9d911508d3135a1ed6f1ee607ca012"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04118",
+      "side": "B",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Out-of-the-Depths-5B.jpg",
+        "sha256": "4f457090bd7e74f1e8d2ba265ccb18ebea3b5b2d5b41443e5aacd2f81039ed02"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 card from the encounter deck per player, and add it to the staging area.",
+        "Each player cannot commit more allies to the quest than the number of heroes he is also committing to the quest.",
+        "If the players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04119",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Durin's-Axe.jpg",
+        "sha256": "75172647f613da5ea7ce53d864031a3fdb958ba0355dac0bb25c881bbda2410a"
+      },
+      "lines": [
+        "Surge. Restricted.",
+        "Attached hero gets +3 Attack. If attached hero is a Dwarf, it gets +1 Willpower.",
+        "Action: Exhaust a hero to claim this objective. Then, attach Durin's Axe to that hero as an attachment."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04120",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Durin's-Helm.jpg",
+        "sha256": "abc1720c3c8c53a43623bff84ff5c0d3366dc83e0a9942b1c88248b7c20905d3"
+      },
+      "lines": [
+        "Surge.",
+        "Attached hero gets +1 Defense. If attached hero is a Dwarf, it gets +2 hit points.",
+        "Action: Exhaust a hero to claim this objective. Then, attach Durin's Helm to that hero as an attachment."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04121",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Drowned-Treasury.jpg",
+        "sha256": "b52cd2a461143d84d707c6ff057c5abb2aa7b552a6a28bd943221c925f559b6a"
+      },
+      "lines": [
+        "If Drowned Treasury is the active location at the end of the quest phase, each player must discard 1 character he controls.",
+        "Response: After Drowned Treasury leaves play as an explored location, each player may draw 2 cards or claim 1 objective in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04122",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Mithril-Lode.jpg",
+        "sha256": "6845c1537629adc4c8a07e6c7f882466237d22862b2b429054cb18e293477b7b"
+      },
+      "lines": [
+        "Doomed 1.",
+        "While Mithril Lode is the active location, it gains: \"Refresh Action: Exhaust a character you control to place X progress tokens on the current quest card, bypassing any active location. X is the exhausted character's Willpower. (Limit once per round.)\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04123",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Deep-Deep-Dark.jpg",
+        "sha256": "7639b5cf36044af3a86ddd9df7f02f83c146aa89cb14ffd09b87881c63566ddf"
+      },
+      "lines": [
+        "Doomed 1. Surge.",
+        "When Revealed: Attach 1 card from the top of the first player's deck to each Nameless enemy in play, if able.",
+        "Shadow: If attacking enemy is Nameless, the defending player must discard his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04124",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Lost-and-Alone.jpg",
+        "sha256": "616e99cf45563912aad1a9c1787b6f7b6ca62936d79da86d258acc68fa1c3e09"
+      },
+      "lines": [
+        "When Revealed: Each player chooses and shuffles a hero he controls into his deck. When he draws that hero, he puts it into play.",
+        "Shadow: If attacking enemy is Nameless, the defending player must discard his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04125",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Nameless-Thing.jpg",
+        "sha256": "7401cca7d89844f4bb4dd02c7ee5c3b43af8dc3c5459acf1650ed5f4838fef7e"
+      },
+      "lines": [
+        "Forced: After Nameless Thing engages a player, attach the top 2 cards of that player's deck to it.",
+        "X is the printed cost of all attached cards on this card. If there are no cards attached, X is 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04126",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Elder-Nameless-Thing.jpg",
+        "sha256": "ce4ba73e188e7f216a5e785f0dc1b0d2a35b8191933e7b47831b954e0cfe9251"
+      },
+      "lines": [
+        "Forced: After Elder Nameless Thing engages a player, attach the top 3 cards of that player's deck to it.",
+        "X is the printed cost of all attached cards on this card. If there are no cards attached, X is 4."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04127",
+      "side": "A",
+      "printing": "FoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Moria-Bats.jpg",
+        "sha256": "74f8fec9de1814a11fe1665d846b8d417e1480ac210caf18ca1c62dedf37ca11"
+      },
+      "lines": [
+        "Only characters with ranged can attack or defend against Moria Bats.",
+        "While Moria Bats is engaged with a player, it gets +1 Attack for each other enemy engaged with that player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04138",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Nearing-the-Gate-1A.jpg",
+        "sha256": "691cc4169dcfe44e08b7d46f4b480483fc37149f3d16360e366bf8b1ca4fe223"
+      },
+      "lines": [
+        "Setup: Remove Dark Pit from the encounter deck and place it aside, out of play. Add Durin's Bane to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04138",
+      "side": "B",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Nearing-the-Gate-1B.jpg",
+        "sha256": "1485a067810bc154c11e3137f2ce67ea771ea4e66bcef090b700902bd16674dc"
+      },
+      "lines": [
+        "When Revealed: Reduce each player's threat to 0. Reveal X cards from the encounter deck, where X is one less than the number of players in the game, and add them to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04139",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/The-Rear-Guard-2A.jpg",
+        "sha256": "b77e5b67403597e8a61105ea8005c1b67fbc551d31844885cc7c93f60393bb3a"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04139",
+      "side": "B",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/The-Rear-Guard-2B.jpg",
+        "sha256": "a38c65f22a647b39555f179624cefc73949233544e496b8a5eaaa68e003c562d"
+      },
+      "lines": [
+        "Forced: If at least 1 hero committed to the quest this round, place 4 progress tokens on The Rear Guard (bypassing any active location) at the end of the quest phase.",
+        "If Durin's Bane has 0 hit points, advance to the next stage of the scenario immediately."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04140",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Last-Lord-of-Moria-3A.jpg",
+        "sha256": "67ef7a4f3b6336ace4e5a241ff1a45bd7ed92422377030b180982172090a21b5"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04140",
+      "side": "B",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Last-Lord-of-Moria-3B.jpg",
+        "sha256": "cd6383a69c529bf1854ced21b9a81017f3895ca47e1a90907264dafca6658e19"
+      },
+      "lines": [
+        "When Revealed: Durin's Bane makes an immediate attack on the first player. Add Dark Pit to the staging area.",
+        "Players cannot win the game while Durin's Bane is in play. If Durin's Bane leaves play by the effect on Dark Pit, the players have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04141",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Dark-Pit.jpg",
+        "sha256": "e59ff261e47dd943e5d2031fb1f1d847e0fbd532db78c242cbfc3bfc6305c838"
+      },
+      "lines": [
+        "While Dark Pit is the active location, it gains: \"Refresh Action: Exhaust X characters (maximum 3) you control to discard the top X cards of your deck. If all discarded cards have a higher combined printed cost than the remaining hit points of Durin's Bane, discard Durin's Bane from play.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04142",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Second-Hall.jpg",
+        "sha256": "2eebd134107652f11552987012b79024a3598924a98350bdd9d983a8ddfccb79"
+      },
+      "lines": [
+        "While Second Hall is the active location, it gains: \"Forced: After a character leaves play, reveal 1 card from the encounter deck and add it to the staging area.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04143",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Second-Deep.jpg",
+        "sha256": "cb6c26e209596fc40289dda76c9978fecfddd9df186a6cb9d33b7ffd0621056a"
+      },
+      "lines": [
+        "While Durin's Bane has no damage on it, progress tokens cannot be placed on Second Deep."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04144",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Fires-in-the-Deep.jpg",
+        "sha256": "ab31699ae777aefb2259f853657729b5cccaab40fd32a7301e635df13939943c"
+      },
+      "lines": [
+        "When Revealed: Each player must discard 1 ally he controls, if able. If Fires in the Deep discarded no allies, it gains surge.",
+        "Shadow: The defending player discards 1 ally he controls, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04145",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Counter-Spell.jpg",
+        "sha256": "04f6b2a98b279e4a75f61673140dec364ad64131c15595f907a4b7319c3f2268"
+      },
+      "lines": [
+        "When Revealed: Attach Counter-spell to Durin's Bane. (Counts as a Condition attachment with the text: \"Forced: When a player plays an event, discard the top card of the encounter deck. If that card is a treachery card, cancel the effects of the event, discard the event player's hand, and discard Counter-spell from play.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04146",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Inner-Flame.jpg",
+        "sha256": "b6cdda6d0ddc52cd77a65adcb6aa776dc7998166d8e35ac0ca67feb1a84f0aca"
+      },
+      "lines": [
+        "When Revealed: Durin's Bane gets +3 Attack until the end of the round. The first player may remove 1 questing hero he controls from the quest to cancel this effect.",
+        "Shadow: If attacking enemy is Durin's Bane, it gets +3 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04147",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Inner-Shadow.jpg",
+        "sha256": "9e6312c26bb6daa00b8cfebfbde6678e765afd6281648d62645657d9fb19da8b"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Heal 5 damage from Durin's Bane, if able. The first player may remove 1 questing hero he controls from the quest to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04148",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Whip-Lash.jpg",
+        "sha256": "bb7c69382312509938bef07028a2bf5353b6faad3296831fcb3702d32a07ed99"
+      },
+      "lines": [
+        "When Revealed: Each player must discard 1 attachment he controls, if able.",
+        "Shadow: If attacking enemy is Durin's Bane, the defending player discards all attachments he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04149",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Leaping-Flame.jpg",
+        "sha256": "fb007849dd0b3c29572f77ab700f0e9cb3c9af978454190ea226fe50b030eacc"
+      },
+      "lines": [
+        "When Revealed: Durin's Bane makes an immediate attack against the first player (deal and resolve a shadow card).",
+        "Shadow: If attacking enemy is Durin's Bane, it gets +3 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04150",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Durin's-Bane.jpg",
+        "sha256": "776001c5702871d5bc6a355f2dcbbc97c4260353ec7247c07737f73ed5ec7e2a"
+      },
+      "lines": [
+        "Regenerate 3. Indestructible. Players cannot play attachments on Durin's Bane.",
+        "Durin's Bane cannot leave the staging area, is considered to be engaged with each player whose threat is 1 or greater, and attacks each of those players in turn during the combat phase (deal and discard a new shadow card each attack)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04151",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Ranging-Goblin.jpg",
+        "sha256": "b34cd814a4630fe302cc48e3b6e90b902ebc698cce0884bc19386f90b4b1eff2"
+      },
+      "lines": [
+        "When Revealed: Each player must deal 1 damage to a hero he controls.",
+        "Forced: After a character leaves play, shuffle Ranging Goblin and the top card in the encounter discard pile back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04152",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Fiery-Sword.jpg",
+        "sha256": "f8a6517060f49430d9fec7e8c08cd881028909fd82c4ede96b736b7f0f7284b9"
+      },
+      "lines": [
+        "When Revealed: Attach Fiery Sword to Durin's Bane as a Weapon attachment with the text: \"Attached enemy gets +3 Attack.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04153",
+      "side": "A",
+      "printing": "SaF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Many-Thonged-Whip.jpg",
+        "sha256": "1e85ffcfd135cda77070af7138e8bf31d94cd398d833507d14024531ff66b703"
+      },
+      "lines": [
+        "When Revealed: Attach Many Thonged Whip to Durin's Bane as a Weapon attachment with the text: \"Forced: When Durin's Bane attacks, the defending player must discard 1 card at random from his hand.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    }
+  ]
+}
