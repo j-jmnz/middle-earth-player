@@ -61,6 +61,14 @@ function jobs(file: string): Map<string, string> {
 describe("release.yml desktop jobs", () => {
   const all = jobs(path.join(GITHUB, "release.yml"));
 
+  // publish waits on `checks` (test.yml), so a desktop job there would let a desktop failure hold back the phone builds.
+  it("runs no desktop check inside the checks the phone builds wait on", () => {
+    const checks = jobs(path.join(GITHUB, "test.yml"));
+    expect(all.get("checks")).toContain("uses: ./.github/workflows/test.yml");
+    expect(all.get("publish")).toContain("needs.checks.result == 'success'");
+    for (const [name, body] of checks) if (/desktop/.test(name)) expect(body, name).toMatch(/^ {4}if: github\.event_name != 'workflow_dispatch'$/m);
+  });
+
   it("has the web export, the three-OS desktop build and a publish that waits for it", () => {
     expect([...all.keys()]).toEqual(expect.arrayContaining(["plan", "checks", "assets", "android", "ios", "web", "desktop", "cleanup", "publish"]));
     expect(all.get("desktop")).toMatch(/needs: \[plan, web\]/);

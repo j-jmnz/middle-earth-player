@@ -28,7 +28,8 @@ describe("phone-only files", () => {
   test("which files are which", () => {
     expect(["src/play/canvas/table-canvas.native.tsx", "src/x/use.ios.ts", "a.android.tsx", "modules/skia/x.ts", "app.json", "plugins/p.js", "eas.json"].every(isPhoneOnly)).toBe(true);
     expect(["src/play/canvas/table-canvas.tsx", "src/play/spotlight/burn.ts", "package.json"].some(isPhoneOnly)).toBe(false);
-    expect(["desktop/main.ts", "src/ui/skia/skia-web.ts", "src/x/y.canvaskit.tsx"].every(isDesktopWork)).toBe(true);
+    expect(["desktop/main.ts", "src/ui/skia/skia-web.ts", "src/x/y.canvaskit.tsx", "metro.config.js", "src/screens/booklets/web/open-pdf.ts", "src/ui/web/shown.ts"].every(isDesktopWork)).toBe(true);
+    expect(["src/screens/booklets/store.ts", "src/web.ts", "scripts/checks/a11y-web.ts"].some(isDesktopWork)).toBe(false);
   });
 
   test("a change with desktop work names the phone files it touches; one without is not held", () => {

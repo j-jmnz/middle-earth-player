@@ -37,6 +37,11 @@ function isFile(file: string): boolean {
   return existsSync(file) && statSync(file).isFile();
 }
 
+// A folder, not a file a longer path runs on below ("/index.html/x"), whose listing would throw.
+function isDirectory(dir: string): boolean {
+  return existsSync(dir) && statSync(dir).isDirectory();
+}
+
 // A path that climbs out of the export folder ("/../") is not served: it falls to the not-found page.
 function inside(root: string, file: string): boolean {
   const relative = path.relative(root, file);
@@ -59,7 +64,7 @@ export function resolveFile(root: string, pathname: string): string {
   const direct = [pathname, `${pathname}.html`, path.join(pathname, "index.html")].map(at).find((file) => inside(root, file) && isFile(file));
   if (direct) return direct;
   const dir = at(path.dirname(pathname));
-  const dynamic = inside(root, dir) && existsSync(dir) ? readdirSync(dir).find((name) => /^\[.*\]\.html$/.test(name)) : undefined;
+  const dynamic = inside(root, dir) && isDirectory(dir) ? readdirSync(dir).find((name) => /^\[.*\]\.html$/.test(name)) : undefined;
   return dynamic ? path.join(dir, dynamic) : missing;
 }
 

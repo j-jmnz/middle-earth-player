@@ -98,8 +98,10 @@ jobs:
 
   # The desktop app launched through Playwright's Electron driver under xvfb (docs/development.md, Commands): isolation, the drawn table, a save dialog for the backup, no request
   # off app://, and a relaunch that finds the save. Catalog only, no scans: the picture assertion is skipped here, and the booklets are packed only when present, so the release
-  # job runs those. Its own job, like a11y-web, so `test` stays as fast.
+  # job runs those. Its own job, like a11y-web, so `test` stays as fast. Skipped when release.yml calls this workflow: its desktop legs launch the packed app themselves, and
+  # a failed desktop check must not hold back the APK and the IPA, which wait on these checks (docs/releasing.md, Jobs).
   desktop-smoke:
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       ELECTRON_SKIP_BINARY_DOWNLOAD: ""

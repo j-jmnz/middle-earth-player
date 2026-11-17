@@ -534,9 +534,10 @@ jobs:
       TAG: ${{ needs.plan.outputs.tag }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # electron_config_cache is read by Electron's install and passed to electron-builder by `pnpm desktop pack` (its Electron zips); ELECTRON_BUILDER_CACHE holds its tools.
       - name: Point the Electron downloads at the runner
         run: |
-          echo "ELECTRON_CACHE=$RUNNER_TEMP/electron" >> "$GITHUB_ENV"
+          echo "electron_config_cache=$RUNNER_TEMP/electron" >> "$GITHUB_ENV"
           echo "ELECTRON_BUILDER_CACHE=$RUNNER_TEMP/electron-builder" >> "$GITHUB_ENV"
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:

@@ -222,8 +222,8 @@ Read the sections your task touches.
 - `docs/development.md` — Development (~2.7K tok)
 - `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1
-  - 20–35 Jobs (~1.7K) ← 4
-  - 36–60 Caches (~750)
+  - 20–35 Jobs (~1.8K) ← 4
+  - 36–60 Caches (~760)
   - 61–95 Signing (~980) ← 2
     - 65–68 Desktop signing (optional) (~220) ← 1
     - 69–82 Android key (~250) ← 1

@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { requiredFlag as flag } from "../args.ts";
 import { runScript, type Log } from "../log.ts";
 import { parseTag } from "./version.ts";
 
@@ -66,13 +67,6 @@ export function sourceOf(input: SourceInput): Record<string, unknown> {
     ],
     news: [],
   };
-}
-
-function flag(args: string[], name: string): string {
-  const at = args.indexOf(name);
-  const value = at < 0 ? undefined : args[at + 1];
-  if (!value || value.startsWith("--")) throw new Error(`${name} needs a value`);
-  return value;
 }
 
 function repository(): string {

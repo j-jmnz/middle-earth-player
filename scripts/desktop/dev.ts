@@ -5,17 +5,11 @@ import { createRequire } from "node:module";
 import path from "node:path";
 
 import { runScript, type Log } from "../log.ts";
-import { APP_DIR, bundleShell, desktopVersion, packAssets, ROOT } from "./shell.ts";
+import { APP_DIR, bundleShell, desktopVersion, packAssets, pnpmCommand, ROOT, withoutNodeOptions } from "./shell.ts";
 
 // The `electron` package exports the path of its binary.
 const electron = createRequire(import.meta.url)("electron") as string;
 const PORT = 8081;
-
-// pnpm gives every script the NODE_OPTIONS of pnpm-workspace.yaml (--disable-warning=...), which Electron refuses.
-function withoutNodeOptions(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
-  const { NODE_OPTIONS: _dropped, ...rest } = env;
-  return rest;
-}
 
 async function waitFor(url: string, give: number): Promise<void> {
   const until = Date.now() + give;
@@ -33,7 +27,8 @@ async function waitFor(url: string, give: number): Promise<void> {
 async function main(log: Log): Promise<void> {
   packAssets(log, ["catalog", "canvaskit", "pdfjs"]);
   await bundleShell(log, desktopVersion(undefined));
-  const metro = spawn("pnpm", ["exec", "expo", "start", "--web", "--port", String(PORT)], { cwd: ROOT, stdio: ["ignore", "inherit", "inherit"], env: { ...process.env, EXPO_PUBLIC_DESKTOP: "1", BROWSER: "none", CI: "1" } });
+  const pnpm = pnpmCommand(["exec", "expo", "start", "--web", "--port", String(PORT)]);
+  const metro = spawn(pnpm.command, pnpm.args, { cwd: ROOT, shell: pnpm.shell, stdio: ["ignore", "inherit", "inherit"], env: { ...process.env, EXPO_PUBLIC_DESKTOP: "1", BROWSER: "none", CI: "1" } });
   try {
     await waitFor(`http://localhost:${PORT}`, 120_000);
     log.info("Metro is up; opening the window");

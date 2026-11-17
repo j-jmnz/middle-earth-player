@@ -5,18 +5,11 @@
 import { copyFileSync, appendFileSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { flagValue as flag } from "../args.ts";
 import { runScript, type Log } from "../log.ts";
 import { fileSha256 } from "../release/sha256.ts";
 import { ASSET_LIMIT, DESKTOP_OS, installerNames, missingInstallers, packedApp, stagedName } from "./release-files.ts";
 import { desktopVersion, OUT_DIR } from "./shell.ts";
-
-function flag(args: readonly string[], name: string): string | undefined {
-  const at = args.indexOf(name);
-  if (at < 0) return undefined;
-  const value = args[at + 1];
-  if (!value || value.startsWith("--")) throw new Error(`${name} needs a value`);
-  return value;
-}
 
 async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2);

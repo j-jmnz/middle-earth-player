@@ -44,6 +44,11 @@ describe("resolveFile", () => {
     expect(resolveFile(root, "/nowhere/deeper/still")).toBe(at("+not-found.html"));
   });
 
+  it("falls to the not-found page for a path below a file", () => {
+    expect(resolveFile(root, "/index.html/x")).toBe(at("+not-found.html"));
+    expect(resolveFile(root, "/decks.html/x")).toBe(at("+not-found.html"));
+  });
+
   it("does not climb out of the export folder", () => {
     for (const hostile of ["/../outside.txt", "/../../etc/passwd", "/a/../../outside.txt", "//../outside.txt", "/\0/secret.txt"]) {
       expect(resolveFile(root, hostile), hostile).toBe(at("+not-found.html"));

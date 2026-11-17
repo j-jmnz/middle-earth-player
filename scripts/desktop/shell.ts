@@ -63,14 +63,32 @@ export async function bundleShell(log: Log, version: string): Promise<void> {
   writeFileSync(path.join(APP_DIR, "package.json"), `${JSON.stringify(appPackage(version), null, 2)}\n`);
 }
 
+// pnpm gives every script the NODE_OPTIONS of pnpm-workspace.yaml (--disable-warning=...), which Electron refuses: a launch with it never answers. Node's flags are not Electron's.
+/** The environment without NODE_OPTIONS, for an Electron child (Node's spawn and Playwright both leave out a variable that is undefined). */
+export function withoutNodeOptions<Env extends Readonly<Record<string, string | undefined>>>(env: Env): Env {
+  return { ...env, NODE_OPTIONS: undefined };
+}
+
+/**
+ * How to run `pnpm <args>` from a script with no shell, so a path with a space stays one argument on every OS. Under pnpm, `npm_execpath` is pnpm's own script, run
+ * with this Node; on Windows `pnpm` alone is `pnpm.cmd`, which only a shell finds, so without `npm_execpath` the arguments are quoted for cmd instead.
+ */
+export function pnpmCommand(args: readonly string[], env: Readonly<Record<string, string | undefined>> = process.env, platform: string = process.platform): { command: string; args: string[]; shell: boolean } {
+  const runner = env["npm_execpath"];
+  if (runner && /\.c?js$/.test(runner)) return { command: process.execPath, args: [runner, ...args], shell: false };
+  if (platform !== "win32") return { command: "pnpm", args: [...args], shell: false };
+  return { command: "pnpm", args: args.map((arg) => (/[\s"]/.test(arg) ? `"${arg.replace(/"/g, '\\"')}"` : arg)), shell: true };
+}
+
 export type ExportOptions = { out: string; env?: Record<string, string> };
 
 /** Exports the web build for the desktop (`expo export -p web` with EXPO_PUBLIC_DESKTOP=1) into `out`. The packs it serves (pnpm assets) are made before. */
 export function exportDesktopWeb(log: Log, { out, env }: ExportOptions): void {
   log.step(`expo export -p web (desktop) to ${path.relative(ROOT, out)}`, () => {
-    execFileSync("pnpm", ["exec", "expo", "export", "-p", "web", "--output-dir", out], {
+    const pnpm = pnpmCommand(["exec", "expo", "export", "-p", "web", "--output-dir", out]);
+    execFileSync(pnpm.command, pnpm.args, {
       cwd: ROOT,
-      shell: process.platform === "win32",
+      shell: pnpm.shell,
       stdio: ["ignore", "ignore", "inherit"],
       env: { ...process.env, EXPO_PUBLIC_DESKTOP: "1", EXPO_NO_TELEMETRY: "1", EXPO_OFFLINE: "1", CI: "1", ...env },
     });
@@ -80,6 +98,7 @@ export function exportDesktopWeb(log: Log, { out, env }: ExportOptions): void {
 /** Runs `pnpm assets <packs>` (every pack when none is named). */
 export function packAssets(log: Log, packs: readonly string[], extra: readonly string[] = []): void {
   log.step(`pnpm assets ${packs.join(" ")}`.trim(), () => {
-    execFileSync("pnpm", ["assets", ...packs, ...extra], { cwd: ROOT, stdio: ["ignore", "ignore", "inherit"], shell: process.platform === "win32" });
+    const pnpm = pnpmCommand(["assets", ...packs, ...extra]);
+    execFileSync(pnpm.command, pnpm.args, { cwd: ROOT, stdio: ["ignore", "ignore", "inherit"], shell: pnpm.shell });
   });
 }

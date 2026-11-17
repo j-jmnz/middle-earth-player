@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { APP_NAME } from "../../desktop/identity.ts";
 import { builderArgs } from "./pack.ts";
-import { appPackage, desktopVersion } from "./shell.ts";
+import { appPackage, desktopVersion, pnpmCommand, withoutNodeOptions } from "./shell.ts";
 
 describe("desktopVersion", () => {
   it("is package.json's 0.0.0 without APP_VERSION and the tag's version with it", () => {
@@ -40,6 +40,8 @@ describe("builderArgs", () => {
     expect(builderArgs("0.0.0", "45.2.1", "win32", [])).toContain("--win");
     expect(builderArgs("0.0.0", "45.2.1", "darwin", [])).toContain("--mac");
     expect(() => builderArgs("0.0.0", "45.2.1", "freebsd", [])).toThrow(/freebsd/);
+    expect(builderArgs("0.0.0", "45.2.1", "linux", [], "/tmp/electron")).toContain("-c.electronDownload.cache=/tmp/electron");
+    expect(builderArgs("0.0.0", "45.2.1", "linux", []).some((arg) => arg.startsWith("-c.electronDownload"))).toBe(false);
   });
 });
 
@@ -54,5 +56,25 @@ describe("electron-builder.yml", () => {
   it("builds the targets the plan names: NSIS and a zip, a universal dmg, an AppImage and a deb", () => {
     for (const target of ["target: nsis", "target: zip", "target: dmg\n      arch: universal", "target: AppImage", "target: deb"]) expect(yml).toContain(target);
     expect(yml).toContain('identity: "-"');
+  });
+});
+
+describe("pnpmCommand", () => {
+  const args = ["exec", "expo", "export", "--output-dir", "C:\\Users\\Ann Lee\\repo\\web"];
+  it("runs pnpm's own script with this Node under pnpm, so no shell splits a path", () => {
+    expect(pnpmCommand(args, { npm_execpath: "/pnpm/bin/pnpm.cjs" } as Record<string, string>, "win32")).toEqual({ command: process.execPath, args: ["/pnpm/bin/pnpm.cjs", ...args], shell: false });
+  });
+
+  it("runs pnpm directly off Windows, and through cmd with quoted arguments on it", () => {
+    expect(pnpmCommand(args, {} as Record<string, string>, "linux")).toEqual({ command: "pnpm", args, shell: false });
+    const windows = pnpmCommand(args, {} as Record<string, string>, "win32");
+    expect(windows.shell).toBe(true);
+    expect(windows.args.at(-1)).toBe('"C:\\Users\\Ann Lee\\repo\\web"');
+  });
+});
+
+describe("withoutNodeOptions", () => {
+  it("unsets NODE_OPTIONS and keeps the rest", () => {
+    expect(withoutNodeOptions({ NODE_OPTIONS: "--disable-warning=X", PATH: "/bin" })).toEqual({ NODE_OPTIONS: undefined, PATH: "/bin" });
   });
 });

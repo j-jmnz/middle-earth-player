@@ -26,7 +26,7 @@ import { APP_ORIGIN, DESKTOP_API } from "../../desktop/identity.ts";
 import { duration, runScript, type Log } from "../log.ts";
 import { packedVersion } from "../desktop/asar.ts";
 import { parseSmokeArgs } from "../desktop/smoke-args.ts";
-import { APP_DIR, bundleShell, desktopVersion, exportDesktopWeb, packAssets, ROOT, WEB_E2E_DIR } from "../desktop/shell.ts";
+import { APP_DIR, bundleShell, desktopVersion, exportDesktopWeb, packAssets, ROOT, WEB_E2E_DIR, withoutNodeOptions } from "../desktop/shell.ts";
 
 const FIXTURE = "duo";
 const SAVE = `save-e2e-${FIXTURE}`;
@@ -35,10 +35,6 @@ const TIMEOUT = 90_000;
 type Session = { page: Page; context: BrowserContext; app: ElectronApplication | null; close: () => Promise<void>; requests: string[]; csp: string[]; errors: string[] };
 type Options = { packed: string | null; userData: string };
 
-// pnpm gives every script the NODE_OPTIONS of pnpm-workspace.yaml (--disable-warning=...), which Electron refuses: the launch then never answers. Node's own flags are not Electron's.
-function cleanEnv(): Record<string, string> {
-  return Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => entry[0] !== "NODE_OPTIONS" && entry[1] !== undefined));
-}
 
 const linuxFlags = (): string[] => (process.platform === "linux" ? ["--no-sandbox", "--enable-unsafe-swiftshader", "--disable-dev-shm-usage"] : []);
 
@@ -59,7 +55,7 @@ function killTree(child: ChildProcess): void {
 // The packed app, started as a plain process with a debugging port, and attached to over CDP. Browser.close quits it the way the window's close does.
 async function launchPacked(executable: string, userData: string): Promise<{ browser: Browser; child: ChildProcess }> {
   const child: ChildProcess = spawn(executable, [`--user-data-dir=${userData}`, "--remote-debugging-port=0", ...linuxFlags()], {
-    env: { ...process.env, NODE_OPTIONS: undefined, APPIMAGE_EXTRACT_AND_RUN: "1" },
+    env: { ...withoutNodeOptions(process.env), APPIMAGE_EXTRACT_AND_RUN: "1" },
     stdio: ["ignore", "ignore", "pipe"],
   });
   const endpoint = await new Promise<string>((resolve, reject) => {
@@ -118,7 +114,7 @@ async function openPacked(executable: string, userData: string): Promise<Pick<Se
 async function openChecked(userData: string): Promise<Pick<Session, "page" | "context" | "app" | "close">> {
   const app = await electron.launch({
     args: [path.join(APP_DIR, "main.js"), `--user-data-dir=${userData}`, ...linuxFlags()],
-    env: { ...cleanEnv(), MIDDLE_EARTH_PLAYER_WEB_ROOT: WEB_E2E_DIR },
+    env: { ...withoutNodeOptions(process.env), MIDDLE_EARTH_PLAYER_WEB_ROOT: WEB_E2E_DIR },
     timeout: 60_000,
   });
   return { page: await app.firstWindow(), context: app.context(), app, close: () => app.close() };

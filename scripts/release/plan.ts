@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { ENGINE_CHANGES, ENGINE_VERSION } from "../../src/rules/engine/version.ts";
+import { flagValue as flag, flagValues } from "../args.ts";
 import { runScript, type Log } from "../log.ts";
 import { renderNotes } from "./notes.ts";
 import { fileSha256 } from "./sha256.ts";
@@ -41,26 +42,6 @@ function tryGit(args: string[]): string | undefined {
   } catch {
     return undefined;
   }
-}
-
-/** Every value of a flag given more than once (`--desktop a --desktop b`). */
-export function flagValues(args: readonly string[], name: string): string[] {
-  const values: string[] = [];
-  args.forEach((arg, at) => {
-    if (arg !== name) return;
-    const value = args[at + 1];
-    if (!value || value.startsWith("--")) throw new Error(`${name} needs a value`);
-    values.push(value);
-  });
-  return values;
-}
-
-function flag(args: string[], name: string): string | undefined {
-  const at = args.indexOf(name);
-  if (at < 0) return undefined;
-  const value = args[at + 1];
-  if (!value || value.startsWith("--")) throw new Error(`${name} needs a value`);
-  return value;
 }
 
 /** The newest release tag reachable from HEAD, so a release/vX.Y branch counts from its own line. */

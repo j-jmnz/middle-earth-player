@@ -7,9 +7,10 @@ export function isPhoneOnly(file: string): boolean {
   return ["app.json", "app.config.js", "eas.json"].includes(file);
 }
 
-/** A file that only the desktop and web build holds: a change touching one is desktop work. */
+/** A file that only the desktop and web build holds, or the Metro config that decides what each bundle holds: a change touching one is desktop work. */
 export function isDesktopWork(file: string): boolean {
-  return file.startsWith("desktop/") || file.startsWith("src/ui/skia/") || /\.canvaskit\.[^/]+$/.test(file);
+  if (file === "metro.config.js" || file.startsWith("desktop/") || file.startsWith("src/ui/skia/")) return true;
+  return /\.canvaskit\.[^/]+$/.test(file) || /^src\/(.+\/)?web\//.test(file);
 }
 
 /** The phone-only files among `changed`, when `changed` holds desktop work; none otherwise. */
