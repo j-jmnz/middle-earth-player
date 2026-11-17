@@ -9,7 +9,7 @@ const PATROL_SENTRY = "901003";
 const PATROL_LEADER = "03014";
 const DARK_LOCATION: PickSpec = { type: "location", control: "any", trait: "Dark" };
 // A Cave Torch in play, on a hero or not, ready or exhausted: the card of Into the Pit.
-const TORCH_ATTACHMENT: PickSpec = { type: "attachment", control: "any", names: ["Cave Torch"] };
+const TORCH_ATTACHMENT: PickSpec = { type: "card", control: "any", names: ["Cave Torch"] };
 const TORCH_IN_PLAY: Condition = { kind: "inPlay", code: TORCH, is: true };
 const FIFTH_TOKEN: Condition = { kind: "less", left: 4, right: { stat: "damage", of: "self" } };
 const ACTIVE_IS_DARK: Condition = { kind: "matches", card: "activeLocation", pick: DARK_LOCATION };
@@ -43,7 +43,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       ],
     },
     { id: "901002:constant:1", cardCode: "901002", lines: ["901002:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { players: true, plus: 1 }, until: "whileSourceInPlay" }] },
-    { id: "901002:forced:1", cardCode: "901002", lines: ["901002:B:2"], timing: "forced", trigger: "enemyDestroyed", instructions: [{ verb: "AddStageProgress", amount: 1 }] },
+    { id: "901002:forced:1", cardCode: "901002", lines: ["901002:B:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any" }, instructions: [{ verb: "AddStageProgress", amount: 1 }] },
     { id: "901002:constant:2", cardCode: "901002", lines: ["901002:B:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noQuestProgress", amount: 1, until: "whileSourceInPlay", target: "table" }] },
 
     // 901003 Patrol Sentry: after a Cave Torch exhausts, a Sentry engaged with a player makes an immediate attack against him (nothing happens in the staging area). The Shadow adds it to the staging area.
