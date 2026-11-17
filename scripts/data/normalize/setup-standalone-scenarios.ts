@@ -22,7 +22,7 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     return smaug.length === 0 ? null : [{ kind: "aside", codes: [...new Set(smaug.map((card) => card.code))], allCopies: true }];
   }
   // "Then reveal 1 card from the encounter deck per player, and add it to the staging area": the first player reveals one card for each player, as "Each player reveals 1 card" does.
-  if ((match = /^Then reveal (\d+|an?|one) cards? from the encounter deck per player, and add it to the staging area$/i.exec(sentence))) {
+  if ((match = /^Then,? reveal (\d+|an?|one) cards? from the encounter deck per player, and add it to the staging area$/i.exec(sentence))) {
     return [{ kind: "eachPlayerReveals", count: /^\d+$/.test(match[1] ?? "") ? Number(match[1]) : 1 }];
   }
   if ((match = /^Remove (.+?) from the encounter deck and set (?:him|her|it|them) aside, out of play$/.exec(sentence))) {

@@ -55,7 +55,9 @@ describe("The Shadows of Mirkwood cycle", () => {
   });
 
   it("builds the six scenario files, each named for its Hall of Beorn title, in release order after the campaigns", () => {
-    expect(scenarioOrder().slice(-7, -1)).toEqual(Object.keys(DECK));
+    // The Standalone scenarios cycle comes last, whatever number of its scenarios are built.
+    const standalone = loadCampaign("standalone-scenarios").scenarios.length;
+    expect(scenarioOrder().slice(-(6 + standalone), -standalone)).toEqual(Object.keys(DECK));
     for (const [at, [id, pin]] of Object.entries(DECK).entries()) {
       expect(scenarioSlug(pin.title), id).toBe(id);
       const scenario = loadAnyScenario(id);

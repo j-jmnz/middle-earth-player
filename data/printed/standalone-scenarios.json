@@ -385,6 +385,461 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "50201",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Terror-from-the-Mountain-1A.jpg",
+        "sha256": "981fe4b3be9e6f048a5ae5a679476ba4350b32fb1c08fc604c7c96bd1c7a1330"
+      },
+      "lines": [
+        "Setup: Shuffle all copies of Smaug into a separate Smaug deck. Search the encounter deck for Lake-town and add it to the staging area. Shuffle the encounter deck. Then, reveal 1 card from the encounter deck per player, and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50201",
+      "side": "B",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Terror-from-the-Mountain-1B.jpg",
+        "sha256": "4e75466105a9dbc46f2f21639c5134b3c89c98cce6d34955c7b453aa0c81b386"
+      },
+      "lines": [
+        "Smaug cannot have more than 6 damage on him.",
+        "When Revealed: Deal 1 damage to Lake-town for each player in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50202",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fire-and-Water-2A.jpg",
+        "sha256": "208f1eb265c961b7ee17a17bacb1dcfabb70a9000661894c75febc7a17c2891d"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50202",
+      "side": "B",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fire-and-Water-2B.jpg",
+        "sha256": "bd2c160a352001a1f66ec84114d245dbfac515a7e1b5aed80e9d6c21448a0094"
+      },
+      "lines": [
+        "Smaug cannot have more than 12 damage on him.",
+        "When the players quest successfully, any number of progress tokens that would be placed on this quest may instead be discarded to remove the same amount of damage from Lake-town."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50203",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Dragon's-Wrath-3A.jpg",
+        "sha256": "90bc634d5a9d3fbe37a648d72832952cb14cbd949df128c327906d6f6d4bd727"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50203",
+      "side": "B",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Dragon's-Wrath-3B.jpg",
+        "sha256": "84cdd20226089aa3752e34e09de814e04844e71083546067ed7a62265fedc9a2"
+      },
+      "lines": [
+        "Forced: During the quest phase, reveal 1 additional card from the encounter deck",
+        "Refresh Action: Reset the quest deck to stage 2B.",
+        "The players must defeat Smaug to defeat this stage. When Smaug is defeated, compare the number of damage tokens on Lake-town with the number of victory points in the victory display. If the players have more victory points, they have won the game. Otherwise, Lake-town has burned and the players have lost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50204",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Mighty.jpg",
+        "sha256": "dfa6f37c9eef35354e95be0cf3804ad28fde787e72dd85d2993857fd671a56ef"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "When Revealed: Smaug the Mighty makes an immediate attack against each player (deal and resolve a shadow card for each attack)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50205",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Terrible.jpg",
+        "sha256": "04a6a7f09761ef99ca0676f75501d0ed9d6b05252e5ecad4f720e6ddd50d4b25"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "When Revealed: Resolve all burn damage from all locations in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50206",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Magnificent.jpg",
+        "sha256": "cde7d0389ba1c75ce4c439c93a5336111ce38c173353f98039fd9185960f819e"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Excess damage from attacks by Smaug the Magnificent must be assigned to Lake-town.",
+        "When Revealed: Move 3 damage from Smaug the Magnificent to Lake-town."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50207",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Lake-town.jpg",
+        "sha256": "0ba75e10e6b408f27ff147636a3922093b57a3ae89d44866eed83982aea08c91"
+      },
+      "lines": [
+        "If Lake-town has 50 or more damage on it, Lake-town has completely burned and the players have lost the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50208",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Old-Thrush.jpg",
+        "sha256": "89de061eb90b24dd7d1822612ae3a578a8038c4fee537ddeb8854fc12a5745cc"
+      },
+      "lines": [
+        "Guarded.",
+        "Action: Exhaust a hero to claim this objective and attach it to that hero when it is free of encounters. (Counts as an attachment with the text: \"If detached, discard The Old Thrush. Response: After attached hero exhausts to attack Smaug, discard X cards from hand to reduce Smaug's Defense by X.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50209",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Close-to-the-Flame.jpg",
+        "sha256": "48f5a64f536905b3b64ca8edcb6e9814f73bb9dfea73ca2201745d3ed7fee8e8"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each character in play.",
+        "Shadow: Deal 1 damage to each character in play. Any player may discard a hero to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50210",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Scorching-Blast.jpg",
+        "sha256": "9863925b62de2354ae574403e1c8ca9f365b5ea9b5571e97bce8d34876ffbf0b"
+      },
+      "lines": [
+        "When Revealed: Resolve all burn damage from all locations in play.",
+        "Shadow: Resolve this card's \"When Revealed\" effect. Any player may discard a hero to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50211",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Town-Baiting.jpg",
+        "sha256": "42afec90f5dd8c98379e40d7d01069ae04f645baf6f3b19698c909c94e290346"
+      },
+      "lines": [
+        "When Revealed: Smaug makes an attack against Lake-town. The last player may declare a defender against this attack. Excess damage from this attack must be placed on Lake-town. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50212",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Dire-Magnificence.jpg",
+        "sha256": "55f8c7cde5c06a2b0cf6de796f0e04065f5d6eb00840949ea37d781e28cd7ec9"
+      },
+      "lines": [
+        "When Revealed: Each player must choose and discard 1 ally he controls, if able. Deal 2 damage to Lake-town for each player that cannot.",
+        "Shadow: If this attack destroys a character, Smaug engages the next player and makes an immediate attack against that player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50213",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Catching-Fire.jpg",
+        "sha256": "ea573916f6f1274b020d94ae31764607784f31865045e3d50a8f20f6dbdb6748"
+      },
+      "lines": [
+        "When Revealed: Choose and shuffle 1 Pier location from the victory display back into the encounter deck. If no location was shuffled into the encounter deck by this effect, Catching Fire gains surge.",
+        "Shadow: Defending character gets -2 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50214",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Reckless-in-His-Rage.jpg",
+        "sha256": "30283644bd24d5f20caa7f8aafd84f787727f6894da0d333f9b1c1103390cb24"
+      },
+      "lines": [
+        "When Revealed: If Smaug is in play, he gets +2 Threat, +2 Attack, -2 Defense and gains the text: \"Allies cannot be declared as defenders.\" This effect lasts until the end of the round.",
+        "Shadow: If this attack destroys a character, resolve all burn damage on locations in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50215",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/West-Pier.jpg",
+        "sha256": "085c627e8117ecc23e95db25e168922605993a2df882f043e3350c5d9625fab3"
+      },
+      "lines": [
+        "Each location in play gains Burn 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50216",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Master's-Manor.jpg",
+        "sha256": "e9c778100d5de610167131141d7add6a0e839cd45a83398d8f73ae6136e95d7a"
+      },
+      "lines": [
+        "Burn 3.",
+        "When Revealed: Move all damage from Smaug to Lake-town.",
+        "Shadow: If this attack destroys a character, defending player discards his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50217",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/South-Pier.jpg",
+        "sha256": "c6f8d39f5efeaa1beeb69644d377a24cceb9018861534edc5e03a6695a120124"
+      },
+      "lines": [
+        "Burn 2.",
+        "When faced with the option to travel, players cannot travel to other locations."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50218",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/North-Pier.jpg",
+        "sha256": "8e459391cfa431caf4c5e7b7573eac36bdfba0bec802ae917e317fd80d77a31f"
+      },
+      "lines": [
+        "Burn 2.",
+        "Smaug cannot be damaged."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50219",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Merchant's-District.jpg",
+        "sha256": "22d970b845b5b61c209c52b0a15a7af3b9f0206ad742e39b1ce9941f6c6d930e"
+      },
+      "lines": [
+        "Burn 1.",
+        "Travel Action: Deal 2 damage per player to Lake-town to add this location to the victory display.",
+        "Shadow: Deal 1 damage on Lake-town. (4 damage instead if undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50220",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/East-Pier.jpg",
+        "sha256": "077632a1615f4a264155020eb20a13170635abf6946695dd2ea08babc7e38d5e"
+      },
+      "lines": [
+        "Burn 1.",
+        "\"When Revealed\" effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50221",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Great-House.jpg",
+        "sha256": "97a2fde6318c9f7bb3329d076434ecb49c5f4a100d2734c70b996d2cfd4d6453"
+      },
+      "lines": [
+        "Burn 3.",
+        "When Revealed: Resolve all burn damage from all locations in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50222",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Great-Bridge.jpg",
+        "sha256": "28ed62a85abef9323812978c8c9cbaa5dae573754f529ad1d582a0e3d0461bbd"
+      },
+      "lines": [
+        "Burn 2.",
+        "When Revealed: Discard X cards from each player's deck. X is the amount of damage on Lake-town. (If no cards are discarded by this effect, Great Bridge gains surge.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50223",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fisherman's-Dock.jpg",
+        "sha256": "99b43f64ed3aaadff07465ea71dc831bbacca16f80bc675525a162bc3a37e4f1"
+      },
+      "lines": [
+        "Burn 1.",
+        "Travel: If there is 1 active location, exhaust a hero to travel here. (There are now 2 active locations.)",
+        "Shadow: Add this location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50224",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Esgaroth-Wharf.jpg",
+        "sha256": "7cc087baa09fc6d3916e01aeb60111f947f5d10699fefb57f82a4553be5047d5"
+      },
+      "lines": [
+        "Burn 1.",
+        "All locations are immune to player card effects.",
+        "Shadow: Attacking enemy gets +2 Attack. Then, it makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
     }
   ]
 }

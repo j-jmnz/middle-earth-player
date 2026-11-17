@@ -5377,9 +5377,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "f192bc26d4c58bd9b305fbdada62a3685bb27728bb2d80ab34619662c7990269"
+        "value": "2f09007897d4134187ac4cf5510cd2e0ad1f454ca26d99a65eb1c2f4205761b8"
       },
-      "fetchedAt": "2026-11-17T14:00:43.583Z",
+      "fetchedAt": "2026-11-17T18:46:04.974Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -19530,6 +19530,168 @@
           "bytes": 576074
         },
         {
+          "path": "pictures/50201.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1atiJUnDw9LD2xtttpaw22ULKArG4HJHD&export=download&confirm=t",
+          "sha256": "1abc898c26329123ff7e78fc2c18b6c6c0c78cf3a8b7b2feb861aecd7cd2345b",
+          "bytes": 3712390
+        },
+        {
+          "path": "pictures/50201.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1apINh6QjTm2tX_aQ94_zBn3j8iSsh9pn&export=download&confirm=t",
+          "sha256": "f04080855c87f0faad0a175b82878532c94353c1e296e58c752c76a48759a60b",
+          "bytes": 3587481
+        },
+        {
+          "path": "pictures/50202.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1amVgP8HF6xsh_JKIM-7ZtNo9MNgCF8OX&export=download&confirm=t",
+          "sha256": "c857ad61690c8f6b5047ec928f01c33b94e18f4892bae67a42156b097d7cb2ec",
+          "bytes": 3676673
+        },
+        {
+          "path": "pictures/50202.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1b7bTxRIhF7vhFOt0abqLIu1Zft70fF86&export=download&confirm=t",
+          "sha256": "b637817571d31173fc86fbc158b4cfecdce3ecb2ae2115e74c0f28f063dc2c10",
+          "bytes": 3718976
+        },
+        {
+          "path": "pictures/50203.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1b6snc4t_ZOK3gWHQIskbRV9jkgm7mqha&export=download&confirm=t",
+          "sha256": "ae2b463c40e35d7f782b6d2d97464364b46ae19018dfcf8308e8ad5cfc374b62",
+          "bytes": 3532613
+        },
+        {
+          "path": "pictures/50203.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1b3Ai9YSG57PH5ErLsOrdHgWuzX1I9vWn&export=download&confirm=t",
+          "sha256": "905dc5b06bc04d6404b0b1be95d3cf5bf7d04563cdba303333cc022bb32574cd",
+          "bytes": 3620808
+        },
+        {
+          "path": "pictures/50204.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ZyDPGz5ODatZgldW81IMnGAnbIu0d1-_&export=download&confirm=t",
+          "sha256": "6cc0d7854a453014be79e57655ac360e5e17752dd6517aa0cb13a3860647122a",
+          "bytes": 5204272
+        },
+        {
+          "path": "pictures/50205.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_fzG1JXchqEoiieLOZ00A0oIIeHYh1ib&export=download&confirm=t",
+          "sha256": "474cbf0ee96d74cabe095dfd977e1a4ea5452fd073186a1787aa9555719b5944",
+          "bytes": 5031225
+        },
+        {
+          "path": "pictures/50206.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_ZwVtneyu2f3bICx-iEYQEU0Ip8POjhn&export=download&confirm=t",
+          "sha256": "8c90ff5f94ad0f67dc196c4d54c410fa3b1b26add4a22762056f94f595096b88",
+          "bytes": 5024094
+        },
+        {
+          "path": "pictures/50207.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_WyzBukFUQN7dnUAC11qbM6aNJ_3-2u9&export=download&confirm=t",
+          "sha256": "66f3eaa277d519d71bb8309b91ca60595192724b27bb95c0ef7a2d2c15a1e33b",
+          "bytes": 4751105
+        },
+        {
+          "path": "pictures/50208.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_qEKlFK7Uo1ysJojf2p3nXQfgiV-M_KO&export=download&confirm=t",
+          "sha256": "e32337f0c28f42926b6ce3b66956f1d5e314b5a8604eb45fa21e6f4f80bea992",
+          "bytes": 4662938
+        },
+        {
+          "path": "pictures/50209.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_o_Iru86rqiYAk8FhU8ssKSn581F3_iG&export=download&confirm=t",
+          "sha256": "28750a02f25e2c5f7df18e8bdd952fc9deb75f9c3508a84edb71c24b962b4bfa",
+          "bytes": 4511734
+        },
+        {
+          "path": "pictures/50210.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_lTaw5jSIgjqJiD5HjIV1lNya0GAD8Te&export=download&confirm=t",
+          "sha256": "b3d582ee352e596a1a16264f15245a1b8274d8f3a4cff2f592fcaac058e93cc9",
+          "bytes": 4702798
+        },
+        {
+          "path": "pictures/50211.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_jtzMbt32HCqd9nxYV9tTD_wQXkwqXGL&export=download&confirm=t",
+          "sha256": "6540d0939020f74fd23f43f8d3365bcefbb42c680f0449e75d9f86783de3f628",
+          "bytes": 4775285
+        },
+        {
+          "path": "pictures/50212.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1a5WqkU8LoraiWswicc85j4Rf2127XHFp&export=download&confirm=t",
+          "sha256": "3df401e09e38c612ac409c9184a58b319102871bc5fd93e3d6cb04eb06121030",
+          "bytes": 4865954
+        },
+        {
+          "path": "pictures/50213.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_rdM7dJWE2sYwhpqehxakogdbSTjhrGO&export=download&confirm=t",
+          "sha256": "6a9147fee78f26eafd4268d0fb53198d832c5a13c1f890e1d90363a1b82d7ab0",
+          "bytes": 4662366
+        },
+        {
+          "path": "pictures/50214.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_r7XnGIZI0wOXIBJqAuO9Q8KVN9YKzmX&export=download&confirm=t",
+          "sha256": "ad4272d978af964e1ae10ac2f48ab8b1058f4003a59323e219828be9b05941c6",
+          "bytes": 4738466
+        },
+        {
+          "path": "pictures/50215.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1aL6-mAo5WgvDH46S-oBPeaKREshkaTT4&export=download&confirm=t",
+          "sha256": "1d18244a263819c3b21369e301288d42b24662808af08fe5cf088b57264cea56",
+          "bytes": 4821520
+        },
+        {
+          "path": "pictures/50216.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1aHFeUfTu1jlIeZZ2W2fLbKPLDOwezyNO&export=download&confirm=t",
+          "sha256": "708f0d69a0f2b007eaf96672e233ff48e4fe05278b04f2aac077ab0ce3bb901a",
+          "bytes": 4761783
+        },
+        {
+          "path": "pictures/50217.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1aFch98NSq8xw-_YDyOjL6IPQlbzmH-8K&export=download&confirm=t",
+          "sha256": "75cd422f010a7219b01b7f963edcaaa792c9d7a4f11eaa8eb07d125387551a6f",
+          "bytes": 4830267
+        },
+        {
+          "path": "pictures/50218.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1adp7zd4aUTIa9dxT2-ZjgLRzsY0K9U1g&export=download&confirm=t",
+          "sha256": "d2bc87d1e865dd6d5ea5f71a2b0467a014aece84dea63296f7f0a06c5da134d7",
+          "bytes": 4797419
+        },
+        {
+          "path": "pictures/50219.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ac08Y9UErx-cE8aC589WZl62PF0I3RSt&export=download&confirm=t",
+          "sha256": "e1c527e98a9b4693ba6ce147ba2d5ce8e446fe1f687c17e4b2305bb55cd06bd4",
+          "bytes": 4856276
+        },
+        {
+          "path": "pictures/50220.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1aTCCOeQkFaA_97q9IP86l01QfGTvmPrJ&export=download&confirm=t",
+          "sha256": "c5bf1497fd799b4c36d666e5aab47c1705216b80cc2110219c270c67515b9b99",
+          "bytes": 4784518
+        },
+        {
+          "path": "pictures/50221.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1al-f05XkqzLfz-pANYJXUoaB82lo1KIj&export=download&confirm=t",
+          "sha256": "16611c69d45d6c27cc9ca7f367012167590619e4d49e09e4faf2b3025e75c563",
+          "bytes": 4801817
+        },
+        {
+          "path": "pictures/50222.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1aiCG6yEbdpOkWNYLbV3DTbfuRehl_Hpt&export=download&confirm=t",
+          "sha256": "f54ba15e31866b95cd11ba26400d3f257fd9a5e7a901f6c40cebb0aeeeedce89",
+          "bytes": 4733241
+        },
+        {
+          "path": "pictures/50223.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1agJ96129k9yPcZB5XSQ7Ge-n0Tq0wyOb&export=download&confirm=t",
+          "sha256": "12437e4a6718b6cf33cdb1b821989e11c22acc6d67137c6a03d03f993832f7b6",
+          "bytes": 4708984
+        },
+        {
+          "path": "pictures/50224.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1aufzt_IUjijC9rGt1f_8PHtgfmgCzVCt&export=download&confirm=t",
+          "sha256": "8fdf002ae33007ee6ac95a0360826f7ccc292f37c2abc2ce14d0c482646deaad",
+          "bytes": 4804905
+        },
+        {
           "path": "pictures/9901014.A.jpg",
           "url": "https://ringsdb.com/bundles/cards/9901014.png",
           "sha256": "f2828886b5066e11af9dd567c382535ed8b30bd0107ba42352c868cc9f01645b",
@@ -20890,9 +21052,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "cbe5af867730352a7f46876f848732e6a50952ff7a3ae3eecd6bb3f3b6b7bc11"
+        "value": "0b539c2c999ccd8b5e8a5b6b5b3308234d9cdba2bab6046269538c2248ce970e"
       },
-      "fetchedAt": "2026-11-17T13:52:10.891Z",
+      "fetchedAt": "2026-11-17T18:38:11.538Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -30937,6 +31099,168 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Caves-of-Nibin-Dûm-SetupB.jpg",
           "sha256": "69a2559d14b4f66379170d58f8baf86367b6c091cdfe4ee5c2e6f479776ba064",
           "bytes": 62080
+        },
+        {
+          "path": "scans/50201.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Terror-from-the-Mountain-1A.jpg",
+          "sha256": "981fe4b3be9e6f048a5ae5a679476ba4350b32fb1c08fc604c7c96bd1c7a1330",
+          "bytes": 143342
+        },
+        {
+          "path": "scans/50201.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Terror-from-the-Mountain-1B.jpg",
+          "sha256": "4e75466105a9dbc46f2f21639c5134b3c89c98cce6d34955c7b453aa0c81b386",
+          "bytes": 134894
+        },
+        {
+          "path": "scans/50202.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fire-and-Water-2A.jpg",
+          "sha256": "208f1eb265c961b7ee17a17bacb1dcfabb70a9000661894c75febc7a17c2891d",
+          "bytes": 136706
+        },
+        {
+          "path": "scans/50202.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fire-and-Water-2B.jpg",
+          "sha256": "bd2c160a352001a1f66ec84114d245dbfac515a7e1b5aed80e9d6c21448a0094",
+          "bytes": 143048
+        },
+        {
+          "path": "scans/50203.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Dragon's-Wrath-3A.jpg",
+          "sha256": "90bc634d5a9d3fbe37a648d72832952cb14cbd949df128c327906d6f6d4bd727",
+          "bytes": 137718
+        },
+        {
+          "path": "scans/50203.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Dragon's-Wrath-3B.jpg",
+          "sha256": "84cdd20226089aa3752e34e09de814e04844e71083546067ed7a62265fedc9a2",
+          "bytes": 150853
+        },
+        {
+          "path": "scans/50204.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Mighty.jpg",
+          "sha256": "dfa6f37c9eef35354e95be0cf3804ad28fde787e72dd85d2993857fd671a56ef",
+          "bytes": 164372
+        },
+        {
+          "path": "scans/50205.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Terrible.jpg",
+          "sha256": "04a6a7f09761ef99ca0676f75501d0ed9d6b05252e5ecad4f720e6ddd50d4b25",
+          "bytes": 158552
+        },
+        {
+          "path": "scans/50206.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Magnificent.jpg",
+          "sha256": "cde7d0389ba1c75ce4c439c93a5336111ce38c173353f98039fd9185960f819e",
+          "bytes": 162402
+        },
+        {
+          "path": "scans/50207.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Lake-town.jpg",
+          "sha256": "0ba75e10e6b408f27ff147636a3922093b57a3ae89d44866eed83982aea08c91",
+          "bytes": 147506
+        },
+        {
+          "path": "scans/50208.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Old-Thrush.jpg",
+          "sha256": "89de061eb90b24dd7d1822612ae3a578a8038c4fee537ddeb8854fc12a5745cc",
+          "bytes": 134767
+        },
+        {
+          "path": "scans/50209.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Close-to-the-Flame.jpg",
+          "sha256": "48f5a64f536905b3b64ca8edcb6e9814f73bb9dfea73ca2201745d3ed7fee8e8",
+          "bytes": 139804
+        },
+        {
+          "path": "scans/50210.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Scorching-Blast.jpg",
+          "sha256": "9863925b62de2354ae574403e1c8ca9f365b5ea9b5571e97bce8d34876ffbf0b",
+          "bytes": 152397
+        },
+        {
+          "path": "scans/50211.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Town-Baiting.jpg",
+          "sha256": "42afec90f5dd8c98379e40d7d01069ae04f645baf6f3b19698c909c94e290346",
+          "bytes": 153906
+        },
+        {
+          "path": "scans/50212.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Dire-Magnificence.jpg",
+          "sha256": "55f8c7cde5c06a2b0cf6de796f0e04065f5d6eb00840949ea37d781e28cd7ec9",
+          "bytes": 157560
+        },
+        {
+          "path": "scans/50213.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Catching-Fire.jpg",
+          "sha256": "ea573916f6f1274b020d94ae31764607784f31865045e3d50a8f20f6dbdb6748",
+          "bytes": 141893
+        },
+        {
+          "path": "scans/50214.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Reckless-in-His-Rage.jpg",
+          "sha256": "30283644bd24d5f20caa7f8aafd84f787727f6894da0d333f9b1c1103390cb24",
+          "bytes": 151933
+        },
+        {
+          "path": "scans/50215.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/West-Pier.jpg",
+          "sha256": "085c627e8117ecc23e95db25e168922605993a2df882f043e3350c5d9625fab3",
+          "bytes": 147188
+        },
+        {
+          "path": "scans/50216.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Master's-Manor.jpg",
+          "sha256": "e9c778100d5de610167131141d7add6a0e839cd45a83398d8f73ae6136e95d7a",
+          "bytes": 145645
+        },
+        {
+          "path": "scans/50217.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/South-Pier.jpg",
+          "sha256": "c6f8d39f5efeaa1beeb69644d377a24cceb9018861534edc5e03a6695a120124",
+          "bytes": 141249
+        },
+        {
+          "path": "scans/50218.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/North-Pier.jpg",
+          "sha256": "8e459391cfa431caf4c5e7b7573eac36bdfba0bec802ae917e317fd80d77a31f",
+          "bytes": 143313
+        },
+        {
+          "path": "scans/50219.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Merchant's-District.jpg",
+          "sha256": "22d970b845b5b61c209c52b0a15a7af3b9f0206ad742e39b1ce9941f6c6d930e",
+          "bytes": 144174
+        },
+        {
+          "path": "scans/50220.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/East-Pier.jpg",
+          "sha256": "077632a1615f4a264155020eb20a13170635abf6946695dd2ea08babc7e38d5e",
+          "bytes": 136596
+        },
+        {
+          "path": "scans/50221.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Great-House.jpg",
+          "sha256": "97a2fde6318c9f7bb3329d076434ecb49c5f4a100d2734c70b996d2cfd4d6453",
+          "bytes": 142032
+        },
+        {
+          "path": "scans/50222.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Great-Bridge.jpg",
+          "sha256": "28ed62a85abef9323812978c8c9cbaa5dae573754f529ad1d582a0e3d0461bbd",
+          "bytes": 142619
+        },
+        {
+          "path": "scans/50223.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fisherman's-Dock.jpg",
+          "sha256": "99b43f64ed3aaadff07465ea71dc831bbacca16f80bc675525a162bc3a37e4f1",
+          "bytes": 143537
+        },
+        {
+          "path": "scans/50224.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Esgaroth-Wharf.jpg",
+          "sha256": "7cc087baa09fc6d3916e01aeb60111f947f5d10699fefb57f82a4553be5047d5",
+          "bytes": 144102
         },
         {
           "path": "scans/900101.A.jpg",

@@ -1,5 +1,5 @@
-// Rules: none (The Massing at Osgiliath has no rulesheet; its rules are the quest card's).
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath: its codes, its scenario file, the piles the load list and the printed Setup leave, the
+// Rules: none (The Massing at Osgiliath and The Battle of Lake-town have no rulesheet; their rules are the quest cards').
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath and The Battle of Lake-town: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -16,19 +16,20 @@ import { keyOf, loadLedger } from "./printed/ledger.ts";
 const byCode = new Map(loadCards().map((card) => [card.code, card]));
 const cycle = loadCampaign("standalone-scenarios");
 const scenario = loadAnyScenario("the-massing-at-osgiliath");
+const lakeTown = loadAnyScenario("the-battle-of-lake-town");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 1, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 2, playable: true, box: null })]);
   });
 });
 
@@ -65,5 +66,39 @@ describe("The Massing at Osgiliath", () => {
     const sides = [...byCode.values()].filter((card) => card.code.startsWith("000") && card.encounterSet === "The Massing at Osgiliath").flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
     expect(sides).toHaveLength(23);
     for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+  });
+});
+
+describe("The Battle of Lake-town", () => {
+  it("has codes 502 and the collector number, which Hall of Beorn's 00001 to 00024 would share with The Massing at Osgiliath's (overrides.productCodes)", () => {
+    expect(lakeTown).toMatchObject({ id: "the-battle-of-lake-town", name: "The Battle of Lake-town", number: 2, stages: ["50201", "50202", "50203"] });
+    expect(lakeTown.campaignCard).toBeUndefined();
+    expect(lakeTown.campaignPlaced).toEqual([]);
+    expect(lakeTown.source.dragnNormal).toBe("Q99.02");
+    expect(lakeTown.nightmare).toBeUndefined();
+    expect(lakeTown.encounterSets).toEqual([{ name: "The Battle of Lake-town", count: 36 }]);
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TBoLT"));
+    expect(own.map((card) => card.code)).toEqual(Array.from({ length: 24 }, (_, at) => `502${String(at + 1).padStart(2, "0")}`));
+    expect(byCode.get("00004")?.printings[0]?.pack).toBe("TMaO");
+    expect(byCode.get("50204")?.name).toBe("Smaug the Mighty");
+  });
+
+  it("deals the same 36 encounter cards on Normal and Easy, Lake-town staged and the nine Smaug cards set aside (50201:A:1)", () => {
+    for (const seats of [1, 2, 3, 4]) {
+      expect(encounterCodes(lakeTown, "Normal", seats), `${seats} seats`).toHaveLength(36);
+      expect(encounterCodes(lakeTown, "Easy", seats), `${seats} seats`).toHaveLength(36);
+    }
+    expect(setupInstructions(lakeTown).filter((step) => step.verb === "AddToStaging")).toEqual([{ verb: "AddToStaging", code: "50207" }]);
+    const aside = setupInstructions(lakeTown).filter((step) => step.verb === "SetAside").map((step) => step.code);
+    expect(aside.sort()).toEqual(["50204", "50204", "50204", "50205", "50205", "50205", "50206", "50206", "50206"]);
+  });
+
+  it("has every printed side in the ledger, its lines the scan's wording", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("502")).flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(27);
+    for (const key of sides) expect(ledger.byKey.has(key), key).toBe(true);
+    expect(ledger.byKey.get(keyOf("50201", "A"))?.lines[0]).toMatch(/^Setup: Shuffle all copies of Smaug into a separate Smaug deck\./);
+    expect(ledger.byKey.get(keyOf("50204", "A"))?.lines[1]).toMatch(/a shadow card for each attack/);
   });
 });
