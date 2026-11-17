@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~222.8K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~223.0K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -131,9 +131,9 @@ Read the sections your task touches.
     - 1754–1771 The Hills of Emyn Muil (~1.5K) ← 1
     - 1772–1792 The Dead Marshes (~2.1K) ← 2
     - 1793–1816 Return to Mirkwood (~2.3K) ← 4
-  - 1817–1870 Dwarrowdelf (~6.7K) ← 3
+  - 1817–1870 Dwarrowdelf (~6.8K) ← 3
     - 1828–1850 Into the Pit (~2.8K) ← 9
-    - 1851–1870 The Seventh Level (~2.8K) ← 5
+    - 1851–1870 The Seventh Level (~2.9K) ← 5
   - 1871–1879 Nightmare (~410) ← 22
   - 1880–1920 Deckbuilding (~2.1K)
   - 1921–2000 Effects (~3.7K)
@@ -267,10 +267,10 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~15.1K tok)
+- `docs/phases/STATUS.md` — Phase status (~15.2K tok)
   - 5–14 Rules (~380)
   - 15–20 Phases (~50)
-  - 21–306 Open items (~13.7K)
+  - 21–307 Open items (~13.8K)
     - 23–25 Reviews (~70)
     - 26–28 README (~90)
     - 29–33 Releases (~150)
@@ -280,9 +280,9 @@ STATUS.md, then the active phase file.
     - 126–246 Rules and engine (Angmar Awakened) (~5.3K)
     - 247–271 Screens and code (~1.6K)
     - 272–291 Rules and engine (The Two Towers) (~1.4K)
-    - 292–299 Rules and engine (Dwarrowdelf) (~400)
-    - 300–306 Rules and engine (Shadows of Mirkwood) (~380)
-  - 307–332 Standing decisions (~940)
+    - 292–300 Rules and engine (Dwarrowdelf) (~510)
+    - 301–307 Rules and engine (Shadows of Mirkwood) (~380)
+  - 308–333 Standing decisions (~940)
 - `docs/phases/phase-62-dwarrowdelf.md` — Phase 62: The Dwarrowdelf cycle, standalone with Nightmare (~690 tok)
 
 ## Live plans
