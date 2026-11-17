@@ -4,15 +4,15 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
-import { destroyCard } from "../../../rules/core/keywords.ts";
+import { destroyCard, modifiedStat } from "../../../rules/core/keywords.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { whenRevealedUncancelable } from "../../../rules/families/wilderland/heath.ts";
 import { countsAsAttachment } from "../../../rules/interpret/conditions.ts";
 import { travelBlocked } from "../../../rules/interpret/restrictions.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
-import { announce, quest, resolve, type Row } from "../../../../test/harness/card-spec.ts";
-import { finish, first, legalIntents, legalTargets, send, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
+import { announce, attack, quest, resolve, type Row } from "../../../../test/harness/card-spec.ts";
+import { finish, first, legalIntents, legalTargets, resolveRecords, send, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 
 // What a card-spec row cannot express for The Battle of Lake-town: a card that leaves play, an intent that must be refused or is offered to a seat, a game's end, a window answered with several intents. The Smaug deck, Burn, the Smaug swap and the attacks on Lake-town
 // are tested with their family (src/rules/families/smaug/); the rows are in spec.test.ts.
@@ -31,6 +31,16 @@ function undefend(run: Run, made: LayoutTable): Run {
     const hero = legalTargets(current.state, { type: "Undefended" }, made.ctx)[0];
     if (hero == null) break;
     current = send(current, { type: "Undefended", heroId: hero }, made.ctx);
+  }
+  return current;
+}
+
+// The windows of an attack in progress are passed until it is over (the shadow effects resolve, the damage is dealt).
+function finishAttack(run: Run, made: LayoutTable): Run {
+  let current = run;
+  for (let guard = 0; guard < 20 && current.state.pendingAttack != null; guard += 1) {
+    if (!legalIntents(current.state, made.ctx).some((intent) => intent.type === "Pass")) break;
+    current = send(current, { type: "Pass" }, made.ctx);
   }
   return current;
 }
@@ -250,5 +260,144 @@ describe("50216:A:2 The Master's Manor with no Smaug in play", () => {
   it("50216:A:2 moves nothing and does not fail", () => {
     const done = played({ layout: { staging: [LAKE] }, act: resolve("50216", "whenRevealed"), expect: [] });
     expect(damage(done.run.state, LAKE)).toBe(0);
+  });
+});
+
+describe("50211:A:1 Town-Baiting: Smaug attacks Lake-town, the last player may defend", () => {
+  // Two players, Smaug the Terrible (Attack 7) in the staging area, the attack's shadow card on top of the encounter deck.
+  const baited = (shadow: string, layout: Layout = {}) => {
+    const done = played({ layout: { seats: 2, staging: [LAKE, "50205"], deck: [shadow, "f0", "f0"], hand: ["filler", "filler"], ...layout }, act: resolve("50211", "whenRevealed"), expect: [] });
+    let run = done.run;
+    for (let guard = 0; guard < 6 && run.state.window?.kind !== "defense"; guard += 1) run = send(run, { type: "Pass" }, done.table.ctx);
+    return { done, run };
+  };
+  const lastHero = (made: LayoutTable) => made.seat1Hero ?? "";
+
+  it("50211:A:1 the last player is asked: undefended, the whole attack goes on Lake-town and no character takes damage", () => {
+    const { done, run } = baited("treachery");
+    expect(run.state.window).toMatchObject({ kind: "defense", seat: 1 });
+    const after = finishAttack(send(run, { type: "Undefended", heroId: legalTargets(run.state, { type: "Undefended" }, done.table.ctx)[0] }, done.table.ctx), done.table);
+    expect(damage(after.state, LAKE)).toBe(7);
+    expect(after.state.cards[done.table.hero]?.damage ?? 0).toBe(0);
+    expect(after.state.cards[lastHero(done.table)]?.damage ?? 0).toBe(0);
+  });
+
+  it("50211:A:1 Smaug is dealt a shadow card for the attack: one card fewer on the encounter deck", () => {
+    const { run } = baited("50219");
+    expect(run.state.encounterDeck).toHaveLength(2);
+  });
+
+  it("50211:A:1 a defender takes the damage up to its hit points and the excess goes on Lake-town", () => {
+    const { done, run } = baited("treachery");
+    const defended = send(run, { type: "DeclareDefender", defenderId: lastHero(done.table) }, done.table.ctx);
+    const after = finishAttack(defended, done.table);
+    const hero = after.state.cards[lastHero(done.table)];
+    // Attack 7 against the Defense of the stand-in hero: the damage it cannot take (past 6 hit points) is on Lake-town.
+    expect(hero?.damage ?? 0).toBeGreaterThan(0);
+    expect((hero?.damage ?? 0) + damage(after.state, LAKE)).toBeGreaterThanOrEqual(5);
+  });
+
+  it("50211:A:1 with no Smaug in play it does nothing", () => {
+    const done = played({ layout: { seats: 2, staging: [LAKE, "f3"], deck: ["f0", "f0"] }, act: resolve("50211", "whenRevealed"), expect: [] });
+    expect(done.run.state.window?.kind).not.toBe("defense");
+    expect(damage(done.run.state, LAKE)).toBe(0);
+    expect(done.run.state.encounterDeck).toHaveLength(2);
+  });
+
+  it("50211:A:1 alone, the only player is the last player", () => {
+    const done = played({ layout: { staging: [LAKE, "50205"], deck: ["50219", "f0"] }, act: resolve("50211", "whenRevealed"), expect: [] });
+    let run = done.run;
+    for (let guard = 0; guard < 6 && run.state.window?.kind !== "defense"; guard += 1) run = send(run, { type: "Pass" }, done.table.ctx);
+    expect(run.state.window).toMatchObject({ kind: "defense", seat: 0 });
+  });
+
+  it("50211:A:1 a shadow card that depends on the attack being undefended reads the Town-Baiting attack: Merchant's District puts 4 damage on Lake-town on top of the attack's 7", () => {
+    const { done, run } = baited("50219");
+    const after = finishAttack(send(run, { type: "Undefended", heroId: legalTargets(run.state, { type: "Undefended" }, done.table.ctx)[0] }, done.table.ctx), done.table);
+    expect(damage(after.state, LAKE)).toBe(11);
+  });
+});
+
+describe("50216:A:3 The Master's Manor's shadow: the defending player discards his hand when the attack destroys a character", () => {
+  it("50216:A:3 in Town-Baiting's attack the last player, whose defender is destroyed, discards his hand and the first player keeps his", () => {
+    const done = played({ layout: { seats: 2, staging: [LAKE, "50205"], deck: ["50216", "f0", "f0"], hand: ["filler", "filler"] }, act: resolve("50211", "whenRevealed"), expect: [] });
+    let run = done.run;
+    for (let guard = 0; guard < 6 && run.state.window?.kind !== "defense"; guard += 1) run = send(run, { type: "Pass" }, done.table.ctx);
+    const hero = done.table.seat1Hero ?? "";
+    // The defender has 1 hit point left, so the attack destroys it.
+    run = { ...run, state: updateCard(run.state, hero, { damage: 5 }) };
+    const after = finishAttack(send(run, { type: "DeclareDefender", defenderId: hero }, done.table.ctx), done.table);
+    expect(after.state.cards[hero]?.zone).toBe("discard");
+    expect(after.state.seats[1]?.hand).toHaveLength(0);
+    expect(after.state.seats[0]?.hand).toHaveLength(2);
+  });
+
+  it("50216:A:3 when the attack destroys nobody the hand is kept", () => {
+    const done = played({ layout: { seats: 2, staging: [LAKE, "50205"], deck: ["50216", "f0", "f0"], hand: ["filler", "filler"] }, act: resolve("50211", "whenRevealed"), expect: [] });
+    let run = done.run;
+    for (let guard = 0; guard < 6 && run.state.window?.kind !== "defense"; guard += 1) run = send(run, { type: "Pass" }, done.table.ctx);
+    const after = finishAttack(send(run, { type: "Undefended", heroId: legalTargets(run.state, { type: "Undefended" }, done.table.ctx)[0] }, done.table.ctx), done.table);
+    expect(after.state.seats[1]?.hand).toHaveLength(2);
+  });
+});
+
+describe("50212:A:2 Dire Magnificence's shadow engages the next player and attacks at once", () => {
+  const destroyed = (seats: 1 | 2) => played({ layout: { seats, engaged: [{ code: "50205", seat: 0 }], staging: [LAKE] }, act: [attack("50205", { shadow: "50212", undefended: true })], expect: [] });
+  const attacks = (done: ReturnType<typeof destroyed>) => done.run.steps.flatMap((step) => (step.kind === "attack" ? [step.seat] : []));
+  const engages = (done: ReturnType<typeof destroyed>) => done.run.steps.flatMap((step) => (step.kind === "engage" ? [step.seat] : []));
+
+  it("50212:A:2 with a second player, Smaug engages him and makes an immediate attack on him", () => {
+    const done = destroyed(2);
+    expect(attacks(done)).toEqual([0, 1]);
+    expect(engages(done)).toEqual([1]);
+  });
+
+  it("50212:A:2 with one player there is no next player: nobody is engaged and no second attack follows", () => {
+    const done = destroyed(1);
+    expect(attacks(done)).toEqual([0]);
+    expect(engages(done)).toEqual([]);
+  });
+});
+
+describe("50208:A:2 The Old Thrush's Response after the attached hero is declared as an attacker against Smaug", () => {
+  const declared = (enemy: string) => {
+    const done = played({ layout: { phase: "PlayerAttacks", attached: [{ code: "50208", to: "dh1" }], engaged: [{ code: enemy, seat: 0 }], hand: ["filler", "filler", "filler"] }, act: [], expect: [] });
+    const target = first(done.run.state, enemy);
+    return { done, target, run: send(done.run, { type: "DeclareAttackers", enemyId: target, attackerIds: [done.table.hero] }, done.table.ctx) };
+  };
+  const response = (state: ScenarioState, made: LayoutTable) => legalIntents(state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "50208:response:1");
+
+  it("50208:A:2 the player chooses X from his hand, discards that many cards and Smaug's Defense is reduced by X", () => {
+    const { done, target, run } = declared("50204");
+    const offered = response(run.state, done.table);
+    expect(offered).toBeDefined();
+    const asked = send(run, { type: "Trigger", cardId: (offered as { cardId: string }).cardId, effectId: "50208:response:1" }, done.table.ctx);
+    expect(asked.state.window).toMatchObject({ kind: "choose", options: ["x1", "x2", "x3"] });
+    const chosen = send(asked, { type: "Choose", optionId: "x2" }, done.table.ctx);
+    expect(chosen.state.seats[0]?.hand).toHaveLength(1);
+    expect(modifiedStat(chosen.state, chosen.state.cards[target]!, "defense", done.table.ctx.cards)).toBe(7);
+  });
+
+  it("50208:A:2 it is not offered against an enemy that is not Smaug", () => {
+    const { done, run } = declared("f3");
+    expect(response(run.state, done.table)).toBeUndefined();
+  });
+});
+
+describe("50205:A:2 resolve all burn damage: the players exhaust characters to take it", () => {
+  it("50205:A:2 a player exhausts a hero and assigns 4 of the pool of 5 to it, and the rest goes on Lake-town", () => {
+    const made = table({ staging: [LAKE, "50221", "50217"] });
+    const asked: string[][] = [];
+    const run = resolveRecords(made.state, made.ctx, "50205", "whenRevealed", undefined, (state) => {
+      const options = state.window?.kind === "choose" ? state.window.options : [];
+      asked.push([...options]);
+      return options.find((option) => option === `exhaust:${made.hero}`) ?? options.find((option) => option === "burn:4") ?? "done";
+    });
+    // Burn 3 and Burn 2 make a pool of 5: the first question offers each ready hero and "done", the second one share from 1 to 5 (up to the hit points the hero has left).
+    expect(asked[0]).toEqual([`exhaust:${made.hero}`, `exhaust:${made.hero2}`, "done"]);
+    expect(asked[1]).toEqual(["burn:1", "burn:2", "burn:3", "burn:4", "burn:5"]);
+    expect(run.state.cards[made.hero]?.exhausted).toBe(true);
+    expect(run.state.cards[made.hero]?.damage).toBe(4);
+    expect(damage(run.state, LAKE)).toBe(1);
   });
 });
