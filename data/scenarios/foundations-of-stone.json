@@ -1,0 +1,342 @@
+{
+  "id": "foundations-of-stone",
+  "name": "Foundations of Stone",
+  "number": 5,
+  "stages": [
+    "04111",
+    "04112",
+    "04113",
+    "04114",
+    "04115",
+    "04116",
+    "04117",
+    "04118"
+  ],
+  "encounterSets": [
+    {
+      "name": "Foundations of Stone",
+      "count": 24
+    },
+    {
+      "name": "Goblins of the Deep",
+      "count": 13
+    },
+    {
+      "name": "Hazards of the Pit",
+      "count": 12
+    },
+    {
+      "name": "Twists and Turns",
+      "count": 16
+    }
+  ],
+  "cards": [
+    {
+      "code": "03060",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03061",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "03062",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03063",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03048",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03049",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03050",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03051",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03052",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03053",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03035",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "03036",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03037",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03038",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03039",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03040",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04111",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04112",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04113",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04114",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04115",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04116",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04117",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04118",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "attachedChosen"
+    },
+    {
+      "code": "04119",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "04120",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "04121",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "04122",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "04123",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "04124",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "04125",
+      "normal": 5,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "04126",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "04127",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounterDeck2"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.8",
+    "dragnEasy": "E02.8",
+    "hobSlug": "Foundations-of-Stone"
+  },
+  "nightmare": {
+    "setupCard": "901701",
+    "removed": [
+      {
+        "code": "03035",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "03036",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "03039",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "03040",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03048",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03060",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03061",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04121",
+        "copies": 3,
+        "pile": "encounterDeck2"
+      },
+      {
+        "code": "04122",
+        "copies": 1,
+        "pile": "encounterDeck2"
+      },
+      {
+        "code": "04127",
+        "copies": 4,
+        "pile": "encounterDeck2"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901702",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901703",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901704",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901705",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901706",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901707",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901708",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "id": "the-seventh-level",
+  "name": "The Seventh Level",
+  "number": 2,
+  "stages": [
+    "03067",
+    "03068"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Seventh Level",
+      "count": 8
+    },
+    {
+      "name": "Goblins of the Deep",
+      "count": 13
+    },
+    {
+      "name": "Plundering Goblins",
+      "count": 13
+    }
+  ],
+  "cards": [
+    {
+      "code": "03020",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03021",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03022",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03023",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03060",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03061",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "03062",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03063",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03030",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03031",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "03032",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03033",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03034",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03024",
+      "normal": 1,
+      "easy": 1,
+      "pile": "attachedChosen"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.2",
+    "dragnEasy": "E02.2",
+    "hobSlug": "The-Seventh-Level"
+  },
+  "nightmare": {
+    "setupCard": "901101",
+    "removed": [
+      {
+        "code": "03022",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03023",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03031",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03034",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03060",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03061",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901102",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "901103",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "901104",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901105",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901106",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901107",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901108",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901109",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901110",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

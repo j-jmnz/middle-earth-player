@@ -1,15 +1,17 @@
+import { CAMPAIGNS } from "../campaign-defs.ts";
 import { loadCampaignsInOrder } from "../load-scenarios.ts";
 
 // Where a scenario's seed finder lives (scripts/e2e/). A campaign that has a folder here keeps its scenarios' finders in it (scripts/checks/layout.test.ts holds the file
-// count of scripts/e2e); every other finder is top-level, named for its scenario. The one source for pnpm scenario new, the fixture writers and anything else that locates a finder.
+// count of scripts/e2e), and a cycle's scenarios always do (the folder of its id); every other finder is top-level, named for its scenario. The one source for pnpm scenario new, the fixture writers and anything else that locates a finder.
 export const E2E_CAMPAIGN_FOLDERS: Readonly<Record<string, string>> = {
   "angmar-awakened": "angmar-awakened",
-  "shadows-of-mirkwood": "shadows-of-mirkwood",
 };
+
+const CYCLE_IDS: ReadonlySet<string> = new Set(CAMPAIGNS.filter((campaign) => campaign.kind === "cycle").map((campaign) => campaign.id));
 
 /** The path under scripts/e2e/, without the extension, of the seed finder of scenario `id` in `campaignId`. */
 export function seedFinderRel(id: string, campaignId: string | null): string {
-  const folder = campaignId == null ? undefined : E2E_CAMPAIGN_FOLDERS[campaignId];
+  const folder = campaignId == null ? undefined : (E2E_CAMPAIGN_FOLDERS[campaignId] ?? (CYCLE_IDS.has(campaignId) ? campaignId : undefined));
   return folder ? `${folder}/${id}` : id;
 }
 

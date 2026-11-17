@@ -1,0 +1,258 @@
+{
+  "id": "the-redhorn-gate",
+  "name": "The Redhorn Gate",
+  "number": 1,
+  "stages": [
+    "04011",
+    "04012",
+    "04013"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Redhorn Gate",
+      "count": 22
+    },
+    {
+      "name": "Misty Mountains",
+      "count": 15
+    }
+  ],
+  "cards": [
+    {
+      "code": "04016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04017",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04018",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04019",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04020",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04021",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04023",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04024",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "04025",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04026",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "04027",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03054",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "03055",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03056",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03057",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03059",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04011",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04012",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04013",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04015",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "04014",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "04022",
+      "normal": 5,
+      "easy": 5,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.4",
+    "dragnEasy": "E02.4",
+    "hobSlug": "The-Redhorn-Gate"
+  },
+  "nightmare": {
+    "setupCard": "901301",
+    "removed": [
+      {
+        "code": "03054",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "03055",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03057",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "03058",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03059",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04018",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "04020",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04021",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04025",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901302",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901303",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "901304",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901305",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901306",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901307",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901308",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

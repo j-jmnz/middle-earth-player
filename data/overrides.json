@@ -1526,6 +1526,46 @@
       "pile": "setAside",
       "reason": "DragnCards loads Gollum in the staging area (Q01.9, E01.9). The quest card Through the Forest (02126) prints \"Setup: Search the encounter deck for Gollum. Choose a player to guard Gollum at the start of the game, and place Gollum in front of that player.\", so he is guarded by a player, not staged.",
       "source": "dragncards preBuiltDecks.json (Q01.9, E01.9); Through the Forest 02126 printed Setup; return_to_mirkwood_rulesheet.pdf (Guarding Gollum)"
+    },
+    {
+      "scenario": "into-the-pit",
+      "code": "03041",
+      "from": "staging",
+      "pile": "attachedChosen",
+      "reason": "DragnCards loads Cave Torch in the staging area (Q02.1, E02.1). The quest card Entering the Mines (03064) prints a Setup that has the first player attach Cave Torch to a hero of his choice, so it is attached at Setup, not staged.",
+      "source": "dragncards preBuiltDecks.json (Q02.1, E02.1); Entering the Mines printed Setup; Khazad-dûm rules insert MEC08 p2 (dwd.cave-torch)"
+    },
+    {
+      "scenario": "the-seventh-level",
+      "code": "03024",
+      "from": "staging",
+      "pile": "attachedChosen",
+      "reason": "DragnCards loads Book of Mazarbul in the staging area (Q02.2, E02.2). The quest card Search for the Chamber (03067) prints a Setup that searches the encounter deck for Book of Mazarbul and has the first player attach it to a hero of his choice, so it is attached at Setup, not staged.",
+      "source": "dragncards preBuiltDecks.json (Q02.2, E02.2); Search for the Chamber 03067 printed Setup; Khazad-dûm rules insert MEC08 p2 (dwd.book-of-mazarbul)"
+    },
+    {
+      "scenario": "the-long-dark",
+      "code": "03041",
+      "from": "staging",
+      "pile": "attachedChosen",
+      "reason": "DragnCards loads Cave Torch in the staging area (Q02.7, E02.7). The quest card Journey in the Black Pit (04086) prints a Setup that has the first player attach Cave Torch to a hero of his choice, so it is attached at Setup, not staged.",
+      "source": "dragncards preBuiltDecks.json (Q02.7, E02.7); Journey in the Black Pit printed Setup; Khazad-dûm rules insert MEC08 p2 (dwd.cave-torch)"
+    },
+    {
+      "scenario": "foundations-of-stone",
+      "code": "03041",
+      "from": "staging",
+      "pile": "attachedChosen",
+      "reason": "DragnCards loads Cave Torch in the staging area (Q02.8, E02.8). The quest card The Dripping Walls (04111) prints a Setup that has the first player attach Cave Torch to a hero of his choice, so it is attached at Setup, not staged.",
+      "source": "dragncards preBuiltDecks.json (Q02.8, E02.8); The Dripping Walls printed Setup; Khazad-dûm rules insert MEC08 p2 (dwd.cave-torch)"
+    },
+    {
+      "scenario": "flight-from-moria",
+      "code": "03028",
+      "from": "staging",
+      "pile": "setAside",
+      "reason": "DragnCards loads the 4 copies of A Foe Beyond in the staging area (Q02.3, E02.3). The quest card A Presence in the Dark (03069) prints a Setup that removes all copies of A Foe Beyond from the encounter deck and then shuffles 1 copy per player back into it, so the copies are set aside at Setup, not staged.",
+      "source": "dragncards preBuiltDecks.json (Q02.3, E02.3); A Presence in the Dark 03069 printed Setup; hallofbeorn.com/Export/Scenarios/Flight-from-Moria"
     }
   ],
   "scenarioRemovals": [
@@ -1691,23 +1731,6 @@
   ],
   "campaigns": [
     {
-      "id": "dwarrowdelf",
-      "name": "Dwarrowdelf",
-      "kind": "cycle",
-      "products": [
-        "Khazad-dûm",
-        "The Redhorn Gate",
-        "Road to Rivendell",
-        "The Watcher in the Water",
-        "The Long Dark",
-        "Foundations of Stone",
-        "Shadow and Flame"
-      ],
-      "released": "2012-01-06",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenarios of Khazad-dûm and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 11 and 12. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 11 and 12; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
-    {
       "id": "the-hobbit",
       "name": "The Hobbit",
       "kind": "cycle",
@@ -1871,6 +1894,22 @@
       "from": 0,
       "reason": "The cards of The Dread Realm numbered below 156 keep the code Hall of Beorn gives them ('10' and the collector number, 10150 to 10155); a card set with a productCodes rule takes the code of the entry its collector number reaches, so this entry holds the rest of the set beside the one that moves the last nine.",
       "source": "data/raw/hallofbeorn (EncounterCards.json, QuestCards.json RingsDbCardId)"
+    },
+    {
+      "set": "The Watcher in the Water",
+      "prefix": "04",
+      "width": 3,
+      "from": 0,
+      "reason": "Hall of Beorn and RingsDB code the cards of The Watcher in the Water 04053 to 04075 (RingsDB lists no 04076 for it); the code is 04 and the collector number padded to three digits, as before.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet The Watcher in the Water, Number); ringsdb.com pack WitW"
+    },
+    {
+      "set": "The Watcher in the Water",
+      "prefix": "040",
+      "width": 3,
+      "from": 76,
+      "reason": "Hall of Beorn numbers Wrapped! #76 and gives it the RingsDbCardId 04076, which RingsDB gives The Long Dark's Háma (#76), so the build kept Háma and dropped Wrapped!, a card the scenario deals four of (Normal). A card of the box numbered 76 or more is 040 and its number, a six-digit code that no other card has.",
+      "source": "hallofbeorn.com/Export/EncounterCards (Wrapped-TWitW, #76, RingsDbCardId 04076) and PlayerCards (Háma, The Long Dark #76); ringsdb.com pack TLD (04076 Háma); dragncards cardDb.tsv (The Watcher in the Water 76, Wrapped!)"
     }
   ],
   "dragnPackAliases": [
@@ -1951,6 +1990,62 @@
       "code": "10128",
       "reason": "Thaurdir is one physical card (#127) with a Captain side and a Champion side, which Hall of Beorn files as two cards (#127 and #128) and DragnCards as one id with a .B picture; the row's side finds the card.",
       "source": "data/raw/dragncards/cardDb.tsv; data/raw/hallofbeorn/EncounterCards.json; mec108.thaurdir"
+    },
+    {
+      "dragncards": "Khazad-dum",
+      "number": 65,
+      "side": "a",
+      "code": "03072",
+      "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-A-Wrong-Turn-KD (#72) as Khazad-dûm #65, with side B 'A Wrong Turn', so neither the title nor the collector number finds it; the name of its side B does.",
+      "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 65, Search for an Exit / A Wrong Turn); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-A-Wrong-Turn-KD)"
+    },
+    {
+      "dragncards": "Khazad-dum",
+      "number": 70,
+      "side": "a",
+      "code": "03075",
+      "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-Blocked-by-Shadow-KD (#75) as Khazad-dûm #70, with side B 'Blocked by Shadow', so neither the title nor the collector number finds it; the name of its side B does.",
+      "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 70, Search for an Exit / Blocked by Shadow); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-Blocked-By-Shadow-KD)"
+    },
+    {
+      "dragncards": "Khazad-dum",
+      "number": 71,
+      "side": "a",
+      "code": "03076",
+      "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-Escape-from-Darkness-KD (#76) as Khazad-dûm #71, with side B 'Escape from Darkness', so neither the title nor the collector number finds it; the name of its side B does.",
+      "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 71, Search for an Exit / Escape from Darkness); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-Escape-from-Darkness-KD)"
+    },
+    {
+      "dragncards": "Khazad-dum",
+      "number": 73,
+      "side": "a",
+      "code": "03073",
+      "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-Narrow-Paths-KD (#73) as Khazad-dûm #73, with side B 'Narrow Paths', so neither the title nor the collector number finds it; the name of its side B does.",
+      "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 73, Search for an Exit / Narrow Paths); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-Narrow-Paths-KD)"
+    },
+    {
+      "dragncards": "Khazad-dum",
+      "number": 74,
+      "side": "a",
+      "code": "03071",
+      "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-Heading-Up-KD (#71) as Khazad-dûm #74, with side B 'Heading Up', so neither the title nor the collector number finds it; the name of its side B does.",
+      "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 74, Search for an Exit / Heading Up); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-Heading-Up-KD)"
+    },
+    {
+      "dragncards": "Khazad-dum",
+      "number": 75,
+      "side": "a",
+      "code": "03074",
+      "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-Hasty-Council-KD (#74) as Khazad-dûm #75, with side B 'Hasty Council', so neither the title nor the collector number finds it; the name of its side B does.",
+      "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 75, Search for an Exit / Hasty Council); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-Hasty-Council-KD)"
+    },
+    {
+      "dragncards": "Khazad-dum",
+      "number": 76,
+      "side": "a",
+      "code": "03070",
+      "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-Heading-Down-KD (#70) as Khazad-dûm #76, with side B 'Heading Down', so neither the title nor the collector number finds it; the name of its side B does.",
+      "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 76, Search for an Exit / Heading Down); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-Heading-Down-KD)"
     }
   ],
   "encounterSetAliases": [

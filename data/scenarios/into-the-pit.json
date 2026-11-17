@@ -1,0 +1,277 @@
+{
+  "id": "into-the-pit",
+  "name": "Into the Pit",
+  "number": 1,
+  "stages": [
+    "03064",
+    "03065",
+    "03066"
+  ],
+  "encounterSets": [
+    {
+      "name": "Into the Pit",
+      "count": 9
+    },
+    {
+      "name": "Twists and Turns",
+      "count": 16
+    },
+    {
+      "name": "Hazards of the Pit",
+      "count": 12
+    },
+    {
+      "name": "Goblins of the Deep",
+      "count": 13
+    }
+  ],
+  "cards": [
+    {
+      "code": "03014",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03015",
+      "normal": 5,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03019",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03035",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "03036",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03037",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03038",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03039",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03040",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03048",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03049",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03050",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03051",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03052",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03053",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03060",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03061",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "03062",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03063",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03064",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    },
+    {
+      "code": "03017",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "03018",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "03041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "attachedChosen"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.1",
+    "dragnEasy": "E02.1",
+    "hobSlug": "Into-the-Pit"
+  },
+  "nightmare": {
+    "setupCard": "901001",
+    "removed": [
+      {
+        "code": "03019",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03035",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03048",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03049",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03053",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03061",
+        "copies": 5,
+        "pile": "encounter"
+      },
+      {
+        "code": "03063",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03065",
+        "copies": 1,
+        "pile": "quest"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901003",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "901004",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901005",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901006",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901007",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901008",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ],
+    "questCards": [
+      "901002"
+    ]
+  }
+}
