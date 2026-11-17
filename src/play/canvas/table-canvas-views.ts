@@ -20,7 +20,7 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const uncharted = useMemo(() => pileSelector("unchartedDeck", seat), [seat]);
   const grotto = useMemo(() => pileSelector("grottoDeck", seat), [seat]);
   // The Evil Creatures pair and the Caves deck (Ered Mithrin), only while the game has dealt them; shared, so a peek leaves them too.
-  const wilderland = useMemo(() => ({ evilDeck: pileSelector("evilCreaturesDeck", seat), evilDiscard: pileSelector("evilCreaturesDiscard", seat), caves: pileSelector("cavesDeck", seat), harad: pileSelector("haradDeck", seat), orcs: pileSelector("angmarOrcDeck", seat) }), [seat]);
+  const wilderland = useMemo(() => ({ evilDeck: pileSelector("evilCreaturesDeck", seat), evilDiscard: pileSelector("evilCreaturesDiscard", seat), caves: pileSelector("cavesDeck", seat), harad: pileSelector("haradDeck", seat), orcs: pileSelector("angmarOrcDeck", seat), smaugDeck: pileSelector("smaugDeck", seat), smaugDiscard: pileSelector("smaugDiscard", seat) }), [seat]);
   // The victory display, shared by the seats, drawn only while a card is in it.
   const victoryOf = useMemo(() => victoryPileSelector(facts.pointsOf ?? noPoints), [facts]);
   const questStage = useStore(store, (state) => zones.questStage(state.game));
@@ -43,13 +43,15 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const cavesDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("cavesDeck") ? wilderland.caves(state.game) : null));
   const haradDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("haradDeck") ? wilderland.harad(state.game) : null));
   const angmarOrcDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("angmarOrcDeck") ? wilderland.orcs(state.game) : null));
+  const smaugDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("smaugDeck") ? wilderland.smaugDeck(state.game) : null));
+  const smaugDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("smaugDiscard") ? wilderland.smaugDiscard(state.game) : null));
   const victory = useStore(store, (state) => victoryOf(state.game));
   return useMemo(
     () => ({
       views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
-      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(grottoDeck ? { grottoDeck } : {}), ...(evilCreaturesDeck ? { evilCreaturesDeck } : {}), ...(evilCreaturesDiscard ? { evilCreaturesDiscard } : {}), ...(cavesDeck ? { cavesDeck } : {}), ...(angmarOrcDeck ? { angmarOrcDeck } : {}), ...(haradDeck ? { haradDeck } : {}), ...(victory ? { victory } : {}) },
+      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(grottoDeck ? { grottoDeck } : {}), ...(evilCreaturesDeck ? { evilCreaturesDeck } : {}), ...(evilCreaturesDiscard ? { evilCreaturesDiscard } : {}), ...(cavesDeck ? { cavesDeck } : {}), ...(angmarOrcDeck ? { angmarOrcDeck } : {}), ...(haradDeck ? { haradDeck } : {}), ...(smaugDeck ? { smaugDeck } : {}), ...(smaugDiscard ? { smaugDiscard } : {}), ...(victory ? { victory } : {}) },
     }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, grottoDeck, evilCreaturesDeck, evilCreaturesDiscard, cavesDeck, haradDeck, angmarOrcDeck, victory],
+    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, grottoDeck, evilCreaturesDeck, evilCreaturesDiscard, cavesDeck, haradDeck, angmarOrcDeck, smaugDeck, smaugDiscard, victory],
   );
 }
 

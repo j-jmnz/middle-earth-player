@@ -16,6 +16,7 @@ import { rhudaurCurrentDials, rhudaurDials } from "./rhudaur.ts";
 import { gramHands } from "./gram.ts";
 import { isengardDials, isengardHands, type HandMark } from "./isengard.ts";
 import { lairDials, lairHands } from "./lair.ts";
+import { lakeTownDials } from "./lake-town.ts";
 import { mountDoomDials, mountDoomHands } from "./mount-doom.ts";
 import { marshesDials } from "./marshes.ts";
 import { pelennorDials, pelennorHands } from "./pelennor.ts";
@@ -26,7 +27,7 @@ import { wastesDials, wastesHands } from "./wastes.ts";
 
 /** Every scenario dial the game holds now. */
 export function scenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf), ...ungolDials(game, ctx, nameOf), ...blackGateDials(game, nameOf), ...mountDoomDials(game, nameOf), ...rhudaurCurrentDials(game, nameOf), ...angmarDials(game, ctx, nameOf), ...wastesDials(game, nameOf), ...ettenmoorsDials(game, nameOf), ...rhudaurDials(game, ctx, nameOf), ...dumDials(game, ctx, nameOf), ...realmDials(game, ctx, nameOf)];
+  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf), ...ungolDials(game, ctx, nameOf), ...blackGateDials(game, nameOf), ...mountDoomDials(game, nameOf), ...rhudaurCurrentDials(game, nameOf), ...angmarDials(game, ctx, nameOf), ...wastesDials(game, nameOf), ...ettenmoorsDials(game, nameOf), ...rhudaurDials(game, ctx, nameOf), ...dumDials(game, ctx, nameOf), ...realmDials(game, ctx, nameOf), ...lakeTownDials(game, ctx, nameOf)];
 }
 
 /** The dials for the top bar: the same list while no dial's words or number changed, so the bar re-renders only when a token, a hit point or a card moves. */
