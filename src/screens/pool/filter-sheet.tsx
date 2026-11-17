@@ -13,8 +13,9 @@ import {
   costOptions,
   filterSheetAnimation,
   packChooserRows,
+  packDetail,
   traitChooserRows,
-  type CycleGroup,
+  type PackGroup,
   type PoolCard,
   type PoolFilter,
 } from "./filter";
@@ -33,6 +34,7 @@ export function PoolFilterSheet({
   open,
   rows,
   groups,
+  notOwned,
   filter,
   onChange,
   onDismiss,
@@ -40,7 +42,9 @@ export function PoolFilterSheet({
 }: {
   open: boolean;
   rows: readonly FilterRow[];
-  groups: CycleGroup[];
+  groups: readonly PackGroup[];
+  // The packs switched off while My collection is on: the chooser leaves them out. Null lists every pack.
+  notOwned: ReadonlySet<string> | null;
   filter: PoolFilter;
   onChange: (next: PoolFilter) => void;
   onDismiss: () => void;
@@ -71,7 +75,7 @@ export function PoolFilterSheet({
       <PaperSheet title={chooserTitle(chooser)}>
         {chooser === "pack" ? (
           <OptionList
-            rows={packChooserRows(groups)}
+            rows={packChooserRows(groups, notOwned)}
             listHeight={listHeight}
             onBack={() => setChooser(null)}
             onPick={(row) => {
@@ -187,7 +191,7 @@ function FilterBody({
 }: {
   filter: PoolFilter;
   spheres: { code: string; name: string }[];
-  groups: CycleGroup[];
+  groups: readonly PackGroup[];
   onChange: (next: PoolFilter) => void;
   onChoose: (chooser: "pack" | "trait" | "cost") => void;
 }) {
@@ -268,19 +272,6 @@ function CostChooser({
       ))}
     </View>
   );
-}
-
-function packDetail(filter: PoolFilter, groups: readonly CycleGroup[]): string {
-  const selected = filter.pack;
-  if (!selected) return "Any";
-  if (selected.kind === "cycle") {
-    return groups.find((group) => group.cyclePosition === selected.cyclePosition)?.label ?? "Cycle";
-  }
-  for (const group of groups) {
-    const pack = group.packs.find((candidate) => candidate.code === selected.code);
-    if (pack) return pack.name;
-  }
-  return selected.code;
 }
 
 function sphereChoices(rows: readonly FilterRow[]): { code: string; name: string }[] {

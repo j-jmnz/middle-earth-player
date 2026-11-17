@@ -9,8 +9,9 @@ export type PoolPack = {
   cyclePosition: number;
 };
 
-export type CycleGroup = {
-  cyclePosition: number;
+// A switch of the collection (data/collection.json) as the Pack or cycle chooser lists it: its own name, then its packs.
+export type PackGroup = {
+  id: string;
   label: string;
   packs: PoolPack[];
 };
@@ -31,11 +32,13 @@ export type PoolCard = {
 export type PoolFilter = {
   sphere: string | null;
   typeCode: string | null;
-  pack: { kind: "cycle"; cyclePosition: number } | { kind: "pack"; code: string } | null;
+  pack: { kind: "set"; id: string } | { kind: "pack"; code: string } | null;
   trait: string | null;
   cost: string | null;
   unique: boolean;
   activeText: boolean;
+  // "My collection": only the cards the player owns. On whenever the pool opens; it hides nothing while everything is owned.
+  owned: boolean;
 };
 
 export const emptyPoolFilter: PoolFilter = {
@@ -46,6 +49,7 @@ export const emptyPoolFilter: PoolFilter = {
   cost: null,
   unique: false,
   activeText: false,
+  owned: true,
 };
 
 /**
@@ -63,35 +67,17 @@ export function typeRequestWords(types: readonly { code: string; name: string }[
   return `Showing ${name.toLowerCase()} cards`;
 }
 
-export function cycleGroups(packs: readonly PoolPack[]): CycleGroup[] {
-  const byCycle = new Map<number, PoolPack[]>();
-  for (const pack of packs) {
-    const group = byCycle.get(pack.cyclePosition) ?? [];
-    group.push(pack);
-    byCycle.set(pack.cyclePosition, group);
-  }
-  return [...byCycle.entries()]
-    .sort((left, right) => left[0] - right[0])
-    .map(([cyclePosition, group]) => {
-      const sorted = [...group].sort((left, right) => left.position - right.position || left.name.localeCompare(right.name));
-      const label = sorted[0]?.name ?? String(cyclePosition);
-      return { cyclePosition, label, packs: sorted };
-    });
+/** The chooser's groups: each collection switch with the catalog packs it holds, in the collection's order. */
+export function packGroups(sets: readonly { id: string; title: string; packs: readonly string[] }[], packs: readonly PoolPack[]): PackGroup[] {
+  const byCode = new Map(packs.map((pack) => [pack.code, pack]));
+  return sets.map((set) => ({ id: set.id, label: set.title, packs: set.packs.flatMap((code) => byCode.get(code) ?? []) }));
 }
 
-function cyclePackCodes(groups: readonly CycleGroup[], cyclePosition: number): ReadonlySet<string> {
-  const group = groups.find((candidate) => candidate.cyclePosition === cyclePosition);
-  return new Set(group?.packs.map((pack) => pack.code) ?? []);
-}
-
-function matchesPack(card: PoolCard, filter: PoolFilter, groups: readonly CycleGroup[]): boolean {
+function matchesPack(card: PoolCard, filter: PoolFilter, groups: readonly PackGroup[]): boolean {
   if (!filter.pack) return true;
-  if (filter.pack.kind === "pack") {
-    return card.packCode === filter.pack.code || card.packCodes.includes(filter.pack.code);
-  }
-  const cycle = cyclePackCodes(groups, filter.pack.cyclePosition);
-  if (cycle.has(card.packCode)) return true;
-  return card.packCodes.some((code) => cycle.has(code));
+  const selected = filter.pack;
+  const codes = selected.kind === "pack" ? [selected.code] : (groups.find((group) => group.id === selected.id)?.packs.map((pack) => pack.code) ?? []);
+  return codes.some((code) => card.packCode === code || card.packCodes.includes(code));
 }
 
 /** The cards the search and filter keep. With search text they come best match first, ties in the order given (sortPool). */
@@ -99,9 +85,11 @@ export function filterPool<T extends PoolCard & SearchRow>(
   cards: readonly T[],
   search: string,
   filter: PoolFilter,
-  groups: readonly CycleGroup[],
+  groups: readonly PackGroup[],
   // Codes whose unique text is inactive (textInactive in src/catalog/active-text.ts).
   inactiveCodes: ReadonlySet<string>,
+  // Codes of the cards outside the player's collection (unownedCodes in src/catalog/collection.ts); empty while everything is owned.
+  unowned: ReadonlySet<string>,
 ): T[] {
   const terms = searchTerms(search);
   const searching = terms.length > 0;
@@ -120,6 +108,7 @@ export function filterPool<T extends PoolCard & SearchRow>(
     if (filter.cost && shownCost(card) !== filter.cost) continue;
     if (filter.unique && !card.isUnique) continue;
     if (filter.activeText && inactiveCodes.has(card.code)) continue;
+    if (filter.owned && unowned.has(card.code)) continue;
     kept.push({ card, score, at });
   }
   if (searching) kept.sort((left, right) => left.score - right.score || left.at - right.at);
@@ -165,25 +154,43 @@ export type PackChooserRow = {
   pack: PoolFilter["pack"];
 };
 
-export function packChooserRows(groups: readonly CycleGroup[]): PackChooserRow[] {
+/**
+ * The Pack or cycle rows: each collection switch, then its packs when it holds more than one (a switch of one pack is that pack's row).
+ * With `notOwned` (My collection on), only the packs the player owns, and no switch they own none of.
+ */
+export function packChooserRows(groups: readonly PackGroup[], notOwned: ReadonlySet<string> | null): PackChooserRow[] {
   const rows: PackChooserRow[] = [{ key: "any", label: "Any", detail: "", pack: null }];
   for (const group of groups) {
-    rows.push({
-      key: `cycle-${group.cyclePosition}`,
-      label: group.label,
-      detail: "Cycle",
-      pack: { kind: "cycle", cyclePosition: group.cyclePosition },
-    });
-    for (const pack of group.packs) {
-      rows.push({
-        key: `pack-${pack.code}`,
-        label: pack.name,
-        detail: "Pack",
-        pack: { kind: "pack", code: pack.code },
-      });
+    const packs = notOwned ? group.packs.filter((pack) => !notOwned.has(pack.code)) : group.packs;
+    if (packs.length === 0) continue;
+    if (group.packs.length > 1) {
+      rows.push({ key: `set-${group.id}`, label: group.label, detail: "Cycle", pack: { kind: "set", id: group.id } });
+    }
+    for (const pack of packs) {
+      rows.push({ key: `pack-${pack.code}`, label: pack.name, detail: "Pack", pack: { kind: "pack", code: pack.code } });
     }
   }
   return rows;
+}
+
+/** The chooser's word for the pick: the switch's name or the pack's, or Any. */
+export function packDetail(filter: PoolFilter, groups: readonly PackGroup[]): string {
+  const selected = filter.pack;
+  if (!selected) return "Any";
+  if (selected.kind === "set") return groups.find((group) => group.id === selected.id)?.label ?? "Cycle";
+  for (const group of groups) {
+    const pack = group.packs.find((candidate) => candidate.code === selected.code);
+    if (pack) return pack.name;
+  }
+  return selected.code;
+}
+
+/** The count over the pool: "642 cards in your collection", "1,048 cards · 406 you don't own", or "852 cards" while all are owned. */
+export function poolCountLine(shown: number, owned: boolean, collectionSet: boolean, unownedShown: number): string {
+  const cards = `${shown.toLocaleString("en-US")} ${shown === 1 ? "card" : "cards"}`;
+  if (!collectionSet) return cards;
+  if (owned) return `${cards} in your collection`;
+  return unownedShown > 0 ? `${cards} · ${unownedShown.toLocaleString("en-US")} you don't own` : cards;
 }
 
 export type TraitChooserRow = {

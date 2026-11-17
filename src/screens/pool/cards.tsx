@@ -30,6 +30,16 @@ export type PoolRowCard = PoolCard & {
 
 const thumb = { width: 32, height: 44 };
 
+// A card outside the collection is drawn at this opacity, always with the words "Not owned", so the dimming is never the only cue.
+const UNOWNED_OPACITY = 0.5;
+
+export const NOT_OWNED = "Not owned";
+
+// A row's line: "Ally · Spirit · 2", then what the app does not apply and "Not owned" when they hold.
+function rowDetail(detail: string, loss: string | null, unowned: boolean): string {
+  return [detail, loss, unowned ? NOT_OWNED : null].filter((part) => part != null).join(" · ");
+}
+
 // The sphere's printed icon before the row's words ("Ally · Spirit · 2").
 function RowIcons({ sphere }: { sphere: string | null }) {
   const mark = markedSphere(sphere);
@@ -45,6 +55,7 @@ export const PoolCardRow = memo(function PoolCardRow({
   onOpen,
   onPreview,
   loss = null,
+  unowned = false,
   side = false,
 }: {
   item: PoolRowCard;
@@ -53,6 +64,8 @@ export const PoolCardRow = memo(function PoolCardRow({
   side?: boolean;
   // What the app does not apply of this card, in a few words ("Ability not applied"), or null.
   loss?: string | null;
+  // Outside the player's collection: the line ends "Not owned" and the picture is dimmed. It can still be added.
+  unowned?: boolean;
   count: number;
   // Whether + would be refused: the title is at its copy limit (any printing), or the hero is taken or the slots are full.
   full: boolean;
@@ -67,9 +80,13 @@ export const PoolCardRow = memo(function PoolCardRow({
     <ListRow
       testID={`card-${item.code}`}
       label={item.name}
-      detail={loss ? `${poolDetail(item)} · ${loss}` : poolDetail(item)}
+      detail={rowDetail(poolDetail(item), loss, unowned)}
       detailIcons={<RowIcons sphere={item.sphereCode} />}
-      leading={<CardThumbFrame code={item.code} source={picture} width={thumb.width * s} height={thumb.height * s} />}
+      leading={
+        <View style={unowned ? { opacity: UNOWNED_OPACITY } : undefined}>
+          <CardThumbFrame code={item.code} source={picture} width={thumb.width * s} height={thumb.height * s} />
+        </View>
+      }
       onPress={() => onOpen(item.code)}
       onLongPress={() => onPreview(item.code, item.name, picture)}
       trailing={
@@ -104,6 +121,7 @@ export const PoolCardCell = memo(function PoolCardCell({
   onOpen,
   onPreview,
   loss = null,
+  unowned = false,
   selected = false,
   side = false,
 }: {
@@ -116,6 +134,7 @@ export const PoolCardCell = memo(function PoolCardCell({
   // Adding to the side deck: the count, the badge and the stepper are the side deck's.
   side?: boolean;
   loss?: string | null;
+  unowned?: boolean;
   count: number;
   full: boolean;
   lookup: TitleLookup;
@@ -134,7 +153,7 @@ export const PoolCardCell = memo(function PoolCardCell({
         testID={`card-${item.code}`}
         collapsable={false}
         accessibilityRole="button"
-        accessibilityLabel={`${item.name}, ${poolDetail(item)}${loss ? `, ${loss}` : ""}${adding && count > 0 ? `, ${count} in the ${side ? "side deck" : "deck"}` : ""}`}
+        accessibilityLabel={`${item.name}, ${poolDetail(item)}${loss ? `, ${loss}` : ""}${unowned ? `, ${NOT_OWNED.toLowerCase()}` : ""}${adding && count > 0 ? `, ${count} in the ${side ? "side deck" : "deck"}` : ""}`}
         {...longPressA11y("Show card", () => onPreview(item.code, item.name, picture))}
         accessibilityHint="Opens the card. Hold to show it large"
         onPress={() => onOpen(item.code)}
@@ -146,7 +165,9 @@ export const PoolCardCell = memo(function PoolCardCell({
             style={{ width, height, borderRadius: cardCorner(width, height), overflow: "hidden", opacity: pressed ? 0.75 : 1, backgroundColor: palette.raised, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}
           >
             {picture ? (
-              <RowCardImage code={item.code} source={picture} width={width} height={height} />
+              <View style={unowned ? { opacity: UNOWNED_OPACITY } : undefined}>
+                <RowCardImage code={item.code} source={picture} width={width} height={height} />
+              </View>
             ) : (
               <View className="flex-1 justify-between p-2">
                 <Text className="font-display text-label text-bone" numberOfLines={4}>
@@ -160,10 +181,11 @@ export const PoolCardCell = memo(function PoolCardCell({
                 </View>
               </View>
             )}
-            {loss ? (
+            {loss || unowned ? (
               <View className="absolute bottom-1 left-1 right-1 rounded-control px-1 py-0.5" style={{ backgroundColor: withAlphaHex(palette.night, 0.82) }}>
-                <Text className="text-center text-micro text-muted" numberOfLines={1}>
-                  {loss}
+                {/* Not owned first: it is what the player is choosing by; a card can be both. */}
+                <Text className={`text-center text-micro ${unowned ? "text-moon" : "text-muted"}`} numberOfLines={1}>
+                  {unowned ? NOT_OWNED : loss}
                 </Text>
               </View>
             ) : null}
