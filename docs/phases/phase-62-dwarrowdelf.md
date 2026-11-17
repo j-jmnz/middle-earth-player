@@ -1,6 +1,6 @@
 # Phase 62: The Dwarrowdelf cycle, standalone with Nightmare
 
-The second cycle on the roadmap (README, Roadmap), built the way Shadows of Mirkwood was: no Campaign Mode, each scenario played standalone on Easy, Normal and Nightmare, scored and recorded in History (`docs/brief.md`, Shadows of Mirkwood says what a cycle is).
+The second cycle on the roadmap (README, Roadmap), built the way Shadows of Mirkwood was: no Campaign Mode, each scenario played standalone on Easy, Normal and Nightmare, scored and recorded in History (`docs/brief.md`, Shadows of Mirkwood, says what a cycle is).
 
 Depends on: nothing open. Runs beside the Standalone scenarios work on another branch; it touches only the shared files a new cycle must (campaign defs, barrels, registries, snapshots), so the later of the two merges resolves those lists.
 
@@ -27,7 +27,7 @@ Depends on: nothing open. Runs beside the Standalone scenarios work on another b
 
 ## B. The scenarios
 
-Each scenario, in the order of the table, is the Scenario procedure of `docs/agents/agent-brief.md` (Read, Build, Judge, Finish), Nightmare included, with its readings in `docs/brief.md` under a Dwarrowdelf section. A mechanic the cycle adds goes in its family, found by the Read task from the ledger, not assumed.
+Each scenario, in the order of the table, is the Scenario procedure of `docs/agents/agent-brief.md`: Read, Build, Judge and Finish, Nightmare included, with its readings in `docs/brief.md` under a Dwarrowdelf section. A mechanic the cycle adds goes in its family, found by the Read task from the ledger, not assumed.
 
 Exit for each: the engine half's and the screen half's exits in the Scenario procedure.
 
