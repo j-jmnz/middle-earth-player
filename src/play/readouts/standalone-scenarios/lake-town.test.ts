@@ -2,8 +2,9 @@
 // The top-bar dials of The Battle of Lake-town and the Smaug piles of its table: the damage on Lake-town against 50 (it warms near the limit), on stage 3 the Victory points against that damage, and the damage on Smaug against the cap of the stage.
 import { describe, expect, it } from "vitest";
 
-import { tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { pileSelector } from "../../store/selectors.ts";
+import { idOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
+import { pileSelector, zoneIds } from "../../store/selectors.ts";
 import { isDiscardPile, secondPilesOf } from "../../store/pile-ids.ts";
 import { lakeTownDials } from "./lake-town.ts";
 
@@ -70,5 +71,15 @@ describe("the Smaug deck and its discard pile", () => {
 
   it("are absent from a game that deals none", () => {
     expect(secondPilesOf(tableFromLayout(ID, { staging: ["50207"] }).state)).toEqual([]);
+  });
+});
+
+describe("the second active location of Fisherman's Dock", () => {
+  it("50223:A:2 draws the table's second active slot, since the scenario declares it", () => {
+    const made = tableFromLayout(ID, { staging: ["50207", "50223"] });
+    expect(made.state.widgets.secondActiveLocation).toBe(true);
+    const dock = idOf(made.state, "50223");
+    const second = { ...moveCard(made.state, dock, { zone: "secondActiveLocation" }), secondActiveLocation: dock };
+    expect(zoneIds(second, "secondActiveLocation", 0)).toEqual([dock]);
   });
 });

@@ -19,7 +19,6 @@ import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChoose
 import { fateAsk, fateBranchRows, fateBranchWords, fateChooseNote } from "./fate.ts";
 import { boonHeroAsk } from "./angmar/angmar-table.ts";
 import { dragonSicknessAsk, gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
-import { smaugBranchWords, smaugChooseNote } from "./smaug.ts";
 import { nightAsk, nightBranchWords, nightChooseNote, nightMainNow, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "../seat.ts";
@@ -86,8 +85,6 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
-  const engine = smaugChooseNote(choose, game, ctx, names, seat);
-  if (engine) return engine;
   const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed) ?? nightChooseNote(choose, game, ctx, names, source) ?? framsburgChooseNote(choose, game, ctx, names, source) ?? gundabadChooseNote(choose, game, ctx, names, source) ?? fateChooseNote(choose, game, ctx, names, source);
   if (heath) return heath;
   const offer = searchOffer(choose);
@@ -250,8 +247,6 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
 export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null, game?: ScenarioState, ctx?: ReduceContext): string | null {
-  const engine = game && ctx ? smaugBranchWords(choose, optionId, game, ctx, names) : null;
-  if (engine) return engine;
   const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source, now) ?? framsburgBranchWords(choose, optionId, now?.rows) ?? gundabadBranchWords(choose, optionId, game) ?? fateBranchWords(choose, optionId, now?.rows, game, ctx);
   if (accolade) return accolade;
   const offer = searchOffer(choose);

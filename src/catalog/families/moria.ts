@@ -5,7 +5,6 @@
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
-import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
 
@@ -15,7 +14,7 @@ const VERBS = [
   verbFlags(z.strictObject({ verb: z.literal("PlaceDamageOn"), code: z.string().min(1), amount: z.number().int().positive(), ...when }), { setupRuns: "top" }),
   // Up to `amount` damage tokens come off the card in play with this printed code; it stops at 0 ("remove 1 damage token from Doom, Doom,
   // Doom", 142040:B:1, 142042:A:1, 142043:A:1, 142048:A:1, 142059:A:2).
-  z.strictObject({ verb: z.literal("RemoveDamageFrom"), code: z.string().min(1), amount: positiveAmountSchema, ...when }),
+  z.strictObject({ verb: z.literal("RemoveDamageFrom"), code: z.string().min(1), amount: z.number().int().positive(), ...when }),
   // Response of The Great Bridge (142050:A:2): the last picked hero is discarded from play to deal X damage to the card in play with this
   // printed code, X being that hero's threat cost; then that card loses all keywords for the remainder of the game (the `losesKeywords` flag).
   // The damage is an encounter card's, not a player card's, so the Balrog's immunity does not stop it. Nothing happens with no such card in play.

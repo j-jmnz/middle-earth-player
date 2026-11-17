@@ -1,16 +1,16 @@
 // Rules: docs/brief.md (The Battle of Lake-town), rr.step-3-4, rr.quest-advancement, rr.damage (data/rules/entries.json); ledger lines 50202:B:2, 50203:B:3.
-// Stage 2B: when the players quest successfully, any number of the progress tokens that would be placed on the quest card (after the active location took its share) may be discarded instead to remove as many damage tokens from Lake-town. The quest
+// Stage 2B: when the players quest successfully, any number of the progress tokens that would be placed on the quest card (after the active location took its share) may be discarded instead to remove as much damage from Lake-town. The quest
 // holds the flag `progressHealsLakeTown`, so the progress is not placed (quest/quest.ts, PROGRESS_REPLACED) and the stage's record hears it as `progressReplaced` with the amount, which this verb answers: the first player chooses how many to discard (at most
 // the damage on Lake-town), and the rest goes on the quest card as usual. Stage 3B's reading of the score is the amounts `lakeTownDamage` and `victoryDisplay` (amounts.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { putOnStage, questPointsOf } from "../../quest/quest.ts";
+import { changeDamageOn } from "../moria/index.ts";
 import { openBranch } from "../../windows/choices.ts";
 import type { Focus } from "../index.ts";
 import { lakeTownId } from "./cards.ts";
@@ -39,9 +39,6 @@ export function healByProgress(state: ScenarioState, instruction: Heal, focus: F
   }
   const healed = card == null ? 0 : Math.min(instruction.heal, card.damage);
   let next = state;
-  if (card != null && healed > 0) {
-    steps.push({ kind: "damage", targetId: card.id, amount: -healed, cause: currentCause(steps, UNATTRIBUTED) });
-    next = updateCard(next, card.id, { damage: card.damage - healed });
-  }
+  if (card != null && healed > 0) next = changeDamageOn(next, card.id, -healed, steps, ctx);
   return placeRest(next, progress - healed, ctx, steps);
 }

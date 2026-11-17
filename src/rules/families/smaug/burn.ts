@@ -9,9 +9,10 @@ import type { EngineStep } from "../../core/intents.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { heldAmount, updateCard } from "../../core/state.ts";
+import { heldAmount } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { exhaustCard } from "../../interpret/player-verbs.ts";
+import { changeDamageOn } from "../moria/index.ts";
 import { openBranch } from "../../windows/choices.ts";
 import type { Focus } from "../index.ts";
 import { lakeTownId, turnOrder } from "./cards.ts";
@@ -32,24 +33,21 @@ export function burnTotal(state: ScenarioState, ctx: ReduceContext): number {
   return locations.reduce((sum, id) => sum + (printedOf(ctx.cards, state.cards[id]?.code ?? "").keywords.burn ?? 0) + grants, 0);
 }
 
-// The hit points a character can still take before it is destroyed.
-function room(state: ScenarioState, id: string, ctx: ReduceContext): number {
+/** The hit points a character can still take before it is destroyed. */
+export function room(state: ScenarioState, id: string, ctx: ReduceContext): number {
   const card = state.cards[id];
   return card == null ? 0 : Math.max(0, modifiedStat(state, card, "hitPoints", ctx.cards) - card.damage);
 }
 
-// The ready characters of the seat with hit points left, in the order the game keeps them.
-function readyCharacters(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
+/** The ready characters of the seat with hit points left, in the order the game keeps them (the ones a Burn share can go to). */
+export function readyCharacters(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
   return characters(state, seat, ctx.cards).filter((id) => state.cards[id]?.exhausted === false && room(state, id, ctx) > 0);
 }
 
 // What is left of the pool goes on Lake-town as damage tokens, none dealt, so the cap on Smaug and the immunities do not apply to it.
-function restOnLakeTown(state: ScenarioState, pool: number, steps: EngineStep[]): ScenarioState {
+function restOnLakeTown(state: ScenarioState, pool: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = lakeTownId(state);
-  const card = id == null ? undefined : state.cards[id];
-  if (card == null || pool <= 0) return state;
-  steps.push({ kind: "damage", targetId: card.id, amount: pool, cause: currentCause(steps, UNATTRIBUTED) });
-  return updateCard(state, card.id, { damage: card.damage + pool });
+  return id == null || pool <= 0 ? state : changeDamageOn(state, id, pool, steps, ctx);
 }
 
 /**
@@ -67,12 +65,12 @@ export function resolveBurn(state: ScenarioState, instruction: Burn, focus: Focu
     next = placeDamage(next, id, amount, ctx.cards, steps, "framework", cause);
   }
   const seat = seats[0];
-  if (pool <= 0 || seat == null) return restOnLakeTown(next, pool, steps);
+  if (pool <= 0 || seat == null) return restOnLakeTown(next, pool, ctx, steps);
   // The character just exhausted: its share, one option for each amount it can take (a share of 0 is not a share).
   if (instruction.pending != null) {
     const id = instruction.pending;
     const options = Array.from({ length: Math.min(pool, room(next, id, ctx)) }, (_, at) => ({ id: `burn:${at + 1}`, instructions: [{ verb: "ResolveBurn" as const, pool, seats, assign: { id, amount: at + 1 } }] }));
-    return openBranch(exhausted(next, id), { instruction: { verb: "Choose", who: "actor", options }, seat, chosen: null, cause }, 0, ctx);
+    return openBranch(exhaustCard(next, id), { instruction: { verb: "Choose", who: "actor", options }, seat, chosen: null, cause }, 0, ctx);
   }
   const ready = readyCharacters(next, seat, ctx);
   if (ready.length === 0) return resolveBurn(next, { verb: "ResolveBurn", pool, seats: seats.slice(1) }, focus, ctx, steps);
@@ -81,9 +79,4 @@ export function resolveBurn(state: ScenarioState, instruction: Burn, focus: Focu
     { id: "done", instructions: [{ verb: "ResolveBurn" as const, pool, seats: seats.slice(1) }] },
   ];
   return openBranch(next, { instruction: { verb: "Choose", who: "actor", options }, seat, chosen: null, cause }, 0, ctx);
-}
-
-// The character is exhausted as a cost of the share it takes (rr.exhausted): it is not ready for the next share.
-function exhausted(state: ScenarioState, id: string): ScenarioState {
-  return exhaustCard(state, id);
 }

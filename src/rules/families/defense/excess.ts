@@ -94,7 +94,8 @@ export function combatDamage(
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play.
   const toEachQuest = flagged(state, enemyId, "excessToEachQuest");
   // Smaug the Magnificent's excess damage "must be assigned to Lake-town" (50206:A:2), and the excess of his attack against Lake-town (50211:A:1): the damage beyond the defender's remaining hit points goes on Lake-town (families/smaug/attack.ts).
-  const toLake = (flagged(state, enemyId, "excessToLakeTown") || state.pendingAttack?.excessToLakeTown === true) && lakeTownId(state) != null && lakeTownId(state) !== targetId;
+  const lake = lakeTownId(state);
+  const toLake = (flagged(state, enemyId, "excessToLakeTown") || state.pendingAttack?.excessToLakeTown === true) && lake != null && lake !== targetId;
   // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
   const reads = gameReads(state, ctx, '"excessOf"');
   if (!toThreat && !toQuest && !toShip && !reads && !toStage && !toEachQuest && !toLake) return raised;
@@ -109,7 +110,6 @@ export function combatDamage(
   const causeOf = (flag: string) => flagCause(ctx, enemy.code, flag);
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play; the enemy's other excess flags still apply.
   const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(raised, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : raised;
-  const lake = lakeTownId(state);
   if (toLake && lake != null) return noteHitPointsOn(placeDamage(eachQuest, lake, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   if (toStage && state.questStage) return noteHitPointsOn(placeDamage(eachQuest, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(eachQuest, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));

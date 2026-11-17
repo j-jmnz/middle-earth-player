@@ -1,6 +1,6 @@
 // Rules: docs/brief.md (The Battle of Lake-town), rr.cancel, rr.damage, faq.additional-attacks, rr.keywords; ledger lines 50209:A:2, 50224:A:3, 50206:A:3, 50216:A:2, 50202:B:2, Burn X.
 // What the records of the scenario need from the engine beyond the family's verbs: a Shadow effect that any player cancels by discarding a hero, Esgaroth Wharf's additional attack in Smaug's attack against Lake-town, the card refs `smaug` and `lakeTown`,
-// RemoveDamageFrom with an amount that is read, and the Burn keyword.
+// and the Burn keyword.
 import { describe, expect, it } from "vitest";
 
 import { AUTHORED_EFFECTS } from "../../../effects/authored/the-battle-of-lake-town.ts";
@@ -83,16 +83,6 @@ describe("the card refs smaug and lakeTown (50206:A:3, 50216:A:2)", () => {
     expect(damageOn(next, LAKE)).toBe(6);
     const none = lakeTable();
     expect(damageOn(run(none, none.state, { verb: "MoveDamageTo", from: "smaug", to: "lakeTown" }), LAKE)).toBe(0);
-  });
-});
-
-describe("RemoveDamageFrom with a read amount (50202:B:2)", () => {
-  it("removes as much as X, no further than 0", () => {
-    const made = lakeTable();
-    const lake = Object.values(made.state.cards).find((card) => card.code === LAKE)?.id ?? "";
-    const hurt = updateCard(made.state, lake, { damage: 2 });
-    const next = run(made, hurt, { verb: "RemoveDamageFrom", code: LAKE, amount: { lakeTownDamage: true } });
-    expect(damageOn(next, LAKE)).toBe(0);
   });
 });
 

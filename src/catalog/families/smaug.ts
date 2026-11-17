@@ -1,5 +1,5 @@
 // The smaug family (The Battle of Lake-town, docs/brief.md, The Battle of Lake-town): the Smaug deck revealed at the beginning of every quest phase, Burn X and "resolve all burn damage", Smaug's attack against Lake-town and the stage that heals Lake-town with progress.
-// Lake-town takes damage tokens (PlaceDamageOn, RemoveDamageFrom of the moria family), its damage and the Victory points in the display are the amounts `lakeTownDamage` and `victoryDisplay` (effect-schema-amount.ts), and the card refs `smaug` and `lakeTown` name the two cards
+// Lake-town takes damage tokens (`changeDamageOn` of the moria family), its damage and the Victory points in the display are the amounts `lakeTownDamage` and `victoryDisplay` (effect-schema-amount.ts), and the card refs `smaug` and `lakeTown` name the two cards
 // (MoveDamageTo). src/rules/families/smaug/ runs and reads them.
 import { z } from "zod";
 
@@ -23,6 +23,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttackLakeTown"), ...when }),
   // Stage 2B (50202:B:2): the first player chooses how many of the replaced progress tokens (the event's X) are discarded to remove as many damage tokens from Lake-town; the rest goes on the quest card. `progress` and `heal` are the engine's own.
   z.strictObject({ verb: z.literal("HealLakeTownByProgress"), progress: z.number().int().min(0).optional(), heal: z.number().int().min(0).optional(), ...when }),
+  // Fisherman's Dock (50223:A:2): the players split the progress from questing between the two active locations (the official ruling in docs/brief.md). The first player chooses how much goes on the first location; the rest goes on the second. `amount` is the event's X on the first call
+  // (quest/quest.ts hands it over while Fisherman's Dock is one of two active locations, families/smaug/split.ts); `onFirst` is the share chosen, the engine's own.
+  z.strictObject({ verb: z.literal("SplitProgress"), amount: z.number().int().min(0).optional(), onFirst: z.number().int().min(0).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

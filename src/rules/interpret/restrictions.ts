@@ -120,6 +120,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
   const shown = state.cards[locationId];
   const instructions = [...(shown ? recordsOfFace(shown, ctx.effects.filter((effect) => effect.cardCode === code)) : []).filter((effect) => effect.timing === "travel").flatMap((effect) => effect.instructions), ...grantedTravel(state, locationId)];
   return instructions.some((instruction) => {
+      // A cost line that is gated (`when`) is owed only while its condition holds: Fisherman's Dock's exhaust is owed with 1 active location (50223:A:2).
+      if ("when" in instruction && instruction.when != null && !holds(state, instruction.when, { actor: state.firstPlayer, sourceId: locationId, returned: 0 }, ctx)) return false;
       // "A player at this staging area must engage an enemy in any staging area to travel here" (142079:A:1): an enemy to engage must be in some staging area.
       // "Place 1 resource on Shelob to travel here" (144045:A:3): the card the resources go on is picked and must be in play.
       if ((instruction.verb === "Engage" && instruction.target === "picked") || (instruction.verb === "PlaceResourceTokens" && instruction.on === "picked")) {

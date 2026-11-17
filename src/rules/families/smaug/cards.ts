@@ -1,7 +1,9 @@
 // Rules: docs/brief.md (The Battle of Lake-town; the Smaug deck and Burn X come from the Quest Companion), rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 50207:A:1, 50204:A:1, 50203:B:3.
 // The cards of The Battle of Lake-town the family reads: the Lake-town objective (damage tokens go on it, never dealt) and the Smaug in play, in the staging area or engaged. Pure lookups.
+import { victoryPointsOf } from "../../core/printed-stat.ts";
+import type { PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats } from "../../core/state.ts";
+import { heldAmount, inPlay, livingSeats } from "../../core/state.ts";
 
 /** Lake-town (50207), the objective in the staging area that takes the damage. */
 export const LAKE_TOWN = "50207";
@@ -28,6 +30,18 @@ export function smaugInPlay(state: ScenarioState): string | null {
 export function lakeTownDamage(state: ScenarioState): number {
   const id = lakeTownId(state);
   return id == null ? 0 : (state.cards[id]?.damage ?? 0);
+}
+
+/** The damage on Lake-town that loses the game: its record's `loseAtDamage`, 50 while the game holds none (50207:A:1). */
+export function lakeTownLimit(state: ScenarioState): number {
+  const id = lakeTownId(state);
+  const held = id == null ? 0 : heldAmount(state, id, "loseAtDamage");
+  return held > 0 ? held : 50;
+}
+
+/** The Victory points of the cards in the victory display (stage 3B's score, 50203:B:3). */
+export function victoryPoints(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): number {
+  return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, cards), 0);
 }
 
 /** The players still in the game in turn order, from the first player. */

@@ -61,7 +61,14 @@ describe("50205:A:2 Burn: each player exhausts characters to take the damage", (
     const sheet = sheetOf(made, state);
     expect(sheet.note).toContain("Player 1: resolve burn damage: 3 left.");
     expect(sheet.note).toContain("(0 of 50)");
-    expect(sheet.options.map((option) => option.label)).toEqual(["Player 1 exhausts dh1: it can take up to 3 of the 3", "Player 1 exhausts dh2: it can take up to 3 of the 3", "Player 1 is done: Player 2 chooses next"]);
+    expect(sheet.options.map((option) => option.label)).toEqual(["Player 1 exhausts dh1: it must take at least 1, up to 3 of the 3", "Player 1 exhausts dh2: it must take at least 1, up to 3 of the 3", "Player 1 is done: Player 2 chooses for the 3 left"]);
+  });
+
+  it("50205:A:2 Done skips a player with no ready character, as the engine does, and says the rest goes on Lake-town", () => {
+    const { made, state } = burning({});
+    const tired = updateCard(state, made.seat1Hero ?? "", { exhausted: true });
+    const done = sheetOf(made, tired).options.find((option) => option.id === "done");
+    expect(done?.label).toBe("Player 1 is done: the 3 left goes on Lake-town (3 of 50)");
   });
 
   it("50205:A:2 alone, Done says the rest goes on Lake-town and is armed when that puts it at 50", () => {
@@ -81,7 +88,7 @@ describe("50205:A:2 Burn: each player exhausts characters to take the damage", (
     const hero = first(state, "dh1");
     const wounded = updateCard(take(made, state, `exhaust:${hero}`), hero, { damage: 4 });
     const sheet = sheetOf(made, wounded);
-    expect(sheet.note).toContain("dh1 is exhausted. Choose how much of the 3 burn damage it takes, up to the 2 it can still take.");
+    expect(sheet.note).toContain("dh1 is exhausted. It must take at least 1 of the 3 burn damage, up to the 2 it can still take (dh1 can take 1 without being destroyed; 2 destroys it).");
     expect(sheet.options.map((option) => option.label)).toEqual(["Player 1: dh1 takes 1 of the 3", "Player 1: dh1 takes 2 of the 3, enough to destroy it", "Player 1: dh1 takes 3 of the 3, enough to destroy it"]);
     expect(sheet.options.map((option) => option.caution)).toEqual([undefined, "Tap again: dh1 is destroyed", "Tap again: dh1 is destroyed"]);
   });
@@ -92,7 +99,7 @@ describe("50202:B:2 the first player discards progress tokens to heal Lake-town"
     const made = table({ stage: "50202", seats: 2, staging: [{ code: LAKE, damage: 5 }] });
     const framed = pushEffectFrame(made.state, { frame: "whenRevealed", sourceId: made.state.questStage ?? "none", actor: made.state.firstPlayer, peril: false, effectId: "50202:triggered:1", instructions: [{ verb: "HealLakeTownByProgress", progress: 4 }], cancel: null, blockCancel: null }, []);
     const sheet = sheetOf(made, settle({ ...framed, window: null, mode: "stopped" }, made.ctx, []));
-    expect(sheet.note).toContain("Player 1: 4 progress tokens would go on the quest. Discard some to remove as many damage from Lake-town (5 of 50).");
+    expect(sheet.note).toContain("Player 1: 4 progress tokens would go on the quest. Discard some to remove as much damage from Lake-town (5 of 50).");
     expect(sheet.options.map((option) => option.label)).toEqual([
       "Discard none: all the progress goes on the quest",
       "Discard 1 progress token: Lake-town drops to 4 of 50",
@@ -100,5 +107,34 @@ describe("50202:B:2 the first player discards progress tokens to heal Lake-town"
       "Discard 3 progress tokens: Lake-town drops to 2 of 50",
       "Discard 4 progress tokens: Lake-town drops to 1 of 50",
     ]);
+  });
+});
+
+describe("50209:A:2 the keep row of the cancel offer", () => {
+  const offered = (seats: 1 | 2) => {
+    const made = table({ seats, staging: [LAKE] });
+    return { made, state: opened(made, "50209", "shadow") };
+  };
+
+  it("50209:A:2 says another player is asked next, and only the last player's row says the effect resolves", () => {
+    const { made, state } = offered(2);
+    const keep = (at: ScenarioState) => sheetOf(made, at).options.find((option) => option.id === "keep")?.label;
+    expect(keep(state)).toBe("Keep your heroes: Player 2 is asked next");
+    expect(keep({ ...state, window: { ...state.window!, seat: 1 } as ScenarioState["window"] })).toBe("Keep your heroes: the Shadow effect resolves: 1 damage to each character in play");
+  });
+});
+
+describe("50223:A:2 the split of progress between two active locations", () => {
+  it("50223:A:2 says the tokens and each row how many go on each location", () => {
+    const made = table({ staging: [LAKE, "50219", "50223"] });
+    const ids = (code: string) => first(made.state, code);
+    const two = { ...made.state, activeLocation: ids("50219"), secondActiveLocation: ids("50223") };
+    const placed = spawn(two, "50223", { zone: "secondActiveLocation" });
+    const state = { ...placed.state, secondActiveLocation: placed.id };
+    const framed = pushEffectFrame(state, { frame: "whenRevealed", sourceId: placed.id, actor: state.firstPlayer, peril: false, effectId: "50223:triggered:1", instructions: [{ verb: "SplitProgress", amount: 2 }], cancel: null, blockCancel: null }, []);
+    const sheet = sheetOf(made, settle({ ...framed, window: null, mode: "stopped" }, made.ctx, []));
+    expect(sheet.note).toContain("Divide the 2 progress tokens between them");
+    expect(sheet.options.map((option) => option.label)).toHaveLength(3);
+    expect(sheet.options[0]?.label).toMatch(/^0 on .*, 2 on Fisherman's Dock/);
   });
 });

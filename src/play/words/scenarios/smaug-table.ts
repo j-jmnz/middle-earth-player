@@ -17,6 +17,6 @@ export const scoreLimitWords = (damage: number): string => `more than ${damage} 
 
 /** Smaug's damage against the cap of the stage (stages 1 and 2) or his hit points (stage 3, where he can be defeated). */
 export const smaugWords = (damage: number, limit: number, capped: boolean): string =>
-  capped ? `Smaug holds ${damage} of the ${limit} damage this stage lets him take. More is not placed on him, and he cannot be defeated.` : `Smaug holds ${damage} of ${limit} hit points. Defeating him ends the game.`;
+  capped ? `Smaug holds ${damage} of the ${limit} damage this stage lets him take. More is not placed on him, and he cannot be defeated.` : `Smaug has ${damage} damage of his ${limit} hit points. Defeating him ends the game.`;
 
 export const smaugLimitWords = (limit: number, capped: boolean): string => (capped ? `${limit} damage is the most he can hold` : `${limit} damage defeats him`);

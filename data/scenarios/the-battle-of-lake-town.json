@@ -162,7 +162,7 @@
   "campaignPlaced": [],
   "widgets": {
     "hide": false,
-    "secondActiveLocation": false,
+    "secondActiveLocation": true,
     "perSeatStaging": false
   },
   "source": {

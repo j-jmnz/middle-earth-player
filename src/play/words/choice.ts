@@ -26,6 +26,7 @@ import { unchartedBranchWords, unchartedPickWords } from "./scenarios/uncharted.
 import { islandPickWords } from "./scenarios/island.ts";
 import { angmarPickWords } from "./scenarios/angmar/angmar.ts";
 import { aflameBranchWords, aflamePickWords, type BranchNow } from "./scenarios/aflame.ts";
+import { smaugBranchWords } from "./scenarios/smaug.ts";
 import { stormcallerBranchWords } from "./scenarios/stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
 import { wilderlandBranchWords } from "./scenarios/wilderland.ts";
@@ -67,7 +68,7 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null, game, ctx);
+  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? (ctx ? smaugBranchWords(choose, optionId, game, ctx, names, sourceId) : null) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null, game, ctx);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = deckBranchWords(option.instructions) ?? burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);

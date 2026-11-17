@@ -4,11 +4,10 @@
 // Smaug against the cap the stage gives him (6 or 12) or, on stage 3, against his hit points. The Smaug deck and its discard pile are piles of the table (store/pile-ids.ts). The engine decided every number (the damage tokens, the `damageCeiling` and `loseAtDamage` constants, the points of
 // the cards in the victory display); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import { victoryPointsOf } from "../../../rules/core/printed-stat.ts";
 import { heldAmount } from "../../../rules/core/state.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
-import { lakeTownDamage, lakeTownId, smaugInPlay } from "../../../rules/families/smaug/cards.ts";
+import { lakeTownDamage, lakeTownId, lakeTownLimit, smaugInPlay, victoryPoints } from "../../../rules/families/smaug/cards.ts";
 
 import { scoreLimitWords, scoreWords, smaugLimitWords, smaugWords, townLimitWords, townNearWords, townWords } from "../../words/scenarios/smaug-table.ts";
 import type { TableDial } from "../dials.ts";
@@ -25,8 +24,7 @@ export function lakeTownDials(game: ScenarioState, ctx: ReduceContext, nameOf: (
   if (town == null) return [];
   const dials: TableDial[] = [];
   const damage = lakeTownDamage(game);
-  const held = heldAmount(game, town, "loseAtDamage");
-  const limit = held > 0 ? held : 50;
+  const limit = lakeTownLimit(game);
   const left = Math.max(0, limit - damage);
   const level = left <= CRITICAL ? ("critical" as const) : left <= NEAR ? ("near" as const) : null;
   dials.push({
@@ -43,7 +41,7 @@ export function lakeTownDials(game: ScenarioState, ctx: ReduceContext, nameOf: (
   });
   const stage = game.questStage ? game.cards[game.questStage] : undefined;
   if (stage?.code === DRAGONS_WRATH) {
-    const points = game.victory.reduce((sum, id) => sum + victoryPointsOf(game, id, ctx.cards), 0);
+    const points = victoryPoints(game, ctx.cards);
     dials.push({ id: "score", testID: "town-score", label: "Points", name: "Victory points in the victory display", value: points, limit: damage + 1, goal: true, limitWords: scoreLimitWords(damage), note: scoreWords(points, damage) });
   }
   const smaug = smaugInPlay(game);

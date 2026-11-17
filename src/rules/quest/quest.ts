@@ -15,6 +15,7 @@ import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.
 import { hasQuestPoints, isLocationCard, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { CardInstance, Modifier, ScenarioState } from "../core/state.ts";
 import { flagged, livingSeats, updateCard, updateCards, withMode } from "../core/state.ts";
+import { askSplit } from "../families/smaug/split.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
 import { placeQuestingProgress } from "../families/defense/damage.ts";
@@ -211,10 +212,9 @@ export function placeQuestProgress(
   questing = false,
 ): ScenarioState {
   const started = steps.length;
-  // The active locations take it first (rr.active-location); stage 4 of The Ring Goes South has two (families/south/locations.ts).
-  const placedOn = placeOnActive(state, amount, cards, steps);
-  let next = placedOn.state;
-  let remaining = placedOn.remaining;
+  // The active locations take it first (rr.active-location; two in The Ring Goes South stage 4); the players divide it between Fisherman's Dock and the other (families/smaug/split.ts).
+  const placedOn = askSplit(state, amount, cards, steps) ?? placeOnActive(state, amount, cards, steps);
+  let { state: next, remaining } = placedOn;
   if (remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps, questing));
   // Progress a stage turns into discards from the encounter deck (families/breaking/progress.ts).
   if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressDiscards")) {

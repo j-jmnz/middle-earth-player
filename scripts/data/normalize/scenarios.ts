@@ -425,7 +425,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const everything = placed.map((item) => textOf(item.code)).join("\n");
     const widgets = {
       hide: /\bHide (?:test|\d)/.test(everything) || placed.some((item) => byCode.get(item.code)?.keywords?.hide != null),
-      secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))),
+      // A stage that says "There can be 2 active locations", or a dealt card that grants the slot (Fisherman's Dock: "There are now 2 active locations").
+      secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))) || /There are now 2 active locations/.test(everything),
       perSeatStaging: stages.some((code) => /creates? (?:his|their) own staging area/.test(textOf(code))),
     };
 

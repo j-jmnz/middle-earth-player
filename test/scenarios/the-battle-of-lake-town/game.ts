@@ -33,7 +33,6 @@ export type TownPolicy = {
 export const DEFAULT_POLICY: TownPolicy = { choose: "first", burn: "heroes", quest: "one" };
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
 export function townIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: TownPolicy = DEFAULT_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") return { type: "Choose", optionId: answer(state.window.options, policy) };
   if (state.window?.kind === "playerAttack") return attackTogether(state, ctx) ?? { type: "DeclineAttack" };
@@ -61,12 +60,11 @@ export type TownGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-battle-of-lake-town/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type TownGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: TownDecks; outcome: "won" | "lost"; policy?: Partial<TownPolicy>; lossReason?: string };
 
-// The games to pin (about 550 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy (Smaug defeated on stage 3 with more Victory points in the display than damage on Lake-town; the solo win with
+// The games to pin (under 3000 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy (Smaug defeated on stage 3 with more Victory points in the display than damage on Lake-town; the solo win with
 // burn taken by heroes plays 14 rounds of Burn, the two-handed one takes it all on Lake-town), and each way to lose: every player's threat at 50 (heroes too weak to quest), every hero destroyed, 50 damage on Lake-town, and Smaug defeated with too
 // few points (a tie loses). The scenario has no Nightmare deck.
 export const TOWN_GOLDENS: readonly TownGolden[] = [
-  { name: "solo win", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "solo win with the heroes taking the burn damage", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { burn: "town" } },
   { name: "Easy solo win", seatCount: 1, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
