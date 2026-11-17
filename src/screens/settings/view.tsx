@@ -15,7 +15,7 @@ import { CATALOG_VERSION } from "../../catalog/version";
 import { EFFECTS } from "../../effects";
 import { SettingGroup, SettingsRows } from "../../play/chrome/setting-rows";
 import { restoreDefaults, tableSettings } from "../../ui/table-settings";
-import { alwaysCodes, alwaysRows, CREDITS } from "../../play/chrome/settings-words";
+import { alwaysCodes, alwaysRows, CREDITS, DEBUG_LABEL, DEBUG_LINE } from "../../play/chrome/settings-words";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSplitColumns } from "../nav/use-split-columns";
 import { CHECK_LABEL, CHECK_LINE, OFFER_LINK_HINT, offerLinkLabel, offerTitle, releasedLine, updateStore } from "../../ui/update/offer";
@@ -63,6 +63,7 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
         </View>
       ) : null}
       <SettingSwitch roomy label={CHECK_LABEL} detail={CHECK_LINE} value={settings.checkUpdates} onChange={(checkUpdates) => change({ checkUpdates })} testID="app-settings-check-updates" />
+      <SettingSwitch roomy label={DEBUG_LABEL} detail={DEBUG_LINE} value={settings.debugTools} onChange={(debugTools) => change({ debugTools })} testID="app-settings-debug-tools" />
       <Label className="pb-2" testID="app-settings-credits">
         {CREDITS}
       </Label>

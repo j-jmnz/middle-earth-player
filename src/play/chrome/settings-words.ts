@@ -43,6 +43,8 @@ export const HAPTICS_LINE = "Vibration at key moments.";
 export const GUIDE_LINE = "A hint under the step title, the first two times each step comes up.";
 export const STOPS_LINE = "Pauses where a card can be played. Choose the steps on the table's rail.";
 export const TIMING_TIPS_LINE = "On the table, a card's large view adds a chip for each timing word (When Revealed, Shadow, Forced, Response, Action, Travel, Setup, Valour). Tap one for its rule.";
+export const DEBUG_LABEL = "Debug tools";
+export const DEBUG_LINE = "Adds Copy game state to the table menu. It copies the whole game as text, hidden cards and deck order included, to paste into a bug report.";
 export const AWAKE_LINE = "Keeps the screen on during a game. Uses more battery.";
 // The assistive technology each platform names for the way in: VoiceOver and Switch Control and Voice Control, or TalkBack and Switch Access.
 export const TABLE_LIST_LINE = Platform.select({
