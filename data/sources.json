@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "32beb5dbf32a388f6c0f5838e0b4b42c7755d6125aa37ab46a7f43622da84ffb"
+        "value": "00f4e967633a5c4e4b46efdb64d7994bc0bf34815b4a0c767dbcb2544791acf5"
       },
-      "fetchedAt": "2026-11-16T12:48:39.139Z",
+      "fetchedAt": "2026-11-17T13:42:38.619Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -451,6 +451,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Fate-of-Wilderland",
           "sha256": "f2e1a88d1924552af62c8662c901f06ae16c1fef4cd26a34130dd1b56d6098a9",
           "bytes": 11229
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Massing-at-Osgiliath.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Massing-at-Osgiliath",
+          "sha256": "bc2ac83b5eb1b3712d1484a1a4b13fbabb4e7dc93b2831485763a0f66f3ff6a2",
+          "bytes": 11322
         }
       ]
     },

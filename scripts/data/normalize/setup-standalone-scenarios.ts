@@ -1,0 +1,25 @@
+import type { NameIndex, SetupClause } from "./setup-text.ts";
+
+// Rules: none printed outside the quest card (The Massing at Osgiliath has no rulesheet: docs/brief.md, Data sources).
+// The sentences of the Standalone scenarios' stage 1A cards that the other readers do not read. Each pattern is quoted from a Setup line, names the cards it moves, and
+// returns null for a sentence it does not read (or whose card names find no card), so the scenario stays unbuilt and a name is never dropped silently.
+export function readStandaloneScenarios(sentence: string, names: NameIndex): SetupClause[] | null {
+  let match: RegExpExecArray | null;
+
+  // The Massing at Osgiliath: "Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area": one copy of each Scout title per player,
+  // the other copies staying in the encounter deck (the Placement's `perPlayer`).
+  if ((match = /^Search the encounter deck for (\d+) ([A-Z][a-z]+) cards?, and add (\d+) per player \(one of each title\), to the staging area$/.exec(sentence))) {
+    const scouts = names.cards.filter((card) => card.type === "enemy" && card.traits.includes(match?.[2] ?? "") && card.encounterSet === "The Massing at Osgiliath");
+    const titles = new Set(scouts.map((card) => card.name));
+    const copies = scouts.reduce((sum, card) => sum + (card.quantity ?? 0), 0);
+    if (titles.size === 0 || copies !== Number(match[1]) || Number(match[3]) !== titles.size) return null;
+    return [{ kind: "stage", codes: scouts.map((card) => card.code), perPlayer: 1, count: 0 }];
+  }
+  if ((match = /^Remove (.+?) from the encounter deck and set (?:him|her|it|them) aside, out of play$/.exec(sentence))) {
+    const codes = names.codesOf(match[1] ?? "");
+    return codes.length === 0 || names.without(match[1] ?? "").replace(/\bThe\b|\s/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];
+  }
+  // "Shuffle any unused Scoutcards back into the encounter deck" (the card prints "Scoutcards"): the copies not staged stay in the encounter deck.
+  if (/^Shuffle any unused Scout ?cards back into the encounter deck$/.test(sentence)) return [{ kind: "shuffleEncounterDeck" }];
+  return null;
+}

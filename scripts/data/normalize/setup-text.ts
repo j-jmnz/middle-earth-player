@@ -3,6 +3,7 @@ import { readAngmarAwakened } from "./setup-angmar-awakened.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
 import { readReturnOfTheKing } from "./setup-return-of-the-king.ts";
 import { readShadowsOfMirkwood } from "./setup-shadows-of-mirkwood.ts";
+import { readStandaloneScenarios } from "./setup-standalone-scenarios.ts";
 import { readTwoTowers } from "./setup-two-towers.ts";
 import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
@@ -341,7 +342,7 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readShadowsOfMirkwood(sentence, names);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readShadowsOfMirkwood(sentence, names) ?? readStandaloneScenarios(sentence, names);
     if (campaignStep) {
       clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {

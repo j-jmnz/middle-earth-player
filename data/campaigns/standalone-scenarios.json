@@ -1,0 +1,10 @@
+{
+  "id": "standalone-scenarios",
+  "name": "Standalone scenarios",
+  "scenarios": [
+    "the-massing-at-osgiliath"
+  ],
+  "kind": "cycle",
+  "starterDecks": [],
+  "saga": false
+}
