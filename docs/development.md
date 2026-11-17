@@ -1,6 +1,6 @@
 # Development
 
-Start with the Local setup section of the [README](../README.md), which gets `pnpm test` passing. This page covers what comes after: running the app in a browser or on a phone, the Maestro flows, and every `pnpm` command. [CONTRIBUTING.md](../CONTRIBUTING.md) explains how a change lands.
+Start with the Local setup section of [CONTRIBUTING.md](../CONTRIBUTING.md), which gets `pnpm test` passing. This page covers what comes after: running the app in a browser or on a phone, the Maestro flows, and every `pnpm` command. CONTRIBUTING.md also explains how a change lands.
 
 ## In a browser
 
@@ -83,6 +83,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm assets scans` / `pnpm assets booklets` | Packs the card pictures or the booklet PDFs into `assets/`. |
 | `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators. It needs macOS, Xcode and Maestro. |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet. `--publish` replaces the `showcase` branch with them. |
+| `pnpm assets banner` | Draws the README's banner in both themes (`.github/readme/banner-*.webp`) from the tablet stills, the icon and the app's fonts. |
 | `pnpm desktop dev` | Opens the Electron shell on the Metro web server (`localhost:8081`, allowed in this mode only). |
 | `pnpm desktop build` | Writes the web export (`EXPO_PUBLIC_DESKTOP=1`) and the shell's bundle to `desktop/build`, after `pnpm assets`. `--skip-assets` leaves the packs, `--optional` lets one fail. |
 | `pnpm desktop pack` | Runs electron-builder for this OS into `desktop/out`; `APP_VERSION` sets the version, `--skip-build` packs the last build and `--dir` makes the unpacked app only. |

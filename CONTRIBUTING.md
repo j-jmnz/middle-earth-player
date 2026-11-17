@@ -2,9 +2,24 @@
 
 Anything you contribute is released under the [MIT License](LICENSE). Contributions must not add game content (card text, art or rules text) beyond what the sources in `data/sources.json` already provide. Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Local setup
+
+You need Node 22.18 or later and pnpm 10.34.1 (`corepack enable` installs the pinned version). `poppler` is optional: it renders the campaign, boon and burden cards from FFG's PDFs, and without it those cards fall back to their scans.
+
+```bash
+git clone https://github.com/j-jmnz/middle-earth-player.git
+cd middle-earth-player
+pnpm install
+pnpm test        # no network or prebuilt database needed
+pnpm web         # opens the app in a browser; narrow the window to phone width
+pnpm desktop dev # opens the app in the Electron desktop shell
+```
+
+[docs/development.md](docs/development.md) covers phone builds, the Maestro flows and every `pnpm` command.
+
 ## Before you start
 
-- Work through the Local setup section of [README.md](README.md) until `pnpm test` passes.
+- Work through Local setup until `pnpm test` passes.
 - For anything bigger than a small fix, open an issue first so the approach can be agreed before you write the code.
 - If a ruling or a card behaves wrongly, report it with the "Rules or card bug" form. Name the card or rule and the printed source it comes from: the card, a booklet, the Rules Reference or the FAQ.
 - Report security problems privately, as [SECURITY.md](SECURITY.md) describes.
@@ -31,4 +46,30 @@ Releases are only ever cut by the release workflow ([docs/releasing.md](docs/rel
 - Never commit `assets/catalog.db`, card scans, card pictures, PDFs, a filled-in `src/screens/images/scan-map.ts`, secrets or signing keys.
 - Playtest cards, accounts or a backend, online multiplayer and other card games are out of scope. [docs/brief.md](docs/brief.md) has the full list.
 
-To add a scenario, follow [docs/agents/agent-brief.md](docs/agents/agent-brief.md). To write effect records, see [docs/agents/effect-authoring.md](docs/agents/effect-authoring.md). You don't need the Claude Code files in `.claude/` to contribute.
+## Project structure
+
+- `data/` holds the card, scenario and rules data. It is committed and built offline from snapshots in `data/raw/`, and `data/sources.json` pins every source.
+- `data/printed/` records the lines printed on each card, read from its scan. This is the card text the app uses.
+- Each printed line is implemented by an effect record, generated in `src/effects/generated/` or hand-written in `src/effects/authored/`. A scenario becomes playable once every line it deals has a record.
+- `src/rules/` is the rules engine: a pure reducer, split by mechanic family.
+- `desktop/` is the Electron shell that packs the web build into the Windows, macOS and Linux apps.
+- When sources disagree, [.claude/rules/authority.md](./.claude/rules/authority.md) says which one wins.
+
+The stack is Expo SDK 58, Expo Router, Skia, Reanimated, NativeWind, SQLite with Drizzle, Zustand and Zod, with Electron for the desktop app. [docs/architecture.md](docs/architecture.md) goes into detail.
+
+To add a scenario, follow [docs/agents/agent-brief.md](docs/agents/agent-brief.md). To write effect records, see [docs/agents/effect-authoring.md](docs/agents/effect-authoring.md).
+
+## Documentation
+
+- [docs/brief.md](docs/brief.md) records the product decisions and the rules as implemented.
+- [docs/architecture.md](docs/architecture.md) covers the code layout, state, the engine and the tests.
+- [docs/development.md](docs/development.md) covers running the app, the test flows and the commands.
+- [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md) describe the screens and the game table.
+- [docs/releasing.md](docs/releasing.md) walks through the release pipeline.
+- [docs/INDEX.md](docs/INDEX.md) is a generated index of every doc, section by section.
+
+## AI-assisted development
+
+Claude (Anthropic) writes most of the code, tests and docs in Claude Code. The maintainer directs that work: they set the product and its rules and decide what lands on `main`. Commits written this way name Claude as the author or in a `Co-Authored-By` line. The instructions the agents follow are in `CLAUDE.md`, `.claude/rules/` and `.claude/agents/`; you don't need them to contribute.
+
+Nothing lands until CI passes the tests, lint, the type check and the data check. Rules come from the printed cards and booklets, and the engine code cites the id of each rule it implements.
