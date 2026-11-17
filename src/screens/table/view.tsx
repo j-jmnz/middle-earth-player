@@ -31,7 +31,7 @@ import { phaseCarousel, stopAheadOf } from "../../play/phases/carousel";
 import { useLook } from "../../ui/display-prefs";
 import { tableSettings } from "../../ui/table-settings";
 import { useKeepAwake } from "../../play/chrome/use-keep-awake";
-import { TableMenu } from "../../play/chrome/table-menu";
+import { UpdateTableMenu, type TableMenuRow } from "./update-menu";
 import type { MenuItemId } from "../../play/chrome/table-menu-items";
 import { previewCards } from "../../play/cards/table-preview";
 import { pictureKey } from "../../play/canvas/picture-key";
@@ -170,7 +170,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
 
   // A menu row closes the menu and then acts (src/play/chrome/table-menu-items.ts).
   const onMenuRow = useCallback(
-    (id: MenuItemId) => {
+    (id: TableMenuRow) => {
       setMenuOpen(false);
       switch (id) {
         case "leave":
@@ -490,7 +490,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
-      <TableMenu open={menuOpen} nav={nav} without={menuWithout} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <UpdateTableMenu open={menuOpen} nav={nav} without={menuWithout} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable, result: choice.readout?.result, refusal }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );

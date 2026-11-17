@@ -11,6 +11,7 @@ import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming
 
 import { armedRoom, armedSaid, armMs, BAR_DENSE_PX, BAR_PX, dockArmedLines, LINE_PX, ONLY } from "./armed-room.ts";
 import { MORE_ID } from "./extras.ts";
+import { pausedFor } from "./phase-pause.ts";
 import { RING_OFFSET, RING_WIDTH } from "../../../ui/focus-ring-style.ts";
 import { tickArmed } from "../../../ui/haptics.ts";
 import { armBarEasing, useMotionScale } from "../../../ui/motion-run.ts";
@@ -71,6 +72,11 @@ export function DockButtons({
   // A keyboard holds focus on the primary: on a dense dock its ring (the width and its offset) would lie over the armed bar, so the bar moves up.
   const [primaryFocus, setPrimaryFocus] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // When this moment came onto the dock (the parent keys this component on it), for the phase pause (phase-pause.ts).
+  const shownAt = useRef(0);
+  useEffect(() => {
+    shownAt.current = Date.now();
+  }, []);
   const left = useSharedValue(1);
   const animates = useMotionScale() > 0;
   // The wait follows the real reader (it speaks the line), not the Table as a list setting.
@@ -85,6 +91,7 @@ export function DockButtons({
     [left],
   );
   const press = (button: DockButton) => {
+    if (pausedFor(button, shownAt.current, Date.now())) return;
     if (timer.current) clearTimeout(timer.current);
     if (button.arm && armed !== button.testID) {
       setArmed(button.testID);
@@ -119,6 +126,9 @@ export function DockButtons({
   const primaryHint = hints === "" ? undefined : hints;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
   const line = armedButton ? armedSaid(armedButton, dense, chars) : (dock.why ?? (dock.single ? ONLY : null));
+  // An armed answer that reaches past one window says so in gold, its line and its bar alike.
+  const armedGold = armedButton?.reach != null;
+  const armedColor = armedGold ? t.phase : t.accent;
   // The room holds the longest thing this moment's buttons can say when armed, in full, so arming moves nothing (armed-room.ts).
   const lines = dockArmedLines(dock, dense, chars);
   const inline = aidsFolded && more.length > 0;
@@ -144,14 +154,14 @@ export function DockButtons({
         {/* A fixed slot: the armed line keeps the lines this moment's longest caution takes (numberOfLines {lines}), each as tall as the phone's text size makes it. */}
         <View style={{ height: lines * LINE_PX * s * text, justifyContent: "flex-end" }}>
           {line ? (
-            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-accent" : "text-muted"}`}>
+            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-accent" : "text-muted"}`} style={armedGold ? { color: armedColor } : undefined}>
               {line}
             </Text>
           ) : null}
         </View>
         {armedButton ? (
           <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "flex-start", alignItems: "center", transform: [{ translateY: dense && primaryFocus ? -(RING_WIDTH + RING_OFFSET) * s : 0 }] }}>
-            <Animated.View style={[{ height: 2 * s, backgroundColor: t.accent }, bar]} />
+            <Animated.View style={[{ height: 2 * s, backgroundColor: armedColor }, bar]} />
           </View>
         ) : null}
       </View>
@@ -160,6 +170,7 @@ export function DockButtons({
           label={primary.label}
           testID={primary.testID}
           dock
+          tone={primary.reach ? "phase" : "accent"}
           compact={dense}
           disabled={!primaryReady(dock)}
           accessibilityHint={primaryHint}
@@ -172,7 +183,7 @@ export function DockButtons({
       {dock.secondary.length > 0 || inline ? (
         <View className="flex-row flex-wrap items-center justify-center gap-2" style={{ marginTop: (dense ? 4 : 6) * s }}>
           {dock.secondary.map((button) => (
-            <SecondaryButton key={button.testID} label={button.label} testID={button.testID} tight={dense} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+            <SecondaryButton key={button.testID} label={button.label} testID={button.testID} tone={button.reach ? "phase" : "accent"} tight={dense} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
           ))}
           {inline ? moreButton : null}
         </View>

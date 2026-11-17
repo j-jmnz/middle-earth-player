@@ -319,4 +319,5 @@ No phase is open.
 - Desktop builds are unsigned: Windows Authenticode is an optional step behind secrets and macOS notarization is not wired (user decision, 2026-11-16; `docs/releasing.md`, Signing).
 - The desktop origin and profile folder never change after the first release (user decision, 2026-11-16; `.claude/rules/release-standards.md`, Tags and releases).
 - The desktop and web work never changes phone or iPad code or the Android and iOS bundles (user instruction, 2026-11-16; `docs/architecture.md`, Screens).
+- The app may go online for the RingsDB deck import and a daily update check (on by default, a switch in Settings), and for nothing else (user decision, 2026-11-17; `docs/architecture.md`, Update check).
 - Saves stay synchronous on desktop and web, as on the phone; the web waits for the database on a clock deadline, not a spin count (user instruction, 2026-11-16; `src/screens/data/web/sync-wait.ts`).

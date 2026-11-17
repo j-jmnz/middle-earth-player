@@ -13,7 +13,7 @@ import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { longPressA11y } from "./long-press-action.ts";
 import { CONTROL_RADIUS } from "./radius.ts";
-import { accentPlate, DISABLED_OPACITY, glassSurface, PRESSED_FILTER, slateSurface, textSurface } from "./surfaces.ts";
+import { accentPlate, DISABLED_OPACITY, glassSurface, phaseSurface, PRESSED_FILTER, slateSurface, textSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { capLines, touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -22,7 +22,8 @@ import { Text } from "./text.tsx";
 /**
  * The one filled action on a screen: wraith-light silver on Dark, elven green on Light, a capsule 52 pt tall (`compact` 44, `dock` 46:
  * the table's command column), its word in Marcellus SC 17 tracked 1.2. A press darkens it about 8% and sinks it 1 pt. On paper it is an
- * ink capsule. Disabled is the same shape at 35%; the sentence near it says why.
+ * ink capsule. Disabled is the same shape at 35%; the sentence near it says why. `tone` "phase" is the dock's gold answer that reaches past
+ * one window (End planning; docs/design-system-table.md, Two taps).
  */
 export function PrimaryButton({
   label,
@@ -34,6 +35,7 @@ export function PrimaryButton({
   accessibilityHint,
   compact = false,
   dock = false,
+  tone,
   onFocusChange,
 }: {
   label: string;
@@ -41,6 +43,8 @@ export function PrimaryButton({
   testID: string;
   disabled?: boolean;
   surface?: "night" | "paper";
+  // Silver (the default) or the dock's gold.
+  tone?: "accent" | "phase";
   accessibilityLabel?: string;
   accessibilityHint?: string;
   // 44 pt: a tray's foot, a short phone's dock.
@@ -71,7 +75,7 @@ export function PrimaryButton({
       disabled={disabled}
       onPress={onPress}
     >
-      {({ pressed }) => <PrimaryFace label={label} pressed={pressed} disabled={disabled} paper={paper} compact={compact} dock={dock} ring={ring.style} />}
+      {({ pressed }) => <PrimaryFace label={label} pressed={pressed} disabled={disabled} paper={paper} compact={compact} dock={dock} tone={tone} ring={ring.style} />}
     </Pressable>
   );
 }
@@ -88,6 +92,7 @@ export function PrimaryFace({
   paper = false,
   compact = false,
   dock = false,
+  tone,
   ring,
 }: {
   label: string;
@@ -96,6 +101,7 @@ export function PrimaryFace({
   paper?: boolean;
   compact?: boolean;
   dock?: boolean;
+  tone?: "accent" | "phase";
   // The focus ring's outline while a keyboard holds focus (focus-ring.ts).
   ring?: ViewStyle;
 }) {
@@ -104,7 +110,11 @@ export function PrimaryFace({
   // The dock's primary keeps two lines at the phone's default text size; larger text grows the button (capLines, ui/ui-scale.ts).
   const twoLines = capLines(2, useWindowDimensions().fontScale);
   const dockCap = dock ? twoLines : undefined;
-  const fill = paper ? { backgroundColor: t.ink, opacity: pressed && !disabled ? 0.85 : 1 } : accentPlate(pressed && !disabled, t);
+  const gold = tone === "phase" && !paper;
+  const down = pressed && !disabled;
+  const plate = gold ? phaseSurface(down, t) : accentPlate(down, t);
+  const fill = paper ? { backgroundColor: t.ink, opacity: down ? 0.85 : 1 } : plate;
+  const word = gold ? t.onPhase : t.onAccent;
   return (
     // The ring is on a view of its own so a disabled capsule's opacity does not fade it (the capsule's corner radius is the ring's).
     <View style={{ borderRadius: CONTROL_RADIUS, ...ring }}>
@@ -120,7 +130,7 @@ export function PrimaryFace({
         <Text
           numberOfLines={dockCap}
           className="font-display text-center"
-          style={{ fontSize: 17 * s, lineHeight: 21 * s, letterSpacing: 1.2 * s, color: paper ? t.paper : t.onAccent }}
+          style={{ fontSize: 17 * s, lineHeight: 21 * s, letterSpacing: 1.2 * s, color: paper ? t.paper : word }}
         >
           {label}
         </Text>
@@ -132,7 +142,8 @@ export function PrimaryFace({
 /**
  * A button for the actions beside the primary (Path, Log, Change, Add cards, the dock's other answers): a capsule 44 pt tall on the
  * tonal fill, its word in Marcellus SC 15 in the accent, an optional printed icon before it and `trailing` (a count badge) after.
- * `tone` colours the word: danger for a loss. `tight` is a short phone's dock: a 36 pt capsule in a 40 pt row, its 44 pt target kept by a
+ * `tone` colours the word: danger for a loss; phase is the dock's gold answer that reaches past one window (Pass to stop), its word and a
+ * dashed edge in gold on the same fill (docs/design-system-table.md, Two taps). `tight` is a short phone's dock: a 36 pt capsule in a 40 pt row, its 44 pt target kept by a
  * vertical hit slop.
  */
 export function SecondaryButton({
@@ -153,7 +164,7 @@ export function SecondaryButton({
   testID: string;
   icon?: IconName;
   trailing?: ReactNode;
-  tone?: "bone" | "accent" | "danger";
+  tone?: "bone" | "accent" | "danger" | "phase";
   tight?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;
@@ -163,7 +174,10 @@ export function SecondaryButton({
 }) {
   const t = useTableTokens();
   const s = useUiScale();
-  const color = tone === "danger" ? t.danger : tone === "bone" ? t.bone : t.accent;
+  const color = tone === "danger" ? t.danger : tone === "bone" ? t.bone : tone === "phase" ? t.phase : t.accent;
+  // The gold answer's dashed edge takes its width out of the side padding, so the capsule keeps its size.
+  const edgeWidth = tone === "phase" ? 1.5 * s : 0;
+  const edge = tone === "phase" ? { borderWidth: edgeWidth, borderStyle: "dashed" as const, borderColor: t.phase } : {};
   const row = tight ? 40 * s : touch(s, 44);
   const slop = touchSlop(s, row);
   const ring = useFocusRing();
@@ -189,12 +203,13 @@ export function SecondaryButton({
             style={{
               minHeight: tight ? 36 * s : touch(s, 44),
               minWidth: touch(s, 44),
-              paddingHorizontal: 18 * s,
+              paddingHorizontal: 18 * s - edgeWidth,
               ...slateSurface(pressed && !disabled, t),
+              ...edge,
               ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
             }}
           >
-            {icon ? <GameIcon name={icon} size={15 * s} tint={tone === "danger" ? "danger" : tone === "bone" ? "bone" : "accent"} /> : null}
+            {icon ? <GameIcon name={icon} size={15 * s} tint={tone} /> : null}
             <Text className="font-display" style={{ fontSize: 15 * s, lineHeight: 19 * s, letterSpacing: 1 * s, color }}>
               {label}
             </Text>

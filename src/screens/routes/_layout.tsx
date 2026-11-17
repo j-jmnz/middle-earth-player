@@ -24,6 +24,9 @@ import { REM_BASE, UiScaleContext, uiFactor } from "../../ui/ui-scale";
 import { useIsTablet } from "../../ui/use-size-class";
 import { PicturesReady } from "../../ui/showcase/pictures-ready";
 import { SplashGlow } from "../kit/splash-glow";
+import { startUpdateChecks } from "../update/check";
+import { APP_VERSION } from "../update/offer";
+import { UpdateFrame } from "../update/ribbon";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -148,6 +151,12 @@ export default function RootLayout() {
     return bindCollection(databases.user, (message) => console.warn(message));
   }, [databases]);
 
+  // The update check (src/screens/update/check.ts): the stored offer at once, then a request only when one is due, a few seconds after opening.
+  useEffect(() => {
+    if (!databases) return;
+    return startUpdateChecks(databases.user, { current: APP_VERSION, warn: (message) => console.warn(message) });
+  }, [databases]);
+
   useEffect(() => {
     if (!databases) return;
     let cancelled = false;
@@ -195,6 +204,8 @@ export default function RootLayout() {
                     so a phone's landscape table is not turned back to read a card. */}
                 {/* A screen two or more pushes down is hidden (React Activity: its effects stop and its renders wait, its state stays), so a
                     stack of screens does not keep rendering under the one on top. This is expo-router 58's freezeOnBlur, which it ignores. */}
+                {/* The update ribbon stands above the stack, on every screen but the table (src/screens/update/ribbon.tsx). */}
+                <UpdateFrame>
                 <Stack
                   activityEnabled
                   screenOptions={{
@@ -214,6 +225,7 @@ export default function RootLayout() {
                   <Stack.Screen name="glossary" options={{ orientation: "all" }} />
                   <Stack.Screen name="rule/[id]" options={{ orientation: "all" }} />
                 </Stack>
+                </UpdateFrame>
                 <PicturesReady />
               </DatabaseProvider>
             </DatabaseBoundary>

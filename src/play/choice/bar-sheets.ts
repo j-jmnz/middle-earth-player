@@ -120,9 +120,11 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
       title: "Play allies and attachments",
       note: [usable ? "Tap a glowing card to play it, or drag it." : "Nothing in your hand can be played now.", pileNote].filter((part) => part != null).join(" "),
       readerNote: [usable ? [readerPlays, readerUses].filter((part) => part != null).join(" ") : "Nothing in your hand can be played now.", pileNote].filter((part) => part != null).join(" "),
-      pass: "Pass",
-      passNote: "Pass ends your planning.",
+      // Its word says it ends the phase, and the dock draws it in gold: a Pass from the window before must not end planning by habit.
+      pass: "End planning",
+      passNote: "End planning when you have played what you want.",
       armed: "Tap again: planning ends",
+      passReach: "phase",
     };
   }
   // The window is named by what comes next, so the player knows what an action here can still change (rail.ts).

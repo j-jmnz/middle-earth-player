@@ -36,6 +36,7 @@ import { capLines, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 import { tableSettings } from "../../ui/table-settings.ts";
+import { useRibbonRoom } from "../../ui/update/ribbon-room.ts";
 
 const SCRIM = 0.82;
 
@@ -131,6 +132,8 @@ export function CardPreview({
 }) {
   const screen = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  // The update ribbon's height above the stack (0 on the table, where it never shows): the window is that much taller than the preview's room.
+  const ribbon = useRibbonRoom();
   const scale = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
@@ -151,7 +154,7 @@ export function CardPreview({
   const shown = all[at] ?? card;
   const wide = screen.width > screen.height;
   const roomW = screen.width - insets.left - insets.right;
-  const roomH = screen.height - insets.top - insets.bottom;
+  const roomH = screen.height - ribbon - insets.top - insets.bottom;
   // A card turned a quarter turn (the Heading card) is drawn in a sideways frame, and its picture turned in it.
   const sideways = (shown.landscape ?? false) !== (((shown.turn ?? 0) % 180 + 180) % 180 === 90);
   // Upright, the cards with it are a strip under the card (user request, 2026-11-02: a quest card's side B was out of reach on a phone);
