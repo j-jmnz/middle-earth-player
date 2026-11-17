@@ -96,7 +96,8 @@ export const imageFiles = sqliteTable("image_files", {
 });
 
 // App-wide settings, one JSON value per key. "table": the table's settings (src/ui/table-settings.ts): stops, free
-// Responses always used, readability, the first-game guide.
+// Responses always used, readability, the first-game guide. "update": the update check's last answer and the closed ribbon's version
+// (src/screens/update/check.ts; docs/architecture.md, Update check).
 export const settings = sqliteTable("settings", {
   key: text("key").primaryKey(),
   value: text("value", { mode: "json" }).$type<StoredJson>().notNull(),
