@@ -48,6 +48,12 @@ export const announce = (trigger: GameEvent["trigger"], code?: string, extra: Pa
 export const stat = (code: string, name: StatName, value: number): Expect => ({ expect: "stat", code, name, value });
 export const flag = (code: string, name: FlagName, value = true): Expect => ({ expect: "flag", code, name, value });
 export const zone = (code: string, name: string): Expect => ({ expect: "zone", code, zone: name });
+/** The card is (or is not) committed to the quest. */
+export const committed = (code: string, value = true): Expect => ({ expect: "committed", code, value });
+/** This many cards with the code lie in the zone (a layout that places a stage in the victory display also deals it with the quest deck). */
+export const count = (code: string, name: string, value: number): Expect => ({ expect: "count", code, zone: name, value });
+/** The card shows this side (a quest stage: A before its flip, B after). */
+export const side = (code: string, name: "A" | "B"): Expect => ({ expect: "side", code, side: name });
 export const progressOn = (code: string, value: number): Expect => ({ expect: "progressOn", code, value });
 export const resourcesOn = (code: string, value: number): Expect => ({ expect: "resourcesOn", code, value });
 /** The card holds this much damage. */

@@ -165,6 +165,8 @@ export const pickSchema = z.strictObject({
   notOther: z.boolean().optional(),
   // A character that could be declared as a defender of the attack in progress and is not defending it yet (rr.step-6-4-1).
   canDefend: z.boolean().optional(),
+  // A character that can exhaust now: not exhausted and not held by `cannotExhaust` (Shadow of Fear, 03027:A:2), so "exhaust a hero to ..." as a cost is not offered a hero that cannot pay it (03029:A:2, 03076:B:1).
+  canExhaust: z.literal(true).optional(),
   // An enemy with a facedown shadow card dealt to it.
   facedownShadow: z.boolean().optional(),
   // The enemy making the attack in progress (`false`: any other enemy, "another enemy engaged with you").

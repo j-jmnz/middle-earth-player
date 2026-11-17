@@ -1,4 +1,4 @@
-// Rules: dwd.creating-the-quest-deck, dwd.bypassing-a-quest-card, rr.quest-cards-quest-deck, rr.first-player, rr.search (data/rules/entries.json); ledger lines 03070:A:1, 03070:B:1, 03026:A:1, 03074:B:1, 03075:B:3.
+// Rules: dwd.creating-the-quest-deck, dwd.bypassing-a-quest-card, rr.quest-cards-quest-deck, rr.first-player, rr.search (data/rules/entries.json); ledger lines 03070:A:1, 03070:B:1, 03026:A:1, 03074:B:1, 03075:B:3, 901209:A:3.
 //
 // Flight from Moria's quest deck beside Mount Gundabad's (gundabad.ts): the stage 2s arrive side A and are flipped at the beginning of the staging step, which resolves the side B's When Revealed (FlipCurrentQuest `resolve`); a stage can be revealed anew by New Devilry
 // and Blocked by Shadow (RevealNewStage), Hasty Council flips the stage it chooses at once (ChooseStageToFlip), and Heading Up and Heading Down return each other from the victory display (ShuffleStageFromVictory).
@@ -10,12 +10,13 @@ import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { eliminateSeat } from "../../core/eliminate.ts";
 import { printedOf } from "../../core/printed.ts";
-import { moveCard } from "../../core/zones.ts";
+import { moveCard, shadowCards } from "../../core/zones.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
+import { addToVictory } from "../sidequests/victory.ts";
 import { recordSide } from "../dreamchaser/faces.ts";
 import { keepStage, lookedStages } from "../quest/order.ts";
 import type { Focus } from "../index.ts";
@@ -67,6 +68,13 @@ export function discardTopEliminating(state: ScenarioState, instruction: Verb<"D
     if (next.lost || next.failure) return next;
   }
   return next;
+}
+
+/** AddShadowToVictory (901209:A:3): an AfterAttack's source is the attacking enemy, so the shadow card with this code is the one among the enemy's shadow cards. */
+export function addShadowToVictory(state: ScenarioState, instruction: Verb<"AddShadowToVictory">, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  const id = shadowCards(enemy).find((held) => state.cards[held]?.code === instruction.code);
+  return id ? addToVictory(state, id, ctx) : state;
 }
 
 /** ShuffleStageFromVictory (03070:B:1): the card with this code leaves the victory display for the quest deck, side A up, and the deck is shuffled. */

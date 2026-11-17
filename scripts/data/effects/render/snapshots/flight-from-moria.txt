@@ -70,9 +70,9 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03029:A:2 (front): Action: Exhaust a hero to claim this objective if it has no encounters attached. Then, attach Abandoned Tools to that hero. (If detached, return Abandoned Tools to the staging area.)
   03029:action:1: Action (any player may use it)
-    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) to choose)
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) that can exhaust (not held by a rule that stops it exhausting) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose ready hero (you control)
+    - choose ready hero (you control) that can exhaust (not held by a rule that stops it exhausting)
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
 
@@ -326,16 +326,16 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03076:B:1 (back): Abandoned Tools gains: "Refresh Action: Exhaust attached hero to put a progress token on Escape from Darkness."
   03076:action:1: Action
-    only if all of: (it is the Refresh phase) and (there is a ready hero (any player controls) with an attachment named "Abandoned Tools" to choose) and (the table does not hold the flag refreshOnce)
+    only if all of: (it is the Refresh phase) and (there is a ready hero (any player controls) that can exhaust (not held by a rule that stops it exhausting), with an attachment named "Abandoned Tools" to choose) and (the table does not hold the flag refreshOnce)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose ready hero (any player controls) with an attachment named "Abandoned Tools"
+    - choose ready hero (any player controls) that can exhaust (not held by a rule that stops it exhausting), with an attachment named "Abandoned Tools"
     - exhaust the picked card
     - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
     - the table: stat refreshUsed 1, until the end of the round
   03076:action:2: Action
-    only if all of: (it is the Refresh phase) and (there is a ready hero (any player controls) with an attachment named "Abandoned Tools" to choose) and (the table holds the flag refreshOnce) and (the table does not hold the flag refreshUsed)
+    only if all of: (it is the Refresh phase) and (there is a ready hero (any player controls) that can exhaust (not held by a rule that stops it exhausting), with an attachment named "Abandoned Tools" to choose) and (the table holds the flag refreshOnce) and (the table does not hold the flag refreshUsed)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose ready hero (any player controls) with an attachment named "Abandoned Tools"
+    - choose ready hero (any player controls) that can exhaust (not held by a rule that stops it exhausting), with an attachment named "Abandoned Tools"
     - exhaust the picked card
     - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
     - the table: stat refreshUsed 1, until the end of the round
