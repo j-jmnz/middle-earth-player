@@ -244,7 +244,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144060:A:1 (front): When Revealed: Attach to a hero you control and exhaust that hero. (Counts as a Condition attachment with the text: "Limit 1 per hero. Treat attached hero's text box as blank, except for Traits. Attached hero cannot ready.").
   144060:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - attach this card to a hero
+    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
     - exhaust its host
   144060:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)

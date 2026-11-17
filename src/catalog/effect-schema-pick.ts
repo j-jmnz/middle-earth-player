@@ -176,6 +176,8 @@ export const pickSchema = z.strictObject({
   attachable: z.string().min(1).optional(),
   guarded: z.boolean().optional(),
   progress: z.boolean().optional(),
+  // Only a card a card effect can affect: one immune to card effects is not counted ("If Cave In removed no progress tokens", East-gate's own tokens are out of reach, 03048:A:1; dwd.immune-to-card-effects).
+  affectable: z.literal(true).optional(),
   // The uncharted family's filters (src/rules/families/uncharted/pick.ts). `uncharted`: a double-sided location lying on its Lost Island side, the keyword Uncharted (dcce.uncharted),
   // `false`: any other card. `minProgress`: a card with at least this many progress tokens ("Remove 4 progress from Lost Island"). `bottom`: from the deck, only its bottom cards
   // ("the bottom 5 cards of your deck").

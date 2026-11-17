@@ -1,7 +1,7 @@
 // Rules: rr.cancel, rr.replacement-effects, rr.search, rr.first-player, rr.travel, rr.immune, rr.optional-engagement, rr.engagement-check, rr.active-location, rr.explored, dwd.immune-to-card-effects, dwd.last-player, dwd.cave-torch-the-long-dark, faq.lasting-effects (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attackersOf, cardSpecs, damageOn, deckCount, endPhase, endRound, exhausted, flag, handCount, offers, progressOn, quest, resolve, reveal, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, offers, progressOn, quest, resolve, reveal, revealedBy, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Into the Pit (dwarrowdelf part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
@@ -35,6 +35,42 @@ const ROWS: readonly Row[] = [
   { line: "03041:A:2", name: "Action: exhaust Cave Torch to place up to 3 progress on a Dark location", layout: { staging: ["03038"], attached: [{ code: "03041", to: "dh1" }], deck: ["f0"] }, act: [resolve("03041", "action"), answer("x3")], expect: [progressOn("03038", 3), exhausted("03041")] },
   { line: "03038:A:1", name: "Action: every player raises his threat by 1 to place 1 progress on Zigil Mineshaft", layout: { staging: ["03038"] }, act: resolve("03038", "action"), expect: [progressOn("03038", 1), threat(29)] },
   { line: "901008:A:2", name: "the location it is attached to is a Dark location for every Dark text (Branching Paths gives it +1 Threat)", layout: { staging: ["03036", "03017"], deck: ["f0"] }, act: reveal("901008"), expect: [stat("03017", "threat", 3)] },
+
+  // Lines of the first pass of Finish: each record a row, the judge's fixes with theirs.
+  { line: "03048:A:1", name: "East-gate's tokens do not count: with the quest card empty Cave In gains surge", layout: { active: { code: "03016", progress: 3 }, deck: ["f0", "f0"] }, act: reveal("03048"), expect: [progressOn("03016", 3), deckCount(1)] },
+  { line: "03015:A:2", name: "Shadow: the defending player raises his threat by 2", layout: {}, act: attack("f3", { shadow: "03015" }), expect: threat(30) },
+  { line: "03016:A:2", name: "no player can optionally engage an enemy while East-gate is in play", layout: { phase: "Encounter", staging: ["03061"], active: "03016" }, act: [], expect: [offers("Engage", undefined, false)] },
+  { line: "03016:A:2", name: "and no engagement check is made for it", layout: { phase: "Encounter", staging: ["03061"], active: "03016" }, act: endPhase, expect: [zone("03061", "staging")] },
+  { line: "03017:A:1", name: "Travel: each player raises his threat by 3", layout: { seats: 2, staging: ["03017"] }, act: resolve("03017", "travel"), expect: [threat(31, 0), threat(31, 1)] },
+  { line: "03017:A:2", name: "Forced: after First Hall is explored Bridge of Khazad-dûm joins the staging area", layout: { active: { code: "03017", progress: 1 }, setAside: ["03018"], progress: 0 }, act: [quest("success")], expect: [zone("03018", "staging")] },
+  { line: "03019:A:1", name: "Travel: the first player exhausts a character he controls", layout: { staging: ["03019"] }, act: [resolve("03019", "travel"), answer("dh2")], expect: [exhausted("dh2"), exhausted("dh1", false)] },
+  { line: "03019:A:2", name: "Shadow: the defending player chooses and exhausts a character he controls", layout: { staging: ["03019"] }, act: [resolve("03019", "shadow"), answer("dh2")], expect: [exhausted("dh2"), exhausted("dh1", false)] },
+  { line: "03035:A:2", name: "Shadow: +2 Attack when the attacked player is the last player (the only player of a solo game)", layout: {}, act: attack("f3", { shadow: "03035", undefended: true }), expect: [damageOn("dh1", 3)] },
+  { line: "03035:A:2", name: "and +1 when he is not (the first player of two)", layout: { seats: 2 }, act: attack("f3", { shadow: "03035", undefended: true }), expect: [damageOn("dh1", 2)] },
+  { line: "03036:A:1", name: "while Branching Paths is in the staging area each Dark location gets +1 Threat", layout: { staging: ["03036", "03038"] }, act: [], expect: [stat("03038", "threat", 6), stat("03036", "threat", 2)] },
+  { line: "03036:A:2", name: "Forced: after it is explored the players look at 3 cards, reveal 1 and move the others to the bottom", layout: { active: { code: "03036", progress: 2 }, deck: ["f0", "f3", "place", "treachery"], progress: 0 }, act: [quest("success"), answer("f3")], expect: [revealedBy("f3", 0)] },
+  { line: "03039:A:2", name: "When Revealed: the locations of the encounter discard pile go back into the deck", layout: { discard: ["place", "f0"], deck: ["f3"] }, act: resolve("03039", "whenRevealed"), expect: [zone("place", "encounterDeck"), zone("f0", "encounterDiscard")] },
+  { line: "03041:A:3", name: "Forced: after the Torch exhausts the top card is discarded and an enemy joins the staging area", layout: { attached: [{ code: "03041", to: "dh1" }], deck: ["f3", "f0"] }, act: announce("exhausted", "03041"), expect: [zone("f3", "staging")] },
+  { line: "03049:A:1", name: "each player exhausts a character and discards the top card of his deck", layout: { deckOf: ["c3"], deck: ["f0"] }, act: [reveal("03049"), answer("dh1")], expect: [exhausted("dh1"), zone("c3", "discard")] },
+  { line: "03050:A:2", name: "Shadow: 1 damage to the defending character", layout: {}, act: [attack("f3", { shadow: "03050" }), defend("dh1")], expect: [damageOn("dh1", 1)] },
+  { line: "03050:A:2", name: "and +2 Attack instead when the attack is undefended", layout: {}, act: attack("f3", { shadow: "03050", undefended: true }), expect: [damageOn("dh1", 3)] },
+  { line: "03051:A:1", name: "the first player discards a questing character he controls", layout: { committed: ["dh1"], deck: ["f0"] }, act: reveal("03051"), expect: [zone("dh1", "discard")] },
+  { line: "03051:A:2", name: "Shadow: the defending character is discarded from play", layout: {}, act: [attack("f3", { shadow: "03051" }), defend("dh1")], expect: [zone("dh1", "discard")] },
+  { line: "03052:A:2", name: "X is the number of characters in play, every player's", layout: { seats: 2, play: ["ally"], staging: ["03052"] }, act: [], expect: [stat("03052", "questPoints", 4)] },
+  { line: "03061:A:1", name: "+2 Attack when its attack is undefended", layout: {}, act: attack("03061", { undefended: true }), expect: [damageOn("dh1", 5)] },
+  { line: "03061:A:2", name: "Shadow: Goblin Swordsman is added to the staging area", layout: {}, act: attack("f3", { shadow: "03061" }), expect: [zone("03061", "staging")] },
+  { line: "03062:A:1", name: "When Revealed: the first player attaches it to one of his heroes", layout: { deck: ["f0"] }, act: reveal("03062"), expect: [zone("03062", "attached")] },
+  { line: "03063:A:1", name: "while in the staging area Goblin Tunnels removes 1 progress when a Goblin is revealed", layout: { staging: ["03063"], progress: 2, deck: ["f0"] }, act: reveal("03060"), expect: [progressOn("03064", 1)] },
+  { line: "03064:A:1", name: "Setup: the first player attaches Cave Torch to a hero", layout: { deck: ["f0"] }, act: [resolve("03064", "setup"), answer("dh2")], expect: [zone("03041", "play")] },
+  { line: "03064:B:1", name: "When Revealed: each player reveals 1 encounter card", layout: { seats: 2, stage: "03064", deck: ["f0", "f3"] }, act: resolve("03064", "whenRevealed"), expect: [revealedBy("f0", 0), revealedBy("f3", 1)] },
+  { line: "03064:B:2", name: "the stage cannot be advanced until Bridge of Khazad-dûm is in the victory display", layout: { progress: 6 }, act: quest("success"), expect: [zone("03064", "questStage")] },
+  { line: "03066:B:1", name: "the heroes collect no resources in the resource phase", layout: { stage: "03066" }, act: [], expect: [flag("dh1", "noCollection")] },
+
+  { line: "03040:A:1", name: "a card that arrives in the staging area later gets no Threat", layout: { staging: ["03060"], deck: ["f0"] }, act: [reveal("03040"), reveal("03038")], expect: [stat("03060", "threat", 4), stat("03038", "threat", 5)] },
+  { line: "03040:A:1", name: "a location made Dark by Shadow-fall gets +3", layout: { staging: ["03017"], deck: ["f0", "f0"] }, act: [reveal("901008"), reveal("03040")], expect: [stat("03017", "threat", 5)] },
+  { line: "03060:A:1", name: "a player at 25 threat or more cannot optionally engage it", layout: { phase: "Encounter", staging: ["03060"], threat: [40, 28] }, act: [], expect: [offers("Engage", undefined, false)] },
+  { line: "901002:B:3", name: "a successful quest places no progress on Goblin Ambush", layout: { stage: "901002", progress: 0 }, act: quest("success"), expect: [progressOn("901002", 0)] },
+  { line: "901002:A:1", name: "with two players the first player alone searches for Patrol Sentry, Patrol Leader and 1 more Orc", layout: { seats: 2, stage: "901002", deck: ["03060", "03014", "901003", "901004", "901005"] }, act: resolve("901002", "whenRevealed"), expect: [zone("901003", "staging"), zone("03014", "staging")] },
 ];
 
 if (ROWS.length > 0) cardSpecs("into-the-pit", ROWS);

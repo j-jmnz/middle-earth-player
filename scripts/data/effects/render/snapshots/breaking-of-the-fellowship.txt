@@ -426,7 +426,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142090:A:2 (front): When Revealed: Attach to a hero you control. (Counts as a Condition attachment with the text: "Forced: After a character you control is destroyed, raise your threat by 2.")
   142090:whenRevealed:1: When revealed
-    - attach this card to a hero
+    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
   142090:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142090:forced:1: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])

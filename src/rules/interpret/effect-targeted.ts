@@ -86,7 +86,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       const data = topFrame(state)?.data;
       // "One of those enemies must be Corsair Captain, if able" (145030:A:3): the requirement is met once an earlier search of this effect has found a card with that code (the frame's picked cards, kept by applyTargeted).
       const met = instruction.verb === "SearchMove" && instruction.require != null && data?.kind === "effect" && (data.picked ?? []).some((id) => state.cards[id]?.code === instruction.require);
-      const required = instruction.verb === "SearchMove" && instruction.require && !met ? searchable(state, { code: instruction.require }, ctx) : [];
+      const picked = instruction.verb === "SearchMove" && instruction.requireFor === "picked" ? lastPickedSeat(state) : null;
+      const required = instruction.verb === "SearchMove" && instruction.require && !met && (picked == null || picked === item.seat) ? searchable(state, { code: instruction.require }, ctx) : [];
       if (required.length > 0) return required;
       if (instruction.verb !== "SearchMove" || !instruction.different) return found;
       // A different title: not one an earlier search of this effect has found.
