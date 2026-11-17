@@ -198,6 +198,9 @@ export const simpleVerbs = [
     // While a card with this code is in the encounter deck or its discard pile, the search must take it, until an earlier search of the same effect has taken one ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1; "one of those enemies must be Corsair Captain, if able", 145030:A:3: the first search takes it, the others are free).
     require: z.string().min(1).optional(),
+    // With `require`: only the search of the player an earlier Pick of this effect chose must take it ("each player searches ... the first player names which player's choice is Patrol Leader", 03065:B:1;
+    // rr.first-player); with no player picked (a game with one player) every search is held to it.
+    requireFor: z.literal("picked").optional(),
     // The card found is the effect's picked card afterward, for the instructions that follow ("add it to the staging area. Then, attach Heavy Cruiser to that objective", 12127:A:3).
     remember: z.literal(true).optional(),
     // With `to: "engaged"`: the card found comes into play engaged with the seat an earlier pick chose (PickHighestThreat), not with the searching player ("puts it into play engaged with the player with the highest threat", 10083:A:2).

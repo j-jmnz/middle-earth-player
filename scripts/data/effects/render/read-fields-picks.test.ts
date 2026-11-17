@@ -35,6 +35,7 @@ describe("effects render read fields, picks", () => {
     defending: true,
     hasResources: true,
     progress: true,
+    affectable: true,
     exceptSphere: "lore",
     who: "firstPlayer",
     engagedEnemies: true,

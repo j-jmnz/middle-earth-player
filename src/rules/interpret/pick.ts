@@ -188,6 +188,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
   }
+  if (spec.affectable && immuneToSource(state, id, at.sourceId, ctx)) return false;
   if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
   if (spec.traits && !spec.traits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
   if (spec.notTraits && spec.notTraits.some((trait) => hasTrait(state, id, trait, ctx))) return false;

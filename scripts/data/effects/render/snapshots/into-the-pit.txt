@@ -149,8 +149,9 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
           - exhaust the card with code 03041
           - the effect's X grows by 1
         * option "keep":
-    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): every enemy and location in the staging area, now and arriving there later while the effect lasts: stat threat 1, until the end of the phase
-    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): every enemy and location in the staging area, now and arriving there later while the effect lasts (Dark only): stat threat 2, until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each Dark location (any player controls) in the staging area only: stat threat 2, until the end of the phase
 
 03040:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
   03040:shadow:1: Shadow
@@ -184,7 +185,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 03048:A:1 (front): When Revealed: Remove all progress tokens from the current quest card and active location. If Cave In removed no progress tokens, it gains surge.
   03048:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if all of: (the current quest card holds no progress (neither is true while there is no current quest)) and (the number of location (any player controls) with progress on it, that is the active location is at most 0): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - if all of: (the current quest card holds no progress (neither is true while there is no current quest)) and (the number of location (any player controls) that a card effect can affect (not one immune to card effects), with progress on it, that is the active location is at most 0): this card gains surge (one more encounter card is revealed when it has been resolved)
     - all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
     - remove all the progress from the active location
 
@@ -282,7 +283,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03062:A:1 (front): When Revealed: The first player attaches Watchful Eyes to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck and add it to the staging area.")
   03062:whenRevealed:1: When revealed
-    - attach this card to a hero
+    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
   03062:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   03062:forced:1: Forced at the end of the phase
@@ -310,7 +311,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   03064:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - a copy of the card with code 03041 is set aside, out of play
-    - choose hero (you control) [also {"attachable":"03041"}]
+    - choose hero (any player controls) chosen by the first player [also {"attachable":"03041"}]
     - the set-aside copy of the card with code 03041 is attached to the last picked hero; if it would leave play it is removed from the game
     - shuffle the encounter deck
 
@@ -330,8 +331,9 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 03065:B:1 (back): When Revealed: Each player must search the encounter deck and discard pile for 1 enemy of his choice, and add it to the staging area. One choice must be Patrol Leader, if able.
   03065:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls) chosen by the first player
     - for each player, first player first:
-      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 03014 is there to be found, the search must take it (the first search of the effect that can)
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 03014 is there to be found, the search must take it (the search of the player the first player named)
     - shuffle the encounter deck
 
 03065:B:2 (back): Forced: After an enemy is revealed from the encounter deck, discard it instead of adding it to the staging area.
@@ -354,4 +356,4 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   03066:constant:2: Constant
     (no instructions)
 
-(rendered pieces: 217 by template, 4 as JSON)
+(rendered pieces: 225 by template, 4 as JSON)

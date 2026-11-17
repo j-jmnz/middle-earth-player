@@ -17,10 +17,14 @@ const BRIDGE = "03018";
 const FIRST_HALL = "03017";
 const PATROL_LEADER = "03014";
 const DARK_LOCATION: PickSpec = { type: "location", control: "any", trait: "Dark" };
-const ACTIVE_LOCATION_PROGRESS: PickSpec = { type: "location", control: "any", active: true, progress: true };
+const ACTIVE_LOCATION_PROGRESS: PickSpec = { type: "location", control: "any", active: true, progress: true, affectable: true };
 const UNDEFENDED: Condition = { kind: "undefended" };
 const NOT_UNDEFENDED: Condition = { kind: "not", condition: UNDEFENDED };
 const ACTIVE_IS_DARK: Condition = { kind: "matches", card: "activeLocation", pick: DARK_LOCATION };
+// Burning Low's cards: the enemies and locations in the staging area when it resolves ("currently"), a Dark location read as it is then (a trait a card gives counts).
+const STAGED_ENEMY: PickSpec = { type: "enemy", control: "any", stagingOnly: true };
+const STAGED_LOCATION: PickSpec = { type: "location", control: "any", stagingOnly: true };
+const NO_TORCH: Condition = { kind: "not", condition: { kind: "x", min: 1 } };
 const ACTIVE_NOT_DARK: Condition = { kind: "not", condition: ACTIVE_IS_DARK };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
@@ -90,8 +94,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 03039 Many Roads: the locations in the encounter discard pile go back into the deck.
     { id: "03039:whenRevealed:1", cardCode: "03039", lines: ["03039:A:2"], timing: "whenRevealed", instructions: [{ verb: "ShuffleEncounterDiscard", type: "location" }] },
 
-    // 03040 Burning Low. A player who controls a ready Cave Torch may exhaust it, and the whole effect is canceled; else every enemy and location in the staging area gets +1 Threat until the end of the phase, +3 for a Dark
-    // location (faq.lasting-effects: a lasting effect of an encounter card is recalculated, the class of cards is read while it lasts).
+    // 03040 Burning Low. A player who controls a ready Cave Torch may exhaust it, and the whole effect is canceled; else every enemy and location in the staging area when it resolves gets +1 Threat until the end of the phase, +3 for a Dark
+    // location (the cards are fixed when it resolves, faq.lasting-effects).
     {
       id: "03040:whenRevealed:1",
       cardCode: "03040",
@@ -113,8 +117,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
             },
           ],
         },
-        { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", target: "stagingCards", when: { kind: "not", condition: { kind: "x", min: 1 } } },
-        { verb: "ModifyStat", stat: "threat", amount: 2, until: "endOfPhase", target: "stagingCards", trait: "Dark", when: { kind: "not", condition: { kind: "x", min: 1 } } },
+        { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", holders: STAGED_ENEMY, when: NO_TORCH },
+        { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", holders: STAGED_LOCATION, when: NO_TORCH },
+        { verb: "ModifyStat", stat: "threat", amount: 2, until: "endOfPhase", holders: { ...STAGED_LOCATION, trait: "Dark" }, when: NO_TORCH },
       ],
     },
 
@@ -224,26 +229,30 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     copyLine("41040:A:1", "03062:A:1"),
     copyLine("41032:A:1", "03063:A:1"),
 
-    // 03064 Entering the Mines. Setup: East-gate is the active location, First Hall and Bridge of Khazad-dûm are set aside and Cave Torch is out of the encounter deck by the scenario data; the Setup attaches the Torch to a hero the first player
+    // 03064 Entering the Mines. Setup: East-gate is the active location, First Hall and Bridge of Khazad-dûm are set aside and Cave Torch is out of the encounter deck by the scenario data; the Setup attaches the Torch to a hero of any player the first player
     // chooses (it is removed from the game if it would leave play, dwd.cave-torch-the-long-dark) and shuffles the encounter deck. Each player reveals a card; the stage cannot be advanced until Bridge of Khazad-dûm is in the victory display.
     {
       id: "03064:setup:1",
       cardCode: "03064",
       lines: ["03064:A:1"],
       timing: "setup",
-      instructions: [{ verb: "SetAside", code: TORCH }, { verb: "Pick", pick: { type: "hero", control: "you", attachable: TORCH } }, { verb: "AttachSetAside", code: TORCH, removeWhenLeaving: true }, { verb: "ShuffleEncounterDeck" }],
+      instructions: [{ verb: "SetAside", code: TORCH }, { verb: "Pick", pick: { type: "hero", control: "any", attachable: TORCH, who: "firstPlayer" } }, { verb: "AttachSetAside", code: TORCH, removeWhenLeaving: true }, { verb: "ShuffleEncounterDeck" }],
     },
     { id: "03064:whenRevealed:1", cardCode: "03064", lines: ["03064:B:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RevealEncounter" }] }] },
     { id: "03064:constant:1", cardCode: "03064", lines: ["03064:B:2"], timing: "constant", condition: { kind: "inVictory", code: BRIDGE, is: false }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
-    // 03065 Goblin Patrol. B:1: each player in order searches the deck and discard pile for an enemy, one of the choices being Patrol Leader, if able (the first search takes it). B:2: an enemy revealed from the encounter deck that
+    // 03065 Goblin Patrol. B:1: each player in order searches the deck and discard pile for an enemy, one of the choices being Patrol Leader, if able (the first player names the player whose search takes it). B:2: an enemy revealed from the encounter deck that
     // would stay in the staging area is discarded instead (after its reveal resolved: an enemy that engaged a player through its When Revealed is not in the staging area). B:3: with no enemy in play the stage advances at once (the settle sweep reads the flag), and 11 progress also advances it.
     {
       id: "03065:whenRevealed:1",
       cardCode: "03065",
       lines: ["03065:B:1"],
       timing: "whenRevealed",
-      instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", type: "enemy", to: "staging", require: PATROL_LEADER }] }, { verb: "ShuffleEncounterDeck" }],
+      instructions: [
+        { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } },
+        { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", type: "enemy", to: "staging", require: PATROL_LEADER, requireFor: "picked" }] },
+        { verb: "ShuffleEncounterDeck" },
+      ],
     },
     {
       id: "03065:forced:1",
