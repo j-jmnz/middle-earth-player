@@ -99,7 +99,6 @@ No phase is open.
 - Fellowship-of-heroes with no replacement left in the collection is not modelled (`ltp.fellowship-of-heroes`, `rr.fellowship-of-heroes`).
 - Simultaneous Forced and delayed effects resolve in a fixed order, not the first player's choice (FAQ 1.02).
 - `src/play/readouts/threat-level.ts` shows 50 as the elimination level and ignores The One Ring's `eliminationReduction`.
-- Burglar's Turn loot has no table UI.
 - Collapsed Mine's per-round cap ignores progress placed before it appears (fixing it moves every game; in the brief).
 - 41004:B:1 prints "searches the encounter deck"; the record also searches the discard pile.
 - The Oath: the Tokens dial does not open the quest preview; the Resolution joins used Adaptations with a comma, not "and".
@@ -293,7 +292,7 @@ No phase is open.
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.
 - Every Rules Reference action window opens; Responses are offered as soon as their trigger resolves; deckbuilding follows the Rules Reference (one to three heroes, no sphere match on save) (user, 2026-10-25).
 - An event with no record cannot be played (`rr.triggered-ability`) (user, 2026-10-26).
-- Every deck-legal player card is automated; Messenger of the King cards (`MotKA`, 22134) are out of scope (user, 2026-10-26).
+- Every deck-legal player card is automated (user, 2026-10-26), Messenger of the King included; RingsDB's `(MotK)` hero stand-ins (`MotKA`) stay out of the pool and import as their ally (user, 2026-11-16).
 - The player deck stays hidden; the two-handed peek shows the whole seat (user, 2026-10-26).
 - Back order on the table is spotlight, scrub, peek, then the rest (user, 2026-10-27).
 - Pinned RevCore encounter scans that are 2010/2012 Core Set printings are accepted where the text matches (user, 2026-10-27).

@@ -87,6 +87,9 @@ export type CardInstance = {
   code: string;
   zone: ZoneName;
   exhausted: boolean;
+  // The phase the card was last readied in, `<round>:<phase>`, kept only while it cannot be readied more than once per phase
+  // (readyOncePerPhase, 22134:B:2). Absent otherwise.
+  readiedIn?: string;
   damage: number;
   progress: number;
   resources: number;

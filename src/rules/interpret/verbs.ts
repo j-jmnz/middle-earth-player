@@ -290,6 +290,8 @@ export function raiseFor(
   for (const seat of seats) {
     const count = instruction.perCommitted ? committedHeroes(next, seat, instruction.perCommitted.exceptSphere, ctx) : 1;
     next = raiseThreat(next, seat, amount * count, steps, currentCause(steps, UNATTRIBUTED));
+    // A raise of the starting threat (22134:A:2) moves the starting threat level a card may reduce back to (04053:A:2).
+    if (instruction.starting && next.startingThreat) next = { ...next, startingThreat: next.startingThreat.map((level, at) => (at === seat ? level + amount * count : level)) };
     // "After your threat is raised by an encounter card effect" (08062:A:1).
     next = noteEncounterThreat(next, seat, amount * count, focus.sourceId, ctx);
   }

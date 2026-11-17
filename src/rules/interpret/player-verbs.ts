@@ -20,7 +20,7 @@ import { stagingLocations } from "../quest/quest.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
 import { printedOf, type PrintedCard } from "../core/printed.ts";
-import { readyBarred } from "../core/holder-classes.ts";
+import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { attachTo, discardFromHand, moveCard } from "../core/zones.ts";
@@ -91,11 +91,11 @@ export function runPlayerVerb(
       }
       if (instruction.target === "host") {
         const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
-        return hostId && state.cards[hostId] && !readyBarred(state, hostId, byPlayerCards(state, focus.sourceId, ctx)) ? updateCard(state, hostId, { exhausted: false }) : state;
+        return hostId && state.cards[hostId] && !readyBarred(state, hostId, byPlayerCards(state, focus.sourceId, ctx)) ? updateCard(state, hostId, readyPatch(state, hostId)) : state;
       }
       if (instruction.target !== "allCharacters") return null;
       let next = state;
-      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) if (!readyBarred(state, id, byPlayerCards(state, focus.sourceId, ctx))) next = updateCard(next, id, { exhausted: false });
+      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) if (!readyBarred(state, id, byPlayerCards(state, focus.sourceId, ctx))) next = updateCard(next, id, readyPatch(next, id));
       return next;
     }
     case "Exhaust": {
@@ -328,7 +328,7 @@ export function readyCard(state: ScenarioState, id: string, byPlayerCard = false
   const card = state.cards[id];
   // "Your cards cannot ready for the remainder of the round" (cannotReady, 900103:A:1).
   if (!card?.exhausted || readyBarred(state, id, byPlayerCard ? cards : undefined)) return state;
-  return queueEvent(updateCard(state, id, { exhausted: false }), { trigger: "readied", seat: card.controller, cardId: id, ...(byPlayerCard ? { byPlayerCard: true } : {}) });
+  return queueEvent(updateCard(state, id, readyPatch(state, id)), { trigger: "readied", seat: card.controller, cardId: id, ...(byPlayerCard ? { byPlayerCard: true } : {}) });
 }
 
 export function exhaustCard(state: ScenarioState, id: string): ScenarioState {

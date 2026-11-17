@@ -4,8 +4,9 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, ty
 import { Pressable, ScrollView, View } from "react-native";
 
 import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, ToggleChip, sphereWord } from "../kit/chrome";
-import { draftAddRefused, draftCopyCount, useDeckDraft, type TitleLookup } from "../deck/draft";
-import { deckCardCount, deckCountLine, DECK_MINIMUM } from "../deck/status";
+import { draftAddRefused, draftCopyCount, setDraftTarget, targetPicks, useDeckDraft, type DraftPile, type TitleLookup } from "../deck/draft";
+import { deckCardCount, deckCountLine, deckLootRule, DECK_MINIMUM } from "../deck/status";
+import { lootCodes } from "../../catalog/loot";
 import { useDatabases } from "../data/databases";
 import { enqueueImageDownloads } from "../images/queue";
 import { useListPreview } from "./list-preview";
@@ -167,10 +168,13 @@ export function CardPoolBody({
   // The card whose detail is open beside the pool: its cell carries the silver ring.
   selected?: string | null;
 }) {
-  // Only the heroes and the cards: typing the deck's name in the editor does not render the pool.
+  // Only the heroes, the cards and the side deck: typing the deck's name in the editor does not render the pool. While adding, − and +
+  // change the pile the editor chose (the deck, or the side deck), and the switch above the search moves between them.
   const heroes = useDeckDraft((current) => current.heroes);
   const deckCards = useDeckDraft((current) => current.cards);
-  const draft = useMemo(() => ({ heroes, cards: deckCards }), [heroes, deckCards]);
+  const sideCards = useDeckDraft((current) => current.side);
+  const target = useDeckDraft((current) => current.target);
+  const draft = useMemo(() => targetPicks({ heroes, cards: deckCards, side: sideCards }, target), [heroes, deckCards, sideCards, target]);
   const { catalog } = useDatabases();
   const router = useRouter();
   // Both views are read on every render (a hook is never chosen at run time); the mode picks which one shows and which one changes.
@@ -235,16 +239,21 @@ export function CardPoolBody({
       if (!item) return null;
       const loss = inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null;
       const count = draftCopyCount(draft, item.code, item.typeCode);
-      const full = draftAddRefused(draft, item, lookup);
+      const full = draftAddRefused(draft, item, lookup, target);
+      const side = target === "side";
+      // A hero or a contract has no stepper while adding to the side deck: it never goes there.
+      const offSide = side && (item.typeCode === "hero" || item.typeCode === "contract");
+      const stepper = adding && !offSide;
       if (!grid) {
-        return <PoolCardRow item={item} adding={adding} loss={loss} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
+        return <PoolCardRow item={item} adding={stepper} side={side} loss={loss} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
       }
       return (
         <PoolCardCell
           item={item}
           width={cellWidth}
           offset={gridOffset(index, columns, scale)}
-          adding={adding}
+          adding={stepper}
+          side={side}
           loss={loss}
           count={count}
           full={full}
@@ -255,7 +264,7 @@ export function CardPoolBody({
         />
       );
     },
-    [grid, cellWidth, columns, scale, adding, inactiveCodes, draft, lookup, openCard, previewCard, selected],
+    [grid, cellWidth, columns, scale, adding, inactiveCodes, draft, target, lookup, openCard, previewCard, selected],
   );
 
   function openSheet(): void {
@@ -274,6 +283,11 @@ export function CardPoolBody({
 
   return (
     <View className="min-h-0 flex-1">
+      {adding ? (
+        <View className="mt-3">
+          <Segmented options={PILE_WORDS} value={pileWord(target)} onChange={(word) => setDraftTarget(word === "Side deck" ? "side" : "deck")} testIDPrefix="pool-pile" stretch accessibilityLabel="Add cards to" />
+        </View>
+      ) : null}
       <View className="mt-3 flex-row items-center gap-2">
         <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search name, trait or text" accessibilityLabel="Search cards" accessibilityHint="Searches card name, traits, type, sphere and text" />
         <FilterButton count={filters} onPress={openSheet} />
@@ -331,6 +345,21 @@ export function CardPoolBody({
   );
 }
 
+// The bar's count of the side deck: "12 cards", or "9 of 14 loot" while the deck's contract builds a loot deck from it ("16 loot, 14
+// kept" past the size: the player leaves the rest out at Setup).
+function sideDeckLine(count: number, loot: { found: number; size: number } | null): string {
+  if (loot && loot.found > loot.size) return `${loot.found} loot, ${loot.size} kept`;
+  if (loot) return `${loot.found} of ${loot.size} loot`;
+  return `${count} ${count === 1 ? "card" : "cards"}`;
+}
+
+// The two piles the pool adds to while adding, by name.
+const PILE_WORDS = ["Deck", "Side deck"] as const;
+
+function pileWord(pile: DraftPile): (typeof PILE_WORDS)[number] {
+  return pile === "side" ? "Side deck" : "Deck";
+}
+
 /** Filter, with a round count of the filters on beside the word. */
 function FilterButton({ count, onPress }: { count: number; onPress: () => void }) {
   const palette = usePalette();
@@ -347,8 +376,8 @@ function FilterButton({ count, onPress }: { count: number; onPress: () => void }
 }
 
 // The pool on its own route: the Cards tab, or the pool the deck editor pushes on a phone. `header` is the screen's top: the tab's
-// title, or the editor's NavBar naming the deck. Adding, a bar shows the deck's count against 50 beside Done, and every change is
-// said in a toast with Undo.
+// title, or the editor's NavBar naming the deck. Adding, a bar shows the deck's count against 50 (or the side deck's count) beside Done,
+// and every change is said in a toast with Undo.
 export function CardPool({
   adding,
   header,
@@ -362,7 +391,14 @@ export function CardPool({
 }) {
   const heroes = useDeckDraft((current) => current.heroes);
   const deckCards = useDeckDraft((current) => current.cards);
+  const sideCards = useDeckDraft((current) => current.side);
+  const side = useDeckDraft((current) => current.target === "side");
   const preview = useListPreview();
+  const { catalog } = useDatabases();
+  // With The Burglar's Turn in the deck, the side deck's bar counts the loot deck against its size (src/catalog/loot.ts).
+  const loot = useMemo(() => deckLootRule(deckCards), [deckCards]);
+  const lootFound = loot ? lootCodes(loot, sideCards, poolOf(catalog).byCode).length : 0;
+  const sideCount = deckCardCount(sideCards);
   return (
     <Screen scene="calm">
       <View className="min-h-0 flex-1">
@@ -374,14 +410,16 @@ export function CardPool({
             <View className="flex-row items-center gap-3.5">
               <View className="flex-1">
                 <View className="flex-row items-baseline justify-between">
-                  <Text className="text-label text-muted">Deck</Text>
+                  <Text className="text-label text-muted">{side ? "Side deck" : "Deck"}</Text>
                   <Text testID="pool-deck-count" className="text-label text-bone" numberOfLines={1}>
-                    {deckCountLine({ heroes, cards: deckCards })}
+                    {side ? sideDeckLine(sideCount, loot ? { found: lootFound, size: loot.size } : null) : deckCountLine({ heroes, cards: deckCards })}
                   </Text>
                 </View>
-                <View className="mt-1.5">
-                  <ProgressBar value={deckCardCount(deckCards)} max={DECK_MINIMUM} />
-                </View>
+                {side && !loot ? null : (
+                  <View className="mt-1.5">
+                    <ProgressBar value={side ? lootFound : deckCardCount(deckCards)} max={side && loot ? loot.size : DECK_MINIMUM} />
+                  </View>
+                )}
               </View>
               <PrimaryButton testID="pool-done" label="Done" onPress={() => onDone?.()} />
             </View>

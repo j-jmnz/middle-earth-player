@@ -9,6 +9,7 @@ import { queueEvent } from "../windows/queue.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { flagged, livingSeats, updateCards, withMode, type CardInstance, type ScenarioState } from "../core/state.ts";
 import { inPlay } from "../core/zones.ts";
+import { readiedThisPhase, readyPatch } from "../core/holder-classes.ts";
 
 export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // A Response to "After a character readies during the refresh phase" (02102:A:1) hears each card that readies here.
@@ -18,9 +19,9 @@ export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: Engin
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (!instance.exhausted && !instance.committed)) continue;
     // "Does not ready during the refresh phase" (a flag) leaves the card exhausted.
-    // So does "cannot ready" (cannotReady, 900103:A:1).
-    const stays = instance.exhausted && (flagged(state, instance.id, "doesNotReady") || flagged(state, instance.id, "cannotReady"));
-    patches.push([instance.id, { exhausted: stays, committed: false }]);
+    // So does "cannot ready" (cannotReady, 900103:A:1), and a card readied in this phase already that cannot be readied more than once per phase (22134:B:2).
+    const stays = instance.exhausted && (flagged(state, instance.id, "doesNotReady") || flagged(state, instance.id, "cannotReady") || readiedThisPhase(state, instance.id));
+    patches.push([instance.id, instance.exhausted && !stays ? { ...readyPatch(state, instance.id), committed: false } : { exhausted: stays, committed: false }]);
     if (heard && instance.exhausted && !stays) readied.push({ trigger: "readied", seat: instance.controller, cardId: instance.id, phase: "Refresh" });
   }
   let next = updateCards(state, patches);

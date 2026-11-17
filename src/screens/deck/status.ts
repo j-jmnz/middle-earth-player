@@ -1,5 +1,6 @@
-import { deckRulesOf } from "../../catalog/deck-rules";
-import { deckSaveRefusal, formatDeckRefusal, type DeckSaveCard, type DeckSaveRefusal } from "../../catalog/deck-save";
+import { deckReadyRefusal } from "../../catalog/deck-ready";
+import { formatDeckRefusal, type DeckSaveCard, type DeckSaveRefusal } from "../../catalog/deck-save";
+import { lootCodes, lootRuleOf, lootWords, type LootRule } from "../../catalog/loot";
 import { EFFECTS } from "../../effects";
 
 // What the deck screens say about a deck: whether it is ready to play, its counts, and its cards grouped by type. A deck
@@ -22,6 +23,8 @@ export type DeckContent = {
   name: string;
   heroes: readonly string[];
   cards: readonly { code: string; count: number }[];
+  // The side deck, where a contract finds what it chooses "from your collection" (src/catalog/loot.ts). Empty when absent.
+  side?: readonly { code: string; count: number }[];
 };
 
 export const DECK_MINIMUM = 50;
@@ -30,10 +33,30 @@ export function deckCardCount(cards: DeckContent["cards"]): number {
   return cards.reduce((sum, card) => sum + card.count, 0);
 }
 
-/** The first rule the deck breaks (rr.deckbuilding), or null when it is ready to play. The name is not a rule. */
+/**
+ * The first rule the deck breaks (rr.deckbuilding), or null when it is ready to play. The name is not a rule. A contract that builds a
+ * loot deck (The Burglar's Turn) also needs its cards in the side deck (src/catalog/loot.ts).
+ */
 export function deckRefusal(deck: DeckContent, faces: ReadonlyMap<string, DeckSaveCard>): DeckSaveRefusal | null {
-  // The rules of the deck's contract, if it has one (a contract prints deckbuilding rules on its side A).
-  return deckSaveRefusal(deck.heroes, deck.cards, faces, [], deckRulesOf(EFFECTS, deck.cards.map((card) => card.code)));
+  return deckReadyRefusal(deck.heroes, deck.cards, faces, EFFECTS, deck.side ?? []);
+}
+
+/** The loot deck the deck's contract builds from its side deck (The Burglar's Turn), or null when it has no such contract. */
+export function deckLootRule(cards: DeckContent["cards"]): LootRule | null {
+  return lootRuleOf(EFFECTS, cards.map((card) => card.code));
+}
+
+/**
+ * The line under the side deck's heading in the editor: what the deck's contract takes from it and how much of it is there
+ * ("The Burglar's Turn takes its loot deck from here: 14 different Item or Artifact attachments, 9 so far."), or what a side deck is.
+ */
+export function sideDeckNote(loot: LootRule | null, side: DeckContent["cards"], faces: ReadonlyMap<string, DeckSaveCard>): string {
+  if (!loot) return "Cards kept with the deck but not in it. A contract that takes cards from outside the deck takes them from here.";
+  const name = faces.get(loot.cardCode)?.name ?? "The contract";
+  const found = lootCodes(loot, side, faces).length;
+  const extra = found - loot.size;
+  const chooses = extra > 0 ? `: you leave ${extra} out at Setup` : "";
+  return `${name} takes its loot deck from here: ${lootWords(loot)}, ${found} so far${chooses}.`;
 }
 
 // A ready deck has no words (nothing on the deck screens says it is ready): `text` is what a deck that is not ready still needs.

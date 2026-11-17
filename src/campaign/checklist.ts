@@ -18,7 +18,7 @@ import { setAsideBoonWords } from "./return-of-the-king-words.ts";
 
 export type ChecklistStep = { n: number; rule: "rr.campaign-setup-checklist"; text: string; did: string[] };
 // The seat while the checklist fills it in; StartSeat is the read-only shape it hands to the start.
-type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[]; setAside?: string[]; threatPenalty?: number; threatRaise?: number; resources?: number };
+type Working = { heroes: string[]; deck: string[]; loot?: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[]; setAside?: string[]; threatPenalty?: number; threatRaise?: number; resources?: number };
 
 // `note` says what the choice is when the options alone do not (a search of the encounter deck for cards to remove from the game).
 // `words` gives an option that is not a card the words it is shown with (`resources`); a card option is shown as the card.
@@ -27,7 +27,7 @@ export type Need = { seat: number; options: readonly string[]; note?: string; wo
 export type ChecklistInput = {
   log: CampaignLog;
   scenario: ScenarioData;
-  seats: readonly { heroes: readonly string[]; deck: readonly string[] }[];
+  seats: readonly { heroes: readonly string[]; deck: readonly string[]; loot?: readonly string[] }[];
   effects: readonly Effect[];
   cards: ReadonlyMap<string, PrintedCard>;
   choices?: readonly string[];
@@ -356,7 +356,8 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const modifier = (amount: number): string => (amount < 0 ? `minus ${-amount}, and at least 0` : `plus ${amount}`);
   note(4, [`Each player's starting threat is the combined threat cost of their heroes ${modifier(threatPenalty)}.`, ...extra.flatMap((more, index) => (more > 0 ? [`Seat ${index + 1} takes a permanent +${more} starting threat penalty of its own: its starting threat is the combined threat cost of its heroes ${modifier(threatPenalty + more)}.`] : []))]);
 
-  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(dealtBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [], afterMulligan: [], ...((extra[index] ?? 0) > 0 ? { threatPenalty: extra[index] } : {}) }));
+  // A loot deck (The Burglar's Turn) goes to the start as the seat chose it.
+  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(dealtBySeat[index] ?? [])], deck: [...seat.deck], ...(seat.loot ? { loot: [...seat.loot] } : {}), attachments: [], hand: [], afterMulligan: [], ...((extra[index] ?? 0) > 0 ? { threatPenalty: extra[index] } : {}) }));
 
   // The cards with the Permanent keyword on a logged Aragorn move to ☺ Aragorn (mec112.campaign-mode-aragorn).
   pool = moveToGranted(pool, forgotten, saga);

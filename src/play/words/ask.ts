@@ -13,6 +13,7 @@ import { grappleAsk, grappleFactsOf } from "./scenarios/grapple.ts";
 import { seaAsk } from "./scenarios/sea.ts";
 import { tradeWords } from "./scenarios/uncharted.ts";
 import { wilderlandAsk } from "./scenarios/wilderland.ts";
+import { lootLeaveOutWords } from "./loot.ts";
 
 /** What the instruction a player is asked about says to ask. `queue` is the instructions after the asked one (`queue[0]` is the next instruction), `picked` the card the effect last picked. */
 export function askWords(a: {
@@ -38,6 +39,8 @@ export function askWords(a: {
     const loses = effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"));
     return { verb: "Trade", prompt: tradeWords(game, ctx.cards, instruction, names.card(traded.id), loses) };
   }
+  // The Burglar's Turn's Setup with more candidates than the loot deck takes (22024:A:2).
+  if (instruction.verb === "BuildLootDeck") return lootLeaveOutWords(options.length, instruction.size);
   return (
     grappleAsk(instruction, source, names, grappleFactsOf(game, ctx, instruction, picked)) ??
     wilderlandAsk(instruction, source, names, queue[0], picked, { game, ctx, options }) ??

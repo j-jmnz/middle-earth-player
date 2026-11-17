@@ -64,9 +64,9 @@ Read the sections your task touches.
     - 223–234 Mechanic families (~5.0K) ← 5
   - 235–240 Effects (~600) ← 5
   - 241–273 Scenario definition (~800)
-  - 274–318 Persistence (~3.0K) ← 1
+  - 274–318 Persistence (~3.1K) ← 1
     - 295–298 Open games across an update (~50)
-    - 299–305 Open game rows (~650)
+    - 299–305 Open game rows (~660)
     - 306–311 Opening a game (~350)
     - 312–318 Continue, Restart and the checkpoint (~380)
   - 319–324 Images (~940) ← 6
@@ -74,11 +74,11 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.3K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~213.8K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~214.5K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~630) ← 2
   - 54–67 Non-goals (~590)
-  - 68–88 Decisions (~840)
+  - 68–88 Decisions (~860)
   - 89–118 Stack (~950)
   - 119–136 Performance and feel (~750)
   - 137–154 Repository layout (~440)
@@ -140,18 +140,18 @@ Read the sections your task touches.
     - 1761–1781 The Dead Marshes (~2.1K) ← 2
     - 1782–1805 Return to Mirkwood (~2.3K) ← 4
   - 1806–1814 Nightmare (~410) ← 21
-  - 1815–1853 Deckbuilding (~2.0K)
-  - 1854–1932 Effects (~3.2K)
-    - 1856–1914 Three layers (~2.4K) ← 10
-    - 1915–1924 Player side quests, contracts and saga cards (~430)
-    - 1925–1928 Window stack (~100)
-    - 1929–1932 Coverage test (~270)
-  - 1933–1955 Data sources (~700) ← 2
-  - 1956–1974 Card images (~1.2K) ← 9
-  - 1975–2000 Persistence and shipping (~2.6K) ← 6
-  - 2001–2042 Screens (~5.0K) ← 1
-    - 2027–2042 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~57.6K tok)
+  - 1815–1855 Deckbuilding (~2.1K)
+  - 1856–1935 Effects (~3.7K)
+    - 1858–1916 Three layers (~2.4K) ← 10
+    - 1917–1927 Player side quests, contracts and saga cards (~940)
+    - 1928–1931 Window stack (~100)
+    - 1932–1935 Coverage test (~270)
+  - 1936–1958 Data sources (~700) ← 2
+  - 1959–1977 Card images (~1.2K) ← 9
+  - 1978–2003 Persistence and shipping (~2.6K) ← 6
+  - 2004–2045 Screens (~5.0K) ← 1
+    - 2030–2045 Table screen (~1.8K) ← 3
+- `docs/design-system-table.md` — Design system — Table (landscape) (~57.7K tok)
   - 5–8 Overview (~150) ← 1
   - 9–23 Top bar (~3.2K) ← 5
   - 24–27 Table menu (~490) ← 2
@@ -159,32 +159,32 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–107 Cards (~20.8K) ← 27
-  - 108–113 The Sailing test (~690) ← 5
-  - 114–127 The Island Map (~1.8K) ← 8
-  - 128–131 Tokens and effects (~360)
-  - 132–146 Piles (~2.0K) ← 7
-  - 147–152 Marks of the open moment (~400) ← 1
-  - 153–223 Motion (~3.3K) ← 7
-  - 224–249 Spotlight (~2.5K) ← 33
-  - 250–255 Gestures (~620) ← 4
-  - 256–259 Hold, slide and release (~940)
-  - 260–265 Peeking at the other seat (~600) ← 1
-  - 266–285 Command column (~2.6K) ← 11
-  - 286–289 Two taps (~420) ← 2
-  - 290–293 One answer, one tap (~240)
-  - 294–297 Stops and Always use (~250)
-  - 298–301 Guide (~120)
-  - 302–318 Choice tray (~5.6K) ← 55
-  - 319–333 Reading panels (~1.6K) ← 5
-  - 334–343 Phase carousel (~680)
-  - 344–349 Quest advance (~530) ← 1
-  - 350–353 Undo (~150)
-  - 354–357 Haptics (~280)
-  - 358–369 Banner (~750) ← 5
-  - 370–389 Screen reader (~2.8K) ← 17
-  - 390–393 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~30.5K tok)
+  - 59–108 Cards (~20.9K) ← 27
+  - 109–114 The Sailing test (~690) ← 5
+  - 115–128 The Island Map (~1.8K) ← 8
+  - 129–132 Tokens and effects (~360)
+  - 133–147 Piles (~2.0K) ← 7
+  - 148–153 Marks of the open moment (~400) ← 1
+  - 154–224 Motion (~3.3K) ← 7
+  - 225–250 Spotlight (~2.5K) ← 33
+  - 251–256 Gestures (~620) ← 4
+  - 257–260 Hold, slide and release (~940)
+  - 261–266 Peeking at the other seat (~600) ← 1
+  - 267–286 Command column (~2.6K) ← 11
+  - 287–290 Two taps (~420) ← 2
+  - 291–294 One answer, one tap (~240)
+  - 295–298 Stops and Always use (~250)
+  - 299–302 Guide (~120)
+  - 303–319 Choice tray (~5.6K) ← 55
+  - 320–334 Reading panels (~1.6K) ← 5
+  - 335–344 Phase carousel (~680)
+  - 345–350 Quest advance (~530) ← 1
+  - 351–354 Undo (~150)
+  - 355–358 Haptics (~280)
+  - 359–370 Banner (~750) ← 5
+  - 371–390 Screen reader (~2.8K) ← 17
+  - 391–394 Android Back (~90)
+- `docs/design-system.md` — Design system — Carved Stone (~30.8K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -199,7 +199,7 @@ Read the sections your task touches.
   - 231–245 Icons (~480) ← 7
   - 246–264 Card art (~740) ← 2
   - 265–279 Tablets (~510) ← 13
-  - 280–469 Screens (~17.4K)
+  - 280–469 Screens (~17.7K)
     - 284–289 Splash (~210) ← 3
     - 290–293 App icon (~80)
     - 294–309 Campaigns (campaign list) (~1.5K) ← 6
@@ -214,8 +214,8 @@ Read the sections your task touches.
     - 376–379 Table opens stale (~750) ← 4
     - 380–393 Resolution and standalone outcome (~1.9K) ← 2
     - 394–403 Decks (~920) ← 2
-    - 404–413 Deck builder (deck editor) (~870) ← 3
-    - 414–423 Card pool (the Cards tab) (~770) ← 3
+    - 404–413 Deck builder (deck editor) (~1.0K) ← 3
+    - 414–423 Card pool (the Cards tab) (~910) ← 3
     - 424–429 Card (~490) ← 2
     - 430–435 Packs and pack cards (~170)
     - 436–449 Settings (~940) ← 11
@@ -272,17 +272,17 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~14.1K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–291 Open items (~12.9K)
+  - 22–290 Open items (~12.9K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
     - 35–78 Fixtures and Maestro (~2.4K)
-    - 79–118 Rules and engine (~1.6K)
-    - 119–239 Rules and engine (Angmar Awakened) (~5.3K)
-    - 240–264 Screens and code (~1.6K)
-    - 265–284 Rules and engine (The Two Towers) (~1.4K)
-    - 285–291 Rules and engine (Shadows of Mirkwood) (~380)
-  - 292–312 Standing decisions (~700)
+    - 79–117 Rules and engine (~1.6K)
+    - 118–238 Rules and engine (Angmar Awakened) (~5.3K)
+    - 239–263 Screens and code (~1.6K)
+    - 264–283 Rules and engine (The Two Towers) (~1.4K)
+    - 284–290 Rules and engine (Shadows of Mirkwood) (~380)
+  - 291–311 Standing decisions (~720)
 
 ## Live plans
 

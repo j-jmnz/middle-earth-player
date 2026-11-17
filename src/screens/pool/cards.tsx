@@ -45,9 +45,12 @@ export const PoolCardRow = memo(function PoolCardRow({
   onOpen,
   onPreview,
   loss = null,
+  side = false,
 }: {
   item: PoolRowCard;
   adding: boolean;
+  // Adding to the side deck: the count and the stepper are the side deck's.
+  side?: boolean;
   // What the app does not apply of this card, in a few words ("Ability not applied"), or null.
   loss?: string | null;
   count: number;
@@ -78,6 +81,7 @@ export const PoolCardRow = memo(function PoolCardRow({
             full={full}
             minus={count > 0}
             ids={{ dec: `take-${item.code}`, count: `pool-count-${item.code}`, inc: `add-${item.code}` }}
+            where={side ? "side deck" : undefined}
             onChange={(delta) => announceDraftChange(delta > 0 ? addDraftCard(card, lookup) : takeDraftCard(card, lookup))}
           />
         ) : undefined
@@ -101,6 +105,7 @@ export const PoolCardCell = memo(function PoolCardCell({
   onPreview,
   loss = null,
   selected = false,
+  side = false,
 }: {
   item: PoolRowCard;
   width: number;
@@ -108,6 +113,8 @@ export const PoolCardCell = memo(function PoolCardCell({
   // The card whose detail is open beside the grid (the Cards hub on a tablet in landscape): the silver ring.
   selected?: boolean;
   adding: boolean;
+  // Adding to the side deck: the count, the badge and the stepper are the side deck's.
+  side?: boolean;
   loss?: string | null;
   count: number;
   full: boolean;
@@ -127,7 +134,7 @@ export const PoolCardCell = memo(function PoolCardCell({
         testID={`card-${item.code}`}
         collapsable={false}
         accessibilityRole="button"
-        accessibilityLabel={`${item.name}, ${poolDetail(item)}${loss ? `, ${loss}` : ""}${adding && count > 0 ? `, ${count} in the deck` : ""}`}
+        accessibilityLabel={`${item.name}, ${poolDetail(item)}${loss ? `, ${loss}` : ""}${adding && count > 0 ? `, ${count} in the ${side ? "side deck" : "deck"}` : ""}`}
         {...longPressA11y("Show card", () => onPreview(item.code, item.name, picture))}
         accessibilityHint="Opens the card. Hold to show it large"
         onPress={() => onOpen(item.code)}
@@ -180,6 +187,7 @@ export const PoolCardCell = memo(function PoolCardCell({
             full={full}
             minus={count > 0}
             ids={{ dec: `take-${item.code}`, count: `pool-count-${item.code}`, inc: `add-${item.code}` }}
+            where={side ? "side deck" : undefined}
             onChange={(delta) => announceDraftChange(delta > 0 ? addDraftCard(card, lookup) : takeDraftCard(card, lookup))}
           />
         </View>

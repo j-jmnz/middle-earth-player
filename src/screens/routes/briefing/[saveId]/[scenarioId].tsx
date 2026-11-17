@@ -76,7 +76,8 @@ export default function Briefing() {
     () =>
       Array.from({ length: seatCount }, (_, index) => {
         const deck = savedDecks.find((item) => item.id === picked[index]);
-        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck) };
+        // The side deck goes with every new deal, empty or not (BriefingSeat).
+        return { deckId: deck?.id ?? null, heroes: deck?.heroes ?? [], deck: expand(deck?.cards), side: expand(deck?.side) };
       }),
     [seatCount, savedDecks, picked],
   );
@@ -84,7 +85,7 @@ export default function Briefing() {
   // The world is built from the scenario and these codes (the log's cards, the Ring-bearers, every saved deck's heroes, the picked decks'
   // cards), as one string: a deck list read again on focus, or a pick of the same cards, keeps the world instead of loading it again.
   const hasSave = save != null;
-  const codeKey = hasSave ? [...new Set([...logCodes(save.log), ...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)])].sort().join("\0") : "";
+  const codeKey = hasSave ? [...new Set([...logCodes(save.log), ...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => [...seat.deck, ...(seat.side ?? [])])])].sort().join("\0") : "";
   const world = useMemo(() => {
     if (!hasSave || !campaign || !scenario) return null;
     return loadWorld(catalog, campaign, scenario, EFFECTS, codeKey === "" ? [] : codeKey.split("\0"));
@@ -150,7 +151,7 @@ export default function Briefing() {
     const stored = {
       scenarioId: scenario?.id ?? "",
       difficulty,
-      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck] })),
+      seats: seats.map((seat) => ({ deckId: seat.deckId, heroes: [...seat.heroes], deck: [...seat.deck], side: [...(seat.side ?? [])] })),
       ringBearer,
       choices: [...choices],
       acceptPenalty: accepted,

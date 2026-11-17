@@ -1,0 +1,1 @@
+ALTER TABLE `decks` ADD `side` text DEFAULT '[]' NOT NULL;

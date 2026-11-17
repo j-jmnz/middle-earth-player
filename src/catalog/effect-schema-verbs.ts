@@ -135,6 +135,8 @@ export const simpleVerbs = [
         exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
       })
       .optional(),
+    // The raise is part of the starting threat ("Add ... to your starting threat", 22134:A:2): the recorded starting threat level rises with it.
+    starting: z.literal(true).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("Travel"), to: z.literal("self").optional(), ...when }),
