@@ -292,6 +292,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 ### Rules and engine (Dwarrowdelf)
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
 - Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
+- The Seventh Level readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Seventh Level). Not user-confirmed.
+- The Caves of Nibin-Dûm reads "attach Cave Torch to a hero of his choice" (41004:A:1) as the first player's own hero; the Dwarrowdelf cards with the same phrase read any player's hero, as the Khazad-dûm insert says of Cave Torch. Not reconciled: changing the Caves moves its goldens.
 - Into the Pit readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Into the Pit). Not user-confirmed.
 - Renderer gaps, Into the Pit (behaviour proven by spec rows): `BottomOtherLooked`, `xReachesRemaining`, `inVictory`, `ShuffleSelfIntoEncounterDeck` and `GrantTrait` print as JSON; `optionalEngageThreat` shows as a stat; a before-damage Forced, a revealed-enemy replacement, an immune location left out of a count, a refused travel, Restricted, and a `noQuestProgress` exception are not said (03014:A:1, 03036:A:2, 03041:A:1, 03048:A:1, 03049:A:1, 03052:A:1, 03060:A:1, 03064:B:2, 03065:B:2, 901002:B:3, 901005:A:3, 901008:A:2).
 
