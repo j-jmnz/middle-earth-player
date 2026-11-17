@@ -267,7 +267,8 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   const lethal = printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards);
   // Damage dealt to a character is first offered to the Responses that cancel it ("cancel X damage just dealt", rr.cancel).
   // A character it would destroy is destroyed by the sweep once they have had their chance (destroyOverwhelmed, damageHeld).
-  if (hurt && isCharacterType(printed)) {
+  // An enemy whose own Forced effect answers the damage dealt to it (Patrol Leader, 03014:A:1) is offered it the same way (families/encounter/patrol.ts markEnemyDamage).
+  if (hurt && (isCharacterType(printed) || (printed.type === "enemy" && state.enemyDamageHeard?.includes(instance.code) === true))) {
     next = queueEvent(next, { trigger: "damageDealt", seat: instance.controller, cardId: id, subject: id, amount: dealt });
     if (lethal && state.holdLethal) return next;
   }

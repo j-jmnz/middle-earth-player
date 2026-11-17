@@ -28,6 +28,7 @@ import { stampRoutes } from "../families/sea/routes.ts";
 import { markSideQuests } from "../families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../families/angmar/progress.ts";
 import { markCapture } from "../families/captured/entry.ts";
+import { markEnemyDamage } from "../families/encounter/patrol.ts";
 import { dealDoubleSided, dealUnchartedDeck, type DoubleSidedCard } from "../families/uncharted/deal.ts";
 
 /** The prefix of an `afterMulligan` entry that is shuffled into the deck, not added to the hand, once the opening hands are final. */
@@ -137,6 +138,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   state = markProgressNoted(state, ctx);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   state = markCapture(state, ctx);
+  state = markEnemyDamage(state, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/brief.md, Nightmare).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
   const chosen = input.seats.slice(0, input.seatCount).flatMap((seat, at) => (seat.chosen ?? []).map((code) => ({ code, seat: at })));

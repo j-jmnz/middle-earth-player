@@ -395,6 +395,8 @@ export type ScenarioState = {
   // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
   // damage then waits for those Responses before it destroys the character (settle keeps it current).
   holdLethal?: true;
+  // The codes of the enemies dealt whose own Forced effect hears the damage dealt to them ("Before Patrol Leader is dealt damage, ...", 03014:A:1): the damage step offers them `damageDealt` like a character's. Absent in every other game (families/encounter/patrol.ts).
+  enemyDamageHeard?: readonly string[];
   // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests/setup.ts).
   playerSetup?: true;
   // The loot decks (The Burglar's Turn, 22024): the cards each seat chose at deckbuilding (`lootPlan`, codes), and the ids of the

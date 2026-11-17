@@ -4,7 +4,7 @@
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause, type Cause } from "../core/cause.ts";
 import { checkCost } from "../families/costs/stats.ts";
-import { engagementBarred, noteEngaged } from "../families/quest/engage.ts";
+import { engagementBarred, noteEngaged, optionalThreatBarred } from "../families/quest/engage.ts";
 import { currentQuestHas } from "../families/quest/conditions.ts";
 import { noteHostDefeated, withStagingThreat } from "../families/attachments/hold.ts";
 import { progressFirstLocations } from "../families/attachments/quest.ts";
@@ -376,7 +376,7 @@ export function stagingLocations(state: ScenarioState, cards: Cards, seat?: numb
 export function optionalEnemies(state: ScenarioState, cards: Cards, seat?: number): string[] {
   const acting = seat ?? state.activeSeat;
   if (flagged(state, "table", "cannotBeOptionallyEngaged")) return [];
-  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage") && !familyOptionalEngageBarred(state, id, acting, cards));
+  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage") && !optionalThreatBarred(state, id, acting) && !familyOptionalEngageBarred(state, id, acting, cards));
 }
 
 // The enemies in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).

@@ -63,7 +63,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ReturnFromDiscard":
       return returnFromDiscard(state, instruction, focus, ctx, steps);
     case "ShuffleEncounterDiscard":
-      return shuffleDiscardIn(state, ctx, instruction.trait);
+      return shuffleDiscardIn(state, ctx, instruction.trait, instruction.type);
     case "DiscardUntil":
       return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait);
     case "ResolveWhenRevealed": {
