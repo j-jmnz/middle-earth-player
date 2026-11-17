@@ -3,11 +3,11 @@
 // The piece Into the Pit's Nightmare setup card holds on the table: the damage its Forced effect puts on it each time a Cave Torch exhausts, against the 5 that remove the Torch from the game, as a top-bar dial. The limit is a loss the players feel, not the game's, so the ring warms toward it
 // (a `warms` dial, as the pursuit dial does); one exhaust short it warns what the Torch's going takes from the table. Once the Torch is out of play the dial has no limit and says so. The engine decided every number (`damage` on the setup card, the cards in play); nothing here changes
 // one. Empty in any other scenario and on Easy and Normal, where no setup card lies in the Nightmare zone. Pure, so a test reads it.
-import { CAVE_TORCH, SETUP_CARD, TORCH_DAMAGE_LIMIT } from "../../effects/authored/nightmare/into-the-pit.ts";
-import { inPlay, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
+import { CAVE_TORCH, SETUP_CARD, TORCH_DAMAGE_LIMIT } from "../../../effects/authored/nightmare/into-the-pit.ts";
+import { inPlay, type CardInstance, type ScenarioState } from "../../../rules/core/state.ts";
 
-import { torchDialName, torchDialWords, torchLimitWords, torchNearWords } from "../words/scenarios/pit-table.ts";
-import type { TableDial } from "./dials.ts";
+import { torchDialName, torchDialWords, torchLimitWords, torchNearWords } from "../../words/scenarios/pit-table.ts";
+import type { TableDial } from "../dials.ts";
 
 /** The Nightmare setup card, when it lies in the Nightmare zone (a Nightmare game of Into the Pit). */
 export const pitSetupCard = (game: ScenarioState): CardInstance | undefined => Object.values(game.cards).find((card) => card.code === SETUP_CARD && card.zone === "nightmare");
