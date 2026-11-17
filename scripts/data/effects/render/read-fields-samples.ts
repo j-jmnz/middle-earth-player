@@ -210,7 +210,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "Reanimate", from: "card", card: "other" },
     { verb: "Reanimate", from: "destroyed" },
   ],
-  ResolveWhenRevealedOf: [{ verb: "ResolveWhenRevealedOf", of: "heldShadows", trait: "Sorcery" }, { verb: "ResolveWhenRevealedOf", of: "looked", trait: "Sorcery" }],
+  ResolveWhenRevealedOf: [{ verb: "ResolveWhenRevealedOf", of: "heldShadows", trait: "Sorcery" }, { verb: "ResolveWhenRevealedOf", of: "looked", trait: "Sorcery" }, { verb: "ResolveWhenRevealedOf", of: "looked", name: "A Foe Beyond" }],
   DealSourceAsShadow: [{ verb: "DealSourceAsShadow" }],
   AttachEnemyToPicked: [{ verb: "AttachEnemyToPicked" }],
   MakeSetAsideActive: [{ verb: "MakeSetAsideActive", code: "10154" }],
