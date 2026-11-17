@@ -5,13 +5,16 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 
-/** Reads the dealt enemies whose records hear `damageDealt` on themselves (`enemyDamageHeard`). Absent when the game deals none (every other scenario). */
+// Orc Taskmaster (901104:A:2) hears the damage dealt to another enemy: "Forced: When a Goblin enemy with at least 1 resource on it is dealt any amount of damage ... cancel all damage just dealt to it." A dealt card whose record hears `damageDealt` about
+// enemies in general marks every enemy the game deals, so the damage dealt to any of them is offered to it.
+/** Reads the dealt enemies whose records hear `damageDealt` on themselves, or every dealt enemy when a dealt card's record hears it about enemies (`enemyDamageHeard`). Absent when the game deals none (every other scenario). */
 export function markEnemyDamage(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const dealt = new Set(Object.values(state.cards).map((card) => card.code));
   const heard = new Set<string>();
   for (const effect of ctx.effects) {
-    if (effect.trigger !== "damageDealt" || effect.subject !== "self" || !dealt.has(effect.cardCode) || printedOf(ctx.cards, effect.cardCode).type !== "enemy") continue;
-    heard.add(effect.cardCode);
+    if (effect.trigger !== "damageDealt" || !dealt.has(effect.cardCode)) continue;
+    if (effect.subject === "self" && printedOf(ctx.cards, effect.cardCode).type === "enemy") heard.add(effect.cardCode);
+    else if (typeof effect.subject === "object" && effect.subject.type === "enemy") for (const code of dealt) if (printedOf(ctx.cards, code).type === "enemy") heard.add(code);
   }
   return heard.size === 0 ? state : { ...state, enemyDamageHeard: [...heard] };
 }

@@ -93,9 +93,16 @@ function setRecord(state: ScenarioState, source: CardInstance, effectId: string,
 
 function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
   const found: Modifier[] = [];
+  // The records of a "does not stack" ModifyStat that a copy already gave (the oldest copy gives it).
+  const given = new Set<string>();
   for (const { source, effect, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb === "SetStat") found.push(...setRecord(state, source, effect.id, instruction, ctx));
     if (instruction.verb !== "ModifyStat") continue;
+    if (instruction.doesNotStack) {
+      const key = `${effect.id}:${effect.instructions.indexOf(instruction)}`;
+      if (given.has(key)) continue;
+      given.add(key);
+    }
     // "for each Hobbit hero you control", "for each enemy engaged with you" are counted here, each time the records are rebuilt.
     const seat = source.controller ?? state.firstPlayer;
     const base = resolveAmount(state, instruction.amount, { actor: seat, sourceId: source.id }, ctx);
@@ -105,7 +112,7 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
     const named = instruction.holders ? matching(state, source, instruction.holders, ctx) : holders(state, source, instruction.target, ctx, instruction.trait);
     for (const holder of named) {
       // "+1 Willpower for each restricted attachment on it": the amount times the matching cards attached to the holder.
-      const factor = instruction.eachAttached ? attachedCount(state, holder, instruction.eachAttached, source.id, ctx) : 1;
+      const factor = instruction.eachAttached ? attachedCount(state, holder, instruction.eachAttached, source.id, ctx) : instruction.eachResource ? (state.cards[holder]?.resources ?? 0) : 1;
       if (factor === 0) continue;
       found.push({
         instanceId: holder,

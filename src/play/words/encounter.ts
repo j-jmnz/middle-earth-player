@@ -12,6 +12,7 @@ type EncounterVerb = Extract<
       | "MoveEncounterCard"
       | "CountEncounterTop"
       | "RevealEncounter"
+      | "RevealTopEnemies"
       | "ShuffleEncounterDiscard"
       | "DiscardUntil"
       | "ResolveWhenRevealed"
@@ -107,6 +108,8 @@ export function encounterWords(instruction: Instruction): string | null {
       return verb.not ? null : `name ${verb.type}`;
     case "RevealEncounter":
       return "reveal an encounter card";
+    case "RevealTopEnemies":
+      return "reveal the top cards of the encounter deck, adding the enemies to the staging area";
     case "ShuffleEncounterDiscard":
       return "shuffle the encounter discard pile into the encounter deck";
     case "DiscardUntil":

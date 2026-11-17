@@ -95,6 +95,10 @@ export const modifyStatSchema = z.strictObject({
   // The amount, once read, is taken away instead of added ("gets -5 engagement cost for each enemy in the staging area", 142026:A:2): a
   // read amount is never below 0, so the sign is given here.
   subtract: z.boolean().optional(),
+  // The amount is multiplied by the resource tokens on each holder ("Each Goblin enemy gets +1 Attack for each resource on it", 901105:A:1): read for a constant each time its records are rebuilt (rules/interpret/constants.ts); a holder with none gets nothing.
+  eachResource: z.literal(true).optional(),
+  // "This ability does not stack with other copies of ~" (901105:A:1, 901108:A:1): of the copies of the card in play only the first (the oldest) gives the modifier, so it goes on while one copy remains.
+  doesNotStack: z.literal(true).optional(),
   // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
   per: z.enum(["committed", "ally", "hobbitHero", "x"]).optional(),
   ...when,

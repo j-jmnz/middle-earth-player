@@ -263,6 +263,8 @@ export function canAttack(
     if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
     return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
+  // Goblin Archer (03032:A:2): in the staging area it is attacked by characters with ranged, of any player, in the combat phase.
+  if (enemy.zone === "staging" && flagged(state, enemyId, "attackableByRanged")) return !flagged(state, attackerId, "cannotAttack") && state.phase === "Combat" && hasKeyword(state, attackerId, "ranged", cards);
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack/targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");

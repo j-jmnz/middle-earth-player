@@ -6,6 +6,8 @@
 // your threat." The damage still goes on the character; the excess is read before it lands, and a card that cancels the damage
 // afterwards does not call the threat back (it was assigned as it was dealt). Great Cave-troll (`excessToQuestProgress`) takes that many progress
 // tokens off the current quest instead.
+import type { Cause } from "../../core/cause.ts";
+import type { Instruction } from "../../../catalog/boundary.ts";
 import { captureInstead } from "../captured/instead.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -73,13 +75,15 @@ export function combatDamage(
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   const toShip = flagged(state, enemyId, "excessToShip");
+  // Cave-troll (03020:A:1): each point of excess is damage the defending player assigns to another character once the attack ends (excessDamageAfter).
+  const toDamage = flagged(state, enemyId, "excessToDamage");
   // "Excess damage must be dealt to Hrogar's Hill" (19083:B:1, 19080:A:3): an attack that the quest card or a Shadow effect marked sends the damage beyond the defender's remaining hit points to the main quest card.
   const toStage = state.pendingAttack?.excessToStage === true && state.questStage != null && state.questStage !== targetId;
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play.
   const toEachQuest = flagged(state, enemyId, "excessToEachQuest");
   // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
   const reads = gameReads(state, ctx, '"excessOf"');
-  if (!toThreat && !toQuest && !toShip && !reads && !toStage && !toEachQuest) return placed;
+  if (!toThreat && !toQuest && !toShip && !toDamage && !reads && !toStage && !toEachQuest) return placed;
   const enemy = state.cards[enemyId];
   const target = state.cards[targetId];
   if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
@@ -95,11 +99,25 @@ export function combatDamage(
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play; the enemy's other excess flags still apply.
   const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(placed, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : placed;
   if (toStage && state.questStage) return noteHitPointsOn(placeDamage(eachQuest, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
-  if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(eachQuest, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
+  if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(toDamage ? noteExcess(eachQuest, excess) : eachQuest, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
   if (toShip && !toThreat && !toQuest) return noteExcess(eachQuest, excess);
   const excessCause = causeOf(toThreat ? "excessToThreat" : "excessToQuestProgress");
   // Great Cave-troll (41030:A:2): each point of excess takes a progress token off the current quest.
   if (!toThreat) return removeQuestProgress(eachQuest, excess, steps, excessCause);
   return raiseThreat(eachQuest, enemy.controller ?? target.controller, excess, steps, excessCause);
+}
+
+// Cave-troll (03020:A:1, flag `excessToDamage`): "For each excess point of combat damage dealt by Cave-troll you must damage another character you control." Once the attack ends, each
+// point is its own choice of the defending player: 1 damage on a character he controls other than the one the attack damaged, and a point that kills a character does not stop the next
+// (FFG's answer, docs/brief.md, The Seventh Level). With no other character the point is lost. The instructions run in the frame the attack's `after` effects use.
+export function excessDamageAfter(state: ScenarioState, attack: NonNullable<ScenarioState["pendingAttack"]>, ctx: ReduceContext): { instructions: readonly Instruction[]; cause: Cause | undefined } | null {
+  const excess = attack.defense?.excess ?? 0;
+  const enemy = state.cards[attack.enemyId];
+  if (excess <= 0 || !enemy || !flagged(state, attack.enemyId, "excessToDamage")) return null;
+  const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "excessToDamage"));
+  return {
+    instructions: [{ verb: "Repeat", times: excess, instructions: [{ verb: "Pick", pick: { type: "character", control: "you", notOther: true } }, { verb: "DamageCard", amount: 1 }] }],
+    cause: record ? effectCause(record) : ruleCause("rr.damage"),
+  };
 }

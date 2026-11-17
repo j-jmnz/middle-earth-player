@@ -21,7 +21,7 @@ import { enemyAttackWindow } from "../engine/step-window.ts";
 import { noteAttackDamage } from "../families/defense/damage.ts";
 import { announceHurt } from "../families/angmar/damage.ts";
 import { discardableShadow } from "../families/angmar/shadows.ts";
-import { combatDamage } from "../families/defense/excess.ts";
+import { combatDamage, excessDamageAfter } from "../families/defense/excess.ts";
 import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "../families/defense/defenders.ts";
 import { holdAttack } from "../families/defense/listen.ts";
 import { startShadowAttack } from "../families/defense/shadow-attack.ts";
@@ -288,6 +288,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const held = holdAttackEnd(state, ctx, steps);
   if (held) return held;
   // The characters this attack destroyed are the X of the effect it leaves for its end ("If this attack destroys a character").
+  // Cave-troll's excess damage (excessToDamage) is one more instruction for the attack's end.
+  const troll = excessDamageAfter(state, attack, ctx);
   const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx) : 0;
   const sendsExcess = flagged(state, attack.enemyId, "excessToShip");
   const done = expireModifiers(state, ["endOfAttack"]);
@@ -306,7 +308,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks, ...noted };
   // A shadow card that attacks the defending player (Wolf Rider) attacks once this attack's own "after" instructions have run, and the
   // shadow cards that follow it once its attack has ended (startShadowAttack carries the rest of the list onto its attack).
-  const after = attack.after ?? [];
+  const after = troll ? [...(attack.after ?? []), ...troll.instructions] : (attack.after ?? []);
   const waiting = attack.shadowAttackers ?? [];
   if (after.length === 0 && waiting.length > 0) return startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended;
   if (after.length === 0) return ended;
@@ -335,7 +337,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       ...(destroyedAlly ? { destroyedAlly } : {}),
       ...(destroyedCharacter ? { destroyedCharacter } : {}),
       ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),
-      ...(attack.afterCause ? { cause: attack.afterCause } : {}),
+      ...(attack.afterCause ?? troll?.cause ? { cause: (attack.afterCause ?? troll?.cause)! } : {}),
     },
     steps,
   );
