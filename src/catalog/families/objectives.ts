@@ -20,6 +20,7 @@ const VERBS = [
   // Claiming (01108:A:2, 01109:A:2, 01110:A:2): the source objective, free of encounters, leaves the staging area and is attached to the
   // last picked hero, a card its controller controls ("Counts as an attachment"). It is announced as `claimed`. A hero with more
   // restricted attachments than it can hold discards the one its controller chooses, and a discarded objective returns to the staging area.
+  // A claimed objective attached to another hero is claimed from there as well, and moves to the last picked hero (Book of Mazarbul, 03024:A:2; dwd.book-of-mazarbul).
   z.strictObject({ verb: z.literal("ClaimObjective"), ...when }),
   // "Attach X to that objective, guarding it" (12121:A:1, 12126:A:3, 12127:A:3, 12133:A:1): the encounter card `guard` (the source by default), in the staging area or engaged
   // (an engaged one returns to the staging area first, 12133:A:1), is attached to the objective `to` (the last picked card by default) as its guard (rr.guarded). It stays

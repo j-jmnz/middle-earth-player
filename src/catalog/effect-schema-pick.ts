@@ -161,6 +161,8 @@ export const pickSchema = z.strictObject({
   cost: z.number().int().min(0).optional(),
   // A card that prints no victory points ("a location worth no victory points"); `false`: a card that prints some ("3 locations with victory points", 18078:B:2).
   noVictory: z.boolean().optional(),
+  // Not the other card of the answered event or the running effect: "another character" than the one the attack damaged (03020:A:1; families/attack/pick.ts).
+  notOther: z.boolean().optional(),
   // A character that could be declared as a defender of the attack in progress and is not defending it yet (rr.step-6-4-1).
   canDefend: z.boolean().optional(),
   // An enemy with a facedown shadow card dealt to it.

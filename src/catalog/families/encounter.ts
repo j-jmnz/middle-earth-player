@@ -70,9 +70,14 @@ const VERBS = [
   // fewer. The number returned is the effect's `returned` count, read by `noneReturned` ("If no enemies were returned ... gains surge").
   z.strictObject({ verb: z.literal("ReturnFromDiscard"), trait: z.string().min(1), count: positiveAmountSchema, ...when }),
 
+  // Reveals the top `count` cards of the encounter deck one at a time: an enemy is revealed in full in a staging of its own (rr.reveal: its When Revealed, Surge, Doomed and the Forced effects that hear a reveal) and joins the staging area, and every other
+  // card is discarded unresolved, with no When Revealed, no Surge and no Doomed ("Reveal the top X cards of the encounter deck, adding all enemies to the staging area. Discard the other revealed cards without resolving them", 03068:B:2, 901110:A:1). When the
+  // deck runs out partway the encounter discard pile, the cards just discarded included, is shuffled back and the revealing goes on (rr.running-out-of-cards).
+  verbFlags(z.strictObject({ verb: z.literal("RevealTopEnemies"), count: positiveAmountSchema, ...when }), { runsInFrame: true }),
+
   // The encounter discard pile is shuffled into the encounter deck; with `trait`, only the cards of that printed or gained Trait go back and the deck is shuffled ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
-  // With `type`, only the cards of that printed type go back ("Shuffle all locations in the encounter discard pile back into the encounter deck", 03039:A:2).
-  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), trait: z.string().min(1).optional(), type: z.enum(["location", "enemy", "treachery"]).optional(), ...when }),
+  // With `type`, only the cards of that printed type go back ("Shuffle all locations in the encounter discard pile back into the encounter deck", 03039:A:2). With `name`, only the cards with that title go back ("shuffle all copies of Balin's Doom in the encounter discard pile back into the encounter deck", 901101:A:3).
+  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), trait: z.string().min(1).optional(), type: z.enum(["location", "enemy", "treachery"]).optional(), name: z.string().min(1).optional(), ...when }),
 
   // Every location in the victory display goes back into the encounter deck, which is then shuffled ("Shuffle all locations in the victory display into the encounter deck", 144066:A:1). They lose nothing they had: a card in the display has no tokens.
   z.strictObject({ verb: z.literal("ShuffleVictoryIntoEncounterDeck"), ...when }),
