@@ -7,9 +7,12 @@ import { protocol } from "electron";
 import { APP_HOST, APP_SCHEME } from "./identity.ts";
 import { answerFor, parseRange, responseHeaders } from "./serve.ts";
 
-/** The scheme's privileges: a standard, secure origin (crypto.subtle and OPFS need a secure context), with fetch and streamed bodies. */
+/**
+ * The scheme's privileges: a standard, secure origin (crypto.subtle and OPFS need a secure context), with fetch and streamed bodies, and V8's code cache, which
+ * Chromium keeps only for http(s) unless a standard scheme asks for it: a launch after the first reuses the bundle's compiled code instead of compiling it again.
+ */
 export function registerAppScheme(): void {
-  protocol.registerSchemesAsPrivileged([{ scheme: APP_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
+  protocol.registerSchemesAsPrivileged([{ scheme: APP_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, codeCache: true } }]);
 }
 
 function plain(status: number, text: string): Response {
