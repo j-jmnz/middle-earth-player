@@ -6,7 +6,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { encounterCodes, setupInstructions } from "../../src/catalog/scenario-data.ts";
+import { dealtPiles, encounterCodes, setupInstructions } from "../../src/catalog/scenario-data.ts";
 
 import { loadCards } from "./load-cards.ts";
 import { loadAnyScenario, loadCampaign } from "./load-scenarios.ts";
@@ -76,21 +76,22 @@ describe("The Battle of Lake-town", () => {
     expect(lakeTown.campaignPlaced).toEqual([]);
     expect(lakeTown.source.dragnNormal).toBe("Q99.02");
     expect(lakeTown.nightmare).toBeUndefined();
-    expect(lakeTown.encounterSets).toEqual([{ name: "The Battle of Lake-town", count: 36 }]);
+    expect(lakeTown.encounterSets).toEqual([{ name: "The Battle of Lake-town", count: 45 }]);
     const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TBoLT"));
     expect(own.map((card) => card.code)).toEqual(Array.from({ length: 24 }, (_, at) => `502${String(at + 1).padStart(2, "0")}`));
     expect(byCode.get("00004")?.printings[0]?.pack).toBe("TMaO");
     expect(byCode.get("50204")?.name).toBe("Smaug the Mighty");
   });
 
-  it("deals the same 36 encounter cards on Normal and Easy, Lake-town staged and the nine Smaug cards set aside (50201:A:1)", () => {
+  it("deals the same 36 encounter cards on Normal and Easy, Lake-town staged and the nine Smaug cards dealt into the Smaug deck (50201:A:1)", () => {
     for (const seats of [1, 2, 3, 4]) {
       expect(encounterCodes(lakeTown, "Normal", seats), `${seats} seats`).toHaveLength(36);
       expect(encounterCodes(lakeTown, "Easy", seats), `${seats} seats`).toHaveLength(36);
     }
     expect(setupInstructions(lakeTown).filter((step) => step.verb === "AddToStaging")).toEqual([{ verb: "AddToStaging", code: "50207" }]);
-    const aside = setupInstructions(lakeTown).filter((step) => step.verb === "SetAside").map((step) => step.code);
-    expect(aside.sort()).toEqual(["50204", "50204", "50204", "50205", "50205", "50205", "50206", "50206", "50206"]);
+    expect(setupInstructions(lakeTown).filter((step) => step.verb === "SetAside")).toEqual([]);
+    // The Smaug deck is a pile of its own, with a discard pile (src/rules/core/piles.ts DECKS), in both difficulties.
+    for (const difficulty of ["Normal", "Easy"] as const) expect([...(dealtPiles(lakeTown, difficulty).smaugDeck ?? [])].sort(), difficulty).toEqual(["50204", "50204", "50204", "50205", "50205", "50205", "50206", "50206", "50206"]);
   });
 
   it("has every printed side in the ledger, its lines the scan's wording", () => {

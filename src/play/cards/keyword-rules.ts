@@ -8,7 +8,7 @@ import { ruleDoc } from "./ledger.ts";
 
 export type KeywordKey =
   | "surge" | "peril" | "indestructible" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
-  | "phantom" | "dire" | "hide" | "doomed" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple";
+  | "phantom" | "dire" | "hide" | "doomed" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn";
 
 /** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. */
 export type RuleWord = { word: string; rules: readonly string[] };
@@ -35,6 +35,8 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
   uncharted: { word: "Uncharted", rules: ["dcce.uncharted"] },
   aflame: { word: "Aflame", rules: ["dcce.aflame"] },
   grapple: { word: "Grapple", rules: ["dcce.grapple"] },
+  // Burn X (The Battle of Lake-town): printed on no rules span, the Quest Companion defines it (docs/brief.md, The Battle of Lake-town).
+  burn: { word: "Burn", rules: [] },
   phantom: { word: "Phantom", rules: ["mec113.phantom"] },
   dire: { word: "Dire", rules: ["mec113.dire"] },
 };
