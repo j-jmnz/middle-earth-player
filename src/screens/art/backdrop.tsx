@@ -8,7 +8,10 @@ import { scenesByTheme, type SceneLight, type SceneName, type Wash } from "./bac
 // Web dev loop. Skia web needs CanvasKit, so the browser draws the same scene with CSS: each fog texture is an SVG feTurbulence tile
 // (stitched, so it repeats without a seam) drawn as a repeating background, faded out by a CSS mask; the morning light is gradients,
 // each beam a clipped gradient inside a blurred box. react-native-web forwards these CSS properties to the DOM. The drift is a CSS
-// animation of each tile's position, one tile's width per loop, so it repeats without a jump.
+// animation of a transform, one tile's width per loop, so it repeats without a jump: the tiles are on a layer one tile wider than the
+// box, which moves inside a box that holds the layer's mask, blend and opacity still. A transform runs on the compositor, so the drift
+// repaints nothing; animating the tiles' background-position instead repainted every masked, blended fog layer on the main thread in
+// every frame, under the table too.
 type WebStyle = Record<string, string | number>;
 
 const tiles = new Map<FogTexture, string>();
@@ -33,44 +36,73 @@ const pct = (value: number) => `${Math.round(value * 100)}%`;
 
 const drifts = new Map<FogTexture, string>();
 
-/** A texture's drift as a keyframes rule, added to the page once per texture: from its offset to one tile's width along. */
+/** A texture's drift as a keyframes rule, added to the page once per texture: the tile layer moved one tile's width along, in the drift's direction. */
 function driftName(texture: FogTexture): string {
   const cached = drifts.get(texture);
   if (cached) return cached;
   const name = `fog-drift-${drifts.size}`;
-  const [dx, dy] = texture.offset ?? [0, 0];
-  const to = dx + Math.sign(texture.drift) * texture.tile[0];
+  const to = Math.sign(texture.drift) * texture.tile[0];
   const style = document.createElement("style");
-  style.textContent = `@keyframes ${name} { from { background-position: ${dx}px ${dy}px; } to { background-position: ${to}px ${dy}px; } }`;
+  style.textContent = `@keyframes ${name} { from { transform: translateX(0px); } to { transform: translateX(${to}px); } }`;
   document.head.appendChild(style);
   drifts.set(texture, name);
   return name;
 }
 
-/** One fog layer as CSS: its tile repeated (moved by its offset and drifting at `rate`), faded out by its elliptical mask (fractions of the box it fills). */
-function fogStyle(layer: FogLayer, rate: number, running: boolean): WebStyle {
+/** The still box of a fog layer: its opacity, blend and elliptical mask (fractions of the box it fills); it clips the moving tiles to itself. */
+function fogBoxStyle(layer: FogLayer): WebStyle {
   const stops = maskStops(layer.invert);
   const stop = (n: number) => `rgba(0,0,0,${stops.alphas[n] ?? 0}) ${pct(stops.positions[n] ?? 0)}`;
   const mask = layer.mask ? `radial-gradient(${pct(layer.mask.rx)} ${pct(layer.mask.ry)} at ${pct(layer.mask.cx)} ${pct(layer.mask.cy)}, ${stop(0)}, ${stop(1)})` : undefined;
-  const [dx, dy] = layer.texture.offset ?? [0, 0];
   return {
-    backgroundImage: tileUrl(layer.texture),
-    backgroundSize: `${layer.texture.tile[0]}px ${layer.texture.tile[1]}px`,
-    backgroundRepeat: "repeat",
-    backgroundPosition: `${dx}px ${dy}px`,
+    overflow: "hidden",
     opacity: layer.opacity,
     ...(layer.blend ? { mixBlendMode: layer.blend } : {}),
     ...(mask ? { maskImage: mask, WebkitMaskImage: mask } : {}),
-    ...(layer.texture.drift !== 0 && rate > 0
+  };
+}
+
+/**
+ * A fog layer's tiles: repeated (moved by the texture's offset) on a layer that drifts at `rate` by a transform. A drifting layer is one tile wider
+ * than the box on the side it moves away from, so a loop never uncovers the box, and no wider: the layer is held as a texture while it moves. A
+ * tile at the box's x shows texture point (x - offset - shift) whatever the layer's extra width, as the background-position drift did.
+ */
+function fogTilesStyle(layer: FogLayer, rate: number, running: boolean): WebStyle {
+  const [tw, th] = layer.texture.tile;
+  const [dx, dy] = layer.texture.offset ?? [0, 0];
+  const drifting = layer.texture.drift !== 0 && rate > 0;
+  const before = drifting && layer.texture.drift > 0 ? tw : 0;
+  const after = drifting && layer.texture.drift < 0 ? tw : 0;
+  return {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: -before,
+    right: -after,
+    backgroundImage: tileUrl(layer.texture),
+    backgroundSize: `${tw}px ${th}px`,
+    backgroundRepeat: "repeat",
+    // A layer that starts left of the box takes as much more position: the pattern sits where the box's own did.
+    backgroundPosition: `${dx + before}px ${dy}px`,
+    ...(drifting
       ? {
           animationName: driftName(layer.texture),
-          animationDuration: `${layer.texture.tile[0] / Math.abs(layer.texture.drift) / rate}s`,
+          animationDuration: `${tw / Math.abs(layer.texture.drift) / rate}s`,
           animationTimingFunction: "linear",
           animationIterationCount: "infinite",
           animationPlayState: running ? "running" : "paused",
         }
       : {}),
   };
+}
+
+/** One fog layer: the still box and the tiles drifting inside it. */
+function Fog({ layer, rate, running }: { layer: FogLayer; rate: number; running: boolean }) {
+  return (
+    <View style={[StyleSheet.absoluteFill, fogBoxStyle(layer) as object]}>
+      <View style={fogTilesStyle(layer, rate, running) as object} />
+    </View>
+  );
 }
 
 /** The morning light: the sun's glow, and each beam a gradient clipped to its shape inside a blurred box, all screened. */
@@ -125,7 +157,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
       <View style={[StyleSheet.absoluteFill, groundStyle as object]} />
       {s.wash ? <View style={[StyleSheet.absoluteFill, washStyle(s.wash) as object]} /> : null}
       {s.fog.map((layer, index) => (
-        <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer, s.drift ?? 1, running) as object]} />
+        <Fog key={index} layer={layer} rate={s.drift ?? 1} running={running} />
       ))}
       {s.light ? <Light light={s.light} width={width} /> : null}
       <View style={[StyleSheet.absoluteFill, { backgroundImage: `radial-gradient(120% 100% at 50% 45%, rgba(${vignette.rgb},0) ${pct(vignette.from)}, rgba(${vignette.rgb},${vignette.alpha}) 100%)` } as object]} />
@@ -145,7 +177,7 @@ export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]
   return (
     <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
       {layers.map((layer, index) => (
-        <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer, 1, running) as object]} />
+        <Fog key={index} layer={layer} rate={1} running={running} />
       ))}
     </View>
   );
