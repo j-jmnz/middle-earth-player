@@ -12,13 +12,18 @@ Your phone's backup (iCloud or Google) may include these saves. That copy goes t
 
 ## Network connections
 
-The phone app works offline and makes only one kind of connection. When you import a deck from a RingsDB link, it sends [ringsdb.com](https://ringsdb.com), over HTTPS, the deck's id and the code of any card the app doesn't recognise. RingsDB sees your IP address and a standard user agent, and handles them under its own privacy policy. The app adds no identifier, cookie, account or game data to that request. If you never import a deck from RingsDB, the phone app never connects at all.
+The app plays offline and makes two kinds of connection.
 
-The browser build of the app has no bundled pictures, so it also loads each card picture from [RingsDB](https://ringsdb.com), or from the [Hall of Beorn](https://hallofbeorn.com) and DragnCards image storage on `s3.amazonaws.com`. The desktop app bundles every picture and every booklet, like the phone app, and fetches none: a card without a picture is drawn as its text. Its booklet reader (pdf.js) runs from files inside the app and requests nothing. The desktop app also makes the RingsDB deck import its only request, and enforces that itself: its window cancels every other request, refuses to navigate away from the app, denies every permission request (camera, microphone, location, notifications) and sends only links to this project's GitHub pages to your system browser, when you tap them in Settings. It has no update check, no analytics and no crash reporting.
+- **Deck import.** When you import a deck from a RingsDB link, it sends [ringsdb.com](https://ringsdb.com), over HTTPS, the deck's id and the code of any card the app doesn't recognise.
+- **Update check.** At most once a day, a few seconds after the app opens, when you come back to it, or when you turn the check on, it asks GitHub's public API (`api.github.com`), over HTTPS, for the latest release of this project. The request carries nothing about you or your games. The app reads only the newest version number and its release date, and keeps them in `user.db` with the time it asked and the version whose notice you closed. If a newer version is out, a notice says so and Get it opens the release page in your browser. Turn it off in Settings, About, Check for new versions; with it off the app never asks. Development builds never ask.
+
+RingsDB and GitHub see your IP address and a standard user agent, and handle them under their own privacy policies ([GitHub's](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)). The app adds no identifier, cookie, account or game data to either request. With Check for new versions off and no RingsDB import, the app never connects at all.
+
+The browser build of the app has no bundled pictures, so it also loads each card picture from [RingsDB](https://ringsdb.com), or from the [Hall of Beorn](https://hallofbeorn.com) and DragnCards image storage on `s3.amazonaws.com`. The desktop app bundles every picture and every booklet, like the phone app, and fetches none: a card without a picture is drawn as its text. Its booklet reader (pdf.js) runs from files inside the app and requests nothing. The desktop app makes the same two requests and no others, and enforces that itself: its window cancels every other request, refuses to navigate away from the app, denies every permission request (camera, microphone, location, notifications) and sends only links to this project's GitHub pages to your system browser, when you tap them in Settings. It has no auto-update, no analytics and no crash reporting: a new version is a new installer you download yourself.
 
 ## Permissions
 
-On Android the app asks for `INTERNET`, for deck import, and `VIBRATE`, for haptics. On iPhone and iPad it asks for none. The desktop app asks for none and denies every permission request its window receives. It never uses the camera, microphone, location, contacts or photos.
+On Android the app asks for `INTERNET`, for deck import and the update check, and `VIBRATE`, for haptics. On iPhone and iPad it asks for none. The desktop app asks for none and denies every permission request its window receives. It never uses the camera, microphone, location, contacts or photos.
 
 ## Installing
 

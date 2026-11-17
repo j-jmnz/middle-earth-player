@@ -111,7 +111,7 @@ There is no online multiplayer, and there won't be. The app is built for one dev
 
 ## Private by design
 
-No accounts, no tracking, no ads, no analytics, no crash reports. Cards, rules, booklets and art are all inside the app. It goes online only to import a RingsDB deck.
+No accounts, no tracking, no ads, no analytics, no crash reports. Cards, rules, booklets and art are all inside the app. It goes online only to import a RingsDB deck and, once a day, to ask GitHub whether a new version is out (Settings turns that off).
 
 Your saves stay on your device. A phone deletes them with the app; a computer keeps them in the app's profile folder until you delete it. On Android the app asks for two permissions, `INTERNET` and `VIBRATE`. On iOS and desktop it asks for none.
 

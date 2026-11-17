@@ -35,7 +35,7 @@ Read the sections your task touches.
   - 56–93 Features (~550)
     - 79–93 Themes (~190)
   - 94–111 What you can play (~240)
-  - 112–119 Private by design (~150)
+  - 112–119 Private by design (~170)
   - 120–125 Accessibility (~120)
   - 126–223 Install (~1.7K)
   - 224–258 Roadmap (~1.2K)
@@ -43,9 +43,9 @@ Read the sections your task touches.
   - 270–273 Support (~90)
   - 274–289 Attribution (~410)
   - 290–293 License (~50)
-- `docs/architecture.md` — Architecture (~27.8K tok)
+- `docs/architecture.md` — Architecture (~28.5K tok)
   - 7–42 Stack (~1.3K)
-  - 43–78 Processes (~680)
+  - 43–78 Processes (~690)
   - 79–162 Modules (~2.4K) ← 3
     - 127–162 Repository map (~960) ← 1
   - 163–188 State (~1.1K) ← 9
@@ -62,90 +62,91 @@ Read the sections your task touches.
   - 323–328 Images (~980) ← 6
   - 329–383 Screens (~5.1K) ← 9
   - 384–395 Desktop (~1.3K) ← 5
-  - 396–401 Catalog build (~410)
-  - 402–419 Tests (~2.3K) ← 5
-  - 420–435 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~215.9K tok)
+  - 396–405 Update check (~630) ← 7
+  - 406–411 Catalog build (~410)
+  - 412–429 Tests (~2.3K) ← 5
+  - 430–445 Performance (~1.2K) ← 4
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~216.1K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
-  - 68–88 Decisions (~860)
-  - 89–121 Stack (~1.2K)
-  - 122–139 Performance and feel (~750)
-  - 140–158 Repository layout (~500)
-  - 159–395 Domain (~10.2K)
-    - 161–249 Campaign (~2.2K) ← 1
-    - 250–264 Mirkwood campaign cards and carry-over (~890)
-    - 265–277 Standalone play (~990) ← 1
-    - 278–289 Scenario state (~540)
-    - 290–323 The engine plays the game (~2.2K) ← 4
-    - 324–331 Engine steps (~180)
-    - 332–360 Core round (~1.3K) ← 1
-    - 361–395 Keywords implemented once (~1.9K)
-  - 396–553 Fellowship of the Ring (~10.6K)
-    - 420–434 Scenario 1 resolution (~370)
-    - 435–448 A Knife in the Dark (~1.6K) ← 1
-    - 449–452 Hide tests (~130)
-    - 453–476 Flight to the Ford burden deck and life (~1.6K) ← 1
-    - 477–491 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
-    - 492–507 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
-    - 508–531 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
-    - 532–553 Seeded decks (~660)
-  - 554–653 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
-    - 572–585 Passage Through Mirkwood (~1.6K)
-    - 586–599 Journey Along the Anduin (~2.1K)
-    - 600–620 Escape from Dol Guldur (~2.7K)
-    - 621–635 The Oath (~2.4K)
-    - 636–653 The Caves of Nibin-Dûm (~2.4K)
-  - 654–712 Dream-chaser (~16.2K) ← 4
-  - 713–740 Ered Mithrin (~16.4K) ← 7
-  - 741–1301 Angmar Awakened (~69.4K) ← 6
-    - 764–798 Intruders in Chetwood (~3.5K)
-    - 799–829 The Weather Hills (~3.9K)
-    - 830–865 Deadmen's Dike (~4.5K)
-    - 866–896 The Weather Hills (~3.9K)
-    - 897–935 Deadmen's Dike (~5.8K)
-    - 936–972 The Wastes of Eriador (~4.8K)
-    - 973–1007 Escape from Mount Gram (~3.2K) ← 1
-    - 1008–1038 The Weather Hills (~3.9K)
-    - 1039–1077 Deadmen's Dike (~5.8K)
-    - 1078–1114 The Wastes of Eriador (~4.8K)
-    - 1115–1158 Escape from Mount Gram (~5.3K)
-    - 1159–1195 Across the Ettenmoors (~5.0K)
-    - 1196–1234 The Treachery of Rhudaur (~4.3K)
-    - 1235–1270 The Battle of Carn Dûm (~4.7K)
-    - 1271–1301 The Dread Realm (~4.2K)
-  - 1302–1439 The Two Towers (~16.4K) ← 20
-  - 1440–1675 The Return of the King (~28.2K) ← 22
-    - 1468–1493 The Passing of the Grey Company (~2.7K)
-    - 1494–1525 The Siege of Gondor (~4.1K)
-    - 1526–1571 The Battle of the Pelennor Fields (~5.8K)
-    - 1572–1609 The Tower of Cirith Ungol (~4.4K)
-    - 1610–1646 The Black Gate Opens (~4.4K) ← 2
-    - 1647–1675 Mount Doom (~4.3K)
-  - 1676–1814 Shadows of Mirkwood (~14.1K) ← 3
-    - 1684–1705 The Hunt for Gollum (~2.1K) ← 2
-    - 1706–1725 Conflict at the Carrock (~2.4K) ← 2
-    - 1726–1751 A Journey to Rhosgobel (~2.9K) ← 1
-    - 1752–1769 The Hills of Emyn Muil (~1.5K) ← 1
-    - 1770–1790 The Dead Marshes (~2.1K) ← 2
-    - 1791–1814 Return to Mirkwood (~2.3K) ← 4
-  - 1815–1823 Nightmare (~410) ← 21
-  - 1824–1864 Deckbuilding (~2.1K)
-  - 1865–1944 Effects (~3.7K)
-    - 1867–1925 Three layers (~2.4K) ← 10
-    - 1926–1936 Player side quests, contracts and saga cards (~940)
-    - 1937–1940 Window stack (~100)
-    - 1941–1944 Coverage test (~270)
-  - 1945–1967 Data sources (~700) ← 2
-  - 1968–1986 Card images (~1.3K) ← 9
-  - 1987–2014 Persistence and shipping (~3.2K) ← 10
-  - 2015–2056 Screens (~5.1K) ← 2
-    - 2041–2056 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~59.9K tok)
+  - 68–89 Decisions (~1000)
+  - 90–122 Stack (~1.2K)
+  - 123–140 Performance and feel (~750)
+  - 141–159 Repository layout (~500)
+  - 160–396 Domain (~10.2K)
+    - 162–250 Campaign (~2.2K) ← 1
+    - 251–265 Mirkwood campaign cards and carry-over (~890)
+    - 266–278 Standalone play (~990) ← 1
+    - 279–290 Scenario state (~540)
+    - 291–324 The engine plays the game (~2.2K) ← 4
+    - 325–332 Engine steps (~180)
+    - 333–361 Core round (~1.3K) ← 1
+    - 362–396 Keywords implemented once (~1.9K)
+  - 397–554 Fellowship of the Ring (~10.6K)
+    - 421–435 Scenario 1 resolution (~370)
+    - 436–449 A Knife in the Dark (~1.6K) ← 1
+    - 450–453 Hide tests (~130)
+    - 454–477 Flight to the Ford burden deck and life (~1.6K) ← 1
+    - 478–492 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
+    - 493–508 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
+    - 509–532 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
+    - 533–554 Seeded decks (~660)
+  - 555–654 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
+    - 573–586 Passage Through Mirkwood (~1.6K)
+    - 587–600 Journey Along the Anduin (~2.1K)
+    - 601–621 Escape from Dol Guldur (~2.7K)
+    - 622–636 The Oath (~2.4K)
+    - 637–654 The Caves of Nibin-Dûm (~2.4K)
+  - 655–713 Dream-chaser (~16.2K) ← 4
+  - 714–741 Ered Mithrin (~16.4K) ← 7
+  - 742–1302 Angmar Awakened (~69.4K) ← 6
+    - 765–799 Intruders in Chetwood (~3.5K)
+    - 800–830 The Weather Hills (~3.9K)
+    - 831–866 Deadmen's Dike (~4.5K)
+    - 867–897 The Weather Hills (~3.9K)
+    - 898–936 Deadmen's Dike (~5.8K)
+    - 937–973 The Wastes of Eriador (~4.8K)
+    - 974–1008 Escape from Mount Gram (~3.2K) ← 1
+    - 1009–1039 The Weather Hills (~3.9K)
+    - 1040–1078 Deadmen's Dike (~5.8K)
+    - 1079–1115 The Wastes of Eriador (~4.8K)
+    - 1116–1159 Escape from Mount Gram (~5.3K)
+    - 1160–1196 Across the Ettenmoors (~5.0K)
+    - 1197–1235 The Treachery of Rhudaur (~4.3K)
+    - 1236–1271 The Battle of Carn Dûm (~4.7K)
+    - 1272–1302 The Dread Realm (~4.2K)
+  - 1303–1440 The Two Towers (~16.4K) ← 20
+  - 1441–1676 The Return of the King (~28.2K) ← 22
+    - 1469–1494 The Passing of the Grey Company (~2.7K)
+    - 1495–1526 The Siege of Gondor (~4.1K)
+    - 1527–1572 The Battle of the Pelennor Fields (~5.8K)
+    - 1573–1610 The Tower of Cirith Ungol (~4.4K)
+    - 1611–1647 The Black Gate Opens (~4.4K) ← 2
+    - 1648–1676 Mount Doom (~4.3K)
+  - 1677–1815 Shadows of Mirkwood (~14.1K) ← 3
+    - 1685–1706 The Hunt for Gollum (~2.1K) ← 2
+    - 1707–1726 Conflict at the Carrock (~2.4K) ← 2
+    - 1727–1752 A Journey to Rhosgobel (~2.9K) ← 1
+    - 1753–1770 The Hills of Emyn Muil (~1.5K) ← 1
+    - 1771–1791 The Dead Marshes (~2.1K) ← 2
+    - 1792–1815 Return to Mirkwood (~2.3K) ← 4
+  - 1816–1824 Nightmare (~410) ← 21
+  - 1825–1865 Deckbuilding (~2.1K)
+  - 1866–1945 Effects (~3.7K)
+    - 1868–1926 Three layers (~2.4K) ← 10
+    - 1927–1937 Player side quests, contracts and saga cards (~940)
+    - 1938–1941 Window stack (~100)
+    - 1942–1945 Coverage test (~270)
+  - 1946–1968 Data sources (~700) ← 2
+  - 1969–1987 Card images (~1.3K) ← 9
+  - 1988–2015 Persistence and shipping (~3.2K) ← 10
+  - 2016–2057 Screens (~5.1K) ← 2
+    - 2042–2057 Table screen (~1.8K) ← 3
+- `docs/design-system-table.md` — Design system — Table (landscape) (~60.0K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
-  - 24–27 Table menu (~490) ← 2
+  - 24–27 Table menu (~570) ← 4
   - 28–35 Quest scale (~830) ← 2
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
@@ -176,7 +177,7 @@ Read the sections your task touches.
   - 374–385 Banner (~750) ← 5
   - 386–405 Screen reader (~3.0K) ← 19
   - 406–409 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~31.9K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~32.3K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
   - 35–45 Performance (~680) ← 4
@@ -186,36 +187,37 @@ Read the sections your task touches.
   - 130–147 Spacing, radius, border (~600) ← 2
   - 148–169 Backdrops (~1.0K) ← 5
   - 170–178 Navigation (~560) ← 6
-  - 179–216 Components (~1.8K) ← 9
-  - 217–231 Screen reader (~970) ← 8
-  - 232–246 Icons (~480) ← 7
-  - 247–265 Card art (~750) ← 2
-  - 266–281 Tablets (~630) ← 15
-  - 282–474 Screens (~18.4K)
-    - 286–291 Splash (~210) ← 3
-    - 292–295 App icon (~80)
-    - 296–311 Campaigns (campaign list) (~1.5K) ← 6
-    - 312–325 Scenarios (~1000) ← 1
-    - 326–337 History (~1.4K) ← 4
-    - 338–355 Briefing (~2.0K) ← 6
-    - 356–359 Campaign setup (~1.0K) ← 3
-    - 360–365 Campaign path (~890) ← 4
-    - 366–369 Campaign log (~840) ← 1
-    - 370–373 Spend XP (~610) ← 1
-    - 374–377 Table — landscape (~30) ← 1
-    - 378–381 Table opens stale (~750) ← 4
-    - 382–395 Resolution and standalone outcome (~1.9K) ← 2
-    - 396–405 Decks (~920) ← 2
-    - 406–415 Deck builder (deck editor) (~1.1K) ← 3
-    - 416–425 Card pool (the Cards tab) (~910) ← 3
-    - 426–431 Card (~490) ← 2
-    - 432–437 Packs and pack cards (~170)
-    - 438–452 Settings (~1.3K) ← 12
-    - 453–458 Rules (~470) ← 1
-    - 459–462 Rule (~220) ← 1
-    - 463–470 Booklet (~540) ← 2
-    - 471–474 Database (~110)
-  - 475–494 States (~620)
+  - 179–182 Update ribbon (~340) ← 5
+  - 183–220 Components (~1.8K) ← 9
+  - 221–235 Screen reader (~970) ← 8
+  - 236–250 Icons (~480) ← 7
+  - 251–269 Card art (~750) ← 2
+  - 270–285 Tablets (~630) ← 15
+  - 286–478 Screens (~18.5K)
+    - 290–295 Splash (~210) ← 3
+    - 296–299 App icon (~80)
+    - 300–315 Campaigns (campaign list) (~1.5K) ← 6
+    - 316–329 Scenarios (~1000) ← 1
+    - 330–341 History (~1.4K) ← 4
+    - 342–359 Briefing (~2.0K) ← 6
+    - 360–363 Campaign setup (~1.0K) ← 3
+    - 364–369 Campaign path (~890) ← 4
+    - 370–373 Campaign log (~840) ← 1
+    - 374–377 Spend XP (~610) ← 1
+    - 378–381 Table — landscape (~30) ← 1
+    - 382–385 Table opens stale (~750) ← 4
+    - 386–399 Resolution and standalone outcome (~1.9K) ← 2
+    - 400–409 Decks (~920) ← 2
+    - 410–419 Deck builder (deck editor) (~1.1K) ← 3
+    - 420–429 Card pool (the Cards tab) (~910) ← 3
+    - 430–435 Card (~490) ← 2
+    - 436–441 Packs and pack cards (~170)
+    - 442–456 Settings (~1.4K) ← 12
+    - 457–462 Rules (~470) ← 1
+    - 463–466 Rule (~220) ← 1
+    - 467–474 Booklet (~540) ← 2
+    - 475–478 Database (~110)
+  - 479–498 States (~620)
 - `docs/development.md` — Development (~2.8K tok)
 - `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1
@@ -276,7 +278,7 @@ STATUS.md, then the active phase file.
     - 247–271 Screens and code (~1.6K)
     - 272–291 Rules and engine (The Two Towers) (~1.4K)
     - 292–298 Rules and engine (Shadows of Mirkwood) (~380)
-  - 299–323 Standing decisions (~890)
+  - 299–324 Standing decisions (~940)
 
 ## Live plans
 
@@ -309,7 +311,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); releasing.md, Jobs (1)
+- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); releasing.md, Jobs (1)
 - `scripts/data`: brief.md, Nightmare (5); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Data sources (2); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
@@ -323,7 +325,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Return to Mirkwood (2); brief.md, The Dead Marshes (2); brief.md, A Journey to Rhosgobel (1); brief.md, Angmar Awakened (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Conflict at the Carrock (1); brief.md, Nightmare (1); brief.md, The Hills of Emyn Muil (1); brief.md, The Hunt for Gollum (1)
 - `src/play`: design-system-table.md, Choice tray (48); design-system-table.md, Spotlight (29); design-system-table.md, Cards (26); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); design-system-table.md, Pointer and keys (4); design-system-table.md, Top bar (4); design-system-table.md, Two taps (4); brief.md, Table screen (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
 - `src/rules`: brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); brief.md, Angmar Awakened (2); brief.md, Return to Mirkwood (2); architecture.md, State (1); brief.md, Conflict at the Carrock (1); brief.md, Escape from Mount Gram (1); brief.md, The Black Gate Opens (1); brief.md, The Return of the King (1)
-- `src/screens`: design-system.md, Tablets (10); brief.md, Persistence and shipping (6); design-system.md, Briefing (6); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); design-system.md, Settings (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); architecture.md, Desktop (2); brief.md, Screens (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); .claude/rules/code-standards.md, Saving (1); architecture.md, Images (1); architecture.md, Persistence (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Shadows of Mirkwood (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system-table.md, Two taps (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
-- `src/ui`: design-system-table.md, Screen reader (4); design-system.md, Settings (4); design-system.md, Type (4); design-system-table.md, Two taps (3); design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Standards (1); design-system.md, Surfaces (1)
+- `src/screens`: design-system.md, Tablets (10); brief.md, Persistence and shipping (6); design-system.md, Briefing (6); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); design-system.md, Settings (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); architecture.md, Desktop (2); architecture.md, Update check (2); brief.md, Screens (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); design-system.md, Update ribbon (2); .claude/rules/code-standards.md, Saving (1); architecture.md, Images (1); architecture.md, Persistence (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Shadows of Mirkwood (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
+- `src/ui`: design-system-table.md, Screen reader (4); design-system.md, Settings (4); design-system.md, Type (4); design-system-table.md, Two taps (3); design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); architecture.md, Update check (1); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Standards (1); design-system.md, Surfaces (1); design-system.md, Update ribbon (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)
 - `test/scenarios`: .claude/rules/code-standards.md, Test cost (6)
