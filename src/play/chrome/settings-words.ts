@@ -42,6 +42,7 @@ export const SPOTLIGHT_LINE = "A replay of each attack that deals or blocks dama
 export const HAPTICS_LINE = "Vibration at key moments.";
 export const GUIDE_LINE = "A hint under the step title, the first two times each step comes up.";
 export const STOPS_LINE = "Pauses where a card can be played. Choose the steps on the table's rail.";
+export const TIMING_TIPS_LINE = "Card previews also explain When Revealed, Shadow, Forced, Response, Action, Travel, Setup and Valour.";
 export const AWAKE_LINE = "Keeps the screen on during a game. Uses more battery.";
 // The assistive technology each platform names for the way in: VoiceOver and Switch Control and Voice Control, or TalkBack and Switch Access.
 export const TABLE_LIST_LINE = Platform.select({

@@ -38,7 +38,7 @@ export function previewKeywords(game: ScenarioState, ctx: ReduceContext, cardId:
   return out;
 }
 
-/** The chips the preview draws: every keyword, and no timing word (the chip row hides them until a setting shows them). */
-export function drawnKeywords(keywords: readonly PreviewKeyword[] | undefined): readonly PreviewKeyword[] {
-  return (keywords ?? []).filter((chip) => chip.timing !== true);
+/** The chips the preview draws: every keyword, and the timing words only while Explain timing words (`timingTips`) is on. */
+export function drawnKeywords(keywords: readonly PreviewKeyword[] | undefined, timingTips: boolean): readonly PreviewKeyword[] {
+  return timingTips ? (keywords ?? []) : (keywords ?? []).filter((chip) => chip.timing !== true);
 }

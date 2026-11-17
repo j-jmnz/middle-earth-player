@@ -13,6 +13,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
+import { useStore } from "zustand";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { CardTextView } from "./card-text-view.tsx";
@@ -32,6 +33,7 @@ import { cardCorner } from "../../ui/card-corner.ts";
 import { capLines, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
+import { tableSettings } from "../../ui/table-settings.ts";
 
 const SCRIM = 0.82;
 
@@ -133,6 +135,7 @@ export function CardPreview({
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const all = [card, ...related];
   const [at, setAt] = useState(0);
+  const timingTips = useStore(tableSettings, (state) => state.settings.timingTips);
   // The keyword bubble: the chip tapped last, and whether it is open. It is shut for another card of the preview (a swipe, a related row).
   const [bubble, setBubble] = useState<Bubble | null>(null);
   const [bubbleOpen, setBubbleOpen] = useState(false);
@@ -147,7 +150,7 @@ export function CardPreview({
   // the card gives up the strip's height.
   // The tokens line is two lines at the phone's default text size and as many as its words take at a larger one (preview-size.ts, previewStrip).
   const tokenRows = Math.max(0, ...all.map((item) => ((item.tokens ?? []).length > 0 ? tokenLines((item.tokens ?? []).join(" · "), roomW - 32 * s, s, screen.fontScale) : 0)));
-  const keywordRow = rule != null && all.some((item) => drawnKeywords(item.keywords).length > 0);
+  const keywordRow = rule != null && all.some((item) => drawnKeywords(item.keywords, timingTips).length > 0);
   const strip = !wide ? previewStrip({ chips: all.length > 1, tokenRows, keywords: keywordRow }, s, screen.fontScale) : 0;
   const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
 
@@ -252,7 +255,7 @@ export function CardPreview({
           {(shown.tokens ?? []).join(" · ")}
         </Text>
       ) : null}
-      {rule ? <KeywordChips chips={drawnKeywords(shown.keywords)} wrap onPick={pick} /> : null}
+      {rule ? <KeywordChips chips={drawnKeywords(shown.keywords, timingTips)} wrap onPick={pick} /> : null}
     </>
   );
   const body = (
@@ -344,7 +347,7 @@ export function CardPreview({
             ) : null}
             {keywordRow ? (
               <Animated.View style={[{ marginTop: 8 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
-                <KeywordChips chips={drawnKeywords(shown.keywords)} wrap={false} onPick={pick} />
+                <KeywordChips chips={drawnKeywords(shown.keywords, timingTips)} wrap={false} onPick={pick} />
               </Animated.View>
             ) : null}
             {all.length > 1 ? (

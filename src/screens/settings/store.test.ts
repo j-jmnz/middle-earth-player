@@ -87,6 +87,15 @@ describe("parseSettings card pictures and moving fog", () => {
   });
 });
 
+describe("parseSettings explain timing words", () => {
+  it("defaults to off, replaces a wrong type and round-trips on", () => {
+    expect(DEFAULT_SETTINGS.timingTips).toBe(false);
+    expect(parseSettings({}).timingTips).toBe(false);
+    expect(parseSettings({ timingTips: "yes" }).timingTips).toBe(false);
+    expect(parseSettings(JSON.parse(JSON.stringify({ ...DEFAULT_SETTINGS, timingTips: true }))).timingTips).toBe(true);
+  });
+});
+
 describe("parseSettings table as a list and confirm time", () => {
   it("defaults a missing, wrong-typed or unknown value", () => {
     expect(parseSettings({}).tableAsList).toBe("system");
