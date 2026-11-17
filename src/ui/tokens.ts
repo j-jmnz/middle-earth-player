@@ -45,6 +45,13 @@ export const tableTokens = {
   shade: "#000000",
   primaryTop: "#EEF5EA",
   primaryMid: "#B2C3AD",
+  // Not palette keys: the gold of a dock answer that reaches past one window (End planning, Pass to stop; docs/design-system-table.md,
+  // Two taps). `phase` is its word and armed line on the ground; the filled capsule runs phaseTop, phaseMid, phaseDeep under onPhase.
+  phase: "#C9A961",
+  phaseTop: "#E6CF92",
+  phaseMid: "#C9A961",
+  phaseDeep: "#8A6F35",
+  onPhase: "#17120A",
   // Not a palette key: the victory pile's gold coin, under ink numbers (canvas/pieces.native.tsx). Light's is paler than its bronze
   // fellowship, so the ink number keeps 4.5:1 (5.9:1 here, 7.4:1 on Dark).
   coin: "#C9A961",
@@ -96,6 +103,11 @@ const lightTableTokens: TableTokens = {
   shade: "#3C3228",
   primaryTop: "#3F5A4B",
   primaryMid: "#253A2F",
+  phase: "#6B4E1C",
+  phaseTop: "#8F7434",
+  phaseMid: "#6B4E1C",
+  phaseDeep: "#4A3A14",
+  onPhase: "#FBF5E6",
   coin: "#B8964E",
   veil: "clear",
 };

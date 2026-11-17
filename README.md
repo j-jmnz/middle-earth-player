@@ -223,12 +223,12 @@ Each release lists the SHA-256 of every file, with a `.sha256` file beside each 
 
 ## Roadmap
 
-Every official campaign and scenario, then the fan-made content from [A Long-extended Party](https://alongextendedparty.com) (ALeP).
+Every official campaign and scenario, then the fan-made ones: first the content from [A Long-extended Party](https://alongextendedparty.com) (ALeP), then the other community projects listed below.
 
 The official campaigns are done, so the cycles are next. Shadows of Mirkwood is playable: six scenarios, each on Easy, Normal and Nightmare. The other cycles show under Coming later in the app until one of their scenarios is playable. They come in release order:
 
 <details>
-<summary>The cycles, in order</summary>
+<summary>Incoming cycles, in order of implementation</summary>
 
 - The Standalone scenarios cycle: The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
 - The Dwarrowdelf cycle: Into the Pit, The Seventh Level, Flight from Moria, The Redhorn Gate, Road to Rivendell, The Watcher in the Water, The Long Dark, Foundations of Stone, Shadow and Flame.
@@ -238,6 +238,19 @@ The official campaigns are done, so the cycles are next. Shadows of Mirkwood is 
 - The Haradrim cycle: Escape from Umbar, Desert Crossing, The Long Arm of Mordor, The Mûmakil, Race Across Harad, Beneath the Sands, The Black Serpent, The Dungeons of Cirith Gurat, The Crossings of Poros.
 - The Vengeance of Mordor cycle: The River Running, Danger in Dorwinion, The Temple of Doom, Wrath and Ruin, The City of Ulfast, Challenge of the Wainriders, Under the Ash Mountains, The Land of Sorrow, The Fortress of Nurn.
 
+</details>
+
+The fan-made scenarios follow the official ones. None is playable yet, and their cards are not in the app until then.
+
+<details>
+<summary>Fan-made scenarios, in order of implementation</summary>
+
+- ALeP's Oaths of the Rohirrim cycle: Ambush at Erelas, The Battle for the Beacon and The Horse Lord's Ire (the Children of Eorl box), then The Aldburg Plot, Fire on the Eastemnet, The Gap of Rohan, The Glittering Caves, Mustering of the Rohirrim, Blood in the Isen.
+- ALeP's standalone scenarios: The Scouring of the Shire, The Nine are Abroad, The Siege of Erebor, The Hobbit, The Mirror of Galadriel.
+- ALeP's Fell Summer cycle: Pies for the Party, Sundown on the Shire and Secrets of the Old Forest (The Shire's Reckoning box), then Strange News in Bree, Fangs in the Dark, The Brandywine Pursuit, and the three packs ALeP has yet to release.
+- [First Age](https://talesfromthecards.wordpress.com/first-age/), by Ian of Tales from the Cards: The Isle of Werewolves, The Seat of Morgoth and Hunting of the Wolf, then its Doom Mastered cycle: Trial Upon the Marches, Among the Outlaws, The Betrayal of Mîm, The Fall of Nargothrond.
+- [Legacy of Fëanor](https://www.facebook.com/LegacyofFeanor): Skirmish in the Shire, Down the Baranduin and Dwarf Lord Battle, then its Fate of the Stone cycle as it is released.
+- Scenarios shared on BoardGameGeek and community sites, once a source the app can read holds their cards: MJ Newman's five ([Ruins of Nan Wathren](https://boardgamegeek.com/thread/689740), [The Bandits of Chetwood North](https://boardgamegeek.com/thread/703809), [The Culling at the Barrow Downs](https://boardgamegeek.com/thread/710317), [Raid on the River Carnen](https://boardgamegeek.com/thread/805266), [The Fall of Dale](https://boardgamegeek.com/thread/818448)), [Ninjadorg's Mirkwood trilogy](https://boardgamegeek.com/filepage/66659/ninjadorgs-lotr-lcg-scenarios), [A Light in the East](https://sites.google.com/view/where-the-stars-are-strange/the-lord-of-the-rings-lcg/a-light-in-the-east-deluxe-expansion), [Defiance of the East](https://superior-realities.com/2022/10/21/defiance-of-the-east-a-fan-made-expansion-for-lord-of-the-rings-lcg/), [The Battle of the Last Alliance](https://boardgamegeek.com/filepage/200071/lotr-lcg-last-alliance-custom-scenario) and [Dragon Hunting](https://boardgamegeek.com/thread/1906141/stand-alone-dragon-hunting-map-mechanic).
 
 </details>
 

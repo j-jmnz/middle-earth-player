@@ -228,8 +228,10 @@ export type DockAction =
   | { kind: "close" };
 
 // `arm`: the button sends an intent with nothing picked first, so the first tap only arms it, and `armed` is the caption the
-// button shows under it while armed (what the second tap does).
-export type DockButton = { label: string; action: DockAction; arm: boolean; armed?: string; testID: string };
+// button shows under it while armed (what the second tap does). `reach` marks an answer that goes past one window, drawn in gold
+// (docs/design-system-table.md, Two taps): "phase" ends the player's phase (End planning), "run" passes up to the next stop.
+export type DockReach = "phase" | "run";
+export type DockButton = { label: string; action: DockAction; arm: boolean; armed?: string; testID: string; reach?: DockReach };
 
 export type Dock = {
   // The one filled button, always in the same place: the confirm of what is picked, or (with nothing picked) Pass,
@@ -359,9 +361,11 @@ export function dockFor(
         why = sheet.mustCommit;
       } else if (sheet.pass != null && sheet.armed != null) {
         // Nothing picked: Pass is the filled button. In the commit window it sends no one on the quest.
-        primary = PASS(sheet.pass, "table-pass", sheet.armed);
+        // In planning it ends the player's phase, so it is the gold End planning.
+        const pass = PASS(sheet.pass, "table-pass", sheet.armed);
+        primary = sheet.passReach ? { ...pass, reach: sheet.passReach } : pass;
       }
-      if (options.stopPass && count === 0) secondary.push({ label: "Pass to stop", action: { kind: "passToStop" }, arm: true, armed: options.stopPass, testID: "table-pass-to-stop" });
+      if (options.stopPass && count === 0) secondary.push({ label: "Pass to stop", action: { kind: "passToStop" }, arm: true, armed: options.stopPass, testID: "table-pass-to-stop", reach: "run" });
       break;
     }
     case "outcome":
