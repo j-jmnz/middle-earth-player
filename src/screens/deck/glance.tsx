@@ -7,7 +7,7 @@ import { dropShadowOf } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { SPHERE_TINT } from "../../ui/icon-map";
-import { BodyText, Label, markedSphere, SphereMark, sphereWord, useTitleShadow } from "../kit/chrome";
+import { BodyText, Label, markedSphere, SphereMark, sphereWord, TextButton, useTitleShadow } from "../kit/chrome";
 import { CardThumb } from "../images/picture";
 import { ArcRing } from "../../ui/arc-ring";
 import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type DeckFace } from "./status";
@@ -176,6 +176,8 @@ export function DeckGlance({
   notApplied,
   droppedNote,
   starterNote,
+  notOwnedNote,
+  onEditCollection,
   jumps,
   onJump,
   top,
@@ -194,6 +196,9 @@ export function DeckGlance({
   notApplied: string | null;
   droppedNote: string | null;
   starterNote: string | null;
+  // The cards outside the player's collection, named (notOwnedNote in src/screens/collection/view.ts), and Edit collection's tap.
+  notOwnedNote: string | null;
+  onEditCollection: () => void;
   jumps: readonly Jump[];
   onJump: (jump: Jump) => void;
   // The top inset (useTopInset), and the page's side padding.
@@ -252,6 +257,15 @@ export function DeckGlance({
           <Label testID="starter-note" className="mt-2">
             {starterNote}
           </Label>
+        ) : null}
+        {/* A note, not a rule: the deck stays ready and keeps every card. */}
+        {notOwnedNote ? (
+          <View className="mt-2 items-start">
+            <Label testID="deck-not-owned" tone="muted">
+              {notOwnedNote}
+            </Label>
+            <TextButton testID="deck-edit-collection" label="Edit collection" tone="accent" small onPress={onEditCollection} />
+          </View>
         ) : null}
         {/* Jump to a heading: the deck stays one list (every card reachable by scrolling), and these shorten the trip. */}
         <View className="mt-2 flex-row flex-wrap gap-x-1.5">

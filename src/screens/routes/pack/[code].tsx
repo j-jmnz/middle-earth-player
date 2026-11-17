@@ -94,7 +94,7 @@ export default function PackCards() {
 
   return (
     <Screen>
-      <NavBar backTestID="pack-back" backLabel="Packs" onBack={() => goBack(router, "/packs")} />
+      <NavBar backTestID="pack-back" backLabel="Collection" onBack={() => goBack(router, "/collection")} />
       <Column>
         <View className="pt-2">
           <ScreenTitle size="title">{pack?.name ?? "Pack"}</ScreenTitle>

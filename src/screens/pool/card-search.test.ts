@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { matchCard, searchIndexOf, searchTerms, type SearchRow } from "./card-search.ts";
 import { fold, searchFold } from "../kit/fold.ts";
-import { cycleGroups, emptyPoolFilter, filterPool, type PoolCard } from "./filter.ts";
+import { emptyPoolFilter, filterPool, type PoolCard } from "./filter.ts";
 
 type Row = PoolCard & SearchRow;
 
@@ -34,7 +34,7 @@ const rows: Row[] = [
   row({ code: "02005", name: "Brave Heart", typeCode: "event", typeName: "Event", text: "Show courage." }),
   row({ code: "02004", name: "Gandalf's Staff", typeCode: "attachment", typeName: "Attachment", traits: "Item.", text: "Errata printed.", errata: "Gain a [lore] resource." }),
 ];
-const codes = (query: string) => filterPool(rows, query, emptyPoolFilter, cycleGroups([]), new Set()).map((entry) => entry.code);
+const codes = (query: string) => filterPool(rows, query, emptyPoolFilter, [], new Set(), new Set()).map((entry) => entry.code);
 
 describe("fold", () => {
   it("keeps the glossary fold and drops markup and punctuation for the search", () => {

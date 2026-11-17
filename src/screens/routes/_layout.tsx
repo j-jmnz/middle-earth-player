@@ -13,6 +13,7 @@ import { useStore } from "zustand";
 import { DatabaseBoundary, DatabaseError } from "../data/database-error";
 import { DatabaseProvider } from "../data/databases";
 import { bindTableSettings, readTableSettings } from "../settings/store";
+import { bindCollection } from "../collection/store";
 import { startImageDownloads } from "../images/queue";
 import { completeStarterInsert, insertStarterDecks } from "../deck/starter-decks";
 import { openDatabases, type AppDatabases } from "../data/open-databases";
@@ -142,6 +143,12 @@ export default function RootLayout() {
   useEffect(() => {
     if (!databases) return;
     return bindTableSettings(databases.user, (message) => console.warn(message));
+  }, [databases]);
+
+  // The player's collection (the packs they have switched off): loaded once, every change written back.
+  useEffect(() => {
+    if (!databases) return;
+    return bindCollection(databases.user, (message) => console.warn(message));
   }, [databases]);
 
   // The update check (src/screens/update/check.ts): the stored offer at once, then a request only when one is due, a few seconds after opening.

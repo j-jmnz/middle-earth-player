@@ -13,8 +13,9 @@ const ROW = 44;
 /**
  * The Carved Stone switch, 46 × 26 with a round knob: on, a lit accent track with a glow and a dark knob; off, a sunk track and a
  * grey knob. A drawing, not the platform's Switch, so it looks the same on every platform; the row is the control.
+ * The Collection rows draw it beside a row that opens, as a control of its own (src/screens/collection/owned-row.tsx).
  */
-function SwitchMark({ value, paper }: { value: boolean; paper: boolean }) {
+export function SwitchMark({ value, paper }: { value: boolean; paper: boolean }) {
   const t = useTableTokens();
   const s = useUiScale();
   const light = t.depth === "light";

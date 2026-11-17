@@ -16,7 +16,10 @@ import { poolOf } from "./cache";
 import { addingView, browseView } from "./view";
 import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./cards";
 import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./grid";
-import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, typeRequestWords, type PoolFilter } from "./filter";
+import { activeFilterCount, applyTypeRequest, emptyPoolFilter, filterPool, packGroups, poolCountLine, typeRequestWords, type PoolFilter } from "./filter";
+import { unownedCodes } from "../../catalog/collection";
+import { collectionPacks, collectionSets } from "../collection/sets";
+import { useNotOwned } from "../collection/store";
 import { PoolFilterSheet, typeChoices } from "./filter-sheet";
 import { ToastView } from "../kit/toast-view";
 import { gutter } from "../../ui/size-class";
@@ -54,6 +57,7 @@ function TypeChips({
   onChange,
   applied,
   onApplied,
+  collection,
   request,
 }: {
   types: { code: string; name: string }[];
@@ -62,6 +66,8 @@ function TypeChips({
   // "Applied only": the cards whose every printed line the app applies (the filter's Active text, as a chip). Off by default.
   applied: boolean;
   onApplied: (next: boolean) => void;
+  // "My collection": only the cards the player owns. Null while they own everything, when it would hide nothing.
+  collection: { on: boolean; onChange: (next: boolean) => void } | null;
   // A request from outside the pool: the row scrolls to the chip it chose.
   request: PoolTypeRequest | null;
 }) {
@@ -75,7 +81,17 @@ function TypeChips({
   const options = [{ code: null, name: "All" }, ...types];
   return (
     <ScrollView ref={row} horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">
-      {/* A switch, not a type: a chip with a check when on, before the type chips. */}
+      {/* Switches, not types: chips with a check when on, before the type chips. */}
+      {collection ? (
+        <ToggleChip
+          testID="pool-my-collection"
+          asSwitch
+          selected={collection.on}
+          label={collection.on ? "✓ My collection" : "My collection"}
+          accessibilityLabel="My collection: only the cards you own"
+          onPress={() => collection.onChange(!collection.on)}
+        />
+      ) : null}
       <ToggleChip
         testID="pool-applied-only"
         asSwitch
@@ -199,7 +215,13 @@ export function CardPoolBody({
   // The sorted pool, its packs and the cards with a line the app does not apply: read once per catalog (pool/cache.ts), shared with the
   // Cards tab, the pool route, the deck editor's cards pane and the import screen.
   const { rows, packs: packRows, notApplied: inactiveCodes, byCode } = poolOf(catalog);
-  const groups = useMemo(() => cycleGroups(packRows), [packRows]);
+  const groups = useMemo(() => packGroups(collectionSets(), packRows), [packRows]);
+  // The cards outside the player's collection (src/catalog/collection.ts): the My collection chip hides them, and with it off they
+  // say "Not owned". Empty, and the chip gone, while everything is owned.
+  const notOwnedList = useNotOwned();
+  const notOwned = useMemo(() => new Set(notOwnedList), [notOwnedList]);
+  const unowned = useMemo(() => unownedCodes(rows, collectionPacks(), notOwned), [rows, notOwned]);
+  const collectionSet = notOwned.size > 0;
   const [search, setSearch] = useState("");
   // The field shows each keystroke at once; the list catches up when React has time, so typing never waits on the grid.
   const query = useDeferredValue(search);
@@ -218,9 +240,10 @@ export function CardPoolBody({
   const [draftFilter, setDraftFilter] = useState<PoolFilter>(applied);
   const [open, setOpen] = useState(false);
   const visible = useMemo(
-    () => filterPool(rows, query, applied, groups, inactiveCodes),
-    [rows, query, applied, groups, inactiveCodes],
+    () => filterPool(rows, query, applied, groups, inactiveCodes, unowned),
+    [rows, query, applied, groups, inactiveCodes, unowned],
   );
+  const unownedShown = useMemo(() => (applied.owned || !collectionSet ? 0 : visible.filter((card) => unowned.has(card.code)).length), [applied.owned, collectionSet, visible, unowned]);
   const types = useMemo(() => typeChoices(rows), [rows]);
   const list = useRef<FlashListRef<PoolRowCard>>(null);
   useEffect(() => {
@@ -238,6 +261,7 @@ export function CardPoolBody({
     ({ item, index }: { item: PoolRowCard | undefined; index: number }) => {
       if (!item) return null;
       const loss = inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null;
+      const out = unowned.has(item.code);
       const count = draftCopyCount(draft, item.code, item.typeCode);
       const full = draftAddRefused(draft, item, lookup, target);
       const side = target === "side";
@@ -245,7 +269,7 @@ export function CardPoolBody({
       const offSide = side && (item.typeCode === "hero" || item.typeCode === "contract");
       const stepper = adding && !offSide;
       if (!grid) {
-        return <PoolCardRow item={item} adding={stepper} side={side} loss={loss} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
+        return <PoolCardRow item={item} adding={stepper} side={side} loss={loss} unowned={out} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
       }
       return (
         <PoolCardCell
@@ -255,6 +279,7 @@ export function CardPoolBody({
           adding={stepper}
           side={side}
           loss={loss}
+          unowned={out}
           count={count}
           full={full}
           lookup={lookup}
@@ -264,7 +289,7 @@ export function CardPoolBody({
         />
       );
     },
-    [grid, cellWidth, columns, scale, adding, inactiveCodes, draft, target, lookup, openCard, previewCard, selected],
+    [grid, cellWidth, columns, scale, adding, inactiveCodes, unowned, draft, target, lookup, openCard, previewCard, selected],
   );
 
   function openSheet(): void {
@@ -299,10 +324,11 @@ export function CardPoolBody({
         onChange={(typeCode) => setApplied({ ...applied, typeCode })}
         applied={applied.activeText}
         onApplied={(activeText) => setApplied({ ...applied, activeText })}
+        collection={collectionSet ? { on: applied.owned, onChange: (owned) => setApplied({ ...applied, owned }) } : null}
         request={typeRequest}
       />
       <View className="mt-1 flex-row items-center justify-between">
-        <Text testID="pool-shown" className="text-label text-muted">{`${visible.length} ${visible.length === 1 ? "card" : "cards"}`}</Text>
+        <Text testID="pool-shown" className="text-label text-muted">{poolCountLine(visible.length, applied.owned, collectionSet, unownedShown)}</Text>
         <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact accessibilityLabel="Card view" />
       </View>
       <View
@@ -340,7 +366,7 @@ export function CardPoolBody({
           />
         ) : null}
       </View>
-      <PoolFilterSheet open={open} rows={rows} groups={groups} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
+      <PoolFilterSheet open={open} rows={rows} groups={groups} notOwned={draftFilter.owned && collectionSet ? notOwned : null} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
     </View>
   );
 }

@@ -85,7 +85,7 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
       {confirming ? (
         <AskInPlace
           testID="app-settings-restore-ask"
-          sentence="Put every setting back to its default? Your games and decks are not touched."
+          sentence="Put every setting back to its default? Your games, decks and collection are not touched."
           confirm={{
             label: "Restore",
             testID: "app-settings-restore-confirm",

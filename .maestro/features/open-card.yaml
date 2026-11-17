@@ -4,14 +4,16 @@ appId: com.middleearth.player
 - tapOn:
     id: cards-tab
 - tapOn:
-    id: packs-open
+    id: collection-open
 - scrollUntilVisible:
     element:
-      id: pack-TBR
+      id: collection-the-lord-of-the-rings
     direction: DOWN
     timeout: 40000
     speed: 70
     visibilityPercentage: 100
+- tapOn:
+    id: collection-the-lord-of-the-rings
 - tapOn:
     id: pack-TBR
 - tapOn:
@@ -22,14 +24,16 @@ appId: com.middleearth.player
 - tapOn:
     id: cards-tab
 - tapOn:
-    id: packs-open
+    id: collection-open
 - scrollUntilVisible:
     element:
-      id: pack-TBR
+      id: collection-the-lord-of-the-rings
     direction: DOWN
     timeout: 40000
     speed: 70
     visibilityPercentage: 100
+- tapOn:
+    id: collection-the-lord-of-the-rings
 - tapOn:
     id: pack-TBR
 - tapOn:
