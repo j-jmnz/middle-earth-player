@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~227.9K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~228.5K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -131,10 +131,10 @@ Read the sections your task touches.
     - 1754–1771 The Hills of Emyn Muil (~1.5K) ← 1
     - 1772–1792 The Dead Marshes (~2.1K) ← 2
     - 1793–1816 Return to Mirkwood (~2.3K) ← 4
-  - 1817–1905 Dwarrowdelf (~11.8K) ← 3
+  - 1817–1905 Dwarrowdelf (~12.4K) ← 3
     - 1828–1850 Into the Pit (~2.8K) ← 9
     - 1851–1871 The Seventh Level (~3.0K) ← 5
-    - 1872–1905 Flight from Moria (~4.9K) ← 4
+    - 1872–1905 Flight from Moria (~5.5K) ← 4
   - 1906–1914 Nightmare (~410) ← 22
   - 1915–1955 Deckbuilding (~2.1K)
   - 1956–2035 Effects (~3.7K)
@@ -147,7 +147,7 @@ Read the sections your task touches.
   - 2078–2105 Persistence and shipping (~3.2K) ← 10
   - 2106–2147 Screens (~5.1K) ← 2
     - 2132–2147 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~60.5K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~60.9K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
   - 24–27 Table menu (~570) ← 4
@@ -155,32 +155,32 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–111 Cards (~22.1K) ← 27
-  - 112–117 The Sailing test (~690) ← 5
-  - 118–131 The Island Map (~1.8K) ← 8
-  - 132–135 Tokens and effects (~360)
-  - 136–150 Piles (~2.0K) ← 7
-  - 151–156 Marks of the open moment (~400) ← 1
-  - 157–227 Motion (~3.3K) ← 7
-  - 228–253 Spotlight (~2.6K) ← 33
-  - 254–259 Gestures (~620) ← 4
-  - 260–263 Hold, slide and release (~940)
-  - 264–275 Pointer and keys (~1.0K) ← 5
-  - 276–281 Peeking at the other seat (~610) ← 1
-  - 282–301 Command column (~2.6K) ← 11
-  - 302–307 Two taps (~620) ← 9
-  - 308–311 One answer, one tap (~240)
-  - 312–315 Stops and Always use (~250)
-  - 316–319 Guide (~120)
-  - 320–336 Choice tray (~5.6K) ← 59
-  - 337–351 Reading panels (~1.6K) ← 5
-  - 352–361 Phase carousel (~680)
-  - 362–367 Quest advance (~530) ← 1
-  - 368–371 Undo (~150)
-  - 372–375 Haptics (~280)
-  - 376–387 Banner (~750) ← 5
-  - 388–407 Screen reader (~3.0K) ← 19
-  - 408–411 Android Back (~90)
+  - 59–112 Cards (~22.5K) ← 27
+  - 113–118 The Sailing test (~690) ← 5
+  - 119–132 The Island Map (~1.8K) ← 8
+  - 133–136 Tokens and effects (~360)
+  - 137–151 Piles (~2.0K) ← 7
+  - 152–157 Marks of the open moment (~400) ← 1
+  - 158–228 Motion (~3.3K) ← 7
+  - 229–254 Spotlight (~2.6K) ← 33
+  - 255–260 Gestures (~620) ← 4
+  - 261–264 Hold, slide and release (~940)
+  - 265–276 Pointer and keys (~1.0K) ← 5
+  - 277–282 Peeking at the other seat (~610) ← 1
+  - 283–302 Command column (~2.6K) ← 11
+  - 303–308 Two taps (~620) ← 9
+  - 309–312 One answer, one tap (~240)
+  - 313–316 Stops and Always use (~250)
+  - 317–320 Guide (~120)
+  - 321–337 Choice tray (~5.6K) ← 59
+  - 338–352 Reading panels (~1.6K) ← 5
+  - 353–362 Phase carousel (~680)
+  - 363–368 Quest advance (~530) ← 1
+  - 369–372 Undo (~150)
+  - 373–376 Haptics (~280)
+  - 377–388 Banner (~750) ← 5
+  - 389–408 Screen reader (~3.0K) ← 19
+  - 409–412 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~32.3K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
@@ -268,10 +268,10 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~15.3K tok)
+- `docs/phases/STATUS.md` — Phase status (~15.5K tok)
   - 5–14 Rules (~380)
   - 15–20 Phases (~50)
-  - 21–310 Open items (~13.9K)
+  - 21–311 Open items (~14.1K)
     - 23–25 Reviews (~70)
     - 26–28 README (~90)
     - 29–33 Releases (~150)
@@ -281,9 +281,9 @@ STATUS.md, then the active phase file.
     - 127–247 Rules and engine (Angmar Awakened) (~5.3K)
     - 248–272 Screens and code (~1.6K)
     - 273–292 Rules and engine (The Two Towers) (~1.4K)
-    - 293–303 Rules and engine (Dwarrowdelf) (~590)
-    - 304–310 Rules and engine (Shadows of Mirkwood) (~380)
-  - 311–336 Standing decisions (~940)
+    - 293–304 Rules and engine (Dwarrowdelf) (~760)
+    - 305–311 Rules and engine (Shadows of Mirkwood) (~380)
+  - 312–337 Standing decisions (~940)
 - `docs/phases/phase-62-dwarrowdelf.md` — Phase 62: The Dwarrowdelf cycle, standalone with Nightmare (~690 tok)
 
 ## Live plans
