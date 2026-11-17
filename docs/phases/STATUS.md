@@ -293,6 +293,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 ### Rules and engine (Dwarrowdelf)
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
 - Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
+- Flight from Moria readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Flight from Moria). Not user-confirmed.
+- The pinned FAQ (`lotr_faq_19.pdf`) entries 1.21, 1.29, 1.45, 1.47, 1.53 and 1.54 have no `faq.*` span yet, so Flight from Moria's readings cite the PDF.
 - The Seventh Level readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Seventh Level). Not user-confirmed.
 - The Caves of Nibin-Dûm reads "attach Cave Torch to a hero of his choice" (41004:A:1) as the first player's own hero; the Dwarrowdelf cards with the same phrase read any player's hero, as the Khazad-dûm insert says of Cave Torch. Not reconciled: changing the Caves moves its goldens.
 - Into the Pit readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Into the Pit). Not user-confirmed.
