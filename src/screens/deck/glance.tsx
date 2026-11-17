@@ -1,6 +1,6 @@
 // The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, the
 // deck at a glance (the sphere donut and count, the cost curve), its notes and the jump chips to its headings, which carry the counts by type.
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 
 import { cardCorner } from "../../ui/card-corner";
 import { dropShadowOf } from "../../ui/surfaces";
@@ -19,6 +19,13 @@ import { Text, TextInput } from "../../ui/text";
 
 // How far the head's top runs before the deck's own words: Back's row over the fan. The editor watches the scroll past it.
 export const BANNER_HEIGHT = 196;
+
+// The web's textarea takes the height of its words (react-native-web gives a multiline field no height of its own); a phone's
+// multiline field grows by itself.
+const GROW_ON_WEB = Platform.OS === "web" ? ({ fieldSizing: "content" } as object) : {};
+
+// Return on the name: react-native-web keeps the line break out only while a submit handler is set; the field blurs on its own.
+function finishName(): void {}
 
 // A hero card in the fan, at Medium's size: 112 × 156 on a phone, 150 × 209 on a tablet.
 const FAN_CARD = { width: 112, height: 156 };
@@ -202,20 +209,28 @@ export function DeckGlance({
     <View style={{ paddingTop: top + 56 * s }}>
       <View style={side}>
         {heroes.length > 0 ? <HeroFan heroes={heroes} wide={wide} /> : null}
+        {/* A long name wraps and the field grows with it, so the threat below never sits under the name's words. Return still finishes
+            the name (no new line), and a pasted line break becomes a space. */}
         <TextInput
           testID="deck-name"
           value={name}
-          onChangeText={onName}
+          onChangeText={(next) => onName(next.replace(/\s*[\r\n]+\s*/g, " "))}
           placeholder="Name this deck"
           placeholderTextColor={palette.faint}
           accessibilityLabel="Deck name"
           selectTextOnFocus
+          multiline
+          scrollEnabled={false}
+          submitBehavior="blurAndSubmit"
+          blurOnSubmit
+          onSubmitEditing={finishName}
           returnKeyType="done"
-          className="mt-3 text-center font-display text-bone"
-          style={{ minHeight: touch(s, 44), fontSize: 26 * s, lineHeight: 32 * s, ...shadow }}
+          textAlignVertical="center"
+          className="mt-3 w-full text-center font-display text-bone"
+          style={{ minHeight: touch(s, 44), paddingVertical: 6 * s, paddingHorizontal: 0, fontSize: 26 * s, lineHeight: 32 * s, ...shadow, ...GROW_ON_WEB }}
         />
         {threat == null ? null : (
-          <Text className="text-center text-label text-muted">
+          <Text className="mt-1 text-center text-label text-muted">
             {`Threat ${threat}`}
           </Text>
         )}

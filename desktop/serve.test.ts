@@ -6,6 +6,7 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { answerFor, contentType, CSP, HYDRATE_SCRIPT_HASH, parseRange, resolveFile, responseHeaders } from "./serve.ts";
+import { LATEST_RELEASE_URL } from "./policy.ts";
 
 let root = "";
 const put = (file: string) => {
@@ -98,14 +99,14 @@ describe("responseHeaders", () => {
 });
 
 describe("CSP", () => {
-  it("allows no remote host but RingsDB, no object, no framing and no unsafe script", () => {
+  it("allows no remote host but RingsDB and the update check's one URL, no object, no framing and no unsafe script", () => {
     expect(CSP).toContain("default-src 'none'");
-    expect(CSP).toContain("connect-src 'self' https://ringsdb.com");
+    expect(CSP).toContain(`connect-src 'self' https://ringsdb.com ${LATEST_RELEASE_URL}`);
     expect(CSP).toContain("object-src 'none'");
     expect(CSP).toContain("frame-ancestors 'none'");
     expect(CSP).toContain("'wasm-unsafe-eval'");
     expect(CSP).not.toMatch(/script-src[^;]*'unsafe-(inline|eval)'/);
-    expect(CSP.match(/https?:\/\/[^\s;]+/g)).toEqual(["https://ringsdb.com"]);
+    expect(CSP.match(/https?:\/\/[^\s;]+/g)).toEqual(["https://ringsdb.com", LATEST_RELEASE_URL]);
   });
 
   it("names the hash of the one inline script Expo Router writes", async () => {

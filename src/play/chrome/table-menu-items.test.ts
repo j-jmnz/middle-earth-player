@@ -25,4 +25,11 @@ describe("table menu rows", () => {
     expect(scenarios?.accessibilityHint).toBe("The game is saved");
     expect(menuItems({ backLabel: "Path", backAccessibilityLabel: "" }).filter((row) => row.id !== "leave").every((row) => row.glyph == null)).toBe(true);
   });
+
+  it("heads the menu with the version on offer, in the accent with the One Ring, and leaves it out when there is none", () => {
+    const rows = menuItems({ backLabel: "Path", backAccessibilityLabel: "Back to the path" }, undefined, "0.5.0");
+    expect(rows.map((row) => row.id)).toEqual(["update", "log", "rules", "booklet", "setup", "settings", "resign", "leave"]);
+    expect(rows[0]).toMatchObject({ testID: "update-open", label: "Version 0.5.0 is out", accessibilityLabel: "Get version 0.5.0", tone: "accent", icon: "oneRing" });
+    expect(menuItems({ backLabel: "Path", backAccessibilityLabel: "" }, undefined, null).some((row) => row.id === "update")).toBe(false);
+  });
 });
