@@ -33,7 +33,7 @@
 > [!IMPORTANT]
 > This is a fan-made project. It is not an official app, and it is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises. All game content belongs to its owners.
 
-Play The Lord of the Rings: The Card Game solo on Android, iPhone, iPad, Windows, macOS or Linux. The app runs the rules, the encounter deck and the bookkeeping. You make the decisions.
+Play The Lord of the Rings: The Card Game solo on Android, iPhone, iPad, Windows, macOS or Linux. The app runs the rules, the encounter deck, the quests and the card effects.
 
 <p align="center">
   <img src=".github/readme/game-board.webp" width="830" alt="Combat on the game table: a Black Rider attacks Celeborn, then Haldir of Lórien attacks the Black Rider, whose 4 Defense blocks his 4 Attack">
