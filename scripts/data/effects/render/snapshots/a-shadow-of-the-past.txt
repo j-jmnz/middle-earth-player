@@ -40,7 +40,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141023:B:1 (back): When Revealed: The first player searches the encounter deck and discard pile for a Black Rider, reveals it (cannot be canceled), and adds it to the staging area. Shuffle the encounter deck.
   141023:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the first player searches the encounter deck and discard pile for a card, reveals it and adds it to the staging area [also {"code":"141039"}]
+    - the first player searches the encounter deck and discard pile for the card with code 141039, a a card, reveals it and adds it to the staging area
     - shuffle the encounter deck
 
 141023:B:2 (back): When a player makes a Hide test, add 1 to the total Threat for each ally that player controls.
@@ -61,7 +61,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141024:B:1 (back): When Revealed: The first player searches the encounter deck and discard pile for a Black Rider, reveals it (cannot be canceled), and adds it to the staging area. Shuffle the encounter deck.
   141024:whenRevealed:2: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the first player searches the encounter deck and discard pile for a card, reveals it and adds it to the staging area [also {"code":"141039"}]
+    - the first player searches the encounter deck and discard pile for the card with code 141039, a a card, reveals it and adds it to the staging area
     - shuffle the encounter deck
 
 141024:B:2 (back): When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 220 by template, 38 as JSON)
+(rendered pieces: 222 by template, 36 as JSON)

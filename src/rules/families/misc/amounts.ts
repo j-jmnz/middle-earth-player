@@ -5,6 +5,7 @@
 import type { AmountExpr } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import { victoryPointsOf } from "../../core/printed-stat.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -44,7 +45,14 @@ export function namedInPlay(state: ScenarioState, name: string, ctx: ReduceConte
   return found[0]?.id ?? null;
 }
 
+// The active location's quest points less its progress (901302:A:2): 0 with no active location, or one that prints no quest points.
+function remainingQuestPoints(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): number {
+  const location = state.activeLocation ? state.cards[state.activeLocation] : undefined;
+  return location ? Math.max(0, modifiedStat(state, location, "questPoints", cards) - location.progress) : 0;
+}
+
 export function miscAmount(state: ScenarioState, amount: AmountExpr, sourceId: string | null, cards: ReadonlyMap<string, PrintedCard>): number {
+  if (amount.remainingQuestPoints) return remainingQuestPoints(state, cards);
   if (amount.victoryPoints) return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, cards), 0);
   if (amount.facedown) return facedownCount(state, sourceId);
   if (amount.resourcesAboveCopies) return resourcesAboveCopies(state, sourceId);

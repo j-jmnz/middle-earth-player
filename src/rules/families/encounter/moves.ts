@@ -159,6 +159,18 @@ export function shuffleDiscardIn(state: ScenarioState, ctx?: ReduceContext, trai
   return shuffleEncounterDeck(next);
 }
 
+// The encounter discard pile and the victory display both go back into the encounter deck, which is shuffled once: the locations in them (`type`), or the cards that match the other filters ("Reshuffle all locations in the discard pile and victory display back into the encounter deck", 04018:A:1).
+// The cards that went back, from both, are the running effect's `returned` count (`returnedBelow`).
+export function shuffleDiscardAndVictoryIn(state: ScenarioState, ctx: ReduceContext, trait?: string, type?: CardType, name?: string): ScenarioState {
+  const wanted = (id: string) => (trait == null || hasTrait(state, id, trait, ctx)) && (type == null || typeOf(state, id, ctx) === type) && (name == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name);
+  const moving = [...state.encounterDiscard, ...state.victory].filter(wanted);
+  let next = state;
+  for (const id of moving) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  const shuffled = shuffleEncounterDeck(next);
+  const data = effectData(shuffled);
+  return data ? patchTop(shuffled, { data: { ...data, returned: data.returned + moving.length } }) : shuffled;
+}
+
 // Each location in the victory display goes into the encounter deck, which is shuffled once (144066:A:1).
 export function shuffleVictoryIn(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   let next = state;

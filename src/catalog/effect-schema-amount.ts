@@ -54,6 +54,8 @@ export const amountExprSchema = z.strictObject({
   resourcesAboveCopies: z.literal(true).optional(),
   // The Victory points of the cards in the victory display added up, read live ("X is the number of victory points in the victory display", 03025:A:3; dwd.the-nameless-fear). Read by src/rules/families/misc/amounts.ts.
   victoryPoints: z.literal(true).optional(),
+  // The quest points the active location still needs: its quest points less its progress, 0 with no active location or when it is full ("where X is the active location's remaining quest points", 901302:A:2). Read by src/rules/families/misc/amounts.ts.
+  remainingQuestPoints: z.literal("activeLocation").optional(),
   // The amount comes out negative ("gets -1 Willpower for each damaged hero you control"): the value read, below 0.
   negative: z.literal(true).optional(),
   // A scalable card's level, read from the Campaign Log (dcce.scalable-upgradable): the level of the source card. `halved`: half of the value read, rounded up ("half the level of Galdor's

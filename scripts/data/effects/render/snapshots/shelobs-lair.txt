@@ -300,7 +300,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144070:A:1 (front): Setup: Set Cleft of Cirith Ungol, Shelob, and The Great Spider encounter set aside, out of play. Put Sméagol into play under the first player's control. Make Morgul Vale the active location. Add Sméagol's Secret Way to the staging area. Shuffle the encounter deck.
   144070:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"144076"}]
+    - the set-aside card with code 144076 enters play under the first player's control, ready
     - shuffle the encounter deck
 
 144070:B:1 (back): Progress cannot be placed on Underground locations.
@@ -370,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 244 by template, 10 as JSON)
+(rendered pieces: 245 by template, 9 as JSON)

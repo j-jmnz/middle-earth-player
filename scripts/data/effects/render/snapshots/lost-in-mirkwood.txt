@@ -263,7 +263,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - the card with code 01096 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - shuffle the encounter deck
   18071:setup:2: Setup
-    - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"18070"}]
+    - the set-aside card with code 18070 enters play under the first player's control, ready
 
 18071:B:1 (back): Each player's threat cannot be reduced by player card effects.
   18071:constant:1: Constant
@@ -416,4 +416,4 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 252 by template, 42 as JSON)
+(rendered pieces: 253 by template, 41 as JSON)

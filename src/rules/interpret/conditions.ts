@@ -194,6 +194,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "noneReturned":
       return scope.returned === 0;
+    case "returnedBelow":
+      return scope.returned < condition.than;
     case "phase":
       // The action window after 7.4 (the engine's "End of round" step) is still in the refresh phase (rr.step-7-4,
       // rr.step-7-5): a Refresh Action may be used there. An ended phase an event names is read as it is.

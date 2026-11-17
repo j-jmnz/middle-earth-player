@@ -59,6 +59,9 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["progress"], pick.progress === true ? "with progress on it" : pick.progress === false ? "with no progress on it" : null);
   note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (held by an enemy or lying free)" : pick.captive === "free" ? "that is a Captive that no enemy holds" : "(Captives included)") : null);
   note(["exceptSphere"], typeof pick.exceptSphere === "string" ? `that is not a ${pick.exceptSphere} card` : null);
+  note(["maxWillpower"], typeof pick.maxWillpower === "number" ? `with a current Willpower of ${pick.maxWillpower} or less` : null);
+  note(["highestWillpower"], pick.highestWillpower === true ? "with the highest current Willpower of those (ties: the chooser decides)" : null);
+  note(["attachedTo"], typeof pick.attachedTo === "string" ? `attached to ${pick.attachedTo === "host" ? "this card's host" : pick.attachedTo === "source" ? "this card" : pick.attachedTo === "defender" ? "the defending character" : "the active location"}` : null);
   note(["lowestAttack"], pick.lowestAttack === true ? "with the lowest Attack of those (ties: the chooser decides)" : null);
   note(["minCost"], typeof pick.minCost === "number" ? `with a printed cost of at least ${pick.minCost} (a card with no printed cost never matches)` : null);
   note(["highestCost"], pick.highestCost === true ? "with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)" : null);

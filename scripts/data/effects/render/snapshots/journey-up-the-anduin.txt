@@ -214,11 +214,11 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - this card counts as a Condition attachment while it is attached
   18027:forced:1: Forced on the event readied (heard about the host)
     - the acting player chooses one of:
-      * option "other" (only if there is a card (any player controls) that is not an objective, other than this card [also {"attachedTo":"host"}] to choose):
-        - choose card (any player controls) other than this card [also {"attachedTo":"host"}]
+      * option "other" (only if there is a card (any player controls) that is not an objective, attached to this card's host, other than this card to choose):
+        - choose card (any player controls) attached to this card's host, other than this card
         - discard the picked card
-      * option "self" (only if not (there is a card (any player controls) that is not an objective, other than this card [also {"attachedTo":"host"}] to choose)):
-        - choose card (any player controls) [also {"attachedTo":"host"}]
+      * option "self" (only if not (there is a card (any player controls) that is not an objective, attached to this card's host, other than this card to choose)):
+        - choose card (any player controls) attached to this card's host
         - discard the picked card
 
 ## 18066 Traveling North
@@ -332,4 +332,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 203 by template, 22 as JSON)
+(rendered pieces: 207 by template, 18 as JSON)

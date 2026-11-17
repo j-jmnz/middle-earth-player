@@ -32,6 +32,7 @@ import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
 import { aflamePickMatches, lowestAflame } from "../families/aflame/pick.ts";
 import { lowestOf } from "../families/harad/pick.ts";
 import { highestAttack } from "../families/sea/ramming.ts";
+import { tiedExtreme } from "./tied-extreme.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
@@ -287,6 +288,7 @@ function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<Pic
   const type = cardTypeOf(host, printedOf(ctx.cards, host.code));
   if (on.type === "hero" ? type !== "hero" : type !== "hero" && type !== "ally") return false;
   if (on.minWillpower != null && modifiedStat(state, host, "willpower", ctx.cards) < on.minWillpower) return false;
+  if (on.committed != null && host.committed !== on.committed) return false;
   return on.control === "any" || (on.control === "you") === (host.controller === asking);
 }
 
@@ -358,6 +360,8 @@ export function pickCandidates(
   if (spec.highestThreat) return highestThreatOf(state, found, ctx);
   // "The highest cost attachment you control" (families/costs/pick.ts).
   if (spec.highestCost) return highestCost(state, found, ctx);
+  // "The ally you control with the highest Willpower" (901304:A:2).
+  if (spec.highestWillpower) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "willpower", ctx.cards) : 0), "highest");
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
   return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }

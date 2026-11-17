@@ -38,6 +38,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("engagedWithActor") }),
   // The running effect has returned no enemy to staging (or, for ImmediateAttackEach, made no attack).
   z.strictObject({ kind: z.literal("noneReturned") }),
+  // The running effect has returned fewer than `than` cards (ReturnFromDiscard `treacheries` counts the treachery cards only, ShuffleEncounterDiscard `alsoVictory` the cards that went back): "If this effect returned less than 2 Snow treachery cards" (04020:A:1), "If you reshuffled at least two locations" (04018:A:1, with `not`). Read by the encounter family.
+  z.strictObject({ kind: z.literal("returnedBelow"), than: z.number().int().positive() }),
   // The running effect has discarded no card with DiscardEach ("If no cards are discarded by this effect, ~ gains surge", 12106:A:1). Read by src/rules/families/south/damage.ts.
   z.strictObject({ kind: z.literal("noneDiscarded") }),
   // The acting player is the last player: the one to the first player's right, the only player of a solo game ("attacking the last player", 03035:A:2; dcce.last-player). Read by the sea family (families/sea/index.ts).
@@ -187,8 +189,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("defendingAgainst"), trait: z.string().min(1) }),
   // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
   // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/core/keywords.ts).
-  // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2).
-  z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0).optional(), ally: z.literal(true).optional() }),
+  // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2). `maxWillpower`: its current Willpower is at most this ("if the defending character has less than 2 Willpower", 901303:A:1).
+  z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0).optional(), maxWillpower: z.number().int().min(0).optional(), ally: z.literal(true).optional() }),
   // The source card is attached to a card with this name.
   z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
   // The actor controls a hero or ally in play with this code.

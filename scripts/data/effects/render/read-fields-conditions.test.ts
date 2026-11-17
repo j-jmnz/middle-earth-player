@@ -41,6 +41,7 @@ describe("effects render read fields, conditions", () => {
     questProgressNoted: [{ kind: "questProgressNoted", is: true }, { kind: "questProgressNoted", is: false }],
     currentQuestProgress: [{ kind: "currentQuestProgress", is: "some" }, { kind: "currentQuestProgress", is: "none" }],
     defendingAgainst: [{ kind: "defendingAgainst", trait: "Undead" }],
+    versusDefender: [{ kind: "versusDefender", maxHitPoints: 2, maxWillpower: 1, ally: true }],
     attacking: [{ kind: "attacking", card: "host", enemy: { type: "enemy", control: "any" }, notEnemy: { type: "enemy", control: "any" }, alone: true, ranged: true }],
     timeOfDay: [{ kind: "timeOfDay", is: "day" }, { kind: "timeOfDay", is: "night" }],
     safeActive: [{ kind: "safeActive", is: true }, { kind: "safeActive", is: false }],

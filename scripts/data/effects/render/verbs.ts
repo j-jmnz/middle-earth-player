@@ -61,6 +61,7 @@ const TARGET_STAT: Readonly<Record<string, string>> = {
   attacker: "the attacking enemy",
   table: "the table",
   eachSeat: "each player",
+  questingCharacters: "every character committed to the quest, now and committing later while the effect lasts",
 };
 const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(value);
 // What a stat flag means where the bare name would not say it.
@@ -316,8 +317,8 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     read: ["amount", "who", "remember"],
   }),
   SearchReveal: (i) => ({
-    text: `the ${i.who === "firstPlayer" ? "first player" : "acting player"} searches the encounter deck and discard pile for ${typeof i.trait === "string" ? `a ${i.trait} ` : "a "}${typeof i.type === "string" ? i.type : "card"}, reveals it and ${i.to === "engaged" ? "puts it into play engaged with them" : "adds it to the staging area"}${i.cost === true ? " (a Travel cost: payable only when a card is found)" : ""}`,
-    read: ["trait", "type", "who", "to", "cost"],
+    text: `the ${i.who === "firstPlayer" ? "first player" : "acting player"} searches the encounter deck and discard pile for ${typeof i.code === "string" ? `the card with code ${i.code}, a ` : ""}${typeof i.trait === "string" ? `a ${i.trait} ` : "a "}${typeof i.type === "string" ? i.type : "card"}, reveals it and ${i.to === "engaged" ? "puts it into play engaged with them" : "adds it to the staging area"}${i.cost === true ? " (a Travel cost: payable only when a card is found)" : ""}`,
+    read: ["trait", "type", "who", "to", "cost", "code"],
   }),
   AttachSelf: (i) => (isObj(i.to) && i.to.kind === "character" ? { text: `attach this card to ${typeof i.to.name === "string" ? `the character titled "${i.to.name}"` : `a ${typeof i.to.trait === "string" ? `${i.to.trait} ` : ""}character of any player (the first player chooses it)`}${i.to.unlimited === true ? " (any number of copies may be attached)" : " that carries no copy of this card"}; with none this card is discarded`, read: ["to"] } : isObj(i.to) && i.to.kind === "hero" ? { text: `attach this card to ${i.to.control === "firstPlayer" ? "a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)" : typeof i.to.trait === "string" ? `a ${i.to.trait} hero` : `a hero${typeof i.to.minWillpower === "number" ? ` with ${i.to.minWillpower} or more Willpower` : ""}${i.to.control === "you" ? " the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)" : ""}${i.to.control === "any" ? " of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)" : ""}`}`, read: ["to"] } : null),
   EndQuestPhase: () => ({ text: "end the quest phase at once (no quest resolution)", read: [] }),
@@ -384,7 +385,14 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ShuffleStageFromVictory: (i) => ({ text: `the card with code ${str(i.code)} leaves the victory display for the quest deck, side A up, and the quest deck is shuffled (nothing if it is not in the victory display)`, read: ["code"] }),
   AddShadowToVictory: (i) => ({ text: `the shadow card with code ${str(i.code)} that the attacking enemy holds goes to the victory display`, read: ["code"] }),
   DiscardTopEliminating: (i) => ({ text: `each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a ${str(i.type)} eliminates the player who discarded it from the game before the next player discards`, read: ["type"] }),
-  ShuffleEncounterDiscard: (i) => ({ text: `shuffle ${typeof i.name === "string" ? `every copy of ${i.name} in ` : typeof i.trait === "string" ? `the ${i.trait} cards of ` : typeof i.type === "string" ? `the ${i.type} cards of ` : ""}the encounter discard pile into the encounter deck`, read: ["trait", "type", "name"] }),
+  ShuffleEncounterDiscard: (i) => ({
+    text: `shuffle ${typeof i.name === "string" ? `every copy of ${i.name} in ` : typeof i.trait === "string" ? `the ${i.trait} cards of ` : typeof i.type === "string" ? `the ${i.type} cards of ` : ""}the encounter discard pile${i.alsoVictory === true ? " and the victory display (the cards that went back are counted as returned)" : ""} into the encounter deck`,
+    read: ["trait", "type", "name", "alsoVictory"],
+  }),
+  ActAs: (i) => ({ text: `the rest of the effect is carried out by ${i.who === "firstPlayer" ? "the first player" : i.who === "pickedPlayer" ? "the last player picked" : "the acting player"}`, read: ["who"] }),
+  ArrangeEncounter: () => ({ text: "the acting player puts the cards this effect looked at or returned, still on top of the encounter deck, back in the order they choose", read: [] }),
+  TakeControlOfSetAside: (i) => ({ text: `the set-aside card with code ${str(i.code)} enters play under the first player's control, ready`, read: ["code"] }),
+  CommitToQuest: (i) => ({ text: `${i.target == null ? "the picked card" : cardRef(i.target)} is committed to the quest without exhausting${i.stat === "attack" ? ", questing with its Attack" : ""} (a character that cannot quest stays out)`, read: ["target", "stat"] }),
   RevealTopEnemies: (i, ctx) => ({ text: `reveal the top ${amount(i.count, ctx)} cards of the encounter deck one at a time: each enemy is revealed in full (its When Revealed, Surge, Doomed and the Forced effects of a reveal) and added to the staging area, every other card is discarded unresolved (the discard pile is shuffled back when the deck runs out)`, read: ["count"] }),
   DiscardEncounterTop: (i, ctx) => ({ text: `discard ${amount(i.count, ctx)} card(s) from the top of the encounter deck${i.reset === true ? " (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)" : ""}`, read: ["count", "reset"] }),
   StageLooked: (i) => ({ text: `${i.own === true ? "the acting player adds" : "each player in turn adds"} one ${str(i.trait)} ${str(i.type)} among the cards this effect discarded (still in the encounter discard pile) to the staging area, ${i.own === true ? "choosing among those their own discard looked at" : "choosing among them"}; not revealed`, read: ["trait", "type", "own", "seat"] }),
