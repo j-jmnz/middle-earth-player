@@ -56,7 +56,9 @@ export function discardEach(state: ScenarioState, instruction: Extract<Instructi
   return data ? patchTop(next, { data: { ...data, discardedCount: (data.discardedCount ?? 0) + count } }) : next;
 }
 
-/** The `noneDiscarded` condition: the running effect's DiscardEach has discarded no card. Null for any other condition. */
+/** The `noneDiscarded` condition: the running effect's DiscardEach has discarded no card and DiscardFromDeck has discarded none from a deck (Great Bridge, 50222:A:2). Null for any other condition. */
 export function noneDiscarded(state: ScenarioState, condition: Condition): boolean | null {
-  return condition.kind === "noneDiscarded" ? (effectData(state)?.discardedCount ?? 0) === 0 : null;
+  if (condition.kind !== "noneDiscarded") return null;
+  const data = effectData(state);
+  return (data?.discardedCount ?? 0) === 0 && (data?.discardedFromDecks ?? []).length === 0;
 }

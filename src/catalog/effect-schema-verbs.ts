@@ -308,8 +308,8 @@ export const simpleVerbs = [
     ...when,
   }),
   // Constant on an encounter card attached by its own text: it counts as an attachment with this trait while attached
-  // ("Counts as a Condition attachment", 141043:A:2, 141055:A:2), so "a Condition attachment" finds it (01061:A:1).
-  z.strictObject({ verb: z.literal("CountsAs"), cardType: z.literal("attachment"), trait: z.string().min(1), ...when }),
+  // ("Counts as a Condition attachment", 141043:A:2, 141055:A:2), so "a Condition attachment" finds it (01061:A:1); with no trait it counts as an attachment only ("Counts as an attachment", 50208:A:2).
+  z.strictObject({ verb: z.literal("CountsAs"), cardType: z.literal("attachment"), trait: z.string().min(1).optional(), ...when }),
   // Deals damage to each ally in play, only those with willpower at most `maxWillpower` when it is named (a value below 0
   // counts as 0, rr.modifiers) ("Deal 2 damage to each ally with 0 Willpower", 141071:A:1).
   z.strictObject({

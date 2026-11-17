@@ -42,6 +42,8 @@ const FLAGS = [
   // On a claimed objective: when the hero it is attached to leaves play, the objective returns to the top of the encounter deck instead of the staging area ("Forced: After attached hero is damaged or leaves play, return this card to the top of the
   // encounter deck", 02014:A:2). Read where a card's attachments are released (families/objectives/claimed.ts).
   "returnsToEncounterDeck",
+  // On a claimed objective: when it is detached (its hero leaves play, a card discards it) it is discarded to the encounter discard pile instead of returning to the staging area ("If detached, discard The Old Thrush", 50208:A:2).
+  "discardedWhenDetached",
 ] as const;
 
 export const manifest = { name: "objectives", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

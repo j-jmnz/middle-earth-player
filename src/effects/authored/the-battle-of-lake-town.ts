@@ -96,6 +96,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "freeOfEncounters" }, { kind: "canPick", pick: READY_HERO }] },
     instructions: [{ verb: "Pick", pick: READY_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
   },
+  // "Counts as an attachment with the text: If detached, discard The Old Thrush": a card that counts or targets attachments finds it, and any detach (its hero leaves play, a card discards it) discards it to the encounter discard pile.
+  {
+    id: "50208:constant:1",
+    cardCode: "50208",
+    lines: ["50208:A:2"],
+    timing: "constant",
+    instructions: [{ verb: "CountsAs", cardType: "attachment" }, { verb: "ModifyStat", stat: "discardedWhenDetached", amount: 1, until: "whileSourceInPlay", target: "self" }],
+  },
   {
     id: "50208:response:1",
     cardCode: "50208",
@@ -198,13 +206,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "50217:constant:1", cardCode: "50217", lines: ["50217:A:2"], timing: "constant", instructions: [{ verb: "Restrict", what: "travel", exceptSelf: true }] },
   // 50218 North Pier. While it is in play no damage can be placed on Smaug.
   { id: "50218:constant:1", cardCode: "50218", lines: ["50218:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: SMAUG }] },
-  // 50219 Merchant's District. Travel Action: 2 damage per player on Lake-town to add this location to the victory display. Shadow: 1 damage on Lake-town, 4 if the attack is undefended.
+  // 50219 Merchant's District. Travel Action (an Action of the Travel phase, taken in the window after the travel option, from the staging area or as the active location, as often as there are copies; it is not traveling): 2 damage per player on Lake-town to add this location to the victory display. Shadow: 1 damage on Lake-town, 4 if the attack is undefended.
   {
     id: "50219:action:1",
     cardCode: "50219",
     lines: ["50219:A:2"],
     timing: "action",
-    condition: { kind: "step", is: "canTravel" },
+    condition: { kind: "phase", is: "Travel" },
     instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "PlaceDamageOn", code: LAKE_TOWN, amount: 2 }] }, { verb: "AddSourceToVictory" }],
   },
   {
@@ -238,8 +246,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "Pick", pick: READY_HERO, when: ONE_ACTIVE }, { verb: "Exhaust", target: { kind: "picked" }, when: ONE_ACTIVE }],
   },
   { id: "50223:shadow:1", cardCode: "50223", lines: ["50223:A:3"], timing: "shadow", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
-  // 50224 Esgaroth Wharf. All locations in play are immune to player card effects. Shadow: the attacking enemy gets +2 Attack and makes an additional attack after this one.
-  { id: "50224:constant:1", cardCode: "50224", lines: ["50224:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any" } }] },
+  // 50224 Esgaroth Wharf. All locations in play, the staging area's and the active ones, are immune to player card effects. Shadow: the attacking enemy gets +2 Attack and makes an additional attack after this one.
+  { id: "50224:constant:1", cardCode: "50224", lines: ["50224:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", staging: true } }] },
   {
     id: "50224:shadow:1",
     cardCode: "50224",

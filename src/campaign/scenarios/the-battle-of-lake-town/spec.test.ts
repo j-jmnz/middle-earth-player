@@ -1,12 +1,57 @@
-// Rules: TODO name the rule ids the rows exercise (data/rules/entries.json).
+// Rules: docs/brief.md (The Battle of Lake-town), rr.forced, rr.shadow-effects, rr.travel, rr.keywords, rr.cancel, faq.enemy-attacks-outside-combat, faq.additional-attacks (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { cardSpecs, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, defend, flag, exhausted, lost, progressOn, quest, resolve, reveal, stat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Battle of Lake-town (standalone-scenarios part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
-// TODO: the rows; the todo below stands in until there is one.
-const ROWS: readonly Row[] = [];
+// The lines a row cannot express (a choice among many, a count of damage the engine places in a loop, a stage defeated) are tests in lines.test.ts; the Smaug deck, Burn and the attacks on Lake-town are tested with their family in src/rules/families/smaug/.
+const LAKE = "50207";
+
+const ROWS: readonly Row[] = [
+  { line: "50201:B:1", name: "Smaug cannot have more than 6 damage on him", layout: { stage: "50201", staging: ["50204"] }, act: [], expect: [stat("50204", "damageCeiling", 6)] },
+  { line: "50202:B:1", name: "Smaug cannot have more than 12 damage on him", layout: { stage: "50202", staging: ["50204"] }, act: [], expect: [stat("50204", "damageCeiling", 12)] },
+  { line: "50201:B:2", name: "When Revealed: 1 damage on Lake-town for each player", layout: { stage: "50201", seats: 2, staging: [LAKE] }, act: resolve("50201", "whenRevealed"), expect: [damageOn(LAKE, 2)] },
+  { line: "50201:A:1", name: "Setup: each player reveals 1 card, which is added to the staging area", layout: { seats: 2, deck: ["f0", "f3", "place"], staging: [LAKE] }, act: resolve("50201", "setup"), expect: [zone("f0", "staging"), zone("f3", "staging"), zone("place", "encounterDeck")] },
+  { line: "50202:B:2", name: "the first player discards 3 of the 4 progress tokens to remove 3 of the 5 damage from Lake-town; the other goes on the quest", layout: { stage: "50202", staging: [{ code: LAKE, damage: 5 }] }, act: [quest("success"), answer("discard:3")], expect: [damageOn(LAKE, 2), progressOn("50202", 1)] },
+  { line: "50202:B:2", name: "no more tokens come off than the damage on Lake-town", layout: { stage: "50202", staging: [{ code: LAKE, damage: 2 }] }, act: [quest("success"), answer("discard:2")], expect: [damageOn(LAKE, 0), progressOn("50202", 2)] },
+  { line: "50203:B:3", name: "defeating Smaug wins when the victory display holds more points than Lake-town has damage", layout: { stage: "50203", staging: [{ code: LAKE, damage: 8 }, "50204"], victory: ["50221", "50219"] }, act: announce("enemyDestroyed", "50204"), expect: [won] },
+  { line: "50203:B:3", name: "defeating Smaug loses when the points only equal the damage (a tie loses)", layout: { stage: "50203", staging: [{ code: LAKE, damage: 9 }, "50204"], victory: ["50221", "50219"] }, act: announce("enemyDestroyed", "50204"), expect: [lost] },
+  { line: "50203:B:3", name: "defeating Smaug loses when Lake-town has more damage than the points", layout: { stage: "50203", staging: [{ code: LAKE, damage: 20 }, "50204"], victory: ["50221"] }, act: announce("enemyDestroyed", "50204"), expect: [lost] },
+  { line: "50205:A:2", name: "resolve all burn damage: nobody exhausts, so the 4 of Great House (Burn 3 and its own West Pier's 1 absent) goes on Lake-town", layout: { staging: [LAKE, "50221"] }, act: [resolve("50205", "whenRevealed"), answer("done")], expect: [damageOn(LAKE, 3)] },
+  { line: "50215:A:1", name: "each location in play gains Burn 1, itself too: Great House 3+1, West Pier 1+1", layout: { staging: [LAKE, "50221", "50215"] }, act: [resolve("50205", "whenRevealed"), answer("done")], expect: [damageOn(LAKE, 5)] },
+  { line: "50207:A:1", name: "50 damage on Lake-town loses the game", layout: { staging: [{ code: LAKE, damage: 49 }] }, act: resolve("50201", "whenRevealed"), expect: [lost] },
+  { line: "50206:A:2", name: "Smaug the Magnificent holds the flag: the damage beyond a defender's hit points goes on Lake-town", layout: { staging: ["50206"] }, act: [], expect: [flag("50206", "excessToLakeTown")] },
+  { line: "50206:A:2", name: "an undefended attack of 8 on a hero with 6 hit points puts the 2 beyond them on Lake-town", layout: { staging: [LAKE], engaged: ["50206"] }, act: attack("50206", { undefended: true }), expect: [damageOn(LAKE, 2)] },
+  { line: "50206:A:3", name: "When Revealed: up to 3 damage moves from him to Lake-town", layout: { staging: [LAKE, { code: "50206", damage: 5 }] }, act: resolve("50206", "whenRevealed"), expect: [damageOn("50206", 2), damageOn(LAKE, 3)] },
+  { line: "50206:A:3", name: "When Revealed: fewer than 3 when fewer are on him", layout: { staging: [LAKE, { code: "50206", damage: 2 }] }, act: resolve("50206", "whenRevealed"), expect: [damageOn("50206", 0), damageOn(LAKE, 2)] },
+  { line: "50208:A:1", name: "Guarded: the next card of the encounter deck is revealed and attached to it", layout: { deck: ["f3", "f0"] }, act: reveal("50208"), expect: [zone("f3", "staging"), zone("50208", "staging")] },
+  { line: "50208:A:2", name: "Action: a player exhausts a hero to claim it and attach it to that hero", layout: { staging: ["50208"] }, act: [resolve("50208", "action"), answer("dh2")], expect: [zone("50208", "attached"), exhausted("dh2")] },
+  { line: "50209:A:1", name: "When Revealed: 1 damage to each character in play, the allies and every player's heroes", layout: { seats: 2, play: ["ally", { code: "ally", seat: 1 }] }, act: resolve("50209", "whenRevealed"), expect: [damageOn("dh1", 1), damageOn("dh2", 1), damageOn("dh3", 1), damageOn("ally", 1)] },
+  { line: "50210:A:1", name: "When Revealed: resolve all burn damage: Great House's 3 goes on Lake-town when nobody exhausts", layout: { staging: [LAKE, "50221"] }, act: [resolve("50210", "whenRevealed"), answer("done")], expect: [damageOn(LAKE, 3)] },
+  { line: "50221:A:2", name: "When Revealed: resolve all burn damage, its own Burn 3 counted", layout: { staging: [LAKE] }, act: [resolve("50221", "whenRevealed"), answer("done")], expect: [damageOn(LAKE, 3)] },
+  { line: "50216:A:2", name: "When Revealed: all damage on Smaug moves to Lake-town", layout: { staging: [LAKE, { code: "50204", damage: 7 }] }, act: resolve("50216", "whenRevealed"), expect: [damageOn("50204", 0), damageOn(LAKE, 7)] },
+  { line: "50218:A:2", name: "North Pier: no damage can be placed on Smaug", layout: { staging: ["50218", "50204"] }, act: [], expect: [flag("50204", "cannotTakeDamage")] },
+  { line: "50223:A:3", name: "Shadow: Fisherman's Dock is added to the staging area", layout: { engaged: ["f3"] }, act: [attack("f3", { shadow: "50223", undefended: true })], expect: [zone("50223", "staging")] },
+  { line: "50222:A:2", name: "With no card discarded (Lake-town undamaged) Great Bridge gains surge", layout: { staging: [LAKE], deck: ["f3", "f0"] }, act: reveal("50222"), expect: [zone("f3", "staging")] },
+  { line: "50222:A:2", name: "With every deck empty it gains surge though Lake-town has damage", layout: { staging: [{ code: LAKE, damage: 3 }], deck: ["f3", "f0"] }, act: reveal("50222"), expect: [zone("f3", "staging")] },
+  { line: "50222:A:2", name: "A card discarded: no surge", layout: { staging: [{ code: LAKE, damage: 2 }], deckOf: ["filler", "filler", "filler"], deck: ["f3", "f0"] }, act: reveal("50222"), expect: [zone("filler", "discard"), zone("f3", "encounterDeck")] },
+  { line: "50213:A:1", name: "a Pier location is chosen from the victory display and shuffled into the encounter deck", layout: { victory: ["50215", "50219"], deck: ["f3"] }, act: reveal("50213"), expect: [zone("50215", "encounterDeck"), zone("50219", "victory")] },
+  { line: "50213:A:1", name: "with no Pier location in the victory display it gains surge", layout: { victory: ["50219"], deck: ["f3", "f0"] }, act: reveal("50213"), expect: [zone("f3", "staging"), zone("50219", "victory")] },
+  { line: "50213:A:2", name: "Shadow: the defending character gets -2 Defense, so the 1 Attack of the filler enemy gets through", layout: { engaged: ["f3"] }, act: [attack("f3", { shadow: "50213" }), defend("dh1")], expect: [damageOn("dh1", 1)] },
+  { line: "50209:A:2", name: "Shadow: 1 damage to each character in play when no player cancels it", layout: { seats: 2, engaged: ["f3"] }, act: [attack("f3", { shadow: "50209", undefended: true }), answer("keep"), answer("keep")], expect: [damageOn("dh1", 2), damageOn("dh2", 1), damageOn("dh3", 1)] },
+  { line: "50209:A:2", name: "Shadow: the second player may cancel it by discarding a hero after the first player kept his", layout: { seats: 2, engaged: ["f3"] }, act: [attack("f3", { shadow: "50209", undefended: true }), answer("keep"), answer("discard"), answer("dh3")], expect: [zone("dh3", "discard"), damageOn("dh1", 1), damageOn("dh2", 0)] },
+  { line: "50210:A:2", name: "Shadow: resolve all burn damage unless a player discards a hero to cancel it", layout: { staging: [LAKE, "50221"], engaged: ["f3"] }, act: [attack("f3", { shadow: "50210", undefended: true }), answer("keep"), answer("done")], expect: [damageOn(LAKE, 3)] },
+  { line: "50210:A:2", name: "Shadow: a hero discarded cancels it, so no burn damage is placed", layout: { staging: [LAKE, "50221"], engaged: ["f3"] }, act: [attack("f3", { shadow: "50210", undefended: true }), answer("discard"), answer("dh2")], expect: [zone("dh2", "discard"), damageOn(LAKE, 0)] },
+  { line: "50212:A:1", name: "When Revealed: the player who controls an ally discards it, the one with none puts 2 damage on Lake-town", layout: { seats: 2, staging: [LAKE], play: ["ally"] }, act: resolve("50212", "whenRevealed"), expect: [zone("ally", "discard"), damageOn(LAKE, 2)] },
+  { line: "50214:A:1", name: "When Revealed: Smaug gets +2 Threat, +2 Attack and -2 Defense until the end of the round", layout: { staging: ["50204"] }, act: resolve("50214", "whenRevealed"), expect: [stat("50204", "threat", 9), stat("50204", "attack", 7), stat("50204", "defense", 7)] },
+  { line: "50214:A:1", name: "When Revealed: allies cannot be declared as defenders against him", layout: { staging: ["50204"] }, act: resolve("50214", "whenRevealed"), expect: [flag("50204", "alliesCannotDefend")] },
+  { line: "50214:A:2", name: "Shadow: if the attack destroys a character, resolve all burn damage", layout: { staging: [LAKE, "50221"], engaged: ["50205"] }, act: [attack("50205", { shadow: "50214", undefended: true }), answer("done")], expect: [damageOn(LAKE, 3)] },
+  { line: "50224:A:3", name: "Shadow: the first attack has +2 Attack (3), the additional one is made with the printed 1", layout: { engaged: ["f3"], deck: ["f0", "f0"] }, act: attack("f3", { shadow: "50224", undefended: true }), expect: [damageOn("dh1", 4)] },
+  { line: "50224:A:2", name: "a location in the staging area is immune to player card effects", layout: { staging: ["50224", "50215"] }, act: [], expect: [flag("50215", "immuneToPlayerCards")] },
+  { line: "50224:A:2", name: "the active location is immune to player card effects", layout: { staging: ["50224"], active: "50215" }, act: [], expect: [flag("50215", "immuneToPlayerCards")] },
+  { line: "50224:A:2", name: "Esgaroth Wharf is immune to player card effects itself", layout: { staging: ["50224"] }, act: [], expect: [flag("50224", "immuneToPlayerCards")] },
+];
 
 if (ROWS.length > 0) cardSpecs("the-battle-of-lake-town", ROWS);
 else describe("the-battle-of-lake-town card specs", () => it.todo("a row for each record whose behaviour needs a game moment"));

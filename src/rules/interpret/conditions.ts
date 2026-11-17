@@ -437,18 +437,23 @@ export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: R
   );
 }
 
-// An encounter card its own text attached to a card "counts as" an attachment with a trait while it is attached ("Counts as a
-// Condition attachment", 141043:A:2, 141055:A:2; rr.attachment-cards): the traits its CountsAs records give it.
-function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
+// An encounter card its own text attached to a card "counts as" an attachment, with a trait or none, while it is attached ("Counts as a
+// Condition attachment", 141043:A:2, 141055:A:2; "Counts as an attachment", 50208:A:2; rr.attachment-cards): its CountsAs records.
+function countsAsRecords(state: ScenarioState, id: string, ctx: ReduceContext): { trait?: string }[] {
   const instance = state.cards[id];
   if (!instance || instance.zone !== "attached" || instance.host == null) return [];
   return ctx.effects.flatMap((effect) =>
-    effect.cardCode === instance.code && effect.timing === "constant" ? effect.instructions.flatMap((instruction) => (instruction.verb === "CountsAs" ? [instruction.trait] : [])) : [],
+    effect.cardCode === instance.code && effect.timing === "constant" ? effect.instructions.flatMap((instruction) => (instruction.verb === "CountsAs" ? [instruction] : [])) : [],
   );
 }
 
+// The traits those records give it.
+function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
+  return countsAsRecords(state, id, ctx).flatMap((record) => (record.trait ? [record.trait] : []));
+}
+
 export function countsAsAttachment(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
-  return countedTraits(state, id, ctx).length > 0;
+  return countsAsRecords(state, id, ctx).length > 0;
 }
 
 // What the constant records of a card's attachments give it: the Gondor trait from Steward of Gondor, a resource icon

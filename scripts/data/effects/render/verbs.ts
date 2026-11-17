@@ -251,7 +251,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   PickDiscardTop: (i) => ({ text: `the topmost ${Array.isArray(i.types) ? i.types.map(str).join(" or ") : "?"}${typeof i.trait === "string" ? ` with the trait ${i.trait}` : ""} in the encounter discard pile (the last put there) is picked (nothing with none)`, read: ["types", "trait"] }),
   MoveEncounterCard: (i) => ({ text: `${i.card === undefined ? "the picked card" : i.card === "deckTop" ? "the top card of the encounter deck" : i.card === "discardTop" ? "the top card of the encounter discard pile" : cardRef(i.card)} ${ENCOUNTER_MOVE[str(i.to)] ?? `goes to ${str(i.to)}`}`, read: ["card", "to"] }),
   GainSurge: () => ({ text: "this card gains surge (one more encounter card is revealed when it has been resolved)", read: [] }),
-  CountsAs: (i) => ({ text: `this card counts as a ${str(i.trait)} ${str(i.cardType)} while it is attached`, read: ["cardType", "trait"] }),
+  CountsAs: (i) => ({ text: i.trait === undefined ? `this card counts as an ${str(i.cardType)} while it is attached` : `this card counts as a ${str(i.trait)} ${str(i.cardType)} while it is attached`, read: ["cardType", "trait"] }),
   IncreaseCost: (i, ctx) => ({ text: `while this card is in play, each card a player plays (${i.fromHand === true ? "from its owner's hand only" : "from any zone"}) that is a ${pick(i.pick, ctx)} costs ${str(i.amount)} more (every player's; several such cards stack)`, read: ["amount", "pick", "fromHand"] }),
   SetX: (i) => ({ text: `the effect's X is set to ${str(i.value)}`, read: ["value"] }),
   DiscardTopOfDeck: () => ({ text: "the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X", read: [] }),
