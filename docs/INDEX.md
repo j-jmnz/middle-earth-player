@@ -124,7 +124,7 @@ Read the sections your task touches.
     - 1573–1610 The Tower of Cirith Ungol (~4.4K)
     - 1611–1647 The Black Gate Opens (~4.4K) ← 2
     - 1648–1676 Mount Doom (~4.3K)
-  - 1677–1815 Shadows of Mirkwood (~14.1K) ← 3
+  - 1677–1815 Shadows of Mirkwood (~14.1K) ← 4
     - 1685–1706 The Hunt for Gollum (~2.1K) ← 2
     - 1707–1726 Conflict at the Carrock (~2.4K) ← 2
     - 1727–1752 A Journey to Rhosgobel (~2.9K) ← 1
