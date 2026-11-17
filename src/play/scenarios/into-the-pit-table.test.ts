@@ -11,7 +11,7 @@ import { idOf, legalIntents, tableFromLayout, type Layout } from "../../../test/
 import { sheetFor } from "../choice/sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { dialProps } from "../readouts/dials.ts";
-import { pitDials } from "../readouts/pit.ts";
+import { pitDials } from "../readouts/dwarrowdelf/pit.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 
 const at = (layout: Layout = {}) => tableFromLayout("into-the-pit", { phase: "Quest", ...layout });

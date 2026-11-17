@@ -1,5 +1,5 @@
 // Rules: dwd.cave-torch-the-long-dark, rr.forced, rr.removed-from-game (data/rules/entries.json); ledger line 901001:A:2.
-// What the table says of Into the Pit's Nightmare setup card (src/play/readouts/pit.ts): the damage its Forced effect puts on it each time the Cave Torch exhausts, against the 5 that remove the Torch from the game. The engine decided every number; these only say it.
+// What the table says of Into the Pit's Nightmare setup card (src/play/readouts/dwarrowdelf/pit.ts): the damage its Forced effect puts on it each time the Cave Torch exhausts, against the 5 that remove the Torch from the game. The engine decided every number; these only say it.
 // Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words). Pure.
 
 import { plural } from "../list.ts";

@@ -131,7 +131,7 @@ Read the sections your task touches.
     - 1754–1771 The Hills of Emyn Muil (~1.5K) ← 1
     - 1772–1792 The Dead Marshes (~2.1K) ← 2
     - 1793–1816 Return to Mirkwood (~2.3K) ← 4
-  - 1817–1850 Dwarrowdelf (~3.9K) ← 3
+  - 1817–1850 Dwarrowdelf (~4.0K) ← 3
     - 1828–1850 Into the Pit (~2.8K) ← 9
   - 1851–1859 Nightmare (~410) ← 22
   - 1860–1900 Deckbuilding (~2.1K)
