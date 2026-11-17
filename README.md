@@ -22,11 +22,13 @@
     <a href="#support"><strong>Support</strong></a>
   </p>
   <p>
+    <a href="https://discord.gg/9tY2jVy32"><img alt="Join the Discord server" src="https://img.shields.io/badge/Discord-Join%20the%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=1E2328"></a>
+  </p>
+  <p>
     <a href="https://github.com/j-jmnz/middle-earth-player/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release"></a>
     <a href="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml/badge.svg?branch=main"></a>
     <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3E5A48"></a>
     <a href="https://www.bestpractices.dev/projects/16744"><img alt="OpenSSF Best Practices" src="https://www.bestpractices.dev/projects/16744/badge"></a>
-    <a href="https://discord.gg/9tY2jVy32"><img alt="Discord: join the server" src="https://img.shields.io/badge/Discord-join-3E5A48?logo=discord&logoColor=white"></a>
     <a href="ACCESSIBILITY.md"><img alt="Accessibility: screen readers, WCAG 2.2 AA target" src="https://img.shields.io/badge/accessibility-screen%20readers%20%C2%B7%20WCAG%202.2%20AA-3E5A48"></a>
   </p>
 </div>
