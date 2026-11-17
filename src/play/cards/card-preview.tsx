@@ -16,6 +16,8 @@ import { scheduleOnRN } from "react-native-worklets";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { CardTextView } from "./card-text-view.tsx";
+import { drawnKeywords, type PreviewKeyword } from "./preview-keywords.ts";
+import { KeywordBubble, KeywordChips, type Anchor, type Bubble, type RuleTip } from "./keyword-tips.tsx";
 import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
@@ -65,6 +67,8 @@ export type PreviewCard = {
   lostIsland?: boolean;
   // The card is a facedown Reanimated Dead: the preview says what it is on paper and Details (which would open the card behind it) is not offered.
   faceless?: boolean;
+  // The keyword chips under the name (preview-keywords.ts): keywords now, then timing words (`timing`); `lost` is a printed keyword an effect took away.
+  keywords?: readonly PreviewKeyword[];
 };
 
 // The card's picture, or (while it is not on the phone) its name and text on paper. The quest advance screen draws its stage with it.
@@ -104,6 +108,8 @@ export function CardPreview({
   onDetails = null,
   ownsBack = true,
   closeRef,
+  rule,
+  onOpenRule,
 }: {
   card: PreviewCard;
   // The cards attached to it and its face-up shadow cards (and, for the quest stage, the stages before it), each shown in its place on a
@@ -115,6 +121,9 @@ export function CardPreview({
   ownsBack?: boolean;
   closeRef?: { current: (() => void) | null };
   onDetails?: ((code: string) => void) | null;
+  // What the keyword chips quote: the span's words for a rule id. With none, no chips are drawn (the pool and deck lists' previews).
+  rule?: (id: string) => RuleTip | null;
+  onOpenRule?: (id: string) => void;
 }) {
   const screen = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -124,6 +133,10 @@ export function CardPreview({
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const all = [card, ...related];
   const [at, setAt] = useState(0);
+  // The keyword bubble: the chip tapped last, and whether it is open. It is shut for another card of the preview (a swipe, a related row).
+  const [bubble, setBubble] = useState<Bubble | null>(null);
+  const [bubbleOpen, setBubbleOpen] = useState(false);
+  const bubbleShown = bubbleOpen && bubble?.at === at;
   const shown = all[at] ?? card;
   const wide = screen.width > screen.height;
   const roomW = screen.width - insets.left - insets.right;
@@ -134,7 +147,8 @@ export function CardPreview({
   // the card gives up the strip's height.
   // The tokens line is two lines at the phone's default text size and as many as its words take at a larger one (preview-size.ts, previewStrip).
   const tokenRows = Math.max(0, ...all.map((item) => ((item.tokens ?? []).length > 0 ? tokenLines((item.tokens ?? []).join(" · "), roomW - 32 * s, s, screen.fontScale) : 0)));
-  const strip = !wide ? previewStrip({ chips: all.length > 1, tokenRows }, s, screen.fontScale) : 0;
+  const keywordRow = rule != null && all.some((item) => drawnKeywords(item.keywords).length > 0);
+  const strip = !wide ? previewStrip({ chips: all.length > 1, tokenRows, keywords: keywordRow }, s, screen.fontScale) : 0;
   const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
 
   useEffect(() => {
@@ -153,21 +167,31 @@ export function CardPreview({
     );
   }, [progress, scale, onClose]);
 
+  // Back and Escape shut the bubble while it is open, and the preview after it.
+  const back = useCallback(() => {
+    if (bubbleShown) setBubbleOpen(false);
+    else close();
+  }, [bubbleShown, close, setBubbleOpen]);
+  const pick = (chip: PreviewKeyword, anchor: Anchor) => {
+    setBubble({ word: chip.word, ruleId: chip.ruleId, anchor, at });
+    setBubbleOpen(true);
+  };
+
   useEffect(() => {
     if (!ownsBack) return;
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      close();
+      back();
       return true;
     });
     return () => subscription.remove();
-  }, [close, ownsBack]);
+  }, [back, ownsBack]);
   useEffect(() => {
     if (!closeRef) return;
-    closeRef.current = close;
+    closeRef.current = back;
     return () => {
       closeRef.current = null;
     };
-  }, [close, closeRef]);
+  }, [back, closeRef]);
 
   const scrimStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.get())) * SCRIM }));
   const cardStyle = useAnimatedStyle(() => {
@@ -228,6 +252,7 @@ export function CardPreview({
           {(shown.tokens ?? []).join(" · ")}
         </Text>
       ) : null}
+      {rule ? <KeywordChips chips={drawnKeywords(shown.keywords)} wrap onPick={pick} /> : null}
     </>
   );
   const body = (
@@ -275,7 +300,7 @@ export function CardPreview({
   );
 
   return (
-    <View testID="card-preview" accessibilityViewIsModal onAccessibilityEscape={close} style={StyleSheet.absoluteFill}>
+    <View testID="card-preview" accessibilityViewIsModal onAccessibilityEscape={back} style={StyleSheet.absoluteFill}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
       <Pressable
         testID="card-preview-scrim"
@@ -317,6 +342,11 @@ export function CardPreview({
                 </Text>
               </Animated.View>
             ) : null}
+            {keywordRow ? (
+              <Animated.View style={[{ marginTop: 8 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
+                <KeywordChips chips={drawnKeywords(shown.keywords)} wrap={false} onPick={pick} />
+              </Animated.View>
+            ) : null}
             {all.length > 1 ? (
               <Animated.View testID="card-preview-attached" style={[{ marginTop: 16 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
                 {/* No grow: a horizontal ScrollView grows by default, and on a phone it stretched the column past the screen's height, so the
@@ -332,6 +362,7 @@ export function CardPreview({
           </>
         )}
       </Pressable>
+      {rule ? <KeywordBubble bubble={bubble} open={bubbleShown} rule={rule} onOpenRule={onOpenRule} onClose={() => setBubbleOpen(false)} /> : null}
     </View>
   );
 }

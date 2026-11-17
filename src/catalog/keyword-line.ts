@@ -7,7 +7,7 @@ import type { PrintedKeywords } from "./boundary.ts";
 
 export type KeywordResult = { keywords: PrintedKeywords; unknown: string[] };
 
-const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
+export const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   surge: "surge",
   peril: "peril",
   indestructible: "indestructible",
@@ -24,7 +24,7 @@ const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   dire: "dire",
 };
 
-const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
+export const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
   hide: "hide",
   doomed: "doomed",
   archery: "archery",

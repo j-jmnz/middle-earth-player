@@ -204,7 +204,7 @@ export function isPlayerCardEffect(state: ScenarioState, cards: ReadonlyMap<stri
 }
 
 // An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2).
-function indestructible(state: ScenarioState, id: string, printed: PrintedCard): boolean {
+export function indestructible(state: ScenarioState, id: string, printed: PrintedCard): boolean {
   return printed.type === "enemy" && (printed.keywords.indestructible || flagged(state, id, "indestructible")) && !flagged(state, id, "losesKeywords");
 }
 

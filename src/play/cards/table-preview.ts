@@ -19,6 +19,7 @@ import { pictureKey } from "../canvas/picture-key.ts";
 import { headingLook, headingPreviewSteps, headingPreviewTitle, headingStepOf } from "../dream-chaser/heading.ts";
 import { inspectTargets } from "../store/selectors.ts";
 import { whyNotPlayable } from "../choice/why.ts";
+import { previewKeywords } from "./preview-keywords.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
 // stage), whether it is printed sideways, its text, and the lines of it the app does not apply.
@@ -82,6 +83,8 @@ export function previewCards(
   line: (id: string) => string | null = () => null,
   // Why the card the player pressed cannot be chosen in the pick that is open (why.ts, whyNotChosen), or null.
   chosen: (cardId: string) => string | null = () => null,
+  // `ruleDoc`: the document whose wording a keyword's rule is quoted from first (the open scenario's own booklet; glossary.ts, scenarioRuleDoc), or null for the Rules Reference.
+  options: { ruleDoc?: string | null } = {},
 ): { cards: PreviewCard[]; start: number } {
   const earlier = earlierStages(game, ctx, cardId);
   const ids = [...inspectTargets(game, cardId), ...extra.filter((id) => id !== cardId), ...earlier];
@@ -108,7 +111,8 @@ export function previewCards(
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
     const tokens = tokenLines(card);
-    return [{ code: card.code, ...described, ...(tokens.length > 0 ? { tokens } : {}), ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), ...turned, ...steps, effects, ...(lostIsland ? { lostIsland } : {}), ...(role ? { role } : {}), ...(note ? { note } : {}), ...(refusal && note === refusal ? { noteTitle: "Cannot be chosen now" } : {}) }];
+    const keywords = previewKeywords(game, ctx, id, described.text, options.ruleDoc ?? null);
+    return [{ code: card.code, ...described, ...(keywords.length > 0 ? { keywords } : {}), ...(tokens.length > 0 ? { tokens } : {}), ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), ...turned, ...steps, effects, ...(lostIsland ? { lostIsland } : {}), ...(role ? { role } : {}), ...(note ? { note } : {}), ...(refusal && note === refusal ? { noteTitle: "Cannot be chosen now" } : {}) }];
   });
   return { cards, start: Math.max(0, ids.indexOf(cardId)) };
 }

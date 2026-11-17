@@ -3,8 +3,9 @@
 // with no quest points is won.
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { buildTable, idsOf, sceneCards } from "../../../test/harness/scene.ts";
+import { buildTable, FRODO, idsOf, sceneCards } from "../../../test/harness/scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
 import { seaFixture } from "../dream-chaser/sea-fixture.ts";
@@ -101,5 +102,43 @@ describe("the tokens on a previewed card", () => {
     const shown = previewCards(linked, table.ctx, dealt, describeCode, (name) => name, [], ledgerLine);
     expect(shown.start).toBe(1);
     expect(shown.cards.map((card) => card.code)).toEqual([linked.cards[enemy]?.code, linked.cards[dealt]?.code]);
+  });
+});
+
+describe("the keyword chips of a previewed card", () => {
+  function table(scene: Parameters<typeof buildTable>[1]) {
+    const cards = new Map(base.cards);
+    cards.set("kw-orc", definePrinted({ code: "kw-orc", name: "Orc", type: "enemy", threat: 1, engagementCost: 20, attack: 1, defense: 1, health: 3, keywords: { peril: true, archery: 1 } }));
+    cards.set("kw-gear", definePrinted({ code: "kw-gear", name: "Gear", type: "attachment", cost: 0, keywords: { restricted: true } }));
+    return buildTable({ definition: base.definition, cards }, scene);
+  }
+  const text = "Peril.\n<b>When Revealed:</b> Do a thing.\n<i><b>Shadow:</b> Do another.</i>\n<b>Forced:</b> Again. <b>Forced:</b> Twice.";
+  const describeText = (code: string) => ({ name: `name ${code}`, source: null, text });
+
+  it("lists the keywords in printed order with the rule of the open scenario's own book first", () => {
+    const t = table({ staging: ["kw-orc"] });
+    const own = previewCards(t.state, t.ctx, idsOf(t, "kw-orc"), describeCode, (id) => id, [], ledgerLine, () => null, { ruleDoc: "mec113" });
+    expect(own.cards[own.start]?.keywords).toEqual([
+      { word: "Peril", ruleId: "mec113.peril" },
+      { word: "Archery 1", ruleId: "mec113.archery" },
+    ]);
+    const plain = previewCards(t.state, t.ctx, idsOf(t, "kw-orc"), describeCode, (id) => id, [], ledgerLine);
+    expect(plain.cards[plain.start]?.keywords?.map((chip) => chip.ruleId)).toEqual(["mec109.peril", "mec109.archery"]);
+  });
+
+  it("gives an attachment its own keywords when it is the card shown", () => {
+    const t = table({ staging: ["kw-orc"], attached: [{ code: "kw-gear", host: FRODO }] });
+    const shown = previewCards(t.state, t.ctx, idsOf(t, "kw-gear"), describeCode, (id) => id, [], ledgerLine);
+    expect(shown.cards[shown.start]?.keywords).toEqual([{ word: "Restricted", ruleId: "rr.restricted" }]);
+  });
+
+  it("adds each timing word of the text once, marked timing, after the keywords", () => {
+    const t = table({ staging: ["kw-orc"] });
+    const shown = previewCards(t.state, t.ctx, idsOf(t, "kw-orc"), describeText, (id) => id, [], ledgerLine);
+    expect(shown.cards[shown.start]?.keywords?.filter((chip) => chip.timing)).toEqual([
+      { word: "When Revealed", ruleId: "rr.triggered-ability", timing: true },
+      { word: "Shadow", ruleId: "rr.shadow-effects", timing: true },
+      { word: "Forced", ruleId: "rr.forced", timing: true },
+    ]);
   });
 });

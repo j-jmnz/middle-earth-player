@@ -60,6 +60,9 @@ describe("the strip under an upright card", () => {
     expect(tokenLines(TOKENS, 300)).toBe(2);
     expect(previewStrip({ chips: true, tokenRows: 2 })).toBe(44 + 16 + 12 + 40);
     expect(previewStrip({ chips: false, tokenRows: 0 })).toBe(0);
+    // One row of keyword chips: a 44 pt target and an 8 pt gap, never more however many chips there are.
+    expect(previewStrip({ chips: false, tokenRows: 0, keywords: true })).toBe(44 + 8);
+    expect(previewStrip({ chips: true, tokenRows: 2, keywords: true })).toBe(44 + 16 + 44 + 8 + 12 + 40);
     expect(previewStrip({ chips: true, tokenRows: 0 }, 1.15)).toBe(Math.max(44, 44 * 1.15) + 16 * 1.15);
   });
 

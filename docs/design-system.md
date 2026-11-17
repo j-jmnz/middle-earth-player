@@ -260,7 +260,7 @@ A scenario's scene is also bundled on its own (`<code>.scene`, `SCENE_PICTURE`, 
 - **Card screen**: the card at 236 wide on a phone, 360 in a tablet's portrait column (`card-picture.ts`), radius 10, in its sphere's glow over a deep shadow (`CardPicture`, `card-detail.tsx`); its own picture, blurred, lights the top of the screen behind it. Pinch to zoom.
 - **Fan** (`HeroFan`, deck editor): the heroes' cards 112 × 156 (150 × 209 on a tablet), turned −9°, 0° and 9°, the middle one raised and on top, a glow of the fellowship's sphere behind them.
 - **Grids**: the pool's and the deck editor's cards are the whole card, `cardCorner()`, with a soft shadow; a copy peeks out behind a card the deck holds more than once; the stepper overlaps the card's foot.
-- **Preview**: a long press shows the card large over the dimmed screen with Details under it.
+- **Preview**: a long press shows the card large over the dimmed screen with Details under it; on the table its keyword chips open their rule.
 - Encounter cards other than quests have no picture off the table. On the table they use the bundled scans.
 
 ## Tablets

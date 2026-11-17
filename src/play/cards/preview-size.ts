@@ -37,11 +37,11 @@ export function tokenLines(tokens: string, width: number, scale = 1, text = 1): 
 
 /**
  * The height the strip under an upright card takes, in screen points: the row of the cards with it (a 44 pt target and its 16 pt gap) and
- * the tokens line (12 pt above it and `tokenRows` lines of it, each as tall as the phone's text size makes it). The card gives it up
+ * the keyword chips' one row (a 44 pt target and its 8 pt gap), the tokens line (12 pt above it and `tokenRows` lines of it, each as tall as the phone's text size makes it). The card gives it up
  * (`previewSize`), so a taller line at a larger text size takes it from the card, never from the controls.
  */
-export function previewStrip(a: { chips: boolean; tokenRows: number }, scale = 1, text = 1): number {
-  return (a.chips ? touch(scale, 44) + 16 * scale : 0) + (a.tokenRows > 0 ? 12 * scale + a.tokenRows * TOKEN_LINE_PX * scale * text : 0);
+export function previewStrip(a: { chips: boolean; tokenRows: number; keywords?: boolean }, scale = 1, text = 1): number {
+  return (a.chips ? touch(scale, 44) + 16 * scale : 0) + (a.keywords === true ? touch(scale, 44) + 8 * scale : 0) + (a.tokenRows > 0 ? 12 * scale + a.tokenRows * TOKEN_LINE_PX * scale * text : 0);
 }
 
 /**

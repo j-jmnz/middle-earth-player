@@ -7,6 +7,7 @@ import { parseRuleEntries } from "../../catalog/rule-entry.ts";
 
 let lines: Map<string, string> | null = null;
 let titles: Map<string, string> | null = null;
+let docs: Map<string, string> | null = null;
 
 /** The printed line a "<code>:<side>:<n>" ledger id names, or null when the ledger does not hold it. */
 export function ledgerLine(id: string): string | null {
@@ -23,6 +24,12 @@ export function ledgerLine(id: string): string | null {
 export function ruleTitle(id: string): string | null {
   if (!titles) titles = new Map(parseRuleEntries(rules).map((entry) => [entry.id, entry.title]));
   return titles.get(id) ?? null;
+}
+
+/** The document a rule span id belongs to ("rr", "learn-to-play", "mec113", "jtr"), or null when data/rules has no such span. */
+export function ruleDoc(id: string): string | null {
+  if (!docs) docs = new Map(parseRuleEntries(rules).map((entry) => [entry.id, entry.doc]));
+  return docs.get(id) ?? null;
 }
 
 /** A card side's printed lines from the ledger, one to a line (a revealed quest stage's B side), or null when the ledger has none. */
