@@ -290,6 +290,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Rules and engine (Dwarrowdelf)
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
+- Into the Pit readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Into the Pit). Not user-confirmed.
 - The Nightmare data carries quest-card removals, but `questDeckCodes` still deals the whole Nightmare quest deck; each scenario's Build applies them.
 
 ### Rules and engine (Shadows of Mirkwood)
