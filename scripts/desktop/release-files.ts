@@ -31,7 +31,7 @@ export function stagedName(name: string, version: string, suffix: string): strin
   return suffix === "" ? name : name.replace(`-v${version}-`, `-v${version}${suffix}-`);
 }
 
-/** The installers in `files` that are missing, and an error-ready list of what is there instead. */
+/** The installers this OS makes that `files` lacks. */
 export function missingInstallers(os: DesktopOs, version: string, files: readonly string[]): string[] {
   return installerNames(os, version).filter((name) => !files.includes(name));
 }

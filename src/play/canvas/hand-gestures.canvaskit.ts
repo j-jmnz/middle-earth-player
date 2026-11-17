@@ -7,8 +7,8 @@
 //   - the wheel over the open hand steps the lifted card (hand-hover.ts);
 //   - a right click opens the preview the hold opens (a pile opens its list, as the hold does); the browser's own menu is off for it.
 // They read the page's own pointer events, not a gesture: a gesture composed beside the phone's race would make its drag, scrub, hold and tap run together, and a
-// hover that stayed active would cancel a drag. The table's canvas is the event's target only where nothing covers it, so the command column, a sheet and the
-// spotlight's layer shut the mouse out as they do a touch. A press on the risen hand is a press on the card it is drawn on, not on the resting hand under it: the
+// hover that stayed active would cancel a drag. The table's canvas is the event's target only where nothing covers it, so the command column and a sheet shut the
+// mouse out as they do a touch; the spotlight's canvas takes no pointer, so while a spotlight plays each handler checks `live` and does nothing. A press on the risen hand is a press on the card it is drawn on, not on the resting hand under it: the
 // phone's gesture never sees it, a click taps that card, and a move past the slop hands the press to the phone's drag from a point on that card's resting place (a pointer press
 // the gesture reads as its own), so a drag plays what a drag from the hand plays. A press outside the risen hand closes it and goes to the phone's gesture as it
 // is. A touch never opens the hover. Nothing here sends an intent but the tap the press is.

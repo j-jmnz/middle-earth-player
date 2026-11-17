@@ -218,7 +218,7 @@ export function pileCountWords(name: string, count: number): string {
   return `${name}, ${count} ${count === 1 ? "card" : "cards"}`;
 }
 
-/** A line for the second slot: "Corsair deck 9 · Corsair discard pile 2". No screen prints it now (the web's list table did); the reader table words each pile on its own (pileCountWords). */
+/** A line for the second slot: "Corsair deck 9 · Corsair discard pile 2". No screen prints it (the reader table words each pile on its own, pileCountWords); the Wilderland table test reads it. */
 export function secondSlotLine(rows: readonly { name: string; count: number }[]): string {
   return rows.map((row) => `${row.name} ${row.count}`).join(" · ");
 }

@@ -34,7 +34,7 @@ No phase is open.
 
 ### Desktop
 - Frame time on the drawn table was measured only in a GPU-less sandbox (software rendering); measure idle, a card motion and a spotlight on real hardware before the first desktop release (`docs/architecture.md`, Desktop).
-- The burn's runtime shader does not compile on CanvasKit, so the web and the desktop use its fade, drop and darken fallback (accepted).
+- `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their screen with the web list table; only tests call them. Delete them with their tests in a change that is not desktop work, since removing them moves the phone bundle.
 - A booklet missing on the desktop reads "This booklet is not on this phone.": route files cannot have `.canvaskit` variants, so the wording is the phone's. Pending user decision.
 - A failed web save is retried only by the next successful save: catching it in `src/screens/data/game-store.ts` would change the phone bundle. Pending user decision.
 - Windows and macOS packaging has been proven only in CI (`docs/releasing.md`); open each packed app by hand on each OS once before the first release.
@@ -310,5 +310,5 @@ No phase is open.
 - An open game is never dropped by the app: after an update the player chooses Continue (from the saved table, checked against the engine) or Restart (user decision, 2026-11-11).
 - Desktop builds are unsigned: Windows Authenticode is an optional step behind secrets and macOS notarization is not wired (user decision, 2026-11-16; `docs/releasing.md`, Signing).
 - The desktop origin and profile folder never change after the first release (user decision, 2026-11-16; `.claude/rules/release-standards.md`, Tags and releases).
-- The desktop and web work never changes phone or iPad code: phone-only files stay byte for byte as on `main` and the Android and iOS bundles stay identical, checked by `pnpm test phone-bundle` (the bundle built from both sources with this tree's installed dependencies, so a `pnpm-lock.yaml` change touching a phone dependency is reviewed by hand) and `scripts/checks/phone-files.test.ts` (user instruction, 2026-11-16; `docs/architecture.md`, Screens).
+- The desktop and web work never changes phone or iPad code or the Android and iOS bundles (user instruction, 2026-11-16; `docs/architecture.md`, Screens).
 - Saves stay synchronous on desktop and web, as on the phone; the web waits for the database on a clock deadline, not a spin count (user instruction, 2026-11-16; `src/screens/data/web/sync-wait.ts`).
