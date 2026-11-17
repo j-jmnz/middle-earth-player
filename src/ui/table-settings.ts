@@ -54,6 +54,8 @@ export type TableSettings = {
   titleFace: TitleFaceOption;
   // Explain timing words: the table's card preview also draws a chip for each timing word the card's text opens a line with (When Revealed, Shadow, Forced, ...).
   timingTips: boolean;
+  // Check for new versions: once a day the app asks GitHub for its latest release and offers a later one (src/ui/update-offer.ts). On by default (user decision, 2026-11-17).
+  checkUpdates: boolean;
 };
 
 export const UI_SCALE_OPTIONS = ["small", "medium", "large", "xlarge"] as const;
@@ -84,7 +86,7 @@ export function strongOutlines(option: StrongOutlinesOption, increaseContrast: b
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false, checkUpdates: true };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -117,6 +119,7 @@ export function parseSettings(raw: unknown): TableSettings {
     bannerCloses: BANNER_CLOSES_OPTIONS.find((option) => option === value.bannerCloses) ?? DEFAULT_SETTINGS.bannerCloses,
     titleFace: TITLE_FACE_OPTIONS.find((option) => option === value.titleFace) ?? DEFAULT_SETTINGS.titleFace,
     timingTips: flag(value.timingTips, DEFAULT_SETTINGS.timingTips),
+    checkUpdates: flag(value.checkUpdates, DEFAULT_SETTINGS.checkUpdates),
   };
 }
 

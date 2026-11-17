@@ -61,6 +61,8 @@ import { ruleTip, scenarioRuleDoc } from "../rules/glossary";
 import { notApplied } from "../../play/cards/not-applied";
 import { BodyText, NavBar, Screen } from "../kit/chrome";
 import { useTableBack } from "./use-table-back";
+import { openReleasePage } from "../settings/links";
+import { useUpdateOffer } from "../update/ribbon";
 import { TableTopBar, TOP_BAR } from "./top-bar";
 import { useTableLayout } from "./use-table-layout";
 import { goBack } from "../nav/go-back";
@@ -168,11 +170,17 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
     [names, nameOf, ctx, session],
   );
 
+  // The version on offer heads the menu: the table shows no update ribbon (src/screens/update/ribbon.tsx).
+  const update = useUpdateOffer();
   // A menu row closes the menu and then acts (src/play/chrome/table-menu-items.ts).
   const onMenuRow = useCallback(
     (id: MenuItemId) => {
       setMenuOpen(false);
       switch (id) {
+        case "update":
+          // The game is saved on every intent, so the browser can open over it.
+          if (update) openReleasePage(update);
+          return;
         case "leave":
           goBack(router, nav.back);
           return;
@@ -205,7 +213,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
         }
       }
     },
-    [router, nav, store],
+    [router, nav, store, update],
   );
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
   // The printed facts, the preview opener, the pile taps, the Heading dial and the Island Map chip (use-table-wiring.ts).
@@ -490,7 +498,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
-      <TableMenu open={menuOpen} nav={nav} without={menuWithout} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <TableMenu open={menuOpen} nav={nav} without={menuWithout} update={update} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable, result: choice.readout?.result, refusal }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );

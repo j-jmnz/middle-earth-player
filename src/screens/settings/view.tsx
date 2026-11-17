@@ -1,13 +1,12 @@
 // The Settings screen (docs/design-system.md, Settings; user request, 2026-10-28): the app's settings on one page, grouped
 // by topic, no sub-menus. Every change applies at once and is saved by bindTableSettings; the page itself reflows when the scale
 // or the theme changes, which is the feedback. Restore defaults asks twice, in place, as Delete does (ask-in-place.tsx).
-import Constants from "expo-constants";
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useStore } from "zustand";
 
-import { BodyText, Column, IconButton, Label, Screen, ScreenScroll, ScreenTitle, TextButton } from "../kit/chrome";
+import { BodyText, Column, IconButton, Label, Screen, ScreenScroll, ScreenTitle, SettingSwitch, TextButton } from "../kit/chrome";
 import { AskInPlace } from "../kit/ask-in-place";
 import { goBack } from "../nav/go-back";
 import { cardNames } from "../data/card-names";
@@ -19,7 +18,9 @@ import { restoreDefaults, tableSettings } from "../../ui/table-settings";
 import { alwaysCodes, alwaysRows, CREDITS } from "../../play/chrome/settings-words";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSplitColumns } from "../nav/use-split-columns";
-import { openPrivacyPolicy, openSupport } from "./links";
+import { CHECK_LABEL, CHECK_LINE, OFFER_LINK_HINT, offerTitle, releasedLine, updateStore } from "../../ui/update-offer";
+import { APP_VERSION, useUpdateOffer } from "../update/ribbon";
+import { openPrivacyPolicy, openReleasePage, openSupport } from "./links";
 
 type Change = Parameters<ReturnType<typeof tableSettings.getState>["update"]>[0];
 const change = (next: Change) => tableSettings.getState().update(next);
@@ -43,13 +44,26 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
     const id = setTimeout(() => scroll.current?.scrollToEnd({ animated: false }), 50);
     return () => clearTimeout(id);
   }, [confirming]);
-  const appVersion = Constants.expoConfig?.version ?? "unknown";
+  const appVersion = APP_VERSION;
+  // The offer stays here after the ribbon is closed (src/ui/update-offer.ts): its line, the release date and Get it.
+  const offer = useUpdateOffer();
+  const released = useStore(updateStore, (state) => releasedLine(state.stored.latest?.publishedAt ?? null));
   const about = (
     <SettingGroup title="About" testID="app-settings-about">
       <View style={{ paddingVertical: 6 * s }}>
         <BodyText testID="app-settings-version">{`App version ${appVersion}`}</BodyText>
         <Label testID="app-settings-catalog">{`Card data version ${CATALOG_VERSION}`}</Label>
       </View>
+      {offer ? (
+        <View testID="app-settings-update" style={{ paddingVertical: 6 * s }}>
+          <BodyText>{offerTitle(offer)}</BodyText>
+          <Label>{released ? `${released}. Install it over this one; your saves stay.` : "Install it over this one; your saves stay."}</Label>
+          <View className="-mx-3 items-start">
+            <TextButton label="Get it" tone="accent" testID="app-settings-update-get" accessibilityLabel={`Get version ${offer}`} accessibilityHint={OFFER_LINK_HINT} onPress={() => openReleasePage(offer)} />
+          </View>
+        </View>
+      ) : null}
+      <SettingSwitch roomy label={CHECK_LABEL} detail={CHECK_LINE} value={settings.checkUpdates} onChange={(checkUpdates) => change({ checkUpdates })} testID="app-settings-check-updates" />
       <Label className="pb-2" testID="app-settings-credits">
         {CREDITS}
       </Label>

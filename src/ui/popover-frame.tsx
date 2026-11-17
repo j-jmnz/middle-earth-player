@@ -35,8 +35,8 @@ export type PopoverRowItem = {
   icon?: IconName | null;
   // A mark drawn as views when no printed icon fits: the door of Leave the table.
   glyph?: "leave";
-  // Leave the table: the word and its mark in danger.
-  tone?: "danger";
+  // Leave the table: the word and its mark in danger. The update offer: the word and its icon in the accent.
+  tone?: "danger" | "accent";
 };
 
 /** One 48 pt row of a popover: a rounded plate inside the frame's padding that fills when pressed. */
@@ -71,9 +71,9 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
             ...ring.style,
           }}
         >
-          {item.icon ? <GameIcon name={item.icon} size={18 * s} tint="bone" /> : null}
+          {item.icon ? <GameIcon name={item.icon} size={18 * s} tint={item.tone === "accent" ? "accent" : "bone"} /> : null}
           {item.glyph === "leave" ? <LeaveMark color={item.tone === "danger" ? t.danger : t.muted} s={s} /> : null}
-          <Text className="flex-1 text-body font-medium" style={{ color: item.tone === "danger" ? t.danger : t.bone, minWidth: 0 }} numberOfLines={1}>
+          <Text className="flex-1 text-body font-medium" style={{ color: item.tone === "danger" ? t.danger : item.tone === "accent" ? t.accent : t.bone, minWidth: 0 }} numberOfLines={1}>
             {item.label}
           </Text>
         </View>

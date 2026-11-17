@@ -81,7 +81,7 @@ export function answerFor(root: string, pathname: string): { file: string; statu
 //   style-src             the export's stylesheet, and the inline styles and <style> rules react-native-web writes
 //   img-src               pictures from the bundle, data: and blob: images the table draws
 //   font-src              the bundled fonts (data: for an icon font a stylesheet inlines)
-//   connect-src           fetch and workers' requests: the bundle, and the RingsDB deck import (desktop/policy.ts holds the exact paths)
+//   connect-src           fetch and workers' requests: the bundle, the RingsDB deck import, and the update check's one URL (desktop/policy.ts holds the exact paths)
 //   worker-src            expo-sqlite's database worker and pdf.js's worker (a module of the bundle), and a blob: shim expo-sqlite starts them through
 //   object-src, base-uri, form-action, frame-ancestors    closed: no plugin, no <base>, no form post, no framing
 export const HYDRATE_SCRIPT_HASH = "sha256-67fhrP0+BkBqmgGGXTtgiVO/9EQs3QruYNU/7fnRkI8=";
@@ -91,7 +91,7 @@ export const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self' https://ringsdb.com",
+  "connect-src 'self' https://ringsdb.com https://api.github.com/repos/j-jmnz/middle-earth-player/releases/latest",
   "worker-src 'self' blob:",
   "media-src 'self'",
   "object-src 'none'",
