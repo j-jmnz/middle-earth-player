@@ -5,6 +5,7 @@
 import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import { deckPacks } from "../../catalog/collection";
 import { cards, packs } from "../../catalog/schema";
 import { notAppliedCodes } from "../../play/cards/not-applied";
 
@@ -47,6 +48,7 @@ export type PoolData = {
   /** In name order (sortPool). */
   rows: readonly PoolEntry[];
   byCode: ReadonlyMap<string, PoolEntry>;
+  /** The packs that hold one of the rows (deckPacks), in cycle order. */
   packs: readonly PoolPackRow[];
   /** The codes with a printed line the app does not apply. */
   notApplied: ReadonlySet<string>;
@@ -56,10 +58,16 @@ const pools = new WeakMap<object, PoolData>();
 
 export function readPool<TRun>(catalog: Db<TRun>): PoolData {
   const rows = sortPool(selectPool(catalog));
+  const held = deckPacks(rows);
   return {
     rows,
     byCode: new Map(rows.map((row) => [row.code, row])),
-    packs: catalog.select(packColumns).from(packs).orderBy(packs.cyclePosition, packs.position).all(),
+    packs: catalog
+      .select(packColumns)
+      .from(packs)
+      .orderBy(packs.cyclePosition, packs.position)
+      .all()
+      .filter((pack) => held.has(pack.code)),
     notApplied: notAppliedCodes(rows.map((row) => [row.code, row.errata ?? row.text] as const)),
   };
 }

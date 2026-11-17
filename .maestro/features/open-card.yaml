@@ -4,18 +4,10 @@ appId: com.middleearth.player
 - tapOn:
     id: cards-tab
 - tapOn:
-    id: collection-open
-- scrollUntilVisible:
-    element:
-      id: collection-the-lord-of-the-rings
-    direction: DOWN
-    timeout: 40000
-    speed: 70
-    visibilityPercentage: 100
-- tapOn:
-    id: collection-the-lord-of-the-rings
-- tapOn:
-    id: pack-TBR
+    id: pool-search
+- inputText: "Frodo Baggins"
+- assertVisible:
+    id: card-141001
 - tapOn:
     id: card-141001
 - assertVisible: "141001"
@@ -24,18 +16,10 @@ appId: com.middleearth.player
 - tapOn:
     id: cards-tab
 - tapOn:
-    id: collection-open
-- scrollUntilVisible:
-    element:
-      id: collection-the-lord-of-the-rings
-    direction: DOWN
-    timeout: 40000
-    speed: 70
-    visibilityPercentage: 100
-- tapOn:
-    id: collection-the-lord-of-the-rings
-- tapOn:
-    id: pack-TBR
+    id: pool-search
+- inputText: "Frodo Baggins"
+- assertVisible:
+    id: card-141001
 - tapOn:
     id: card-141001
 - assertVisible: "141001"

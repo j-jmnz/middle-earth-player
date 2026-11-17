@@ -16,8 +16,3 @@ export function collectionPacks(): ReadonlySet<string> {
   claimed ??= claimedPacks(collectionSets());
   return claimed;
 }
-
-/** One switch by its id, or undefined. */
-export function collectionSet(id: string): CollectionSet | undefined {
-  return collectionSets().find((set) => set.id === id);
-}

@@ -9,6 +9,7 @@ import {
   claimedPacks,
   collectionHeadings,
   collectionSchema,
+  deckPacks,
   ownsCard,
   parseCollection,
   setOwnership,
@@ -39,7 +40,8 @@ describe("data/collection.json", () => {
     expect(new Set(sets.map((set) => set.id)).size).toBe(sets.length);
   });
 
-  // The Collection screen is also the way to browse the cards by pack, so every catalog pack is under some switch.
+  // Every catalog pack is under some switch, so a pack that gains a deck-legal card is already filed; the screens list only the
+  // packs that hold one (deckPacks).
   it("puts every catalog pack in exactly one set, and no other code", () => {
     const counts = new Map<string, number>();
     for (const code of sets.flatMap((set) => set.packs)) counts.set(code, (counts.get(code) ?? 0) + 1);
@@ -61,8 +63,8 @@ describe("data/collection.json", () => {
   });
 });
 
-const angmar: CollectionSet = { id: "a", heading: "Angmar Awakened", name: "Packs", title: "Angmar Awakened", detail: null, packs: ["TLR", "WoE"] };
-const campaign: CollectionSet = { id: "b", heading: "Angmar Awakened", name: "Campaign Expansion", title: "Angmar Awakened Campaign Expansion", detail: null, packs: ["AACE"] };
+const angmar: CollectionSet = { id: "a", heading: "Cycles", name: "Angmar Awakened", title: "Angmar Awakened", detail: null, packs: ["TLR", "WoE"] };
+const campaign: CollectionSet = { id: "b", heading: "Cycles", name: "Angmar Awakened Campaign Expansion", title: "Angmar Awakened Campaign Expansion", detail: null, packs: ["AACE"] };
 const core: CollectionSet = { id: "c", heading: "Core Set", name: "Core Set", title: "Core Set", detail: null, packs: ["Core"] };
 
 describe("collection ownership", () => {
@@ -70,9 +72,13 @@ describe("collection ownership", () => {
 
   it("files sets under their headings in order", () => {
     expect(collectionHeadings([angmar, core, campaign]).map((group) => [group.heading, group.sets.map((set) => set.id)])).toEqual([
-      ["Angmar Awakened", ["a", "b"]],
+      ["Cycles", ["a", "b"]],
       ["Core Set", ["c"]],
     ]);
+  });
+
+  it("lists the packs a deck-legal card is printed in", () => {
+    expect([...deckPacks([{ packCode: "Core", packCodes: ["Core", "TLR"] }, { packCode: "WoE", packCodes: [] }])].sort()).toEqual(["Core", "TLR", "WoE"]);
   });
 
   it("reads a set as all, some or none of its packs", () => {
