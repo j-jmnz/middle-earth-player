@@ -30,7 +30,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return next;
     }
     case "AttachSetAside":
-      return attachSetAside(state, instruction.code, lastPicked(state), instruction.removeWhenLeaving === true, ctx);
+      return attachSetAside(state, instruction.code, lastPicked(state), instruction.removeWhenLeaving === true, instruction.claimed === true, ctx);
     case "SetAsideHeroWithAttachments":
       return setAsideHeroWithAttachments(state, instruction);
     case "ReturnSetAsideHero":
@@ -105,12 +105,12 @@ export function tokensOn(state: ScenarioState, code: string): number {
 }
 
 // The last picked hero takes a set-aside copy of the card: it comes into its controller's play area attached to the hero (an objective card is claimed by it).
-function attachSetAside(state: ScenarioState, code: string, hostId: string, temporary: boolean, ctx: ReduceContext): ScenarioState {
+function attachSetAside(state: ScenarioState, code: string, hostId: string, temporary: boolean, claim: boolean, ctx: ReduceContext): ScenarioState {
   const host = state.cards[hostId];
   const copy = state.setAside.find((id) => state.cards[id]?.code === code);
   if (!host || host.controller == null || host.zone !== "heroes" || !copy) return state;
   // An objective card (Book of Mazarbul, 03067:A:1) is attached the way a claim attaches it: claimed, so it returns to the staging area when it is detached (dwd.book-of-mazarbul).
-  if (printedOf(ctx.cards, state.cards[copy]?.code ?? "").type === "objective") {
+  if (claim && printedOf(ctx.cards, state.cards[copy]?.code ?? "").type === "objective") {
     const claimed = updateCard(attachTo(moveCard(state, copy, { zone: "attached" }), copy, hostId), copy, { face: "up", controller: host.controller, claimed: true });
     return queueEvent(claimed, { trigger: "claimed", seat: host.controller, cardId: copy });
   }

@@ -138,7 +138,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "03067",
       lines: ["03067:A:1"],
       timing: "setup",
-      instructions: [{ verb: "SetAside", code: BOOK }, { verb: "Pick", pick: { type: "hero", control: "any", who: "firstPlayer" } }, { verb: "AttachSetAside", code: BOOK }, { verb: "ShuffleEncounterDeck" }],
+      instructions: [{ verb: "SetAside", code: BOOK }, { verb: "Pick", pick: { type: "hero", control: "any", who: "firstPlayer" } }, { verb: "AttachSetAside", code: BOOK, claimed: true }, { verb: "ShuffleEncounterDeck" }],
     },
     copyLine("03064:B:1", "03067:B:1"),
 

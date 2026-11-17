@@ -176,7 +176,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     read: ["code"],
   }),
   EngageLastPlayer: () => ({ text: "the source enemy engages the last player", read: [] }),
-  AttachSetAside: (i) => ({ text: `the set-aside copy of the card with code ${str(i.code)} is attached to the last picked hero${i.removeWhenLeaving === true ? "; if it would leave play it is removed from the game" : ""}`, read: ["code", "removeWhenLeaving"] }),
+  AttachSetAside: (i) => ({ text: `the set-aside copy of the card with code ${str(i.code)} is attached to the last picked hero${i.removeWhenLeaving === true ? "; if it would leave play it is removed from the game" : ""}${i.claimed === true ? "; an objective card is claimed by it (it returns to the staging area when it is detached)" : ""}`, read: ["code", "removeWhenLeaving", "claimed"] }),
   RemoveSetAside: (i) => ({ text: `every set-aside copy of the card with code ${str(i.code)} is removed from the game`, read: ["code"] }),
   DiscardHand: () => ({ text: "the acting player discards all the cards in their hand", read: [] }),
   FreeRingBearer: () => ({ text: "(rule marker) the first player gains control of the Ring-bearer a card guards as soon as that card is out of play: it returns among their heroes where it was, as it was held", read: [] }),

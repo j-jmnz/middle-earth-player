@@ -129,7 +129,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
     (steps run in order; a step depends on an earlier one only through its own condition)
     - a copy of the card with code 03024 is set aside, out of play
     - choose hero (any player controls) chosen by the first player
-    - the set-aside copy of the card with code 03024 is attached to the last picked hero
+    - the set-aside copy of the card with code 03024 is attached to the last picked hero; an objective card is claimed by it (it returns to the staging area when it is detached)
     - shuffle the encounter deck
 
 03067:B:1 (back): When Revealed: Reveal 1 encounter card per player, and add it to the staging area.
