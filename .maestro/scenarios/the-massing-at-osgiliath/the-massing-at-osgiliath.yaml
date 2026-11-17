@@ -2,12 +2,14 @@ appId: com.middleearth.player
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `osgiliath-won` (scripts/e2e/the-massing-at-osgiliath.ts): a real two-handed
-# standalone game of The Massing at Osgiliath, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `osgiliath-won` (scripts/e2e/the-massing-at-osgiliath.ts): a real two-handed
+# standalone game of The Massing at Osgiliath (the One Deck and Defenders of Gondor lists, Easy), parked on its win: Race to Minas Tirith defeated on stage 4, the rail reads Victory.
+# The fixture is OPEN: no seed up to 1200 gives the auto-player (card play on, every choice its first option) a win with the real decklists: their heroes are destroyed by the Scouts' attacks by round 2 to 4 (docs/phases/STATUS.md).
+# The flow runs once scripts/e2e/fixtures.ts finds one (OSGILIATH_SEEDS).
+# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml): the victory on the table, the outcome with its score, and the Scenarios tab, where the scenario's tile reads as won.
+# A cycle has no campaign: no Resolution, no XP and no next part, so the flow checks nothing more.
 - runFlow:
     file: ../../subflows/standalone-win.yaml
     env:
       FIXTURE: osgiliath-won
       SCENARIO_ID: the-massing-at-osgiliath
-# TODO: this scenario's own assertions on the outcome screen after the win (the score).
