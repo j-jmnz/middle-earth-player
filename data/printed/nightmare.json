@@ -5123,12 +5123,17 @@
     "sha256": "a8519a6a8543120bdc625faed3092990f76016712fc4d86586a9bf1ba541c8e6"
    },
    "lines": [
-    "Forced: When Unspeakable Thing enages a player or attacks a player, attach the top card of that player's deck to it.",
+    "Forced: When Unspeakable Thing engages a player or attacks a player, attach the top card of that player's deck to it.",
     "X is the printed cost of all attached cards on this card. If there are no cards attached, X is 5."
    ],
    "inert": [],
-   "misprints": [],
-   "readBy": "",
+   "misprints": [
+    {
+     "line": 1,
+     "printed": "Forced: When Unspeakable Thing enages a player or attacks a player, attach the top card of that player's deck to it."
+    }
+   ],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5145,7 +5150,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5157,12 +5162,12 @@
     "sha256": "e1c11798b5271bed6ac29302724e21d2ff07c14b06281db6f1b77e1828a4ebef"
    },
    "lines": [
-    "While Nest of Horrors is in the staging area, it gains: 'Forced: When one or more cards are attached to a Nameless enemy from the top of a player's deck, attach an additional card from the top of that player's deck.'",
+    "While Nest of Horrors is in the staging area, it gains: \"Forced: When one or more cards are attached to a Nameless enemy from the top of a player's deck, attach an additional card from the top of that player's deck.\"",
     "Travel: Each player at this stage discards the top card of the encounter deck to travel here. Reveal each Nameless enemy discarded by this effect."
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5179,7 +5184,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5191,11 +5196,12 @@
     "sha256": "ecd6a0a3d86fc0f2589413862c0637dac5981927443569d3714b9257859eb0ae"
    },
    "lines": [
-    "When Revealed: Each player must either discard his hand, or raise his threat by the number of cards in his hand. If no cards were discarded by this effect, Chill of the Roots gains surge."
+    "When Revealed: Each player must either discard his hand, or raise his threat by the number of cards in his hand. If no cards were discarded by this effect, Chill of the Roots gains surge.",
+    "Shadow: If attacking enemy is Nameless, attach the top card of the defending player's deck to it."
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5208,13 +5214,13 @@
    },
    "lines": [
     "You are playing Nightmare mode.",
-    "Setup: Shuffle the 10 encounter cards with the Attack trait into a separate 'Balrog deck.'",
+    "Setup: Shuffle the 10 encounter cards with the Attack trait into a separate \"Balrog deck.\"",
     "When Durin's Bane would be dealt a shadow card, deal it from the Balrog deck instead of the encounter deck. Shadow cards dealt from the Balrog deck are discarded into a separate Balrog discard pile.",
     "At the beginning of each combat phase (or if the Balrog deck runs out of cards), shuffle the Balrog discard pile back into the Balrog deck."
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5226,7 +5232,7 @@
     "sha256": "7a369ad5e0979751b086ff90108c213ad21243407a139982f3727d0ef1690e43"
    },
    "lines": [
-    "Begin with the standard quest deck and encounter deck for Foundations of Stone scenario.",
+    "Begin with the standard quest deck and encounter deck for the Shadow and Flame scenario.",
     "Remove the following cards, in the specified quantities, from the standard encounter deck:",
     "3x Goblin Scout",
     "2x Goblin Tunnels",
@@ -5237,11 +5243,11 @@
     "1x Many Thonged Whip",
     "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Shadow and Flame encounter deck.",
     "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.",
-    "Play Tip: This scenario contains 10 treachery cards with the Attack trait that have only a 'shadow' effect, and no 'when revealed' effect. These cards are never revealed from the encounter deck and are only ever dealt as shadow cards to Durin's Bane."
+    "Play Tip: This scenario contains 10 treachery cards with the Attack trait that have only a \"shadow\" effect, and no \"when revealed\" effect. These cards are never revealed from the encounter deck and are only ever dealt as shadow cards to Durin's Bane."
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5253,11 +5259,11 @@
     "sha256": "7f4fc0041a8d8d062cfe0429ecdb2cb909eafcceb797967ecd04c85607548ffb"
    },
    "lines": [
-    "Shadow: For each excess point of combat damage dealt by this attack (damage that is dealt beyond the remaining hit points of the character damaged by this attack) you must damage another character you control. Exhaust all characters damaged by this effect."
+    "Shadow: For each excess point of combat damage dealt by this attack (damage that is dealt beyond the remaining hit points of the character damaged by this attack) you must damage another character you control. Exhaust all characters damaged from this effect."
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5273,7 +5279,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5289,7 +5295,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5305,7 +5311,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5321,7 +5327,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5338,7 +5344,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5355,7 +5361,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5372,7 +5378,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   },
   {
@@ -5389,7 +5395,7 @@
    ],
    "inert": [],
    "misprints": [],
-   "readBy": "",
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
   }
  ]
