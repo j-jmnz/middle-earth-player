@@ -80,7 +80,7 @@ Contrast (`contrast.test.ts` checks every pair in both themes, and the words of 
 
 Colour vision (`colour-vision.test.ts`): the sphere tints against one another and against threat, danger against ok and the glows against the ground must differ by CIEDE2000 10 or more under protanopia, deuteranopia and tritanopia simulation in both themes, or the pair is listed with the non-colour cue that carries it (a sphere icon beside its word, a sentence, a check ring); an entry nothing needs fails (WCAG 1.4.1).
 
-The table's copy of the tokens (`tokens.ts`) carries keys that are not colours of the palette: `lit` (the lit edge), `depth` ("dark" or "light": how surfaces.ts builds depth), `shade` (the shadow colour: black on Dark, a warm brown on Light) and `primaryTop`/`primaryMid` (the primary's lit top and middle).
+The table's copy of the tokens (`tokens.ts`) carries keys that are not colours of the palette: `lit` (the lit edge), `depth` ("dark" or "light": how surfaces.ts builds depth), `shade` (the shadow colour: black on Dark, a warm brown on Light) `primaryTop`/`primaryMid` (the primary's lit top and middle), and the dock's gold for an answer that reaches past one window: `phase` (its word and armed line on the ground), `phaseTop`/`phaseMid`/`phaseDeep` (the gold primary's fill) and `onPhase` (its word); see Two taps in `docs/design-system-table.md`.
 
 ## Surfaces
 
