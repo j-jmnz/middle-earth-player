@@ -86,14 +86,14 @@ export function restartStandaloneGame<TCatalog, TUser>(catalog: Db<TCatalog>, us
   return restartChoice(game, game ? worldOf(catalog, game) : null, deal, (held) => writeStandaloneReplaced(user, held));
 }
 
-export type StandaloneTable = { store: TableStore; clock: PlayClock };
+export type StandaloneTable = { store: TableStore; game: () => StandaloneGame; clock: PlayClock };
 
 /**
- * The table store for an opened game (game-store.ts). Each intent the reducer accepts is appended and written at once; Undo takes it off. `clock`
+ * The table store for an opened game (game-store.ts). Each intent the reducer accepts is appended and written at once; Undo takes it off. `game` is the game as last written. `clock`
  * counts the foreground time as the session store's does (table-open.ts): folded into each write, and written once on a pause.
  */
 export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): StandaloneTable {
-  const { store, clock } = gameStore<StandaloneGame, Opened>({
+  const { store, saved, clock } = gameStore<StandaloneGame, Opened>({
     session,
     initial: session.stored,
     cache: sessionCacheOf<Opened>(user, "standalone"),
@@ -101,5 +101,5 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): Standalo
     reopened: (stored, now) => ({ ...session, stamp: null, stored, ...now }),
     writers: { active: (game) => writeStandaloneActive(user, game), undone: (game) => writeStandaloneUndone(user, game), checkpoint: (id, checkpoint) => writeStandaloneCheckpoint(user, id, checkpoint) },
   });
-  return { store, clock };
+  return { store, game: saved, clock };
 }

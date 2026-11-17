@@ -67,5 +67,5 @@ export default function TableScreen() {
     outcome: { pathname: "/resolution/[saveId]", params: { saveId } },
     booklet: bookletParams(session.save.campaignId, session.save.loadout?.scenarioId),
   };
-  return <TableView session={session} store={table.store} clock={table.clock} nav={nav} />;
+  return <TableView session={session} store={table.store} clock={table.clock} nav={nav} intents={() => table.save().active?.intents ?? null} />;
 }

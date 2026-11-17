@@ -1,21 +1,35 @@
 // The table menu with the update offer (docs/design-system-table.md, Table menu): the table shows no update ribbon, so the version on offer heads the
 // menu's rows (src/play/chrome/table-menu-items.ts), and its row opens the release page here, where src/screens may open a link. Every other row goes to
-// the table's own handler, which never sees "update".
+// the table's own handler, which never sees "update". Copy game state is handled here too (copy-state.ts), and its row is left out while Debug tools is off
+// (docs/design-system.md, Settings).
 import type { ComponentProps } from "react";
+import { useStore } from "zustand";
 
 import { TableMenu } from "../../play/chrome/table-menu";
 import type { MenuItemId } from "../../play/chrome/table-menu-items";
+import { tableSettings } from "../../ui/table-settings";
 import { openReleasePage } from "../settings/links";
 import { useUpdateOffer } from "../update/offer";
+import { copyGameState, type GameStateSource } from "./copy-state";
 
-/** A menu row the table handles itself: every row but the update offer. */
-export type TableMenuRow = Exclude<MenuItemId, "update">;
+/** A menu row the table handles itself: every row but the update offer and Copy game state. */
+export type TableMenuRow = Exclude<MenuItemId, "update" | "debug">;
 
-type Props = Omit<ComponentProps<typeof TableMenu>, "update" | "onSelect"> & { onSelect: (id: TableMenuRow) => void };
+type Props = Omit<ComponentProps<typeof TableMenu>, "update" | "onSelect"> & { onSelect: (id: TableMenuRow) => void; state: GameStateSource };
 
-export function UpdateTableMenu({ onSelect, ...props }: Props) {
+const NO_DEBUG: readonly MenuItemId[] = ["debug"];
+
+export function UpdateTableMenu({ onSelect, state, without, ...props }: Props) {
   const update = useUpdateOffer();
+  const debugTools = useStore(tableSettings, (settings) => settings.settings.debugTools);
+  const hidden = debugTools ? without : [...(without ?? []), ...NO_DEBUG];
   const select = (id: MenuItemId) => {
+    if (id === "debug") {
+      // The game is read when the row is tapped, never during a render.
+      props.onClose();
+      void copyGameState(state);
+      return;
+    }
     if (id !== "update") {
       onSelect(id);
       return;
@@ -24,5 +38,5 @@ export function UpdateTableMenu({ onSelect, ...props }: Props) {
     props.onClose();
     if (update) openReleasePage(update);
   };
-  return <TableMenu {...props} update={update} onSelect={select} />;
+  return <TableMenu {...props} without={hidden} update={update} onSelect={select} />;
 }
