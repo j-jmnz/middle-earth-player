@@ -5371,9 +5371,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "812fc73806160d4cf4a0d6db94739014a30a441f2d1d28b7fb18165417166ac5"
+        "value": "f192bc26d4c58bd9b305fbdada62a3685bb27728bb2d80ab34619662c7990269"
       },
-      "fetchedAt": "2026-11-16T13:16:13.246Z",
+      "fetchedAt": "2026-11-17T14:00:43.583Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -5386,6 +5386,144 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf",
           "sha256": "99aa149fa83b37a532ecf68b176e5ee5cfc19e35ea2aa7305e35af72c4b9642b",
           "bytes": 25263489
+        },
+        {
+          "path": "pictures/00001.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Vv0EDcqsBVe3ki0QUhbKlicTEeTNZM_T&export=download&confirm=t",
+          "sha256": "3986342cfce412049ecbbe81e5d31e238db6c77143010cc0a6e391dc8a2815e2",
+          "bytes": 4668528
+        },
+        {
+          "path": "pictures/00002.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WFgLM8LsU6xz1ESYPbvPlp-M_kNcHaG_&export=download&confirm=t",
+          "sha256": "41deed8c904b4f6d2debabf9f9fef0d0bf174cf1d992ecfea289ebefbf2c80f1",
+          "bytes": 4733573
+        },
+        {
+          "path": "pictures/00003.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WA9hv9ai9jvNTrkzNOwVXrsB-hyh4MfL&export=download&confirm=t",
+          "sha256": "cf932223073c5147e84a481f2f022f67336d34af62bc49dd6b8f4ccf69e0e9ae",
+          "bytes": 4745495
+        },
+        {
+          "path": "pictures/00004.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1W5iyzGrHQQ4zJhKtiRt97q7cAoya-R4n&export=download&confirm=t",
+          "sha256": "307d25a732ebe7cc6703c10286d83d309b6b5d978e392b201ae429119d58f41e",
+          "bytes": 4846044
+        },
+        {
+          "path": "pictures/00005.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WRrNmRYbPFJkyV262ZhDElOhElIMwlbI&export=download&confirm=t",
+          "sha256": "f7b30388e7c90c75ab41a1ff3537ffe189dd434195bc05469076993fbab71699",
+          "bytes": 4714796
+        },
+        {
+          "path": "pictures/00006.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WNs5ZAGkLf5b6IXHVs1GlY-SdmCLWqA4&export=download&confirm=t",
+          "sha256": "093423fb6cb04938f868b883a6f78f77012cb4264b0fcbdc5bfc94cd145af524",
+          "bytes": 4650075
+        },
+        {
+          "path": "pictures/00007.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WK8TCYSjctcF5LwVjo4QPDQvdhEjySge&export=download&confirm=t",
+          "sha256": "66f9ade186407000dc00e4c65c3788292d50a031506bb7ce0c786eac505bf0d9",
+          "bytes": 4868382
+        },
+        {
+          "path": "pictures/00008.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Wfoqf6MGW6mgN0s1Rx9VLy9U9z9IkQPl&export=download&confirm=t",
+          "sha256": "e428a8f569cd732e548d642020ea58433c8e19c09b3ac64018a5909703a8b64a",
+          "bytes": 4845411
+        },
+        {
+          "path": "pictures/00009.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1We9hyZHvy4PY19m6nH-8Kpn5irDf5_KC&export=download&confirm=t",
+          "sha256": "3091fb344719ee2f5231e0b872455c6f6645495b296f30b0833abb318b2ead40",
+          "bytes": 4850960
+        },
+        {
+          "path": "pictures/00010.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WVXzztzZrDiLDrZpvH_edalb3NcLPp9F&export=download&confirm=t",
+          "sha256": "5b2133d8bdff28c98b613cfcad17346c4dfd44917b45a2b03f107f4916a580f3",
+          "bytes": 4937419
+        },
+        {
+          "path": "pictures/00011.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WxNix5MHO_i0KSMkqsj9pVFmiAUPPRD3&export=download&confirm=t",
+          "sha256": "78019607fa9b0ef0a22898b92b6ae40e23274a974d840847de40e9048d845aa2",
+          "bytes": 4897616
+        },
+        {
+          "path": "pictures/00012.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WubZJHq5KeZQ-z_pspIY8sX-OgqCO6jJ&export=download&confirm=t",
+          "sha256": "ed945ee965786cbf2f4606c0e1f065bb3932da02a5dc26a7ee1708518d7ce752",
+          "bytes": 4957732
+        },
+        {
+          "path": "pictures/00013.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WhYwJG-7dVjZJURU7JQ1jfg7fKr9vJ9M&export=download&confirm=t",
+          "sha256": "ee2c42552ecaf84e46964f4b611495141aa8da600516987dcc196552699fca6e",
+          "bytes": 4680542
+        },
+        {
+          "path": "pictures/00014.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1X7RbLPBsl40pJFKT9lFBe_cx0x7Zc_L8&export=download&confirm=t",
+          "sha256": "2490d9964f0f3c5870aea4add19806e1289ca0831df51a592020d46f41d556a9",
+          "bytes": 4793540
+        },
+        {
+          "path": "pictures/00015.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1X62ovPO37JCCl4DjQlTURquEyzISUlQd&export=download&confirm=t",
+          "sha256": "dacc79d3e99f00a6c1d9083ffebfe90d63a1942c23e1361716c789147e2363c5",
+          "bytes": 4632482
+        },
+        {
+          "path": "pictures/00016.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Wyhf_lrqMcmdV9lAkfT5XjpU_VO7lTEX&export=download&confirm=t",
+          "sha256": "4e89b24511a486a06553d7b1ae7acfabb57607ba62ba7d938a725e1af13bc7b2",
+          "bytes": 3782420
+        },
+        {
+          "path": "pictures/00016.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Wxm1455NTaaZPdPeeyi5XH2KXEvzGgYf&export=download&confirm=t",
+          "sha256": "7a2905824e09c356c7fd1da5186fc8925f3387ca083fc1a15eeaeb98078fa21c",
+          "bytes": 3592606
+        },
+        {
+          "path": "pictures/00017.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1XQH7SCQZX5jMuQBOnnezxHmaE_xSKSmV&export=download&confirm=t",
+          "sha256": "2a475088616cb13de060fc322b69e6313e8b7ee592cad0dd3fb6378e04174be4",
+          "bytes": 3497835
+        },
+        {
+          "path": "pictures/00017.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1XKhv8CXx0enALuBw998OAdY1p8ENJPg1&export=download&confirm=t",
+          "sha256": "c250e3cd8a5fe507bf7a3ea4ef47057b1ae564d23f2c0bc31d673ed60c0f8cc3",
+          "bytes": 3614910
+        },
+        {
+          "path": "pictures/00018.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1XIClAK-ghtwx0Ar5Hd9Om8HJzUgWSzXi&export=download&confirm=t",
+          "sha256": "d0320161650cbfb24ef201e654319ecd8adba6ab0491ac0d0924ce3cdd961f52",
+          "bytes": 3560023
+        },
+        {
+          "path": "pictures/00018.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1XALCNwiqA5zAbngV2yfFmU_OONFey5_H&export=download&confirm=t",
+          "sha256": "850e60efcb823d4fbea0a69de587c111c935d49192ae4722d10b06d18d5d3641",
+          "bytes": 3509070
+        },
+        {
+          "path": "pictures/00019.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1XhVGzNIbOpMNK62jlDNI_hsSAq9P_a6u&export=download&confirm=t",
+          "sha256": "3e990afe26b93aff45e48b844a9b454bfc6009b939dd5bad88fc275b920f321f",
+          "bytes": 3331659
+        },
+        {
+          "path": "pictures/00019.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1XWxAQMC7dB6qdQTVc1Qtp7yXKU3wexoG&export=download&confirm=t",
+          "sha256": "3e61740acb4110094973afe7c51df3e35e5a19a507d0a10ba545bee517340471",
+          "bytes": 3362290
         },
         {
           "path": "pictures/01001.A.jpg",

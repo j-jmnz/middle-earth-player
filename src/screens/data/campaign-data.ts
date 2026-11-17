@@ -1,4 +1,5 @@
 import shadowsOfMirkwood from "../../../data/campaigns/shadows-of-mirkwood.json";
+import standaloneScenarios from "../../../data/campaigns/standalone-scenarios.json";
 import dreamChaser from "../../../data/campaigns/dream-chaser.json";
 import fellowship from "../../../data/campaigns/fellowship-of-the-ring.json";
 import darkOfMirkwood from "../../../data/campaigns/the-dark-of-mirkwood.json";
@@ -13,6 +14,7 @@ import rhosgobel from "../../../data/scenarios/a-journey-to-rhosgobel.json";
 import emynMuil from "../../../data/scenarios/the-hills-of-emyn-muil.json";
 import deadMarshes from "../../../data/scenarios/the-dead-marshes.json";
 import returnToMirkwood from "../../../data/scenarios/return-to-mirkwood.json";
+import massing from "../../../data/scenarios/the-massing-at-osgiliath.json";
 import anduin from "../../../data/scenarios/journey-along-the-anduin.json";
 import knife from "../../../data/scenarios/a-knife-in-the-dark.json";
 import past from "../../../data/scenarios/a-shadow-of-the-past.json";
@@ -70,8 +72,8 @@ import { campaignDataSchema, parseAnyScenarioData, type AnyScenarioData, type Ca
 // source for them. Metro needs static JSON imports, so the map is written by hand; campaign-data.test.ts checks it against
 // data/campaigns/index.json and data/scenarios. Each file is parsed (zod) the first time it is asked for, not when the module
 // loads, and kept: the app opens without parsing every scenario, and a screen pays only for the ones it shows.
-const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([shadowsOfMirkwood, fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
-const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm, hunt, carrock, rhosgobel, emynMuil, deadMarshes, returnToMirkwood].map((raw) => [raw.id, raw]));
+const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([shadowsOfMirkwood, standaloneScenarios, fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
+const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm, hunt, carrock, rhosgobel, emynMuil, deadMarshes, returnToMirkwood, massing].map((raw) => [raw.id, raw]));
 
 const campaigns = new Map<string, CampaignData>();
 const scenarios = new Map<string, AnyScenarioData>();
@@ -92,6 +94,8 @@ export const BOXES: readonly Box[] = [
   // In the campaigns table's order (`position`): by release, the Lord of the Rings saga boxes together at the Fellowship's.
   // Shadows of Mirkwood is a cycle, not a campaign: its six Adventure Packs have no Campaign Mode and are played standalone only (docs/brief.md, Shadows of Mirkwood).
   { id: "shadows-of-mirkwood", name: "Shadows of Mirkwood", campaignId: "shadows-of-mirkwood", scenarios: ["the-hunt-for-gollum", "conflict-at-the-carrock", "a-journey-to-rhosgobel", "the-hills-of-emyn-muil", "the-dead-marshes", "return-to-mirkwood"] },
+  // The Standalone scenarios cycle likewise, one box per scenario as each is built (docs/brief.md, Standalone scenarios).
+  { id: "the-massing-at-osgiliath", name: "The Massing at Osgiliath", campaignId: "standalone-scenarios", scenarios: ["the-massing-at-osgiliath"] },
   { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
   // The Lost Realm and the six Adventure Packs are one box with the Campaign Expansion on the Scenarios tab, as the other campaign expansions' are.

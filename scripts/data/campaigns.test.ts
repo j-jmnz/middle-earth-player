@@ -21,14 +21,15 @@ describe("data/campaigns/index.json", () => {
     // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The Return of the King is built (scripts/data/return-of-the-king.test.ts) and playable from its first scenario, its box named by no override. Angmar Awakened is built (scripts/data/angmar-awakened.test.ts) and playable from its first scenario. The other locked entries have no scenario files: the
     // campaigns played in Campaign Mode, under their RCO boxes, then the cycles: scenarios that are part of no campaign (data/overrides.json, campaigns).
     const locked = index.filter((entry) => !entry.playable).map((entry) => [entry.name, entry.kind, entry.scenarioCount]);
+    // The Standalone scenarios cycle is built one scenario at a time (The Massing at Osgiliath so far, not playable yet): its count is the scenarios built.
     expect(locked).toEqual([
+      ["Standalone scenarios", "cycle", 1],
       ["Dwarrowdelf", "cycle", 9],
       ["The Hobbit", "cycle", 6],
       ["Against the Shadow", "cycle", 9],
       ["The Ring-maker", "cycle", 9],
       ["Haradrim", "cycle", 9],
       ["Vengeance of Mordor", "cycle", 9],
-      ["Standalone scenarios", "cycle", 14],
     ]);
     // The Shadows of Mirkwood cycle is playable from its first scenario (The Hunt for Gollum); the other cycles are locked.
     expect(index.filter((entry) => entry.playable && entry.kind !== "campaign").map((entry) => entry.id)).toEqual(["shadows-of-mirkwood"]);
@@ -72,11 +73,13 @@ describe("data/campaigns/index.json", () => {
       "The Scouring of the Shire", "The Nine are Abroad", "The Siege of Erebor", "The Shire's Reckoning", "The Hobbit", "Strange News in Bree", "Fangs in the Dark",
       "First Age", "Trial Upon the Marches", "Among the Outlaws", "The Betrayal of Mîm", "The Fall of Nargothrond", "Skirmish in the Shire", "Down the Baranduin", "Dwarf Lord Battle",
     ];
-    const unaccounted = [...products].filter((product) => !listed.has(product) && !reprinted.includes(product) && !fanMade.includes(product));
+    // The Standalone scenarios cycle is built one scenario at a time: the products of the ones not built yet (README.md, Roadmap). Each moves to scripts/data/campaign-defs.ts as it is built.
+    const standaloneToBuild = ["2012", "2013", "2014", "2015", "2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"];
+    const unaccounted = [...products].filter((product) => !listed.has(product) && !reprinted.includes(product) && !fanMade.includes(product) && !standaloneToBuild.includes(product));
     expect(unaccounted).toEqual([]);
     // Each name above is a product Hall of Beorn lists, so a rename upstream fails here rather than hiding a product.
-    expect([...reprinted, ...fanMade].filter((product) => !products.has(product))).toEqual([]);
-    expect([...reprinted, ...fanMade].filter((product) => listed.has(product))).toEqual([]);
+    expect([...reprinted, ...fanMade, ...standaloneToBuild].filter((product) => !products.has(product))).toEqual([]);
+    expect([...reprinted, ...fanMade, ...standaloneToBuild].filter((product) => listed.has(product))).toEqual([]);
   });
 
   it("lists The Two Towers, built from six scenario files, as a playable campaign of six scenarios after Ered Mithrin", () => {
