@@ -56,6 +56,7 @@ import * as muil from "../scenarios/the-hills-of-emyn-muil/game.ts";
 import * as deadmarshes from "../scenarios/the-dead-marshes/game.ts";
 import * as returnmirkwood from "../scenarios/return-to-mirkwood/game.ts";
 import * as osgiliath from "../scenarios/the-massing-at-osgiliath/game.ts";
+// import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -138,4 +139,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-dead-marshes", "The Dead Marshes", deadmarshes.DEADMARSHES_GOLDENS, deadmarshes.deadmarshesWorld, deadmarshes.playGolden),
   entry("return-to-mirkwood", "Return to Mirkwood", returnmirkwood.RETURNMIRKWOOD_GOLDENS, returnmirkwood.returnmirkwoodWorld, returnmirkwood.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
+  // entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
 ];
