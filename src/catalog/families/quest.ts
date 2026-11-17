@@ -87,6 +87,8 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // The quest resolves: the committed Willpower is about to be counted against the staging area's threat, once the window after the staging step has closed (rr.step-3-4). Fanuidhol's payment is asked here (04016:A:1).
+  "questTotalCounted",
   // About each character committed to the quest when it resolved: the quest succeeded ("After ~ quests successfully"), or it
   // resolved at all ("After resolving a quest to which ~ was committed").
   "questedSuccessfully",
@@ -148,12 +150,14 @@ const FLAGS = [
   // On "table": the staging step of the quest phase is skipped (01128:B:2, "for the remainder of the game" while the stage is current).
   "skipStaging",
   // On a hero, from the active location's constant: its Willpower counts toward the quest only while it holds `countsWillpower` ("heroes must spend 1 resource from their resource pool to count their Willpower during the quest phase", 04016:A:1; willpowerIgnored in
-  // families/quest/conditions.ts). The location's Forced effect at the end of the staging step asks the controller of each committed hero with a resource whether to spend 1 from its pool, and a hero that paid holds `countsWillpower` until the end of the phase.
+  // families/quest/conditions.ts). The location's Forced effect when the quest total is counted asks the controller of each committed hero with a resource whether to spend 1 from its pool, and a hero that paid holds `countsWillpower` until the end of the phase.
   "willpowerCostsResource",
   // On a treachery in the staging area, set by its own When Revealed until it leaves play ("Add Blinding Blizzard to the staging area. Progress that would be placed on the current quest or on Snow locations are instead placed on Blinding Blizzard. When the 5th progress is placed on Blinding Blizzard,
   // discard it", 901307:A:2): the card stays in the staging area after its reveal (windows/frames.ts), takes the progress that would go on the current quest stage or on a location with the Snow trait, in play or in the staging area, from questing or an effect, up to 5, and is discarded
   // with the 5th; what it cannot take is placed as it would have gone without it (families/quest/blizzard.ts, read where progress is placed: rules/quest/quest.ts putOnStage, interpret/effect-verbs.ts placeProgress, south/locations.ts placeOnActive, attachments/quest.ts).
   "progressRedirect",
+  // Held by the table until the end of the phase: `questTotalCounted` was announced this phase (rules/quest/stage-reveal.ts).
+  "questTotalAnnounced",
 ] as const;
 
 export const manifest = { name: "quest", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

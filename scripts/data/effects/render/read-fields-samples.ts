@@ -63,6 +63,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   SetX: [{ verb: "SetX", value: 2 }],
   DiscardTopOfDeck: [{ verb: "DiscardTopOfDeck" }],
   DiscardResources: [{ verb: "DiscardResources", amount: 2, target: "self" }, { verb: "DiscardResources", all: true, target: "self" }],
+  SpendResources: [{ verb: "SpendResources", amount: 1, target: "picked" }],
   PlaceFacedownUnder: [{ verb: "PlaceFacedownUnder", code: "144027", target: "self", afterAttack: true }],
   AttachToDial: [{ verb: "AttachToDial", code: "145016" }],
   DetachFromDial: [{ verb: "DetachFromDial", code: "145016" }],
@@ -190,6 +191,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   AttachSelf: [
     { verb: "AttachSelf", to: { kind: "hero", trait: "Warrior" } },
     { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } },
+    { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer", unlimited: true } },
     { verb: "AttachSelf", to: { kind: "character", trait: "Eagle", unlimited: true } },
     { verb: "AttachSelf", to: { kind: "character", name: "Wilyador" } },
   ],

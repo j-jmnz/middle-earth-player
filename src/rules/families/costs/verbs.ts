@@ -89,6 +89,12 @@ export function spendablePools(state: ScenarioState, actor: number, spec: { sphe
 
 // SpendResources: a hero for each resource, chosen by the actor unless every resource left must pay.
 export function spendResources(state: ScenarioState, instruction: Extract<Instruction, { verb: "SpendResources" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
+  if (instruction.target) {
+    // From one card's own pool: nobody chooses, and a pool that cannot pay spends nothing.
+    const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
+    if ((state.cards[id]?.resources ?? 0) < instruction.amount) return state;
+    return noteSpent(updateCard(state, id, { resources: (state.cards[id]?.resources ?? 0) - instruction.amount }), [{ heroId: id, amount: instruction.amount }], ctx);
+  }
   let paid = [...(instruction.paid ?? []), ...(focus.chosen ? [focus.chosen] : [])];
   const left = (id: string): number => (state.cards[id]?.resources ?? 0) - paid.filter((entry) => entry === id).length;
   const { pools } = spendablePools(state, focus.seat, instruction, ctx);

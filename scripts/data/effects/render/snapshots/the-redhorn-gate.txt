@@ -103,7 +103,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
   04012:forced:1: Forced on the event questCardDefeated (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the active location is a location (any player controls) named "Caradhras"): discard the active location
-    - then, if not (there is a location (any player controls) in the staging area only, named "Caradhras" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
+    - then, if the encounter deck or its discard pile holds a card with code 04015 (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
     - the acting player finds one card with code 04015 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
     - then, if there is a location (any player controls) in the staging area only, named "Caradhras" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "Caradhras"
     - then, if there is a location (any player controls) in the staging area only, named "Caradhras" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
@@ -164,13 +164,13 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
   04016:constant:1: Constant
     only if this card is the active location
     - each hero (any player controls): stat willpowerCostsResource (its Willpower counts toward the quest only once it holds countsWillpower, which paying 1 resource from its pool gives until the end of the phase) 1, while this card is in play
-  04016:forced:1: Forced on the event stagingStepEnds
+  04016:forced:1: Forced on the event questTotalCounted
     only if this card is the active location
     - for each player, first player first:
       - for each hero (you control) committed to the quest, with resources on it:
         - the acting player chooses one of:
           * option "pay":
-            - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
+            - 1 resource(s) are spent from the resource pool of the picked card (nothing is spent when the pool holds fewer)
             - the picked card: stat countsWillpower 1, until the end of the phase
           * option "keep":
 
@@ -225,6 +225,8 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
       * option "remove":
         - remove all the progress from each location (any player controls)
         - remove all the progress from the current quest stage
+        - remove all the progress from each card (any player controls) of card type player-side-quest
+        - remove all the progress from each card (any player controls) of card type encounter-side-quest
         - remove all the progress from each treachery (any player controls) named "Blinding Blizzard"
       * option "reveal":
         - the first player reveals 2 encounter cards, one after the other, each in a staging of its own
@@ -251,7 +253,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04023:A:1 (front): When Revealed: The first player attaches this card to a hero he controls. Counts as a Condition attachment with the text: "Attached hero gets -2 Willpower and cannot commit to a quest. If attached hero has more than 1 copy of Freezing Cold attached, discard attached hero from play."
   04023:whenRevealed:1: When revealed
-    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
+    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card is discarded)
   04023:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
@@ -309,4 +311,4 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     only if the event's other card is a enemy (any player controls) that is this card itself
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 193 by template, 0 as JSON)
+(rendered pieces: 195 by template, 0 as JSON)

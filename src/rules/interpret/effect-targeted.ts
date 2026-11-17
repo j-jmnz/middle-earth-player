@@ -60,7 +60,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     }
     case "AttachSelf": {
       const code = sourceId ? state.cards[sourceId]?.code : undefined;
-      const unlimited = instruction.to.kind === "character" && instruction.to.unlimited === true;
+      const unlimited = (instruction.to.kind === "character" || instruction.to.kind === "hero") && instruction.to.unlimited === true;
       const free = (id: string): boolean => (unlimited || !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code)) && (code == null || !attachBlocked(state, ctx, id, code));
       if (instruction.to.kind === "character") {
         const { trait, name } = instruction.to;
