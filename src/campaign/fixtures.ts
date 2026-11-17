@@ -62,6 +62,7 @@ import returnmirkwoodFixtures from "./fixtures/return-to-mirkwood.json";
 import pitFixtures from "./fixtures/into-the-pit.json";
 import levelFixtures from "./fixtures/the-seventh-level.json";
 import frommoriaFixtures from "./fixtures/flight-from-moria.json";
+import gateFixtures from "./fixtures/the-redhorn-gate.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -142,6 +143,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "into-the-pit": pitFixtures,
   "the-seventh-level": levelFixtures,
   "flight-from-moria": frommoriaFixtures,
+  "the-redhorn-gate": gateFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

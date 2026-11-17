@@ -58,6 +58,7 @@ import * as returnmirkwood from "../scenarios/return-to-mirkwood/game.ts";
 import * as pit from "../scenarios/into-the-pit/game.ts";
 import * as level from "../scenarios/the-seventh-level/game.ts";
 import * as frommoria from "../scenarios/flight-from-moria/game.ts";
+// import * as gate from "../scenarios/the-redhorn-gate/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -142,4 +143,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("into-the-pit", "Into the Pit", pit.PIT_GOLDENS, pit.pitWorld, pit.playGolden),
   entry("the-seventh-level", "The Seventh Level", level.LEVEL_GOLDENS, level.levelWorld, level.playGolden),
   entry("flight-from-moria", "Flight from Moria", frommoria.FROMMORIA_GOLDENS, frommoria.frommoriaWorld, frommoria.playGolden),
+  // entry("the-redhorn-gate", "The Redhorn Gate", gate.GATE_GOLDENS, gate.gateWorld, gate.playGolden),
 ];
