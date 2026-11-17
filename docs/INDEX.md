@@ -76,7 +76,7 @@ Read the sections your task touches.
   - 396–401 Catalog build (~410)
   - 402–419 Tests (~2.3K) ← 5
   - 420–435 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~215.6K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~215.9K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~720) ← 2
   - 54–67 Non-goals (~600)
@@ -84,7 +84,7 @@ Read the sections your task touches.
   - 89–121 Stack (~1.2K)
   - 122–139 Performance and feel (~750)
   - 140–158 Repository layout (~500)
-  - 159–390 Domain (~9.9K)
+  - 159–395 Domain (~10.2K)
     - 161–249 Campaign (~2.2K) ← 1
     - 250–264 Mirkwood campaign cards and carry-over (~890)
     - 265–277 Standalone play (~990) ← 1
@@ -92,67 +92,67 @@ Read the sections your task touches.
     - 290–323 The engine plays the game (~2.2K) ← 4
     - 324–331 Engine steps (~180)
     - 332–360 Core round (~1.3K) ← 1
-    - 361–390 Keywords implemented once (~1.6K)
-  - 391–548 Fellowship of the Ring (~10.6K)
-    - 415–429 Scenario 1 resolution (~370)
-    - 430–443 A Knife in the Dark (~1.6K) ← 1
-    - 444–447 Hide tests (~130)
-    - 448–471 Flight to the Ford burden deck and life (~1.6K) ← 1
-    - 472–486 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
-    - 487–502 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
-    - 503–526 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
-    - 527–548 Seeded decks (~660)
-  - 549–648 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
-    - 567–580 Passage Through Mirkwood (~1.6K)
-    - 581–594 Journey Along the Anduin (~2.1K)
-    - 595–615 Escape from Dol Guldur (~2.7K)
-    - 616–630 The Oath (~2.4K)
-    - 631–648 The Caves of Nibin-Dûm (~2.4K)
-  - 649–707 Dream-chaser (~16.2K) ← 4
-  - 708–735 Ered Mithrin (~16.4K) ← 7
-  - 736–1296 Angmar Awakened (~69.4K) ← 6
-    - 759–793 Intruders in Chetwood (~3.5K)
-    - 794–824 The Weather Hills (~3.9K)
-    - 825–860 Deadmen's Dike (~4.5K)
-    - 861–891 The Weather Hills (~3.9K)
-    - 892–930 Deadmen's Dike (~5.8K)
-    - 931–967 The Wastes of Eriador (~4.8K)
-    - 968–1002 Escape from Mount Gram (~3.2K) ← 1
-    - 1003–1033 The Weather Hills (~3.9K)
-    - 1034–1072 Deadmen's Dike (~5.8K)
-    - 1073–1109 The Wastes of Eriador (~4.8K)
-    - 1110–1153 Escape from Mount Gram (~5.3K)
-    - 1154–1190 Across the Ettenmoors (~5.0K)
-    - 1191–1229 The Treachery of Rhudaur (~4.3K)
-    - 1230–1265 The Battle of Carn Dûm (~4.7K)
-    - 1266–1296 The Dread Realm (~4.2K)
-  - 1297–1434 The Two Towers (~16.4K) ← 20
-  - 1435–1670 The Return of the King (~28.2K) ← 22
-    - 1463–1488 The Passing of the Grey Company (~2.7K)
-    - 1489–1520 The Siege of Gondor (~4.1K)
-    - 1521–1566 The Battle of the Pelennor Fields (~5.8K)
-    - 1567–1604 The Tower of Cirith Ungol (~4.4K)
-    - 1605–1641 The Black Gate Opens (~4.4K) ← 2
-    - 1642–1670 Mount Doom (~4.3K)
-  - 1671–1809 Shadows of Mirkwood (~14.1K) ← 3
-    - 1679–1700 The Hunt for Gollum (~2.1K) ← 2
-    - 1701–1720 Conflict at the Carrock (~2.4K) ← 2
-    - 1721–1746 A Journey to Rhosgobel (~2.9K) ← 1
-    - 1747–1764 The Hills of Emyn Muil (~1.5K) ← 1
-    - 1765–1785 The Dead Marshes (~2.1K) ← 2
-    - 1786–1809 Return to Mirkwood (~2.3K) ← 4
-  - 1810–1818 Nightmare (~410) ← 21
-  - 1819–1859 Deckbuilding (~2.1K)
-  - 1860–1939 Effects (~3.7K)
-    - 1862–1920 Three layers (~2.4K) ← 10
-    - 1921–1931 Player side quests, contracts and saga cards (~940)
-    - 1932–1935 Window stack (~100)
-    - 1936–1939 Coverage test (~270)
-  - 1940–1962 Data sources (~700) ← 2
-  - 1963–1981 Card images (~1.3K) ← 9
-  - 1982–2009 Persistence and shipping (~3.2K) ← 10
-  - 2010–2051 Screens (~5.1K) ← 2
-    - 2036–2051 Table screen (~1.8K) ← 3
+    - 361–395 Keywords implemented once (~1.9K)
+  - 396–553 Fellowship of the Ring (~10.6K)
+    - 420–434 Scenario 1 resolution (~370)
+    - 435–448 A Knife in the Dark (~1.6K) ← 1
+    - 449–452 Hide tests (~130)
+    - 453–476 Flight to the Ford burden deck and life (~1.6K) ← 1
+    - 477–491 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
+    - 492–507 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
+    - 508–531 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
+    - 532–553 Seeded decks (~660)
+  - 554–653 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
+    - 572–585 Passage Through Mirkwood (~1.6K)
+    - 586–599 Journey Along the Anduin (~2.1K)
+    - 600–620 Escape from Dol Guldur (~2.7K)
+    - 621–635 The Oath (~2.4K)
+    - 636–653 The Caves of Nibin-Dûm (~2.4K)
+  - 654–712 Dream-chaser (~16.2K) ← 4
+  - 713–740 Ered Mithrin (~16.4K) ← 7
+  - 741–1301 Angmar Awakened (~69.4K) ← 6
+    - 764–798 Intruders in Chetwood (~3.5K)
+    - 799–829 The Weather Hills (~3.9K)
+    - 830–865 Deadmen's Dike (~4.5K)
+    - 866–896 The Weather Hills (~3.9K)
+    - 897–935 Deadmen's Dike (~5.8K)
+    - 936–972 The Wastes of Eriador (~4.8K)
+    - 973–1007 Escape from Mount Gram (~3.2K) ← 1
+    - 1008–1038 The Weather Hills (~3.9K)
+    - 1039–1077 Deadmen's Dike (~5.8K)
+    - 1078–1114 The Wastes of Eriador (~4.8K)
+    - 1115–1158 Escape from Mount Gram (~5.3K)
+    - 1159–1195 Across the Ettenmoors (~5.0K)
+    - 1196–1234 The Treachery of Rhudaur (~4.3K)
+    - 1235–1270 The Battle of Carn Dûm (~4.7K)
+    - 1271–1301 The Dread Realm (~4.2K)
+  - 1302–1439 The Two Towers (~16.4K) ← 20
+  - 1440–1675 The Return of the King (~28.2K) ← 22
+    - 1468–1493 The Passing of the Grey Company (~2.7K)
+    - 1494–1525 The Siege of Gondor (~4.1K)
+    - 1526–1571 The Battle of the Pelennor Fields (~5.8K)
+    - 1572–1609 The Tower of Cirith Ungol (~4.4K)
+    - 1610–1646 The Black Gate Opens (~4.4K) ← 2
+    - 1647–1675 Mount Doom (~4.3K)
+  - 1676–1814 Shadows of Mirkwood (~14.1K) ← 3
+    - 1684–1705 The Hunt for Gollum (~2.1K) ← 2
+    - 1706–1725 Conflict at the Carrock (~2.4K) ← 2
+    - 1726–1751 A Journey to Rhosgobel (~2.9K) ← 1
+    - 1752–1769 The Hills of Emyn Muil (~1.5K) ← 1
+    - 1770–1790 The Dead Marshes (~2.1K) ← 2
+    - 1791–1814 Return to Mirkwood (~2.3K) ← 4
+  - 1815–1823 Nightmare (~410) ← 21
+  - 1824–1864 Deckbuilding (~2.1K)
+  - 1865–1944 Effects (~3.7K)
+    - 1867–1925 Three layers (~2.4K) ← 10
+    - 1926–1936 Player side quests, contracts and saga cards (~940)
+    - 1937–1940 Window stack (~100)
+    - 1941–1944 Coverage test (~270)
+  - 1945–1967 Data sources (~700) ← 2
+  - 1968–1986 Card images (~1.3K) ← 9
+  - 1987–2014 Persistence and shipping (~3.2K) ← 10
+  - 2015–2056 Screens (~5.1K) ← 2
+    - 2041–2056 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~59.0K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5

@@ -20501,9 +20501,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "2d80d130d9001df93521ec329328a85741ade1111da4b3c382efdaf5a1e50d5d"
+        "value": "03192704f343c4b8dca58ae34a653ed049e5be6d47c148f4265f3f7874f6e65a"
       },
-      "fetchedAt": "2026-11-16T12:50:15.338Z",
+      "fetchedAt": "2026-11-17T01:13:18.877Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -20678,6 +20678,18 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec65_web_the-wilds-of_rhovanion_rules.pdf",
           "sha256": "a822a79776d1e7df282c12789b21ed5b001025e016413b4a81602328f3b83dd6",
           "bytes": 4748254
+        },
+        {
+          "path": "pdf/the-redhorn-gate-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/the-redhorn-gate-rulesheet.pdf",
+          "sha256": "4e64c05192be7ad046226ff7fdce430adc21eca33467f48d1d9b06c3837584d0",
+          "bytes": 1032324
+        },
+        {
+          "path": "pdf/mec58_web_beneath_the_sands-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec58_web_beneath_the_sands-rules.pdf",
+          "sha256": "1301f6a1b0f3b30520df349ea0226dd35a8d477ce8d58871e3b60b8ad4875d33",
+          "bytes": 2716010
         },
         {
           "path": "pdf/a-journey-to-rhosgobel-rules.pdf",
