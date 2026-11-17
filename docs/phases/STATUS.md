@@ -40,6 +40,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
+- `pit-won` is not committed: no seed in 500 wins Into the Pit with the saved decklists (their heroes are destroyed by round 3 or 4). Until it exists `.maestro/scenarios/into-the-pit/into-the-pit.yaml` cannot run.
 - `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50). Until it exists `.maestro/scenarios/conflict-at-the-carrock/conflict-at-the-carrock.yaml` cannot run.
 - `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists. Until it exists `.maestro/scenarios/return-to-mirkwood/return-to-mirkwood.yaml` cannot run.
 - `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.
@@ -290,6 +291,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Rules and engine (Dwarrowdelf)
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
+- Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
 - Into the Pit readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Into the Pit). Not user-confirmed.
 - Renderer gaps, Into the Pit (behaviour proven by spec rows): `BottomOtherLooked`, `xReachesRemaining`, `inVictory`, `ShuffleSelfIntoEncounterDeck` and `GrantTrait` print as JSON; `optionalEngageThreat` shows as a stat; a before-damage Forced, a revealed-enemy replacement, an immune location left out of a count, a refused travel, Restricted, and a `noQuestProgress` exception are not said (03014:A:1, 03036:A:2, 03041:A:1, 03048:A:1, 03049:A:1, 03052:A:1, 03060:A:1, 03064:B:2, 03065:B:2, 901002:B:3, 901005:A:3, 901008:A:2).
 
