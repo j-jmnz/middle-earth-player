@@ -7,7 +7,9 @@
 // clicks. Nothing of this reaches the phone: it only looks for the testIDs react-native-web renders as `data-testid`.
 import { shown } from "./shown.ts";
 
-const LAYERS = ['[data-testid="card-preview"]', '[data-testid="quest-advance"]', '[data-testid="phase-carousel"]'].join(", ");
+// The card preview's keyword bubble is a layer inside the preview: while it is open the preview's own controls are inert too (a Tab stays in the bubble), and when it
+// closes focus goes back to the chip that opened it.
+const LAYERS = ['[data-testid="card-preview"]', '[data-testid="card-preview-keyword-bubble"]', '[data-testid="quest-advance"]', '[data-testid="phase-carousel"]'].join(", ");
 const SKIPPED = new Set(["SCRIPT", "STYLE", "LINK"]);
 const SCRIM = /-scrim$/;
 
@@ -29,9 +31,22 @@ export function outsideOf<T extends object>(modal: T, parentOf: (node: T) => T |
   return outside;
 }
 
+/** How many of the open layers (outermost first) stay open when `found` is the layer on top: those that are it or hold it. Pure over `holds`. */
+export function layersKept<T>(open: readonly T[], found: T | null, holds: (outer: T, inner: T) => boolean): number {
+  if (!found) return 0;
+  let kept = 0;
+  while (kept < open.length) {
+    const outer = open[kept];
+    if (outer === undefined || (outer !== found && !holds(outer, found))) break;
+    kept += 1;
+  }
+  return kept;
+}
+
 type Layer = { modal: Element; inerted: Set<Element>; returnTo: HTMLElement | null };
 
-let layer: Layer | null = null;
+// The open layers, outermost first: the card preview, then its keyword bubble.
+const layers: Layer[] = [];
 let started = false;
 
 // What this layer makes inert: not a script or a style, not the layer's own scrim, and not something that was inert before it (the page's own, which must stay as it was when the layer closes).
@@ -52,28 +67,30 @@ function focusInto(modal: HTMLElement): void {
   target.focus({ preventScroll: true });
 }
 
-function open(modal: HTMLElement): void {
+function open(modal: HTMLElement): Layer {
   const active = document.activeElement;
-  layer = { modal, inerted: new Set(), returnTo: active instanceof HTMLElement && active !== document.body ? active : null };
+  const next: Layer = { modal, inerted: new Set(), returnTo: active instanceof HTMLElement && active !== document.body ? active : null };
+  layers.push(next);
   focusInto(modal);
+  return next;
 }
 
 function close(): void {
-  if (!layer) return;
-  for (const node of layer.inerted) node.removeAttribute("inert");
-  const back = layer.returnTo;
-  layer = null;
+  const top = layers.pop();
+  if (!top) return;
+  for (const node of top.inerted) node.removeAttribute("inert");
+  const back = top.returnTo;
   if (back?.isConnected && !back.closest("[inert]")) back.focus({ preventScroll: true });
 }
 
 /** Brings the document in line with the layers on screen: the last shown one in the document is the one on top. */
 export function syncModalLayers(): void {
   const found = [...document.querySelectorAll<HTMLElement>(LAYERS)].filter(shown).at(-1) ?? null;
-  if (layer && layer.modal !== found) close();
+  const kept = layersKept(layers.map((open) => open.modal), found, (outer, inner) => outer.contains(inner));
+  while (layers.length > kept) close();
   if (!found) return;
   // Opening remembers the focused control and moves focus first, before the inert attribute can blur it unseen.
-  if (!layer) open(found);
-  const current = layer;
+  const current = layers.at(-1)?.modal === found ? layers.at(-1) : open(found);
   if (!current) return;
   const wanted = new Set(outside(found, current.inerted));
   for (const node of wanted) {

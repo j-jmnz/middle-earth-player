@@ -5,6 +5,7 @@ import entries from "../../../data/rules/entries.json";
 import { parseRuleEntries, type RuleEntry } from "../../catalog/rule-entry";
 import { bookletName, type BookletId } from "../booklets/books";
 import { fold } from "../kit/fold";
+import type { RuleTip } from "../../play/cards/keyword-tip-types";
 
 export type GlossaryEntry = RuleEntry & { source: string };
 
@@ -24,6 +25,9 @@ const DOC_NAMES: Readonly<Record<string, string>> = {
   hoem: "The Hills of Emyn Muil rules",
   tdm: "The Dead Marshes rules",
   rtm: "Return to Mirkwood rules",
+  // Rulesheets the app does not carry as books: their rules open in the Rules tab, with no page to turn to.
+  trg: "The Redhorn Gate rules",
+  bts: "Beneath the Sands rules",
 };
 
 // A decklist, a scenario's setup or one scenario's stage is read on its own screen (deck import, briefing), not looked up.
@@ -97,6 +101,29 @@ export function ruleSource(id: string): string | null {
   if (!entry) return null;
   const book = bookPage(entry);
   return book ? `${book.name}, page ${book.page}` : `${DOC_NAMES[entry.doc] ?? entry.doc}, page ${entry.page}`;
+}
+
+/**
+ * The document whose wording a keyword is quoted from first at this table: the one that holds the scenario's setup span
+ * (`<set>.setup-<scenario id>`), else the book of the campaign's `bookletId`, else null (the Rules Reference then wins).
+ */
+export function scenarioRuleDoc(scenarioId: string, bookletId: string | undefined): string | null {
+  const setup = parsedEntries().find((entry) => entry.id.endsWith(`.setup-${scenarioId}`));
+  if (setup) return setup.doc;
+  const own = Object.entries(BOOKS).find(([, id]) => id === bookletId && bookletId !== "rules-reference");
+  return own?.[0] ?? null;
+}
+
+/**
+ * What a keyword chip's bubble shows for a rule span: its paragraphs without the "See also:" line, where it is printed, and whether the
+ * Rules tab can open it (a span of a document the glossary does not list cannot).
+ */
+export function ruleTip(id: string): RuleTip | null {
+  all ??= new Map(parsedEntries().map((entry) => [entry.id, entry]));
+  const entry = all.get(id);
+  const source = ruleSource(id);
+  if (!entry || source == null) return null;
+  return { paragraphs: paragraphs(entry).filter((line) => !line.startsWith("See also:")), source, openable: glossaryEntry(id) != null };
 }
 
 export function glossaryEntry(id: string): GlossaryEntry | null {

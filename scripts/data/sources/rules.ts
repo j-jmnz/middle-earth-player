@@ -50,6 +50,9 @@ export const RULE_PDFS = [
     ["otd", "hobbit_on_the_doorstep_rulesheet.pdf"],
     ["hon", "heirs-of-numenor_rules.pdf"],
     ["wor", "mec65_web_the-wilds-of_rhovanion_rules.pdf"],
+    // trg and bts are read for one keyword each: Secrecy X (The Redhorn Gate, which introduced it) and Valour (Beneath the Sands).
+    ["trg", "the-redhorn-gate-rulesheet.pdf"],
+    ["bts", "mec58_web_beneath_the_sands-rules.pdf"],
     // Shadows of Mirkwood's Adventure Pack rulesheets: the encounter sets of the scenario and its special rules. The Hunt for Gollum's and Conflict at the Carrock's rulesheets
     // (rulesheet-thehuntforgollum.pdf, rulesheet-conflictatthecarrock.pdf) hold their text as outlines with no text layer, so no span can be read from them.
     ["jtr", "a-journey-to-rhosgobel-rules.pdf"],

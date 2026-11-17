@@ -1,3 +1,4 @@
+// Rules: bts.valour (data/rules/entries.json): the `threat` condition marked `valour` holds from 40 threat, from 80 while the main quest has Dire (mec113.dire).
 import { encounterHolds, underBurnHolds } from "../families/aflame/values.ts";
 import { familyCondition } from "./family-hooks.ts";
 import { outOfPlayCopies, searchable } from "./search.ts";

@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { bookPage, glossary, glossaryEntry, paragraphs, searchGlossary, seeAlso } from "./glossary.ts";
+import { bookPage, glossary, glossaryEntry, paragraphs, ruleTip, scenarioRuleDoc, searchGlossary, seeAlso } from "./glossary.ts";
 
 const GLOSSARY = glossary();
 
 describe("GLOSSARY", () => {
   it("holds the rule books' spans and leaves out decklists, setups and stages", () => {
     const docs = new Set(GLOSSARY.map((entry) => entry.doc));
-    expect([...docs].sort()).toEqual(["dcce", "easy-mode", "emce", "faq", "hoem", "jtr", "learn-to-play", "mec108", "mec109", "mec112", "mec113", "rr", "rtm", "tdm", "tdom"]);
+    expect([...docs].sort()).toEqual(["bts", "dcce", "easy-mode", "emce", "faq", "hoem", "jtr", "learn-to-play", "mec108", "mec109", "mec112", "mec113", "rr", "rtm", "tdm", "tdom", "trg"]);
     expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-)|dcce\.(campaign-)?setup-|emce\.setup-|mec108\.(campaign-)?setup-|mec11[23]\.setup-|sotm\.setup-)/.test(entry.id))).toBe(false);
     expect(glossaryEntry("dcce.gaining-xp")?.source).toBe("Dream-chaser campaign rulebook · page 29");
     expect(glossaryEntry("mec109.hide-tests")?.source).toBe("Fellowship of the Ring campaign book · page 4");
@@ -103,5 +103,28 @@ describe("scenario setup spans", () => {
   it("are read on the briefing, not looked up: the glossary leaves out mec109, ltp and tdom setup spans", () => {
     expect(GLOSSARY.filter((entry) => /^(mec109|ltp|tdom)\.setup-/.test(entry.id))).toEqual([]);
     expect(glossaryEntry("tdom.campaign-mode")).not.toBeNull();
+  });
+});
+
+describe("the rules a keyword chip quotes", () => {
+  it("find the book of the scenario in play: its setup span, else its campaign's book, else none", () => {
+    expect(scenarioRuleDoc("the-passing-of-the-grey-company", "the-return-of-the-king")).toBe("mec113");
+    expect(scenarioRuleDoc("a-journey-to-rhosgobel", undefined)).toBe("jtr");
+    expect(scenarioRuleDoc("the-hunt-for-gollum", undefined)).toBeNull();
+    expect(scenarioRuleDoc("no-such-scenario", "the-two-towers")).toBe("mec112");
+    expect(scenarioRuleDoc("no-such-scenario", undefined)).toBeNull();
+  });
+
+  it("give a span's paragraphs without See also, its source, and whether the Rules tab opens it", () => {
+    const tip = ruleTip("rr.surge");
+    expect(tip?.source).toBe("Rules Reference, page 17");
+    expect(tip?.openable).toBe(true);
+    expect(tip?.paragraphs.length).toBeGreaterThan(0);
+    expect(tip?.paragraphs.some((line) => line.startsWith("See also:"))).toBe(false);
+    // Not a document the app carries as a book: named, and opened in the Rules tab all the same.
+    expect(ruleTip("trg.secrecy")).toMatchObject({ source: "The Redhorn Gate rules, page 1", openable: true });
+    // The Honour of the Rohirrim spans are in no glossary document.
+    expect(ruleTip("hon.siege")?.openable).toBe(false);
+    expect(ruleTip("no.such.rule")).toBeNull();
   });
 });

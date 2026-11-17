@@ -57,6 +57,7 @@ import { useScenarioDials, useSeatMarks } from "../../play/readouts/scenario-dia
 import { campaignTokens, heldDials, nightmareCardId, usePursuitReadout, widgetReadouts } from "../../play/readouts/widgets";
 import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
+import { ruleTip, scenarioRuleDoc } from "../rules/glossary";
 import { notApplied } from "../../play/cards/not-applied";
 import { BodyText, NavBar, Screen } from "../kit/chrome";
 import { useTableBack } from "./use-table-back";
@@ -287,6 +288,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
         preview.extra,
         ledgerLine,
         (cardId) => whyNotChosen(game, ctx, cardId, choice.sheet),
+        { ruleDoc: scenarioRuleDoc(session.world.scenario.id, session.world.campaign.bookletId) },
       )
     : null;
   const shown = previewed?.cards[previewed.start];
@@ -472,6 +474,8 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           ownsBack={false}
           closeRef={previewClose}
           onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
+          rule={ruleTip}
+          onOpenRule={(id) => (setPreview(null), router.push({ pathname: "/rule/[id]", params: { id } }))}
         />
       ) : null}
       {setupCards[0] ? (

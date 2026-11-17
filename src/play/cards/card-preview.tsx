@@ -7,15 +7,20 @@
 // effects are on it now (+1 Attack from Dagger of Westernesse) and lists the cards attached to it and its shadow cards: a
 // tap on one shows that card in its place. A horizontal swipe on the card steps through the same cards (preview-swipe.ts), and so
 // does the screen reader's adjust gesture; the rows stay the plain path.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BackHandler, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
+import { useStore } from "zustand";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { CardTextView } from "./card-text-view.tsx";
+import { drawnKeywords, type PreviewKeyword } from "./preview-keywords.ts";
+import { focusChip, KeywordBubble, KeywordChips, type PickChip } from "./keyword-tips.tsx";
+import type { Bubble, RuleTip } from "./keyword-tip-types.ts";
+import type { PressableRef } from "../../ui/popover-frame.tsx";
 import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
@@ -30,6 +35,7 @@ import { cardCorner } from "../../ui/card-corner.ts";
 import { capLines, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
+import { tableSettings } from "../../ui/table-settings.ts";
 
 const SCRIM = 0.82;
 
@@ -65,6 +71,8 @@ export type PreviewCard = {
   lostIsland?: boolean;
   // The card is a facedown Reanimated Dead: the preview says what it is on paper and Details (which would open the card behind it) is not offered.
   faceless?: boolean;
+  // The keyword chips under the name (preview-keywords.ts): keywords now, then timing words (`timing`); `lost` is a printed keyword an effect took away.
+  keywords?: readonly PreviewKeyword[];
 };
 
 // The card's picture, or (while it is not on the phone) its name and text on paper. The quest advance screen draws its stage with it.
@@ -104,6 +112,8 @@ export function CardPreview({
   onDetails = null,
   ownsBack = true,
   closeRef,
+  rule,
+  onOpenRule,
 }: {
   card: PreviewCard;
   // The cards attached to it and its face-up shadow cards (and, for the quest stage, the stages before it), each shown in its place on a
@@ -115,6 +125,9 @@ export function CardPreview({
   ownsBack?: boolean;
   closeRef?: { current: (() => void) | null };
   onDetails?: ((code: string) => void) | null;
+  // What the keyword chips quote: the span's words for a rule id. With none, no chips are drawn (the pool and deck lists' previews).
+  rule?: (id: string) => RuleTip | null;
+  onOpenRule?: (id: string) => void;
 }) {
   const screen = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -124,6 +137,17 @@ export function CardPreview({
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const all = [card, ...related];
   const [at, setAt] = useState(0);
+  const timingTips = useStore(tableSettings, (state) => state.settings.timingTips);
+  // The keyword bubble: the chip tapped last, and whether it is open. It is shut for another card of the preview (a swipe, a related row).
+  const [bubble, setBubble] = useState<Bubble | null>(null);
+  const [bubbleOpen, setBubbleOpen] = useState(false);
+  // The chip that opened the bubble: the screen reader's focus goes back to it once the bubble is shut, however it was shut.
+  const opener = useRef<PressableRef | null>(null);
+  const returning = useRef(false);
+  const show = (index: number) => {
+    setBubbleOpen(false);
+    setAt(index);
+  };
   const shown = all[at] ?? card;
   const wide = screen.width > screen.height;
   const roomW = screen.width - insets.left - insets.right;
@@ -134,7 +158,8 @@ export function CardPreview({
   // the card gives up the strip's height.
   // The tokens line is two lines at the phone's default text size and as many as its words take at a larger one (preview-size.ts, previewStrip).
   const tokenRows = Math.max(0, ...all.map((item) => ((item.tokens ?? []).length > 0 ? tokenLines((item.tokens ?? []).join(" · "), roomW - 32 * s, s, screen.fontScale) : 0)));
-  const strip = !wide ? previewStrip({ chips: all.length > 1, tokenRows }, s, screen.fontScale) : 0;
+  const keywordRow = rule != null && all.some((item) => drawnKeywords(item.keywords, timingTips).length > 0);
+  const strip = !wide ? previewStrip({ chips: all.length > 1, tokenRows, keywords: keywordRow }, s, screen.fontScale) : 0;
   const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
 
   useEffect(() => {
@@ -153,21 +178,38 @@ export function CardPreview({
     );
   }, [progress, scale, onClose]);
 
+  // Back and Escape shut the bubble while it is open, and the preview after it.
+  const back = useCallback(() => {
+    if (bubbleOpen) setBubbleOpen(false);
+    else close();
+  }, [bubbleOpen, close, setBubbleOpen]);
+  const pick: PickChip = (chip, anchor, from) => {
+    opener.current = from.current;
+    returning.current = true;
+    setBubble({ word: chip.word, ruleId: chip.ruleId, anchor });
+    setBubbleOpen(true);
+  };
+  useEffect(() => {
+    if (bubbleOpen || !returning.current) return;
+    returning.current = false;
+    focusChip(opener);
+  }, [bubbleOpen]);
+
   useEffect(() => {
     if (!ownsBack) return;
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      close();
+      back();
       return true;
     });
     return () => subscription.remove();
-  }, [close, ownsBack]);
+  }, [back, ownsBack]);
   useEffect(() => {
     if (!closeRef) return;
-    closeRef.current = close;
+    closeRef.current = back;
     return () => {
       closeRef.current = null;
     };
-  }, [close, closeRef]);
+  }, [back, closeRef]);
 
   const scrimStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.get())) * SCRIM }));
   const cardStyle = useAnimatedStyle(() => {
@@ -184,8 +226,14 @@ export function CardPreview({
     .enabled(count > 1)
     .activeOffsetX([-12 * s, 12 * s])
     .failOffsetY([-12 * s, 12 * s])
-    .onEnd((event) => setAt((now) => swipeStep(now, count, event.translationX, event.velocityX, s)));
-  const step = (by: number) => setAt((now) => clampStep(now, count, by));
+    .onEnd((event) => {
+      setBubbleOpen(false);
+      setAt((now) => swipeStep(now, count, event.translationX, event.velocityX, s));
+    });
+  const step = (by: number) => {
+    setBubbleOpen(false);
+    setAt((now) => clampStep(now, count, by));
+  };
   const frame = (
     <GestureDetector gesture={swipe}>
       <Animated.View
@@ -228,6 +276,7 @@ export function CardPreview({
           {(shown.tokens ?? []).join(" · ")}
         </Text>
       ) : null}
+      {rule ? <KeywordChips chips={drawnKeywords(shown.keywords, timingTips)} wrap onPick={pick} /> : null}
     </>
   );
   const body = (
@@ -267,7 +316,7 @@ export function CardPreview({
           <View testID="card-preview-attached">
             <Text className="font-display text-eyebrow uppercase text-accent">{listHeading(all, at)}</Text>
             {all.map((item, index) => (
-              <RelatedRow key={`${item.code}:${index}`} item={item} index={index} selected={index === at} onPress={() => setAt(index)} />
+              <RelatedRow key={`${item.code}:${index}`} item={item} index={index} selected={index === at} onPress={() => show(index)} />
             ))}
           </View>
         ) : null}
@@ -275,12 +324,14 @@ export function CardPreview({
   );
 
   return (
-    <View testID="card-preview" accessibilityViewIsModal onAccessibilityEscape={close} style={StyleSheet.absoluteFill}>
+    <View testID="card-preview" accessibilityViewIsModal onAccessibilityEscape={back} style={StyleSheet.absoluteFill}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
+      {/* The scrim is a button of its own under the content, so no control sits inside another (the web nests them as buttons in a button). The wrapper over it is not a
+          control (no role, no tab stop): it takes the tap that lands on no control of the preview, and the preview closes, as before (user request, 2026-10-29). */}
+      <Pressable testID="card-preview-scrim" accessibilityRole="button" accessibilityLabel="Close the preview" onPress={close} style={StyleSheet.absoluteFill} />
       <Pressable
-        testID="card-preview-scrim"
-        accessibilityRole="button"
-        accessibilityLabel="Close the preview"
+        accessible={false}
+        tabIndex={-1}
         onPress={close}
         style={[StyleSheet.absoluteFill, wide ? styles.row : styles.column, { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left + 16 * s, paddingRight: insets.right + 16 * s }]}
       >
@@ -317,13 +368,18 @@ export function CardPreview({
                 </Text>
               </Animated.View>
             ) : null}
+            {keywordRow ? (
+              <Animated.View style={[{ marginTop: 8 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
+                <KeywordChips chips={drawnKeywords(shown.keywords, timingTips)} wrap={false} onPick={pick} />
+              </Animated.View>
+            ) : null}
             {all.length > 1 ? (
               <Animated.View testID="card-preview-attached" style={[{ marginTop: 16 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
                 {/* No grow: a horizontal ScrollView grows by default, and on a phone it stretched the column past the screen's height, so the
                     centred card went off the top and Details off the foot. The strip is one chip tall, as previewStrip counts it. */}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 6 * s }}>
                   {all.map((item, index) => (
-                    <RelatedChip key={`${item.code}:${index}`} item={item} index={index} selected={index === at} onPress={() => setAt(index)} />
+                    <RelatedChip key={`${item.code}:${index}`} item={item} index={index} selected={index === at} onPress={() => show(index)} />
                   ))}
                 </ScrollView>
               </Animated.View>
@@ -332,6 +388,7 @@ export function CardPreview({
           </>
         )}
       </Pressable>
+      {rule ? <KeywordBubble bubble={bubble} open={bubbleOpen} rule={rule} onOpenRule={onOpenRule} onClose={() => setBubbleOpen(false)} /> : null}
     </View>
   );
 }

@@ -3,8 +3,9 @@
 // with no quest points is won.
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { buildTable, idsOf, sceneCards } from "../../../test/harness/scene.ts";
+import { buildTable, FRODO, idsOf, sceneCards } from "../../../test/harness/scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
 import { seaFixture } from "../dream-chaser/sea-fixture.ts";
@@ -101,5 +102,60 @@ describe("the tokens on a previewed card", () => {
     const shown = previewCards(linked, table.ctx, dealt, describeCode, (name) => name, [], ledgerLine);
     expect(shown.start).toBe(1);
     expect(shown.cards.map((card) => card.code)).toEqual([linked.cards[enemy]?.code, linked.cards[dealt]?.code]);
+  });
+});
+
+describe("the keyword chips of a previewed card", () => {
+  function table(scene: Parameters<typeof buildTable>[1]) {
+    const cards = new Map(base.cards);
+    cards.set("kw-orc", definePrinted({ code: "kw-orc", name: "Orc", type: "enemy", threat: 1, engagementCost: 20, attack: 1, defense: 1, health: 3, keywords: { peril: true, archery: 1 } }));
+    cards.set("kw-gear", definePrinted({ code: "kw-gear", name: "Gear", type: "attachment", cost: 0, keywords: { restricted: true } }));
+    return buildTable({ definition: base.definition, cards }, scene);
+  }
+  it("lists the keywords in the keyword table's order with the rule of the open scenario's own book first", () => {
+    const t = table({ staging: ["kw-orc"] });
+    const own = previewCards(t.state, t.ctx, idsOf(t, "kw-orc"), describeCode, (id) => id, [], ledgerLine, () => null, { ruleDoc: "mec113" });
+    expect(own.cards[own.start]?.keywords).toEqual([
+      { word: "Peril", ruleId: "mec113.peril" },
+      { word: "Archery 1", ruleId: "mec113.archery" },
+    ]);
+    const plain = previewCards(t.state, t.ctx, idsOf(t, "kw-orc"), describeCode, (id) => id, [], ledgerLine);
+    expect(plain.cards[plain.start]?.keywords?.map((chip) => chip.ruleId)).toEqual(["mec109.peril", "mec109.archery"]);
+  });
+
+  it("gives an attachment its own keywords when it is the card shown", () => {
+    const t = table({ staging: ["kw-orc"], attached: [{ code: "kw-gear", host: FRODO }] });
+    const shown = previewCards(t.state, t.ctx, idsOf(t, "kw-gear"), describeCode, (id) => id, [], ledgerLine);
+    expect(shown.cards[shown.start]?.keywords).toEqual([{ word: "Restricted", ruleId: "rr.restricted" }]);
+  });
+
+  it("adds each timing word of marked-up text once, marked timing, after the keywords", () => {
+    const t = table({ staging: ["kw-orc"] });
+    const text = "Peril.\n<b>When Revealed:</b> Do a thing.\n<i><b>Shadow:</b> Do another.</i>\n<b>Forced:</b> Again. <b>Forced:</b> Twice.";
+    const shown = previewCards(t.state, t.ctx, idsOf(t, "kw-orc"), (code) => ({ name: code, source: null, text }), (id) => id, [], ledgerLine);
+    expect(shown.cards[shown.start]?.keywords?.filter((chip) => chip.timing)).toEqual([
+      { word: "When Revealed", ruleId: "rr.triggered-ability", timing: true },
+      { word: "Shadow", ruleId: "rr.shadow-effects", timing: true },
+      { word: "Forced", ruleId: "rr.forced", timing: true },
+    ]);
+  });
+
+  it("finds a timing word in plain text, with its colon outside the bold, and in a ledger side", () => {
+    // The catalog's text for real cards: Caught in a Web prints "When Revealed:" with no markup, Frodo's Response has its colon outside the bold.
+    const web = "When Revealed: The player with the highest threat level attaches this card to one of his heroes.";
+    const response = "<b>Response</b>: After Frodo Baggins commits to the quest, spend 1 resource from his resource pool to ready another unique character committed to the quest.";
+    const cards = new Map(base.cards);
+    cards.set("01080", definePrinted({ code: "01080", name: "Caught in a Web", type: "treachery" }));
+    cards.set("01074", definePrinted({ code: "01074", name: "King Spider", type: "enemy", threat: 1, engagementCost: 20, attack: 1, defense: 1, health: 3 }));
+    cards.set("21002", definePrinted({ code: "21002", name: "Frodo Baggins", type: "hero", threat: 7 }));
+    const built = buildTable({ definition: base.definition, cards }, { staging: ["01080", "01074", "21002"] });
+    const words = (code: string, text: string | null) => {
+      const shown = previewCards(built.state, built.ctx, idsOf(built, code), () => ({ name: code, source: null, text }), (id) => id, [], ledgerLine);
+      return shown.cards[shown.start]?.keywords?.filter((chip) => chip.timing).map((chip) => chip.word);
+    };
+    expect(words("01080", web)).toEqual(["When Revealed"]);
+    expect(words("21002", response)).toEqual(["Response"]);
+    // King Spider's catalog text has no shadow effect; its printed lines in the ledger (01074:A) open a line with each.
+    expect(words("01074", null)).toEqual(["When Revealed", "Shadow"]);
   });
 });

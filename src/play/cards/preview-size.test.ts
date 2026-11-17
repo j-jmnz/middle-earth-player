@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { inspectSize, previewSideSize, previewSize, previewStrip, tokenLines } from "./preview-size.ts";
+import { chipRowHeight, inspectSize, previewSideSize, previewSize, previewStrip, tokenLines } from "./preview-size.ts";
 
 describe("the long-press preview", () => {
   it("fills a phone's width with a portrait card and leaves room for the buttons", () => {
@@ -60,6 +60,14 @@ describe("the strip under an upright card", () => {
     expect(tokenLines(TOKENS, 300)).toBe(2);
     expect(previewStrip({ chips: true, tokenRows: 2 })).toBe(44 + 16 + 12 + 40);
     expect(previewStrip({ chips: false, tokenRows: 0 })).toBe(0);
+    // One row of keyword chips: a 44 pt target and an 8 pt gap, never more however many chips there are.
+    expect(previewStrip({ chips: false, tokenRows: 0, keywords: true })).toBe(44 + 8);
+    // The chip row holds the label's line at a larger text size: the 44 pt target at 200%, the taller capsule past it.
+    expect(chipRowHeight(1, 2)).toBe(44);
+    expect(chipRowHeight(1, 3)).toBe(17 * 3 + 10);
+    expect(previewStrip({ chips: false, tokenRows: 0, keywords: true }, 1, 2)).toBe(44 + 8);
+    expect(previewStrip({ chips: false, tokenRows: 0, keywords: true }, 1, 3)).toBe(17 * 3 + 10 + 8);
+    expect(previewStrip({ chips: true, tokenRows: 2, keywords: true })).toBe(44 + 16 + 44 + 8 + 12 + 40);
     expect(previewStrip({ chips: true, tokenRows: 0 }, 1.15)).toBe(Math.max(44, 44 * 1.15) + 16 * 1.15);
   });
 

@@ -1,7 +1,7 @@
 // Which nodes a modal layer makes inert (modal-layers.ts): the siblings of the layer and of each of its ancestors, and nothing inside it or above it.
 import { describe, expect, it } from "vitest";
 
-import { outsideOf, ownScrim } from "./modal-layers.ts";
+import { layersKept, outsideOf, ownScrim } from "./modal-layers.ts";
 
 type Node = { name: string; parent: Node | null; children: Node[] };
 
@@ -38,5 +38,20 @@ describe("ownScrim", () => {
     expect(ownScrim(element("carousel-scrim", {}), modal)).toBe(false);
     expect(ownScrim(element("phase-rail", box), modal)).toBe(false);
     expect(ownScrim(element(null, box), modal)).toBe(false);
+  });
+});
+
+describe("layersKept", () => {
+  const holds = (outer: string, inner: string) => inner.startsWith(`${outer}/`);
+  it("keeps the preview open under its keyword bubble, and closes both when neither is on top", () => {
+    expect(layersKept(["preview"], "preview/bubble", holds)).toBe(1);
+    expect(layersKept(["preview", "preview/bubble"], "preview/bubble", holds)).toBe(2);
+    expect(layersKept(["preview", "preview/bubble"], "preview", holds)).toBe(1);
+    expect(layersKept(["preview", "preview/bubble"], null, holds)).toBe(0);
+  });
+
+  it("closes a layer the new top is not inside", () => {
+    expect(layersKept(["preview"], "quest-advance", holds)).toBe(0);
+    expect(layersKept([], "preview", holds)).toBe(0);
   });
 });
