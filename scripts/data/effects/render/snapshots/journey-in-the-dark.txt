@@ -192,7 +192,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142051:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true,"require":"142045"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 142045 is there to be found, the search must take it (the first search of the effect that can) [also {"different":true}]
     - shuffle the encounter deck
 
 ## 142052 Mines of Moria

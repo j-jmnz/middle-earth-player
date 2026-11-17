@@ -349,7 +349,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11078:A:1 (front): Na'asiyah engages the last player.
   11078:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
-    - [json EngageLastPlayer {"verb":"EngageLastPlayer"}]
+    - the source enemy engages the last player
 
 11078:A:2 (front): Forced: When Na'asiyah engages you, discard each event in your hand. Add 1 resource to Na'asiyah for each event discarded in this way.
   11078:forced:2: Forced after an enemy engages a player (heard about this card; event happened to the controller)
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 296 by template, 40 as JSON)
+(rendered pieces: 297 by template, 39 as JSON)

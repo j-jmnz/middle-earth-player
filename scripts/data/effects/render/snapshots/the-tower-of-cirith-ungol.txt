@@ -273,7 +273,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"146015","guarded":true}]
     - a copy of the card with code 146014 is set aside, out of play
     - choose hero (you control) chosen by the first player
-    - [json AttachSetAside {"verb":"AttachSetAside","code":"146014"}]
+    - the set-aside copy of the card with code 146014 is attached to the last picked hero
     - the card with code 146065 in play moves, with what is on it, to the last picked hero (one card moves; it never leaves play)
 
 146066:B:1 (back): Each non-unique location gets -1 Threat and cannot leave the staging area.
@@ -384,4 +384,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - this card: stat phantom 1, until the end of the attack
 
-(rendered pieces: 265 by template, 16 as JSON)
+(rendered pieces: 266 by template, 15 as JSON)

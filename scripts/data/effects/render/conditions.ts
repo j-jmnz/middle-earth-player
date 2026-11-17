@@ -55,6 +55,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   faceUp: (c) => ({ text: `this card shows side ${str(c.side)}`, read: ["side"] }),
   freeOfEncounters: () => ({ text: "no encounter card is attached to this card (it is free of encounters)", read: [] }),
   firstPlayer: () => ({ text: "the actor holds the first player token", read: [] }),
+  lastPlayer: () => ({ text: "the actor is the last player (to the first player's right; the only player of a solo game)", read: [] }),
   otherPlayer: () => ({ text: "another player is still in the game", read: [] }),
   handHasCard: () => ({ text: "the actor has a card in hand", read: [] }),
   undefended: () => ({ text: "the attack has no defender", read: [] }),
@@ -83,7 +84,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
-  matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}${c.inPlay === false ? " that is out of play now" : ""}`, read: ["card", "pick", "inPlay"] }),
+  matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}${c.inPlay === false ? " that is out of play now" : ""}${c.inStaging === true ? " that is in the staging area" : ""}`, read: ["card", "pick", "inPlay", "inStaging"] }),
   tokens: (c) => ({ text: `the card with code ${str(c.code)} in play holds at least ${str(c.min)} resource token(s)${c.perPlayer === true ? " for each player" : ""}`, read: ["code", "min", "perPlayer"] }),
   controls: (c) => ({ text: `the actor controls the card with code ${str(c.code)}`, read: ["code"] }),
 };

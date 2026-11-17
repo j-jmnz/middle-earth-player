@@ -23,6 +23,7 @@ describe("effects render read fields, conditions", () => {
     inPlay: [{ kind: "inPlay", code: "12345", is: true }],
     faceUp: [{ kind: "faceUp", side: "B" }],
     firstPlayer: [{ kind: "firstPlayer" }],
+    lastPlayer: [{ kind: "lastPlayer" }],
     otherPlayer: [{ kind: "otherPlayer" }],
     handHasCard: [{ kind: "handHasCard" }],
     undefended: [{ kind: "undefended" }],
@@ -59,7 +60,7 @@ describe("effects render read fields, conditions", () => {
     fortitudeFailed: [{ kind: "fortitudeFailed", scope: "round", who: "any" }],
     hostControlledByActor: [{ kind: "hostControlledByActor" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
-    matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false }],
+    matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false, inStaging: true }],
     controls: [{ kind: "controls", code: "12345" }],
     freeOfEncounters: [{ kind: "freeOfEncounters" }],
     // The combinators are not in the table: renderCondition words them.
