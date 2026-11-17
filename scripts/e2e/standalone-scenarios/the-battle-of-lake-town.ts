@@ -2,9 +2,9 @@
 // Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. `town-won` is the first seed that wins, parked on the win (the outcome screen is one tap away); `town-lost` the first that loses,
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
 // TODO: say which answers the saved decklists' policy gives the scenario's questions.
-import { nextIntent } from "../../test/harness/auto-player.ts";
-import { createLog } from "../log.ts";
-import { standaloneWonLost } from "./seed-kit.ts";
+import { nextIntent } from "../../../test/harness/auto-player.ts";
+import { createLog } from "../../log.ts";
+import { standaloneWonLost } from "../seed-kit.ts";
 
 const say = createLog("e2e-town");
 

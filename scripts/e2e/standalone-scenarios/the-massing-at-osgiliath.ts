@@ -2,9 +2,9 @@
 // Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. `osgiliath-won` is the first seed that wins, parked on the win (the outcome screen is one tap away); `osgiliath-lost` the first that loses,
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
 // The saved decklists are played with the auto-player's card play on; every choice the scenario asks (the Witch-king's, Cut Off's, the Ranger's and Anduin Crossing's) takes its first option.
-import { nextIntent } from "../../test/harness/auto-player.ts";
-import { createLog } from "../log.ts";
-import { standaloneWonLost } from "./seed-kit.ts";
+import { nextIntent } from "../../../test/harness/auto-player.ts";
+import { createLog } from "../../log.ts";
+import { standaloneWonLost } from "../seed-kit.ts";
 
 const say = createLog("e2e-osgiliath");
 

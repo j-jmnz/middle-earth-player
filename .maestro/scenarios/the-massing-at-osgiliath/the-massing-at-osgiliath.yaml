@@ -2,7 +2,7 @@ appId: com.middleearth.player
 tags:
   - scenario
 ---
-# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `osgiliath-won` (scripts/e2e/the-massing-at-osgiliath.ts): a real two-handed
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `osgiliath-won` (scripts/e2e/standalone-scenarios/the-massing-at-osgiliath.ts): a real two-handed
 # standalone game of The Massing at Osgiliath (the One Deck and Defenders of Gondor lists, Easy), parked on its win: Race to Minas Tirith defeated on stage 4, the rail reads Victory.
 # The fixture is OPEN: no seed up to 1200 gives the auto-player (card play on, every choice its first option) a win with the real decklists: their heroes are destroyed by the Scouts' attacks by round 2 to 4 (docs/phases/STATUS.md).
 # The flow runs once scripts/e2e/fixtures.ts finds one (OSGILIATH_SEEDS).
