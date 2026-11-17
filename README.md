@@ -1,14 +1,18 @@
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/readme/banner-ringwraiths.webp">
+    <img src=".github/readme/banner-rivendell.webp" width="830" alt="Middle-Earth Player: The Lord of the Rings: The Card Game, solo, on your phone or computer">
+  </picture>
+</h1>
+
 <div align="center">
-  <img src=".github/readme/icon.png" width="128" height="128" alt="Middle-Earth Player app icon: the One Ring glowing on black">
-  <h1>Middle-Earth Player</h1>
-  <p><strong>The Lord of the Rings: The Card Game, solo, on your phone or computer.</strong><br>Offline, private, free and open source.</p>
+  <p><strong>Offline, private, free and open source.</strong></p>
   <p>
-    <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3E5A48"></a>
-    <a href="https://www.bestpractices.dev/projects/16744"><img src="https://www.bestpractices.dev/projects/16744/badge"></a>
-    <a href="https://github.com/j-jmnz/middle-earth-player/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release"></a>
-    <a href="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml/badge.svg?branch=main"></a>
-    <a href="ACCESSIBILITY.md#supported-features"><img alt="Accessibility: VoiceOver, TalkBack, Table as a list" src="https://img.shields.io/badge/accessibility-VoiceOver%20%7C%20TalkBack%20%7C%20Table%20as%20a%20list-3E5A48"></a>
-    <a href="ACCESSIBILITY.md#target"><img alt="Accessibility target: WCAG 2.2 AA" src="https://img.shields.io/badge/accessibility-WCAG%202.2%20AA-3E5A48"></a>
+    <a href="#android"><img alt="Android: APK" src="https://img.shields.io/badge/Android-APK-3E5A48?style=for-the-badge&logo=android&logoColor=white&labelColor=1E2328"></a>
+    <a href="#iphone-and-ipad"><img alt="iPhone and iPad: SideStore or AltStore" src="https://img.shields.io/badge/iPhone%20%C2%B7%20iPad-SideStore-3E5A48?style=for-the-badge&logo=apple&logoColor=white&labelColor=1E2328"></a>
+    <a href="#windows-macos-and-linux"><img alt="Windows: installer" src="https://img.shields.io/badge/Windows-.exe-3E5A48?style=for-the-badge&logo=windows&logoColor=white&labelColor=1E2328"></a>
+    <a href="#windows-macos-and-linux"><img alt="macOS: disk image" src="https://img.shields.io/badge/macOS-.dmg-3E5A48?style=for-the-badge&logo=apple&logoColor=white&labelColor=1E2328"></a>
+    <a href="#windows-macos-and-linux"><img alt="Linux: AppImage" src="https://img.shields.io/badge/Linux-AppImage-3E5A48?style=for-the-badge&logo=linux&logoColor=white&labelColor=1E2328"></a>
   </p>
   <p>
     <a href="#install"><strong>Install</strong></a> ·
@@ -17,38 +21,61 @@
     <a href="#get-involved"><strong>Get involved</strong></a> ·
     <a href="#support"><strong>Support</strong></a>
   </p>
+  <p>
+    <a href="https://github.com/j-jmnz/middle-earth-player/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release"></a>
+    <a href="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml/badge.svg?branch=main"></a>
+    <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3E5A48"></a>
+    <a href="https://www.bestpractices.dev/projects/16744"><img alt="OpenSSF Best Practices" src="https://www.bestpractices.dev/projects/16744/badge"></a>
+    <a href="ACCESSIBILITY.md"><img alt="Accessibility: screen readers, WCAG 2.2 AA target" src="https://img.shields.io/badge/accessibility-screen%20readers%20%C2%B7%20WCAG%202.2%20AA-3E5A48"></a>
+  </p>
 </div>
 
-Middle-Earth Player lets you play The Lord of the Rings: The Card Game solo on an iPhone, iPad or Android phone, or on a Windows, macOS or Linux computer. The app handles the rules, the encounter deck and the bookkeeping, so you can concentrate on your decisions.
-
 > [!IMPORTANT]
-> This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
+> This is a fan-made project. It is not an official app, and it is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises. All game content belongs to its owners.
+
+Play The Lord of the Rings: The Card Game solo on Android, iPhone, iPad, Windows, macOS or Linux. The app runs the rules, the encounter deck, the quests and the card effects.
 
 <p align="center">
-  <img src=".github/readme/game-board.webp" width="640" alt="Combat on the game board: a Black Rider's attack on Celeborn is resolved, then Haldir of Lórien attacks the Black Rider">
+  <img src=".github/readme/game-board.webp" width="830" alt="Combat on the game table: a Black Rider attacks Celeborn, then Haldir of Lórien attacks the Black Rider, whose 4 Defense blocks his 4 Attack">
 </p>
+
+<table>
+  <tr>
+    <td width="50%"><img src=".github/readme/campaign-path.webp" width="100%" alt="The Return of the King's campaign path, The Passing of the Grey Company at the start of the road"></td>
+    <td width="50%"><img src=".github/readme/deck-builder.webp" width="100%" alt="The Elves of Lórien deck in the deck builder: its heroes, allies, attachments, threat and cost curve"></td>
+  </tr>
+  <tr>
+    <td align="center">A campaign's path</td>
+    <td align="center">The deck builder</td>
+  </tr>
+</table>
 
 ## Features
 
-- **Play the official campaigns from start to finish.** Every scenario is set up, dealt and resolved for you, and the campaign log carries your boons, burdens and fallen heroes from one scenario to the next. Any scenario can also be played on its own.
+<table>
+  <tr>
+    <td width="50%" valign="top"><strong>Full campaigns</strong><br>Every scenario is set up and dealt for you. The campaign log carries boons, burdens and fallen heroes forward. Any scenario also plays on its own.</td>
+    <td width="50%" valign="top"><strong>The app runs the rules</strong><br>It applies every card effect and works out every number. You pick a legal move. Undo takes it back.</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Easy, Normal or Nightmare</strong><br>Nightmare where a scenario has it. Play one hand, or two on the same device.</td>
+    <td valign="top"><strong>Deck builder</strong><br>Every player card, the official pre-built decks, and import from a RingsDB link.</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Rules at hand</strong><br>The rules reference, the printed booklets and a glossary, open from the table.</td>
+    <td valign="top"><strong>Card art included</strong><br>Every picture comes with the app. Nothing to download.</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Mouse and keyboard</strong><br>Hover lifts a card and right click previews it. Escape closes a panel. Z is Undo.</td>
+    <td valign="top"><strong>Screen readers</strong><br>With a screen reader on, the table becomes a list of zones and cards.</td>
+  </tr>
+</table>
 
-  <img src=".github/readme/start-a-campaign.webp" width="480" alt="Starting The Return of the King: the campaign map opens, then the first scenario's setup screen with a deck chosen and the Deal button">
-
-- **Let the app run the rules.** The engine applies every rule and card effect and works out every number. You choose from the legal moves it offers, and Undo takes a move back.
-- **Choose your challenge.** Play on Easy or Normal, and try Nightmare mode on the scenarios that have it.
-- **Play true solo or two-handed.** Run one seat, or two seats on the same device.
-- **Use a mouse and keyboard.** On a computer the table answers the pointer (hover lifts a card, the wheel steps through the hand, right click opens a preview) and the keys (Escape and Z).
-- **Build your decks.** The deck builder has the full player-card pool and the official pre-built decks, and it imports any public deck from a RingsDB link.
-
-  <img src=".github/readme/decks.webp" width="480" alt="The deck list with the pre-built decks, then the Elves of Lórien deck open in the editor with its heroes, allies, attachments, threat and cost curve">
-
-- **Look things up without leaving the game.** The rules reference and the printed booklets are built in, along with a glossary you can open from the table.
-- **See the cards.** Card art ships with the app, so nothing needs downloading.
-- **Make it yours.** Choose a dark or light theme, the size of the interface, the animation speed and haptics, and look back over your run history.
+You can also pick the theme, the interface size, the animation speed and haptics, and see your past games.
 
 ### Themes
 
-Ringwraiths is the dark theme, with Minas Morgul's pale green moonlight over a near-black table. Rivendell is the light theme, with warm parchment in morning sunlight. Pick one in Settings, or let the app follow your device.
+Ringwraiths is the dark theme: pale green moonlight over a black table. Rivendell is the light one: warm parchment. Pick one in Settings, or follow your device.
 
 <table>
   <tr>
@@ -56,20 +83,16 @@ Ringwraiths is the dark theme, with Minas Morgul's pale green moonlight over a n
     <th>Rivendell (light)</th>
   </tr>
   <tr>
-    <td align="center"><img src=".github/readme/theme-phone-ringwraiths.webp" width="240" alt="The Campaigns screen on a phone in the Ringwraiths theme: dark, with green fog behind the Fellowship of the Ring campaign and a pale Resume button"></td>
-    <td align="center"><img src=".github/readme/theme-phone-rivendell.webp" width="240" alt="The Campaigns screen on a phone in the Rivendell theme: light parchment behind the Fellowship of the Ring campaign and a dark green Resume button"></td>
-  </tr>
-  <tr>
-    <td align="center"><img src=".github/readme/theme-tablet-ringwraiths.webp" width="400" alt="The game board on a tablet in the Ringwraiths theme, at the Assault on Helm's Deep quest: cards over a red and green fog"></td>
-    <td align="center"><img src=".github/readme/theme-tablet-rivendell.webp" width="400" alt="The same game board on a tablet in the Rivendell theme: the cards over warm parchment"></td>
+    <td align="center"><img src=".github/readme/theme-phone-ringwraiths.webp" width="300" alt="The Campaigns screen on a phone in the Ringwraiths theme: dark, with green fog behind the Fellowship of the Ring campaign and a pale Resume button"></td>
+    <td align="center"><img src=".github/readme/theme-phone-rivendell.webp" width="300" alt="The Campaigns screen on a phone in the Rivendell theme: light parchment behind the Fellowship of the Ring campaign and a dark green Resume button"></td>
   </tr>
 </table>
 
-### Campaigns
+## What you can play
 
-All eight official campaigns from the revised, repackaged products are playable. They're listed here in the order the app shows them.
+All eight official campaigns from the revised products, in the order the app lists them. A cycle has no campaign, so you play its scenarios one at a time from the Scenarios tab.
 
-| Campaign | Product | Scenarios |
+| Campaign or cycle | Product | Scenarios |
 | --- | --- | --- |
 | Mirkwood Paths | Revised Core Set and The Dark of Mirkwood | 5 |
 | The Dark of Mirkwood | The Dark of Mirkwood | 2 |
@@ -79,101 +102,124 @@ All eight official campaigns from the revised, repackaged products are playable.
 | The Return of the King | The Return of the King Saga Expansion | 6 |
 | Dream-chaser | Dream-chaser Campaign Expansion | 9 |
 | Ered Mithrin | Ered Mithrin Campaign Expansion | 9 |
+| Shadows of Mirkwood (cycle) | The Hunt for Gollum to Return to Mirkwood (six Adventure Packs) | 6 |
 
-### Cycles
-
-A cycle's scenarios belong to no campaign, so you play them one at a time from the Scenarios tab, on Easy, Normal or Nightmare.
-
-| Cycle | Products | Scenarios |
-| --- | --- | --- |
-| Shadows of Mirkwood | The Hunt for Gollum to Return to Mirkwood (six Adventure Packs) | 6 |
-
-There is no online multiplayer, and there won't be: the app is built for one device.
+There is no online multiplayer, and there won't be. The app is built for one device.
 
 ## Private by design
 
-There are no accounts, and the app does no tracking, shows no ads, and sends no analytics or crash reports. Cards, rules, booklets and card art all ship inside the app, so you can play anywhere. The only time it goes online is when you import a deck from RingsDB. Your saves live in the app's private storage: a phone deletes them with the app, and a computer keeps them in the app's profile folder until you delete it. On Android the app asks for two permissions, `INTERNET` and `VIBRATE`; on iOS and on the desktop it asks for none.
+No accounts, no tracking, no ads, no analytics, no crash reports. Cards, rules, booklets and art are all inside the app. It goes online only to import a RingsDB deck.
 
-You don't have to take this on trust. [PRIVACY.md](PRIVACY.md) is the full policy, and [SECURITY.md](SECURITY.md) names the code behind each of these promises, describes how the build and release pipeline is locked down, and explains how to report a vulnerability.
+Your saves stay on your device. A phone deletes them with the app; a computer keeps them in the app's profile folder until you delete it. On Android the app asks for two permissions, `INTERNET` and `VIBRATE`. On iOS and desktop it asks for none.
+
+[PRIVACY.md](PRIVACY.md) is the full policy. [SECURITY.md](SECURITY.md) shows the code behind each promise, how releases are built, and how to report a vulnerability.
 
 ## Accessibility
 
-You can play a full game with VoiceOver or TalkBack: with a screen reader on, the table turns into a list of zones and cards. On a computer the same happens with NVDA, Narrator, VoiceOver for Mac or Orca, and the desktop app works with the keyboard and the mouse. Settings let you use that list table without a reader, and adjust text size, contrast, motion, how long banners and confirmations wait, and whether titles use a plain typeface. The app aims for WCAG 2.2 AA and the Game Accessibility Guidelines, but it hasn't been audited and makes no claim of conformance. [ACCESSIBILITY.md](ACCESSIBILITY.md) describes what is supported and the gaps that remain.
+You can play a whole game with a screen reader: VoiceOver, TalkBack, NVDA, Narrator or Orca. The table becomes a list of zones and cards. You can also turn on the list without a reader, and change text size, contrast, motion, how long messages stay, and the title typeface.
+
+The app aims for WCAG 2.2 AA and the Game Accessibility Guidelines. It hasn't been audited, so it claims no conformance. [ACCESSIBILITY.md](ACCESSIBILITY.md) lists what works and what doesn't yet.
 
 ## Install
 
-The app isn't on the Play Store, the App Store or any other store. On Android you install the APK from the [Releases page](https://github.com/j-jmnz/middle-earth-player/releases). On an iPhone or iPad you install the IPA through SideStore or AltStore, which sign it with your own Apple ID. On Windows, macOS or Linux you download the installer for your system from the same page. It's free, and once it's installed it never needs a network connection.
+The app isn't in any app store. Get it from the [Releases page](https://github.com/j-jmnz/middle-earth-player/releases). It's free and works offline once installed.
 
-### Requirements
+| Platform | You need | Download |
+| --- | --- | --- |
+| Android | Android 7.0 or later, 64-bit | `.apk` |
+| iPhone, iPad | iOS 15.1 or later, a free Apple ID, and SideStore or AltStore Classic. A computer once, for setup. | `source.json` or `.ipa` |
+| Windows | 64-bit | `.exe` installer or portable `.zip` |
+| macOS | Apple silicon or Intel | `.dmg` |
+| Linux | 64-bit x86 | `.AppImage` or `.deb` |
 
-- An Android phone running Android 7.0 or later, on a 64-bit processor.
-- Or an iPhone or iPad running iOS or iPadOS 15.1 or later, a free Apple ID, and SideStore or AltStore Classic. You need a computer once, for the setup. AltStore also needs AltServer running on that computer to refresh the app each week.
-- Or a 64-bit Windows PC, a Mac (Apple silicon or Intel) or a 64-bit x86 Linux PC.
-- Wi-Fi, and free space of at least twice the download size. The desktop installers are large, because every card picture and booklet is inside them.
+Use Wi-Fi, and have twice the download size free. The desktop downloads are large because every card picture and booklet is inside.
 
-### Android
+<a name="android"></a>
+<details open>
+<summary><strong>Android</strong></summary>
 
-1. On your phone, open the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest), and under Assets tap `middle-earth-player-v<version>.apk`. You can ignore the `.sha256` file.
-2. Open the download from your browser or your Files app.
-3. If the phone asks, allow that app to install unknown apps (Settings, Allow from this source), then go back.
+1. On your phone, open the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest). Under Assets, tap `middle-earth-player-v<version>.apk`. Skip the `.sha256` file.
+2. Open the download.
+3. If asked, allow your browser or Files app to install apps, then go back.
 4. Tap Install. If Play Protect warns you, tap More details, then Install anyway.
-5. Open Middle-Earth Player.
 
-To update, install the newer `.apk` the same way and your saves carry over. Don't uninstall the old version first, because that deletes your saves.
+To update, install the new `.apk` the same way. Your saves stay. Don't uninstall first: that deletes your saves.
 
-#### Automatic updates with Obtainium
+</details>
 
-[Obtainium](https://obtainium.imranr.dev) is a free app that checks the Releases page for you and installs each new version as it comes out.
+<a name="automatic-updates-with-obtainium"></a>
+<details>
+<summary><strong>Automatic Android updates with Obtainium</strong></summary>
 
-1. Install Obtainium from its [GitHub releases](https://github.com/ImranR98/Obtainium/releases/latest) or from F-Droid.
-2. On your phone, tap [Add to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.middleearth.player%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fj-jmnz%2Fmiddle-earth-player%22%2C%22author%22%3A%22j-jmnz%22%2C%22name%22%3A%22Middle-Earth%20Player%22%7D). If the link doesn't open Obtainium, open Obtainium, tap Add App, paste `https://github.com/j-jmnz/middle-earth-player`, and tap Add.
-3. Tap Install. If Middle-Earth Player is already on the phone, Obtainium picks it up and offers the next release as an update.
+[Obtainium](https://obtainium.imranr.dev) is a free app that installs each new release for you.
 
-Obtainium checks in the background and tells you when an update is ready. On Android 12 or later it can install updates without asking each time, but only for apps it installed itself. Your saves carry over just as they do with a manual update.
+1. Install Obtainium from its [GitHub releases](https://github.com/ImranR98/Obtainium/releases/latest) or F-Droid.
+2. On your phone, tap [Add to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.middleearth.player%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fj-jmnz%2Fmiddle-earth-player%22%2C%22author%22%3A%22j-jmnz%22%2C%22name%22%3A%22Middle-Earth%20Player%22%7D). If that doesn't open Obtainium, open it yourself, tap Add App, paste `https://github.com/j-jmnz/middle-earth-player` and tap Add.
+3. Tap Install. If the app is already installed, Obtainium picks it up.
 
-### iPhone and iPad
+Obtainium checks in the background. On Android 12 or later it can update without asking, for apps it installed itself. Your saves stay.
 
-1. Set up [SideStore](https://sidestore.io), which refreshes the app on the phone itself, or [AltStore Classic](https://altstore.io), which refreshes it through AltServer on a computer on the same Wi-Fi. AltStore PAL won't work, because it only installs apps from its own marketplace.
-2. On iOS 16 and later, turn on Developer Mode (Settings, Privacy & Security) and restart.
+</details>
+
+<a name="iphone-and-ipad"></a>
+<details>
+<summary><strong>iPhone and iPad</strong></summary>
+
+1. Set up [SideStore](https://sidestore.io), which refreshes the app on the phone, or [AltStore Classic](https://altstore.io), which refreshes it from AltServer on a computer on the same Wi-Fi. AltStore PAL won't work.
+2. On iOS 16 or later, turn on Developer Mode (Settings, Privacy & Security) and restart.
 3. In SideStore or AltStore, open Sources, tap +, and add `https://github.com/j-jmnz/middle-earth-player/releases/latest/download/source.json`.
 4. Open the Middle-Earth Player source and tap Free or Get.
 
-You can also download the `.ipa` from the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest) in Safari and add it under My Apps, +.
+Or download the `.ipa` from the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest) in Safari and add it under My Apps, +.
 
-An app signed with a free Apple ID stays valid for 7 days. SideStore and AltStore refresh it in the background, or you can tap Refresh All in My Apps. A free Apple ID allows 3 sideloaded apps at once, and SideStore or AltStore counts as one of them. Updates show up in the source and keep your saves, but deleting the app deletes them.
+A free Apple ID signs the app for 7 days. SideStore and AltStore refresh it in the background, or tap Refresh All in My Apps. A free Apple ID allows 3 sideloaded apps, SideStore or AltStore included. Updates appear in the source and keep your saves. Deleting the app deletes them.
 
-If a release's notes include a TestFlight link, you can use that instead: install [TestFlight](https://apps.apple.com/app/testflight/id899247664), open the link, tap Accept, then Install. TestFlight builds never need refreshing, but they expire 90 days after they are published.
+If a release's notes have a TestFlight link, you can use that instead: install [TestFlight](https://apps.apple.com/app/testflight/id899247664), open the link, tap Accept, then Install. TestFlight builds never need refreshing but expire after 90 days.
 
-### Windows, macOS and Linux
+</details>
 
-The desktop builds are not signed by Microsoft or Apple, so the first launch shows a warning. Under Assets on the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest), download the file for your system:
+<a name="windows-macos-and-linux"></a>
+<details>
+<summary><strong>Windows, macOS and Linux</strong></summary>
 
-- **Windows (64-bit):** `middle-earth-player-v<version>-win-x64.exe` is the installer. Run it, and when SmartScreen says "Windows protected your PC", choose More info, then Run anyway. `middle-earth-player-v<version>-win-x64.zip` is the portable version: unzip it anywhere and run `Middle-Earth Player.exe` from the folder, with the same SmartScreen step.
-- **macOS:** `middle-earth-player-v<version>-mac-universal.dmg` runs on Apple silicon and Intel Macs. Open it and drag Middle-Earth Player to Applications. The first time, right-click the app, choose Open, then choose Open again; a double-click is refused for an app Apple hasn't signed. On macOS 15 or later that step is gone: try to open the app once, then go to System Settings, Privacy & Security and choose Open Anyway.
-- **Linux (x86-64):** `middle-earth-player-v<version>-linux-x64.AppImage` runs after `chmod +x` on it. Or install `middle-earth-player-v<version>-linux-x64.deb` with your package manager, for example `sudo apt install ./middle-earth-player-v<version>-linux-x64.deb`.
+The desktop apps aren't signed by Microsoft or Apple, so the first launch shows a warning. Download your file from Assets on the [latest release](https://github.com/j-jmnz/middle-earth-player/releases/latest):
 
-Your saves stay on that computer, in the app's profile folder ([PRIVACY.md](PRIVACY.md) says where). To update, install the newer release over the old one. To move your campaigns to another computer, or to keep a copy, use Settings, Back up saves, and on the other computer Restore from a backup. The app never updates itself and never goes online but for a RingsDB deck import.
+- **Windows:** run `middle-earth-player-v<version>-win-x64.exe`. When SmartScreen says "Windows protected your PC", choose More info, then Run anyway. Or unzip the portable `-win-x64.zip` anywhere and run `Middle-Earth Player.exe`.
+- **macOS:** open `middle-earth-player-v<version>-mac-universal.dmg` and drag the app to Applications. The first time, right-click it and choose Open twice. On macOS 15 or later, try to open it once, then choose Open Anyway in System Settings, Privacy & Security.
+- **Linux:** run `chmod +x` on `middle-earth-player-v<version>-linux-x64.AppImage`, then run it. Or install the `.deb`, for example `sudo apt install ./middle-earth-player-v<version>-linux-x64.deb`.
 
-### Check a download (optional)
+Saves stay on that computer ([PRIVACY.md](PRIVACY.md) says where). To update, install the new release over the old one. To move or copy your campaigns, use Settings, Back up saves, then Restore from a backup on the other computer. The app never updates itself.
 
-Each release's notes give the SHA-256 of every file, and a `.sha256` file sits beside each download. The notes also give the fingerprint of the APK's signing certificate. You can check a file with `sha256sum` on Linux, `shasum -a 256` on macOS or `certutil -hashfile <file> SHA256` on Windows.
+</details>
 
-### If something goes wrong
+<a name="check-a-download-optional"></a>
+<details>
+<summary><strong>Check a download (optional)</strong></summary>
 
-- Android says "App not installed": the phone is 32-bit or older than Android 7.0, it is short of space, or a copy you built yourself is already installed. In the last case, uninstall that copy first, knowing its saves go with it.
-- The download stops or won't open: download it again over Wi-Fi.
-- On a Mac, "Middle-Earth Player can't be opened" or "is damaged": right-click the app and choose Open instead of double-clicking. If it still refuses, run `xattr -dr com.apple.quarantine /Applications/Middle-Earth\ Player.app` in Terminal once.
-- On Linux the AppImage won't start: it needs FUSE 2 on some systems (`libfuse2`), or run it with `--appimage-extract-and-run`.
-- On iOS, the app stops opening after a few days: its signature has expired. Refresh it in SideStore or AltStore, with AltServer running on the same Wi-Fi if you use AltStore.
-- You've hit the app limit: remove a sideloaded app you no longer use.
-- The TestFlight beta is full: use SideStore or AltStore instead.
-- For anything else, [open an issue](https://github.com/j-jmnz/middle-earth-player/issues/new/choose) and include your device, its OS version and the app version shown in Settings.
+Each release lists the SHA-256 of every file, with a `.sha256` file beside each download, and the APK's signing certificate fingerprint. Check a file with `sha256sum` on Linux, `shasum -a 256` on macOS or `certutil -hashfile <file> SHA256` on Windows.
+
+</details>
+
+<a name="if-something-goes-wrong"></a>
+<details>
+<summary><strong>If something goes wrong</strong></summary>
+
+- **Android says "App not installed":** the phone is 32-bit or older than Android 7.0, it's short of space, or a copy you built yourself is installed. Uninstall that copy first; its saves go with it.
+- **The download stops or won't open:** download it again over Wi-Fi.
+- **Mac says the app "can't be opened" or "is damaged":** right-click it and choose Open. If that fails, run `xattr -dr com.apple.quarantine /Applications/Middle-Earth\ Player.app` in Terminal once.
+- **The Linux AppImage won't start:** install FUSE 2 (`libfuse2`), or run it with `--appimage-extract-and-run`.
+- **The iOS app stops opening after a few days:** its signature expired. Refresh it in SideStore or AltStore (with AltServer running, for AltStore).
+- **You've hit the 3-app limit:** remove a sideloaded app you don't use.
+- **The TestFlight beta is full:** use SideStore or AltStore.
+- **Anything else:** [open an issue](https://github.com/j-jmnz/middle-earth-player/issues/new/choose) with your device, its OS version and the app version from Settings.
+
+</details>
 
 ## Roadmap
 
-The goal is every official campaign and scenario, followed by the fan-made content from [A Long-extended Party](https://alongextendedparty.com) (ALeP).
+Every official campaign and scenario, then the fan-made content from [A Long-extended Party](https://alongextendedparty.com) (ALeP).
 
-With the official campaigns done, the cycles come next. A cycle is a group of scenarios that belongs to no campaign, so its scenarios are played standalone only, from the Scenarios tab. The Shadows of Mirkwood cycle is playable: The Hunt for Gollum, Conflict at the Carrock, A Journey to Rhosgobel, The Hills of Emyn Muil, The Dead Marshes and Return to Mirkwood, each on Easy, Normal and Nightmare. The rest wait under Coming later in the app until at least one of their scenarios is playable (`data/overrides.json`, campaigns). They come in release order, going by the US release of the product that starts each one:
+The official campaigns are done, so the cycles are next. Shadows of Mirkwood is playable: six scenarios, each on Easy, Normal and Nightmare. The other cycles show under Coming later in the app until one of their scenarios is playable. They come in release order:
 
 <details>
 <summary>The cycles, in order</summary>
@@ -186,69 +232,29 @@ With the official campaigns done, the cycles come next. A cycle is a group of sc
 - The Haradrim cycle: Escape from Umbar, Desert Crossing, The Long Arm of Mordor, The Mûmakil, Race Across Harad, Beneath the Sands, The Black Serpent, The Dungeons of Cirith Gurat, The Crossings of Poros.
 - The Vengeance of Mordor cycle: The River Running, Danger in Dorwinion, The Temple of Doom, Wrath and Ruin, The City of Ulfast, Challenge of the Wainriders, Under the Ash Mountains, The Land of Sorrow, The Fortress of Nurn.
 
+
 </details>
 
-ALeP's content comes after all of these. [docs/phases/STATUS.md](docs/phases/STATUS.md) tracks the work in progress.
+[docs/phases/STATUS.md](docs/phases/STATUS.md) tracks the work in progress.
 
 ## Get involved
 
-Middle-Earth Player is open source under the MIT License, and you don't need to write code to help.
+The app is open source under the MIT License. You don't need to code to help.
 
-- **Report a rules or card bug.** If a card or a ruling plays wrongly, the [Rules or card bug form](https://github.com/j-jmnz/middle-earth-player/issues/new?template=rules-bug.yml) asks for the card or rule and the printed source it comes from. These reports are the most useful thing a player can send.
-- **Report an accessibility barrier.** The [accessibility form](https://github.com/j-jmnz/middle-earth-player/issues/new?template=accessibility.yml) asks for your device, assistive technology and what got in the way. Barriers are treated as bugs.
-- **Report a bug or suggest a feature** through the [other issue forms](https://github.com/j-jmnz/middle-earth-player/issues/new/choose).
-- **Contribute code or docs.** [CONTRIBUTING.md](CONTRIBUTING.md) explains how to get started and how a change lands, and everyone follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+- **Rules or card bug:** use the [Rules or card bug form](https://github.com/j-jmnz/middle-earth-player/issues/new?template=rules-bug.yml). Name the card or rule and where it's printed. These reports help most.
+- **Accessibility barrier:** use the [accessibility form](https://github.com/j-jmnz/middle-earth-player/issues/new?template=accessibility.yml). Barriers are treated as bugs.
+- **Other bugs and ideas:** use the [other issue forms](https://github.com/j-jmnz/middle-earth-player/issues/new/choose).
+- **Code or docs:** start with [CONTRIBUTING.md](CONTRIBUTING.md). Everyone follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-Report security problems privately, as [SECURITY.md](SECURITY.md) describes, rather than in a public issue.
-
-### AI-assisted development
-
-Claude (Anthropic) writes most of the code, tests and docs in Claude Code. The maintainer directs that work: they set the product and its rules and decide what lands on `main`. Commits written this way name Claude as the author or in a `Co-Authored-By` line. The instructions the agents follow are in `CLAUDE.md`, `.claude/rules/` and `.claude/agents/`; you don't need them to contribute.
-
-Nothing lands until CI passes the tests, lint, the type check and the data check. Rules come from the printed cards and booklets, and the engine code cites the id of each rule it implements.
-
-### Project structure
-
-- `data/` holds the card, scenario and rules data. It is committed and built offline from snapshots in `data/raw/`, and `data/sources.json` pins every source.
-- `data/printed/` records the lines printed on each card, read from its scan. This is the card text the app uses.
-- Each printed line is implemented by an effect record, generated in `src/effects/generated/` or hand-written in `src/effects/authored/`. A scenario becomes playable once every line it deals has a record.
-- `src/rules/` is the rules engine: a pure reducer, split by mechanic family.
-- `desktop/` is the Electron shell that packs the web build into the Windows, macOS and Linux apps.
-- When sources disagree, [.claude/rules/authority.md](./.claude/rules/authority.md) says which one wins.
-
-The stack is Expo SDK 58, Expo Router, Skia, Reanimated, NativeWind, SQLite with Drizzle, Zustand and Zod, with Electron for the desktop app. [docs/architecture.md](docs/architecture.md) goes into detail.
-
-### Local setup
-
-You need Node 22.18 or later and pnpm 10.34.1 (`corepack enable` installs the pinned version). `poppler` is optional: it renders the campaign, boon and burden cards from FFG's PDFs, and without it those cards fall back to their scans.
-
-```bash
-git clone https://github.com/j-jmnz/middle-earth-player.git
-cd middle-earth-player
-pnpm install
-pnpm test        # no network or prebuilt database needed
-pnpm web         # opens the app in a browser; narrow the window to phone width
-pnpm desktop dev # opens the app in the Electron desktop shell
-```
-
-Before you push, run `pnpm lint` and `pnpm typecheck` as well. [docs/development.md](docs/development.md) covers phone builds, the Maestro flows and every `pnpm` command.
-
-### Documentation
-
-- [docs/brief.md](docs/brief.md) records the product decisions and the rules as implemented.
-- [docs/architecture.md](docs/architecture.md) covers the code layout, state, the engine and the tests.
-- [docs/development.md](docs/development.md) covers running the app, the test flows and the commands.
-- [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md) describe the screens and the game table.
-- [docs/releasing.md](docs/releasing.md) walks through the release pipeline.
-- [docs/INDEX.md](docs/INDEX.md) is a generated index of every doc, section by section.
+Report security problems privately, as [SECURITY.md](SECURITY.md) says, not in a public issue.
 
 ## Support
 
-If you enjoy the app, you can support its development through [GitHub Sponsors](https://github.com/sponsors/j-jmnz) or [Ko-fi](https://ko-fi.com/jjmnz). Donations pay for development time and build costs, never for game content. Nothing is paywalled and supporters get no rewards: every build is the same, free for everyone. The app itself never asks for money.
+If you enjoy the app, you can support it through [GitHub Sponsors](https://github.com/sponsors/j-jmnz) or [Ko-fi](https://ko-fi.com/jjmnz). Donations pay for development time and build costs, never for game content. Supporters get no rewards and nothing is paywalled: every build is free and the same for everyone. The app never asks for money.
 
 ## Attribution
 
-The Lord of the Rings: The Card Game and all of its content are © Fantasy Flight Games. The Lord of the Rings and its characters and places are trademarks of Middle-earth Enterprises. Every source is pinned by URL and sha256 in `data/sources.json`.
+The Lord of the Rings: The Card Game and all its content are © Fantasy Flight Games. The Lord of the Rings and its characters and places are trademarks of Middle-earth Enterprises. `data/sources.json` pins every source by URL and sha256.
 
 | Resource | Source |
 | --- | --- |
@@ -264,4 +270,4 @@ The Lord of the Rings: The Card Game and all of its content are © Fantasy Fligh
 
 ## License
 
-The code and documentation are under the [MIT License](LICENSE). Game content, `data/raw/` and the fonts stay under their owners' terms; [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) has the details.
+The code and docs are under the [MIT License](LICENSE). Game content, `data/raw/` and the fonts stay under their owners' terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
