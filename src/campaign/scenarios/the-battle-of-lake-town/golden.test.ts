@@ -1,5 +1,7 @@
-// Rules: TODO name the rule ids the scenario implements (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, ltp.scoring, docs/brief.md (The Battle of Lake-town) (data/rules/entries.json).
 import { describe, expect } from "vitest";
+
+import type { ScenarioState } from "../../../rules/core/state.ts";
 
 import { TOWN_GOLDENS, playGolden, townWorld, type TownDecks, type TownGolden } from "../../../../test/scenarios/the-battle-of-lake-town/game.ts";
 import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
@@ -7,13 +9,17 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 
 const cycle = loadCampaign("standalone-scenarios");
 const town = loadAnyScenario("the-battle-of-lake-town");
+const cardsOf = (state: ScenarioState, ...codes: string[]) => Object.values(state.cards).filter((card) => codes.includes(card.code));
+const lakeDamage = (state: ScenarioState) => cardsOf(state, "50207")[0]?.damage ?? 0;
 
 // A permanent golden: whole standalone games of The Battle of Lake-town played by the auto-player (test/scenarios/the-battle-of-lake-town/game.ts) on fixed seeds, through a win and through each way to lose.
-// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. TODO: say what the games cover. Update the snapshot only when the change is meant.
+// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed on Normal and on Easy: each round a Smaug is revealed into the play area, the players travel, quest with one hero and
+// attack him with the others; the quest goes a stage a round to The Dragon's Wrath, which Smaug's defeat ends with more Victory points in the victory display than damage on Lake-town (one win has the heroes take the Burn damage, 14 rounds, the other
+// leaves it all on Lake-town). The losses are every player's threat at 50, every hero destroyed, 50 damage on Lake-town and Smaug defeated for too few points. Update the snapshot only when the change is meant.
 //
-// Open until the goldens are chosen: the suite is skipped, so it writes no golden.json. To finish it, fill TOWN_GOLDENS, change `describe.skip` to `describe`, fill the TODOs below, run this file
-// (it writes golden.json) and uncomment this scenario's two lines in test/harness/golden-registry.ts (its test fails on a golden.json that is not listed).
-describe.skip("The Battle of Lake-town golden (open: scaffold)", () => {
+// Open until the scenario is playable (`readBy` on its ledger sides, data/printed/standalone-scenarios.json): the suite is skipped, so it writes no golden.json. To finish it, change `describe.skip` to `describe`, run this file (it writes golden.json),
+// and uncomment this scenario's two lines in test/harness/golden-registry.ts (its test fails on a golden.json that is not listed).
+describe.skip("The Battle of Lake-town golden (open: not playable until readBy is set)", () => {
   goldenSuite<TownGolden, TownDecks>({
     title: "The Battle of Lake-town",
     file: new URL("./golden.json", import.meta.url).pathname,
@@ -24,16 +30,31 @@ describe.skip("The Battle of Lake-town golden (open: scaffold)", () => {
     world: townWorld,
     play: playGolden,
     opening: {
-      title: "TODO: starts with (the staging area, the cards set aside, the encounter deck, the quest stage)",
+      title: "starts at Terror from the Mountain with Lake-town and a card revealed for each player in the staging area, the 9 Smaug cards in the Smaug deck and the later stages in the quest deck",
       check(state, golden) {
-        // TODO: the opening the Setup leaves.
-        expect(state.questStage, golden.name).toBeTruthy();
+        expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("50201");
+        expect(["50202", "50203"].map((code) => cardsOf(state, code).map((card) => card.zone)), golden.name).toEqual([["questDeck"], ["questDeck"]]);
+        // Lake-town is staged by the data and holds no damage but what the cards revealed in Setup put on it; no Smaug is in play before round 1 (their deck holds all nine).
+        expect(cardsOf(state, "50207").map((card) => card.zone), golden.name).toEqual(["staging"]);
+        expect(cardsOf(state, "50204", "50205", "50206").map((card) => card.zone), golden.name).toEqual(Array(9).fill("smaugDeck"));
+        expect(state.piles?.smaugDiscard, golden.name).toEqual([]);
       },
     },
-    wins: "TODO: wins when ..., settles with a score and earns nothing",
-    won(state) {
-      // TODO: the stage the game ended on.
-      expect(state.stageCleared).toBe(true);
+    wins: "ends when The Dragon's Wrath is defeated by Smaug's defeat with more Victory points than damage on Lake-town, settles at once with a score and earns nothing",
+    won(state, golden) {
+      expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("50203");
+      expect(lakeDamage(state), golden.name).toBeLessThan(50);
+      expect(state.seats.slice(0, golden.seatCount).some((seat) => !seat.eliminated), golden.name).toBe(true);
+    },
+    lost(state, golden) {
+      const seats = state.seats.slice(0, golden.seatCount);
+      if (golden.lossReason === "Lake-town holds 50 damage") expect(lakeDamage(state), golden.name).toBeGreaterThanOrEqual(50);
+      else if (golden.lossReason?.startsWith("Smaug was defeated")) expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("50203");
+      else {
+        expect(seats.every((seat) => seat.eliminated), golden.name).toBe(true);
+        // Two ways to be eliminated: the threat reached 50, or no hero is left.
+        expect(golden.decks === "weak" ? seats.every((seat) => seat.threat >= 50) : seats.every((seat) => seat.heroes.length === 0), golden.name).toBe(true);
+      }
     },
   });
 });

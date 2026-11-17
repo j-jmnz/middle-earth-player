@@ -69,7 +69,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     subject: SMAUG,
     instructions: [
       { verb: "WinGame", when: { kind: "less", left: { lakeTownDamage: true }, right: { victoryDisplay: true } } },
-      { verb: "LoseGame", when: { kind: "not", condition: { kind: "less", left: { lakeTownDamage: true }, right: { victoryDisplay: true } } } },
+      { verb: "LoseGame", reason: "Smaug was defeated, but the victory display holds no more Victory points than the damage on Lake-town", when: { kind: "not", condition: { kind: "less", left: { lakeTownDamage: true }, right: { victoryDisplay: true } } } },
     ],
   },
 
