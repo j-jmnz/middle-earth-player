@@ -10,7 +10,7 @@ import { pickSchema } from "./effect-schema-pick.ts";
 // `other` is the second card the answered event names: the enemy a character defends against or attacks, the enemy an
 // attack destroyed, the defender of an attack that resolved.
 // `previous` is the card picked before the last, `discardTop` the top card of the encounter discard pile (the last card put there), `questStage` the main quest card now (Hrogar's Hill, 19083:B:1).
-export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage"]);
+export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage", "smaug", "lakeTown"]);
 
 // The decks beside the encounter deck a record names (emce.caves-deck, emce.evil-creatures-deck, mec112.setup-journey-to-the-cross-roads; src/rules/core/piles.ts NAMED_PILES): the one list `pile` of a wilderland verb, the amount `pile` and the condition `pileHas` share.
 export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug"]);
@@ -121,6 +121,9 @@ export const amountExprSchema = z.strictObject({
   minasTirithLeft: z.literal(true).optional(),
   // A count the earlier Resolution recorded in the Campaign Log's notes ("X is the number recorded in the campaign log", 145078:A:1), 0 when none is recorded or the game has no log. Read by the campaign family.
   recorded: z.enum(RECORDED_COUNTS).optional(),
+  // The Battle of Lake-town (docs/brief.md, The Battle of Lake-town), read by the smaug family: the damage on Lake-town ("X is the amount of damage on Lake-town", 50222:A:2), and the Victory points in the victory display (50203:B:3).
+  lakeTownDamage: z.literal(true).optional(),
+  victoryDisplay: z.literal(true).optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);

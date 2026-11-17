@@ -3,7 +3,7 @@
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope } from "../../interpret/amounts.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -22,7 +22,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PlaceDamageOn":
       return changeDamage(state, instruction.code, instruction.amount, steps, ctx);
     case "RemoveDamageFrom":
-      return changeDamage(state, instruction.code, -instruction.amount, steps, ctx);
+      // An amount that is read (stage 2B of The Battle of Lake-town heals as many as the first player chose) may come to 0 and then removes nothing.
+      return changeDamage(state, instruction.code, -resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), steps, ctx);
     case "SacrificeForDamage":
       return sacrificeForDamage(state, instruction.code, ctx, steps);
     case "AttachToSubject":

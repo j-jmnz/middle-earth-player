@@ -380,6 +380,8 @@ export type ScenarioState = {
   pendingAttack: PendingAttack | null;
   // The round the first player was asked whether a side quest is the current quest (families/wilderland/night.ts); kept only in a game with encounter side quests.
   sideAsked?: number;
+  // The round the first player chose where the next Smaug goes (families/smaug/deck.ts); kept only in a game with a Smaug deck.
+  smaugAsked?: number;
   // The game deals encounter side quests in its encounter deck, not in a side quest deck of its own (Intruders in Chetwood, mec108.side-quests): the side quest reads of families/wilderland/night-quest.ts apply. Set at the start (markSideQuests), absent in every other game.
   sideQuests?: true;
   // The game has a card that asks whether progress was placed on a side quest this round ("if no progress was placed on Lie Low this round", 10081:A:1): the engine notes each placement as `progressPlacedHere` (families/angmar/progress.ts). Set at the start (markProgressNoted), absent in every other game.

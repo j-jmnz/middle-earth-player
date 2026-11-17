@@ -26,7 +26,7 @@ import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, trave
 import { flagged, modifierActive, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
 import { sideQuestReason } from "../families/sidequests/quest.ts";
-import { familyAttackReason, familyDefenseReason, familyMayTravel, familyTravelReach } from "../interpret/family-hooks.ts";
+import { familyAttackReason, familyDefenseReason, familyMayTravel, familyTravelReach, familyTravelSecond } from "../interpret/family-hooks.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploring } from "../families/island/map.ts";
 import { islandMayTravel, islandReach } from "../families/island/travel.ts";
@@ -229,7 +229,7 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
 // A slot is free for the traveling seat: its own active location once stages are separate (families/breaking/areas.ts).
 // Under Exploration the active location stays, and the players may travel from it once it holds progress equal to its quest points (families/island/travel.ts).
 function canTravel(state: ScenarioState, ctx: ReduceContext): boolean {
-  return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state) || islandMayTravel(state, ctx.cards) || familyMayTravel(state, ctx);
+  return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state) || islandMayTravel(state, ctx.cards) || familyMayTravel(state, ctx) || stagingLocations(state, ctx.cards).some((id) => familyTravelSecond(state, id));
 }
 
 // The locations the players may travel to: those in the staging area, and the ones the active location lets them reach beyond it (Winding Caverns, 12073:A:2), then any a family's travel hook adds (interpret/family-hooks.ts).
@@ -242,7 +242,10 @@ function travelCandidates(state: ScenarioState, ctx: ReduceContext): string[] {
 
 function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {
   // Once stages are separate the seat that travels chooses among the locations of its own staging area.
-  const open = travelCandidates(state, ctx).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  const candidates = travelCandidates(state, ctx);
+  // With no slot free and no stage that lets the players travel anyway, only a location a family lets them travel to as a second active location (Fisherman's Dock, 50223:A:2).
+  const slotless = freeSlot(viewOf(state, state.activeSeat)) == null && !travelsOverActive(state) && !islandMayTravel(state, ctx.cards) && !familyMayTravel(state, ctx);
+  const open = (slotless ? candidates.filter((id) => familyTravelSecond(state, id)) : candidates).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
   // A location that says the players must travel to it (01088:A:1) is the only one they may travel to.
   const forced = forcedTravel(state, ctx);
   return forced.length > 0 ? open.filter((id) => forced.includes(id)) : open;

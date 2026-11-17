@@ -19,7 +19,7 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; exceptSelf?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -51,6 +51,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
       ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
+      ...(instruction.exceptSelf ? { exceptSelf: true } : {}),
       ...(instruction.unlessControls ? { unlessControls: instruction.unlessControls } : {}),
       ...(instruction.guardian ? { guardian: true as const } : {}),
       ...(instruction.exceptAlone ? { exceptAlone: true as const } : {}),
@@ -66,6 +67,8 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
   // A guarded safe objective-location waits for its guard to leave play (mec108.objective-locations).
   if (guardedSafeLocation(state, ctx, locationId)) return true;
   return restricted(state, ctx, "travel").some((rule) => {
+    // Every location but the source (South Pier, 50217:A:2: "players cannot travel to other locations").
+    if (rule.exceptSelf) return rule.sourceId !== locationId;
     // Every location with a trait (Grond's, 145044:A:1 and the Gate's kin).
     if (rule.trait != null) return printedOf(ctx.cards, location?.code ?? "").traits.includes(rule.trait);
     // A restriction on the location itself.

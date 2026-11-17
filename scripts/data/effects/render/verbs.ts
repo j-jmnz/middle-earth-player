@@ -7,9 +7,10 @@ import { renderPick } from "./picks.ts";
 import { ANGMAR_TEMPLATES } from "./angmar.ts";
 import { ESCAPE_STAT_NOTES, ESCAPE_TEMPLATES } from "./escape.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES, guardianRestrict } from "./guardian.ts";
+import { SMAUG_SAMPLES, SMAUG_STAT_NOTES, SMAUG_TEMPLATES } from "./smaug.ts";
 
 export { ESCAPE_SAMPLES } from "./escape.ts";
-export { GUARDIAN_SAMPLES };
+export { GUARDIAN_SAMPLES, SMAUG_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -66,6 +67,7 @@ const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(valu
 // What a stat flag means where the bare name would not say it.
 const STAT_NOTE: Readonly<Record<string, string>> = {
   ...ESCAPE_STAT_NOTES,
+  ...SMAUG_STAT_NOTES,
   questProgressCap: " (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count)",
   cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
   cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",
@@ -116,6 +118,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_TEMPLATES,
   ...ANGMAR_TEMPLATES,
   ...GUARDIAN_TEMPLATES,
+  ...SMAUG_TEMPLATES,
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
@@ -358,6 +361,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     const guarded = guardianRestrict(i); if (guarded) return guarded;
     if (i.what === "commit") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot commit characters to the quest`, read: ["what", "unlessControls"] };
     if (i.what === "draw") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot draw cards through card effects (the framework's draws are not card effects)`, read: ["what", "unlessControls"] };
+    if (i.what === "travel" && i.exceptSelf === true) return { text: "the players cannot travel to any location but this one while this card is in play (a Travel Action is not traveling)", read: ["what", "exceptSelf"] };
     if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : typeof i.trait === "string" ? `locations with the trait ${i.trait}` : "any location"} while this holds`, read: ["what", "location", "guarding", "trait"] };
     return null;
   },

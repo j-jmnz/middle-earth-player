@@ -13,15 +13,16 @@ import type { ScenarioState } from "../../core/state.ts";
 import { flagged, heldAmount, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { exploring } from "../island/map.ts";
+import { familyTravelSecond } from "../../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 export type Slot = "activeLocation" | "secondActiveLocation";
 
-// The slot a location traveled to, or made active by an effect, goes in; null when both are taken (or the one is, with no second).
-export function freeSlot(state: ScenarioState): Slot | null {
+// The slot a location traveled to, or made active by an effect, goes in; null when both are taken (or the one is, with no second). `locationId`: the location traveled to, which a family may let take the second slot (Fisherman's Dock, 50223:A:2).
+export function freeSlot(state: ScenarioState, locationId?: string): Slot | null {
   if (!state.activeLocation) return "activeLocation";
   if (heldAmount(state, "table", "extraActiveLocation") > 0 && !state.secondActiveLocation) return "secondActiveLocation";
-  return null;
+  return locationId != null && familyTravelSecond(state, locationId) ? "secondActiveLocation" : null;
 }
 
 // The players must travel to a location if able (mec109.stage-4).

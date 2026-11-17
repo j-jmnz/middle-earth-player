@@ -189,12 +189,13 @@ function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], c
   return advanceStage(state, cards, steps, canAdvance);
 }
 
-// The flags of a quest stage that replace the progress placed on it, tried in this order: the removal of damage from locations in play (families/aflame.ts, 11037:B:1), progress the players place on a location in the staging area instead (families/island.ts, 12067:B:2) and,
-// for progress from questing successfully only (a player card's is placed as usual), damage among the enemies in play (families/pelennor, 145076:B:1).
+// The flags of a quest stage that replace the progress placed on it, tried in this order: the removal of damage from locations in play (families/aflame.ts, 11037:B:1), progress placed on a location in the staging area instead (families/island.ts, 12067:B:2), and, for progress from
+// questing successfully only (a player card's is placed as usual), damage among the enemies in play (families/pelennor, 145076:B:1) and the healing of Lake-town (families/smaug/stage.ts, 50202:B:2).
 const PROGRESS_REPLACED: readonly { flag: Modifier["stat"]; questingOnly: boolean }[] = [
   { flag: "progressHeals", questingOnly: false },
   { flag: "progressToStaging", questingOnly: false },
   { flag: "progressAsDamage", questingOnly: true },
+  { flag: "progressHealsLakeTown", questingOnly: true },
 ];
 
 // Progress on the quest goes on the active location first, up to its quest points, and the rest on the current quest card
@@ -351,9 +352,8 @@ export function travelTo(state: ScenarioState, locationId: string, cards: Cards,
   // Exploration: the active location stays where it lies and the players travel from it to the next (families/island/travel.ts).
   const mapped = islandTravelTo(state, locationId, cards, steps);
   if (mapped !== undefined) return mapped;
-  // A second active location slot may be free (families/south/locations.ts).
-  const slot = freeSlot(state);
-  // With no slot free the active location returns to the staging area when a stage lets the players travel anyway (12041:B:1).
+  // A second active location slot may be free (families/south/locations.ts); with none free the active location returns to the staging area when a stage lets the players travel anyway (12041:B:1).
+  const slot = freeSlot(state, locationId);
   if (!slot && !travelsOverActive(state)) return null;
   const instance = state.cards[locationId];
   if (!instance || instance.zone !== "staging") return null;

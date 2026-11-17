@@ -1,5 +1,5 @@
 import type { Obj } from "./kit.ts";
-import { ESCAPE_SAMPLES, GUARDIAN_SAMPLES } from "./verbs.ts";
+import { ESCAPE_SAMPLES, GUARDIAN_SAMPLES, SMAUG_SAMPLES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
@@ -7,6 +7,7 @@ export const HERO = { type: "hero", control: "you" };
 export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...ESCAPE_SAMPLES,
   ...GUARDIAN_SAMPLES,
+  ...SMAUG_SAMPLES,
   ModifyStat: [
     { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true },
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", target: "heroes" },
@@ -229,6 +230,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "Restrict", what: "defend", belowSourceHitPoints: true },
     { verb: "Restrict", what: "travel", location: "18068", guarding: "Tiny" },
     { verb: "Restrict", what: "travel", trait: "West Bank" },
+    { verb: "Restrict", what: "travel", exceptSelf: true },
     { verb: "Restrict", what: "commit", unlessControls: HERO },
     { verb: "Restrict", what: "draw", unlessControls: HERO }, { verb: "Restrict", what: "commit", guardian: true, exceptAlone: true }, { verb: "Restrict", what: "playFromHand", guardian: true },
   ],

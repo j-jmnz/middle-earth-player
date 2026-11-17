@@ -284,6 +284,10 @@ export type PendingAttack = {
   toStage?: boolean;
   // The damage beyond the remaining hit points of the defending character goes on the main quest card (19083:B:1, 19080:A:3).
   excessToStage?: boolean;
+  // The attack is Smaug's against Lake-town (Town-Baiting, 50211:A:1): the damage of an undefended attack is placed on Lake-town, and so is the damage beyond a defender's remaining hit points (families/smaug/attack.ts).
+  toLakeTown?: boolean;
+  // The damage beyond the remaining hit points of the defending character goes on Lake-town (Esgaroth Wharf's Shadow in a Town-Baiting attack; the flag `excessToLakeTown` of Smaug the Magnificent is read for the enemy).
+  excessToLakeTown?: boolean;
   // Shadow cards that are enemies and say "attacks the defending player" (Wolf Rider, 01081:A:2): each attacks once this attack has ended
   // (families/defense/shadow-attack.ts).
   shadowAttackers?: readonly string[];
