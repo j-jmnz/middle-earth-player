@@ -121,7 +121,9 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
     const trait = typeof i.trait === "string" ? ` (${i.trait} only)` : "";
     const sign = i.subtract === true ? "minus " : "";
-    return { text: `${holders}${trait}: stat ${str(i.stat)}${STAT_NOTE[str(i.stat)] ?? ""} ${sign}${amount(i.amount, ctx)}${per}, ${untilWords(i.until)}`, read: ["stat", "amount", "until", "holders", "target", "per", "trait", "subtract"] };
+    const resources = i.eachResource === true ? " for each resource on the holder" : "";
+    const stacking = i.doesNotStack === true ? " (does not stack: only the oldest copy of this card in play gives it)" : "";
+    return { text: `${holders}${trait}: stat ${str(i.stat)}${STAT_NOTE[str(i.stat)] ?? ""} ${sign}${amount(i.amount, ctx)}${per}${resources}, ${untilWords(i.until)}${stacking}`, read: ["stat", "amount", "until", "holders", "target", "per", "trait", "subtract", "eachResource", "doesNotStack"] };
   },
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),
   // The mount-doom family (src/catalog/families/mount-doom.ts).
@@ -229,6 +231,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ShuffleIntoDeck: (i) => ({ text: `${i.each === true ? "every" : "one"} ${typeof i.trait === "string" ? `${i.trait} ` : ""}${typeof i.type === "string" ? i.type : "card"}${typeof i.code === "string" ? ` with code ${i.code}` : ""} in the encounter discard pile goes back into the encounter deck, which is shuffled (nothing with none there)`, read: ["code", "trait", "type", "each"] }),
   CancelEffect: () => ({ text: "the effect being resolved is canceled: nothing after this resolves", read: [] }),
   SetAsideFromDeck: (i) => ({ text: `the copy of the card with code ${str(i.code)} in the encounter deck is set aside, out of play`, read: ["code"] }),
+  RemoveCodeFromGame: (i) => ({ text: `the card in play with code ${str(i.code)} is removed from the game, wherever it is (in the staging area or attached)`, read: ["code"] }),
   RemoveFromGame: (i) => ({ text: `${i.self === true ? "this card" : i.card === undefined ? "the last picked card" : cardRef(i.card)} is removed from the game`, read: ["self", "card"] }),
   SetAside: (i) => ({ text: `a copy of the card with code ${str(i.code)} is set aside, out of play`, read: ["code"] }),
   PlaceToken: (i, ctx) => ({ text: `${i.amount === undefined ? "1" : amount(i.amount, ctx)} resource token(s) are placed on this card`, read: ["amount"] }),

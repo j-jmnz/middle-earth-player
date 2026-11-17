@@ -3967,7 +3967,12 @@
     "Setup: Set Overseer Maurûl and Chamber of Records aside, out of play.",
     "Forced: When stage 2B is revealed, make Chamber of Records the active location (returning any currently active location to the staging area) and add Overseer Maurûl to the staging area. Then, shuffle all copies of Balin's Doom in the encounter discard pile back into the encounter deck."
    ],
-   "inert": [],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
    "misprints": [],
    "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
@@ -3994,7 +3999,56 @@
     "\"Does not stack\"",
     "Some cards have passive abilities with the text \"This ability does not stack with...\" While two or more effects that do not stack with one another are active, only one of them will affect the game state."
    ],
-   "inert": [],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The rule of \"does not stack\", printed on the setup card and implemented by the doesNotStack flag of 901105:A:1 and 901108:A:1."
+    },
+    {
+     "line": 12,
+     "reason": "The rule of \"does not stack\", printed on the setup card and implemented by the doesNotStack flag of 901105:A:1 and 901108:A:1."
+    }
+   ],
    "misprints": [],
    "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
