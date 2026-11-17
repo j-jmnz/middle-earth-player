@@ -17,6 +17,8 @@ const RING_BEARER = "141001";
 const file = new URL("./golden.json", import.meta.url).pathname;
 
 describe("golden: a whole game of A Shadow of the Past", () => {
+  // Three whole games in one test: a loaded CI shard runs past Vitest's 5 s default, so it takes the budget
+  // goldenSuite gives its games (test/harness/golden-suite.ts).
   it("plays the same intents to the same state on fixed seeds", async () => {
     const world = await loadWorld();
     const ctx = pastContext(world);
@@ -29,5 +31,5 @@ describe("golden: a whole game of A Shadow of the Past", () => {
       out.push({ seed, intents: run.intents, state: run.state, checks: checksOf({ kept, intents: run.intents }, ctx) });
     }
     await expect(JSON.stringify(out)).toMatchFileSnapshot(file);
-  });
+  }, 240_000);
 });
