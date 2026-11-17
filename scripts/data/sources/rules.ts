@@ -50,7 +50,7 @@ export const RULE_PDFS = [
     ["otd", "hobbit_on_the_doorstep_rulesheet.pdf"],
     ["hon", "heirs-of-numenor_rules.pdf"],
     ["wor", "mec65_web_the-wilds-of_rhovanion_rules.pdf"],
-    // trg and bts are read for one keyword each: Secrecy X (The Redhorn Gate, which introduced it) and Valour (Beneath the Sands).
+    // trg is read for its Setup and special rules (Dwarrowdelf, below) and Secrecy X, which it introduced; bts for one keyword, Valour (Beneath the Sands).
     ["trg", "the-redhorn-gate-rulesheet.pdf"],
     ["bts", "mec58_web_beneath_the_sands-rules.pdf"],
     // Shadows of Mirkwood's Adventure Pack rulesheets: the encounter sets of the scenario and its special rules. The Hunt for Gollum's and Conflict at the Carrock's rulesheets
@@ -63,6 +63,16 @@ export const RULE_PDFS = [
     ["community-red-arrow", "mec_communitydecklists_theredarrow-compressed.pdf"],
     ["community-noldor", "mec_communitydecklists_theswordsofthenoldor-compressed.pdf"],
   ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
+  // Dwarrowdelf's rules inserts: the Khazad-dûm expansion's (MEC08: its three scenarios' encounter sets and special rules) and the Adventure Packs' rulesheets, a page of two columns each (MEC10 to
+  // MEC14; The Redhorn Gate's is `trg`, above, the same file as MEC09). They have a text layer. Hall of Beorn's S3 host holds them as Images/LotR/Rules/MEC<n>.pdf.
+  ...[
+    ["kd", "08", "mec08_khazad-dum_rules_insert.pdf"],
+    ["rtr", "10", "mec10_road_to_rivendell_rulesheet.pdf"],
+    ["witw", "11", "mec11_the_watcher_in_the_water_rulesheet.pdf"],
+    ["tld", "12", "mec12_the_long_dark_rulesheet.pdf"],
+    ["fos", "13", "mec13_foundations_of_stone_rulesheet.pdf"],
+    ["saf", "14", "mec14_shadow_and_flame_rulesheet.pdf"],
+  ].map(([doc, number, file]) => ({ doc: doc as string, file: file as string, url: `https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC${number as string}.pdf` })),
 ] as const;
 
 // PDFs stay out of git. They are fetched into .cache/pdf and pinned by sha256 in data/sources.json.

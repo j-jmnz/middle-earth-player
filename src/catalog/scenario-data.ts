@@ -48,8 +48,9 @@ const placementSchema = z
 // taken from the pile it was in), with the deck's own cards (`cards`, the copies printed) shuffled in. A Nightmare card takes the
 // Setup slot of a removed card of its title (`pile`, `perPlayer`). The setup card is placed next to the quest deck, side A faceup,
 // and its lines stay active all game.
-// In the order a removal takes from them: the encounter deck, then the piles the quest's Setup fills from it.
-export const NIGHTMARE_PILES = ["encounter", "staging", "activeLocation", "setAside", "attached"] as const;
+// In the order a removal takes from them: the encounter deck, then the piles the quest's Setup fills from it. `encounterDeck2` is an encounter set the Setup sets aside (Foundations of Stone's),
+// which the removal list also thins; `quest` is a stage the removal list takes out of the quest deck (Road to Rivendell's "Orc Outpost (quest stage 2)"), which the Nightmare deck's own quest card replaces.
+export const NIGHTMARE_PILES = ["encounter", "staging", "activeLocation", "setAside", "attached", "encounterDeck2", "quest"] as const;
 const nightmareSchema = z.strictObject({
   setupCard: z.string().min(1),
   removed: z.array(z.strictObject({ code: z.string().min(1), copies: z.number().int().positive(), pile: z.enum(NIGHTMARE_PILES) })),

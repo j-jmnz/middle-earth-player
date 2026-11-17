@@ -2,13 +2,13 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { CampaignData, AnyScenarioData } from "../../../src/catalog/scenario-data.ts";
-import { AUTHORED_CAMPAIGN_FOLDERS } from "./authored-paths.ts";
+import { AUTHORED_FOLDERS } from "./authored-paths.ts";
 
 // The barrel of the authored effect files (src/effects/generated/authored.ts). Metro cannot glob, so pnpm data build lists
 // them. A top-level file of src/effects/authored/ that exports AUTHORED_EFFECTS is named for a campaign (its box's cards) or
 // a scenario (its records). The merge order is the order the engine resolves records in: for each campaign in data/campaigns
 // order, its own file and then its scenarios' files (a scenario in two campaigns counts once), then the scenarios no campaign
-// lists, then the three folders that follow. A file named for neither fails the build. A campaign's own folder (AUTHORED_CAMPAIGN_FOLDERS) holds
+// lists, then the three folders that follow. A file named for neither fails the build. A campaign's own folder (AUTHORED_FOLDERS) holds
 // its box's file and its scenarios' files; a name here is the path under src/effects/authored/ without the extension.
 const FOLDERS = [
   { exports: ["NIGHTMARE_AUTHORED_EFFECTS", "NIGHTMARE_AUTHORED_REPLACES"], from: "nightmare/index.ts" },
@@ -18,7 +18,7 @@ const FOLDERS = [
 
 export function authoredFileNames(dir: string): string[] {
   // A campaign's folder exists once its first scenario file does (a cycle's holds none until then).
-  const holders = ["", ...Object.values(AUTHORED_CAMPAIGN_FOLDERS)].filter((folder) => existsSync(path.join(dir, folder)));
+  const holders = ["", ...AUTHORED_FOLDERS].filter((folder) => existsSync(path.join(dir, folder)));
   return holders
     .flatMap((folder) =>
       readdirSync(path.join(dir, folder), { withFileTypes: true })

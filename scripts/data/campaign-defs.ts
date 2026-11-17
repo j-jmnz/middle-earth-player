@@ -113,6 +113,14 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Hills of Emyn Muil", packs: ["HoEM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Dead Marshes", packs: ["TDM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
   { name: "Return to Mirkwood", packs: ["RtM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
+  // Dwarrowdelf: the Khazad-dûm deluxe expansion (three scenarios) and the six Adventure Packs, whose cards are Hall of Beorn's alone like the first cycle's.
+  { name: "Khazad-dûm", packs: ["KD"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Redhorn Gate", packs: ["TRG"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Road to Rivendell", packs: ["RtR"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Watcher in the Water", packs: ["WitW"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Long Dark", packs: ["TLD"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Foundations of Stone", packs: ["FoS"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Shadow and Flame", packs: ["SaF"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
   { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
@@ -221,12 +229,14 @@ function sagaScenario(doc: string, id: string, product: string, extra: Partial<S
 const twoTowers = (id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => sagaScenario("mec112", id, product, extra);
 const returnOfTheKing = (id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => sagaScenario("mec113", id, product, extra);
 
-// A Shadows of Mirkwood scenario: its Adventure Pack, and the DragnCards decks (Q01.<n+3> / E01.<n+3>: the 2011 core decks are Q01.1 to Q01.3). The rulesheet of an Adventure Pack
-// (`sotm.setup-<id>`) prints its encounter sets; The Hunt for Gollum's and Conflict at the Carrock's rulesheets are outlines with no text layer, so those two have no `setupSpan`.
-// The piles are checked against the quest card's printed Setup.
-function cycleScenario(n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef {
-  return { id, product, deck: { normal: `Q01.${n + 3}`, easy: `E01.${n + 3}` }, ...extra };
+// A scenario of a cycle: its product (an Adventure Pack or a deluxe box), and the DragnCards decks `Q<cycle>.<n>` / `E<cycle>.<n>` that load it (`n` counts from 1 within DragnCards' cycle: Shadows
+// of Mirkwood's start at 4, after the three 2011 core decks Q01.1 to Q01.3). An Adventure Pack's rulesheet (`<insert>.setup-<id>`) prints its encounter sets where it has a text layer, and a scenario
+// with no such span has no `setupSpan`: its piles are checked against the quest card's printed Setup and Hall of Beorn's set list.
+function cycleScenario(cycle: string, n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef {
+  return { id, product, deck: { normal: `Q${cycle}.${n}`, easy: `E${cycle}.${n}` }, ...extra };
 }
+const shadowsOfMirkwood = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("01", n + 3, id, product, extra);
+const dwarrowdelf = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("02", n, id, product, extra);
 
 // The three saga boxes of The Lord of the Rings, in book order. Every list keeps them together, placed by the Fellowship's release
 // (scripts/data/normalize/campaigns.ts, positions).
@@ -392,16 +402,38 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     released: "2011-07-22",
     products: ["The Hunt for Gollum", "Conflict at the Carrock", "A Journey to Rhosgobel", "The Hills of Emyn Muil", "The Dead Marshes", "Return to Mirkwood"],
     scenarios: [
-      cycleScenario(1, "the-hunt-for-gollum", "The Hunt for Gollum"),
-      cycleScenario(2, "conflict-at-the-carrock", "Conflict at the Carrock"),
+      shadowsOfMirkwood(1, "the-hunt-for-gollum", "The Hunt for Gollum"),
+      shadowsOfMirkwood(2, "conflict-at-the-carrock", "Conflict at the Carrock"),
       // DragnCards loads Wilyador in player 1's play area; the printed Setup adds him to the staging area (the first player then gains control of him, his own text).
-      cycleScenario(3, "a-journey-to-rhosgobel", "A Journey to Rhosgobel", { setupSpan: "sotm.setup-a-journey-to-rhosgobel", groups: { player1Play1: "staging" } }),
-      cycleScenario(4, "the-hills-of-emyn-muil", "The Hills of Emyn Muil", { setupSpan: "sotm.setup-the-hills-of-emyn-muil" }),
-      cycleScenario(5, "the-dead-marshes", "The Dead Marshes", { setupSpan: "sotm.setup-the-dead-marshes" }),
-      cycleScenario(6, "return-to-mirkwood", "Return to Mirkwood", { setupSpan: "sotm.setup-return-to-mirkwood" }),
+      shadowsOfMirkwood(3, "a-journey-to-rhosgobel", "A Journey to Rhosgobel", { setupSpan: "sotm.setup-a-journey-to-rhosgobel", groups: { player1Play1: "staging" } }),
+      shadowsOfMirkwood(4, "the-hills-of-emyn-muil", "The Hills of Emyn Muil", { setupSpan: "sotm.setup-the-hills-of-emyn-muil" }),
+      shadowsOfMirkwood(5, "the-dead-marshes", "The Dead Marshes", { setupSpan: "sotm.setup-the-dead-marshes" }),
+      shadowsOfMirkwood(6, "return-to-mirkwood", "Return to Mirkwood", { setupSpan: "sotm.setup-return-to-mirkwood" }),
     ],
     saga: false,
     ledger: "shadows-of-mirkwood",
+  },
+  {
+    id: "dwarrowdelf",
+    name: "Dwarrowdelf",
+    kind: "cycle",
+    released: "2012-01-06",
+    products: ["Khazad-dûm", "The Redhorn Gate", "Road to Rivendell", "The Watcher in the Water", "The Long Dark", "Foundations of Stone", "Shadow and Flame"],
+    scenarios: [
+      dwarrowdelf(1, "into-the-pit", "Khazad-dûm"),
+      dwarrowdelf(2, "the-seventh-level", "Khazad-dûm"),
+      dwarrowdelf(3, "flight-from-moria", "Khazad-dûm"),
+      // DragnCards loads Arwen Undómiel in player 1's play area; the printed Setup puts her into play under the first player's control (dwd.ally-objective-arwen).
+      dwarrowdelf(4, "the-redhorn-gate", "The Redhorn Gate", { groups: { player1Play1: "setAside" } }),
+      dwarrowdelf(5, "road-to-rivendell", "Road to Rivendell", { groups: { player1Play1: "setAside" } }),
+      dwarrowdelf(6, "the-watcher-in-the-water", "The Watcher in the Water"),
+      dwarrowdelf(7, "the-long-dark", "The Long Dark"),
+      // The Setup sets the Foundations of Stone encounter set aside (a second encounter deck the quest later shuffles in): DragnCards loads it as the second shared deck.
+      dwarrowdelf(8, "foundations-of-stone", "Foundations of Stone", { groups: { sharedEncounterDeck2: "encounterDeck2" } }),
+      dwarrowdelf(9, "shadow-and-flame", "Shadow and Flame"),
+    ],
+    saga: false,
+    ledger: "dwarrowdelf",
   },
 ];
 

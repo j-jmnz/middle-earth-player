@@ -1,0 +1,296 @@
+{
+  "id": "the-long-dark",
+  "name": "The Long Dark",
+  "number": 4,
+  "stages": [
+    "04086",
+    "04087"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Long Dark",
+      "count": 30
+    },
+    {
+      "name": "Deeps of Moria",
+      "count": 14
+    },
+    {
+      "name": "Twists and Turns",
+      "count": 16
+    }
+  ],
+  "cards": [
+    {
+      "code": "04088",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04089",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04090",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04091",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04092",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04093",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04094",
+      "normal": 4,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04095",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "04096",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04097",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04098",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "04099",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "04100",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03042",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03043",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03044",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03045",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03046",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03047",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03035",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "03036",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03037",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03038",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03039",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03040",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04086",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04087",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "attachedChosen"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.7",
+    "dragnEasy": "E02.7",
+    "hobSlug": "The-Long-Dark"
+  },
+  "nightmare": {
+    "setupCard": "901601",
+    "removed": [
+      {
+        "code": "03035",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "03036",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "03040",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03044",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03045",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03047",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04089",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "04093",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04098",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "04100",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901602",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "901603",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901604",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901605",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901606",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901607",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901608",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

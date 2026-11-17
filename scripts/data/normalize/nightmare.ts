@@ -28,14 +28,21 @@ export function removalLines(text: string | null): { name: string; copies: numbe
   return out;
 }
 
-type Named = Pick<Card, "code" | "name">;
+type Named = Pick<Card, "code" | "name"> & Partial<Pick<Card, "type" | "printings">>;
 type Slots = NightmareData["cards"];
 
 // The scenario's one card a removal line names: the exact title, else the one near title (a printed typo, "Striken Dumb").
-function resolveRemoval(name: string, dealt: readonly string[], byCode: ReadonlyMap<string, Named>): string[] {
+function resolveRemoval(printed: string, dealt: readonly string[], byCode: ReadonlyMap<string, Named>): string[] {
+  // A stage the list takes out of the quest deck is printed "Orc Outpost (quest stage 2)", or by its side B title where the stage 2 cards share their side A title (Flight from Moria's
+  // "Blocked by Shadow": Hall of Beorn's slug of the quest card, Search-for-an-Exit-Blocked-By-Shadow-KD, keeps the side B title).
+  const name = printed.replace(/\s*\(quest stage \d+\)$/i, "");
   const key = titleKey(name);
   const exact = dealt.filter((code) => titleKey(byCode.get(code)?.name ?? "") === key);
-  return exact.length > 0 ? exact : dealt.filter((code) => sameName(titleKey(byCode.get(code)?.name ?? ""), key));
+  if (exact.length > 0) return exact;
+  const near = dealt.filter((code) => sameName(titleKey(byCode.get(code)?.name ?? ""), key));
+  if (near.length > 0) return near;
+  const slug = key.replace(/\s+/g, "-");
+  return dealt.filter((code) => byCode.get(code)?.type === "quest" && (byCode.get(code)?.printings ?? []).some((item) => titleKey((item.hobSlug ?? "").replace(/-[A-Za-z]+$/, "").replaceAll("-", " ")).endsWith(titleKey(slug.replaceAll("-", " ")))));
 }
 
 // The removed copies come out of the encounter deck first, then out of the piles the quest's Setup fills from it (NIGHTMARE_PILES

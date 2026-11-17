@@ -11,7 +11,7 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"41029:constant:1","cardCode":"41029","lines":["41029:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},
   {"id":"41030:constant:1","cardCode":"41030","lines":["41030:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"41032:shadow:1","cardCode":"41032","lines":["41032:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"not","condition":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Goblin"}}}},{"verb":"ModifyStat","stat":"attack","amount":3,"until":"endOfAttack","target":"attacker","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Goblin"}}}]},
-  {"id":"41033:travel:1","cardCode":"41033","lines":["41033:A:1"],"timing":"travel","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":"41029"}}]},
+  {"id":"41033:travel:1","cardCode":"41033","lines":["41033:A:1"],"timing":"travel","instructions":[{"verb":"Exhaust","target":{"kind":"byName","name":"Cave Torch"}}]},
   {"id":"41036:travel:1","cardCode":"41036","lines":["41036:A:1"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
   {"id":"41044:setup:1","cardCode":"41044","lines":["41044:A:1"],"timing":"setup","instructions":[{"verb":"AttachSelf","to":{"kind":"hero"}}]},
   {"id":"41045:setup:1","cardCode":"41045","lines":["41045:A:1"],"timing":"setup","instructions":[{"verb":"AttachSelf","to":{"kind":"hero"}}]},

@@ -1,0 +1,313 @@
+{
+  "id": "flight-from-moria",
+  "name": "Flight from Moria",
+  "number": 3,
+  "stages": [
+    "03069",
+    "03070",
+    "03071",
+    "03072",
+    "03073",
+    "03074",
+    "03075",
+    "03076"
+  ],
+  "encounterSets": [
+    {
+      "name": "Flight from Moria",
+      "count": 7
+    },
+    {
+      "name": "Hazards of the Pit",
+      "count": 12
+    },
+    {
+      "name": "Deeps of Moria",
+      "count": 14
+    },
+    {
+      "name": "Plundering Goblins",
+      "count": 13
+    }
+  ],
+  "cards": [
+    {
+      "code": "03026",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03027",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03029",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03048",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03049",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03050",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03051",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03052",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03053",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03042",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03043",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03044",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03045",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03046",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03047",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03030",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03031",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "03032",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03033",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03034",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03071",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03072",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03073",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03074",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03075",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03076",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "03025",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "03028",
+      "normal": 4,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.3",
+    "dragnEasy": "E02.3",
+    "hobSlug": "Flight-from-Moria"
+  },
+  "nightmare": {
+    "setupCard": "901201",
+    "removed": [
+      {
+        "code": "03026",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "03031",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "03032",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03034",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03044",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03045",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03047",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03048",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03050",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03075",
+        "copies": 1,
+        "pile": "quest"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901205",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901206",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901207",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "901208",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901209",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ],
+    "questCards": [
+      "901202",
+      "901203",
+      "901204"
+    ]
+  }
+}

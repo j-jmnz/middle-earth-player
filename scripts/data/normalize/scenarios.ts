@@ -241,7 +241,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       const stormcallerStages = new Set([...normal.placements.keys()].filter((key) => key.endsWith("\u0000stormcallerQuests")).map((key) => key.split("\u0000")[0] ?? ""));
       stages = questCodes.filter((code) => !stormcallerStages.has(code));
       const deckStages = [...normal.placements.keys()].filter((key) => key.endsWith("\u0000quest")).map((key) => key.split("\u0000")[0] ?? "");
-      if (JSON.stringify(stages) !== JSON.stringify(deckStages)) local.push(`${id}: quest stages disagree: Hall of Beorn ${stages.join(",")} / DragnCards ${deckStages.join(",")}`);
+      // The variants of one stage (Flight from Moria's seven stage 2 cards, Foundations of Stone's four stage 4 cards) are dealt in no printed order, so the load list may list them in another order than Hall of Beorn's.
+      const stageNumber = (code: string) => Number.parseInt(byCode.get(code)?.stage ?? "", 10);
+      const sameStages = JSON.stringify(stages) === JSON.stringify(deckStages) || (stages.length === deckStages.length && [...stages].sort().join() === [...deckStages].sort().join() && stages.every((code, at) => stageNumber(code) === stageNumber(deckStages[at] ?? "")));
+      if (!sameStages) local.push(`${id}: quest stages disagree: Hall of Beorn ${stages.join(",")} / DragnCards ${deckStages.join(",")}`);
     } else {
       // No load list: Hall of Beorn's counts are the pile, and the quest card's printed Setup moves cards out of the deck.
       normal = fromSetup("Normal");
