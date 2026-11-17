@@ -4,15 +4,19 @@
 // cancellation, not a render of a component.
 import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from "pdfjs-dist";
 
-import { fitScale, pixelScale } from "./reader-math";
+import { fitScale, PIXEL_BUDGET, pixelScale } from "./reader-math";
 
 export type Area = { width: number; height: number };
 export type Drawn = { cssWidth: number; cssHeight: number };
 
 type Entry = { canvas: HTMLCanvasElement; drawn: Drawn };
 
-// The pages kept drawn: the one shown and its neighbours, with room for the one being left.
+// The pages kept drawn: the one shown and its neighbours, with room for the one being left. A deep zoom makes each page up to PIXEL_BUDGET, so the
+// pixels kept are held too, to about two such pages (some 128 MB), past which the oldest go first; the newest page is always kept.
 const KEPT = 5;
+const KEPT_PIXELS = 2 * PIXEL_BUDGET;
+
+const pixelsOf = (entry: Entry): number => entry.canvas.width * entry.canvas.height;
 
 function isCancel(error: unknown): boolean {
   return error instanceof Error && error.name === "RenderingCancelledException";
@@ -41,8 +45,11 @@ export class PageRenderer {
   private keep(key: string, entry: Entry): void {
     this.cache.delete(key);
     this.cache.set(key, entry);
+    let pixels = 0;
+    for (const kept of this.cache.values()) pixels += pixelsOf(kept);
     for (const [oldest, old] of this.cache) {
-      if (this.cache.size <= KEPT) break;
+      if (old === entry || (this.cache.size <= KEPT && pixels <= KEPT_PIXELS)) break;
+      pixels -= pixelsOf(old);
       old.canvas.width = 0;
       old.canvas.height = 0;
       this.cache.delete(oldest);
@@ -74,6 +81,9 @@ export class PageRenderer {
       throw error;
     } finally {
       if (this.task === task) this.task = null;
+      // The drawn canvas is what is kept: pdf.js's own copy of the page (its operator list, its decoded images) is let go, or reading through a long booklet
+      // would hold every page visited until the document closes. A page drawn again parses again.
+      proxy.cleanup();
     }
     if (generation !== this.generation) return null;
     const entry: Entry = { canvas, drawn: { cssWidth: base.width * css, cssHeight: base.height * css } };

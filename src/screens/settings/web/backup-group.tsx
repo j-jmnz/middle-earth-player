@@ -11,7 +11,7 @@ import { clearRestored, peekRestored, restoredLine } from "./backup-note";
 import { backUp, pickBackup, restore, type Picked, type Say } from "./backup-run";
 
 const BACKUP_LINE = "Saves every campaign, game, deck and run on this computer to a file. It is made only when you ask, and it stays where you save it.";
-const RESTORE_LINE = "Replaces the campaigns, games, decks, runs and settings on this computer with the ones in a backup file. A file from a newer version of the app is refused.";
+const RESTORE_LINE = "Replaces the campaigns, games, decks, runs and settings on this computer with the ones in a backup file. A file this version of the app cannot read is refused.";
 
 function reloadPage(): void {
   window.location.reload();

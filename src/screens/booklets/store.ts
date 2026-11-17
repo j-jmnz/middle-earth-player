@@ -11,7 +11,7 @@ import { bundledBooklets } from "./bundled-map";
 import { hex, looksLikePdf } from "./web/pdf-check";
 import { countPages, openPdf, openPdfBytes } from "./web/open-pdf";
 import { opfsAvailable, opfsUri, writeOpfsFile } from "./web/opfs";
-import { pickPdfFile } from "./web/pick-file";
+import { pickFile } from "../../ui/web/pick-file";
 
 export type ImportResult = { ok: true; row: BookletRow } | { ok: false; reason: "cancelled" | "notPdf" | "unavailable" | "failed"; message: string };
 
@@ -96,7 +96,7 @@ async function storePicked<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: str
 export async function importBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: string): Promise<ImportResult> {
   if (!opfsAvailable()) return { ok: false, reason: "unavailable", message: "This browser cannot keep files for the app." };
   try {
-    const file = await pickPdfFile();
+    const file = await pickFile("application/pdf,.pdf");
     if (!file) return { ok: false, reason: "cancelled", message: "No file was picked." };
     return await storePicked(user, id, file);
   } catch (error: unknown) {

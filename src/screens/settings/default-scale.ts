@@ -1,6 +1,6 @@
 // The desktop's first-launch interface size (docs/design-system.md, Settings; the desktop build only, store.canvaskit.ts): a big window shows the table small at
-// Medium, so a profile that has never set the interface size starts at the step the window suits. A value the player has set (stored with the rest of the settings) is
-// never replaced.
+// Medium, so a profile that has never set the interface size starts at the step the window suits, which is then stored. A stored value (the player's, or the first
+// launch's) is never replaced.
 import { UI_SCALE_OPTIONS, type UiScaleOption } from "../../ui/table-settings.ts";
 
 /** The window, in points, from which a first launch starts at Large. */

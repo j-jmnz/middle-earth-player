@@ -59,12 +59,6 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
     ],
   },
   {
-    phone: "src/screens/settings/store.ts",
-    web: "src/screens/settings/store.canvaskit.ts",
-    from: "/**\n * Loads the table settings",
-    edits: [],
-  },
-  {
     phone: "src/screens/data/database-error.tsx",
     web: "src/screens/data/database-error.canvaskit.tsx",
     from: "export class DatabaseBoundary",
