@@ -397,6 +397,8 @@ export type ScenarioState = {
   holdLethal?: true;
   // The codes of the enemies dealt whose own Forced effect hears the damage dealt to them ("Before Patrol Leader is dealt damage, ...", 03014:A:1): the damage step offers them `damageDealt` like a character's. Absent in every other game (families/encounter/patrol.ts).
   enemyDamageHeard?: readonly string[];
+  // The picks that span seats name the owner on each row of their sheet, as in the side quest games: a Setup line has the first player pick a hero of any player (Entering the Mines, 03064:A:1; families/encounter/seated.ts). Absent in every other game.
+  seatedRows?: true;
   // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests/setup.ts).
   playerSetup?: true;
   // The loot decks (The Burglar's Turn, 22024): the cards each seat chose at deckbuilding (`lootPlan`, codes), and the ids of the

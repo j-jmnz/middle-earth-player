@@ -11,6 +11,7 @@ import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.
 import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
 import { markCapture } from "../../src/rules/families/captured/entry.ts";
 import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
+import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
@@ -193,6 +194,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   state = markCapture(state, ctx);
   // The enemies whose own Forced effect hears the damage dealt to them (families/encounter/patrol.ts markEnemyDamage).
   state = markEnemyDamage(state, ctx);
+  state = markSeatedRows(state, ctx);
   state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
 }
