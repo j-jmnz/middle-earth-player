@@ -228,7 +228,7 @@ Every official campaign and scenario, then the fan-made content from [A Long-ext
 The official campaigns are done, so the cycles are next. Shadows of Mirkwood is playable: six scenarios, each on Easy, Normal and Nightmare. The other cycles show under Coming later in the app until one of their scenarios is playable. They come in release order:
 
 <details>
-<summary>The cycles, in order</summary>
+<summary>Incoming cycles, in order of implementation</summary>
 
 - The Standalone scenarios cycle: The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
 - The Dwarrowdelf cycle: Into the Pit, The Seventh Level, Flight from Moria, The Redhorn Gate, Road to Rivendell, The Watcher in the Water, The Long Dark, Foundations of Stone, Shadow and Flame.
