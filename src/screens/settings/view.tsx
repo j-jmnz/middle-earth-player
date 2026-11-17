@@ -18,7 +18,7 @@ import { restoreDefaults, tableSettings } from "../../ui/table-settings";
 import { alwaysCodes, alwaysRows, CREDITS } from "../../play/chrome/settings-words";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSplitColumns } from "../nav/use-split-columns";
-import { CHECK_LABEL, CHECK_LINE, OFFER_LINK_HINT, offerLinkLabel, offerTitle, releasedLine, updateStore } from "../../ui/update-offer";
+import { CHECK_LABEL, CHECK_LINE, OFFER_LINK_HINT, offerLinkLabel, offerTitle, releasedLine, updateStore } from "../../ui/update/offer";
 import { APP_VERSION, useUpdateOffer } from "../update/offer";
 import { openPrivacyPolicy, openReleasePage, openSupport } from "./links";
 
@@ -44,7 +44,7 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
     const id = setTimeout(() => scroll.current?.scrollToEnd({ animated: false }), 50);
     return () => clearTimeout(id);
   }, [confirming]);
-  // The offer stays here after the ribbon is closed (src/ui/update-offer.ts): its line, the release date and Get it.
+  // The offer stays here after the ribbon is closed (src/ui/update/offer.ts): its line, the release date and Get it.
   const offer = useUpdateOffer();
   const released = useStore(updateStore, (state) => releasedLine(state.stored.latest?.publishedAt ?? null));
   const about = (

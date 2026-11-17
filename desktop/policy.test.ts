@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { LATEST_RELEASE_URL as CHECKED_URL, releasePageUrl } from "../src/ui/update-offer.ts";
+import { LATEST_RELEASE_URL as CHECKED_URL, releasePageUrl } from "../src/ui/update/offer.ts";
 import { allowExternal, allowNavigation, allowPermission, allowRequest, DEV_ORIGIN, LATEST_RELEASE_URL, RINGSDB_PATHS } from "./policy.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");

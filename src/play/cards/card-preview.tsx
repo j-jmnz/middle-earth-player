@@ -36,7 +36,7 @@ import { capLines, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 import { tableSettings } from "../../ui/table-settings.ts";
-import { useRibbonRoom } from "../../ui/ribbon-room.ts";
+import { useRibbonRoom } from "../../ui/update/ribbon-room.ts";
 
 const SCRIM = 0.82;
 

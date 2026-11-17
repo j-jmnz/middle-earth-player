@@ -1,6 +1,6 @@
 import { Linking } from "react-native";
 
-import { releasePageUrl } from "../../ui/update-offer";
+import { releasePageUrl } from "../../ui/update/offer";
 
 // The pages Settings, About opens in the browser, all on the project's GitHub.
 // The privacy policy (PRIVACY.md, linked from App Store Connect as well: docs/releasing.md, TestFlight (optional)).
@@ -18,7 +18,7 @@ const open = (url: string) => () => {
 export const openPrivacyPolicy: () => void = open(PRIVACY_POLICY_URL);
 /** Opens the README's Support section in the browser. */
 export const openSupport: () => void = open(SUPPORT_URL);
-/** Opens a release's page in the browser: the update ribbon's, the table menu's and Settings' Get it (src/ui/update-offer.ts, releasePageUrl). */
+/** Opens a release's page in the browser: the update ribbon's, the table menu's and Settings' Get it (src/ui/update/offer.ts, releasePageUrl). */
 export function openReleasePage(version: string): void {
   open(releasePageUrl(version))();
 }

@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("react-native", () => ({ Linking: { openURL: vi.fn(() => Promise.resolve()) } }));
 
 const { PRIVACY_POLICY_URL, SUPPORT_URL } = await import("./links");
-const { RELEASE_REPOSITORY, releasePageUrl } = await import("../../ui/update-offer");
+const { RELEASE_REPOSITORY, releasePageUrl } = await import("../../ui/update/offer");
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..", "..");
 const pkg = JSON.parse(readFileSync(path.join(ROOT, "package.json"), "utf8")) as { homepage: string };

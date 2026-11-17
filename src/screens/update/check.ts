@@ -1,6 +1,6 @@
 // The update check (docs/architecture.md, Update check; user request, 2026-11-17): once a day, while Check for new versions is on and the build is a
 // release, one GET of GitHub's latest-release endpoint, with no header, cookie or identifier of the app's own. The answer's version and date are kept
-// in user.db (`settings`, key "update") with the time of the answer and the version whose ribbon was closed; the offer itself is src/ui/update-offer.ts.
+// in user.db (`settings`, key "update") with the time of the answer and the version whose ribbon was closed; the offer itself is src/ui/update/offer.ts.
 // It runs a few seconds after the app opens and again when the app comes back to the foreground, each time only when a check is due. No network, a
 // refused request or an odd answer changes nothing the player sees.
 import { eq } from "drizzle-orm";
@@ -9,7 +9,7 @@ import { AppState } from "react-native";
 
 import { settings, type StoredJson } from "../data/user-schema";
 import { tableSettings } from "../../ui/table-settings";
-import { checkDue, checksFor, LATEST_RELEASE_URL, parseLatestRelease, parseStoredUpdate, updateStore, type StoredUpdate } from "../../ui/update-offer";
+import { checkDue, checksFor, LATEST_RELEASE_URL, parseLatestRelease, parseStoredUpdate, updateStore, type StoredUpdate } from "../../ui/update/offer";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 

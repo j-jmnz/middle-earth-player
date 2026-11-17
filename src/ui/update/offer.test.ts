@@ -1,4 +1,4 @@
-// The rules of the update offer (src/ui/update-offer.ts): which versions are later, what is read from GitHub's answer, when a check is
+// The rules of the update offer (src/ui/update/offer.ts): which versions are later, what is read from GitHub's answer, when a check is
 // due, which builds check, and when the ribbon shows.
 import { describe, expect, it } from "vitest";
 
@@ -15,7 +15,7 @@ import {
   releasedLine,
   releasePageUrl,
   ribbonShows,
-} from "./update-offer.ts";
+} from "./offer.ts";
 
 describe("versions", () => {
   it("reads plain semver and v tags, and nothing else", () => {

@@ -1,5 +1,5 @@
 // The update ribbon (docs/design-system.md, Update ribbon; user request, 2026-11-17): a floating strip at the top of every screen but the table while a
-// later release is offered (src/ui/update-offer.ts). It sits above the root stack, in the top safe-area inset, so the screen under it starts below it
+// later release is offered (src/ui/update/offer.ts). It sits above the root stack, in the top safe-area inset, so the screen under it starts below it
 // and no Back, gear or title is covered: the screens below hear a top inset of 0 and keep their own TOP_ROOM (src/screens/nav/top-inset.ts). Get it
 // opens the release page in the browser; the ✕ closes it until a later version. Settings, About and the table menu still say the offer.
 import { usePathname } from "expo-router";
@@ -11,11 +11,11 @@ import { useStore } from "zustand";
 import { announce } from "../../ui/announce";
 import { CrossMark, GlassIconButton, TextButton } from "../../ui/buttons";
 import { GameIcon } from "../../ui/game-icon";
-import { RibbonRoom } from "../../ui/ribbon-room";
+import { RibbonRoom } from "../../ui/update/ribbon-room";
 import { floatingSurface } from "../../ui/surfaces";
 import { Text } from "../../ui/text";
 import { useUiScale } from "../../ui/ui-scale";
-import { OFFER_LINK_HINT, offerDetail, offerLinkLabel, offerTitle, ribbonShows, updateStore } from "../../ui/update-offer";
+import { OFFER_LINK_HINT, offerDetail, offerLinkLabel, offerTitle, ribbonShows, updateStore } from "../../ui/update/offer";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { topInsetOf } from "../nav/top-inset";
 import { openReleasePage } from "../settings/links";

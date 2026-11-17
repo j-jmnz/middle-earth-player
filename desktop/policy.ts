@@ -6,7 +6,7 @@ import { APP_HOST, APP_SCHEME } from "./identity.ts";
 /** The RingsDB endpoints the deck import calls (src/screens/deck/import.ts, ringsDbUrl and the card lookup): the public API, and the deck load of a shared deck. */
 export const RINGSDB_PATHS: readonly string[] = ["https://ringsdb.com/api/public/", "https://ringsdb.com/api/oauth2/deck/load/"];
 
-/** The update check's one request (src/ui/update-offer.ts, LATEST_RELEASE_URL; desktop/ imports nothing from src/, so the test holds the two equal): this exact URL, no other GitHub API path. */
+/** The update check's one request (src/ui/update/offer.ts, LATEST_RELEASE_URL; desktop/ imports nothing from src/, so the test holds the two equal): this exact URL, no other GitHub API path. */
 export const LATEST_RELEASE_URL = "https://api.github.com/repos/j-jmnz/middle-earth-player/releases/latest";
 
 /** The development server `pnpm desktop dev` loads; allowed only then. */

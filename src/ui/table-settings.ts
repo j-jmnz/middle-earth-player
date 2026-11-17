@@ -54,7 +54,7 @@ export type TableSettings = {
   titleFace: TitleFaceOption;
   // Explain timing words: the table's card preview also draws a chip for each timing word the card's text opens a line with (When Revealed, Shadow, Forced, ...).
   timingTips: boolean;
-  // Check for new versions: once a day the app asks GitHub for its latest release and offers a later one (src/ui/update-offer.ts). On by default (user decision, 2026-11-17).
+  // Check for new versions: once a day the app asks GitHub for its latest release and offers a later one (src/ui/update/offer.ts). On by default (user decision, 2026-11-17).
   checkUpdates: boolean;
 };
 

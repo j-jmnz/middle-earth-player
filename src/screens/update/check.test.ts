@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import migrations from "../../../drizzle/migrations";
 import { DEFAULT_SETTINGS, tableSettings } from "../../ui/table-settings";
-import { CHECK_INTERVAL_MS, EMPTY_UPDATE, LATEST_RELEASE_URL, updateStore } from "../../ui/update-offer";
+import { CHECK_INTERVAL_MS, EMPTY_UPDATE, LATEST_RELEASE_URL, updateStore } from "../../ui/update/offer";
 import { afterAnswer, dismissUpdate, readStoredUpdate, startUpdateChecks, writeStoredUpdate, type UpdateFetch } from "./check.ts";
 
 vi.mock("react-native", () => ({ AppState: { addEventListener: () => ({ remove: () => undefined }) } }));

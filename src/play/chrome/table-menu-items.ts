@@ -2,7 +2,7 @@
 // reads the order and the words. The testIDs are the ones the controls had in the bar, so a Maestro flow taps `table-menu`
 // and then the same id.
 import type { IconName } from "../../ui/icon-map.ts";
-import { OFFER_LINK_HINT, offerLinkLabel, offerTitle } from "../../ui/update-offer.ts";
+import { OFFER_LINK_HINT, offerLinkLabel, offerTitle } from "../../ui/update/offer.ts";
 
 /** What the menu needs of the table's navigation: the word the table's back control names the screen it leads to. */
 export type MenuNav = { backLabel: string; backAccessibilityLabel: string };
@@ -27,7 +27,7 @@ export type MenuItem = {
  * The menu's rows in order: what opens over the table (Log, Rules, Booklet, the scenario's Setup card, Table settings), Resign, then, apart at the foot, Leave the table
  * with its door mark and no more words (user request, 2026-10-27); a screen reader still hears where it goes and that the game is saved.
  * `without` leaves out the rows a game has nothing behind: Booklet for a cycle's scenario, the Setup card where there is none. `update` is the version
- * on offer (src/ui/update-offer.ts): its row heads the menu, since the table shows no update ribbon (docs/design-system-table.md, Table menu).
+ * on offer (src/ui/update/offer.ts): its row heads the menu, since the table shows no update ribbon (docs/design-system-table.md, Table menu).
  */
 export function menuItems(nav: MenuNav, without?: readonly MenuItemId[], update?: string | null): readonly MenuItem[] {
   const offer: MenuItem[] = update
