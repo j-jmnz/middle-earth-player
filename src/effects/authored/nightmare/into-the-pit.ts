@@ -11,7 +11,11 @@ const DARK_LOCATION: PickSpec = { type: "location", control: "any", trait: "Dark
 // A Cave Torch in play, on a hero or not, ready or exhausted: the card of Into the Pit.
 const TORCH_ATTACHMENT: PickSpec = { type: "card", control: "any", names: ["Cave Torch"] };
 const TORCH_IN_PLAY: Condition = { kind: "inPlay", code: TORCH, is: true };
-const FIFTH_TOKEN: Condition = { kind: "less", left: 4, right: { stat: "damage", of: "self" } };
+// The damage on the setup card at which the Cave Torch is removed from the game (901001:A:2); the table's readout of it is src/play/readouts/pit.ts.
+export const TORCH_DAMAGE_LIMIT = 5;
+export const SETUP_CARD = "901001";
+export const CAVE_TORCH = TORCH;
+const FIFTH_TOKEN: Condition = { kind: "less", left: TORCH_DAMAGE_LIMIT - 1, right: { stat: "damage", of: "self" } };
 const ACTIVE_IS_DARK: Condition = { kind: "matches", card: "activeLocation", pick: DARK_LOCATION };
 const DARK_LOCATIONS_IN_PLAY = { count: { type: "location", control: "any", trait: "Dark", staging: true } } as const;
 

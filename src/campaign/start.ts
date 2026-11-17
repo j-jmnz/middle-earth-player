@@ -116,7 +116,14 @@ export function buildStart(start: StartInput): StartScenario {
   const piles = removedCaves.length > 0 && dealtDecks.cavesDeck ? { ...dealtDecks, cavesDeck: withoutCards(dealtDecks.cavesDeck, removedCaves) } : dealtDecks;
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/brief.md, Nightmare).
   // Its quest cards (a stage after the last printed one) follow the printed stages in the quest deck.
-  if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard, stages: [...definition.stages, ...(input.scenario.nightmare?.questCards ?? []).map((code) => stageOf(code, effects))] };
+  // A Nightmare quest card that takes the place of a stage the setup card removes (Goblin Ambush for Goblin Patrol, 901001:B:3) stands at that stage's place in the order the stages advance in, not after the last one.
+  if (input.difficulty === "Nightmare") {
+    const nightmare = input.scenario.nightmare;
+    const replaces = nightmare?.removed?.some((removed) => removed.pile === "quest") === true && (nightmare.questCards ?? []).length > 0;
+    const known = new Map(definition.stages.map((stage) => [stage.code, stage]));
+    const stages = replaces ? [...new Set(questDeckCodes(input.scenario, input.difficulty, input.seatCount))].map((code) => known.get(code) ?? stageOf(code, effects)) : [...definition.stages, ...(nightmare?.questCards ?? []).map((code) => stageOf(code, effects))];
+    definition = { ...definition, nightmareCard: nightmare?.setupCard, stages };
+  }
   return {
     seatCount: input.seatCount,
     seed: input.seed,
