@@ -24,7 +24,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) [also {"attachable":"12176"}] to choose)):
           - choose hero (you control) [also {"attachable":"12176"}]
-          - [json AttachSetAside {"verb":"AttachSetAside","code":"12176"}]
+          - the set-aside copy of the card with code 12176 is attached to the last picked hero
         * option "decline":
   12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:3)
     only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" that is out of play now
@@ -32,7 +32,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) [also {"attachable":"12177"}] to choose)):
           - choose hero (you control) [also {"attachable":"12177"}]
-          - [json AttachSetAside {"verb":"AttachSetAside","code":"12177"}]
+          - the set-aside copy of the card with code 12177 is attached to the last picked hero
         * option "decline":
   12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:4)
     only if the card the event is about is a card (any player controls) named "Hunting the Beast" that is out of play now
@@ -40,7 +40,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) [also {"attachable":"12178"}] to choose)):
           - choose hero (you control) [also {"attachable":"12178"}]
-          - [json AttachSetAside {"verb":"AttachSetAside","code":"12178"}]
+          - the set-aside copy of the card with code 12178 is attached to the last picked hero
         * option "decline":
   12175:forced:4: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Cold-Drake") (record also names 12175:B:5)
     only if the players are on stage 4
@@ -48,7 +48,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12179"}]) and (there is a hero (you control) [also {"attachable":"12179"}] to choose)):
           - choose hero (you control) [also {"attachable":"12179"}]
-          - [json AttachSetAside {"verb":"AttachSetAside","code":"12179"}]
+          - the set-aside copy of the card with code 12179 is attached to the last picked hero
         * option "decline":
 
 12175:B:2 (back): Stage 1: Attach Master of the Hunt to a hero.
@@ -58,7 +58,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) [also {"attachable":"12176"}] to choose)):
           - choose hero (you control) [also {"attachable":"12176"}]
-          - [json AttachSetAside {"verb":"AttachSetAside","code":"12176"}]
+          - the set-aside copy of the card with code 12176 is attached to the last picked hero
         * option "decline":
 
 12175:B:3 (back): Stage 2: Attach Unbroken to a hero.
@@ -68,7 +68,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) [also {"attachable":"12177"}] to choose)):
           - choose hero (you control) [also {"attachable":"12177"}]
-          - [json AttachSetAside {"verb":"AttachSetAside","code":"12177"}]
+          - the set-aside copy of the card with code 12177 is attached to the last picked hero
         * option "decline":
 
 12175:B:4 (back): Stage 3: Attach The Steadfast to a hero.
@@ -78,7 +78,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) [also {"attachable":"12178"}] to choose)):
           - choose hero (you control) [also {"attachable":"12178"}]
-          - [json AttachSetAside {"verb":"AttachSetAside","code":"12178"}]
+          - the set-aside copy of the card with code 12178 is attached to the last picked hero
         * option "decline":
 
 12175:B:5 (back): Stage 4: Attach Dragon-slayer to a hero.
@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12179"}]) and (there is a hero (you control) [also {"attachable":"12179"}] to choose)):
           - choose hero (you control) [also {"attachable":"12179"}]
-          - [json AttachSetAside {"verb":"AttachSetAside","code":"12179"}]
+          - the set-aside copy of the card with code 12179 is attached to the last picked hero
         * option "decline":
 
 12175:B:6 (back): Resolution: Add each Accolade boon in play to the campaign pool. Each player may choose one of the following boons and add it to the campaign pool: The Canny Huntsman, A Tale of Victories, Lay of Courage, Rhyme of the Slayer.
@@ -390,4 +390,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 291 by template, 48 as JSON)
+(rendered pieces: 299 by template, 40 as JSON)

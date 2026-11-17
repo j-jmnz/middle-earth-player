@@ -93,7 +93,7 @@
     "id": "dwarrowdelf",
     "name": "Dwarrowdelf",
     "scenarioCount": 9,
-    "playable": false,
+    "playable": true,
     "kind": "cycle",
     "box": null,
     "released": "2012-01-06",

@@ -159,7 +159,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142067:B:2 (back): Response: After an enemy is revealed at this stage, raise your threat by X to engage that enemy. X is that enemy's Threat. Each player (at any stage) may trigger this ability once per round.
   142067:response:1: Response after a card is revealed (heard about enemy (any player controls); event happened to the controller; limit once per round for each player; any player may use it; only when the encounter deck revealed it)
-    only if the card the event is about is a enemy (any player controls) [also {"inStaging":true}]
+    only if the card the event is about is a enemy (any player controls) that is in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by threat of the card the event is about (the acting player)
     - engage the card the event is about
@@ -433,4 +433,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 199 by template, 47 as JSON)
+(rendered pieces: 200 by template, 46 as JSON)

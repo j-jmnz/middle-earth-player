@@ -390,12 +390,12 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - the first player chooses one of:
       * option "rohan" (only if there is a hero (any player controls) chosen by the first player [also {"attachable":"145014"}] to choose):
         - choose hero (any player controls) chosen by the first player [also {"attachable":"145014"}]
-        - [json AttachSetAside {"verb":"AttachSetAside","code":"145014"}]
+        - the set-aside copy of the card with code 145014 is attached to the last picked hero
       * option "none":
     - the first player chooses one of:
       * option "gondor" (only if there is a hero (any player controls) chosen by the first player, with no attachment named "Esquire of Rohan" [also {"attachable":"145015"}] to choose):
         - choose hero (any player controls) chosen by the first player, with no attachment named "Esquire of Rohan" [also {"attachable":"145015"}]
-        - [json AttachSetAside {"verb":"AttachSetAside","code":"145015"}]
+        - the set-aside copy of the card with code 145015 is attached to the last picked hero
       * option "none":
 
 145073:B:1 (back): Skip the quest phase and combat phase.
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 309 by template, 43 as JSON)
+(rendered pieces: 311 by template, 41 as JSON)
