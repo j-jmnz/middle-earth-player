@@ -1,9 +1,8 @@
 import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 
-import { AUTHORED_EFFECTS as INTO_THE_PIT } from "./into-the-pit.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
-// Records for The Redhorn Gate (Dwarrowdelf part 4, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json). The quest's 1B prints Entering the Mines' When Revealed (03064:B:1), Rocky Crags and Fallen Stones print the
+// Records for The Redhorn Gate (Dwarrowdelf part 4, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json). The quest's 1B says Entering the Mines' When Revealed (03064:B:1) in other words, Rocky Crags and Fallen Stones print the
 // same Shadow (04019:A:2 and 04021:A:2), Mountain Goblin and Mountain Troll the same +1 Attack (04025:A:1 and 04026:A:1). Mountain Goblin's and Mountain Troll's Shadow (04025:A:2, 04026:A:2) is a template; the Nightmare deck's records are in ../nightmare/the-redhorn-gate.ts. The readings are in docs/brief.md (The Redhorn Gate).
 // Rules: dwd.setup-the-redhorn-gate, dwd.setup-the-redhorn-gate-set-aside, dwd.ally-objective-arwen, dwd.caradhras, rr.reveal, rr.staging, rr.travel, rr.victory, rr.first-player, rr.defending-player, rr.attachment-cards, rr.lasting-effects, faq.lasting-effects,
 // faq.progress-without-advancing, faq.first-player-elimination, faq.simultaneous-effects (data/rules/entries.json).
@@ -103,7 +102,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 04011 To the Redhorn Gate (stage 1). Setup: Caradhras joins the staging area and the Snowstorm copies are set aside by the scenario's piles; Arwen enters play under the first player's control. 1B is Entering the Mines' When Revealed.
     { id: "04011:setup:1", cardCode: "04011", lines: ["04011:A:1"], timing: "setup", instructions: [{ verb: "TakeControlOfSetAside", code: ARWEN }, { verb: "ShuffleEncounterDeck" }] },
-    copyLine("03064:B:1", "04011:B:1"),
+    { id: "04011:whenRevealed:1", cardCode: "04011", lines: ["04011:B:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RevealEncounter" }] }] },
 
     // 04012 Snowdrifts (stage 2). B:1: 1 more Snowstorm than there are players is shuffled into the encounter deck from the set-aside copies. B:2: after the 11th progress token, the active location is discarded (with its progress) and Caradhras becomes the active location without a Travel
     // (dwd.caradhras): from the staging area, or searched out of the victory display, the encounter deck or its discard pile into the staging area first (the deck is shuffled); a Caradhras already active stays (agent recommendation, docs/brief.md, The Redhorn Gate).
@@ -338,7 +337,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "DamageCard", amount: 1, target: "subject" }],
     },
   ],
-  { pool: INTO_THE_PIT },
 );
 
 export const AUTHORED_REPLACES: readonly string[] = [];

@@ -8,7 +8,7 @@ import { engagementBarred, noteEngaged, optionalThreatBarred } from "../families
 import { currentQuestHas, willpowerIgnored } from "../families/quest/conditions.ts";
 import { noteHostDefeated, withStagingThreat } from "../families/attachments/hold.ts";
 import { progressFirstLocations } from "../families/attachments/quest.ts";
-import { redirectProgress } from "../families/quest/blizzard.ts";
+import { absorbFirst } from "../families/quest/blizzard.ts";
 import { passSorcery } from "../families/angmar/reanimate/stage.ts";
 import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -32,7 +32,6 @@ import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/orde
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
-import { absorbProgress } from "../families/angmar/sponge.ts";
 import { currentSideQuest, hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
@@ -269,9 +268,7 @@ export type PutOnStageOptions = { readonly counted: boolean; readonly reduced?: 
 export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, options: PutOnStageOptions): ScenarioState {
   const { counted, reduced = true } = options;
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
-  const sponged = absorbProgress(from, wanted, cards, steps);
-  // And what a Blinding Blizzard in the staging area takes (901307:A:2).
-  const { state, remaining: absorbed } = redirectProgress(sponged.state, stageId, sponged.remaining, cards, steps);
+  const { state, remaining: absorbed } = absorbFirst(from, stageId, wanted, cards, steps);
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
   const amount = reduced ? reduceQuestProgress(state, absorbed) : absorbed;
   const stage = state.cards[stageId];
