@@ -269,7 +269,7 @@ function committers(state: ScenarioState, seat: number, ctx: ReduceContext): str
   return characters(state, seat, ctx.cards).filter((id) => {
     const instance = state.cards[id];
     // "Can commit to quests while exhausted" (11009:A:1).
-    return instance != null && (!instance.exhausted || flagged(state, id, "commitsExhausted")) && !instance.committed && !flagged(state, id, "cannotQuest");
+    return instance != null && (!instance.exhausted || flagged(state, id, "commitsExhausted")) && !instance.committed && !flagged(state, id, "cannotQuest") && (!flagged(state, id, "cannotExhaust") || flagged(state, id, "noExhaustQuest"));
   });
 }
 

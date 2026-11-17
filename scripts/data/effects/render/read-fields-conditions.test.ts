@@ -12,7 +12,7 @@ describe("effects render read fields, conditions", () => {
     x: [{ kind: "x", min: 2 }],
     shadowBlank: [{ kind: "shadowBlank" }],
     namedFlag: [{ kind: "namedFlag", name: "A Card", stat: "blankText" }],
-    flag: [{ kind: "flag", stat: "blankText", holder: "seat", is: false }],
+    flag: [{ kind: "flag", stat: "blankText", holder: "seat", is: false }, { kind: "flag", stat: "refreshOnce", holder: "table" }],
     canPick: [{ kind: "canPick", pick: { type: "hero", control: "you" } }],
     attackedThisPhase: [{ kind: "attackedThisPhase", name: "A Card" }],
     phase: [{ kind: "phase", is: "combat" }],

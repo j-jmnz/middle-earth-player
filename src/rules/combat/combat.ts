@@ -24,7 +24,7 @@ import { markDefender, moreDefenders, staysReadyToDefend } from "../families/def
 import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
-import { countsDefense, struck } from "../families/attack/strike.ts";
+import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
 import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 
@@ -183,6 +183,8 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   const printed = printedOf(cards, instance.code);
   if (!isCharacterType(printed) || instance.host != null) return false;
   if (flagged(state, defenderId, "cannotDefend")) return false;
+  // A character that cannot exhaust (Shadow of Fear, 03027:A:1) defends only where it stays ready.
+  if (flagged(state, defenderId, "cannotExhaust") && !flagged(state, defenderId, "noExhaustDefend")) return false;
   // A ship-enemy's attack is defended only by a ship-objective, and a ship-objective defends only against one (dcce.ship-enemies).
   if (familyDefenseReason(state, printed, cards, defenderId)) return false;
   if (instance.controller === attackedSeat) return true;
@@ -248,6 +250,8 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed) || attacker.host != null) return false;
+  // A character that cannot exhaust (Shadow of Fear, 03027:A:1) attacks only where it stays ready.
+  if (flagged(state, attackerId, "cannotExhaust") && !flagged(state, attackerId, "noExhaustAttack")) return false;
   // A ship-objective attacks only ship-enemies (dcce.ship-objectives), and only Ship objectives can be declared as attackers against Raider Flagship (12124:A:3).
   if (familyAttackReason(state, enemyId, printed, printedOf(cards, enemy.code), attackerId)) return false;
   // "Only Eagle characters or characters with ranged can attack ... Mirkwood Flock" (02070:A:1), "cannot be attacked by characters with the ranged keyword" (900606:A:2).
@@ -380,8 +384,11 @@ export function strikeEnemy(
 // The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.
 export function attackStrength(state: ScenarioState, attackerIds: readonly string[], enemyId: string, cards: Cards): number {
   let attack = 0;
+  // "Immune to ranged damage" (Great Cave-troll, 03042:A:1; dwd.immune-to-ranged-damage): a character that takes part through the ranged keyword deals it no damage, a ranged character that attacks it another way does.
+  const strike = flagged(state, enemyId, "immuneToRangedDamage") && state.pendingStrike?.enemyId === enemyId ? state.pendingStrike : undefined;
   for (const attackerId of attackerIds) {
     const attacker = state.cards[attackerId];
+    if (attacker && strike && rangedAttack(strike, attacker)) continue;
     if (attacker) attack += modifiedStat(state, attacker, "attack", cards, enemyId);
   }
   return attack;

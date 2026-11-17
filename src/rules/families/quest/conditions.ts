@@ -48,3 +48,8 @@ export function currentQuestHas(state: ScenarioState, keyword: "battle" | "siege
   if (!stage) return false;
   return printedOf(cards, stage.code).keywords[keyword] || flagged(state, stage.id, keyword);
 }
+
+/** "Each questing character not chosen does not count its Willpower" (03073:B:1): while the table holds ignoresWillpower, only a character holding countsWillpower adds its Willpower to the quest. */
+export function willpowerIgnored(state: ScenarioState, id: string): boolean {
+  return flagged(state, "table", "ignoresWillpower") && !flagged(state, id, "countsWillpower");
+}

@@ -18,7 +18,7 @@ import { lowerThreatByEffect, playerSource } from "../families/quest/threat.ts";
 import { destroyCard, placeDamage } from "../core/keywords.ts";
 import { stagingLocations } from "../quest/quest.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
 import { printedOf, type PrintedCard } from "../core/printed.ts";
 import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
@@ -166,7 +166,8 @@ export function runPlayerVerb(
       if (!state.cards[id] || amount <= 0) return state;
       if (playerSource(state, focus.sourceId, ctx)) return placePlayerDamage(state, focus.seat, id, amount, ctx, steps, focus.sourceId);
       // An encounter or campaign card's damage is no player card effect, so a Ship objective's immunity to those does not stop it (dcce.ship-objectives). A quest card's or a side quest's is a quest effect (Dagnir's cap, 19074:A:2).
-      return placeDamage(state, id, amount, ctx.cards, steps, isQuestSource(state, focus.sourceId, ctx) ? "quest" : "framework", currentCause(steps, UNATTRIBUTED));
+      const placed = placeDamage(state, id, amount, ctx.cards, steps, isQuestSource(state, focus.sourceId, ctx) ? "quest" : "framework", currentCause(steps, UNATTRIBUTED));
+      return instruction.uncancelable ? uncancelableDamage(placed, (state.pendingEvents ?? []).length) : placed;
     }
     case "PlaceProgressOn": {
       const scope = frameScope(state, focus.seat, focus.sourceId);
@@ -318,6 +319,12 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
   return state;
 }
 
+// The damage dealt events the instruction just queued (from `from` on) cannot be answered by an ability that cancels damage (DamageCard `uncancelable`; rules/windows/listen.ts hears).
+function uncancelableDamage(state: ScenarioState, from: number): ScenarioState {
+  const events = state.pendingEvents ?? [];
+  return events.length > from ? { ...state, pendingEvents: events.map((event, index) => (index >= from && event.trigger === "damageDealt" ? { ...event, uncancelable: true as const } : event)) } : state;
+}
+
 // The printed cards when a player card is the source of the effect (the bar on player card effects reads them), else nothing.
 export function byPlayerCards(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): ReadonlyMap<string, PrintedCard> | undefined {
   return playerSource(state, sourceId, ctx) ? ctx.cards : undefined;
@@ -333,7 +340,8 @@ export function readyCard(state: ScenarioState, id: string, byPlayerCard = false
 
 export function exhaustCard(state: ScenarioState, id: string): ScenarioState {
   const card = state.cards[id];
-  if (!card || card.exhausted) return state;
+  // A character that cannot exhaust (Shadow of Fear, 03027:A:1) stays as it is.
+  if (!card || card.exhausted || flagged(state, id, "cannotExhaust")) return state;
   return queueEvent(updateCard(state, id, { exhausted: true }), { trigger: "exhausted", seat: card.controller, cardId: id });
 }
 

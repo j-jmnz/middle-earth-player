@@ -52,6 +52,8 @@ export const amountExprSchema = z.strictObject({
   // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc/amounts.ts.
   facedown: z.literal(true).optional(),
   resourcesAboveCopies: z.literal(true).optional(),
+  // The Victory points of the cards in the victory display added up, read live ("X is the number of victory points in the victory display", 03025:A:3; dwd.the-nameless-fear). Read by src/rules/families/misc/amounts.ts.
+  victoryPoints: z.literal(true).optional(),
   // The amount comes out negative ("gets -1 Willpower for each damaged hero you control"): the value read, below 0.
   negative: z.literal(true).optional(),
   // A scalable card's level, read from the Campaign Log (dcce.scalable-upgradable): the level of the source card. `halved`: half of the value read, rounded up ("half the level of Galdor's
