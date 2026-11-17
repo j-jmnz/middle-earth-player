@@ -40,6 +40,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
+- `frommoria-won` is not committed: no seed in 400 wins Flight from Moria with the saved decklists (heroes destroyed by round 3). Until it exists `.maestro/scenarios/flight-from-moria/flight-from-moria.yaml` cannot run.
 - `level-won` is not committed: no seed in 500 wins The Seventh Level with the saved decklists (their heroes are gone by round 3). Until it exists `.maestro/scenarios/the-seventh-level/the-seventh-level.yaml` cannot run.
 - `pit-won` is not committed: no seed in 500 wins Into the Pit with the saved decklists (their heroes are destroyed by round 3 or 4). Until it exists `.maestro/scenarios/into-the-pit/into-the-pit.yaml` cannot run.
 - `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50). Until it exists `.maestro/scenarios/conflict-at-the-carrock/conflict-at-the-carrock.yaml` cannot run.
@@ -294,6 +295,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
 - Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
 - Flight from Moria readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Flight from Moria). Not user-confirmed.
+- Flight from Moria's banner beats (`src/play/words/scenarios/gundabad-beats.ts`) say a flipped stage flips "at the beginning of the quest phase" (Moria flips at the staging step) and a Nightmare bypass goes to "the bottom of the quest deck" (it is shuffled in).
 - The pinned FAQ (`lotr_faq_19.pdf`) entries 1.21, 1.29, 1.45, 1.47, 1.53 and 1.54 have no `faq.*` span yet, so Flight from Moria's readings cite the PDF.
 - The Seventh Level readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Seventh Level). Not user-confirmed.
 - The Caves of Nibin-Dûm reads "attach Cave Torch to a hero of his choice" (41004:A:1) as the first player's own hero; the Dwarrowdelf cards with the same phrase read any player's hero, as the Khazad-dûm insert says of Cave Torch. Not reconciled: changing the Caves moves its goldens.
