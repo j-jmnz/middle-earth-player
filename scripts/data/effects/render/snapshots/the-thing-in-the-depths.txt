@@ -53,7 +53,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 11194:A:3 (front): Forced: After Captain Sahír flips over, remove Black Key (burden) from the game and attach Black Key (boon) to him. Add Sea Serpent (Menacing side) to the staging area. One player adds Come Together to their hand. For this game, X is plus 1 for Come Together.
   11194:forced:2: Forced on the event flipped (heard about card (any player controls) named "Captain Sahír")
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveCodeFromGame {"verb":"RemoveCodeFromGame","code":"11192"}]
+    - the card in play with code 11192 is removed from the game, wherever it is (in the staging area or attached)
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
     - the set-aside card with code 11196 joins the staging area (not revealed)
     - choose player (any player controls)
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 169 by template, 33 as JSON)
+(rendered pieces: 170 by template, 32 as JSON)

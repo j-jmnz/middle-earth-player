@@ -8,6 +8,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...ESCAPE_SAMPLES,
   ...GUARDIAN_SAMPLES,
   ModifyStat: [
+    { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: HERO, eachResource: true, doesNotStack: true },
     { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true },
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", target: "heroes" },
   ],
@@ -229,6 +230,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ],
   ShuffleEncounterDeck: [{ verb: "ShuffleEncounterDeck" }],
   ShuffleEncounterDiscard: [{ verb: "ShuffleEncounterDiscard", trait: "Hazard" }, { verb: "ShuffleEncounterDiscard", type: "location" }, { verb: "ShuffleEncounterDiscard", name: "Balin's Doom" }],
+  RemoveCodeFromGame: [{ verb: "RemoveCodeFromGame", code: "03024" }],
   RevealTopEnemies: [{ verb: "RevealTopEnemies", count: { players: true } }],
   DiscardEncounterTop: [{ verb: "DiscardEncounterTop", count: 2 }],
   DiscardUntilEnemies: [{ verb: "DiscardUntilEnemies", perPlayer: 2, to: "staging", trait: "Warg", less: 1 }],
