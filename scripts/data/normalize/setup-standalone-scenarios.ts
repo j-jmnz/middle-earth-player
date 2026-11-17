@@ -16,10 +16,10 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     return [{ kind: "stage", codes: scouts.map((card) => card.code), perPlayer: 1, count: 0 }];
   }
   // The Battle of Lake-town: "Shuffle all copies of Smaug into a separate Smaug Deck": the nine Smaug cards (three titles, three copies each) are dealt out of the encounter deck. The data keeps them
-  // set aside (every copy) until the engine half gives the Smaug deck a pile of its own.
+  // in the `smaugDeck` pile (every copy), a deck of its own with a discard pile (src/rules/core/piles.ts DECKS).
   if (/^Shuffle all copies of Smaug into a separate Smaug Deck$/i.test(sentence)) {
     const smaug = names.cards.filter((card) => card.type === "enemy" && /^Smaug\b/.test(card.name) && card.encounterSet === "The Battle of Lake-town");
-    return smaug.length === 0 ? null : [{ kind: "aside", codes: [...new Set(smaug.map((card) => card.code))], allCopies: true }];
+    return smaug.length === 0 ? null : [{ kind: "step", step: "buildSmaugDeck", codes: [...new Set(smaug.map((card) => card.code))] }];
   }
   // "Then reveal 1 card from the encounter deck per player, and add it to the staging area": the first player reveals one card for each player, as "Each player reveals 1 card" does.
   if ((match = /^Then,? reveal (\d+|an?|one) cards? from the encounter deck per player, and add it to the staging area$/i.exec(sentence))) {

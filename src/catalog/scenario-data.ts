@@ -19,7 +19,8 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // The Two Towers' second encounter decks (mec112.setup-journey-to-the-cross-roads, mec112.setup-shelobs-lair): `haradDeck` (the Men of Harad set, shuffled and
 // placed facedown under The Cross-roads) and `greatSpiderDeck` (The Great Spider set, set aside). Neither is part of the encounter deck.
 // Angmar Awakened's Orc deck (mec108.orc-deck): `angmarOrcDeck`, the Angmar Orcs enemies and Concealed Orc-camp The Weather Hills' Setup takes out of the encounter deck.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
+// The Battle of Lake-town's Smaug deck (docs/brief.md, The Battle of Lake-town): `smaugDeck`, the nine Smaug cards its Setup shuffles into a separate deck, with a discard pile of its own.
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -300,7 +301,7 @@ export function corsairCodes(data: AnyScenarioData, difficulty: Difficulty = "No
 }
 
 // The decks of Ered Mithrin a scenario deals, copy by copy (emce.caves-deck, emce.evil-creatures-deck): each of these piles at the difficulty played, by pile. A pile the scenario does not deal is left out.
-export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
+export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"] as const;
 export function dealtPiles(data: AnyScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
   const piles: Partial<Record<(typeof DEAL_PILES)[number], string[]>> = {};
   for (const card of placementsAt(data, difficulty)) {

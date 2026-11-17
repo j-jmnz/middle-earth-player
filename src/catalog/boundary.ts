@@ -71,6 +71,8 @@ export const printedKeywordsSchema = z.strictObject({
   uncharted: z.boolean().optional(),
   // Aflame X on a location (dcce.aflame): the damage that destroys it, and puts it facedown underneath The Havens Burn (src/rules/families/aflame/). A numbered keyword with a value of 0 does not exist.
   aflame: z.number().int().positive().optional(),
+  // Burn X on a location (docs/brief.md, The Battle of Lake-town): the burn damage "Resolve all burn damage" adds up (src/rules/families/smaug/). A numbered keyword with a value of 0 does not exist.
+  burn: z.number().int().positive().optional(),
   // Grapple (highest or lowest printed Threat or quest points) on an enemy (dcce.grapple): the staging-area location it attaches to, facedown, when it is revealed (src/rules/families/grapple/).
   grapple: z.enum(["highestThreat", "lowestThreat", "highestQuestPoints", "lowestQuestPoints"]).optional(),
   // Phantom on an enemy (mec113.phantom): the damage its attack would deal is canceled and the defending player raises their threat by that much (src/rules/families/grey-company/).

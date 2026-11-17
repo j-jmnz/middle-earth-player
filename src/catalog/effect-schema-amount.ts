@@ -13,7 +13,7 @@ import { pickSchema } from "./effect-schema-pick.ts";
 export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage"]);
 
 // The decks beside the encounter deck a record names (emce.caves-deck, emce.evil-creatures-deck, mec112.setup-journey-to-the-cross-roads; src/rules/core/piles.ts NAMED_PILES): the one list `pile` of a wilderland verb, the amount `pile` and the condition `pileHas` share.
-export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs"]);
+export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").

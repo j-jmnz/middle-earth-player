@@ -40,7 +40,7 @@ const GROUP_PILE: Readonly<Record<string, Pile>> = {
 // ("Prepare the Corsair deck", "Prepare the Uncharted deck"), never by a line naming each card, and they count toward their encounter sets.
 // Ered Mithrin's decks (evilCreaturesDeck, cavesDeck, sideQuestDeck, spidersDeck, orcsDeck) are built by the Setup's deck steps the same way, and
 // The Two Towers' second encounter decks (haradDeck, greatSpiderDeck) by the Setup's encounter set that is shuffled under a card or set aside.
-const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"]);
+const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"]);
 
 // A scenario is written only when every check passes. The rest are listed in problems and stay unbuilt
 // until an override or a template resolves them.

@@ -10,7 +10,7 @@
   "encounterSets": [
     {
       "name": "The Battle of Lake-town",
-      "count": 36
+      "count": 45
     }
   ],
   "cards": [
@@ -144,19 +144,19 @@
       "code": "50204",
       "normal": 3,
       "easy": 3,
-      "pile": "setAside"
+      "pile": "smaugDeck"
     },
     {
       "code": "50205",
       "normal": 3,
       "easy": 3,
-      "pile": "setAside"
+      "pile": "smaugDeck"
     },
     {
       "code": "50206",
       "normal": 3,
       "easy": 3,
-      "pile": "setAside"
+      "pile": "smaugDeck"
     }
   ],
   "campaignPlaced": [],
