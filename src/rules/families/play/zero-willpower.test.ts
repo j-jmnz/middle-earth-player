@@ -12,7 +12,7 @@ import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { ally, enemy, hero, table } from "../defense/table.ts";
 
-// Rules: rr.constant-ability, rr.modifiers, rr.lasting-effects, rr.victory, rr.discard (data/rules/entries.json); ledger lines 04013:B:2, 04022:A:2, 901306:A:1, 901301:A:2, 901302:A:2, 901303:A:1, 901304:A:2, 03054:A:1.
+// Rules: rr.constant-ability, rr.modifiers, rr.lasting-effects, rr.victory, rr.destroy (data/rules/entries.json); ledger lines 04013:B:2, 04022:A:2, 901306:A:1, 901301:A:2, 901302:A:2, 901303:A:1, 901304:A:2, 03054:A:1.
 // discardAtZeroWillpower: the settle sweep discards a character in play whose Willpower is 0; noWillpowerGain: a raise of Willpower from a player card does not count; playerVictoryIgnored: a player card in the victory display scores 0;
 // the amount remainingQuestPoints; the pick filters highestWillpower and `on.committed`; the stat condition versusDefender `maxWillpower`.
 

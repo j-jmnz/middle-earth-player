@@ -4,6 +4,7 @@
 // progressRedirect (its constant) takes the progress that would go on the current quest stage or on a location with the Snow trait, in play or in the staging area, from questing and from a card effect alike. A Blizzard
 // takes at most what brings it to 5, is discarded as the 5th is placed, and the progress it cannot take goes on as it would have without it (the card ends the replacement itself when it leaves play; agent recommendation, docs/brief.md, The Redhorn Gate).
 // With two in the staging area the one that came first takes the progress first and the other what is left (the engine asks no player in the middle of a placement).
+import { absorbProgress } from "../angmar/sponge.ts";
 import { ruleCause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard } from "../../core/keywords.ts";
@@ -33,4 +34,10 @@ export function redirectProgress(state: ScenarioState, targetId: string, amount:
     if (card.progress + put >= BLIZZARD_LIMIT) next = updateCard(destroyCard(next, id, cards, steps), id, { progress: 0 });
   }
   return { state: next, remaining: left };
+}
+
+/** Progress about to go on the current quest stage: the sponges in the staging area take theirs first (Forbidden Descent, 10101:A:1), then a Blinding Blizzard (901307:A:2). */
+export function absorbFirst(state: ScenarioState, stageId: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): { state: ScenarioState; remaining: number } {
+  const sponged = absorbProgress(state, amount, cards, steps);
+  return redirectProgress(sponged.state, stageId, sponged.remaining, cards, steps);
 }
