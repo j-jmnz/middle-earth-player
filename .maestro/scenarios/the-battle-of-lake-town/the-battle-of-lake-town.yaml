@@ -2,12 +2,13 @@ appId: com.middleearth.player
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `town-won` (scripts/e2e/standalone-scenarios/the-battle-of-lake-town.ts): a real two-handed
-# standalone game of The Battle of Lake-town, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `town-won` (scripts/e2e/standalone-scenarios/the-battle-of-lake-town.ts): a real two-handed
+# standalone game of The Battle of Lake-town (the One Deck and Defenders of Gondor lists, Easy), parked on its win: Smaug defeated on The Dragon's Wrath with more Victory points in the display than damage on Lake-town, the rail reads Victory.
+# The fixture is OPEN until scripts/e2e/fixtures.ts finds one in its seeds (TOWN_SEEDS; docs/phases/STATUS.md): the scenario is not playable until its ledger lines are read.
+# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml): the victory on the table, the outcome with its score, and the Scenarios tab, where the scenario's tile reads as won.
+# A cycle has no campaign: no Resolution, no XP and no next part, so the flow checks nothing more.
 - runFlow:
     file: ../../subflows/standalone-win.yaml
     env:
       FIXTURE: town-won
       SCENARIO_ID: the-battle-of-lake-town
-# TODO: this scenario's own assertions on the outcome screen after the win (the score).
