@@ -139,6 +139,9 @@ const FLAGS = [
   // On an enemy, for the modifier's seat only: it makes no engagement checks against that player; it cannot engage that player.
   "noChecksAgainst",
   "cannotEngageSeat",
+  // On an enemy: a player whose threat is at least this much cannot optionally engage it ("Each player with a threat of 25 or higher cannot optionally engage Goblin Scout", 03060:A:1; rr.optional-engagement).
+  // An engagement check still engages him (rules/families/quest/engage.ts optionalThreatBarred).
+  "optionalEngageThreat",
   // On a seat: its threat cannot be reduced below its starting threat level, the threat set at Setup step 2 (rr.initial-threat-level; "Each player cannot reduce his threat below his initial threat level", 145064:B:2): a reduction stops at that level.
   // The game keeps the starting level while a card of it holds this flag (recordStartingThreat).
   "threatFloor",

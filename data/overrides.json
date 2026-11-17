@@ -1166,6 +1166,18 @@
     },
     {
       "match": {
+        "code": "901002"
+      },
+      "set": {
+        "keywords": {
+          "questPointsX": true
+        }
+      },
+      "reason": "Goblin Ambush (Nightmare) prints X for its quest points on side 2B (\"X is 1 plus the number of players in the game.\"). The Nightmare card has no quest points in its source, and the builder reads an X only for the Two Towers boxes, so the stage would have no quest points and never advance; the record 901002:constant:1 sets the value.",
+      "source": "scan 901002.B (data/printed/nightmare.json)"
+    },
+    {
+      "match": {
         "code": "145064"
       },
       "set": {

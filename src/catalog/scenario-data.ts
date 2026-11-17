@@ -256,15 +256,22 @@ export function encounterCodes(data: AnyScenarioData, difficulty: Difficulty = "
 
 // The quest deck: each stage once, and a stage printed in several copies ("a different stage 2A" for each player, 10038:B:1) once for each seat, never more than
 // the copies the box holds. Every stage the box prints once is dealt once, so a scenario without such a stage deals `data.stages` unchanged.
-// The Nightmare deck's quest cards (`nightmare.questCards`) follow the stages on Nightmare: a stage 3 after the last printed one (Grimbeorn's Folly, 900511).
+// The Nightmare deck's quest cards (`nightmare.questCards`) take the place of the stages its setup card removes from the quest deck (`nightmare.removed` with the pile `quest`: Into the Pit's Goblin Patrol
+// leaves and Goblin Ambush takes its place, 901001:B:3 and 901001:B:11, "in stage order"): the first takes the first removed stage's place and so on. The ones left follow the stages: a stage 3 after the last printed one (Grimbeorn's Folly, 900511).
 export function questDeckCodes(data: AnyScenarioData, difficulty: Difficulty = "Normal", seatCount = 1): string[] {
   const placements = placementsAt(data, difficulty);
+  const nightmare = difficulty === "Nightmare" ? data.nightmare : undefined;
+  const added = nightmare?.questCards ?? [];
+  const printed = new Set(data.cards.filter((card) => card.pile === "quest").map((card) => card.code));
+  let taken = 0;
   const stages = data.stages.flatMap((code) => {
-    const printed = placements.find((card) => card.pile === "quest" && card.code === code);
-    const copies = printed ? Math.max(1, Math.min(copiesAt(printed, difficulty), seatCount)) : 1;
+    const placed = placements.find((card) => card.pile === "quest" && card.code === code);
+    // A stage the setup card removes: the next Nightmare quest card, when it has one, stands in its place.
+    if (!placed && nightmare && printed.has(code)) return taken < added.length ? [added[taken++] as string] : [];
+    const copies = placed ? Math.max(1, Math.min(copiesAt(placed, difficulty), seatCount)) : 1;
     return Array.from({ length: copies }, () => code);
   });
-  return difficulty === "Nightmare" ? [...stages, ...(data.nightmare?.questCards ?? [])] : stages;
+  return [...stages, ...added.slice(taken)];
 }
 
 const SETUP_VERB = {

@@ -21,6 +21,12 @@ export function engagementBarred(state: ScenarioState, enemyId: string, seat: nu
   );
 }
 
+// The enemy holds `optionalEngageThreat`: a seat whose threat is at least its amount cannot optionally engage it (03060:A:1). Engagement checks are not barred.
+export function optionalThreatBarred(state: ScenarioState, enemyId: string, seat: number): boolean {
+  const limit = heldAmount(state, enemyId, "optionalEngageThreat");
+  return limit > 0 && (state.seats[seat]?.threat ?? 0) >= limit;
+}
+
 // An enemy engaged a player in the encounter phase: the table remembers it until the phase ends ("If no enemies were engaged
 // this phase", 12065:A:2).
 export function noteEngaged(state: ScenarioState, enemyId: string): ScenarioState {

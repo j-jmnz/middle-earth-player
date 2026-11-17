@@ -29,7 +29,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return next;
     }
     case "AttachSetAside":
-      return attachSetAside(state, instruction.code, lastPicked(state));
+      return attachSetAside(state, instruction.code, lastPicked(state), instruction.removeWhenLeaving === true);
     case "SetAsideHeroWithAttachments":
       return setAsideHeroWithAttachments(state, instruction);
     case "ReturnSetAsideHero":
@@ -104,11 +104,11 @@ export function tokensOn(state: ScenarioState, code: string): number {
 }
 
 // The last picked hero takes a set-aside copy of the card: it comes into its controller's play area attached to the hero.
-function attachSetAside(state: ScenarioState, code: string, hostId: string): ScenarioState {
+function attachSetAside(state: ScenarioState, code: string, hostId: string, temporary: boolean): ScenarioState {
   const host = state.cards[hostId];
   const copy = state.setAside.find((id) => state.cards[id]?.code === code);
   if (!host || host.controller == null || host.zone !== "heroes" || !copy) return state;
-  const placed = updateCard(moveCard(state, copy, { zone: "play", seat: host.controller }), copy, { face: "up" });
+  const placed = updateCard(moveCard(state, copy, { zone: "play", seat: host.controller }), copy, { face: "up", ...(temporary ? { temporary: true as const } : {}) });
   return queueEvent(attachTo(placed, copy, hostId), { trigger: "attached", seat: host.controller, subject: copy, other: hostId });
 }
 
