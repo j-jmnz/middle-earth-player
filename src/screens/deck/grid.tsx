@@ -8,6 +8,7 @@ import { TextButton, ToggleChip } from "../kit/chrome";
 import { CountStepper } from "../kit/count-stepper";
 import { announceDraftChange, changeDraftCount, draftAddRefused, targetPicks, type DraftPicks, type DraftPile, type TitleLookup } from "./draft";
 import type { DeckSectionRow } from "./status";
+import { NOT_OWNED } from "../collection/view";
 import { CardThumb, useCardPreview } from "../images/picture";
 import { usePalette } from "../kit/palette-hook";
 import { SectionHeading } from "../../ui/section-heading";
@@ -106,6 +107,8 @@ type DeckCardCellProps = {
   width: number;
   // What the app does not apply of this card ("Ability not applied"), or null.
   loss?: string | null;
+  // Outside the player's collection: the strip says "Not owned" (before the loss, which the card screen still shows).
+  unowned?: boolean;
   // Whether + would be refused: the title (any printing) is at its copy limit.
   full: boolean;
   lookup: TitleLookup;
@@ -120,6 +123,7 @@ function sameCell(left: DeckCardCellProps, right: DeckCardCellProps): boolean {
     left.width === right.width &&
     left.full === right.full &&
     (left.loss ?? null) === (right.loss ?? null) &&
+    (left.unowned ?? false) === (right.unowned ?? false) &&
     left.lookup === right.lookup &&
     left.onPreview === right.onPreview &&
     a.code === b.code &&
@@ -139,7 +143,7 @@ function sameCell(left: DeckCardCellProps, right: DeckCardCellProps): boolean {
  * One card of the deck in the grid: its picture, a second card peeking out behind it when the deck holds more than one copy, and the
  * − count + stepper overlapping its foot. A tap opens the card, a long press shows it large.
  */
-export const DeckCardCell = memo(function DeckCardCell({ card, width, full, lookup, onPreview, loss = null }: DeckCardCellProps) {
+export const DeckCardCell = memo(function DeckCardCell({ card, width, full, lookup, onPreview, loss = null, unowned = false }: DeckCardCellProps) {
   const router = useRouter();
   const palette = usePalette();
   const t = useTableTokens();
@@ -154,7 +158,7 @@ export const DeckCardCell = memo(function DeckCardCell({ card, width, full, look
         testID={side ? `deck-side-card-${card.code}` : `deck-card-${card.code}`}
         collapsable={false}
         accessibilityRole="button"
-        accessibilityLabel={`${card.name}, ${card.count} in the ${side ? "side deck" : "deck"}${loss ? `, ${loss}` : ""}`}
+        accessibilityLabel={`${card.name}, ${card.count} in the ${side ? "side deck" : "deck"}${loss ? `, ${loss}` : ""}${unowned ? ", not owned" : ""}`}
         {...longPressA11y("Show card", () => onPreview(card.code, card.name, picture))}
         accessibilityHint="Opens the card. Hold to show it large"
         onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
@@ -164,10 +168,10 @@ export const DeckCardCell = memo(function DeckCardCell({ card, width, full, look
         {({ pressed }) => (
           <View style={{ width, height, borderRadius: cardCorner(width, height), overflow: "hidden", opacity: pressed ? 0.8 : 1, backgroundColor: palette.raised, boxShadow: dropShadowOf(t, 8, 18, 0.85) }}>
             <CardThumb code={card.code} imagesrc={card.imagesrc} width={width} height={height} />
-            {loss ? (
+            {loss || unowned ? (
               <View className="absolute left-1 right-1 rounded-control px-1 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
-                <Text className="text-center text-micro text-muted" numberOfLines={1}>
-                  {loss}
+                <Text className={`text-center text-micro ${unowned ? "text-moon" : "text-muted"}`} numberOfLines={1}>
+                  {unowned ? NOT_OWNED : loss}
                 </Text>
               </View>
             ) : null}

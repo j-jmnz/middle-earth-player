@@ -17,6 +17,7 @@ import { useTableTokens } from "../../ui/use-table-tokens";
 import { usePalette } from "../kit/palette-hook";
 import { useUiScale } from "../../ui/ui-scale";
 import { poolDetail, type PoolCard } from "./filter";
+import { NOT_OWNED } from "../collection/view";
 import { CARD_RATIO } from "./grid";
 import { Text } from "../../ui/text";
 
@@ -32,8 +33,6 @@ const thumb = { width: 32, height: 44 };
 
 // A card outside the collection is drawn at this opacity, always with the words "Not owned", so the dimming is never the only cue.
 const UNOWNED_OPACITY = 0.5;
-
-export const NOT_OWNED = "Not owned";
 
 // A row's line: "Ally · Spirit · 2", then what the app does not apply and "Not owned" when they hold.
 function rowDetail(detail: string, loss: string | null, unowned: boolean): string {

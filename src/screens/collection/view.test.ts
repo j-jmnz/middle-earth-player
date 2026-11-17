@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { CollectionSet } from "../../catalog/collection";
-import { collectionRows, collectionTally, setCardCounts, setDetail } from "./view";
+import { collectionRows, collectionTally, notOwnedNote, setCardCounts, setDetail } from "./view";
 
 const angmar: CollectionSet = { id: "angmar", heading: "Angmar Awakened", name: "The Lost Realm and six Adventure Packs", title: "Angmar Awakened", detail: "Or the Hero Expansion", packs: ["TLR", "WoE"] };
 const campaign: CollectionSet = { id: "aace", heading: "Angmar Awakened", name: "Campaign Expansion", title: "Angmar Awakened Campaign Expansion", detail: null, packs: ["AACE"] };
@@ -35,5 +35,12 @@ describe("Collection words", () => {
   it("tallies what is owned", () => {
     expect(collectionTally([angmar, campaign, core], new Set(), 1048)).toBe("Everything owned · 1,048 player cards");
     expect(collectionTally([angmar, campaign, core], new Set(["WoE", "Core"]), 642)).toBe("2 of 3 owned · 642 player cards");
+  });
+
+  it("names the deck's cards outside the collection once each, and counts past five", () => {
+    expect(notOwnedNote([])).toBeNull();
+    expect(notOwnedNote(["Elven Light", "Elven Light"])).toBe("1 card is not in your collection: Elven Light.");
+    expect(notOwnedNote(["Bow of the Galadhrim", "Elven Light", "A Light in the Dark"])).toBe("3 cards are not in your collection: Bow of the Galadhrim, Elven Light and A Light in the Dark.");
+    expect(notOwnedNote(["A", "B", "C", "D", "E", "F", "G"])).toBe("7 cards are not in your collection: A, B, C, D, E and 2 more.");
   });
 });

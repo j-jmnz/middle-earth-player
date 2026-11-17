@@ -2,6 +2,9 @@
 // and the tally over the list. Pure, so the words are tested without a screen.
 import { collectionHeadings, setOwnership, type CollectionSet, type SetOwnership } from "../../catalog/collection";
 
+/** The words on a card outside the collection: the pool's line and strip, the deck editor's strip. */
+export const NOT_OWNED = "Not owned";
+
 export type CollectionRow = { kind: "heading"; title: string } | { kind: "set"; set: CollectionSet };
 
 /** The rows of the Collection list and the indices of its headings, which stay at the top while their sets scroll under them. */
@@ -53,9 +56,15 @@ export function collectionTally(sets: readonly CollectionSet[], notOwned: Readon
   return `${owned} of ${sets.length} owned · ${cardWords(ownedCards)}`;
 }
 
-/** What a screen reader hears for a switch: its state, and the packs while only some are owned. */
-export function ownershipWords(ownership: SetOwnership): string {
-  if (ownership === "all") return "Owned";
-  if (ownership === "some") return "Some packs owned";
-  return "Not owned";
+/**
+ * The deck editor's note on the cards outside the collection, by title, in deck order: "3 cards are not in your collection: Bow of the
+ * Galadhrim, Elven Light and A Light in the Dark." Past five titles the rest are counted. Null when every card is owned.
+ */
+export function notOwnedNote(names: readonly string[]): string | null {
+  const titles = [...new Set(names)];
+  if (titles.length === 0) return null;
+  const head = titles.length === 1 ? "1 card is not in your collection" : `${titles.length} cards are not in your collection`;
+  const shown = titles.length > 5 ? [...titles.slice(0, 5), `${titles.length - 5} more`] : titles;
+  const list = shown.length === 1 ? shown[0] : `${shown.slice(0, -1).join(", ")} and ${shown.at(-1)}`;
+  return `${head}: ${list}.`;
 }
