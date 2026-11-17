@@ -1,6 +1,7 @@
 // Rules: rr.quest-advancement, rr.step-3-4, mec108.side-quests-in-play, mec108.captured-cards (data/rules/entries.json); ledger line 10176:A:1.
 //
 // "A quest card in play": the quest cards a player can name when a card places progress on one. The current quest stage of the player's area, the encounter side quests in the staging area and the player side quests in the quest areas.
+import { effectProgressBarredOn } from "./effect-progress.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { ruleCause } from "../../core/cause.ts";
@@ -36,6 +37,7 @@ export function placeProgressOnQuestCard(state: ScenarioState, instruction: Extr
   const type = printedOf(ctx.cards, quest.code).type;
   if (type === "quest") {
     if (id !== stageOf(state, focus.seat) || state.stageCleared) return state;
+    if (effectProgressBarredOn(state, id)) return state;
     if (flagged(state, id, "progressRescues")) return rescueRandom(state, id, amount);
     const before = steps.length;
     const placed = putOnStage(state, id, amount, questPointsOf(state, quest, ctx.cards), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, ruleCause("rr.step-3-4"), { counted: false, reduced: currentSideQuest(state) == null });

@@ -9,7 +9,8 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
-import { placeOnMainQuest, placeQuestProgress } from "../../quest/quest.ts";
+import { placeOnMainQuest } from "../../quest/quest.ts";
+import { placeEffectProgress } from "../quest/effect-progress.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
@@ -36,7 +37,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       if (amount <= 0) return state;
       const before = steps.length;
       const gate = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
-      const placed = instruction.main ? placeOnMainQuest(state, amount, ctx.cards, steps, gate) : placeQuestProgress(state, amount, ctx.cards, steps, gate);
+      const placed = instruction.main ? placeOnMainQuest(state, amount, ctx.cards, steps, gate) : placeEffectProgress(state, amount, ctx.cards, steps, gate);
       return afterProgress(placed, before, ctx, steps);
     }
     case "ExcessDamageTo": {

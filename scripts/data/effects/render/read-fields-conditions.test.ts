@@ -25,7 +25,7 @@ describe("effects render read fields, conditions", () => {
     firstPlayer: [{ kind: "firstPlayer" }],
     otherPlayer: [{ kind: "otherPlayer" }],
     handHasCard: [{ kind: "handHasCard" }],
-    undefended: [{ kind: "undefended" }],
+    undefended: [{ kind: "undefended" }, { kind: "undefended", is: false }],
     questSucceeded: [{ kind: "questSucceeded" }],
     questFailed: [{ kind: "questFailed" }],
     logged: [{ kind: "logged", line: "A line", is: false }],

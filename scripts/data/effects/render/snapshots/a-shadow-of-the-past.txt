@@ -343,7 +343,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141077:A:1 (front): The first player gains control of Gildor Inglorion.
   141077:whenRevealed:1: When revealed
-    - [json TakeControl {"verb":"TakeControl","who":"firstPlayer"}]
+    - the first player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
 
 141077:A:2 (front): Forced: At the end of the round, discard Gildor Inglorion. The first player may spend 1 Fellowship resource to cancel this effect.
   141077:forced:1: Forced at the end of the round (may be canceled by paying 1)
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 220 by template, 38 as JSON)
+(rendered pieces: 221 by template, 37 as JSON)

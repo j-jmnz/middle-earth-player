@@ -93,7 +93,7 @@
     "id": "standalone-scenarios",
     "name": "Standalone scenarios",
     "scenarioCount": 1,
-    "playable": false,
+    "playable": true,
     "kind": "cycle",
     "box": null,
     "released": "2011-09-21",

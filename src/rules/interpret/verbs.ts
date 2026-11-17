@@ -15,7 +15,8 @@ import { lastPicked, otherSeat, seatsFor } from "./player-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
-import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "../quest/quest.ts";
+import { engageEnemy, engageWith, stagingEnemies } from "../quest/quest.ts";
+import { placeEffectProgress } from "../families/quest/effect-progress.ts";
 import { restricted } from "./restrictions.ts";
 import { nextUint, shuffleIds } from "../core/seed.ts";
 import { afterProgress } from "../quest/stage-reveal.ts";
@@ -26,7 +27,7 @@ import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { flagged, inPlay, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
-import { attachTo, cardsUnder, discardFromHand, moveCard, turnedUp } from "../core/zones.ts";
+import { attachTo, cardsUnder, discardFromHand, leaveShadow, moveCard, turnedUp } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
@@ -117,7 +118,7 @@ export function runExtraVerb(
       return removeQuestProgress(state, questProgressMoved(state, instruction), steps);
     case "PlaceQuestProgress": {
       const before = steps.length;
-      const placed = placeQuestProgress(state, questProgressMoved(state, instruction), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
+      const placed = placeEffectProgress(state, questProgressMoved(state, instruction), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
       return afterProgress(placed, before, ctx, steps);
     }
     case "DiscardUntilEnemies":
@@ -204,7 +205,9 @@ export function runExtraVerb(
     case "TakeControl": {
       if (!focus.sourceId || !state.cards[focus.sourceId]) return state;
       const seat = seatFor(state, instruction.who, focus.seat);
-      return updateCard(moveCard(state, focus.sourceId, { zone: "play", seat }), focus.sourceId, { face: "up", exhausted: false });
+      // A shadow card that is taken (Ranger of Ithilien, 00015:A:2) stops being its enemy's shadow card: the enemy forgets it, then it enters play ready under the player.
+      const taken = leaveShadow(state, focus.sourceId);
+      return updateCard(moveCard(taken, focus.sourceId, { zone: "play", seat }), focus.sourceId, { face: "up", exhausted: false });
     }
     case "ReduceOpeningHand":
       return { ...state, openingHandReduction: state.openingHandReduction + instruction.amount };

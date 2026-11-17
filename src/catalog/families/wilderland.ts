@@ -240,6 +240,10 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachTreasuresToHost"), ...when }),
   // A constant of a card in play: "Each player cannot play more than 1 card each phase" (19140:B:1). A player who has played `max` cards in the phase (the plays state.played records) may play no more; a card put into play is not played.
   z.strictObject({ verb: z.literal("LimitPlaysPerPhase"), max: z.number().int().min(1) }),
+  // A constant of a card in play: "Each player cannot play or put into play more than 1 card from his hand each round" (00017:B:2). Every card a player plays from the hand (allies, attachments and events) and every card an effect puts into play
+  // from his hand counts, each player's own; a card played or put into play from the deck, the discard pile or out of play does not. The count (`handPlays`, a table modifier for the seat until the end of the round) is kept only in a game
+  // with such a card.
+  z.strictObject({ verb: z.literal("LimitHandPlaysPerRound"), max: z.number().int().min(1) }),
   // The Fate of Wilderland (part 9, campaign card 12195; ledger lines 12195:A:2, 19155 to 19170).
   // Campaign Setup: "Each player may search their deck for a boon or treasure card and add it to their hand" (12195:A:2). Each player in turn may take a boon or a treasure card of their deck (a pool card the checklist is about to shuffle into it is in the deck already) into their
   // starting hand, or decline; every player is asked, unlike the search for a boon ally. Dealt by the checklist (campaign/checklist.ts), so it changes nothing here.
@@ -260,6 +264,8 @@ const TRIGGERS = [
   "discovered",
 ] as const;
 const FLAGS = [
+  // On the table, for a seat, until the end of the round: one card played or put into play from its hand (LimitHandPlaysPerRound, 00017:B:2); engine use, one modifier for each card.
+  "handPlays",
   // On a character: the next damage it would be dealt cancels this many points of it, and the flag is spent ("The next time that character would be dealt damage this round, cancel 1 of that damage", 12166:A:2). Set with a ModifyStat that lasts
   // until the end of the round or the phase; src/rules/families/wilderland/shield.ts takes it as damage is placed.
   "damageShield",

@@ -1,5 +1,6 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
+import { effectProgressBarredOn } from "../families/quest/effect-progress.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "../quest/explore.ts";
@@ -114,7 +115,7 @@ export function progressPlacer(state: ScenarioState, ctx: ReduceContext, seat: n
 // Progress on a location in play. A location that is full is explored and leaves play. `placedBy` is the player whose card effect placed it (progressPlacer).
 export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number): ScenarioState {
   const location = state.cards[id];
-  if (!location) return state;
+  if (!location || effectProgressBarredOn(state, id)) return state;
   const points = questPointsOf(state, location, ctx.cards);
   // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south/locations.ts).
   const placed = Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards));

@@ -57,7 +57,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   firstPlayer: () => ({ text: "the actor holds the first player token", read: [] }),
   otherPlayer: () => ({ text: "another player is still in the game", read: [] }),
   handHasCard: () => ({ text: "the actor has a card in hand", read: [] }),
-  undefended: () => ({ text: "the attack has no defender", read: [] }),
+  undefended: (c) => ({ text: c.is === false ? "the attack has a defender" : "the attack has no defender", read: ["is"] }),
   questSucceeded: () => ({ text: "the quest succeeded", read: [] }),
   questFailed: () => ({ text: "the quest failed", read: [] }),
   logged: (c) => ({ text: `the Campaign Log ${c.is === false ? "does not hold" : "holds"} the line "${str(c.line)}"`, read: ["line", "is"] }),

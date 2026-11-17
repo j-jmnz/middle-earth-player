@@ -117,6 +117,9 @@ const FLAGS = [
   "holdsWin",
   // On "table": no character may be committed to the quest ("Do not commit characters to the quest", 143078:B:1; rules/engine/legal.ts committers).
   "cannotCommit",
+  // On the current quest stage: progress from card effects cannot be placed on the stage or on an active location ("Progress tokens from card effects cannot be placed on this quest card or the active location", 00018:B:1). Questing's own progress is
+  // not a card effect. Read by rules/families/quest/effect-progress.ts, where an effect places progress (families/quest/effect-progress.ts placeEffectProgress, interpret/effect-verbs.ts placeProgress, families/quest/quest-card.ts).
+  "noEffectProgress",
   // On a seat: it does not raise threat from questing unsuccessfully; a player card effect that reduces its threat reduces it by
   // at most 1 (22054:A:1); it may optionally engage this many additional enemies (09002:A:2), and the optional engagements it
   // made this phase (engine use).

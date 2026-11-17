@@ -77,8 +77,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("otherLocationInPlay") }),
   // The actor controls a hero that is exhausted.
   z.strictObject({ kind: z.literal("heroExhausted") }),
-  // The attack in progress has no defender (declared or considered).
-  z.strictObject({ kind: z.literal("undefended") }),
+  // The attack in progress has no defender (declared or considered). `is: false`: it has one (an attack is in progress and defended): "Defending player must discard 1 ally card ... (2 allies instead if this attack is undefended)", 00012:A:3.
+  z.strictObject({ kind: z.literal("undefended"), is: z.boolean().optional() }),
   // `type`: only a card of this printed type counts ("discard cards from the top of the encounter deck until an enemy is discarded" is offered while an enemy is left in the deck, 146061:A:1). `victory`: the victory display is read too (146036:A:2).
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(), deckOnly: z.literal(true).optional(), victory: z.literal(true).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.

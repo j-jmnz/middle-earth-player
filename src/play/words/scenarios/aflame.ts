@@ -55,6 +55,8 @@ export function aflameWords(instruction: Instruction): string | null {
       return "search the encounter deck and discard pile for the Aflame location with the highest Aflame value, and add it to the staging area";
     case "EngageFirstPlayer":
       return "it engages the first player";
+    case "EngageLowestThreat":
+      return "every copy of it engages the player with the lowest threat";
     case "StageSetAside":
       return "add the set-aside card to the staging area";
     case "RemoveNamedFromGame":

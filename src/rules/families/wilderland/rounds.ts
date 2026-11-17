@@ -1,9 +1,9 @@
-// Rules: rr.initiating-abilities-playing-cards, rr.cancel, rr.reveal (data/rules/entries.json); ledger lines 19137:B:1, 19140:B:1.
+// Rules: rr.initiating-abilities-playing-cards, rr.play-and-put-into-play, rr.cancel, rr.reveal (data/rules/entries.json); ledger lines 19137:B:1, 19140:B:1, 00017:B:2.
 // What Mount Gundabad's stages say about a round or a phase: the first treachery revealed each round (its When Revealed effects cannot be canceled) and a limit on the cards a player plays in a phase. A game with no card that reads them does none of this work (`gameReads`).
 import { gameReads } from "../../core/game-reads.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { flagged, inPlay } from "../../core/state.ts";
+import { flagged, inPlay, modifierActive } from "../../core/state.ts";
 import { constantInstructions } from "../../interpret/constant-records.ts";
 import { stageName } from "./gundabad.ts";
 import type { PlayHow } from "../../interpret/family-manifest.ts";
@@ -43,4 +43,33 @@ export function phasePlayRefusal(state: ScenarioState, cardId: string, ctx: Redu
   if (!limit) return null;
   const who = state.seatCount > 1 ? `Player ${state.activeSeat + 1} has` : "You have";
   return `${limit.source}: each player can play only ${limit.max} ${limit.max === 1 ? "card" : "cards"} per phase. ${who} played ${limit.played} this ${state.phase.toLowerCase()} phase.`;
+}
+
+// The cards this seat has played or put into play from its hand this round (`handPlays`, noted by noteHandPlay), and the LimitHandPlaysPerRound in force that the seat has used up, if any.
+function handPlayLimit(state: ScenarioState, cardId: string, ctx: ReduceContext, seat: number): { source: string; max: number; played: number } | null {
+  const card = state.cards[cardId];
+  if (!card || card.zone !== "hand" || !gameReads(state, ctx, HAND_LIMIT)) return null;
+  const played = state.modifiers.filter((modifier) => modifier.stat === "handPlays" && modifier.seat === seat && modifierActive(state, modifier)).length;
+  const held = constantInstructions(state, ctx).find(({ instruction }) => instruction.verb === "LimitHandPlaysPerRound" && played >= instruction.max);
+  return held && held.instruction.verb === "LimitHandPlaysPerRound" ? { source: stageName(state, ctx, held.source.id, printedOf(ctx.cards, held.source.code).name), max: held.instruction.max, played } : null;
+}
+
+const HAND_LIMIT = '"LimitHandPlaysPerRound"';
+
+/** Whether a LimitHandPlaysPerRound in force bars the card, in the hand, from being played or put into play by the seat (`how.seat`, the active seat when it is not given). */
+export function handPlaysBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, how: PlayHow): boolean {
+  return handPlayLimit(state, cardId, ctx, how.seat ?? state.activeSeat) != null;
+}
+
+/** The words for a refused play of a card in the hand: "Through the Ruins: each player can play or put into play only 1 card from his hand each round." Null when no limit bars it. */
+export function handPlayRefusal(state: ScenarioState, cardId: string, ctx: ReduceContext): string | null {
+  const limit = handPlayLimit(state, cardId, ctx, state.activeSeat);
+  if (!limit) return null;
+  return `${limit.source}: each player can play or put into play only ${limit.max} ${limit.max === 1 ? "card" : "cards"} from his hand each round.`;
+}
+
+/** A card left the hand of `seat` by being played or put into play: it counts toward the round's limit, in a game with a LimitHandPlaysPerRound. */
+export function noteHandPlay(state: ScenarioState, ctx: ReduceContext, seat: number, cardId: string): ScenarioState {
+  if (!gameReads(state, ctx, HAND_LIMIT)) return state;
+  return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: cardId, stat: "handPlays", amount: 1, until: "endOfRound", seat }] };
 }

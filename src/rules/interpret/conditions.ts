@@ -200,7 +200,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       if (scope.phase == null && condition.is === "Refresh" && state.phase === "End of round") return true;
       return (scope.phase ?? state.phase) === condition.is;
     case "undefended":
-      return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true);
+      return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true) === (condition.is !== false);
     case "searchable":
       return searchable(state, condition, ctx).length > 0;
     case "stageReached":
