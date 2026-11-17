@@ -10,7 +10,7 @@ const CROSSED = "00019";
 const QUEST_START = { seat: null, phase: "Quest" } as const;
 
 const ROWS: readonly Row[] = [
-  { line: "00001:A:1", name: "the Witch-king takes no attachments", layout: { staging: ["00001"] }, act: resolve("00001", "constant"), expect: [flag("00001", "cannotHaveAttachments")] },
+  { line: "00001:A:1", name: "players cannot play attachments on the Witch-king", layout: { staging: ["00001"] }, act: resolve("00001", "constant"), expect: [flag("00001", "noPlayerAttachments")] },
   { line: "00001:A:2", name: "each character gets -1 Willpower while he is in the staging area", layout: { staging: ["00001"] }, act: [], expect: [stat("dh1", "willpower", 1)] },
   {
     line: "00001:A:3",

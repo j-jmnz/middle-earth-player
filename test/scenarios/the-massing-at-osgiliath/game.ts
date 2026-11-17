@@ -9,7 +9,7 @@ const cycle = loadCampaign("standalone-scenarios");
 const osgiliath = loadAnyScenario("the-massing-at-osgiliath");
 
 // Test helper. A whole standalone game of The Massing at Osgiliath played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The players quest every round (one stand-in hero stays ready is not needed: the Witch-king and the Scouts are engaged only by their cost), and a choice takes its first option (the Ranger shadow: take it; Anduin Crossing: discard a hero; The Witch-king: raise threat 3), or the last as the policy says.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The players quest every round, and a choice takes its first option (the Ranger shadow: take it; Anduin Crossing: discard a hero; The Witch-king: raise threat 3), or the last as the policy says.
 export const OSGILIATH_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type OsgiliathDecks = "strong" | "weak" | "brittle";

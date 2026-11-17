@@ -33,4 +33,13 @@ describe("EngageLowestThreat (00002:A:1)", () => {
     const other = engages({ threat: [28, 28], staging: [SNAGA, SNAGA] }, "seat:1");
     for (const id of other.ids) expect(other.state.cards[id]).toMatchObject({ zone: "engaged", controller: 1 });
   });
+
+  it("00002:A:1 with a tie the first player still chooses when every copy is engaged with one tied player, and the other copies then do nothing more", () => {
+    const made = tableFromLayout("the-massing-at-osgiliath", { seats: 2, phase: "Encounter", threat: [28, 28], engaged: [{ code: SNAGA, seat: 0 }, { code: SNAGA, seat: 0 }] });
+    const [first, second] = idsOf(made.state, SNAGA);
+    const chose = resolveRecords(made.state, made.ctx, SNAGA, "forced", first, () => "seat:1");
+    for (const id of idsOf(chose.state, SNAGA)) expect(chose.state.cards[id]).toMatchObject({ zone: "engaged", controller: 1 });
+    const again = resolveRecords(chose.state, made.ctx, SNAGA, "forced", second, () => "seat:0");
+    for (const id of idsOf(again.state, SNAGA)) expect(again.state.cards[id]).toMatchObject({ zone: "engaged", controller: 1 });
+  });
 });

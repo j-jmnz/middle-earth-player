@@ -20,9 +20,9 @@ const ALLIES_IN_HAND = (min: number): Extract<Condition, { kind: "count" }> => (
 const NO_TRAVEL = (...traits: readonly string[]): Instruction[] => traits.map((trait) => ({ verb: "Restrict", what: "travel", trait }));
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
-  // 00001 The Witch-king. No attachments; each character gets -1 Willpower while he is in the staging area; after he attacks (defended or not) the defending player either raises his threat by 3 or he returns to the staging area
+  // 00001 The Witch-king. Players cannot play attachments on him (noPlayerAttachments: player card attachments only, an encounter card may still attach); each character gets -1 Willpower while he is in the staging area; after he attacks (defended or not) the defending player either raises his threat by 3 or he returns to the staging area
   // (raising threat that would eliminate the player is allowed). He leaves the staging area only by an engagement check or an optional engagement.
-  { id: "00001:constant:1", cardCode: "00001", lines: ["00001:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotHaveAttachments", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+  { id: "00001:constant:1", cardCode: "00001", lines: ["00001:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noPlayerAttachments", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: "00001:constant:2", cardCode: "00001", lines: ["00001:A:2"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "willpower", amount: -1, until: "whileSourceInPlay", holders: A_CHARACTER }] },
   {
     id: "00001:forced:1",

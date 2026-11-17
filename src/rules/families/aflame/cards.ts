@@ -58,8 +58,11 @@ export function engageFirstPlayer(state: ScenarioState, focus: Focus, steps: Eng
   return engageEnemy(state, state.firstPlayer, focus.sourceId, steps);
 }
 
-/** EngageLowestThreat: every copy of the source's title, in the staging area or engaged with a player, engages the living seat with the lowest threat. Among tied seats the first player chooses (once, for every copy). Copies that are all
- * engaged with one lowest-threat seat already stay. A copy that cannot be engaged stays where it is. */
+// The use EngageLowestThreat records once the first player has chosen among tied seats (title-wide, so the other copies' triggers this phase do nothing more).
+const ENGAGED_LOWEST = "engage-lowest-threat";
+
+/** EngageLowestThreat: every copy of the source's title, in the staging area or engaged with a player, engages the living seat with the lowest threat. Among tied seats the first player chooses (once a phase, for every copy). Copies that
+ * are all engaged with one lowest-threat seat already stay, once that seat is the only one tied or the first player has chosen it. A copy that cannot be engaged stays where it is. */
 export function engageLowestThreat(state: ScenarioState, focus: Focus, steps: EngineStep[]): ScenarioState {
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
   if (!source) return state;
@@ -70,11 +73,12 @@ export function engageLowestThreat(state: ScenarioState, focus: Focus, steps: En
   if (copies.length === 0 || tied.length === 0) return state;
   const holders = new Set(copies.map((card) => (card.zone === "engaged" ? card.controller : null)));
   const [only] = [...holders];
-  if (holders.size === 1 && only != null && tied.includes(only)) return state;
+  const chosen = state.uses.some((use) => use.effectId === ENGAGED_LOWEST && use.sourceId === source.code && use.round === state.round && use.phase === state.phase);
+  if (holders.size === 1 && only != null && tied.includes(only) && (tied.length === 1 || chosen)) return state;
   const options = tied.map((seat) => `seat:${seat}`);
   const seat = tied.length === 1 ? tied[0] : focus.chosen ? seatOf(focus.chosen) : undefined;
   if (seat == null) return effectData(state) ? askTarget(state, { instruction: { verb: "EngageLowestThreat" }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : state;
-  let next = state;
+  let next: ScenarioState = tied.length > 1 ? { ...state, uses: [...state.uses, { effectId: ENGAGED_LOWEST, sourceId: source.code, round: state.round, phase: state.phase }] } : state;
   for (const copy of copies) {
     if (copy.zone === "engaged" && copy.controller === seat) continue;
     next = copy.zone === "engaged" ? engageWith(next, seat, copy.id, steps) : engageEnemy(next, seat, copy.id, steps);

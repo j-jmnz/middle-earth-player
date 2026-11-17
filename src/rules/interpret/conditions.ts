@@ -199,8 +199,13 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       // rr.step-7-5): a Refresh Action may be used there. An ended phase an event names is read as it is.
       if (scope.phase == null && condition.is === "Refresh" && state.phase === "End of round") return true;
       return (scope.phase ?? state.phase) === condition.is;
-    case "undefended":
-      return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true) === (condition.is !== false);
+    case "undefended": {
+      // The attack in progress has no defender yet (or a shadow effect made it count as undefended); `is: false` asks for the defended one.
+      const attack = state.pendingAttack;
+      if (attack == null) return false;
+      const undefended = attack.defenderId == null || attack.undefended === true;
+      return undefended === (condition.is !== false);
+    }
     case "searchable":
       return searchable(state, condition, ctx).length > 0;
     case "stageReached":

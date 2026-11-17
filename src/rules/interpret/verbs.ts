@@ -27,7 +27,7 @@ import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { flagged, inPlay, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
-import { attachTo, cardsUnder, discardFromHand, leaveShadow, moveCard, turnedUp } from "../core/zones.ts";
+import { attachTo, cardsUnder, discardFromHand, moveCard, turnedUp } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
@@ -205,9 +205,9 @@ export function runExtraVerb(
     case "TakeControl": {
       if (!focus.sourceId || !state.cards[focus.sourceId]) return state;
       const seat = seatFor(state, instruction.who, focus.seat);
-      // A shadow card that is taken (Ranger of Ithilien, 00015:A:2) stops being its enemy's shadow card: the enemy forgets it, then it enters play ready under the player.
-      const taken = leaveShadow(state, focus.sourceId);
-      return updateCard(moveCard(taken, focus.sourceId, { zone: "play", seat }), focus.sourceId, { face: "up", exhausted: false });
+      // A shadow card that is taken (Ranger of Ithilien, 00015:A:2) stops being its enemy's shadow card: the move forgets it on the enemy (detach), and the card loses the enemy as its host.
+      const fromShadow = state.cards[focus.sourceId]?.zone === "shadow";
+      return updateCard(moveCard(state, focus.sourceId, { zone: "play", seat }), focus.sourceId, { face: "up", exhausted: false, ...(fromShadow ? { host: null } : {}) });
     }
     case "ReduceOpeningHand":
       return { ...state, openingHandReduction: state.openingHandReduction + instruction.amount };

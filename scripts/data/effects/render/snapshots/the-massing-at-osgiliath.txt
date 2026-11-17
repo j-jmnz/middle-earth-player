@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00001:A:1 (front): Players cannot play attachments on The Witch-king.
   00001:constant:1: Constant
-    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments 1, while this card is in play
 
 00001:A:2 (front): While The Witch-king is in the staging area, each character gets -1 Willpower.
   00001:constant:2: Constant

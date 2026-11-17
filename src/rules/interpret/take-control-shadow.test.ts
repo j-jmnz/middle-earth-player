@@ -15,10 +15,11 @@ describe("TakeControl of a shadow card (00015:A:2)", () => {
     const { run } = fight("take");
     const ranger = run.state.cards[first(run.state, RANGER)];
     expect(ranger).toMatchObject({ zone: "play", controller: 0, exhausted: false });
-    expect(ranger?.host ?? null).toBeNull();
+    expect(ranger?.host).toBeNull();
     const enemy = run.state.cards[first(run.state, ATTACKER)];
     expect(enemy?.damage).toBe(2);
-    expect(enemy?.shadowId).toBeUndefined();
+    // The move forgets the shadow card on the enemy (detach writes null) and the Ranger has no host.
+    expect(enemy?.shadowId).toBeNull();
     const exhausted = Object.values(run.state.cards).filter((card) => card.zone === "heroes" && card.exhausted).length;
     expect(exhausted).toBeGreaterThanOrEqual(1);
   });

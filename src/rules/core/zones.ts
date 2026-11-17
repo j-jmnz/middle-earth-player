@@ -192,18 +192,6 @@ export function shadowCards(instance: CardInstance | undefined): string[] {
   return [...(instance.shadowId ? [instance.shadowId] : []), ...(instance.extraShadowIds ?? [])];
 }
 
-/** A shadow card that is no longer the enemy's shadow card because it entered play ("take control of Ranger of Ithilien", 00015:A:2): the enemy it was dealt to forgets it and it has no host. Other cards are left as they are. */
-export function leaveShadow(state: ScenarioState, id: string): ScenarioState {
-  const card = state.cards[id];
-  const enemy = card?.zone === "shadow" && card.host ? state.cards[card.host] : undefined;
-  if (!card || !enemy) return state;
-  const rest = (enemy.extraShadowIds ?? []).filter((other) => other !== id);
-  return updateCards(state, [
-    [id, { host: null }],
-    [enemy.id, { ...(enemy.shadowId === id ? { shadowId: undefined } : {}), ...(enemy.extraShadowIds ? { extraShadowIds: rest } : {}) }],
-  ]);
-}
-
 export function unhost(state: ScenarioState, id: string): ScenarioState {
   const current = state.cards[id];
   if (!current?.host) return state;

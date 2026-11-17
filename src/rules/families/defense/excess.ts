@@ -11,7 +11,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage, raiseThreat } from "../../core/keywords.ts";
 import { effectsOf } from "../../windows/listen.ts";
-import { effectCause, ruleCause } from "../../core/cause.ts";
+import { effectCause, ruleCause, type Cause } from "../../core/cause.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay } from "../../core/state.ts";
@@ -46,12 +46,17 @@ function noteHitPointsOn(state: ScenarioState, id: string, hitPoints: number): S
   return attack ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, hitPointsOn: { ...attack.defense?.hitPointsOn, [id]: hitPoints } } } } : state;
 }
 
+// The cause an enemy's flag effect names: the record of the enemy's card that holds the flag, else the damage rule.
+function flagCause(ctx: ReduceContext, code: string, flag: string): Cause {
+  const record = effectsOf(ctx, code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
+  return record ? effectCause(record) : ruleCause("rr.damage");
+}
+
 // The damage an attack landed raises the defending player's threat (damageToThreat): the player the attack is against, or the enemy's controller outside an attack.
 function damageRaisesThreat(state: ScenarioState, before: ScenarioState, enemyId: string, landed: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const seat = before.pendingAttack?.seat ?? before.cards[enemyId]?.controller;
   if (seat == null) return state;
-  const record = effectsOf(ctx, before.cards[enemyId]?.code ?? "").find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "damageToThreat"));
-  return raiseThreat(state, seat, landed, steps, record ? effectCause(record) : ruleCause("rr.damage"));
+  return raiseThreat(state, seat, landed, steps, flagCause(ctx, before.cards[enemyId]?.code ?? "", "damageToThreat"));
 }
 
 // The enemy's combat damage `raw` is placed on `assigned`; the excess goes to threat when the enemy says so. Every place an enemy
@@ -98,10 +103,7 @@ export function combatDamage(
   const excess = landed - remaining;
   if (excess <= 0) return raised;
   // The cause an excess effect names: the record of the enemy that holds the flag, else the rule.
-  const causeOf = (flag: string) => {
-    const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
-    return record ? effectCause(record) : ruleCause("rr.damage");
-  };
+  const causeOf = (flag: string) => flagCause(ctx, enemy.code, flag);
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play; the enemy's other excess flags still apply.
   const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(raised, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : raised;
   if (toStage && state.questStage) return noteHitPointsOn(placeDamage(eachQuest, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
