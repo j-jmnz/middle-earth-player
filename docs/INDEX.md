@@ -31,18 +31,18 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` (~5.1K tok)
+- `README.md` (~5.7K tok)
   - 56–93 Features (~550)
     - 79–93 Themes (~190)
   - 94–111 What you can play (~240)
   - 112–119 Private by design (~150)
   - 120–125 Accessibility (~120)
   - 126–223 Install (~1.7K)
-  - 224–245 Roadmap (~540)
-  - 246–256 Get involved (~210)
-  - 257–260 Support (~90)
-  - 261–276 Attribution (~410)
-  - 277–280 License (~50)
+  - 224–258 Roadmap (~1.2K)
+  - 259–269 Get involved (~210)
+  - 270–273 Support (~90)
+  - 274–289 Attribution (~410)
+  - 290–293 License (~50)
 - `docs/architecture.md` — Architecture (~27.8K tok)
   - 7–42 Stack (~1.3K)
   - 43–78 Processes (~680)
@@ -67,8 +67,8 @@ Read the sections your task touches.
   - 420–435 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~215.9K tok)
   - 17–41 Sections (~520)
-  - 42–53 Product (~720) ← 2
-  - 54–67 Non-goals (~600)
+  - 42–53 Product (~740) ← 2
+  - 54–67 Non-goals (~610)
   - 68–88 Decisions (~860)
   - 89–121 Stack (~1.2K)
   - 122–139 Performance and feel (~750)

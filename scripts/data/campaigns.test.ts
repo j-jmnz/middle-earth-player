@@ -65,8 +65,8 @@ describe("data/campaigns/index.json", () => {
     const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
     // The 2011 Core Set and the Two-Player Limited Edition Starter print the scenarios the Revised Core Set and The Dark of Mirkwood reprint.
     const reprinted = ["Core Set", "Two-Player Limited Edition Starter"];
-    // Fan-made: A Long-extended Party's packs (RingsDB names them "ALeP - ...") and the scenarios RingsDB lists no pack for. The
-    // roadmap takes ALeP after the official content (README.md, Roadmap).
+    // Fan-made: A Long-extended Party's packs (RingsDB names them "ALeP - ..."), then First Age with its Doom Mastered cycle and
+    // Legacy of Fëanor, which RingsDB lists no pack for. The roadmap takes them after the official content (README.md, Roadmap).
     const fanMade = [
       "Children of Eorl", "The Aldburg Plot", "Fire on the Eastemnet", "The Gap of Rohan", "The Glittering Caves", "Mustering of the Rohirrim", "Blood in the Isen",
       "The Scouring of the Shire", "The Nine are Abroad", "The Siege of Erebor", "The Shire's Reckoning", "The Hobbit", "Strange News in Bree", "Fangs in the Dark",
