@@ -40,6 +40,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
+- `level-won` is not committed: no seed in 500 wins The Seventh Level with the saved decklists (their heroes are gone by round 3). Until it exists `.maestro/scenarios/the-seventh-level/the-seventh-level.yaml` cannot run.
 - `pit-won` is not committed: no seed in 500 wins Into the Pit with the saved decklists (their heroes are destroyed by round 3 or 4). Until it exists `.maestro/scenarios/into-the-pit/into-the-pit.yaml` cannot run.
 - `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50). Until it exists `.maestro/scenarios/conflict-at-the-carrock/conflict-at-the-carrock.yaml` cannot run.
 - `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists. Until it exists `.maestro/scenarios/return-to-mirkwood/return-to-mirkwood.yaml` cannot run.
