@@ -5,7 +5,7 @@
 import { ruleCause, type Cause } from "../core/cause.ts";
 import { checkCost } from "../families/costs/stats.ts";
 import { engagementBarred, noteEngaged, optionalThreatBarred } from "../families/quest/engage.ts";
-import { currentQuestHas } from "../families/quest/conditions.ts";
+import { currentQuestHas, willpowerIgnored } from "../families/quest/conditions.ts";
 import { noteHostDefeated, withStagingThreat } from "../families/attachments/hold.ts";
 import { progressFirstLocations } from "../families/attachments/quest.ts";
 import { passSorcery } from "../families/angmar/reanimate/stage.ts";
@@ -114,7 +114,7 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = view.cards[id];
       // A character committed to a side quest places its Willpower on that quest, not against the staging area (families/sidequests/quest.ts).
-      if (!instance?.committed || instance.questTo != null) continue;
+      if (!instance?.committed || instance.questTo != null || willpowerIgnored(view, id)) continue;
       // "Using its Attack instead of its Willpower" (11005:A:2).
       total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
     }

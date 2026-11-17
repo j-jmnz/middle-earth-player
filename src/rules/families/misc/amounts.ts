@@ -5,7 +5,8 @@
 import type { AmountExpr } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { printedOf } from "../../core/printed.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { victoryPointsOf } from "../../core/printed-stat.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats } from "../../core/state.ts";
 
@@ -43,7 +44,8 @@ export function namedInPlay(state: ScenarioState, name: string, ctx: ReduceConte
   return found[0]?.id ?? null;
 }
 
-export function miscAmount(state: ScenarioState, amount: AmountExpr, sourceId: string | null): number {
+export function miscAmount(state: ScenarioState, amount: AmountExpr, sourceId: string | null, cards: ReadonlyMap<string, PrintedCard>): number {
+  if (amount.victoryPoints) return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, cards), 0);
   if (amount.facedown) return facedownCount(state, sourceId);
   if (amount.resourcesAboveCopies) return resourcesAboveCopies(state, sourceId);
   return 0;

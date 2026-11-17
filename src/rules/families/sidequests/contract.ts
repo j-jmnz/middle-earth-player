@@ -22,7 +22,7 @@ export function faceUp(state: ScenarioState, sourceId: string | null, side: "A" 
 
 // The `flag` condition: the actor's seat or the source card holds a modifier of this stat that is in force.
 export function flagHeld(state: ScenarioState, condition: Extract<Condition, { kind: "flag" }>, sourceId: string | null, actor: number): boolean {
-  const holder = condition.holder === "seat" ? `seat:${actor}` : (sourceId ?? "");
+  const holder = condition.holder === "seat" ? `seat:${actor}` : condition.holder === "table" ? "table" : (sourceId ?? "");
   return (heldAmount(state, holder, condition.stat as Modifier["stat"]) > 0) === (condition.is !== false);
 }
 

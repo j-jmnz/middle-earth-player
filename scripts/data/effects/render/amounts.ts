@@ -35,6 +35,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
     return { text: `${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}`, read };
   }
   if (expr.players === true) return { text: "the number of players", read: ["players"] };
+  if (expr.victoryPoints === true) return { text: "the Victory points of the cards in the victory display added up (read live)", read: ["victoryPoints"] };
   if (expr.stagingThreat === true) return { text: "the total Threat of all cards in the staging area now", read: ["stagingThreat"] };
   if (typeof expr.pile === "string") return { text: `the number of cards left in the ${expr.pile === "harad" ? "Harad" : str(expr.pile)} deck`, read: ["pile"] };
   if (expr.highestThreat === true) return { text: "the highest threat among the living players", read: ["highestThreat"] };

@@ -4,6 +4,7 @@
 import type { Instruction } from "../../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../../core/intents.ts";
+import { printedOf } from "../../../core/printed.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../../core/state.ts";
 import { moveCard, shadowCards } from "../../../core/zones.ts";
 import { hasTrait } from "../../../interpret/conditions.ts";
@@ -38,7 +39,7 @@ function resolveReveals(state: ScenarioState, ids: readonly string[], seat: numb
 export function resolveWhenRevealedOf(state: ScenarioState, instruction: Verb<"ResolveWhenRevealedOf">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
   const held = instruction.of === "heldShadows" ? shadowCards(focus.sourceId ? state.cards[focus.sourceId] : undefined) : (effectData(state)?.looked ?? []).filter((id) => state.cards[id]?.zone === "encounterDiscard");
-  const ids = held.filter((id) => hasTrait(state, id, instruction.trait, ctx));
+  const ids = held.filter((id) => (instruction.name != null ? printedOf(ctx.cards, state.cards[id]?.code ?? "").name === instruction.name : instruction.trait != null && hasTrait(state, id, instruction.trait, ctx)));
   return resolveReveals(state, ids, instruction.of === "heldShadows" ? (attack?.seat ?? focus.seat) : focus.seat, ctx, steps);
 }
 

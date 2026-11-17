@@ -66,9 +66,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
-  // The actor's seat (`seat`) or the source card (`self`) holds this flag, a modifier of that stat that is in force now (`is`: false
+  // The actor's seat (`seat`), the source card (`self`) or the table (`table`, the flags every seat holds: 901201:A:3) holds this flag, a modifier of that stat that is in force now (`is`: false
   // for not): "You can only choose each option once per round" records an option as taken on the seat until the end of the round.
-  z.strictObject({ kind: z.literal("flag"), stat: z.string().min(1), holder: z.enum(["seat", "self"]), is: z.boolean().optional() }),
+  z.strictObject({ kind: z.literal("flag"), stat: z.string().min(1), holder: z.enum(["seat", "self", "table"]), is: z.boolean().optional() }),
   // A card with this code is in the victory display (`is`) or is not.
   z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
   // The victory display holds a copy (a card with the same title) of the source, the card the answered event is about, the last

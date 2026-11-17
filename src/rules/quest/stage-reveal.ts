@@ -11,6 +11,7 @@ import { gameReadsOnTrigger } from "../core/game-reads.ts";
 import { isLocationId } from "../core/printed.ts";
 import { advanceStage, clearCommitted, questPointsOf, resolveQuest } from "./quest.ts";
 import { defeatedBefore, questCardDefeatedHeard } from "../families/quest/branch.ts";
+import { unflippedStage } from "../families/quest/order.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { restricted } from "../interpret/restrictions.ts";
@@ -76,7 +77,9 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   // The first stage reached resolves first, so it is pushed last.
   for (const cardId of [...advanced].reverse()) {
     const code = next.cards[cardId]?.code;
-    const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+    // A stage 2 of a quest deck arrives side A: only the When Revealed printed on side A resolves now, its side B's when the stage is flipped (families/quest/order.ts).
+    const arrived = next.cards[cardId];
+    const effects = unflippedStage(next, arrived ?? { zone: "questStage", face: "B" }, ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed"));
     // A stage with Time X gets its time counters as it is revealed (10094:B:1, mec108.time-x).
     next = timeOnReveal(next, cardId, ctx);
     // "Forced: After stage 2B is revealed" (11182:A:3) goes down first, so it resolves once the stage's When Revealed effects have.
