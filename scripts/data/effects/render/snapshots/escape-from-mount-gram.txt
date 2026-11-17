@@ -191,7 +191,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - every enemy in play: stat engagementCost -10, until the end of the round
     - every enemy in play: stat attack 1, until the end of the round
-    - then, if [json condition {"kind":"enemyInPlay","is":false}] (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - then, if there is no enemy in play (in the staging area or engaged) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 ## 10050 Feeble and Weary
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -255,7 +255,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10053:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardCapturedUnder {"verb":"DiscardCapturedUnder","threat":3}]
-    - [json RemoveFromGame {"verb":"RemoveFromGame","self":true}]
+    - this card is removed from the game
 
 ## 10174 Escape from Mount Gram
 
@@ -360,4 +360,4 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
     - the event's other card is added to the victory display
 
-(rendered pieces: 152 by template, 51 as JSON)
+(rendered pieces: 154 by template, 49 as JSON)

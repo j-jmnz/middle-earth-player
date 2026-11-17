@@ -20,6 +20,9 @@ export type EngineStep =
   | { kind: "commit"; cardId: string }
   | { kind: "hideCommit"; cardId: string }
   | { kind: "fortitudeCommit"; cardId: string }
+  | { kind: "escapeCommit"; cardId: string }
+  // `seat`: the player who made the test, null for a party test (every player commits to it). `stat`: what the committed characters counted, left out for Willpower.
+  | { kind: "escapeTest"; seat: number | null; dealtIds: readonly string[]; committed: number; escape: number; success: boolean; stat?: "attack" | "defense" }
   | { kind: "fortitudeTest"; seat: number; discardedIds: readonly string[]; willpower: number; eyes: number; success: boolean }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   // `stormcaller`: the Stormcaller's quest stage advanced (dcce.stormcallers-area-stages), not the players' quest.
@@ -62,6 +65,7 @@ export type PlayerIntent =
   | { type: "Commit"; cardIds: readonly string[]; sideQuestId?: string }
   | { type: "CommitHide"; cardIds: readonly string[] }
   | { type: "CommitFortitude"; cardIds: readonly string[] }
+  | { type: "CommitEscape"; cardIds: readonly string[] }
   | { type: "Travel"; locationId: string }
   | { type: "DeclineTravel" }
   | { type: "Engage"; enemyId: string }
@@ -90,6 +94,7 @@ export type LegalIntent =
   | { type: "Commit" }
   | { type: "CommitHide" }
   | { type: "CommitFortitude" }
+  | { type: "CommitEscape" }
   | { type: "Travel" }
   | { type: "DeclineTravel" }
   | { type: "Engage" }
@@ -109,6 +114,7 @@ export type Selection =
   | { type: "Commit" }
   | { type: "CommitHide" }
   | { type: "CommitFortitude" }
+  | { type: "CommitEscape" }
   | { type: "Travel" }
   | { type: "Engage" }
   | { type: "ChooseEnemy" }

@@ -211,7 +211,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01128:B:3 (back): Once there are no enemies in play, the players have won the game.
   01128:constant:2: Constant
-    only if [json condition {"kind":"enemyInPlay","is":false}]
+    only if there is no enemy in play (in the staging area or engaged)
     - the players win the game
   01128:constant:3: Constant
     - the players cannot defeat this stage while this holds
@@ -251,4 +251,4 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 130 by template, 12 as JSON)
+(rendered pieces: 131 by template, 11 as JSON)

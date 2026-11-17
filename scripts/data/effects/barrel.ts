@@ -1,7 +1,7 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
+import type { CampaignData, AnyScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { AUTHORED_CAMPAIGN_FOLDERS } from "./authored-paths.ts";
 
 // The barrel of the authored effect files (src/effects/generated/authored.ts). Metro cannot glob, so pnpm data build lists
@@ -17,7 +17,8 @@ const FOLDERS = [
 ] as const;
 
 export function authoredFileNames(dir: string): string[] {
-  const holders = ["", ...Object.values(AUTHORED_CAMPAIGN_FOLDERS)];
+  // A campaign's folder exists once its first scenario file does (a cycle's holds none until then).
+  const holders = ["", ...Object.values(AUTHORED_CAMPAIGN_FOLDERS)].filter((folder) => existsSync(path.join(dir, folder)));
   return holders
     .flatMap((folder) =>
       readdirSync(path.join(dir, folder), { withFileTypes: true })
@@ -28,7 +29,7 @@ export function authoredFileNames(dir: string): string[] {
     .sort();
 }
 
-export function authoredOrder(names: readonly string[], campaigns: readonly Pick<CampaignData, "id" | "scenarios">[], scenarios: readonly Pick<ScenarioData, "id">[]): string[] {
+export function authoredOrder(names: readonly string[], campaigns: readonly Pick<CampaignData, "id" | "scenarios">[], scenarios: readonly Pick<AnyScenarioData, "id">[]): string[] {
   const byBase = new Map(names.map((name) => [name.slice(name.lastIndexOf("/") + 1), name]));
   const order: string[] = [];
   const take = (base: string) => {

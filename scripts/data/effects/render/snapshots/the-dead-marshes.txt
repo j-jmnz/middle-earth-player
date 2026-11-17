@@ -1,0 +1,152 @@
+Scenario piles that place cards with no record (quest: 02105 Into the Marshes; quest: 02106 The Capture; staging: 02107 Gollum)
+
+## 02105 Into the Marshes
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02105:A:1 (front): Setup: Search the encounter deck for Gollum, and add it to the staging area. Shuffle the encounter deck, then reveal 1 card per player from the encounter deck and add it to the staging area.
+  02105:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - search the encounter deck, discard pile and victory display for the card with code 02107 and add it to the staging area (not revealed; nothing when none is found)
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+## 02106 The Capture
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02106:B:1 (back): Forced: After this stage is defeated, the first player chooses a player. That player must pass an Escape test, dealing 1 card from the encounter deck for each resource token on Gollum, to capture him. If Gollum is not captured at this time, reset the quest deck to stage 1B.
+  02106:forced:1: Forced on the event questCardDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a objective (any player controls) named "Gollum" to choose: choose player (any player controls) chosen by the first player
+    - then, if there is a objective (any player controls) named "Gollum" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then a number of cards equal to resources of "Gollum" are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players return to stage 1 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
+    - then, if not (there is a objective (any player controls) named "Gollum" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the players return to stage 1 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
+
+02106:B:2 (back): If this final Escape test is passed, the players have captured Gollum and won the game.
+  02106:constant:1: Constant
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
+  02106:forced:2: Forced on the event escapePassed
+    - the players win the game
+
+## 02107 Gollum
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+02107:A:1 (front): If Gollum ever has 8 or more resource tokens on him, shuffle him back into the encounter deck.
+  02107:constant:1: Constant
+    - this card: stat shufflesAtTokens (it is shuffled into the encounter deck, its tokens gone, as soon as it holds this many resource tokens) 8, while this card is in play
+
+02107:A:2 (front): Forced: At the end of the quest phase, the party must make an escape test, dealing 1 card per player from the encounter deck. If this test is failed, place 2 resource tokens on Gollum.
+  02107:forced:1: Forced at the end of the phase
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the party: every player, the first player first, commits to one shared test makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then a number of cards equal to the number of players are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 resource tokens on this card
+
+## 02108 A Wisp of Pale Sheen
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02108:A:1 (front): When Revealed: Place 2 resource tokens on Gollum. Any player may exhaust a Lore hero to reduce this effect to 1 resource token.
+  02108:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if any of: (there is a objective (any player controls) named "Gollum" to choose) or (the card in play titled "The Mere of Dead Faces" holds the flag redirectResources): the effect's X grows by 1
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "reduce" (only if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a ready lore hero (you control) to choose)):
+          - choose ready lore hero (you control)
+          - exhaust the picked card
+          - the effect's X grows by -1
+        * option "keep":
+    - place X + 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+
+02108:A:2 (front): Escape: 4
+  02108:constant:1: Constant
+    - this card counts Escape 4 while it is dealt for an escape test (it does nothing in play)
+
+## 02109 Nightfall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02109:A:1 (front): When Revealed: The first player makes an escape test, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 2.
+  02109:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 2 cards are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 2 (each player)
+
+02109:A:2 (front): Escape: 2
+  02109:constant:1: Constant
+    - this card counts Escape 2 while it is dealt for an escape test (it does nothing in play)
+
+## 02110 Through the Mist
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02110:A:1 (front): When Revealed: The first player makes an escape test counting Attack instead of Willpower, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 1.
+  02110:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 2 cards are dealt from the encounter deck, each counting its Escape value; the committed Attack must be higher than the Escape counted (a tie fails)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 1 (each player)
+
+02110:A:2 (front): Escape: 3
+  02110:constant:1: Constant
+    - this card counts Escape 3 while it is dealt for an escape test (it does nothing in play)
+
+## 02111 The Lights of the Dead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02111:A:1 (front): When Revealed: Each player must make an escape test, dealing 2 cards from the encounter deck for each test. Each player that fails this test places 1 resource token on Gollum, and raises his threat by 1.
+  02111:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 2 cards are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
+      - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+      - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 1 (the acting player)
+
+02111:A:2 (front): Escape: 5
+  02111:constant:1: Constant
+    - this card counts Escape 5 while it is dealt for an escape test (it does nothing in play)
+
+## 02112 Giant Marsh Worm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02112:A:1 (front): Forced: Remove 2 damage from Giant Marsh Worm at the end of each round.
+  02112:forced:1: Forced at the end of the round
+    - heal 2 damage from this card
+
+02112:A:2 (front): Escape: 2
+  02112:constant:1: Constant
+    - this card counts Escape 2 while it is dealt for an escape test (it does nothing in play)
+
+## 02113 Impassable Bog
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02113:A:1 (front): When Revealed: Place 1 resource token on Gollum for each location card in the staging area.
+  02113:whenRevealed:1: When revealed
+    - place the number of location (any player controls) in the staging area only, other than this card resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+
+02113:A:2 (front): Escape: 2
+  02113:constant:1: Constant
+    - this card counts Escape 2 while it is dealt for an escape test (it does nothing in play)
+
+## 02114 The Heart of the Marshes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02114:A:1 (front): While The Heart of the Marshes is the active location, all cards dealt from the encounter deck for escape tests get +1 Escape. (Cards receive this bonus even if they do not have a printed escape value.)
+  02114:constant:1: Constant
+    only if this card is the active location
+    - the table: stat escapeValueBonus (each card dealt for an escape test counts this much more Escape, a card with no printed value too; the amounts held add up) 1, while this card is in play
+
+02114:A:2 (front): Escape: 1
+  02114:constant:2: Constant
+    - this card counts Escape 1 while it is dealt for an escape test (it does nothing in play)
+
+## 02115 Fens and Mires
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02115:A:1 (front): Forced: After the players travel to this location, place 1 resource token on Gollum.
+  02115:forced:1: Forced after the players travel (heard about this card)
+    - place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+
+02115:A:2 (front): Escape: 2
+  02115:constant:1: Constant
+    - this card counts Escape 2 while it is dealt for an escape test (it does nothing in play)
+
+(rendered pieces: 98 by template, 0 as JSON)

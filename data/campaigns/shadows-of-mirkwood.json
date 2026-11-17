@@ -1,0 +1,15 @@
+{
+  "id": "shadows-of-mirkwood",
+  "name": "Shadows of Mirkwood",
+  "scenarios": [
+    "the-hunt-for-gollum",
+    "conflict-at-the-carrock",
+    "a-journey-to-rhosgobel",
+    "the-hills-of-emyn-muil",
+    "the-dead-marshes",
+    "return-to-mirkwood"
+  ],
+  "kind": "cycle",
+  "starterDecks": [],
+  "saga": false
+}

@@ -15,7 +15,7 @@ import { prebuiltDecksSchema } from "../../../src/catalog/prebuilt-deck.ts";
 import { authoredRel } from "./authored-paths.ts";
 import { HOB_ONLY_PACKS } from "../campaign-defs.ts";
 import { loadCards } from "../load-cards.ts";
-import { dealtCodes, gameCodes, loadCampaigns, loadScenario, loadScenarios, nightmareCodes, starterCodes } from "../load-scenarios.ts";
+import { dealtCodes, gameCodes, loadCampaigns, loadAnyScenario, loadScenarios, nightmareCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, loadLedger } from "../printed/ledger.ts";
 import { isPoolCard, withPool } from "../printed/pool.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
@@ -74,7 +74,7 @@ async function main(log: Log): Promise<void> {
   const packCodes = cards.filter((card) => isPoolCard(card) && card.printings[0]?.pack === scenarioId).map((card) => card.code);
   const listed = asCodes ? pieces : [];
   const chosen = deck ? deck.rows.map((row) => row.code) : packCodes.length > 0 ? packCodes : listed;
-  const scenario = chosen.length > 0 ? null : loadScenario(scenarioId);
+  const scenario = chosen.length > 0 ? null : loadAnyScenario(scenarioId);
   log.info(deck ? `deck ${deck.id}: ${deck.rows.length} rows` : packCodes.length > 0 ? `pack ${scenarioId}: ${packCodes.length} player cards` : listed.length > 0 ? `${listed.length} cards` : `scenario ${scenarioId}`);
   const ledger = withPool(loadLedger(), cards);
   const byCode = new Map(cards.map((card) => [card.code, card]));

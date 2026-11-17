@@ -1,0 +1,304 @@
+{
+  "id": "return-to-mirkwood",
+  "name": "Return to Mirkwood",
+  "number": 6,
+  "stages": [
+    "02126",
+    "02127",
+    "02128",
+    "02129"
+  ],
+  "encounterSets": [
+    {
+      "name": "Return to Mirkwood",
+      "count": 27
+    },
+    {
+      "name": "Spiders of Mirkwood",
+      "count": 12
+    },
+    {
+      "name": "Wilderlands",
+      "count": 14
+    }
+  ],
+  "cards": [
+    {
+      "code": "02131",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02132",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02133",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02134",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02135",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02136",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02137",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02138",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02139",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01074",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01075",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01076",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01077",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01078",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "01079",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01080",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01082",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01083",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01084",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01085",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01086",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01087",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01088",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02126",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02127",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02128",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02129",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02130",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q01.9",
+    "dragnEasy": "E01.9",
+    "hobSlug": "Return-to-Mirkwood"
+  },
+  "nightmare": {
+    "setupCard": "900901",
+    "removed": [
+      {
+        "code": "01078",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01083",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01084",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01085",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01086",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01087",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01088",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02133",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "02134",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900902",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900903",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900904",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900905",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900906",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900907",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900908",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900909",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

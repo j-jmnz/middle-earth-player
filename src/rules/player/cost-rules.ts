@@ -80,7 +80,7 @@ export function costReduction(state: ScenarioState, cardId: string, seat: number
 // How much more the card costs from the IncreaseCost constants of the cards in play, every one of them (an encounter card's rule binds every player; 09066:A:2): each whose `pick` the card matches adds its amount, and each is read once.
 export function costIncrease(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): number {
   let amount = 0;
-  for (const { instruction } of constantInstructions(state, ctx)) if (instruction.verb === "IncreaseCost" && fits(state, cardId, instruction.pick, seat, ctx)) amount += instruction.amount;
+  for (const { instruction } of constantInstructions(state, ctx)) if (instruction.verb === "IncreaseCost" && (instruction.fromHand !== true || state.cards[cardId]?.zone === "hand") && fits(state, cardId, instruction.pick, seat, ctx)) amount += instruction.amount;
   return amount;
 }
 

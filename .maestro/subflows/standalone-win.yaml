@@ -1,0 +1,50 @@
+appId: com.middleearth.player
+---
+# The win of a scenario of a cycle (Shadows of Mirkwood), played from a standalone fixture: open the fixture (one open standalone game, written by the e2e
+# route and opened on its table), read the victory on the table, open the outcome, read the score, and go back to the Scenarios tab, where the scenario's tile
+# reads as won. A cycle has no campaign: no path, no Resolution, no XP and no next part. A scenario flow runs it with `runFlow` and keeps its own extra
+# assertions after the call (`.maestro/scenarios/<scenario-id>/`). This folder is outside the `flows` globs of `.maestro/config.yaml`, so
+# `maestro test .maestro` does not run it on its own.
+# Env: FIXTURE (the fixture name, src/campaign/fixtures/registry.ts, an entry with kind "standalone"), SCENARIO_ID (the scenario's id, data/scenarios).
+# Optional env: RAIL_WORD (the word the rail shows when the scenario is over, "Victory" when absent). Optional env: TABLE_WIDGET (the testID of one widget of the scenario's own table, read while the victory is on it).
+- launchApp:
+    clearState: true
+- openLink: "middleearthplayer://e2e/${FIXTURE}"
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertNotVisible:
+    id: life
+- assertVisible:
+    id: rail-current
+    text: "${typeof RAIL_WORD !== 'undefined' && RAIL_WORD !== '' ? RAIL_WORD : 'Victory'}"
+- runFlow:
+    when:
+      true: "${typeof TABLE_WIDGET !== 'undefined' && TABLE_WIDGET !== ''}"
+    commands:
+      - assertVisible:
+          id: "${TABLE_WIDGET}"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: standalone-outcome
+    timeout: 30000
+# The score as the numbers the player watches (ltp.scoring): the lines hold the Score, Rounds and Victory points tiles.
+- assertVisible:
+    id: outcome-lines
+- assertVisible:
+    id: outcome-title
+- tapOn:
+    id: outcome-done
+- extendedWaitUntil:
+    visible:
+      id: scenarios
+    timeout: 15000
+- scrollUntilVisible:
+    element:
+      id: standalone-${SCENARIO_ID}

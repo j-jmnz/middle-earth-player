@@ -139,7 +139,7 @@ export function send(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
 // opens when some seat has an action it could take, Éowyn's included.
 export function passWindows(run: Run, ctx: ReduceContext): Run {
   let next = run;
-  for (let guard = 0; guard < 20 && next.state.window?.kind === "frameAction" && topFrame(next.state)?.frame !== "hide" && topFrame(next.state)?.frame !== "fortitude"; guard += 1) {
+  for (let guard = 0; guard < 20 && next.state.window?.kind === "frameAction" && topFrame(next.state)?.frame !== "hide" && topFrame(next.state)?.frame !== "fortitude" && topFrame(next.state)?.frame !== "escape"; guard += 1) {
     next = send(next, { type: "Pass" }, ctx);
   }
   return next;

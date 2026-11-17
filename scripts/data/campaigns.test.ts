@@ -16,13 +16,12 @@ const index = campaignIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_D
 
 describe("data/campaigns/index.json", () => {
   it("lists the built campaigns playable and the later campaigns and cycles locked, with the scenario counts Hall of Beorn lists", () => {
-    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king"]);
+    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king", "shadows-of-mirkwood"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
     // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The Return of the King is built (scripts/data/return-of-the-king.test.ts) and playable from its first scenario, its box named by no override. Angmar Awakened is built (scripts/data/angmar-awakened.test.ts) and playable from its first scenario. The other locked entries have no scenario files: the
     // campaigns played in Campaign Mode, under their RCO boxes, then the cycles: scenarios that are part of no campaign (data/overrides.json, campaigns).
     const locked = index.filter((entry) => !entry.playable).map((entry) => [entry.name, entry.kind, entry.scenarioCount]);
     expect(locked).toEqual([
-      ["Shadows of Mirkwood", "cycle", 6],
       ["Dwarrowdelf", "cycle", 9],
       ["The Hobbit", "cycle", 6],
       ["Against the Shadow", "cycle", 9],
@@ -31,7 +30,8 @@ describe("data/campaigns/index.json", () => {
       ["Vengeance of Mordor", "cycle", 9],
       ["Standalone scenarios", "cycle", 14],
     ]);
-    expect(index.filter((entry) => entry.playable).every((entry) => entry.kind === "campaign")).toBe(true);
+    // The Shadows of Mirkwood cycle is playable from its first scenario (The Hunt for Gollum); the other cycles are locked.
+    expect(index.filter((entry) => entry.playable && entry.kind !== "campaign").map((entry) => entry.id)).toEqual(["shadows-of-mirkwood"]);
     expect(index.filter((entry) => entry.kind === "cycle").every((entry) => entry.box === null)).toBe(true);
     // Every campaign is built, so none is locked.
     expect(index.filter((entry) => !entry.playable && entry.kind === "campaign")).toEqual([]);

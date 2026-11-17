@@ -134,8 +134,14 @@ function decklistCodes(cards: readonly Card[]): string[] {
   return decks.filter((deck) => prefixes.some((prefix) => deck.source.startsWith(prefix))).flatMap((deck) => [...deck.heroes, ...deck.cards.map((slot) => slot.code)]).filter((code) => reprinted.has(code));
 }
 
+// Every card of a Nightmare deck that names its scenario (nightmare-defs.ts): read from its proxy picture whether or not the built scenario carries the deck yet,
+// since the build needs the ledger to resolve the deck's removals.
+function nightmareDeckCodes(): string[] {
+  return loadCards().filter((card) => isNightmareCard(card) && nightmareDeckOfCode(card.code)?.scenario !== undefined).map((card) => card.code);
+}
+
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
+  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
 }
 
 type HobImages = { CardSet: string; Slug: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };

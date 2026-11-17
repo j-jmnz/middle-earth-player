@@ -1,6 +1,6 @@
 import { namesTreasures } from "../../src/campaign/world.ts";
 import { buildStart } from "../../src/campaign/start.ts";
-import type { CampaignData, ScenarioData } from "../../src/catalog/scenario-data.ts";
+import type { AnyScenarioData, CampaignData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
@@ -9,7 +9,7 @@ import type { StartScenario } from "../../src/rules/setup/setup.ts";
 import { fillerLoadout, HERO_STATS, RING_BEARER, standInWorld } from "../../test/harness/game-kit.ts";
 import { loadTreasures } from "../../test/harness/catalog.ts";
 import { addStandIns, sceneEffects } from "../../test/harness/scene-kit.ts";
-import { dealtCodes, loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
+import { dealtCodes, loadAnyScenario, loadCampaignsInOrder } from "../data/load-scenarios.ts";
 
 // Test helper for scripts/card-smoke/encounter.ts: a scenario dealt as a standalone game to stand-in heroes and a deck of free
 // events, with no campaign log (docs/brief.md, Standalone play). The cards are the scenario's own, the heroes' numbers come from a
@@ -19,7 +19,7 @@ import { dealtCodes, loadCampaignsInOrder, loadScenario } from "../data/load-sce
 export type Profile = keyof typeof HERO_STATS;
 
 export type EncounterWorld = {
-  scenario: ScenarioData;
+  scenario: AnyScenarioData;
   campaign: CampaignData;
   // The same cards under every profile's hero numbers.
   contexts: Readonly<Record<Profile, ReduceContext>>;
@@ -34,7 +34,7 @@ export function campaignOf(scenarioId: string): CampaignData {
 
 /** The scenario's cards (its piles, its Nightmare deck, its campaign card and what a campaign game deals beside them) under each hero profile. */
 export async function encounterWorld(scenarioId: string): Promise<EncounterWorld> {
-  const scenario = loadScenario(scenarioId);
+  const scenario = loadAnyScenario(scenarioId);
   const campaign = campaignOf(scenarioId);
   const codes = [...dealtCodes(campaign, [scenario]), ...(campaign.saga ? [RING_BEARER] : [])];
   const profiles = Object.keys(HERO_STATS) as Profile[];

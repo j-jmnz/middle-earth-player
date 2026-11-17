@@ -33,7 +33,7 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
  * The popover and the layer that closes it. Render it last among the table's panels so it sits over them. `top` and `right`
  * place it under the menu button, inside the safe-area insets.
  */
-export function TableMenu({ open, nav, top, right, onClose, onSelect }: { open: boolean; nav: MenuNav; top: number; right: number; onClose: () => void; onSelect: (id: MenuItemId) => void }) {
+export function TableMenu({ open, nav, without, top, right, onClose, onSelect }: { open: boolean; nav: MenuNav; without?: readonly MenuItemId[]; top: number; right: number; onClose: () => void; onSelect: (id: MenuItemId) => void }) {
   // Focus moves to the first row when the menu opens, so a screen reader starts inside it.
   const first = useRef<PressableRef>(null);
   const s = useUiScale();
@@ -49,7 +49,7 @@ export function TableMenu({ open, nav, top, right, onClose, onSelect }: { open: 
       surface="notice"
       onClose={onClose}
     >
-      {menuItems(nav).map((item, index) => (
+      {menuItems(nav, without).map((item, index) => (
         // Leaving stands apart from the rows that open something over the table: 8 pt of space, and its word in danger.
         <View key={item.id} style={item.id === "leave" ? { marginTop: 8 * s } : undefined}>
           <PopoverRow item={item} rowRef={index === 0 ? first : undefined} onPress={() => onSelect(item.id)} />

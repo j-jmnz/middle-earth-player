@@ -389,8 +389,8 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - the player with the highest threat becomes the picked player (the first player chooses among a tie)
     - the effect goes on with the picked player as the acting player
     - engage this card
-    - [json DealShadow {"verb":"DealShadow","additional":true}]
-    - [json DealShadow {"verb":"DealShadow","additional":true}]
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 ## 12077 Profane Dead
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -456,8 +456,8 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each location (any player controls) in the staging area only [also {"uncharted":true}]: stat threat 1, until the end of the phase
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each ally (any player controls) that is an objective, with resources on it:
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
 
-(rendered pieces: 248 by template, 64 as JSON)
+(rendered pieces: 252 by template, 60 as JSON)

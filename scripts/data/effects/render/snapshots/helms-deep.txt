@@ -43,8 +43,8 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143034:A:2 (shadow): Shadow: Place 1 progress on the active location. Attacking enemy gets +1 Attack for each progress on the active location.
   143034:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a location (any player controls) [also {"active":true}] to choose: choose location (any player controls) [also {"active":true}]
-    - then, if there is a location (any player controls) [also {"active":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card
+    - if there is a location (any player controls) that is the active location to choose: choose location (any player controls) that is the active location
+    - then, if there is a location (any player controls) that is the active location to choose (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card
     - the attacking enemy: stat attack progress of the active location, until the end of the attack
 
 ## 143035 Warrior of Dunland
@@ -278,10 +278,10 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143074:A:1 (front): When Revealed: Search the encounter deck, discard pile, and victory display for Helm's Gate and add it to the staging area. Shuffle the encounter deck. Make Helm's Gate the active location, returning any previous active location to the staging area.
   143074:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchToStaging {"verb":"SearchToStaging","code":"143041"}]
+    - search the encounter deck, discard pile and victory display for the card with code 143041 and add it to the staging area (not revealed; nothing when none is found)
     - shuffle the encounter deck
     - then, if there is a location (any player controls) in the staging area only, named "Helm's Gate" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "Helm's Gate"
-    - [json MakeActive {"verb":"MakeActive","when":{"kind":"canPick","pick":{"type":"location","control":"any","stagingOnly":true,"names":["Helm's Gate"]}}}]
+    - then, if there is a location (any player controls) in the staging area only, named "Helm's Gate" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
 
 143074:B:1 (back): Defense.
   143074:constant:1: Constant
@@ -330,7 +330,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143076:B:2 (back): If there are no enemies in play, the players win the game.
   143076:constant:2: Constant
-    only if [json condition {"kind":"enemyInPlay","is":false}]
+    only if there is no enemy in play (in the staging area or engaged)
     - the players win the game
 
-(rendered pieces: 170 by template, 20 as JSON)
+(rendered pieces: 178 by template, 14 as JSON)

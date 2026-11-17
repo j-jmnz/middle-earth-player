@@ -19,6 +19,7 @@ import { newSave, parseLog, type Save } from "./save.ts";
 import { buildStart } from "./start.ts";
 import { blackGateEnemies, marshesLines, SEARCHING_EYE, threatWords } from "./two-towers-view.ts";
 import type { World } from "./world.ts";
+import type { ScenarioData } from "../catalog/scenario-data.ts";
 
 // Rules: mec112.setting-up-the-game, mec112.aragorn, mec112.fellowship-sphere-heroes, mec112.saruman-grima-smeagol, mec112.campaign-mode-aragorn, mec112.campaign-mode,
 // rr.campaign-setup-checklist (data/rules/entries.json). The Two Towers campaign shell: the saga hero of each scenario, the loadout it asks, the Campaign Log's own columns
@@ -49,7 +50,7 @@ beforeAll(async () => {
 
 const worldOf = (scenario: World["scenario"]): World => ({ campaign, scenario, effects: [], cards, sets: new Map() });
 const seat = (heroes: readonly string[], deck: readonly string[] = []) => ({ deckId: "d", heroes, deck });
-const input = (scenario: World["scenario"], heroes: readonly string[], ringBearer: string | null = null, deck: readonly string[] = []) => ({ world: worldOf(scenario), seatCount: 1 as const, seats: [seat(heroes, deck)], ringBearer });
+const input = (scenario: ScenarioData, heroes: readonly string[], ringBearer: string | null = null, deck: readonly string[] = []) => ({ world: worldOf(scenario), seatCount: 1 as const, seats: [seat(heroes, deck)], ringBearer });
 const check = (args: ReturnType<typeof input>) => loadoutProblems(args, []);
 const messages = (result: ReturnType<typeof loadoutProblems>) => result.problems.map((problem) => `${problem.rule}: ${problem.message}`);
 
@@ -124,7 +125,7 @@ describe("the loadout of The Two Towers", () => {
 });
 
 const log = (extra: Partial<CampaignLog> = {}): CampaignLog => ({ ...emptyLog(1), ...extra });
-const plan = (scenario: World["scenario"], saved: CampaignLog, heroes: readonly string[], effects: Parameters<typeof checklist>[0]["effects"] = []): ChecklistPlan => checklist({ log: saved, scenario, seats: [{ heroes, deck: [] }], effects, cards });
+const plan = (scenario: ScenarioData, saved: CampaignLog, heroes: readonly string[], effects: Parameters<typeof checklist>[0]["effects"] = []): ChecklistPlan => checklist({ log: saved, scenario, seats: [{ heroes, deck: [] }], effects, cards });
 const ok = (result: ChecklistPlan): Extract<ChecklistPlan, { ok: true }> => {
   if (!result.ok) throw new Error(result.errors.join("; "));
   return result;

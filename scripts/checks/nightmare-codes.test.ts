@@ -31,7 +31,7 @@ describe("Nightmare deals every scenario card a record names (twinCode)", () => 
       const scenario = scenarios.find((entry) => entry.id === id);
       const nightmare = scenario?.nightmare;
       if (!scenario || !nightmare) throw new Error(`${id} has no Nightmare deck`);
-      const dealt = new Set([...placementsAt(scenario, "Nightmare").map((card) => card.code), scenario.campaignCard, ...scenario.campaignPlaced, nightmare.setupCard]);
+      const dealt = new Set([...placementsAt(scenario, "Nightmare").map((card) => card.code), ...(scenario.campaignCard !== undefined ? [scenario.campaignCard] : []), ...scenario.campaignPlaced, nightmare.setupCard]);
       const titles = new Set([...dealt].map((code) => cards.get(code)?.name));
       const standard = new Set(scenario.cards.map((card) => card.code));
       const missing: string[] = [];

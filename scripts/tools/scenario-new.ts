@@ -3,10 +3,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { loadCards } from "../data/load-cards.ts";
-import { loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
+import { loadAnyScenario, loadCampaignsInOrder } from "../data/load-scenarios.ts";
 import { seedFinderRel } from "../data/effects/seed-finder-paths.ts";
 import { ROOT } from "../data/paths.ts";
 import { runScript, type Log } from "../log.ts";
+import { cycleFlowFile, cycleGameFile, cycleGoldenTestFile, cycleSeedFinderFile, standaloneTestFile } from "./scenario-new-cycle.ts";
 import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, seedFinderFile, specTestFile, winFlowFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
@@ -19,6 +20,9 @@ import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile
 // (scripts/e2e/<id>.ts, or in the campaign's folder: scripts/data/effects/seed-finder-paths.ts), both Maestro flows (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json). There is no scene file: the game, the golden test and the campaign test read the scenario from data/, and the card tests are spec rows
 // (on tableFromLayout).
+// A scenario of a cycle (Shadows of Mirkwood, data/campaigns kind "cycle") has no campaign card and no Campaign Mode: its game is the standalone game
+// (test/harness/game-kit.ts, standaloneGame), its golden suite the standalone one, `standalone.test.ts` stands in for the campaign test, its fixtures are one
+// open standalone game each (`kind: "standalone"` in the fixture registry) and its Maestro flows run the standalone subflows (.maestro/subflows/).
 // Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/writers.ts,
 // and the golden registry (test/harness/golden-registry.ts), whose two lines are written as comments because that registry's test fails
 // on an entry with no golden.json. Nothing else runs: the next commands are printed.
@@ -61,14 +65,16 @@ function defaultShort(id: string): string {
 
 /** The facts of the scenario: its data, the campaign that plays it and the part before it. */
 function factsOf(id: string, short: string, repo: Repo): Facts {
-  const scenario = loadScenario(id);
+  const scenario = loadAnyScenario(id);
   const campaign = loadCampaignsInOrder().find((one) => one.scenarios.includes(id));
-  if (!campaign) throw new Error(`${id} is in no campaign of data/campaigns`);
+  if (!campaign) throw new Error(`${id} is in no campaign or cycle of data/campaigns`);
+  const cycle = campaign.kind === "cycle";
   const at = campaign.scenarios.indexOf(id);
   const names = new Map(loadCards().map((card) => [card.code, card.name]));
   const used = new Set<string>(["campaignCard"]);
-  const codes: [string, string, string][] = [["campaignCard", scenario.campaignCard, names.get(scenario.campaignCard) ?? scenario.campaignCard]];
-  const seen = new Set<string>([scenario.campaignCard]);
+  const card = scenario.campaignCard;
+  const codes: [string, string, string][] = card === undefined ? [] : [["campaignCard", card, names.get(card) ?? card]];
+  const seen = new Set<string>(card === undefined ? [] : [card]);
   scenario.stages.forEach((code, index) => {
     seen.add(code);
     used.add(`stage${index + 1}`);
@@ -81,17 +87,19 @@ function factsOf(id: string, short: string, repo: Repo): Facts {
     codes.push([keyFor(name, code, used), code, name]);
   }
   const previousId = at > 0 ? (campaign.scenarios[at - 1] ?? null) : null;
-  return { id, name: scenario.name, short, campaignId: campaign.id, part: at + 1, previous: previousId ? previousPart(previousId, campaign.id, repo) : null, finderRel: seedFinderRel(id, campaign.id), campaignCard: scenario.campaignCard, stages: scenario.stages, codes };
+  return { id, name: scenario.name, short, campaignId: campaign.id, cycle, part: at + 1, previous: previousId ? previousPart(previousId, campaign.id, repo, cycle) : null, finderRel: seedFinderRel(id, campaign.id), campaignCard: card ?? null, stages: scenario.stages, codes };
 }
 
 // The names the previous part's modules export, from the places that list them (the golden registry line, the seed finder's functions).
 // A previous part with no seed finder is an error: a finder built on a blank log would drop the earlier parts without a word.
-function previousPart(id: string, campaignId: string, repo: Repo): PreviousPart {
-  const name = loadScenario(id).name;
+// A cycle's part reads no earlier log, so its previous part's finder is not needed: only the entry the registry lines follow.
+function previousPart(id: string, campaignId: string, repo: Repo, cycle: boolean): PreviousPart {
+  const name = loadAnyScenario(id).name;
   const registry = repo.read(GOLDEN_REGISTRY) ?? "";
   const line = new RegExp(`^\\s*entry\\("${id}",\\s*"[^"]*",\\s*(\\w+)\\.(\\w+),\\s*\\1\\.(\\w+),\\s*\\1\\.(\\w+)\\),?$`, "m").exec(registry);
   const finderRel = seedFinderRel(id, campaignId);
   const finder = repo.read(`scripts/e2e/${finderRel}.ts`);
+  if (cycle) return { id, name, finderRel, game: null, finder: { exists: finder != null, earlierLog: null } };
   if (finder == null) throw new Error(`the previous part ${id} has no seed finder at scripts/e2e/${finderRel}.ts: scaffold or move it first (scripts/data/effects/seed-finder-paths.ts)`);
   const earlierLog = finder ? (/export async function (\w+)\(\): Promise<CampaignLog>/.exec(finder)?.[1] ?? null) : null;
   return {
@@ -157,7 +165,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
   const problems: string[] = [];
   let facts: Facts;
   try {
-    loadScenario(id);
+    loadAnyScenario(id);
   } catch {
     return { plan: null, problems: [`${id} is not in data/scenarios (the scenario files are built by pnpm data build)`] };
   }
@@ -171,14 +179,14 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
   }
 
   const files = [
-    { file: `test/scenarios/${id}/game.ts`, text: gameFile(facts) },
-    { file: `src/campaign/scenarios/${id}/golden.test.ts`, text: goldenTestFile(facts) },
-    { file: `src/campaign/scenarios/${id}/campaign.test.ts`, text: campaignTestFile(facts) },
+    { file: `test/scenarios/${id}/game.ts`, text: facts.cycle ? cycleGameFile(facts) : gameFile(facts) },
+    { file: `src/campaign/scenarios/${id}/golden.test.ts`, text: facts.cycle ? cycleGoldenTestFile(facts) : goldenTestFile(facts) },
+    facts.cycle ? { file: `src/campaign/scenarios/${id}/standalone.test.ts`, text: standaloneTestFile(facts) } : { file: `src/campaign/scenarios/${id}/campaign.test.ts`, text: campaignTestFile(facts) },
     { file: `src/campaign/scenarios/${id}/spec.test.ts`, text: specTestFile(facts) },
     { file: `src/play/words/asks/${id}.ts`, text: asksFile(facts) },
-    { file: `scripts/e2e/${facts.finderRel}.ts`, text: seedFinderFile(facts) },
-    { file: `.maestro/scenarios/${id}/${id}.yaml`, text: winFlowFile(facts) },
-    { file: `.maestro/scenarios/${id}/${id}-loss.yaml`, text: lossFlowFile(facts) },
+    { file: `scripts/e2e/${facts.finderRel}.ts`, text: facts.cycle ? cycleSeedFinderFile(facts) : seedFinderFile(facts) },
+    { file: `.maestro/scenarios/${id}/${id}.yaml`, text: facts.cycle ? cycleFlowFile("win", facts) : winFlowFile(facts) },
+    { file: `.maestro/scenarios/${id}/${id}-loss.yaml`, text: facts.cycle ? cycleFlowFile("loss", facts) : lossFlowFile(facts) },
     { file: authoredPath(facts), text: authoredFile(facts) },
     { file: `src/campaign/fixtures/${id}.json`, text: "{}\n" },
   ];
@@ -204,7 +212,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
       problems.push(`${FIXTURE_REGISTRY} already names ${id} or ${short}-won: pass --short with another name`);
       return text;
     }
-    const line = `  { scenarioId: "${id}", names: ["${short}-won", "${short}-lost"] },`;
+    const line = facts.cycle ? `  { scenarioId: "${id}", kind: "standalone", names: ["${short}-won", "${short}-lost"] },` : `  { scenarioId: "${id}", names: ["${short}-won", "${short}-lost"] },`;
     const after = new RegExp(`scenarioId: "${previous}"`);
     return previous && blockHas(text, FIXTURE_ARRAY, after) ? insert(text, FIXTURE_REGISTRY, { block: FIXTURE_ARRAY, anchor: after }, line, "after", problems) : insert(text, FIXTURE_REGISTRY, { block: FIXTURE_ARRAY }, line, "before", problems);
   });
@@ -245,7 +253,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
 }
 
 function describePlan(plan: Plan, log: Log, dry: boolean): void {
-  log.info(`${dry ? "would write" : "writing"} ${plan.files.length} files for ${plan.facts.id} (${plan.facts.campaignId} part ${plan.facts.part}, fixtures ${plan.facts.short}-won and ${plan.facts.short}-lost):`);
+  log.info(`${dry ? "would write" : "writing"} ${plan.files.length} files for ${plan.facts.id} (${plan.facts.campaignId} ${plan.facts.cycle ? "cycle (standalone) " : ""}part ${plan.facts.part}, fixtures ${plan.facts.short}-won and ${plan.facts.short}-lost):`);
   for (const item of plan.files) log.info(`  new   ${item.file}`);
   log.info(`${dry ? "would edit" : "editing"} ${plan.edits.length} registries:`);
   for (const item of plan.edits) {
@@ -270,7 +278,7 @@ function nextSteps(facts: Facts, log: Log): void {
   log.info("  pnpm data build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
   log.info(`  pnpm scenario pack ${facts.id}   runs effects draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
   log.info("  pnpm effects open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");
-  log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts), asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder, the Maestro flows; then list the goldens in test/harness/golden-registry.ts`);
+  log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts)${facts.cycle ? ", the standalone test" : ""}, asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder, the Maestro flows; then list the goldens in test/harness/golden-registry.ts`);
 }
 
 function main(log: Log): void {

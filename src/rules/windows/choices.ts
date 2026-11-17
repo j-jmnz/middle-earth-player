@@ -1,6 +1,7 @@
 import type { LegalIntent, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { holds } from "../interpret/conditions.ts";
+import { guardianSeat } from "../families/guardian/seats.ts";
 import { DONE, limitReached, noteOption, untakenOptions } from "../families/deck/choose.ts";
 import type { EffectData, QueueItem, ScenarioState } from "../core/state.ts";
 import { patchTop, topFrame } from "./windows.ts";
@@ -24,11 +25,12 @@ function ask(state: ScenarioState, wait: NonNullable<EffectData["wait"]>, seat: 
 export function openBranch(state: ScenarioState, item: QueueItem, returned: number, ctx: ReduceContext): ScenarioState {
   const instruction = item.instruction;
   if (instruction.verb !== "Choose") return state;
-  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : item.seat;
+  // `guardian`: the player guarding Gollum chooses (02134:A:1, 900904:A:1); the actor when nobody does.
+  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : instruction.who === "guardian" ? (guardianSeat(state) ?? item.seat) : item.seat;
   const data = effectData(state);
   // An option may require something of the cards the effect picked or the event it answers ("If it is an enemy, you may
   // discard it").
-  const scope = { actor: seat, sourceId: topFrame(state)?.cardId ?? null, returned, ...(data?.picked ? { picked: data.picked } : {}), ...(data?.subject ? { subject: data.subject } : {}), ...(data?.other ? { other: data.other } : {}), ...(data?.participants ? { participants: data.participants } : {}) };
+  const scope = { actor: seat, sourceId: topFrame(state)?.cardId ?? null, returned, ...(data?.picked ? { picked: data.picked } : {}), ...(data?.subject ? { subject: data.subject } : {}), ...(data?.other ? { other: data.other } : {}), ...(data?.participants ? { participants: data.participants } : {}), ...(data?.x != null ? { x: data.x } : {}) };
   const legal = limitReached(state, instruction, seat, scope.sourceId, ctx) ? [] : untakenOptions(state, instruction, instruction.options.filter((option) => !option.requires || holds(state, option.requires, scope, ctx)));
   if (legal.length === 0) return state;
   // A Choose with `upTo` is always asked while an option is left: the actor may stop.

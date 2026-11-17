@@ -5,7 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { actAs, addToX, discardFromDeck, givePicked, moveCardVerb, shuffleDiscardIn, shuffleHandIn, swapPicked } from "./moves.ts";
+import { actAs, addToX, discardFromDeck, givePicked, moveCardVerb, removeDiscardFromGame, shuffleDiscardIn, shuffleHandIn, swapPicked } from "./moves.ts";
 import { keepOpeningHand, playFrom } from "./play.ts";
 import type { Focus } from "../index.ts";
 import { discardedAmount } from "./discarded.ts";
@@ -25,6 +25,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return shuffleDiscardIn(state, instruction, focus, ctx);
     case "ShuffleHandIntoDeck":
       return shuffleHandIn(state, focus);
+    case "RemoveDiscardFromGame":
+      return removeDiscardFromGame(state, focus);
     case "DiscardFromDeck":
       return discardFromDeck(state, instruction, focus, ctx);
     case "AddToX":
@@ -46,4 +48,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleHandIntoDeck", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost", "GainsDoomed"], run, settle: { sweep: eliminateEmptyPiles }, amount: (state, found, _scope, ctx) => discardedAmount(state, found, ctx) };
+export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleHandIntoDeck", "RemoveDiscardFromGame", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost", "GainsDoomed"], run, settle: { sweep: eliminateEmptyPiles }, amount: (state, found, _scope, ctx) => discardedAmount(state, found, ctx) };

@@ -100,6 +100,8 @@ const FLAGS = [
   "noDeckSearch",
   // On a character: it loses the ranged keyword it has (11030:A:1).
   "loseRanged",
+  // On a character: it loses the sentinel keyword it has ("All characters lose the ranged and sentinel keywords", 900907:A:2).
+  "loseSentinel",
   // On a card: no player card can be attached to it ("Cannot have player card attachments", the Lost Island side).
   "noPlayerAttachments",
   // On a location: while it is the active location it contributes its Threat to the staging area's ("it contributes its Threat to the staging area", 11072:A:1).

@@ -7,6 +7,7 @@ import { nextIntent } from "../../test/harness/auto-player.ts";
 import { dice, playIntent, seedOf, triggerIntent, type Dice } from "./policy.ts";
 import { encounterStart, kept, type EncounterWorld, type Profile } from "./encounter-world.ts";
 import { POLICY } from "./world.ts";
+import { escapeCommitLimit } from "../../src/rules/families/escape/commit.ts";
 import { describeError } from "../log.ts";
 
 // Seeded games of one scenario played with random legal intents (the second half of scripts/card-smoke/encounter.ts). Every
@@ -70,6 +71,11 @@ function complete(state: ScenarioState, ctx: ReduceContext, offer: LegalIntent, 
     case "CommitHide": {
       const ids = legalTargets(state, { type: "CommitHide" }, ctx);
       return { type: "CommitHide", cardIds: ids.length > 0 ? subset(roll, ids) : [] };
+    }
+    case "CommitEscape": {
+      const ids = legalTargets(state, { type: "CommitEscape" }, ctx);
+      const limit = state.window?.kind === "escapeCommit" ? escapeCommitLimit(state, state.window.seat) : null;
+      return { type: "CommitEscape", cardIds: (ids.length > 0 ? subset(roll, ids) : []).slice(0, limit ?? undefined) };
     }
     case "CommitFortitude": {
       const ids = legalTargets(state, { type: "CommitFortitude" }, ctx);

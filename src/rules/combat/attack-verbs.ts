@@ -11,7 +11,7 @@ import { lastPicked, seatOf } from "../interpret/player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { addModifier } from "../core/keywords.ts";
 import { headOf } from "../families/breaking/areas.ts";
-import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, isTraitedEnemies, isTraitedStaging, STAGING_CLASS, traitedEnemies, traitedStaging, ownCharacters } from "../core/holder-classes.ts";
+import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, isTraitedEnemies, isTraitedLocations, isTraitedStaging, STAGING_CLASS, traitedEnemies, traitedLocations, traitedStaging, ownCharacters } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
@@ -108,6 +108,10 @@ export function modifyStat(
     case "stagingCards":
       targets = [instruction.trait != null ? traitedStaging(instruction.trait) : STAGING_CLASS];
       break;
+    // Every location in play with the Trait, in the staging area or active, now and arriving later (900707:A:2): the holder is the class, read by heldBy.
+    case "locationsInPlay":
+      targets = instruction.trait != null ? [traitedLocations(instruction.trait)] : [];
+      break;
     // The card the answered event was about ("that ally gets +2 Attack"), the source's host.
     case "subject":
     case "other":
@@ -143,7 +147,7 @@ export function modifyStat(
   let next = state;
   const trait = instruction.trait;
   for (const id of targets) {
-    if (trait != null && !id.startsWith("seat:") && !isTraitedEnemies(id) && !isTraitedStaging(id) && !hasTrait(next, id, trait, ctx)) continue;
+    if (trait != null && !id.startsWith("seat:") && !isTraitedEnemies(id) && !isTraitedStaging(id) && !isTraitedLocations(id) && !hasTrait(next, id, trait, ctx)) continue;
     if (id === "table") next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId, stat: instruction.stat, amount, until: instruction.until }] };
     else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
     else next = isClassHolder(id)

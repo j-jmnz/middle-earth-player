@@ -108,7 +108,7 @@ describe("a built scenario's Nightmare deck", () => {
   const byId = new Map(scenarios.map((scenario) => [scenario.id, scenario]));
   const name = (code: string) => cards.find((card) => card.code === code)?.name;
 
-  it("is carried by the nine built scenarios that have one, and by no other", () => {
+  it("is carried by the built scenarios that have one, and by no other", () => {
     const withDeck = scenarios.filter((scenario) => scenario.nightmare).map((scenario) => scenario.id).sort();
     expect(withDeck).toEqual(NIGHTMARE_DECKS.flatMap((deck) => (deck.scenario ? [deck.scenario] : [])).sort());
     expect(byId.get("the-oath")?.nightmare).toBeUndefined();

@@ -1,0 +1,39 @@
+appId: com.middleearth.player
+---
+# The loss of a scenario of a cycle (Shadows of Mirkwood), played from a standalone fixture: open the fixture (one open standalone game, written by the e2e
+# route and opened on its table), read the defeat on the table, open the outcome, read the reason, and go back to the Scenarios tab. Nothing is written
+# to a campaign: a cycle has none. A scenario flow runs it with `runFlow` and keeps its own extra assertions after the call (`.maestro/scenarios/<scenario-id>/`).
+# This folder is outside the `flows` globs of `.maestro/config.yaml`, so `maestro test .maestro` does not run it on its own.
+# Env: FIXTURE (the fixture name, src/campaign/fixtures/registry.ts, an entry with kind "standalone"), SCENARIO_ID (the scenario's id, data/scenarios).
+- launchApp:
+    clearState: true
+- openLink: "middleearthplayer://e2e/${FIXTURE}"
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch); a game that is over opens on the table.
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertNotVisible:
+    id: life
+- assertVisible:
+    id: rail-current
+    text: "Defeat"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: standalone-outcome
+    timeout: 15000
+- assertVisible:
+    id: outcome-title
+- assertVisible:
+    id: outcome-lines
+- tapOn:
+    id: outcome-done
+- extendedWaitUntil:
+    visible:
+      id: scenarios
+    timeout: 15000

@@ -161,7 +161,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - return one enemy engaged with the acting player (that player picks which) to the staging area
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
     - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
 
 41017:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
@@ -233,8 +233,8 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41022:A:1 (front): When Revealed: Discard the top card of each player's deck. Until the end of the phase, increase Goblintown Scavengers' Threat by the total printed cost of all cards discarded in this way.
   41022:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json SetX {"verb":"SetX","value":0}]
-      - [json DiscardTopOfDeck {"verb":"DiscardTopOfDeck"}]
+      - the effect's X is set to 0
+      - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
       - this card: stat threat X, until the end of the phase
 
 ## 41023 Wild Wargs
@@ -317,4 +317,4 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:resolution:1: Resolution
     - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
 
-(rendered pieces: 182 by template, 9 as JSON)
+(rendered pieces: 185 by template, 6 as JSON)

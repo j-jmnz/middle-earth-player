@@ -345,7 +345,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   146078:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LimitEntries {"verb":"LimitEntries","cardType":"ally","max":0}]
-    - [json UncancelableWhenRevealed {"verb":"UncancelableWhenRevealed"}]
+    - while this card is in play (under its condition), the When Revealed effects of cards cannot be canceled
 
 146078:B:2 (back): Forced: When Mount Doom is explored, the first player makes a Fortitude test. Discard 1 extra encounter card for each player. If the first player fails this test, the Ring-bearer claims The One Ring and the players lose the game. If the test is successful, the Ring-bearer completes the quest and the players win the game.
   146078:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "Mount Doom")
@@ -354,4 +354,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 233 by template, 9 as JSON)
+(rendered pieces: 234 by template, 8 as JSON)

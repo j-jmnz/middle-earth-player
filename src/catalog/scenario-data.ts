@@ -56,6 +56,8 @@ const nightmareSchema = z.strictObject({
   cards: z
     .array(z.strictObject({ code: z.string().min(1), copies: z.number().int().positive(), pile: z.enum(NIGHTMARE_PILES), perPlayer: z.number().int().positive().optional() }))
     .min(1),
+  // The deck's quest cards (side A codes), which the build records and does not place.
+  questCards: z.array(z.string().min(1)).min(1).optional(),
 });
 export type NightmareData = z.infer<typeof nightmareSchema>;
 
@@ -68,8 +70,9 @@ export const scenarioDataSchema = z
     // The booklet's encounter sets, in booklet order, with the Normal count of cards each contributes.
     encounterSets: z.array(z.strictObject({ name: z.string().min(1), count: z.number().int().nonnegative() })),
     cards: z.array(placementSchema),
-    // The campaign card printed for this scenario. Its Setup and Resolution records belong to the scenario.
-    campaignCard: z.string().min(1),
+    // The campaign card printed for this scenario. Its Setup and Resolution records belong to the scenario. A scenario of a cycle (Shadows of
+    // Mirkwood) has none: it has no Campaign Mode and is played standalone only (`CycleScenarioData`).
+    campaignCard: z.string().min(1).optional(),
     // Cards the campaign card's Setup places or shuffles in. They are not in `cards`; the records deal them.
     campaignPlaced: z.array(z.string().min(1)),
     // Dream-chaser: the Campaign Expansion's reprint of a card this scenario deals (in `cards` or `campaignPlaced`), by the code it is dealt under.
@@ -102,7 +105,12 @@ export const scenarioDataSchema = z
     }
   });
 
-export type ScenarioData = z.infer<typeof scenarioDataSchema>;
+type ParsedScenario = z.infer<typeof scenarioDataSchema>;
+// A scenario of a campaign: the campaign card is printed for it, and every campaign reader may rely on it.
+export type ScenarioData = Omit<ParsedScenario, "campaignCard"> & { campaignCard: string };
+// A scenario of a cycle: no campaign card. Code that reads a built scenario whichever kind it is takes `AnyScenarioData`.
+export type CycleScenarioData = Omit<ParsedScenario, "campaignCard"> & { campaignCard?: undefined };
+export type AnyScenarioData = ScenarioData | CycleScenarioData;
 export type Placement = z.infer<typeof placementSchema>;
 
 // One printed row of a starter decklist: the card's name as the booklet prints it, its collector number, its type,
@@ -128,11 +136,13 @@ export const campaignDataSchema = z.strictObject({
   id: z.string().min(1),
   name: z.string().min(1),
   scenarios: z.array(z.string().min(1)),
-  // The campaign card of each scenario, by scenario id. Its Setup and Resolution lines are effect records.
-  campaignCards: z.record(z.string(), z.string().min(1)),
+  // "cycle": scenarios that belong to no campaign (Shadows of Mirkwood), played standalone only. Absent in a campaign's file.
+  kind: z.literal("cycle").optional(),
+  // The campaign card of each scenario, by scenario id. Its Setup and Resolution lines are effect records. A cycle's file omits it (read as empty).
+  campaignCards: z.record(z.string(), z.string().min(1)).default({}),
   // The booklet the campaign opens (src/screens/booklets/books.ts): the Fellowship's MEC109, the Learn to Play for Mirkwood
-  // Paths, The Dark of Mirkwood's rulebook for the two-scenario campaign.
-  bookletId: z.string().min(1),
+  // Paths, The Dark of Mirkwood's rulebook for the two-scenario campaign. A cycle names one only where its rules inserts are a booklet.
+  bookletId: z.string().min(1).optional(),
   // A saga campaign carries the Ring-bearer and the Fellowship-sphere rules (the Fellowship of the Ring only). The others
   // are plain campaigns: no Ring-bearer, and Fellowship heroes are not allowed.
   saga: z.boolean(),
@@ -143,7 +153,7 @@ export const campaignDataSchema = z.strictObject({
   // last page.
   bookletPages: z.record(z.string(), z.number().int().positive()).optional(),
   // Cards every scenario starts with, attached to the Ring-bearer. From the sources' player-1 play area. Empty outside a saga.
-  prelude: z.array(z.strictObject({ code: z.string().min(1) })),
+  prelude: z.array(z.strictObject({ code: z.string().min(1) })).default([]),
   // The two starter decks the booklet prints (data/starter-decks.json). The seed script reads them. Empty outside the Fellowship.
   starterDecks: z.array(starterDeckSchema),
 });
@@ -172,25 +182,32 @@ export const campaignIndexSchema = z.array(
 );
 export type CampaignIndexEntry = z.infer<typeof campaignIndexSchema>[number];
 
+// A campaign scenario: a file with no campaign card is a cycle's (`parseAnyScenarioData`) and is no campaign's.
 export function parseScenarioData(raw: unknown): ScenarioData {
+  const data = parseAnyScenarioData(raw);
+  if (data.campaignCard === undefined) throw new Error(`Scenario ${data.id}: a cycle scenario has no campaign card`);
+  return data;
+}
+
+export function parseAnyScenarioData(raw: unknown): AnyScenarioData {
   const parsed = scenarioDataSchema.safeParse(raw);
   if (!parsed.success) {
     const id = typeof raw === "object" && raw !== null && "id" in raw && typeof raw.id === "string" ? raw.id : "(missing id)";
     const paths = parsed.error.issues.map((issue) => (issue.path.length === 0 ? issue.message : `${issue.path.join(".")}: ${issue.message}`)).join(", ");
     throw new Error(`Scenario ${id}: ${paths}`);
   }
-  return parsed.data;
+  return parsed.data as AnyScenarioData;
 }
 
-export function scenarioCards(data: ScenarioData): Placement[] {
+export function scenarioCards(data: AnyScenarioData): Placement[] {
   return data.cards;
 }
 
-export function normalEncounterSize(data: ScenarioData): number {
+export function normalEncounterSize(data: AnyScenarioData): number {
   return data.cards.filter((card) => card.pile === "encounter").reduce((sum, card) => sum + card.normal, 0);
 }
 
-export function normalCopiesByCode(data: ScenarioData): Map<string, number> {
+export function normalCopiesByCode(data: AnyScenarioData): Map<string, number> {
   const totals = new Map<string, number>();
   for (const card of data.cards) totals.set(card.code, (totals.get(card.code) ?? 0) + card.normal);
   return totals;
@@ -202,7 +219,7 @@ export type Difficulty = (typeof DIFFICULTIES)[number];
 
 // The piles at a difficulty. Easy and Normal read each placement's own count. Nightmare starts from the Normal piles, takes out the
 // copies the setup card removes from the pile each came from, and adds the Nightmare deck's cards to theirs (`nightmare`).
-export function placementsAt(data: ScenarioData, difficulty: Difficulty = "Normal"): Placement[] {
+export function placementsAt(data: AnyScenarioData, difficulty: Difficulty = "Normal"): Placement[] {
   if (difficulty !== "Nightmare") return data.cards;
   const nightmare = data.nightmare;
   if (!nightmare) throw new Error(`Scenario ${data.id} has no Nightmare deck`);
@@ -229,7 +246,7 @@ function placedCopies(card: Placement, difficulty: Difficulty, seatCount?: numbe
 
 // The encounter deck at a difficulty. Easy drops the cards the booklet marks (the `easy` count of each placement); Nightmare deals
 // the Nightmare piles (placementsAt). The copies of a per-player Setup card the players did not take stay in the encounter deck.
-export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): string[] {
+export function encounterCodes(data: AnyScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): string[] {
   return placementsAt(data, difficulty).flatMap((card) => {
     const copies = card.pile === "encounter" || card.searched ? copiesAt(card, difficulty) : card.pile === "quest" || card.pile === "burden" ? 0 : copiesAt(card, difficulty) - placedCopies(card, difficulty, seatCount);
     return Array.from({ length: copies }, () => card.code);
@@ -238,13 +255,15 @@ export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Nor
 
 // The quest deck: each stage once, and a stage printed in several copies ("a different stage 2A" for each player, 10038:B:1) once for each seat, never more than
 // the copies the box holds. Every stage the box prints once is dealt once, so a scenario without such a stage deals `data.stages` unchanged.
-export function questDeckCodes(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount = 1): string[] {
+// The Nightmare deck's quest cards (`nightmare.questCards`) follow the stages on Nightmare: a stage 3 after the last printed one (Grimbeorn's Folly, 900511).
+export function questDeckCodes(data: AnyScenarioData, difficulty: Difficulty = "Normal", seatCount = 1): string[] {
   const placements = placementsAt(data, difficulty);
-  return data.stages.flatMap((code) => {
+  const stages = data.stages.flatMap((code) => {
     const printed = placements.find((card) => card.pile === "quest" && card.code === code);
     const copies = printed ? Math.max(1, Math.min(copiesAt(printed, difficulty), seatCount)) : 1;
     return Array.from({ length: copies }, () => code);
   });
+  return difficulty === "Nightmare" ? [...stages, ...(data.nightmare?.questCards ?? [])] : stages;
 }
 
 const SETUP_VERB = {
@@ -261,7 +280,7 @@ const SETUP_VERB = {
 // Order of the quest card's setup steps: set aside, add to staging, make a location active, then attach.
 // Each copy is one instruction at the difficulty played; a per-player card is one per seat when the seat count is known
 // (buildStart). The encounter, quest and burden piles are dealt by buildStart.
-export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): Instruction[] {
+export function setupInstructions(data: AnyScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): Instruction[] {
   const instructions: Instruction[] = [];
   const cards = placementsAt(data, difficulty);
   for (const pile of ["setAside", "stormcallerQuests", "encounterDeck2", "staging", "activeLocation", "attached"] as const) {
@@ -274,13 +293,13 @@ export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "
 }
 
 // The Corsair deck a scenario deals, copy by copy (dcce.corsair-deck): the `corsairDeck` pile at the difficulty played.
-export function corsairCodes(data: ScenarioData, difficulty: Difficulty = "Normal"): string[] {
+export function corsairCodes(data: AnyScenarioData, difficulty: Difficulty = "Normal"): string[] {
   return placementsAt(data, difficulty).flatMap((card) => (card.pile === "corsairDeck" ? Array.from({ length: copiesAt(card, difficulty) }, () => card.code) : []));
 }
 
 // The decks of Ered Mithrin a scenario deals, copy by copy (emce.caves-deck, emce.evil-creatures-deck): each of these piles at the difficulty played, by pile. A pile the scenario does not deal is left out.
 export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
-export function dealtPiles(data: ScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
+export function dealtPiles(data: AnyScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
   const piles: Partial<Record<(typeof DEAL_PILES)[number], string[]>> = {};
   for (const card of placementsAt(data, difficulty)) {
     const pile = DEAL_PILES.find((name) => name === card.pile);
@@ -291,13 +310,13 @@ export function dealtPiles(data: ScenarioData, difficulty: Difficulty = "Normal"
 
 // The Uncharted deck a scenario deals, copy by copy (dcce.uncharted-deck): the `unchartedDeck` pile at the difficulty played. The `islandMap` pile (dcce.island-map) is dealt the same way: its
 // "Prepare the Island Map" Setup takes the double-sided locations from the deck and lays them out.
-export function unchartedCodes(data: ScenarioData, difficulty: Difficulty = "Normal"): string[] {
+export function unchartedCodes(data: AnyScenarioData, difficulty: Difficulty = "Normal"): string[] {
   return placementsAt(data, difficulty).flatMap((card) => (card.pile === "unchartedDeck" || card.pile === "islandMap" ? Array.from({ length: copiesAt(card, difficulty) }, () => card.code) : []));
 }
 
 // The cards of a scenario with two sides that are two catalog cards (`back`), copy by copy, for the Grotto deck (dcce.grotto-deck): the `grottoDeck` pile at the difficulty played, and the `setAside` cards with a
 // `back` once each (the engine keeps those that are Grotto locations: the Shrine to Morgoth's Underwater side).
-export function doubleSidedCards(data: ScenarioData, difficulty: Difficulty = "Normal"): { code: string; back: string; pile: "grottoDeck" | "setAside" }[] {
+export function doubleSidedCards(data: AnyScenarioData, difficulty: Difficulty = "Normal"): { code: string; back: string; pile: "grottoDeck" | "setAside" }[] {
   return placementsAt(data, difficulty).flatMap((card) => {
     if (card.back == null || (card.pile !== "grottoDeck" && card.pile !== "setAside")) return [];
     const copies = card.pile === "setAside" ? 1 : copiesAt(card, difficulty);
@@ -305,7 +324,7 @@ export function doubleSidedCards(data: ScenarioData, difficulty: Difficulty = "N
   });
 }
 
-export function burdenCodes(data: ScenarioData): string[] {
+export function burdenCodes(data: AnyScenarioData): string[] {
   return data.cards.filter((card) => card.pile === "burden").flatMap((card) => Array.from({ length: card.normal }, () => card.code));
 }
 
@@ -353,7 +372,7 @@ export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: 
 
 // What a campaign game deals of a scenario that has reprints: the Campaign Expansion's reprint of each card in place of the original, in every
 // pile, the quest stages and the cards the campaign card places (ScenarioData.reprints). Standalone play deals the scenario as it is.
-export function campaignScenario(data: ScenarioData): ScenarioData {
+export function campaignScenario<T extends AnyScenarioData>(data: T): T {
   const reprints = data.reprints;
   if (!reprints) return data;
   const swap = (code: string): string => reprints[code] ?? code;
@@ -365,7 +384,7 @@ export function campaignScenario(data: ScenarioData): ScenarioData {
 // A stage that names CatchUpWins (12013:B:3) carries the Stormcaller's stage number that makes its defeat a win as its `catchUp`.
 // A stage that names AdvanceToRandomStage (19048:B:2) carries the stages it proceeds to, in a random order, as its `randomNext`.
 // A stage that names FlipAtQuestPhase (19135:A:2) is a stage of a quest deck (`deck`): it is not flipped when revealed.
-function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true }; deck?: true } {
+export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true }; deck?: true } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
@@ -377,7 +396,7 @@ function stageOf(code: string, effects: readonly Effect[]): { code: string; bran
 
 // The pursuit value at which the players lose, when a stage's Setup sets a pursuit tracker (mec112.pursuit, SetPursuit): the `min` of the pursuit condition on a LoseGame record of a card the scenario places. Undefined
 // for a scenario with no tracker. The top bar's pursuit dial draws its meter against it.
-export function pursuitLimit(data: ScenarioData, effects: readonly Effect[]): number | undefined {
+export function pursuitLimit(data: AnyScenarioData, effects: readonly Effect[]): number | undefined {
   if (!data.stages.some((code) => recordInstructions(effects, code, "setup").some((instruction) => instruction.verb === "SetPursuit"))) return undefined;
   const placed = new Set(placementsAt(data, "Normal").map((card) => card.code));
   for (const effect of effects) {
@@ -389,7 +408,7 @@ export function pursuitLimit(data: ScenarioData, effects: readonly Effect[]): nu
 
 // The objective whose tokens end a stage when they reach a number (mec112.defense, The Defense of Helm's Deep, 143033:A:3): the card of a record whose instruction is held by a `tokens` condition on that card, the `min` of it,
 // and the quest stage (1-based, as `stageNumber` counts) the same record's `AdvanceToStage` goes to. Undefined for a scenario that deals no such card. The top bar's Defense dial draws its meter against the limit.
-export function defenseTracker(data: ScenarioData, effects: readonly Effect[]): { code: string; limit: number; stage: number } | undefined {
+export function defenseTracker(data: AnyScenarioData, effects: readonly Effect[]): { code: string; limit: number; stage: number } | undefined {
   const dealt = new Set(data.cards.map((card) => card.code));
   for (const effect of effects) {
     if (!dealt.has(effect.cardCode) || effect.timing !== "forced") continue;
@@ -404,7 +423,7 @@ export function defenseTracker(data: ScenarioData, effects: readonly Effect[]): 
   return undefined;
 }
 
-export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
+export function scenarioDefinition(data: AnyScenarioData, campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
   const burden = burdenCodes(data);
   const pursuit = pursuitLimit(data, effects);
   const defense = defenseTracker(data, effects);
@@ -422,10 +441,10 @@ export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, e
       perSeatStaging: data.widgets.perSeatStaging,
     },
     setup: setupInstructions(data),
-    resolution: recordInstructions(effects, data.campaignCard, "resolution"),
+    resolution: data.campaignCard === undefined ? [] : recordInstructions(effects, data.campaignCard, "resolution"),
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(data.life != null ? { life: data.life } : {}),
-    campaignCard: data.campaignCard,
+    ...(data.campaignCard !== undefined ? { campaignCard: data.campaignCard } : {}),
     // The part of the campaign (the campaign card's "part number", dcce.gaining-xp): the scenario's place in the campaign, not its number in its product (Hall of Beorn numbers each Adventure Pack's scenario within the pack).
     // Ered Mithrin has no XP, but the burdens The King's Quest (part 3) adds to the pool read it too ("X is the campaign card's part number", 12172:A:1, 12173:A:1: emce.campaign-pool-encounter), so
     // its games from that part on hold it; the first two parts have no card that reads it, and their state is as it was.

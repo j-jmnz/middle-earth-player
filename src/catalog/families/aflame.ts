@@ -17,7 +17,8 @@ const VERBS = [
   // that are not copies of one card the first player chooses. The encounter deck is not shuffled by this verb.
   z.strictObject({ verb: z.literal("SearchAflame"), ...when }),
   // "Captain Sahír engages the first player" (11076:A:1): the source enemy, in the staging area, engages the first player. (EngageLastPlayer is the sea family's: dcce.last-player.)
-  z.strictObject({ verb: z.literal("EngageFirstPlayer"), ...when }),
+  // With `moves`, an enemy already engaged with another player moves to the first player too ("Tunneling Nameless Thing engages the first player", 900702:A:1).
+  z.strictObject({ verb: z.literal("EngageFirstPlayer"), moves: z.literal(true).optional(), ...when }),
   // Resolution: "Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool" (11182:B:2). One entry for each copy with one of these codes that a seat chose at the Setup
   // (ScenarioState.chosenAtSetup), earned for that seat wherever the copy is now (in a hand, in the victory display, in a discard pile).
   z.strictObject({ verb: z.literal("EarnDealt"), codes: z.array(z.string().min(1)).min(1), ...when }),

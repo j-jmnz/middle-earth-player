@@ -19,6 +19,7 @@ import { shadowCards } from "../core/zones.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { grappledCount, resourcesOnMatching } from "../families/grapple/values.ts";
 import { leftThreat } from "../families/island/pick.ts";
+import { stagingThreat } from "../quest/quest.ts";
 import { stormcallerStageNumber } from "../families/stormcaller/values.ts";
 
 // Who an amount is read for: the actor (the "you" of the card), the source, and what the running effect knows.
@@ -153,6 +154,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   } else if (amount.hand) value = (state.seats[scope.actor]?.hand ?? []).length;
   else if (amount.dealt) value = scope.dealt ?? 0;
   else if (amount.excess) value = scope.excess ?? 0;
+  else if (amount.stagingThreat) value = stagingThreat(state, ctx.cards, scope.actor);
   else if (amount.facedown || amount.resourcesAboveCopies) value = miscAmount(state, amount, scope.sourceId);
   else if (amount.grappled) value = grappledCount(state);
   else if (amount.islandLeft) value = leftThreat(state, ctx);

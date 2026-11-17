@@ -27,7 +27,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141022:B:1 (back): When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)
   141022:triggered:1: Triggered (mandatory, not printed as Forced) on the event hideFailed
-    - [json EngageAll {"verb":"EngageAll","trait":"Nazgûl","who":"actor"}]
+    - the acting player engages every enemy in the staging area with the trait Nazgûl
 
 141022:B:2 (back): The players cannot advance unless Bag End is in the victory display.
   141022:constant:1: Constant
@@ -49,7 +49,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141023:B:3 (back): When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)
   141023:triggered:1: Triggered (mandatory, not printed as Forced) on the event hideFailed
-    - [json EngageAll {"verb":"EngageAll","trait":"Nazgûl","who":"actor"}]
+    - the acting player engages every enemy in the staging area with the trait Nazgûl
 
 ## 141024 Escape to Buckland
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -66,7 +66,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141024:B:2 (back): When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)
   141024:triggered:1: Triggered (mandatory, not printed as Forced) on the event hideFailed
-    - [json EngageAll {"verb":"EngageAll","trait":"Nazgûl","who":"actor"}]
+    - the acting player engages every enemy in the staging area with the trait Nazgûl
 
 141024:B:3 (back): Response: After a player makes a successful Hide test, place X progress on a non-unique location in play. X is twice the number of players in the game.
   141024:response:1: Response on the event hideSucceeded
@@ -177,7 +177,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141038:A:1 (front): Forced: After a player fails a Hide test, shuffle a Nazgûl enemy from the discard pile into the encounter deck, if able.
   141038:forced:1: Forced on the event hideFailed
-    - [json ShuffleIntoDeck {"verb":"ShuffleIntoDeck","trait":"Nazgûl"}]
+    - one Nazgûl card in the encounter discard pile goes back into the encounter deck, which is shuffled (nothing with none there)
 
 141038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player failed a Hide test this round).
   141038:shadow:1: Shadow
@@ -249,7 +249,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141043:A:2 (front): When Revealed: Attach to a hero. (Counts as a Condition attachment with the text: "Limit 1 per hero. Forced: After a player fails a Hide test, discard attached hero.")
   141043:whenRevealed:1: When revealed
-    - attach this card to a hero
+    - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   141043:forced:1: Forced on the event hideFailed
     - discard its host
   141043:constant:1: Constant
@@ -312,7 +312,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141075:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return every enemy with the trait Nazgûl engaged with a player to the staging area
-    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141075:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141075:shadow:1: Shadow
@@ -367,7 +367,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141079:A:2 (front): When Revealed: At the end of the phase, each enemy in the staging area engages the first player. If The One Ring is exhausted, this effect cannot be canceled.
   141079:whenRevealed:1: When revealed (cannot be canceled while the card with code 141085 in play is exhausted)
     - later, at the end of this phase (cannot be canceled while the card with code 141085 in play is exhausted):
-      - [json EngageAll {"verb":"EngageAll","who":"firstPlayer"}]
+      - the first player engages every enemy in the staging area
 
 ## 141085 The One Ring
 
@@ -394,7 +394,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   906101:forced:1: Forced on the event stageRevealed
     only if all of: (the card the event is about is a card (any player controls) named "Escape to Buckland") and (the card with code 906102 is not in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchToStaging {"verb":"SearchToStaging","code":"906102"}]
+    - search the encounter deck, discard pile and victory display for the card with code 906102 and add it to the staging area (not revealed; nothing when none is found)
     - shuffle the encounter deck
 
 906101:B:1 (back): Begin with the standard quest deck and encounter deck for the A Shadow of the Past scenario.
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 213 by template, 45 as JSON)
+(rendered pieces: 220 by template, 38 as JSON)

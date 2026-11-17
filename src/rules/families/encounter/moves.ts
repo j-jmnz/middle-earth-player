@@ -15,6 +15,8 @@ import { isLocationId, printedOf, type CardType } from "../../core/printed.ts";
 import { engageWith } from "../../quest/quest.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { travelBlocked } from "../../interpret/restrictions.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { fireForced } from "../../windows/triggers.ts";
 import type { EffectData, ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import { travelNow } from "../../quest/travel.ts";
@@ -115,6 +117,8 @@ export function moveEncounter(
     case "removed":
       return moveCard(leavePlay(next, id, ctx, steps), id, { zone: "removed" });
     case "staging": {
+      // A treachery card taken from the encounter discard pile stays there: it is not added to the staging area, and a ResolveWhenRevealed after it resolves its When Revealed effects ("move the top card of the encounter discard pile to the staging area. Resolve any 'when revealed' effects on that card", 02086:A:1).
+      if (card.zone === "encounterDiscard" && typeOf(next, id, ctx) === "treachery") return next;
       const staged = updateCard(moveCard(next, id, stagingDest(next, seat)), id, { face: "up", controller: null });
       if (wasInPlay) return staged;
       // Put into the staging area from out of play: it is added to the staging area and enters play.
@@ -128,7 +132,8 @@ export function moveEncounter(
     case "activeLocation": {
       if (!isLocationId(next, id, ctx.cards)) return next;
       // In a free active location slot, else in place of the last one (families/south/locations.ts).
-      const placed = updateCard(makeActiveIn(next, id), id, { face: "up", controller: null });
+      // A shadow card that becomes the active location is no longer attached to the enemy it was dealt to (The Spiders' Ring, 02131:A:2).
+      const placed = updateCard(makeActiveIn(next, id), id, { face: "up", controller: null, ...(card.zone === "shadow" ? { host: undefined } : {}) });
       const active = queueEvent(placed, { trigger: "becameActive", seat: null, cardId: id });
       return wasInPlay ? active : announceEntered(active, id, seat, ctx);
     }
@@ -145,10 +150,12 @@ export function travelThere(state: ScenarioState, id: string, ctx: ReduceContext
   return travelNow(next, id, ctx, steps) ?? state;
 }
 
-// The encounter discard pile goes back into the encounter deck, which is shuffled.
-export function shuffleDiscardIn(state: ScenarioState): ScenarioState {
+// The encounter discard pile goes back into the encounter deck, which is shuffled; with a `trait`, only the cards with that trait do ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
+export function shuffleDiscardIn(state: ScenarioState): ScenarioState;
+export function shuffleDiscardIn(state: ScenarioState, ctx: ReduceContext, trait?: string): ScenarioState;
+export function shuffleDiscardIn(state: ScenarioState, ctx?: ReduceContext, trait?: string): ScenarioState {
   let next = state;
-  for (const id of [...state.encounterDiscard]) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  for (const id of [...state.encounterDiscard]) if (trait == null || (ctx != null && hasTrait(state, id, trait, ctx))) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
   return shuffleEncounterDeck(next);
 }
 
@@ -175,15 +182,20 @@ export function discardUntil(state: ScenarioState, wanted: CardType | readonly C
 
 // Shows the actor the top cards of the encounter deck or of their own deck. The top card is picked, and the cards shown are
 // remembered for ArrangeEncounter and PickEncounter.
-export function lookAtTop(state: ScenarioState, instruction: Extract<Instruction, { verb: "LookAtTop" }>, seat: number, ctx: ReduceContext, sourceId: string | null): ScenarioState {
+export function lookAtTop(state: ScenarioState, instruction: Extract<Instruction, { verb: "LookAtTop" }>, seat: number, ctx: ReduceContext, sourceId: string | null, steps: EngineStep[]): ScenarioState {
   const count = instruction.count == null ? 1 : resolveAmount(state, instruction.count, frameScope(state, seat, sourceId), ctx);
   // A player's deck: the actor's, or the last picked player's (families/deck.ts).
   const owner = instruction.deck === "picked" ? seatOf(pickedList(state).at(-1) ?? "") : seat;
-  const ids = instruction.deck === "own" || instruction.deck === "picked" ? (owner == null ? [] : (state.seats[owner]?.deck ?? []).slice(0, count)) : state.encounterDeck.slice(0, count);
+  const seen = instruction.deck === "own" || instruction.deck === "picked" ? (owner == null ? [] : (state.seats[owner]?.deck ?? []).slice(0, count)) : state.encounterDeck.slice(0, count);
+  // A card among the encounter deck's cards that has a Forced effect for being looked at (Ravenous Hawk, 900402:A:1) acts at once and is not one of the cards the effect goes on with.
+  const acting = instruction.deck === "own" || instruction.deck === "picked" ? [] : seen.filter((id) => effectsOf(ctx, state.cards[id]?.code ?? "").some((effect) => effect.timing === "forced" && effect.trigger === "lookedAt"));
+  const ids = seen.filter((id) => !acting.includes(id));
   const data = effectData(state);
   const noted = data ? patchTop(state, { data: { ...data, looked: ids, picked: [...(data.picked ?? []), ids[0] ?? ""] } }) : state;
-  if (ids.length === 0) return noted;
-  return { ...noted, window: { kind: "look", seat, cardIds: ids }, activeSeat: seat, passed: [] };
+  // Each card's frame goes on the stack above the effect, in the order of the deck: the first one found resolves first, so it is pushed last.
+  const heard = [...acting].reverse().reduce((current, id) => fireForced(current, { trigger: "lookedAt", seat, cardId: id }, ctx, steps), noted);
+  if (ids.length === 0) return heard;
+  return { ...heard, window: { kind: "look", seat, cardIds: ids }, activeSeat: seat, passed: [] };
 }
 
 // How many of the top cards of the encounter deck are (or, with `not`, are not) of a type: the effect's X.

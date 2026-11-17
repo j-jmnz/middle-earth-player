@@ -7,7 +7,7 @@ import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { drawMany, type ReduceContext } from "../../interpret/interpret.ts";
-import { placeDamage } from "../../core/keywords.ts";
+import { destroyCard, placeDamage } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
 import { spawn } from "../../core/zones.ts";
@@ -33,12 +33,14 @@ function drawEach(state: ScenarioState, instruction: Verb<"DrawEach">, focus: Fo
 }
 
 // HealQuietly: damage comes off the card with no `healed` event.
-function healQuietly(state: ScenarioState, instruction: Verb<"HealQuietly">, focus: Focus, ctx: ReduceContext): ScenarioState {
+function healQuietly(state: ScenarioState, instruction: Verb<"HealQuietly">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const scope = frameScope(state, focus.seat, focus.sourceId);
   const id = refCard(state, instruction.target ?? "subject", scope) ?? "";
   const card = state.cards[id];
   if (!card || card.damage <= 0) return state;
-  return healDamage(state, id, resolveAmount(state, instruction.amount, scope, ctx), ctx).state;
+  const healed = healDamage(state, id, resolveAmount(state, instruction.amount, scope, ctx), ctx, { sourceId: focus.sourceId });
+  // An attachment that cut the heal to 1 (Noxious Supplies, 900608:A:2) is discarded after it, as for the Heal verb.
+  return healed.reducer ? destroyCard(healed.state, healed.reducer, ctx.cards, steps) : healed.state;
 }
 
 // MoveDamage: damage tokens go from the card picked before the last to the last picked card (rr.damage).
@@ -60,7 +62,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DrawEach":
       return drawEach(state, instruction, focus, ctx, steps);
     case "HealQuietly":
-      return healQuietly(state, instruction, focus, ctx);
+      return healQuietly(state, instruction, focus, ctx, steps);
     case "MoveDamage":
       return moveDamage(state, instruction, focus, ctx, steps);
     // Setup of a player card that adds a card from the box to the encounter deck ("Shuffle 2 copies of Stinker into the encounter

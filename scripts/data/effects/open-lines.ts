@@ -1,6 +1,6 @@
 import type { Effect } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
-import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
+import type { CampaignData, AnyScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { dealtCodes } from "../load-scenarios.ts";
 import { isKeywordLine } from "../normalize/keywords.ts";
 import { lineId, type Ledger } from "../printed/ledger.ts";
@@ -10,7 +10,7 @@ import { isPoolCard } from "../printed/pool.ts";
 // the built scenarios deal. A line is owned by a record that names it, by keywords the engine reads (a line of keywords
 // only), or by an inert mark in the box ledger. The list is src/effects/open-lines.ts, which the app reads
 // for the inactive mark; every card is meant to leave it (user decision, 2026-10-26).
-export function openLines(cards: readonly Card[], ledger: Ledger, campaign: CampaignData | readonly CampaignData[], scenarios: readonly ScenarioData[], effects: readonly Effect[]): string[] {
+export function openLines(cards: readonly Card[], ledger: Ledger, campaign: CampaignData | readonly CampaignData[], scenarios: readonly AnyScenarioData[], effects: readonly Effect[]): string[] {
   const owned = new Set(effects.flatMap((effect) => effect.lines));
   const wanted = new Set([...dealtCodes(campaign, scenarios), ...cards.filter(isPoolCard).map((card) => card.code)]);
   const open: string[] = [];

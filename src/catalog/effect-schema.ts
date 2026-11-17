@@ -181,20 +181,6 @@ const delaySchema = z.strictObject({
   instructions: z.array(simpleInstructionSchema),
 });
 
-const forEachPlayerSchema = z.strictObject({
-  verb: z.literal("ForEachPlayer"),
-  order: z.enum(["lastFirst", "firstFirst"]),
-  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
-});
-
-// Instructions that run, with the attacking enemy as the source, once the attack in progress ends (a ForEachPlayer among them: "Captain Sahír makes an attack ... Each player searches ...", 12093:A:1). `when` is read as the shadow effect
-// resolves, while the attack is still in progress ("If undefended, move the damage to the hero damaged by this attack", 900209:A:2).
-const afterAttackSchema = z.strictObject({
-  verb: z.literal("AfterAttack"),
-  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, forEachPlayerSchema])),
-  ...when,
-});
-
 // Runs the instructions once for each card that matches the filter now, each time with that card as the picked card ("Ready
 // each Dwarf character", "Deal 1 damage to each enemy in the staging area"). Nobody chooses.
 const eachSchema = verbFlags(z.strictObject({
@@ -211,6 +197,26 @@ const eachSchema = verbFlags(z.strictObject({
   taken: z.array(z.string()).optional(),
   ...when,
 }), { runsInFrame: true });
+
+// A Shadow effect with it at its top level runs in a frame (the instructions it expands for each player queue behind it).
+const forEachPlayerSchema = verbFlags(z.strictObject({
+  verb: z.literal("ForEachPlayer"),
+  order: z.enum(["lastFirst", "firstFirst"]),
+  // `guardian`: only the player guarding Gollum, the instructions run for him as the acting player ("Raise the threat of the player guarding Gollum by 8", 02135:A:1). While a card says an effect that targets him also targets each other player (Dry Watercourse, 02132:A:1;
+  // Ambushing Orcs, 900902:A:1) the other players follow, in player order (src/rules/families/guardian/seats.ts).
+  // `otherThanGuardian`: each player but him, in player order ("reduce the threat of each player not guarding Gollum by 2", 02133:A:2).
+  seats: z.enum(["guardian", "otherThanGuardian"]).optional(),
+  // An Each runs for the player acting: "deal 1 damage to each character controlled by the player guarding Gollum" is an Each of the characters he controls (02138:A:2).
+  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, eachSchema])),
+}), { runsInFrame: true });
+
+// Instructions that run, with the attacking enemy as the source, once the attack in progress ends (a ForEachPlayer among them: "Captain Sahír makes an attack ... Each player searches ...", 12093:A:1). `when` is read as the shadow effect
+// resolves, while the attack is still in progress ("If undefended, move the damage to the hero damaged by this attack", 900209:A:2).
+const afterAttackSchema = z.strictObject({
+  verb: z.literal("AfterAttack"),
+  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, forEachPlayerSchema])),
+  ...when,
+});
 
 // Runs the instructions this many times ("Resolve that effect again for each copy of ~ in your discard pile").
 const repeatSchema = verbFlags(z.strictObject({
@@ -300,10 +306,13 @@ export const effectSchema = z.strictObject({
   // Any player may use this Action or Response, not only its controller ("Any player may trigger this ability").
   anyPlayer: z.boolean().optional(),
   // This Response is the player's the event happened to, whoever controls the source ("the engaged player may ...", 12125:A:3): the seat of the event answers it, and it is not offered when the event names no seat.
-  answeredBy: z.literal("eventSeat").optional(),
+  // `guardian`: the player guarding Gollum answers it ("the player guarding Gollum may choose a new player to guard him", 02134:A:1).
+  answeredBy: z.enum(["eventSeat", "guardian"]).optional(),
   // This Action, Response or Forced effect of a card that is not an event is used from its owner's hand, and only there ("put ~ into play
   // from your hand", rr.in-play-and-out-of-play: an ability that refers to being used from an out-of-play area; Lost in the Wild's Forced effect, 18026:A:1).
   fromHand: z.literal(true).optional(),
+  // This Forced effect of a card works from the victory display and only there ("While Louis is in the victory display, each Troll enemy gains: Forced: ...", 900504:A:2; rr.in-play-and-out-of-play: an ability that refers to the out-of-play area it works from).
+  fromVictory: z.literal(true).optional(),
   // A "revealed" event is heard only when the encounter deck itself revealed the card (staging, a surge, the top card;
   // rr.staging), not when a player searched for it and revealed it ("as it is revealed by the encounter deck", 01006:A:1).
   byEncounterDeck: z.literal(true).optional(),

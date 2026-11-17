@@ -83,8 +83,8 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   12092:constant:1: Constant
     only if the active location is a Underwater location (any player controls)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CannotPlay {"verb":"CannotPlay","pick":{"type":"card","control":"you","cardType":"ally"},"anyPlayer":true}]
-    - [json CannotPlay {"verb":"CannotPlay","pick":{"type":"card","control":"you","cardType":"attachment"},"anyPlayer":true}]
+    - no player can play, or put into play, a card (you control) of card type ally
+    - no player can play, or put into play, a card (you control) of card type attachment
 
 12092:B:2 (back): Forced: After a double-sided location is explored, add the top location from the Grotto deck to the staging area, Grotto side faceup.
   12092:forced:2: Forced on the event locationExplored (heard about location (any player controls) [also {"doubleSided":true}])
@@ -113,8 +113,8 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   12093:constant:1: Constant
     only if the active location is a Underwater location (any player controls)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CannotPlay {"verb":"CannotPlay","pick":{"type":"card","control":"you","cardType":"ally"},"anyPlayer":true}]
-    - [json CannotPlay {"verb":"CannotPlay","pick":{"type":"card","control":"you","cardType":"attachment"},"anyPlayer":true}]
+    - no player can play, or put into play, a card (you control) of card type ally
+    - no player can play, or put into play, a card (you control) of card type attachment
 
 ## 12094 Shrine to Morgoth
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -270,9 +270,9 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     only if all of: (it is the Quest phase) and (this card is the active location)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each ally (any player controls) named "Captain Sahír" or "Na'asiyah":
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - for each hero (any player controls):
-      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - the first player chooses one of:
       * option "flip":
         - [json FlipDoubleSided {"verb":"FlipDoubleSided"}]
@@ -327,7 +327,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
           - the acting player discards each card (you control) in hand [also {"notCardType":"player-side-quest"}]
         * option "treasure":
           - the acting player discards each card (you control) in hand [also {"notCardType":"treasure"}]
-    - then, if [json condition {"kind":"noneDiscarded"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 12106:A:2 (shadow): Shadow: If the active location is Underwater, search the encounter deck and discard pile for a Creature enemy, and add it to the staging area.
   12106:shadow:1: Shadow
@@ -362,4 +362,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 194 by template, 50 as JSON)
+(rendered pieces: 205 by template, 43 as JSON)

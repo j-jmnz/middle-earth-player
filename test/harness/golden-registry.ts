@@ -49,10 +49,16 @@ import * as ettenmoors from "../scenarios/across-the-ettenmoors/game.ts";
 import * as rhudaur from "../scenarios/the-treachery-of-rhudaur/game.ts";
 import * as dum from "../scenarios/the-battle-of-carn-dum/game.ts";
 import * as realm from "../scenarios/the-dread-realm/game.ts";
+import * as gollum from "../scenarios/the-hunt-for-gollum/game.ts";
+import * as carrock from "../scenarios/conflict-at-the-carrock/game.ts";
+import * as rhosgobel from "../scenarios/a-journey-to-rhosgobel/game.ts";
+import * as muil from "../scenarios/the-hills-of-emyn-muil/game.ts";
+import * as deadmarshes from "../scenarios/the-dead-marshes/game.ts";
+import * as returnmirkwood from "../scenarios/return-to-mirkwood/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
-// Every scenario's golden games (the `*_GOLDENS` of its test/scenarios/<id>/game.ts), in campaign order. The reader check
+// Every scenario's golden games (the `*_GOLDENS` of its test/scenarios/<id>/game.ts), in campaign order and then the cycle's pack order. The reader check
 // (src/play/reader-play/games.ts) plays them, `pnpm test scenario` filters the Maestro fixtures by an entry's title and
 // `pnpm scenario new` reads the previous part's names here. Each scenario's golden.test.ts plays, pins, cause-checks and replays its
 // goldens (test/harness/golden-suite.ts). A Shadow of the Past's goldens are the filler-hero games and the starter decks
@@ -123,4 +129,11 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
   entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
+  // Shadows of Mirkwood, a cycle (standalone games, no Campaign Mode), after the campaigns: `pnpm scenario new` adds each scenario's entry here, in pack order.
+  entry("the-hunt-for-gollum", "The Hunt for Gollum", gollum.GOLLUM_GOLDENS, gollum.gollumWorld, gollum.playGolden),
+  entry("conflict-at-the-carrock", "Conflict at the Carrock", carrock.CARROCK_GOLDENS, carrock.carrockWorld, carrock.playGolden),
+  entry("a-journey-to-rhosgobel", "A Journey to Rhosgobel", rhosgobel.RHOSGOBEL_GOLDENS, rhosgobel.rhosgobelWorld, rhosgobel.playGolden),
+  entry("the-hills-of-emyn-muil", "The Hills of Emyn Muil", muil.MUIL_GOLDENS, muil.muilWorld, muil.playGolden),
+  entry("the-dead-marshes", "The Dead Marshes", deadmarshes.DEADMARSHES_GOLDENS, deadmarshes.deadmarshesWorld, deadmarshes.playGolden),
+  entry("return-to-mirkwood", "Return to Mirkwood", returnmirkwood.RETURNMIRKWOOD_GOLDENS, returnmirkwood.returnmirkwoodWorld, returnmirkwood.playGolden),
 ];

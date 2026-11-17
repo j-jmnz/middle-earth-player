@@ -251,7 +251,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
       * option "cancel" (only if all of: (the number of card (any player controls) named "Gollum" or "Sméagol", (enemies engaged with a player included) is at least 1) and ([json condition {"kind":"resources","min":1,"sphere":"fellowship"}]) and (the card with code 144063 in play is ready)):
         - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
         - exhaust the card with code 144063
-        - [json CancelEffect {"verb":"CancelEffect"}]
+        - the effect being resolved is canceled: nothing after this resolves
 
 144055:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the attacking enemy is Gollum).
   144055:shadow:1: Shadow
@@ -353,7 +353,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:constant:1: Constant
     - this card: stat immuneToPlayerCards 1, while this card is in play
   144076:constant:2: Constant
-    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+    - this card is controlled by the first player while this holds
 
 144076:A:2 (front): Forced: After the players quest unsuccessfully, flip Sméagol to Gollum.
   144076:forced:1: Forced after the players quest unsuccessfully
@@ -363,4 +363,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 234 by template, 8 as JSON)
+(rendered pieces: 236 by template, 6 as JSON)

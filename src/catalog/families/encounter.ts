@@ -66,8 +66,12 @@ const VERBS = [
   // no collection (docs/brief.md): the collection holds every card the game knows, so a copy of `code` is made when neither the deck nor the pile
   // has one. The deck is shuffled by a ShuffleEncounterDeck after it (the line says so).
   z.strictObject({ verb: z.literal("SearchCollection"), code: z.string().min(1), to: z.literal("staging"), ...when }),
-  // The encounter discard pile is shuffled into the encounter deck.
-  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), ...when }),
+  // The topmost `count` cards of the encounter discard pile that are enemies with this Trait are returned to the staging area, not revealed: no When Revealed, no engagement check ("Return the top X Undead enemies in the encounter discard pile to the staging area", 900810:A:1). Fewer when the pile holds
+  // fewer. The number returned is the effect's `returned` count, read by `noneReturned` ("If no enemies were returned ... gains surge").
+  z.strictObject({ verb: z.literal("ReturnFromDiscard"), trait: z.string().min(1), count: positiveAmountSchema, ...when }),
+
+  // The encounter discard pile is shuffled into the encounter deck; with `trait`, only the cards of that printed or gained Trait go back and the deck is shuffled ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
+  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), trait: z.string().min(1).optional(), ...when }),
 
   // Every location in the victory display goes back into the encounter deck, which is then shuffled ("Shuffle all locations in the victory display into the encounter deck", 144066:A:1). They lose nothing they had: a card in the display has no tokens.
   z.strictObject({ verb: z.literal("ShuffleVictoryIntoEncounterDeck"), ...when }),
@@ -120,6 +124,9 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // About an encounter card (the event's subject) just placed in the encounter discard pile, from the deck, from play or from anywhere else ("After an Athelas card is placed in the discard pile", 900601:A:4). Announced only in a game whose table holds the flag
+  // `noteEncounterDiscards`, which the Setup of the card that hears it sets.
+  "encounterDiscarded",
   // About an encounter card: it entered play, placed in the staging area once its staging resolved (rr.staging), or put
   // into play by a player card effect (MoveEncounterCard).
   "encounterEnteredPlay",
@@ -129,9 +136,15 @@ const TRIGGERS = [
   "firstLocationRevealed",
   // About the seat: an encounter card effect raised its threat (the event's amount is how much).
   "encounterThreatRaised",
+  // About an encounter card in the encounter deck: a card effect made a player look at the cards of the encounter deck and this card is among them (`seat` is the player looking). A Forced effect of the card with `subject: "self"` hears it from the deck ("Forced: When a card
+  // effect instructs a player to "look" at cards in the encounter deck and Ravenous Hawk is among those cards, that player must put Ravenous Hawk into play engaged with him", 900402:A:1). The card leaves the cards the effect looked at, so it does not count
+  // for what the effect picks or discards among them.
+  "lookedAt",
 ] as const;
 
 const FLAGS = [
+  // Held by the table: a card placed in the encounter discard pile is announced (`encounterDiscarded`).
+  "noteEncounterDiscards",
   // Held by the table until the end of the phase: the staging step reveals this many fewer cards, to a minimum of 0
   // (`revealFewer`) or of 1 (`revealFewerMinOne`).
   "revealFewer",
@@ -154,6 +167,8 @@ const FLAGS = [
   "encounterUncancelable",
   // On a card in the staging area: nothing moves it out of the staging area ("Uglúk cannot leave the staging area", 143069:B:2): moveCard refuses a move to another zone, as cannotEnterStaging refuses one into it.
   "cannotLeaveStaging",
+  // On a card in play until the end of the round: it entered play this round ("if Hunting Warg entered play this round", 900403:A:1), set by a Forced effect that hears `encounterEnteredPlay` and read by the condition `flag` with holder `self`.
+  "enteredThisRound",
 ] as const;
 
 export const manifest = { name: "encounter", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

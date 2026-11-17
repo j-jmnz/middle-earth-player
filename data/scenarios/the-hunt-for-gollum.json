@@ -1,0 +1,261 @@
+{
+  "id": "the-hunt-for-gollum",
+  "name": "The Hunt for Gollum",
+  "number": 1,
+  "stages": [
+    "02011",
+    "02012",
+    "02013"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Hunt for Gollum",
+      "count": 29
+    },
+    {
+      "name": "Journey Along the Anduin",
+      "count": 9
+    },
+    {
+      "name": "Sauron's Reach",
+      "count": 10
+    }
+  ],
+  "cards": [
+    {
+      "code": "02014",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "02015",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "02016",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02017",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02018",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02019",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02020",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02021",
+      "normal": 5,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02022",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02023",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02024",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01111",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "01112",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01113",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01114",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01115",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01116",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01117",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01118",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02011",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02012",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02013",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q01.4",
+    "dragnEasy": "E01.4",
+    "hobSlug": "The-Hunt-for-Gollum"
+  },
+  "nightmare": {
+    "setupCard": "900401",
+    "removed": [
+      {
+        "code": "01111",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01113",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01114",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01115",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01116",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01118",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02016",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02017",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02022",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900402",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900403",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900404",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900405",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900406",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900407",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900408",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900409",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

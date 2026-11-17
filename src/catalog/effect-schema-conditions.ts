@@ -46,9 +46,15 @@ const atomSchema = z.discriminatedUnion("kind", [
   // false before the effect has made one. `fortitudeFailed`: a player failed a Fortitude test this round, `who` the actor ("If you failed a Fortitude test this round", 146055:A:3) or any player ("If a player has failed a Fortitude test this round", 146046:A:1).
   z.strictObject({ kind: z.literal("lastFortitudeFailed") }),
   z.strictObject({ kind: z.literal("lastFortitudePassed") }),
+  // The escape family's conditions (src/rules/families/escape/conditions.ts): the last escape test the running effect made was failed, or passed ("If this test is failed", 02109:A:1; "If this final Escape test is passed", 02106:B:2). False before the effect has made one.
+  z.strictObject({ kind: z.literal("lastEscapeFailed") }),
+  z.strictObject({ kind: z.literal("lastEscapePassed") }),
   z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),
   // The source card is attached to a card the actor controls ("After you fail a Fortitude test, exhaust attached hero", 146057:A:1): an encounter card attached to a hero is controlled by nobody, so the Forced effect's actor, the player the event happened to, is compared with the host's controller.
   z.strictObject({ kind: z.literal("hostControlledByActor") }),
+  // The card the answered event is about is the first treachery the encounter deck revealed in this quest phase, whatever that card did ("the first treachery card revealed during the quest phase", 02082:B:1). The engine marks the card as it is revealed (mount-doom/treachery.ts), before the Forced effects
+  // that hear the reveal, and only in a game with a record that reads this condition. Read by the mount-doom family.
+  z.strictObject({ kind: z.literal("firstTreachery") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
@@ -281,6 +287,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("damageReached"), nth: z.number().int().positive() }),
   // The current quest card holds at least `min` progress tokens ("While there are at least 8 progress tokens on this stage", 41007:B:1).
   z.strictObject({ kind: z.literal("stageProgress"), min: z.number().int().positive() }),
+  // The cards in the victory display are worth at least `min` Victory points together ("they have collected at least 20 victory points", 02082:B:2; rr.victory). Read by rules/interpret/conditions.ts, the sum the score takes (src/campaign/score.ts).
+  z.strictObject({ kind: z.literal("victoryPoints"), min: z.number().int().positive() }),
   // The running effect's X is at least the remaining hit points of the picked card (its hit points less its damage): "If the printed cost of the
   // discarded card is equal to or higher than the remaining hit points of the exhausted character" (41038:A:1). False with no picked card.
   z.strictObject({ kind: z.literal("xReachesRemaining") }),
@@ -293,7 +301,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("underBurn"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
   // that has something to find ("search ... for the Aflame location", 11040:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
-  z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional() }),
+  z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional(), trait: z.string().min(1).optional() }),
   // A location in play with this trait has a total Threat of at least `min`, its grappled enemies' Threat included ("if the total Threat of any one Ship location is 9 or higher", 12041:B:2;
   // src/rules/families/grapple/values.ts).
   z.strictObject({ kind: z.literal("locationThreat"), trait: z.string().min(1), min: z.number().int().min(0) }),
@@ -337,6 +345,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("playerUnengaged") }),
   // The active location prints a Wizardry line ("If no Wizardry effect is triggered this way", 143062:A:1, read with `not`; false with no active location). Read by the wizardry family.
   z.strictObject({ kind: z.literal("hasWizardry") }),
+  // The player guarding Gollum may choose a new player now: no card says the guard cannot change and another player is still in the game ("must choose a new player to guard Gollum, if able", 02135:A:1; the option is offered only then, rr.effects). Read by the guardian family.
+  z.strictObject({ kind: z.literal("guardianCanChange") }),
+  // Progress was placed on the current quest card itself this phase, the overflow of an explored active location included ("if no progress was placed on the current quest this phase", 900501:A:4, `is: false`); read from the note the table's `noteQuestProgress` flag keeps (src/rules/families/wizardry/progress.ts).
+  z.strictObject({ kind: z.literal("questProgressNoted"), is: z.boolean() }),
   z.strictObject({ kind: z.literal("soleAttacker") }),
   // The Captives in play (the Uruk-hai's heroes under To Isengard! or held by an enemy; src/rules/families/captives): at least `min` and at most `max` of them, or with `of: "actor"` only the acting seat's ("a seat with no Captive chooses one", 143069:A:1; "if there are no Captives in play", 143022:A:1).
   z.strictObject({ kind: z.literal("captives"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), of: z.literal("actor").optional() }),

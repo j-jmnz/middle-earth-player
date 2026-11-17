@@ -43,7 +43,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144027:A:1 (front): Forced: At the end of the planning phase, place each Harad enemy in the staging area facedown under The Black Gate.
   144027:forced:1: Forced at the end of the phase
-    only if all of: (it is the Planning phase) and (the number of location (any player controls) named "Henneth Annûn" [also {"active":true}] is at most 0)
+    only if all of: (it is the Planning phase) and (the number of location (any player controls) named "Henneth Annûn", that is the active location is at most 0)
     - for each Harad enemy (any player controls) in the staging area only:
       - place the picked card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
 
@@ -284,12 +284,12 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the harad deck
     - for each player, first player first:
-      - if not (the actor holds the first player token): the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"nonUnique":true,"different":true}]
+      - if not (the actor holds the first player token): the acting player finds one non-unique location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 144068:B:1 (back): Forced: At the beginning of the quest phase, reveal the top facedown card from under The Cross-roads and add it to the staging area.
   144068:forced:1: Forced when a phase begins
-    only if all of: (it is the Quest phase) and (the number of location (any player controls) named "Henneth Annûn" [also {"active":true}] is at most 0)
+    only if all of: (it is the Quest phase) and (the number of location (any player controls) named "Henneth Annûn", that is the active location is at most 0)
     - the acting player reveals the top card of the harad deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
 
 144068:B:2 (back): The players cannot defeat this stage while The Cross-roads is in play. When The Cross-roads is explored, the players win the game.
@@ -299,4 +299,4 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
     - the players win the game
 
-(rendered pieces: 199 by template, 5 as JSON)
+(rendered pieces: 201 by template, 3 as JSON)

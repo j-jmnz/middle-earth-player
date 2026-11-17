@@ -12,7 +12,7 @@ import { EFFECTS } from "../../effects/index.ts";
 import { blankScenario } from "../../rules/core/state.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { loadCards } from "../../../scripts/data/load-cards.ts";
-import { dealtCodes, loadCampaigns, loadScenario } from "../../../scripts/data/load-scenarios.ts";
+import { dealtCodes, loadCampaigns, loadAnyScenario } from "../../../scripts/data/load-scenarios.ts";
 import { ROOT } from "../../../scripts/data/paths.ts";
 import { asksFileNames, checkAsksNames, renderAsksBarrel } from "../../../scripts/data/effects/asks-barrel.ts";
 import { walk } from "../../../test/harness/record-walk.ts";
@@ -32,7 +32,7 @@ const campaigns = loadCampaigns();
 const names: ChoiceNames = { card: (key) => cards.get(key)?.name ?? key, code: (code) => cards.get(code)?.name ?? code };
 const ctx: ReduceContext = { effects: EFFECTS, cards: new Map() };
 const tableOf = (id: string, seatCount: 1 | 2 = 2) => {
-  const scenario = loadScenario(id);
+  const scenario = loadAnyScenario(id);
   const campaign = campaigns.find((one) => one.scenarios.includes(id)) ?? campaigns[0]!;
   return blankScenario({ seatCount, seed: 1, definition: scenarioDefinition(scenario, campaign, EFFECTS) });
 };
@@ -208,7 +208,7 @@ const wordsIn = (text: string): number => text.trim().split(/\s+/).filter(Boolea
 const CARD_LIKE = /^(i\d+|\d{5,6})$/;
 describe.each(Object.keys(ASKS_BY_SCENARIO))("the asks of %s", (id) => {
   const asks = ASKS_BY_SCENARIO[id]!;
-  const scenario = loadScenario(id);
+  const scenario = loadAnyScenario(id);
   const codes = dealtCodes(campaigns, [scenario], { nightmare: true });
   const records = EFFECTS.filter((effect) => codes.has(effect.cardCode));
   const game = tableOf(id);

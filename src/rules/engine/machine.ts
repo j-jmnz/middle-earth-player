@@ -22,6 +22,7 @@ import { canAnnounce, drainEvents } from "../windows/events.ts";
 import { advanceFrame, stagingStep } from "../windows/frames.ts";
 import { commitHide, pruneRoundRecords } from "../quest/hide.ts";
 import { commitFortitude } from "../families/mount-doom/commit.ts";
+import { commitEscape } from "../families/escape/commit.ts";
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { drawMany, gainSeatResources, type ReduceContext } from "../interpret/interpret.ts";
@@ -158,6 +159,8 @@ export function applyIntent(
       return commitHide(state, intent.cardIds, steps);
     case "CommitFortitude":
       return commitFortitude(state, intent.cardIds, steps);
+    case "CommitEscape":
+      return commitEscape(state, intent.cardIds, steps);
     case "Trigger":
       return applyTrigger(state, intent, ctx, steps);
     case "Choose":
@@ -292,7 +295,7 @@ function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): S
     // A card that lets its player draw additional cards in the resource phase holds an extraDraw on the seat.
     const draws = 1 + heldStat(next, seat, "extraDraw", NO_COUNTS);
     const before = new Set(next.seats[seat]?.hand ?? []);
-    next = drawMany(next, seat, draws, steps, ruleCause("rr.step-1-3"), ctx);
+    next = drawMany(next, seat, draws, steps, ruleCause("rr.step-1-3"), ctx, false, false, true);
     drawn[seat] = (next.seats[seat]?.hand ?? []).filter((id) => !before.has(id));
   }
   // The draw step is done: Forced effects hear it ("After drawing cards at the beginning of the resource phase", misc family),

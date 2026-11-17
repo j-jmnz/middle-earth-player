@@ -22,14 +22,17 @@ export type Facts = {
   /** The short name every identifier and fixture name starts from ("ruins" for the-drowned-ruins). */
   short: string;
   campaignId: string;
-  /** The part's place in the campaign, from 1. */
+  /** The scenario belongs to a cycle (Shadows of Mirkwood): no campaign card, no Campaign Mode, played standalone only. */
+  cycle: boolean;
+  /** The part's place in the campaign or the cycle, from 1. */
   part: number;
   previous: PreviousPart | null;
   /** This scenario's seed finder under scripts/e2e/, without the extension. */
   finderRel: string;
-  campaignCard: string;
+  /** The scenario's campaign card; null for a cycle's scenario. */
+  campaignCard: string | null;
   stages: readonly string[];
-  /** [key, code, card name] for every card the scenario deals, its campaign card and the cards that card places. */
+  /** [key, code, card name] for every card the scenario deals, its campaign card (a campaign's scenario) and the cards that card places. */
   codes: readonly (readonly [string, string, string])[];
 };
 
@@ -38,7 +41,7 @@ export const camel = (short: string): string => {
   const word = pascal(short);
   return word.charAt(0).toLowerCase() + word.slice(1);
 };
-const upper = (short: string): string => short.toUpperCase().replace(/-/g, "_");
+export const upper = (short: string): string => short.toUpperCase().replace(/-/g, "_");
 
 // What the game, golden and campaign tests import: the campaign and the scenario, read from data/ (no scene file).
 const dataImport = (depth: string): string => `import { loadCampaign, loadScenario } from "${depth}scripts/data/load-scenarios.ts";`;
@@ -306,12 +309,13 @@ export function authoredPath(facts: Pick<Facts, "id" | "campaignId">): string {
 
 /** The file at authoredPath(facts). */
 export function authoredFile(facts: Facts): string {
+  const owner = facts.cycle ? `${facts.campaignId} cycle part ${facts.part}, no campaign card` : `${facts.campaignId} part ${facts.part}, campaign card ${facts.campaignCard}`;
   const nested = authoredPath(facts).split("/").length - 4;
   const up = "../".repeat(2 + nested);
   const reprint = nested > 0 ? "../reprint.ts" : "./reprint.ts";
   return `import type { Effect } from "${up}catalog/boundary.ts";
 
-// Records for ${facts.name} (${facts.campaignId} part ${facts.part}, campaign card ${facts.campaignCard}). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints
+// Records for ${facts.name} (${owner}). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints
 // word for word needs no record here. \`pnpm effects draft ${facts.id}\` writes the bundle of open lines and the effect-author agent turns it into records.
 // Rules: TODO name the rule ids the records implement (data/rules/entries.json).
 // TODO: wrap the list in withCopies(...) from ${reprint} when a card takes the records of another card's identical line.
@@ -347,3 +351,4 @@ if (ROWS.length > 0) cardSpecs("${facts.id}", ROWS);
 else describe("${facts.id} card specs", () => it.todo("a row for each record whose behaviour needs a game moment"));
 `;
 }
+

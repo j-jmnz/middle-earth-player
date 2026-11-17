@@ -49,6 +49,11 @@ const VERBS = [
   // A shadow card's effect on the attack in progress: undefended damage is placed on an active location instead of a hero, the
   // defending player choosing the location (142035:A:2). Damage goes to the hero as usual when no location is active.
   z.strictObject({ verb: z.literal("DamageActiveLocation"), ...when }),
+  // A shadow card's effect on the attack in progress: the damage of an undefended attack must be placed on a hero the defending player controls that matches `pick`, if able ("Damage from this attack must be applied to a hero you control with a Clue card attached, if
+  // able", 900408:A:3: agent recommendation, rr.step-6-4-3 names the one hero an undefended attack damages). The player names the hero among those; a hero already named that does not match is replaced. A defended attack still damages its defender, and an attack
+  // against a player with no such hero damages the hero named as usual.
+  // `character`: the card may be any player's character that matches `pick`, a hero or an ally, not only a hero the defending player controls ("If this attack is undefended, the damage must be placed on Wilyador", 02070:A:2): it takes the attack's damage as the named hero would, and nothing changes when it is not in play.
+  z.strictObject({ verb: z.literal("UndefendedDamageTo"), pick: pickSchema, character: z.literal(true).optional(), ...when }),
   // The enemy (the picked card) in the staging area attacks the actor now, as an attack outside the combat phase, though it is not
   // engaged (142038:A:2). It is dealt a shadow card of its own.
   // `target: self`: the source enemy attacks (a When Revealed on the enemy, 142047:A:1). `who: firstPlayer`: the first player is attacked, whoever

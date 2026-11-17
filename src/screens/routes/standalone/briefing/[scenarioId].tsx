@@ -12,7 +12,7 @@ import type { Difficulty } from "../../../../catalog/scenario-data";
 import { EFFECTS } from "../../../../effects";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
 import { SeatPicker } from "../../../briefing/seat-picker";
-import { bookletParams, campaignOfScenario, scenarioOf } from "../../../data/campaign-data";
+import { bookletOf, campaignOfScenario, scenarioOf } from "../../../data/campaign-data";
 import { BodyText, Section, Segmented } from "../../../kit/chrome";
 import { useDatabases } from "../../../data/databases";
 import { dealSeed } from "../../../nav/e2e";
@@ -40,6 +40,8 @@ export default function StandaloneBriefing() {
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
   // The box the scenario is printed in decides the campaign flags (saga, booklet) a standalone game follows.
   const campaign = scenarioId ? campaignOfScenario(scenarioId) : null;
+  // A cycle's scenario has no booklet to open.
+  const booklet = campaign ? bookletOf(campaign.id, scenarioId) : null;
   const briefingDecks = useBriefingDecks(campaign?.saga ?? false);
   const { savedDecks, candidates } = briefingDecks;
 
@@ -70,7 +72,7 @@ export default function StandaloneBriefing() {
     scenarioId,
     backLabel: "Scenarios",
     onBack: () => goBack(router, "/scenarios"),
-    ...(campaign ? { onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(campaign.id, scenarioId) }) } : {}),
+    ...(booklet ? { onBooklet: () => router.push({ pathname: "/booklet/[id]", params: booklet }) } : {}),
   } as const;
   if (!campaign || !scenario || !world || !input || !result || !facts) {
     return (

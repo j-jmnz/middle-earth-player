@@ -1,0 +1,296 @@
+{
+  "id": "the-dead-marshes",
+  "name": "The Dead Marshes",
+  "number": 5,
+  "stages": [
+    "02105",
+    "02106"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Dead Marshes",
+      "count": 29
+    },
+    {
+      "name": "Sauron's Reach",
+      "count": 10
+    },
+    {
+      "name": "Wilderlands",
+      "count": 14
+    }
+  ],
+  "cards": [
+    {
+      "code": "02108",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02109",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02110",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02111",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02112",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02113",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02114",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02115",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "01115",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01116",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01117",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01118",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01082",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01083",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01084",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01085",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01086",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01087",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01088",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02105",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02106",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02107",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q01.8",
+    "dragnEasy": "E01.8",
+    "hobSlug": "The-Dead-Marshes"
+  },
+  "nightmare": {
+    "setupCard": "900801",
+    "removed": [
+      {
+        "code": "01081",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01082",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01083",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01085",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01086",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01087",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01088",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01115",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01117",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01118",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02108",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02110",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02112",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02115",
+        "copies": 4,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900802",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "900803",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900804",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900805",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900806",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900807",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900808",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "900809",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900810",
+        "copies": 1,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

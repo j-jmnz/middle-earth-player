@@ -11,7 +11,7 @@ import { applyResponse, responseIntents, responseReason } from "../windows/respo
 import { applyMulliganTrigger, mulliganTriggerReason } from "../families/deck/play.ts";
 import { textBlank } from "../families/attachments/hold.ts";
 import { printedOf } from "../core/printed.ts";
-import { inPlay, type ScenarioState } from "../core/state.ts";
+import { flagged, inPlay, type ScenarioState } from "../core/state.ts";
 import { payUsage, usable, usageReason } from "./usage.ts";
 import { announcePlayerAbility } from "../families/deck/pressure.ts";
 
@@ -30,6 +30,8 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   if (!instance) return undefined;
   // A card whose printed text box is blank has none of its abilities (rr.blank).
   if (textBlank(state, instance.id, ctx.cards)) return undefined;
+  // A character that cannot trigger its effect cannot use its Actions (Sacked!, 02048:A:1).
+  if (flagged(state, instance.id, "cannotTriggerEffects")) return undefined;
   const effect = effectsOfCard(state, ctx, instance).find((entry) => entry.id === effectId && entry.timing === "action");
   // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
   // The campaign card next to the quest deck belongs to no player either, and its Action is any player's (11197:A:3, "Travel Action").

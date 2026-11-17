@@ -36,6 +36,7 @@ export type FrameName =
   | "reveal"
   | "hide"
   | "fortitude"
+  | "escape"
   | "whenRevealed"
   | "forced"
   | "shadow"
@@ -50,6 +51,9 @@ export type HideResult = { success: boolean; willpower: number; threat: number }
 
 // A finished Fortitude test (mec113.fortitude-tests): the committed heroes' total Willpower against the Sauron's Eye icons counted; it passes only when the Willpower is greater.
 export type FortitudeResult = { success: boolean; willpower: number; eyes: number };
+
+// A finished escape test (sotm.escape-test): the committed characters' total of the counted stat against the total Escape of the cards dealt; it passes only when the committed total is higher.
+export type EscapeResult = { success: boolean; committed: number; escape: number };
 
 // One instruction still to run, with the seat it runs for. `chosen` is the card a player picked for it.
 // `offset` is where ArrangeTop has got to in the deck.
@@ -121,6 +125,8 @@ export type EffectData = {
   hideFailed?: boolean;
   // The last Fortitude test this effect made (FortitudeTest; the `lastFortitudeFailed` and `lastFortitudePassed` conditions, families/mount-doom/conditions.ts).
   fortitude?: "failed" | "passed";
+  // The last escape test this effect made (EscapeTest; the `lastEscapeFailed` and `lastEscapePassed` conditions, families/escape/conditions.ts).
+  escape?: "failed" | "passed";
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -148,6 +154,22 @@ export type FortitudeData = {
   result: FortitudeResult | null;
 };
 
+// An escape test under way (families/escape/test.ts, sotm.escape-test). `stat`: the stat the committed characters count. `cards`: the cards to deal, read as the test was made. `seats`: the players who commit, in order, and `asked` how many have been asked
+// (a party test asks every player, one test for them all). `fresh`: the characters just committed, whose "after a character commits" Forced effects are still to resolve. `dealtIds`: the cards dealt, held out of the encounter discard pile until the total is read.
+// `escape`: their total Escape and what the table adds, read once they are dealt.
+export type EscapeData = {
+  kind: "escape";
+  stat: "willpower" | "attack" | "defense";
+  cards: number;
+  seats: readonly number[];
+  asked: number;
+  fresh: readonly string[];
+  committedIds: readonly string[];
+  dealtIds: readonly string[];
+  escape: number;
+  result: EscapeResult | null;
+};
+
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
@@ -171,9 +193,10 @@ export type FrameData =
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
   // effects of the card just revealed (Frodo Baggins). `discard`: and the card is discarded, not shuffled back (The Master Ring).
   // `guards`: the card is revealed as the guard of this objective (rr.guarded): it is attached to it as it is placed in the staging area. `engage`: an enemy found by a search is put into play engaged with the revealing seat instead (SearchReveal `to: engaged`).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; extraSurge?: number; surgeLeft?: number; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
   | HideData
   | FortitudeData
+  | EscapeData
   | EffectData;
 
 export type Frame = {
@@ -251,6 +274,8 @@ export type PendingAttack = {
   fromStaging?: boolean;
   // A shadow effect says the undefended damage of this attack goes on an active location (142035:A:2).
   toLocation?: boolean;
+  // A shadow effect says the undefended damage of this attack goes on one of these heroes (900408:A:3): the heroes the defending player may name.
+  onlyHeroes?: readonly string[];
   // The attack is made against the main quest card, or an effect says its undefended damage goes on it (19083:B:1, 19081:A:1): the damage of an undefended attack is placed on the quest card, not a hero (families/wilderland/night.ts).
   toStage?: boolean;
   // The damage beyond the remaining hit points of the defending character goes on the main quest card (19083:B:1, 19080:A:3).

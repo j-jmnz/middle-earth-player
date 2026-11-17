@@ -96,12 +96,14 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (effect.cost !== undefined) notes.push(`cost: ${renderCost(effect.cost, ctx)}`);
   if (effect.anyPlayer === true) notes.push("any player may use it");
   if (effect.answeredBy === "eventSeat") notes.push("answered by the player the event happened to");
+  if (effect.answeredBy === "guardian") notes.push("answered by the player guarding Gollum");
   if (effect.fromHand === true) notes.push("used from hand");
+  if (effect.fromVictory === true) notes.push("used from the victory display");
   if (effect.byEncounterDeck === true) notes.push("only when the encounter deck revealed it");
   if (effect.notFromDiscard === true) notes.push("not for a card found in the encounter discard pile");
   if (isObj(effect.cancel)) notes.push(`may be canceled by paying ${str(effect.cancel.cost)}`);
   if (isObj(effect.uncancelable)) notes.push(`cannot be canceled while ${renderCondition(effect.uncancelable, ctx)}`);
-  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "fromHand", "byEncounterDeck", "notFromDiscard", "cancel", "uncancelable", "condition", "instructions"]);
+  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "cancel", "uncancelable", "condition", "instructions"]);
   const lines = [`${str(effect.id)}: ${head}`];
   if (effect.condition !== undefined) lines.push(`  only if ${renderCondition(effect.condition, ctx)}`);
   const instructions = Array.isArray(effect.instructions) ? effect.instructions : [];

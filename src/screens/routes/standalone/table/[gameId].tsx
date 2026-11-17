@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 
 import { BodyText, NavBar, Screen } from "../../../kit/chrome";
-import { bookletParams, scenarioName } from "../../../data/campaign-data";
+import { bookletOf, scenarioName } from "../../../data/campaign-data";
 import { useDatabases } from "../../../data/databases";
 import { goBack } from "../../../nav/go-back";
 import { routeCode } from "../../../nav/route-code";
@@ -65,7 +65,7 @@ export default function StandaloneTableScreen() {
     backAccessibilityLabel: "Back to the scenarios",
     back: "/scenarios",
     outcome: { pathname: "/standalone/outcome/[gameId]", params: { gameId } },
-    booklet: bookletParams(session.stored.campaignId, session.stored.scenarioId),
+    booklet: bookletOf(session.stored.campaignId, session.stored.scenarioId),
   };
   return <TableView session={session} store={table.store} clock={table.clock} nav={nav} />;
 }

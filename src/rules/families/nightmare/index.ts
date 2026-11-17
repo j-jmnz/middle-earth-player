@@ -7,7 +7,7 @@ import type { CardRef, Effect, Instruction, PickSpec } from "../../../catalog/bo
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
-import { beginEnemyAttack } from "../../combat/combat.ts";
+import { beginEnemyAttack, characters } from "../../combat/combat.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import { attackBarred } from "../../interpret/constants.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -27,6 +27,7 @@ import { cancelsReveal } from "../encounter/cancel.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { engageOutOfPlay, moveResourceFromHeroes, placeResourceTokens, returnToStage, takeHeroPrisoner, takeMorePrisoners } from "./dungeon.ts";
+import { damageOncePerRound } from "./damage-once.ts";
 import { listenerInPlay } from "./guards.ts";
 import { seatThreat } from "../play/hooks.ts";
 import { markPicked } from "../play/refs.ts";
@@ -41,6 +42,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   switch (instruction.verb) {
     case "AttachToQuest":
       return attachToQuest(state, focus);
+    case "DamageOncePerRound":
+      return damageOncePerRound(state, instruction, focus, ctx, steps);
     case "SearchToStaging":
       return searchToStaging(state, instruction.code, ctx);
     case "AttackActor":
@@ -68,7 +71,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PickDiscardTop":
       return pickDiscardTop(state, instruction.types, ctx, instruction.trait);
     case "DealShadowFromDiscard":
-      return dealShadowFromDiscard(state, ctx);
+      return dealShadowFromDiscard(state, ctx, instruction.trait);
     case "EngageSeatWith":
       return engageSeatWith(state, instruction, focus, ctx, steps);
     case "PickMostHitPoints": {
@@ -92,7 +95,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "MoveResourceFromHeroes":
       return moveResourceFromHeroes(state, instruction.to, focus);
     case "PlaceResourceTokens":
-      return placeResourceTokens(state, instruction.on, instruction.amount, focus, ctx);
+      return placeResourceTokens(state, instruction.on, instruction.code, instruction.amount, focus, ctx);
     default:
       return null;
   }
@@ -226,11 +229,11 @@ export function topOfEncounterDiscard(state: ScenarioState, types: readonly stri
 
 // DealShadowFromDiscard: the topmost card of the encounter discard pile with a Shadow effect (a shadow record: every printed line has one) becomes
 // one more shadow card of the attacking enemy, face down; the attack resolves it after the ones it has (900107:A:3, rr.step-6-4-2).
-function dealShadowFromDiscard(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+function dealShadowFromDiscard(state: ScenarioState, ctx: ReduceContext, trait?: string): ScenarioState {
   const enemyId = state.pendingAttack?.enemyId;
   if (!enemyId || !state.cards[enemyId]) return state;
   const found = [...state.encounterDiscard].reverse().find((id) => {
-    return effectsOf(ctx, state.cards[id]?.code ?? "").some((effect) => effect.timing === "shadow");
+    return effectsOf(ctx, state.cards[id]?.code ?? "").some((effect) => effect.timing === "shadow") && (trait == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(trait));
   });
   return found ? updateCard(moveCard(state, found, { zone: "shadow", enemyId }), found, { face: "down", controller: null }) : state;
 }
@@ -241,7 +244,9 @@ function engageSeatWith(state: ScenarioState, instruction: Extract<Instruction, 
   const id = focus.sourceId;
   const enemy = id ? state.cards[id] : undefined;
   if (!id || !enemy || !inPlay(enemy.zone)) return state;
-  const seats = livingSeats(state).filter((seat) => (state.seats[seat]?.engaged ?? []).some((other) => other !== id && matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)));
+  const holds = (seat: number): boolean =>
+    instruction.controls === true ? characters(state, seat, ctx.cards).some((other) => matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)) : (state.seats[seat]?.engaged ?? []).some((other) => other !== id && matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx));
+  const seats = livingSeats(state).filter(holds);
   if (seats.length === 0 || (enemy.zone === "engaged" && enemy.controller != null && seats.includes(enemy.controller))) return state;
   const options = seats.map((seat) => `seat:${seat}`);
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
@@ -315,4 +320,4 @@ function pickMost(
   return markPicked(state, chosen ?? "");
 }
 
-export const manifest: RulesFamily = { name: "nightmare", verbs: ["AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens"], run };
+export const manifest: RulesFamily = { name: "nightmare", verbs: ["AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens", "DamageOncePerRound"], run };

@@ -22,6 +22,7 @@ import { runEncounterItem } from "./items.ts";
 import { countTop, discardUntil, effectData, encounterCard, lookAtTop, moveEncounter, pushPicked, shuffleDiscardIn, shuffleVictoryIn, travelThere } from "./moves.ts";
 import { answeredRaise } from "./reveal.ts";
 import { searchCollection } from "./collection.ts";
+import { returnFromDiscard } from "./returned.ts";
 import { queueFront } from "../play/refs.ts";
 import { freeSlot } from "../south/locations.ts";
 
@@ -31,7 +32,7 @@ const WATCH_STATS = { threatZero: "watchThreatZero", damage: "watchDamage", disc
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "LookAtTop":
-      return lookAtTop(state, instruction, focus.seat, ctx, focus.sourceId);
+      return lookAtTop(state, instruction, focus.seat, ctx, focus.sourceId, steps);
     case "PickEncounter":
     case "ArrangeEncounter":
     case "PayResources":
@@ -59,8 +60,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return searchCollection(state, instruction, focus, ctx, steps);
     case "ShuffleVictoryIntoEncounterDeck":
       return shuffleVictoryIn(state, ctx);
+    case "ReturnFromDiscard":
+      return returnFromDiscard(state, instruction, focus, ctx, steps);
     case "ShuffleEncounterDiscard":
-      return shuffleDiscardIn(state);
+      return shuffleDiscardIn(state, ctx, instruction.trait);
     case "DiscardUntil":
       return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait);
     case "ResolveWhenRevealed": {
@@ -129,4 +132,4 @@ export function addTableModifier(state: ScenarioState, modifier: Omit<Modifier, 
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", ...modifier }] };
 }
 
-export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "SearchCollection", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand"], run };
+export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand"], run };

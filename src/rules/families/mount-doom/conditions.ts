@@ -3,6 +3,7 @@ import type { Condition } from "../../../catalog/boundary.ts";
 
 import type { Scope } from "../../interpret/conditions.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 import { failedThisRound, lastFortitude } from "./failures.ts";
 
 /** True or false for the family's conditions, null for any other. */
@@ -14,6 +15,8 @@ export function fortitudeCondition(state: ScenarioState, condition: Condition, s
       return lastFortitude(state, "passed");
     case "fortitudeFailed":
       return failedThisRound(state, condition.who === "actor" ? scope.actor : null);
+    case "firstTreachery":
+      return scope.subject != null && flagged(state, scope.subject, "firstTreachery");
     case "hostControlledByActor": {
       const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
       return host != null && state.cards[host]?.controller === scope.actor;

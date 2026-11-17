@@ -30,11 +30,12 @@ import { pelennorQuestWords } from "./pelennor.ts";
 import { siegeProgressWords } from "./siege.ts";
 import { sailingReadout } from "./sea-readout.ts";
 import type { Sheet, SheetStat } from "../choice/sheet-types.ts";
+import { escapeNumbers } from "../choice/escape-notes.ts";
 import { choiceFor, type Choice } from "../choice/table-choice.ts";
 
 // `join` is the word between two numbers: "against" (willpower against threat), or "then" for the staging threat before and
 // after a travel.
-export type Readout = { kind: "quest" | "hide" | "fortitude" | "attack" | "defense" | "travel" | "sailing"; stats: readonly SheetStat[]; result: string | null; join?: string };
+export type Readout = { kind: "quest" | "hide" | "fortitude" | "escape" | "attack" | "defense" | "travel" | "sailing"; stats: readonly SheetStat[]; result: string | null; join?: string };
 
 const WILL = (value: number): SheetStat => ({ icon: "willpower", value, word: "Willpower" });
 const THREAT = (value: number): SheetStat => ({ icon: "threat", value, word: "Threat" });
@@ -105,6 +106,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
   // A Fortitude test: the Willpower of the heroes picked (then committed) against the Sauron's Eye icons already added (then counted).
   const fortitude = fortitudeNumbers(game, ctx, sheet?.kind === "multi" && sheet.build.kind === "CommitFortitude" ? (choice?.ids ?? []) : null);
   if (fortitude) return { kind: "fortitude", ...fortitude };
+  // An escape test: the stat of the characters committed so far, and the ones picked now, against the cards dealt next.
+  const escape = escapeNumbers(game, ctx, sheet?.kind === "multi" && sheet.build.kind === "CommitEscape" ? (choice?.ids ?? []) : null);
+  if (escape) return { kind: "escape", ...escape };
   // An enemy attacks: its attack against the defender picked or declared, or all of it on an undefended hero.
   const attack = game.pendingAttack;
   if (attack) {

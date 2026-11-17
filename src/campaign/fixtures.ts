@@ -53,15 +53,23 @@ import ettenmoorsFixtures from "./fixtures/across-the-ettenmoors.json";
 import rhudaurFixtures from "./fixtures/the-treachery-of-rhudaur.json";
 import dumFixtures from "./fixtures/the-battle-of-carn-dum.json";
 import realmFixtures from "./fixtures/the-dread-realm.json";
+import gollumFixtures from "./fixtures/the-hunt-for-gollum.json";
+import carrockFixtures from "./fixtures/conflict-at-the-carrock.json";
+import rhosgobelFixtures from "./fixtures/a-journey-to-rhosgobel.json";
+import muilFixtures from "./fixtures/the-hills-of-emyn-muil.json";
+import deadmarshesFixtures from "./fixtures/the-dead-marshes.json";
+import returnmirkwoodFixtures from "./fixtures/return-to-mirkwood.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 
-import { FIXTURE_REGISTRY, type FixtureName, type FixtureScenarioId } from "./fixtures/registry.ts";
+import { FIXTURE_REGISTRY, fixtureKindOf, type FixtureName, type FixtureScenarioId } from "./fixtures/registry.ts";
+import { parseStandaloneLoadout, type StandaloneGame, type StandaloneLoadout } from "./standalone.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { FELLOWSHIP_ID, parseLoadout, parseLog, parseSeatCount, type Save, type StoredLoadout } from "./save.ts";
 
 export type { FixtureName };
+export { fixtureKindOf };
 
 // `past`: the scenario 1 fixture and the Resolution answers whose log this fixture starts from.
 export type Fixture = { campaignId: string; seatCount: 1 | 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: FixtureName; choices: string[] } | null };
@@ -122,6 +130,12 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-treachery-of-rhudaur": rhudaurFixtures,
   "the-battle-of-carn-dum": dumFixtures,
   "the-dread-realm": realmFixtures,
+  "the-hunt-for-gollum": gollumFixtures,
+  "conflict-at-the-carrock": carrockFixtures,
+  "a-journey-to-rhosgobel": rhosgobelFixtures,
+  "the-hills-of-emyn-muil": muilFixtures,
+  "the-dead-marshes": deadmarshesFixtures,
+  "return-to-mirkwood": returnmirkwoodFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
@@ -139,6 +153,7 @@ export function hasFixture(name: FixtureName): boolean {
 export function fixture(name: FixtureName): Fixture {
   const stored = STORED[name];
   if (!stored) throw new Error(`Fixture ${name} is not committed`);
+  if (fixtureKindOf(name) === "standalone") throw new Error(`Fixture ${name} is a standalone game: read it with standaloneFixture`);
   const loadout = parseLoadout(stored.loadout);
   if (!loadout) throw new Error(`Fixture ${name} has no loadout`);
   const seatCount = parseSeatCount(stored.seatCount);
@@ -158,5 +173,33 @@ export function fixtureSave(name: FixtureName, id: string, dataHash: number): Sa
     log: found.log,
     active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: [...found.intents] },
     loadout: found.loadout,
+  };
+}
+
+/** What a standalone fixture stores: the cycle, the seat count, the loadout the briefing deals (no log, no choices), the seed and the intents that reach the moment. */
+export type StandaloneFixture = { campaignId: string; seatCount: 1 | 2; loadout: StandaloneLoadout; seed: number; intents: PlayerIntent[] };
+
+/** The stored game of a standalone fixture (a scenario of a cycle). */
+export function standaloneFixture(name: FixtureName): StandaloneFixture {
+  const stored = STORED[name];
+  if (!stored) throw new Error(`Fixture ${name} is not committed`);
+  if (fixtureKindOf(name) !== "standalone") throw new Error(`Fixture ${name} is a campaign save: read it with fixture`);
+  const loadout = parseStandaloneLoadout(stored.loadout);
+  if (!loadout) throw new Error(`Fixture ${name} has no loadout`);
+  if (stored.campaignId === undefined) throw new Error(`Fixture ${name} names no cycle`);
+  return { campaignId: stored.campaignId, seatCount: parseSeatCount(stored.seatCount), loadout, seed: stored.seed, intents: stored.intents as PlayerIntent[] };
+}
+
+/** A new standalone game holding the fixture's open scenario, stamped with this build's engine version and catalog version. */
+export function fixtureStandalone(name: FixtureName, id: string, dataHash: number): StandaloneGame {
+  const found = standaloneFixture(name);
+  return {
+    id,
+    campaignId: found.campaignId,
+    scenarioId: found.loadout.scenarioId,
+    seatCount: found.seatCount,
+    loadout: found.loadout,
+    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: [...found.intents] },
+    result: null,
   };
 }

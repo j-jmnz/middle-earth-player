@@ -40,8 +40,8 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142021:B:2 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
   142021:forced:1: Forced after an enemy engages a player
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) chosen by the first player [also {"active":true}]
-    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
+    - choose location (any player controls) chosen by the first player, that is the active location
+    - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 ## 142022 The Hunt is Up!
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -59,13 +59,13 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142022:B:2 (back): Forced: After a location enters play, place 1 damage on it.
   142022:forced:1: Forced on the event encounterEnteredPlay (heard about location (any player controls))
-    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"subject"}]
+    - place 1 damage token(s) on the card the event is about (placed, not dealt: nothing cancels or reduces them)
 
 142022:B:3 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
   142022:forced:2: Forced after an enemy engages a player
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) chosen by the first player [also {"active":true}]
-    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
+    - choose location (any player controls) chosen by the first player, that is the active location
+    - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 ## 142023 The Gates of Moria
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -85,8 +85,8 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142023:B:2 (back): Forced: After an enemy engages a player, place 1 damage on each active location.
   142023:forced:1: Forced after an enemy engages a player
-    - for each location (any player controls) [also {"active":true}]:
-      - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
+    - for each location (any player controls) that is the active location:
+      - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 142023:B:3 (back): If Doors of Durin is explored, the players win the game.
   142023:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about location (any player controls) named "Doors of Durin")
@@ -147,16 +147,16 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142027:A:1 (front): Forced: When Howling Warg attacks, place 1 damage on an active location.
   142027:forced:1: Forced when this enemy attacks, before the defender is declared
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) chosen by the first player [also {"active":true}]
-    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
+    - choose location (any player controls) chosen by the first player, that is the active location
+    - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 142027:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 damage on an active location.
   142027:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player [also {"active":true}]
-      - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked","when":{"kind":"x","min":1}}]
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player, that is the active location
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 ## 142028 Crebain from Dunland
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -267,8 +267,8 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142035:A:1 (front): When Revealed: Place 3 damage on each active location.
   142035:whenRevealed:1: When revealed
-    - for each location (any player controls) [also {"active":true}]:
-      - [json PlaceDamage {"verb":"PlaceDamage","amount":3,"card":"picked"}]
+    - for each location (any player controls) that is the active location:
+      - place 3 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 142035:A:2 (shadow): Shadow: Undefended damage from this attack must be assigned to the active location.
   142035:shadow:1: Shadow
@@ -327,10 +327,10 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142084:A:2 (front): When Revealed: Attach to a non-Fellowship hero in play. Counts as a Condition attachment with the text: "Forced: After The One Ring exhausts, raise each player's threat by 1 and reduce attached hero's Willpower to 0 until the end of the round."
   142084:whenRevealed:1: When revealed
-    - attach this card to a hero
+    - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   142084:forced:1: Forced on the event exhausted (heard about card (any player controls) named "The One Ring")
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
     - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
 
-(rendered pieces: 168 by template, 27 as JSON)
+(rendered pieces: 182 by template, 14 as JSON)

@@ -82,7 +82,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01108:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Gandalf's Map to a hero you control. (Counts as an attachment. If detached, return Gandalf's Map to the staging area.)
   01108:action:1: Action (cost: raise your threat by 2)
-    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -104,7 +104,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01109:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Dungeon Torch to a hero you control. (Counts as an attachment. If detached, return Dungeon Torch to the staging area.)
   01109:action:1: Action (cost: raise your threat by 2)
-    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -125,7 +125,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01110:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Shadow Key to a hero you control. (Counts as an attachment. If detached, return Shadow Key to the staging area.)
   01110:action:1: Action (cost: raise your threat by 2)
-    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -157,7 +157,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01123:B:3 (back): Players cannot advance to the next stage of this quest unless they have at least 1 objective card.
   01123:constant:2: Constant
-    only if the number of objective (any player controls) [also {"attached":true}] is at most 0
+    only if the number of objective (any player controls) that is attached to another card is at most 0
     - the players cannot defeat this stage while this holds
 
 ## 01124 Through the Caverns
@@ -174,7 +174,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01124:B:3 (back): Players cannot advance to the next stage of this quest unless they have rescued the prisoner and have all 3 "Escape from Dol Guldur" objective cards.
   01124:constant:2: Constant
-    only if any of: ([json condition {"kind":"prisoner","is":true}]) or (the number of objective (any player controls) [also {"attached":true}] is at most 2)
+    only if any of: ([json condition {"kind":"prisoner","is":true}]) or (the number of objective (any player controls) that is attached to another card is at most 2)
     - the players cannot defeat this stage while this holds
 
 ## 01125 Out of the Dungeons
@@ -212,7 +212,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01131:B:1 (back): Response: After the first objective is claimed, flip Mendor face-up and place 1 damage token on him.
   01131:response:1: Response on the event claimed (heard about objective (any player controls); limit once per game)
-    only if all of: (this card shows side B) and (the number of objective (any player controls) [also {"attached":true}] is at most 1)
+    only if all of: (this card shows side B) and (the number of objective (any player controls) that is attached to another card is at most 1)
     - [json FreeCaptive {"verb":"FreeCaptive","code":"01135","damage":1}]
 
 01131:B:2 (back): Resolution: Determine one of the following: 1) If Mendor is still in play, add Mendor to the Campaign Pool. If you do, put Mendor into play at the start of each scenario during your next campaign. Each player may include 1 copy of Mendor's Support in their deck during that campaign. 2) If Mendor is not in play, do not adjust the Campaign Pool for your next campaign.
@@ -221,4 +221,4 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - [json CarryOver {"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}}]
     - [json CarryOver {"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]
 
-(rendered pieces: 118 by template, 24 as JSON)
+(rendered pieces: 124 by template, 18 as JSON)

@@ -9,7 +9,7 @@ import type { Card } from "../../../../src/catalog/card-facts.ts";
 import { EFFECTS } from "../../../../src/effects/index.ts";
 import type { Log } from "../../../log.ts";
 import { loadCards } from "../../load-cards.ts";
-import { dealtCodes, loadCampaigns, loadScenario } from "../../load-scenarios.ts";
+import { dealtCodes, loadCampaigns, loadAnyScenario } from "../../load-scenarios.ts";
 import { ROOT } from "../../paths.ts";
 import { keyOf, lineId, loadLedger } from "../../printed/ledger.ts";
 import { withPool } from "../../printed/pool.ts";
@@ -73,7 +73,7 @@ export function renderCodes(env: RenderEnv, codes: readonly string[], piles: Rea
 
 // A scenario's cards: the ones its authored file has records for (every dealt card with `allDealt`, or when it has no authored file).
 export async function renderScenario(env: RenderEnv, scenarioId: string, allDealt: boolean, log: Log): Promise<Rendered> {
-  const scenario = loadScenario(scenarioId);
+  const scenario = loadAnyScenario(scenarioId);
   const dealt = [...dealtCodes(loadCampaigns(), [scenario])];
   const owned = allDealt ? null : await authoredCodes(scenario.id, log);
   const codes = dealt.filter((code) => owned === null || owned.has(code)).sort();

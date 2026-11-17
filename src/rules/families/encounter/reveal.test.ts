@@ -127,6 +127,31 @@ describe("Responses to a card just revealed", () => {
   });
 });
 
+describe("separate instances of surge (rr.surge)", () => {
+  const gains = (id: string) => ({ instanceId: id, sourceId: "x", stat: "gainsSurge" as const, amount: 1, until: "endOfRound" as const });
+
+  it("reveals two additional cards for a card with printed Surge that gains surge", () => {
+    const built = deck(seat().state, ["gust", "ford", "marsh", "orc"]);
+    const done = stage({ ...built.state, modifiers: [gains(built.ids[0] ?? "")] });
+    expect(codes(done, done.staging)).toEqual(["ford", "marsh"]);
+    expect(codes(done, done.encounterDeck)).toEqual(["orc"]);
+  });
+
+  it("reveals two additional cards for a card granted surge twice", () => {
+    const built = deck(seat().state, ["ford", "marsh", "keep", "orc"]);
+    const done = stage({ ...built.state, modifiers: [gains(built.ids[0] ?? ""), gains(built.ids[0] ?? "")] });
+    expect(codes(done, done.staging)).toEqual(["ford", "marsh", "keep"]);
+    expect(codes(done, done.encounterDeck)).toEqual(["orc"]);
+  });
+
+  it("reveals one additional card for one instance", () => {
+    const built = deck(seat().state, ["gust", "ford", "marsh"]);
+    const done = stage(built.state);
+    expect(codes(done, done.staging)).toEqual(["ford"]);
+    expect(codes(done, done.encounterDeck)).toEqual(["marsh"]);
+  });
+});
+
 describe("lasting effects that watch the reveals (rr.lasting-effects)", () => {
   it("discards the next card revealed after a surge card, of the type named, without resolving it (Minas Tirith Lampwright, 06061:A:1)", () => {
     const built = deck(withThreat(seat().state, 0, 20), ["gust", "mist", "orc"]);

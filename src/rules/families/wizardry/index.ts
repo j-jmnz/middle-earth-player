@@ -9,7 +9,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { cancelPhaseProgress } from "./progress.ts";
+import { cancelPhaseProgress, questProgressNoted } from "./progress.ts";
 import { activeHasWizardry, triggerWizardry } from "./trigger.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -25,6 +25,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 // "If no Wizardry effect is triggered this way" (143062:A:1): the active location prints none, or there is no active location.
 function condition(state: ScenarioState, found: Condition, seat: number, ctx: ReduceContext): boolean | null {
+  if (found.kind === "questProgressNoted") return questProgressNoted(state) === found.is;
   return found.kind === "hasWizardry" ? activeHasWizardry(state, seat, ctx) : null;
 }
 

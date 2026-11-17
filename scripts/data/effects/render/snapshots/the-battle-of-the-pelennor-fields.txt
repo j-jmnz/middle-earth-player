@@ -239,7 +239,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145055:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json EngageShadowCard {"verb":"EngageShadowCard","when":{"kind":"inPlay","code":"145043","is":true}}]
-    - [json DealShadow {"verb":"DealShadow","when":{"kind":"sourceIn","zone":"engaged"}}]
+    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
 
 ## 145056 The Rammas is Breached
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 307 by template, 44 as JSON)
+(rendered pieces: 309 by template, 43 as JSON)

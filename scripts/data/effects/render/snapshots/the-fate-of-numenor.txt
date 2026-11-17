@@ -4,7 +4,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 110013:A:1 (front): The first player gains control of Calphon.
   110013:constant:1: Constant
-    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+    - this card is controlled by the first player while this holds
 
 110013:A:2 (front): Action: Exhaust Calphon to look at the bottom card of your deck. Then, you may switch that card with a card in your hand.
   110013:action:1: Action (cost: exhaust this card)
@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 110013:B:2 (back): The first player gains control of Calphon.
   110013:constant:2: Constant
-    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+    - this card is controlled by the first player while this holds
 
 110013:B:3 (back): Action: Exhaust Calphon to look at the bottom 5 cards of your deck. Then, you may switch one of them with a card in your hand.
   110013:action:2: Action (cost: exhaust this card)
@@ -128,7 +128,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11028:A:1 (front): The first player gains control of Calphon.
   11028:constant:1: Constant
-    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+    - this card is controlled by the first player while this holds
 
 11028:A:2 (front): Action: Exhaust Calphon to look at the bottom card of your deck. Then, you may switch that card with a card in your hand.
   11028:action:1: Action (cost: exhaust this card)
@@ -151,7 +151,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11029:A:1 (front): Forced: When Servant of the Deceiver engages you, look at the top card of your deck. If its printed cost is 2 or less, place it on the bottom of your deck and Servant of the Deceiver gets +2 Attack until the end of the round.
   11029:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json LookAtTop {"verb":"LookAtTop","count":1,"deck":"own"}]
+    - the acting player looks at the top 1 card(s) of their own deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - then, if the picked card is a card (any player controls) [also {"maxCost":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (only from deck) goes to the bottom of its owner's deck
     - then, if the picked card is a card (any player controls) [also {"maxCost":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, until the end of the round
 
@@ -463,4 +463,4 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11179:resolution:5: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 202 by template, 77 as JSON)
+(rendered pieces: 206 by template, 73 as JSON)

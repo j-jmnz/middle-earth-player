@@ -1,0 +1,296 @@
+{
+  "id": "the-hills-of-emyn-muil",
+  "name": "The Hills of Emyn Muil",
+  "number": 4,
+  "stages": [
+    "02082"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Hills of Emyn Muil",
+      "count": 29
+    },
+    {
+      "name": "Dol Guldur Orcs",
+      "count": 14
+    },
+    {
+      "name": "Sauron's Reach",
+      "count": 10
+    }
+  ],
+  "cards": [
+    {
+      "code": "02085",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "02086",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02087",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02088",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02089",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02090",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "02091",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02092",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "02093",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "02094",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01089",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "01090",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "01091",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01092",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01093",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01094",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01095",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01115",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01116",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01117",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01118",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "02082",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "02083",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "02084",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q01.7",
+    "dragnEasy": "E01.7",
+    "hobSlug": "The-Hills-of-Emyn-Muil"
+  },
+  "nightmare": {
+    "setupCard": "900701",
+    "removed": [
+      {
+        "code": "01089",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01090",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01091",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01093",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01094",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01095",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01116",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01117",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02085",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02086",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "02088",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02090",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "02091",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "02093",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900702",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900703",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900704",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900705",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900706",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900707",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900708",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900709",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

@@ -277,7 +277,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if all of: (the card the event is about had enough progress to be explored) and (there is a card (any player controls) [also {"burden":true}] to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (any player controls) [also {"burden":true}]
-    - [json RemoveFromGame {"verb":"RemoveFromGame"}]
+    - the last picked card is removed from the game
     - shuffle the encounter deck
 
 ## 142075 The Argonath
@@ -401,7 +401,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142083:A:1 (front): When Revealed: Attach to a non-Fellowship hero and move it to the first player's staging area. (Counts as a Condition attachment with the text: "Attached hero loses the hero card type and gains the enemy card type with Threat equal to its Willpower and engagement cost equal to its threat cost. If Fallen into Evil is discarded, return attached hero to its owner's control.")
   142083:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - attach this card to a hero
+    - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
     - [json FallIntoEvil {"verb":"FallIntoEvil"}]
   142083:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
@@ -433,4 +433,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 198 by template, 48 as JSON)
+(rendered pieces: 199 by template, 47 as JSON)

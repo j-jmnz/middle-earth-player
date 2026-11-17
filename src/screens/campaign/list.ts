@@ -23,6 +23,12 @@ export function scenarioWords(count: number): string {
   return `${count} ${count === 1 ? "scenario" : "scenarios"}`;
 }
 
+// The Campaigns tab's New playthrough tiles: the campaigns the catalog marks playable. A cycle (Shadows of Mirkwood) has no Campaign Mode and is played from the
+// Scenarios tab, so it never offers a new playthrough, playable or not.
+export function startableRows(rows: readonly CampaignRow[]): CampaignRow[] {
+  return rows.filter((row) => row.playable && row.kind === "campaign");
+}
+
 // The Campaigns tab's locked tiles: the campaigns no scenario of is playable yet, named as campaigns. Locking hides no card.
 export function lockedCampaignTiles(rows: readonly CampaignRow[]): LockedTile[] {
   return rows

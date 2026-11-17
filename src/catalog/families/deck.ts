@@ -40,6 +40,8 @@ const VERBS = [
   // The actor's hand (but the source card) is shuffled into their deck. The effect's X becomes how many cards that was ("Count
   // the number of cards in your hand and shuffle your hand into your deck. Then, draw an equal number of cards").
   z.strictObject({ verb: z.literal("ShuffleHandIntoDeck"), ...when }),
+  // Every card in the actor's discard pile leaves the game ("remove all cards in that player's discard pile from the game", 900908:A:1; sotm.removed-from-game): a hero among them goes with the rest, and the cards are announced to nothing.
+  z.strictObject({ verb: z.literal("RemoveDiscardFromGame"), ...when }),
   // The top `amount` cards of the actor's deck (shuffled first with `shuffle`) go to their discard pile, each announced as
   // discarded from the deck, and become the cards the effect looked at (a Pick with `looked` chooses among them). With
   // `count`, the effect's X becomes how many of them match it (read with the X the effect had, for `costIsX`) and whose printed

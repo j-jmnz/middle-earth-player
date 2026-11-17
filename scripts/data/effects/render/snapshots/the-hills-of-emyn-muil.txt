@@ -1,0 +1,154 @@
+Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn Muil; staging: 02083 Amon Hen; staging: 02084 Amon Lhaw)
+
+## 02082 The Hills of Emyn Muil
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+02082:A:1 (front): Setup: Search the encounter deck for Amon Hen and Amon Lhaw, and add them to the staging area. Then shuffle the encounter deck.
+  02082:setup:1: Setup
+    - shuffle the encounter deck
+
+02082:B:1 (back): Forced: If there are no location cards in the staging area, the first treachery card revealed during the quest phase gains surge.
+  02082:forced:1: Forced after a card is revealed (heard about treachery (any player controls); only when the encounter deck revealed it)
+    only if all of: (it is the Quest phase) and (the card the event is about is the first treachery the encounter deck revealed this quest phase) and (the number of location (any player controls) in the staging area only is at most 0)
+    - the card just revealed gains surge
+
+02082:B:2 (back): Players cannot defeat this stage until there are no Emyn Muil locations in play, and they have collected at least 20 victory points.
+  02082:constant:2: Constant
+    only if there is a Emyn Muil location (any player controls) to choose
+    - the players cannot defeat this stage while this holds
+  02082:constant:3: Constant
+    only if not (the victory display holds at least 20 Victory points)
+    - the players cannot defeat this stage while this holds
+
+## 02083 Amon Hen
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+02083:A:1 (front): X is double the number of players in the game.
+  02083:constant:1: Constant
+    - this card: stat threat the number of players x 2, while this card is in play
+
+02083:A:2 (front): While Amon Hen is the active location, players cannot play events.
+  02083:constant:2: Constant
+    only if this card is the active location
+    - no player can play, or put into play, a card (any player controls) of card type event
+
+## 02084 Amon Lhaw
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+02084:A:1 (front): X is double the number of players in the game.
+  02084:constant:1: Constant
+    - this card: stat threat the number of players x 2, while this card is in play
+
+02084:A:2 (front): While Amon Lhaw is the active location, treat all attachments as if their printed text boxes were blank.
+  02084:constant:2: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each attachment (any player controls): stat blankText (its text box is blank) 1, while this card is in play
+    - each attachment (any player controls): stat blanksTraits 1, while this card is in play
+
+## 02085 The East Wall of Rohan
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02085:A:1 (front): While The East Wall of Rohan is the active location, non-Rohan characters cost 2 additional matching resources to play.
+  02085:constant:1: Constant
+    only if this card is the active location
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) without Rohan, of card type ally costs 2 more (every player's; several such cards stack)
+
+## 02086 The North Stair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02086:A:1 (front): Forced: After traveling to The North Stair, move the top card of the encounter discard pile to the staging area. Resolve any "when revealed" effects on that card.
+  02086:forced:1: Forced after the players travel (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter discard pile goes to the staging area (it is not revealed)
+    - the When Revealed effects of the picked card resolve as if it had just been revealed
+
+## 02087 Rauros Falls
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02087:A:1 (front): While Rauros Falls is the active location, all characters must commit to the current quest during the quest phase.
+  02087:constant:1: Constant
+    only if this card is the active location
+    - each character (any player controls): stat mustCommit (in the quest phase its controller cannot pass the commitment while it is able to commit and has not) 1, while this card is in play
+
+02087:A:2 (shadow): Shadow: After this attack resolves, return attacking enemy to the staging area.
+  02087:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 02088 The Shores of Nen Hithoel
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02088:A:1 (front): Travel: The first player must discard 1 event card from his hand to travel to this location.
+  02088:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (you control) in hand, of card type event, chosen by the first player
+    - discard the picked card
+
+02088:A:2 (shadow): Shadow: After this attack resolves, return attacking enemy to the staging area.
+  02088:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 02089 The Outer Ridge
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02089:A:1 (front): While The Outer Ridge is the active location, each location in the staging area gets +1 Threat.
+  02089:constant:1: Constant
+    only if this card is the active location
+    - each location (any player controls) in the staging area only: stat threat 1, while this card is in play
+
+02089:A:2 (shadow): Shadow: After this attack resolves, return attacking enemy to the staging area.
+  02089:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 02090 The Highlands
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02090:A:1 (front): Travel: In order to travel to The Highlands, the players must reveal the top card of the encounter deck, and add it to the staging area.
+  02090:travel:1: Travel
+    - the first player reveals an encounter card
+
+## 02091 Impassable Chasm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02091:A:1 (front): When Revealed: If there is an active location, remove all progress tokens from that location and return it to the staging area. If no location is moved by this effect, this card gains surge.
+  02091:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a location (any player controls) that is the active location to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - remove all the progress from the active location
+    - return the active location to the staging area
+
+## 02092 Rockslide
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02092:A:1 (front): When Revealed: Deal 2 damage to each character committed to this quest.
+  02092:whenRevealed:1: When revealed
+    - deal 2 damage to each character (any player controls) committed to the quest
+
+02092:A:2 (shadow): Shadow: Remove defending character from combat. This attack is considered undefended.
+  02092:shadow:1: Shadow
+    - this attack is considered undefended
+
+## 02093 Slick Footing
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02093:A:1 (front): When Revealed: Remove 1 progress token from each location in play. Then, discard the top card of each player's deck for each progress token removed by this effect.
+  02093:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - remove up to 1 progress from each location (any player controls) (the number of tokens removed in all is the effect's X)
+    - for each player, first player first:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the top X card(s) of the acting player's deck go to their discard pile
+
+## 02094 Orc Horse Thieves
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+02094:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+02094:A:2 (front): Orc Horse Thieves get +1 Attack for each location in the staging area.
+  02094:constant:1: Constant
+    - this card: stat attack the number of location (any player controls) in the staging area only, while this card is in play
+
+(rendered pieces: 87 by template, 0 as JSON)

@@ -19,14 +19,14 @@ import { authoredFileNames, authoredOrder, renderAuthoredBarrel } from "../data/
 import { ROOT } from "../data/paths.ts";
 import { openLines } from "../data/effects/open-lines.ts";
 import { OPEN_LINES } from "../../src/effects/open-lines.ts";
-import { dealtCodes, loadCampaign, loadCampaigns, loadCampaignsInOrder, loadScenarios, nightmareCodes, starterCodes } from "../data/load-scenarios.ts";
+import { dealtCodes, loadCampaign, loadCampaigns, loadCampaignsInOrder, loadLedgeredScenarios, nightmareCodes, starterCodes } from "../data/load-scenarios.ts";
 
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
 // `lines`, by a keyword the engine reads (a line that is only keywords), or by an `inert` entry in the printed-text
 // ledger (data/printed). Every record names lines that exist and belong to its own card. A line no template reads
 // is listed by `pnpm effects draft` for an agent to author.
 const cards = loadCards();
-const scenarios = loadScenarios();
+const scenarios = loadLedgeredScenarios();
 const campaign = loadCampaign();
 const ledger = loadLedger();
 // The box ledger plus the pool's lines (every deck-legal player card outside the box, from its source text).
@@ -85,6 +85,12 @@ describe("effect coverage", () => {
       }
     });
   }
+
+  // A seeded entry (`pnpm data ledger-seed`) has no reader until its lines are read against the scan.
+  it("reads every ledger entry of a playable scenario's cards against its scan", () => {
+    const unread = ledger.entries.filter((entry) => dealt.has(entry.code) && entry.readBy.trim() === "").map((entry) => keyOf(entry.code, entry.side));
+    expect(unread).toEqual([]);
+  });
 
   // A scenario with every line owned waits for PLAYABLE only until its golden is pinned: while golden.test.ts exists and golden.json does not
   // (the records are done and the game is being played), it may be absent; once golden.json exists it must be listed.

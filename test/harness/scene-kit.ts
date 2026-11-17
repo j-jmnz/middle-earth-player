@@ -182,7 +182,7 @@ function undefendedOn(state: ScenarioState, lands: Readonly<Record<string, strin
 
 export type FightTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string };
 // `lands`: for an attacker's code, the code of the card its undefended attack must land on when a card sends its damage elsewhere (Mordor Orc's goes to Minas Tirith, 145055:A:2); the defender (a hero) for any other attacker.
-export type FightOptions<T> = { undefended?: boolean; lands?: Readonly<Record<string, string>>; defender?: (made: T) => string; pick?: (state: ScenarioState) => string; tweak?: (state: ScenarioState, made: T) => ScenarioState };
+export type FightOptions<T> = { undefended?: boolean; escape?: readonly string[]; lands?: Readonly<Record<string, string>>; defender?: (made: T) => string; pick?: (state: ScenarioState) => string; tweak?: (state: ScenarioState, made: T) => ScenarioState };
 export type Fight<T> = { run: Run; ctx: ReduceContext; made: T; start: ScenarioState; during: ScenarioState };
 
 /**
@@ -233,6 +233,11 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
     }
     if (window?.kind === "choose") {
       run = send(run, { type: "Choose", optionId: options.pick?.(run.state) ?? window.options[0] ?? "" }, made.ctx);
+      continue;
+    }
+    // An escape test a Shadow effect makes: the characters of `escape` (codes) commit, the others do not.
+    if (window?.kind === "escapeCommit") {
+      run = send(run, { type: "CommitEscape", cardIds: (options.escape ?? []).map((code) => idOf(run.state, code)).filter((id) => legalTargets(run.state, { type: "CommitEscape" }, made.ctx).includes(id)) }, made.ctx);
       continue;
     }
     if (window?.kind === "look") {
