@@ -206,7 +206,7 @@ Read the sections your task touches.
     - 378–381 Table opens stale (~750) ← 4
     - 382–395 Resolution and standalone outcome (~1.9K) ← 2
     - 396–405 Decks (~920) ← 2
-    - 406–415 Deck builder (deck editor) (~1.0K) ← 3
+    - 406–415 Deck builder (deck editor) (~1.1K) ← 3
     - 416–425 Card pool (the Cards tab) (~910) ← 3
     - 426–431 Card (~490) ← 2
     - 432–437 Packs and pack cards (~170)
