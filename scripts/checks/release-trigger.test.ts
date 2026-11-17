@@ -39,3 +39,81 @@ describe("release trigger", () => {
     expect(releasing.map((file) => path.basename(file))).toEqual([]);
   });
 });
+
+// The release workflow's desktop jobs (docs/releasing.md, Jobs). Read as text, with no YAML dependency: a job is the lines from its two-space key to the next one.
+function jobs(file: string): Map<string, string> {
+  const lines = readFileSync(file, "utf8").split("\n");
+  const out = new Map<string, string>();
+  let name: string | undefined;
+  let inJobs = false;
+  for (const line of lines) {
+    if (/^jobs:\s*$/.test(line)) inJobs = true;
+    else if (inJobs && /^\S/.test(line)) inJobs = false;
+    const key = inJobs ? /^ {2}([a-z][a-z0-9_-]*):\s*$/.exec(line)?.[1] : undefined;
+    if (key) {
+      name = key;
+      out.set(name, "");
+    } else if (name && inJobs) out.set(name, `${out.get(name)}${line}\n`);
+  }
+  return out;
+}
+
+describe("release.yml desktop jobs", () => {
+  const all = jobs(path.join(GITHUB, "release.yml"));
+
+  // publish waits on `checks` (test.yml), so a desktop job there would let a desktop failure hold back the phone builds.
+  it("runs no desktop check inside the checks the phone builds wait on", () => {
+    const checks = jobs(path.join(GITHUB, "test.yml"));
+    expect(all.get("checks")).toContain("uses: ./.github/workflows/test.yml");
+    expect(all.get("publish")).toContain("needs.checks.result == 'success'");
+    for (const [name, body] of checks) if (/desktop/.test(name)) expect(body, name).toMatch(/^ {4}if: github\.event_name != 'workflow_dispatch'$/m);
+  });
+
+  it("has the web export, the three-OS desktop build and a publish that waits for it", () => {
+    expect([...all.keys()]).toEqual(expect.arrayContaining(["plan", "checks", "assets", "android", "ios", "web", "desktop", "cleanup", "publish"]));
+    expect(all.get("desktop")).toMatch(/needs: \[plan, web\]/);
+    for (const os of ["ubuntu-latest", "macos-latest", "windows-latest"]) expect(all.get("desktop")).toContain(os);
+    expect(all.get("publish")).toMatch(/needs: \[[^\]]*\bdesktop\b/);
+    expect(all.get("cleanup")).toMatch(/needs: \[[^\]]*\bdesktop\b/);
+    expect(all.get("publish")).toContain("pattern: desktop-*");
+  });
+
+  it("lets a failed desktop build leave the phone release alone, and still cleans up", () => {
+    const publish = all.get("publish") ?? "";
+    const cond = /^\s*if: (.*)$/m.exec(publish)?.[1] ?? "";
+    expect(cond).toContain("!cancelled()");
+    expect(cond).toContain("!inputs.dry_run");
+    for (const job of ["plan", "checks", "assets", "android", "ios"]) expect(cond, job).toContain(`needs.${job}.result == 'success'`);
+    expect(cond).not.toMatch(/needs\.(desktop|web)\.result == 'success'/);
+    expect(publish).toContain("needs.desktop.result == 'success'");
+    expect(publish).toContain("--desktop-missing");
+    expect(all.get("cleanup")).toContain("if: ${{ !cancelled() }}");
+    // TestFlight follows publish alone: the implicit success() would skip it when the desktop build failed.
+    const tfCond = /^\s*if: (.*)$/m.exec(all.get("testflight") ?? "")?.[1] ?? "";
+    expect(tfCond).toContain("!cancelled()");
+    expect(tfCond).toContain("needs.publish.result == 'success'");
+  });
+
+  it("starts the web export beside the assets job and waits for it, as the native builds do", () => {
+    for (const job of ["web", "android", "ios"]) expect(all.get(job), job).toContain(".github/scripts/wait-for-assets.sh");
+    expect(all.get("web")).toMatch(/needs: \[plan\]/);
+  });
+
+  it("downloads Electron's binary in the desktop job only", () => {
+    for (const [name, body] of all) {
+      if (name === "desktop") expect(body).not.toContain("ELECTRON_SKIP_BINARY_DOWNLOAD");
+      else if (/(uses: \.\/\.github\/actions\/(install|pack-assets)|pnpm install)/.test(body)) expect(body, name).toContain('ELECTRON_SKIP_BINARY_DOWNLOAD: "1"');
+    }
+  });
+
+  it("checks the installers, launches the packed app and keeps every OS's files for the release", () => {
+    const desktop = all.get("desktop") ?? "";
+    expect(desktop).toContain("pnpm desktop pack --skip-build");
+    expect(desktop).toContain("pnpm --silent desktop stage");
+    expect(desktop).toContain("pnpm desktop smoke --app");
+    expect(desktop).toContain("--require-bundle");
+    expect(desktop).toContain("name: desktop-${{ matrix.os }}");
+    const publish = all.get("publish") ?? "";
+    for (const glob of ["*-win-x64.*", "*-mac-universal.*", "*-linux-x64.*"]) expect(publish).toContain(glob);
+  });
+});

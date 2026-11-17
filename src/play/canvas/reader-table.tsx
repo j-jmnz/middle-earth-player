@@ -1,7 +1,7 @@
 // The table for a screen reader on the phone (docs/design-system-table.md, Screen reader): a native list in place of the Skia canvas
 // (table-canvas.native.tsx chooses it under useReaderMode). The zones are headings, in the order reader-table-rows.ts gives, and a card is a
 // button that says its whole state and what a tap does now (card-speech.ts). A double tap is the canvas tap (`onTap`), and the custom action
-// "Show card" is the long press (`onPreview`). It reads the same selectors as the web list and looks like it, for a sighted helper's glance.
+// "Show card" is the long press (`onPreview`). It reads the same selectors as the canvas, for a sighted helper's glance too.
 import { useLayoutEffect } from "react";
 import { Platform, Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";

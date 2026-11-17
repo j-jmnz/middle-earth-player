@@ -53,6 +53,16 @@ modules/*/android/build/
 modules/*/android/.gradle/
 modules/*/android/.cxx/
 
+# the desktop shell's bundle, its web exports and the installers (pnpm desktop)
+desktop/build/
+desktop/out/
+
+# CanvasKit's wasm, copied by pnpm assets canvaskit
+public/canvaskit.wasm
+
+# pdf.js's worker and data, copied by pnpm assets pdfjs
+public/pdfjs/
+
 # generated data and local caches
 .cache/
 assets/catalog.db

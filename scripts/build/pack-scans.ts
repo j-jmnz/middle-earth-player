@@ -317,12 +317,12 @@ function writeScanMap(mapPath: string, packed: readonly PackedScan[]): void {
     .sort((left, right) => left.code.localeCompare(right.code))
     .map(
       (entry) =>
-        `  ${JSON.stringify(entry.code)}: { moduleId: require("../../../assets/scans/${entry.filename}") as number, width: ${entry.width}, height: ${entry.height} },`,
+        `  ${JSON.stringify(entry.code)}: { moduleId: require("../../../assets/scans/${entry.filename}") as number | { uri: string }, width: ${entry.width}, height: ${entry.height} },`,
     );
   const body = lines.length > 0 ? `\n${lines.join("\n")}\n` : "";
   writeFileSync(
     mapPath,
-    `export type ScanAsset = {\n  moduleId: number;\n  width: number;\n  height: number;\n};\n\n// Leave this object empty in git. scripts/build/pack-scans.ts replaces it on the release machine.\nexport const scanAssets: Record<string, ScanAsset> = {${body}};\n`,
+    `export type ScanAsset = {\n  moduleId: number | { uri: string };\n  width: number;\n  height: number;\n};\n\n// Leave this object empty in git. scripts/build/pack-scans.ts replaces it on the release machine.\nexport const scanAssets: Record<string, ScanAsset> = {${body}};\n`,
   );
 }
 

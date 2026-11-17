@@ -239,15 +239,18 @@ export function planForegroundDownloads(
   return { resume, pending: waiting };
 }
 
+// A bundled picture's module: a number from the asset registry on the phone, and what the web bundler's `require` gives (the same number, or `{ uri }`).
+export type BundledModule = number | { uri: string };
+
 export type ResolvedCardImage =
   | { kind: "file"; uri: string; width: number; height: number; download: false }
-  | { kind: "asset"; moduleId: number; width: number; height: number; download: false }
+  | { kind: "asset"; moduleId: BundledModule; width: number; height: number; download: false }
   | { kind: "text"; download: boolean };
 
 export function resolveCardImage(input: {
   cached: { uri: string; width: number; height: number } | null;
   imagesrc: string | null;
-  bundled: { moduleId: number; width: number; height: number } | null;
+  bundled: { moduleId: BundledModule; width: number; height: number } | null;
 }): ResolvedCardImage {
   // The release build's bundled picture wins over a file downloaded before the build bundled one: it is the larger picture.
   if (input.bundled) return { kind: "asset", ...input.bundled, download: false };
@@ -275,7 +278,7 @@ export function isRemoteImageUri(uri: string): boolean {
 export function shownCardImage(input: {
   cached: { uri: string; width: number; height: number } | null;
   imagesrc: string | null;
-  bundled: { moduleId: number; width: number; height: number } | null;
+  bundled: { moduleId: BundledModule; width: number; height: number } | null;
 }): { resolved: ResolvedCardImage; source: { uri: string } | number | null } {
   const resolved = resolveCardImage(input);
   return { resolved, source: displaySource(resolved) };

@@ -32,6 +32,14 @@ No phase is open.
 - The first release with the open-game checks (world hash, per-move checks, checkpoints) carries no card, campaign or engine change, so open games convert cleanly (`docs/brief.md`, Persistence and shipping).
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
+### Desktop
+- Frame time on the drawn table was measured only in a GPU-less sandbox (software rendering); measure idle, a card motion and a spotlight on real hardware before the first desktop release (`docs/architecture.md`, Desktop).
+- `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their screen with the web list table; only tests call them. Delete them with their tests in a change that is not desktop work, since removing them moves the phone bundle.
+- A booklet missing on the desktop reads "This booklet is not on this phone.": route files cannot have `.canvaskit` variants, so the wording is the phone's. Pending user decision.
+- A failed web save is retried only by the next successful save: catching it in `src/screens/data/game-store.ts` would change the phone bundle. Pending user decision.
+- Windows and macOS packaging has been proven only in CI (`docs/releasing.md`); open each packed app by hand on each OS once before the first release.
+- `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
+
 ### Fixtures and Maestro
 - `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50). Until it exists `.maestro/scenarios/conflict-at-the-carrock/conflict-at-the-carrock.yaml` cannot run.
 - `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists. Until it exists `.maestro/scenarios/return-to-mirkwood/return-to-mirkwood.yaml` cannot run.
@@ -308,3 +316,7 @@ No phase is open.
 - A rule reading no official ruling, rule span or agreed community answer settles takes the agent's recommendation, recorded in `docs/brief.md` as "agent recommendation (no ruling found)"; it is not an open item (user, 2026-11-12).
 - One scenario pipeline; no more A/B tests (user decision, 2026-11-08). The procedure is in `docs/agents/agent-brief.md` (Scenario procedure).
 - An open game is never dropped by the app: after an update the player chooses Continue (from the saved table, checked against the engine) or Restart (user decision, 2026-11-11).
+- Desktop builds are unsigned: Windows Authenticode is an optional step behind secrets and macOS notarization is not wired (user decision, 2026-11-16; `docs/releasing.md`, Signing).
+- The desktop origin and profile folder never change after the first release (user decision, 2026-11-16; `.claude/rules/release-standards.md`, Tags and releases).
+- The desktop and web work never changes phone or iPad code or the Android and iOS bundles (user instruction, 2026-11-16; `docs/architecture.md`, Screens).
+- Saves stay synchronous on desktop and web, as on the phone; the web waits for the database on a clock deadline, not a spin count (user instruction, 2026-11-16; `src/screens/data/web/sync-wait.ts`).

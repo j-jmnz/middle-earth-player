@@ -218,17 +218,17 @@ export function pileCountWords(name: string, count: number): string {
   return `${name}, ${count} ${count === 1 ? "card" : "cards"}`;
 }
 
-/** The web list's line for the second slot: "Corsair deck 9 · Corsair discard pile 2". */
+/** A line for the second slot: "Corsair deck 9 · Corsair discard pile 2". No screen prints it (the reader table words each pile on its own, pileCountWords); the Wilderland table test reads it. */
 export function secondSlotLine(rows: readonly { name: string; count: number }[]): string {
   return rows.map((row) => `${row.name} ${row.count}`).join(" · ");
 }
 
-/** The web list's line for the ships: "Ships: Dream-chaser, 3 damage; Dawn Star". */
+/** The reader table's line for the ships: "Ships: Dream-chaser, 3 damage; Dawn Star". */
 export function shipsLine(ships: readonly { name: string; damage: number }[]): string {
   return `Ships: ${ships.map((ship) => (ship.damage > 0 ? `${ship.name}, ${ship.damage} damage` : ship.name)).join("; ")}`;
 }
 
-/** The web list's line for the Heading: "Heading: Rain (off-course)". */
+/** The reader table's line for the Heading: "Heading: Rain (off-course)". */
 export function headingLine(step: string, onCourse: boolean): string {
   return `Heading: ${step} (${onCourse ? "on-course" : "off-course"})`;
 }

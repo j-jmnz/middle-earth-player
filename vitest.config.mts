@@ -39,6 +39,7 @@ export default defineConfig({
     include: [
       "src/**/*.test.ts",
       "scripts/**/*.test.ts",
+      "desktop/**/*.test.ts",
       "test/**/*.test.ts",
     ],
     exclude: process.env.VITEST_FAST ? [...configDefaults.exclude, ...slowFiles] : configDefaults.exclude,

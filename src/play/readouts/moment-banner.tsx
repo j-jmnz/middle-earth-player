@@ -74,7 +74,7 @@ export function MomentBanner({
   const room = Math.max(0, screen.width - left - right - 2 * SIDE);
   const label = bannerLabel(moment);
   // The phone's reader never sees the spotlight, so it hears the banner's title and then each line as its own announcement, in order, through
-  // the queue (banner-speech.ts); every other listener (the web list included) hears the label at once, as it always has.
+  // the queue (banner-speech.ts); every other listener (the reader table included) hears the label at once, as it always has.
   const reader = useReaderMode();
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
   const say = useEffectEvent(() => {

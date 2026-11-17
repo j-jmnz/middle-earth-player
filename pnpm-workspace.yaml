@@ -7,6 +7,8 @@ nodeLinker: hoisted
 nodeOptions: --disable-warning=MODULE_TYPELESS_PACKAGE_JSON
 onlyBuiltDependencies:
   - better-sqlite3
+  # The desktop shell's binary downloads in its postinstall (desktop/).
+  - electron
   - sharp
   - unrs-resolver
 # Security floors for transitive dependencies (pnpm audit): node-forge comes through @expo/cli, minimatch 10 through

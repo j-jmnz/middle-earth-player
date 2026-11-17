@@ -23,6 +23,8 @@
   ],
   "exclude": [
     "node_modules",
-    ".claude"
+    ".claude",
+    "desktop/build",
+    "desktop/out"
   ]
 }

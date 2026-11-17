@@ -1,0 +1,68 @@
+# The installers (docs/architecture.md, Desktop, Packaging). `pnpm desktop pack` runs electron-builder with this file for the OS it runs on and passes the version
+# (APP_VERSION, as app.config.js stamps the phone builds: package.json stays 0.0.0) and the Electron version on the command line.
+# The app is desktop/build/app (the bundled main process and its generated package.json); the web export is not packed into the asar: it is about a gigabyte of
+# pictures, so it goes beside it in resources/web, where desktop/main.ts serves it from.
+# appId and productName name the app to the OS: they never change after the first release (desktop/identity.ts).
+appId: com.middleearth.player
+productName: Middle-Earth Player
+copyright: Fan-made, not affiliated with Fantasy Flight Games. MIT-licensed code; see THIRD_PARTY_NOTICES.md.
+directories:
+  app: desktop/build/app
+  output: desktop/out
+  buildResources: assets/images
+# Artifact names are middle-earth-player-<tag>-<os>-<arch>.<ext>, written out per OS: electron-builder's own ${arch} is x86_64 for an AppImage and amd64 for a .deb.
+# No auto-update (docs/architecture.md, Desktop, Packaging): no publish target, so no latest*.yml or app-update.yml is written.
+publish: null
+asar: true
+# The app is a bundle with no dependencies: electron-builder must not go looking for node_modules (desktop/before-build.cjs says why).
+beforeBuild: ./desktop/before-build.cjs
+# The Electron fuses that a shipped app has no use for: running the binary as Node, NODE_OPTIONS, the Node inspector flags, and loading the app from anywhere but its asar.
+# The launch check attaches to a packed app over Chromium's debugging port, which these do not touch.
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
+extraResources:
+  - from: desktop/build/web
+    to: web
+  - from: THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+  - from: LICENSE
+    to: LICENSE.txt
+# Unsigned unless the Windows certificate is set (docs/releasing.md, Desktop signing): Windows shows SmartScreen, and macOS needs right-click then Open. The macOS build is ad-hoc signed so Apple Silicon will run it.
+mac:
+  target:
+    - target: dmg
+      arch: universal
+  category: public.app-category.card-games
+  icon: assets/images/icon.png
+  identity: "-"
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  artifactName: middle-earth-player-v${version}-mac-universal.${ext}
+win:
+  target:
+    - target: nsis
+      arch: x64
+    - target: zip
+      arch: x64
+  icon: assets/images/icon.png
+  artifactName: middle-earth-player-v${version}-win-x64.${ext}
+nsis:
+  artifactName: middle-earth-player-v${version}-win-x64.${ext}
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+linux:
+  target:
+    - target: AppImage
+      arch: x64
+    - target: deb
+      arch: x64
+  category: Game
+  icon: assets/images/icon.png
+  synopsis: "Play The Lord of the Rings: The Card Game solo, offline"
+  maintainer: Middle-Earth Player <noreply@users.noreply.github.com>
+  artifactName: middle-earth-player-v${version}-linux-x64.${ext}

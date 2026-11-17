@@ -1,8 +1,8 @@
 name: release
 
-# Cuts a release: the next version from the commits since the last tag, the same checks as test.yml, a signed Android APK
-# and an iOS IPA that players sign with SideStore or AltStore, then the tag and a GitHub release with generated notes and the
-# SideStore/AltStore source; and, when the Apple signing is set up, the iOS build on TestFlight as an optional extra.
+# Cuts a release: the next version from the commits since the last tag, the same checks as test.yml, a signed Android APK,
+# an iOS IPA that players sign with SideStore or AltStore and the desktop installers for Windows, macOS and Linux, then the tag
+# and a GitHub release with generated notes and the SideStore/AltStore source; and, when the Apple signing is set up, the iOS build on TestFlight as an optional extra.
 # .claude/rules/release-standards.md sets the rules; docs/releasing.md says how to start it and what each job does. Start it
 # from the Actions tab, with `gh workflow run release.yml --ref main -f bump=auto -f dry_run=false`, or with the GitHub
 # API's workflow dispatch.
@@ -36,6 +36,7 @@ jobs:
       version: ${{ steps.plan.outputs.version }}
       android_signed: ${{ steps.signing.outputs.android }}
       ios_signed: ${{ steps.signing.outputs.ios }}
+      desktop_signed: ${{ steps.signing.outputs.desktop }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -60,9 +61,11 @@ jobs:
           ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          WINDOWS_CERT: ${{ secrets.WINDOWS_CERT_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          android=false; ios=false
+          android=false; ios=false; desktop=false
           if [ -n "$ANDROID_KEYSTORE" ]; then android=true
           elif [ "$DRY_RUN" = "true" ]; then echo "::warning::No ANDROID_* secrets: the dry-run APK is signed with the debug key."
           else echo "::error::A release needs the ANDROID_* secrets (docs/releasing.md, Android key)."; exit 1; fi
@@ -72,8 +75,12 @@ jobs:
           done
           if [ "$apple" = 4 ]; then ios=true
           elif [ "$apple" -gt 0 ]; then echo "::warning::The Apple signing is only partly set up, so TestFlight is skipped (docs/releasing.md, TestFlight (optional))."; fi
+          # The desktop installers are unsigned unless the optional Windows certificate is set (docs/releasing.md, Desktop signing).
+          if [ -n "$WINDOWS_CERT" ] && [ -n "$WINDOWS_CERT_PASSWORD" ]; then desktop=true
+          elif [ -n "$WINDOWS_CERT$WINDOWS_CERT_PASSWORD" ]; then echo "::warning::The Windows certificate is only partly set up, so the Windows installer is unsigned (docs/releasing.md, Desktop signing)."; fi
           echo "android=$android" >> "$GITHUB_OUTPUT"
           echo "ios=$ios" >> "$GITHUB_OUTPUT"
+          echo "desktop=$desktop" >> "$GITHUB_OUTPUT"
 
   checks:
     needs: plan
@@ -84,6 +91,9 @@ jobs:
     needs: plan
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      # Electron's postinstall downloads its binary (about 110 MB); only the desktop job runs it.
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
     # The cache keys this job used, which the cleanup job keeps.
     outputs:
       caches: ${{ steps.pack.outputs.caches }}
@@ -117,6 +127,7 @@ jobs:
       contents: read
       actions: read
     env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
       # app.config.js stamps the version and versionCode from this.
       APP_VERSION: ${{ needs.plan.outputs.version }}
       APK_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.apk
@@ -291,6 +302,7 @@ jobs:
       contents: read
       actions: read
     env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
       # app.config.js stamps the version, the build number and, for TestFlight, the signing team from these.
       APP_VERSION: ${{ needs.plan.outputs.version }}
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
@@ -432,27 +444,179 @@ jobs:
           retention-days: 14
           compression-level: 0
 
+  # The web export every desktop installer carries, built once: it is the same on every OS (docs/releasing.md, Jobs). Like the native builds it starts
+  # beside the assets job and waits for them; CanvasKit's wasm and pdf.js are copied from node_modules, so only the pictures, booklets and catalog come from the artifact.
+  web:
+    needs: [plan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: read
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+      # The desktop build stamps its version from this, as app.config.js does for the phone builds.
+      APP_VERSION: ${{ needs.plan.outputs.version }}
+      EXPO_METRO_CACHE_RESTORE_DIR: ${{ github.workspace }}/../metro-web-restored
+      EXPO_METRO_CACHE_OUTPUT_DIR: ${{ github.workspace }}/../metro-web
+    outputs:
+      caches: ${{ steps.caches.outputs.keys }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: install
+        uses: ./.github/actions/install
+      - id: caches
+        name: Name the Metro cache
+        env:
+          PNPM_KEY: ${{ steps.install.outputs.key }}
+        run: |
+          metro="metro-web-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-$GITHUB_SHA"
+          echo "metro=$metro" >> "$GITHUB_OUTPUT"
+          echo "keys=$PNPM_KEY $metro" >> "$GITHUB_OUTPUT"
+      - id: metro
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ github.workspace }}/../metro-web
+          key: ${{ steps.caches.outputs.metro }}
+          restore-keys: |
+            metro-web-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-
+            metro-web-
+      - name: Move the restored transforms aside
+        run: |
+          rm -rf "$EXPO_METRO_CACHE_RESTORE_DIR"
+          if [ -d "$EXPO_METRO_CACHE_OUTPUT_DIR" ]; then mv "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"; fi
+          mkdir -p "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"
+      - name: Wait for the assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/wait-for-assets.sh
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: assets
+      - name: Export the web build for the desktop
+        run: |
+          pnpm --silent assets canvaskit pdfjs
+          pnpm --silent desktop build --skip-assets
+          du -sh desktop/build/web
+      # include-hidden-files: the export has `_expo/.routes.json`, which the shell serves.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-dist
+          path: desktop/build/web/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+      - if: steps.metro.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ github.workspace }}/../metro-web
+          key: ${{ steps.caches.outputs.metro }}
+
+  # One installer set per OS, packed from the same export and launched once before it is kept (docs/releasing.md, Jobs). Electron is downloaded here and
+  # nowhere else, so its downloads are cached by the lockfile.
+  desktop:
+    needs: [plan, web]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: linux, runner: ubuntu-latest }
+          - { os: macos, runner: macos-latest }
+          - { os: windows, runner: windows-latest }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    env:
+      APP_VERSION: ${{ needs.plan.outputs.version }}
+      TAG: ${{ needs.plan.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # electron_config_cache is read by Electron's install and passed to electron-builder by `pnpm desktop pack` (its Electron zips); ELECTRON_BUILDER_CACHE holds its tools.
+      - name: Point the Electron downloads at the runner
+        run: |
+          echo "electron_config_cache=$RUNNER_TEMP/electron" >> "$GITHUB_ENV"
+          echo "ELECTRON_BUILDER_CACHE=$RUNNER_TEMP/electron-builder" >> "$GITHUB_ENV"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ runner.temp }}/electron
+            ${{ runner.temp }}/electron-builder
+          key: desktop-electron-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: desktop-electron-${{ runner.os }}-
+      - uses: ./.github/actions/install
+      # pnpm's side-effects cache can restore electron without running its postinstall (a store filled by a job that skipped the binary), so the binary is fetched explicitly; a no-op when it is there.
+      - name: Fetch the Electron binary
+        run: node node_modules/electron/install.js
+      # The system libraries Electron needs and xvfb for the display (the smoke script runs itself under xvfb-run).
+      - if: runner.os == 'Linux'
+        run: |
+          pnpm exec playwright install-deps chromium
+          sudo apt-get install -y -q xvfb
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: web-dist
+          path: desktop/build/web
+      # electron-builder signs the Windows installer when these are set (docs/releasing.md, Desktop signing); empty, it does not. Only the Windows leg gets them, and only when
+      # the plan job found both secrets (desktop_signed), so one secret alone ships an unsigned installer instead of failing the build.
+      - name: Pack the installers
+        env:
+          WIN_CSC_LINK: ${{ matrix.os == 'windows' && needs.plan.outputs.desktop_signed == 'true' && secrets.WINDOWS_CERT_BASE64 || '' }}
+          WIN_CSC_KEY_PASSWORD: ${{ matrix.os == 'windows' && needs.plan.outputs.desktop_signed == 'true' && secrets.WINDOWS_CERT_PASSWORD || '' }}
+        run: pnpm desktop pack --skip-build
+      # Every installer this OS makes must exist, stay under GitHub's 2 GiB asset limit and get a SHA-256 file (Node hashes, so no sha256sum or shasum).
+      - id: stage
+        name: Check and name the installers
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: pnpm --silent desktop stage --tag "$TAG" --out "$RUNNER_TEMP/out" --github-output $([ "$DRY_RUN" = "true" ] && echo --suffix -dry-run)
+      # The packed app, not the checkout's: it must start, be cross-origin isolated, load a picture and a booklet page from its own bundle and
+      # make no request off app://, and report the tag's version.
+      - name: Launch the packed app
+        timeout-minutes: 15
+        env:
+          APP: ${{ steps.stage.outputs.app }}
+        run: pnpm desktop smoke --app "$APP" --require-bundle --expect-version "$APP_VERSION"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: desktop-${{ matrix.os }}
+          path: ${{ runner.temp }}/out/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
   # Deletes the cache entries this run's keys replaced, on this run's branch only, once both builds have saved theirs; a
   # dry run tidies its own branch (docs/releasing.md, Caches).
   cleanup:
-    needs: [assets, android, ios]
+    needs: [assets, web, desktop, android, ios]
+    # Runs after a failed build too, so the caches of the legs that finished are still tidied.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       actions: write
     steps:
+      # The lockfile (a root file, so the sparse checkout holds it) names the desktop job's keys: a matrix job has no single output to carry them.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: .github/scripts
       - name: Delete the replaced caches
         env:
           GH_TOKEN: ${{ github.token }}
-          KEEP: ${{ needs.assets.outputs.caches }} ${{ needs.android.outputs.caches }} ${{ needs.ios.outputs.caches }}
-        run: .github/scripts/prune-caches.sh
+          LOCK: ${{ hashFiles('pnpm-lock.yaml') }}
+          KEEP: ${{ needs.assets.outputs.caches }} ${{ needs.web.outputs.caches }} ${{ needs.android.outputs.caches }} ${{ needs.ios.outputs.caches }}
+        run: |
+          for os in Linux macOS Windows; do KEEP="$KEEP desktop-electron-$os-$LOCK"; done
+          export KEEP="$KEEP node-cache-Windows-x64-pnpm-$LOCK"
+          .github/scripts/prune-caches.sh
 
   publish:
-    needs: [plan, checks, assets, android, ios]
-    if: ${{ !inputs.dry_run }}
+    # The desktop build and the web export it needs are not waited on for success: a failed leg must not hold back the APK and the IPA
+    # (docs/releasing.md, Jobs). The phone builds and the checks must all have succeeded.
+    needs: [plan, checks, assets, android, ios, desktop]
+    if: ${{ !cancelled() && !inputs.dry_run && needs.plan.result == 'success' && needs.checks.result == 'success' && needs.assets.result == 'success' && needs.android.result == 'success' && needs.ios.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -472,27 +636,50 @@ jobs:
         with:
           name: ios
           path: ${{ runner.temp }}/out
+      # The three OSes' installers and their .sha256 files, into the same folder.
+      - if: ${{ needs.desktop.result == 'success' }}
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: desktop-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/out
       - name: Write the notes and the SideStore/AltStore source
         env:
           BUMP: ${{ inputs.bump }}
           TAG: ${{ needs.plan.outputs.tag }}
           TESTFLIGHT_URL: ${{ vars.TESTFLIGHT_URL }}
+          WINDOWS_SIGNED: ${{ needs.plan.outputs.desktop_signed }}
+          DESKTOP_RESULT: ${{ needs.desktop.result }}
         run: |
           apk=$(ls "$RUNNER_TEMP"/out/*.apk)
           ipa=$(ls "$RUNNER_TEMP"/out/*.ipa)
-          pnpm --silent release plan --bump "$BUMP" --expect "$TAG" --apk "$apk" --ipa "$ipa" \
+          # A missing OS leaves its glob unexpanded, so the plan fails on it instead of publishing without that installer.
+          # A desktop build that did not succeed ships nothing of it: the notes say so (--desktop-missing).
+          desktop=(--desktop-missing)
+          if [ "$DESKTOP_RESULT" = success ]; then
+            desktop=()
+            for file in "$RUNNER_TEMP"/out/*-win-x64.* "$RUNNER_TEMP"/out/*-mac-universal.* "$RUNNER_TEMP"/out/*-linux-x64.*; do
+              case "$file" in *.sha256) ;; *) desktop+=(--desktop "$file") ;; esac
+            done
+          fi
+          signed=(); if [ "$WINDOWS_SIGNED" = true ]; then signed=(--windows-signed); fi
+          pnpm --silent release plan --bump "$BUMP" --expect "$TAG" --apk "$apk" --ipa "$ipa" "${desktop[@]}" "${signed[@]}" \
             --cert-sha256 "$(cat "$RUNNER_TEMP/out/certificate.sha256")" --notes "$RUNNER_TEMP/notes.md"
           pnpm --silent release source --tag "$TAG" --ipa "$ipa" --notes "$RUNNER_TEMP/notes.md" --out "$RUNNER_TEMP/out/source.json"
       - name: Tag and release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.plan.outputs.tag }}
+          DESKTOP_RESULT: ${{ needs.desktop.result }}
         run: |
+          assets=("$RUNNER_TEMP"/out/*.apk "$RUNNER_TEMP"/out/*.apk.sha256 "$RUNNER_TEMP"/out/*.ipa "$RUNNER_TEMP"/out/*.ipa.sha256)
+          if [ "$DESKTOP_RESULT" = success ]; then
+            assets+=("$RUNNER_TEMP"/out/*-win-x64.* "$RUNNER_TEMP"/out/*-mac-universal.* "$RUNNER_TEMP"/out/*-linux-x64.*)
+          fi
           # A patch cut from a release/vX.Y branch does not take "Latest" from a newer line on main.
           latest=true
           if [ "$GITHUB_REF_NAME" != main ]; then latest=false; fi
-          gh release create "$TAG" "$RUNNER_TEMP"/out/*.apk "$RUNNER_TEMP"/out/*.apk.sha256 \
-            "$RUNNER_TEMP"/out/*.ipa "$RUNNER_TEMP"/out/*.ipa.sha256 "$RUNNER_TEMP/out/source.json" \
+          gh release create "$TAG" "${assets[@]}" "$RUNNER_TEMP/out/source.json" \
             --target "$GITHUB_SHA" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --latest="$latest"
       # The TestFlight job reads the same notes; the tag now exists, so it cannot plan them again.
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -505,7 +692,8 @@ jobs:
   # finishes a release whose upload failed.
   testflight:
     needs: [plan, ios, publish]
-    if: ${{ needs.plan.outputs.ios_signed == 'true' }}
+    # An explicit test: the implicit success() would also skip it when the optional desktop build, upstream of publish, failed.
+    if: ${{ !cancelled() && needs.publish.result == 'success' && needs.plan.outputs.ios_signed == 'true' }}
     runs-on: macos-latest
     timeout-minutes: 90
     steps:

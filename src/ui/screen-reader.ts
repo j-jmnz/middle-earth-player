@@ -1,7 +1,7 @@
 // Whether VoiceOver or TalkBack is on. The table then lists the choices of the open moment on paper as well as on the
 // canvas (a card drawn only on the canvas is not a control a screen reader can reach), and an armed button waits longer.
-// react-native-web always answers yes, so the web build, whose table is already a list of names, lists every choice on
-// paper.
+// This is the phone's file. react-native-web always answers yes, so the web build uses web/screen-reader.canvaskit.ts
+// instead (metro.config.js), which takes the platform's flag from the desktop shell and never from react-native-web.
 import { useSyncExternalStore } from "react";
 import { Platform } from "react-native";
 

@@ -14,6 +14,10 @@ on:
 permissions:
   contents: read
 
+# Electron's postinstall downloads its binary (about 110 MB); only the desktop-smoke job runs it.
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+
 concurrency:
   group: ${{ github.workflow }}-test-${{ github.ref }}
   cancel-in-progress: true
@@ -91,6 +95,49 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test a11y
+
+  # The desktop app launched through Playwright's Electron driver under xvfb (docs/development.md, Commands): isolation, the drawn table, a save dialog for the backup, no request
+  # off app://, and a relaunch that finds the save. Catalog only, no scans: the picture assertion is skipped here, and the booklets are packed only when present, so the release
+  # job runs those. Its own job, like a11y-web, so `test` stays as fast. Skipped when release.yml calls this workflow: its desktop legs launch the packed app themselves, and
+  # a failed desktop check must not hold back the APK and the IPA, which wait on these checks (docs/releasing.md, Jobs).
+  desktop-smoke:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: ""
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # pnpm's side-effects cache can restore electron without running its postinstall (a store filled by a job that skipped the binary), so the binary is fetched explicitly; a no-op when it is there.
+      - run: node node_modules/electron/install.js
+      # The system libraries Chromium (and so Electron) needs, and xvfb for the display.
+      - run: pnpm exec playwright install-deps chromium
+      - run: sudo apt-get install -y xvfb
+      - run: pnpm desktop smoke
+
+  # The Android and iOS bundles of a pull request with desktop work against main's (docs/architecture.md, Screens): each exported with --no-bytecode, and the job fails
+  # unless each pair is byte-identical. The full history gives it the merge base; the script does nothing for a diff with no desktop work. Its own job, like a11y-web, and not
+  # waited on by `test`, which stays as fast.
+  phone-bundle:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm assets catalog
+      - run: pnpm test phone-bundle --if-desktop-work
 
   # The pull request title becomes the squash commit's subject (.claude/rules/commit-standards.md, Squash).
   commits:

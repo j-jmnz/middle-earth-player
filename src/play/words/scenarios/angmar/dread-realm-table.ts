@@ -18,7 +18,7 @@ export type DeadStats = { engagementCost: number; threat: number; attack: number
 
 const statsWords = (s: DeadStats): string => `engagement cost ${s.engagementCost}, Threat ${s.threat}, Attack ${s.attack}, Defense ${s.defense}, ${s.damage > 0 ? `${s.damage} damage of ${s.hitPoints} hit points` : `${s.hitPoints} hit points`}`;
 
-/** What a Reanimated Dead says it is, after its name, for the screen reader and the web list: it never names the card behind it. `owner` is whose card it is ("your", "Player 2's"), `where` where it lies. */
+/** What a Reanimated Dead says it is, after its name, for the screen reader and the reader table: it never names the card behind it. `owner` is whose card it is ("your", "Player 2's"), `where` where it lies. */
 export function reanimatedSpeech(stats: DeadStats, owner: string, where: { engagedWith: string | null }): string {
   const place = where.engagedWith != null ? `engaged with ${where.engagedWith}` : "in the staging area";
   return `a facedown Undead enemy ${place}: ${statsWords(stats)}. ${capital(owner)} card, it goes to ${owner} discard pile when it leaves play`;

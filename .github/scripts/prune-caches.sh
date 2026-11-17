@@ -8,8 +8,8 @@
 set -euo pipefail
 
 families=(
-  node-cache-Linux-x64-pnpm- node-cache-macOS-arm64-pnpm- scans-Linux- ccache-android- gradle-modules- xcode-cas- pods-
-  metro-android- metro-ios-
+  node-cache-Linux-x64-pnpm- node-cache-macOS-arm64-pnpm- node-cache-Windows-x64-pnpm- scans-Linux- ccache-android- gradle-modules- xcode-cas- pods-
+  metro-android- metro-ios- metro-web- desktop-electron-Linux- desktop-electron-macOS- desktop-electron-Windows-
 )
 retired=(setup-java-Linux-x64-gradle- gradle-home- gradle-deps- ccache-ios- scans-macOS-)
 

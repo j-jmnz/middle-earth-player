@@ -42,7 +42,7 @@ export function realmDetail(game: ScenarioState, ctx: ReduceContext, cardId: str
   return null;
 }
 
-/** What the web list and the screen reader say of a Reanimated Dead after its name, or null for any other card: what it is, where it lies, and whose card it is. */
+/** What the reader table and the screen reader say of a Reanimated Dead after its name, or null for any other card: what it is, where it lies, and whose card it is. */
 export function deadSpeech(game: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, cardId: string): string | null {
   const card = game.cards[cardId];
   const stats = deadStats(game, cards, cardId);

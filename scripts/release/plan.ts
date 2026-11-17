@@ -1,13 +1,14 @@
 import { execFileSync } from "node:child_process";
-import { appendFileSync, createReadStream, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { createHash } from "node:crypto";
+import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { ENGINE_CHANGES, ENGINE_VERSION } from "../../src/rules/engine/version.ts";
+import { flagValue as flag, flagValues } from "../args.ts";
 import { runScript, type Log } from "../log.ts";
 import { renderNotes } from "./notes.ts";
+import { fileSha256 } from "./sha256.ts";
 import { reachedScenarios, type GoldenChecks } from "./reach.ts";
 import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf, type BumpRequest, type Change } from "./version.ts";
 
@@ -19,6 +20,9 @@ import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf
 //   --notes <file>         writes the notes there instead of printing them
 //   --apk <file>           adds the APK's name and SHA-256 to the notes; --cert-sha256 <hex> adds its signing certificate
 //   --ipa <file>           adds the IPA's name and SHA-256
+//   --desktop <file>       adds a desktop installer's name and SHA-256; repeat it for each of the three OSes' files
+//   --desktop-missing      says the desktop build did not finish, so the notes carry no desktop files and say so (the publish job passes it instead of --desktop)
+//   --windows-signed       says the Windows installer is signed (the plan job's desktop_signed), so the notes do not warn of SmartScreen
 //   --dry-run              a branch other than main or release/vX.Y only warns, so the pipeline can be tried from any branch
 //   --github-output        writes tag, version and previous_tag to $GITHUB_OUTPUT and the notes to $GITHUB_STEP_SUMMARY
 // TESTFLIGHT_URL (the repository variable of that name, set while the optional TestFlight channel runs) adds its public link.
@@ -38,14 +42,6 @@ function tryGit(args: string[]): string | undefined {
   } catch {
     return undefined;
   }
-}
-
-function flag(args: string[], name: string): string | undefined {
-  const at = args.indexOf(name);
-  if (at < 0) return undefined;
-  const value = args[at + 1];
-  if (!value || value.startsWith("--")) throw new Error(`${name} needs a value`);
-  return value;
 }
 
 /** The newest release tag reachable from HEAD, so a release/vX.Y branch counts from its own line. */
@@ -103,12 +99,6 @@ function repository(): string {
   return match[1];
 }
 
-async function fileSha256(file: string): Promise<string> {
-  const hash = createHash("sha256");
-  for await (const chunk of createReadStream(file)) hash.update(chunk as Buffer);
-  return hash.digest("hex");
-}
-
 /** The scenarios whose open games this release can reach: golden checks that changed since the previous tag, and ENGINE_CHANGES lines after its engine version (reach.ts). */
 function reach(previous: string): { all: boolean; names: string[] } {
   const found = reachedScenarios({ previousEngineVersion: engineVersionAt(previous), engineChanges: ENGINE_CHANGES, previous: goldenChecks(previous), current: goldenChecks(undefined) });
@@ -141,6 +131,8 @@ async function main(log: Log): Promise<void> {
   const apk = apkFile ? { name: path.basename(apkFile), sha256: await fileSha256(apkFile), certificateSha256: flag(args, "--cert-sha256") } : undefined;
   const ipaFile = flag(args, "--ipa");
   const ipa = ipaFile ? { name: path.basename(ipaFile), sha256: await fileSha256(ipaFile) } : undefined;
+  if (args.includes("--desktop-missing") && flagValues(args, "--desktop").length > 0) throw new Error("--desktop-missing and --desktop together: the desktop build either finished or it did not");
+  const desktop = await Promise.all(flagValues(args, "--desktop").map(async (file) => ({ name: path.basename(file), sha256: await fileSha256(file) })));
   const notes = renderNotes({
     tag,
     previousTag: previous,
@@ -151,6 +143,9 @@ async function main(log: Log): Promise<void> {
     reach: previous ? reach(previous) : undefined,
     apk,
     ipa,
+    desktop: desktop.length > 0 ? desktop : undefined,
+    desktopMissing: args.includes("--desktop-missing"),
+    windowsSigned: args.includes("--windows-signed"),
     testflightUrl: process.env.TESTFLIGHT_URL || undefined,
   });
 
