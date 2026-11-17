@@ -1,4 +1,4 @@
-// The player's collection (docs/brief.md, Deckbuilding): the products they own, as switches the Collection screen shows under cycle
+// The player's collection (docs/brief.md, Deckbuilding): the products they own, as switches the Collection screen shows under its
 // headings, and which deck-legal cards that leaves them. data/collection.json lists the switches, each with the catalog packs it holds;
 // the save keeps only the packs switched off, so a pack the catalog adds later starts owned and no saved row means everything is.
 import { z } from "zod";
@@ -6,11 +6,11 @@ import { z } from "zod";
 export const collectionSetSchema = z.object({
   // Stable: a saved collection names packs, not sets, but a route and a testID name the set.
   id: z.string().regex(/^[a-z0-9-]+$/),
-  // The cycle heading the screen files it under; sets with the same heading sit together, in the file's order.
+  // The heading the screen files it under ("Cycles"); sets with the same heading sit together, in the file's order.
   heading: z.string().min(1),
-  // The row's name under its heading ("Campaign Expansion").
+  // The row's name under its heading ("Core Set" under Core Set, "Angmar Awakened" under Cycles).
   name: z.string().min(1),
-  // Its name on its own, outside the Collection screen ("Angmar Awakened Campaign Expansion"): the pool's Pack or cycle chooser.
+  // Its name on its own, outside the Collection screen ("Core Set (2011)"): the pool's Pack or cycle chooser.
   title: z.string().min(1),
   // A short line before the card count: the year, or the revised product that holds the same cards.
   detail: z.string().min(1).nullable(),
@@ -45,10 +45,23 @@ export function claimedPacks(sets: readonly CollectionSet[]): ReadonlySet<string
   return new Set(sets.flatMap((set) => set.packs));
 }
 
+/**
+ * The packs that hold a deck-legal card: every pack one of the rows is printed in. A pack outside it (a Campaign Expansion, a
+ * scenario pack of encounter cards only) gives the player nothing to build with, so no screen lists it.
+ */
+export function deckPacks(rows: readonly { packCode: string; packCodes: readonly string[] }[]): ReadonlySet<string> {
+  const out = new Set<string>();
+  for (const row of rows) {
+    out.add(row.packCode);
+    for (const code of row.packCodes) out.add(code);
+  }
+  return out;
+}
+
 export type SetOwnership = "all" | "some" | "none";
 
 /** Whether the player owns every pack of the set, some of them or none. */
-export function setOwnership(set: CollectionSet, notOwned: ReadonlySet<string>): SetOwnership {
+export function setOwnership(set: { packs: readonly string[] }, notOwned: ReadonlySet<string>): SetOwnership {
   const off = set.packs.filter((code) => notOwned.has(code)).length;
   if (off === 0) return "all";
   return off === set.packs.length ? "none" : "some";

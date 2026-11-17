@@ -161,7 +161,7 @@ No hairline borders: a panel, a tile, a row, a chip, an input and a list draw no
 | hero | Campaigns and Scenarios over the hero's scene | A bank below the picture only | The ground alone (the art draws the light) |
 | path | The campaign path | Banks high on the right, ember low on the left where the road leads | Morning light, rust low on the left |
 | ember | The campaign log, a lost resolution or outcome | Ember high on the left, a little moon low on the right | Morning light, rust high on the left |
-| calm | Decks, the deck editor, cards, rules, settings, the collection and packs, history, every reading screen | A quiet bank in the middle | Morning light |
+| calm | Decks, the deck editor, cards, rules, settings, the collection, history, every reading screen | A quiet bank in the middle | Morning light |
 | victory | A won resolution or outcome | Banks full behind the outcome word | Morning light |
 | table | The table | Ember over the encounter row at the top, moonlight from the fellowship's row down; no zone boxes | Longer beams onto the play area, rust over the encounter row |
 
@@ -435,15 +435,19 @@ On a tablet: medium is a reading column (`ScreenScroll max="readable"`) with the
 
 ### Collection
 
-`collection.tsx`, scene `calm`, from Cards. Round Back (`collection-back`), the title Collection, a muted sentence ("Turn on what you own. The card pool and the deck builder then show only these cards."), then the tally in label ("19 of 23 owned · 698 player cards", or "Everything owned · 853 player cards") with All and None as accent text buttons at its right (`collection-all`, `collection-none`). Then each switch under its sticky cycle heading (a `Section` on night, the deck import's look): an `OwnedRow` (`src/screens/collection/owned-row.tsx`), whose name and line open what it holds (a cycle's packs, or a one-pack switch's cards, with a chevron) and whose switch at the end is a 44 pt target of its own (`collection-<id>-owned`, heard as Own <name>, mixed while only some packs are owned). The line is the switch's detail ("Or the Hero Expansion", the year) or "4 of 7 packs owned", then its count ("75 player cards"); the name is in muted while the switch is off. A switch saves at once.
+`collection.tsx`, scene `calm`, from Cards. Round Back (`collection-back`), the title Collection, a muted sentence ("Turn on what you own. The card pool and the deck builder then show only these cards."), then the tally in label ("653 of 853 cards", or "Everything owned · 853 cards") with All and None as accent text buttons at its right (`collection-all`, `collection-none`), over a 4 pt bar that draws the share owned (the accent on the tonal track). Then one list under five headings (Core Set, Cycles, Saga, Starter Decks, Other: a `Section` each, with no band behind it, scrolling with the rows). Nothing on the screen opens another screen (user decision, 2026-11-17).
 
-A cycle opened (`collection/[id].tsx`): round Back (`collection-set-back`), its full name as the title, its detail in muted, All of it (a `SettingSwitch`, `collection-set-owned`), then each pack as an `OwnedRow` (`pack-<code>`, its switch `pack-<code>-owned`) that opens the pack's cards.
+A row is an `OwnedRow` (`src/screens/collection/owned-row.tsx`). Only what holds a deck-legal card is listed: a pack with none is left out of its row, and a row with none (a Campaign Expansion) is not drawn; a set left with one pack of several is that pack's row, under the pack's name. The name is in muted while none of it is owned. A switch saves at once.
 
-### Pack cards
+- **A row of one pack** (a core set, a starter deck) is one switch, the whole row its target (`collection-<id>-owned`, heard as Own <name> and its line). Its line is the detail (the year) and its count: "2020 · 73 cards".
+- **A row of several packs** (a cycle, the saga) has two targets. Its name and line (`collection-<id>`, a chevron down, up while open) unfold the packs inside the row; several rows can be open, and the list opens folded. The switch at its end (`collection-<id>-owned`, 44 pt) owns or disowns them all; while only some are owned it draws a dash on an accentLine track, is heard as mixed, and a tap owns the rest. Its line is "7 packs, or the Hero Expansion · 75 cards", or "3 of 7 packs · 75 cards" while only some are owned.
+- **A pack unfolded** is one 44 pt switch (`pack-<code>-owned`): its name in body, its card count in faint, the switch.
 
-Scene `calm`. Round Back (`pack-back`, back to Collection), the pack name, rows with thumb and collector code detail. An unknown or empty pack says so in a muted sentence. Deck import (`deck-import.tsx`, opened from Decks) uses the same look, and a successful import goes back to Decks with the toast "Imported Road to Rivendell", which goes on ". Dropped Steward of Gondor." when cards were dropped; its pinned group headings keep their full-width band and pad their text to the column.
+On a tablet the title and the tally sit with the rows in a `useListGutter` inset.
 
-On a tablet (the Collection, its cycles and the pack cards): the titles and the empty sentences sit in a 640 `Column`, and the rows in a `useListGutter` inset.
+### Deck import
+
+`deck-import.tsx`, scene `calm`, opened from Decks. Rows with thumb and collector code detail under pinned group headings, which keep their full-width band and pad their text to the column. A successful import goes back to Decks with the toast "Imported Road to Rivendell", which goes on ". Dropped Steward of Gondor." when cards were dropped. On a tablet the titles and the empty sentences sit in a 640 `Column`, and the rows in a `useListGutter` inset.
 
 ### Settings
 

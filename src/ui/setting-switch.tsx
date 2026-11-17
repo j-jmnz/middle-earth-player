@@ -15,7 +15,7 @@ const ROW = 44;
  * grey knob. A drawing, not the platform's Switch, so it looks the same on every platform; the row is the control.
  * The Collection rows draw it beside a row that opens, as a control of its own (src/screens/collection/owned-row.tsx).
  */
-export function SwitchMark({ value, paper }: { value: boolean; paper: boolean }) {
+export function SwitchMark({ value, paper, mixed }: { value: boolean; paper: boolean; mixed?: boolean }) {
   const t = useTableTokens();
   const s = useUiScale();
   const light = t.depth === "light";
@@ -31,6 +31,14 @@ export function SwitchMark({ value, paper }: { value: boolean; paper: boolean })
         boxShadow: light ? `0 2px 6px ${withAlphaHex(t.shade, 0.25)}` : `0 0 12px ${withAlphaHex(t.glow, 0.35)}`,
       }
     : { backgroundColor: light ? t.pressed : t.dusk, boxShadow: `inset 0 1px 3px ${withAlphaHex(t.shade, light ? 0.3 : 0.9)}` };
+  // Partly on (some packs of a cycle, on the night surface only): a dash in the middle of a track between off and on.
+  if (mixed) {
+    return (
+      <View importantForAccessibility="no-hide-descendants" style={{ width, height, borderRadius: height / 2, alignItems: "center", justifyContent: "center", backgroundColor: t.accentLine }}>
+        <View style={{ width: knob, height: 4 * s, borderRadius: 2 * s, backgroundColor: t.onAccent }} />
+      </View>
+    );
+  }
   return (
     <View importantForAccessibility="no-hide-descendants" style={{ width, height, borderRadius: height / 2, justifyContent: "center", ...track }}>
       <View

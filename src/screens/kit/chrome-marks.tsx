@@ -16,7 +16,7 @@ import type { MarkedSphere } from "./sphere-mark";
 import { Text } from "../../ui/text";
 
 /** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a fold that is open. */
-export function Chevron({ direction = "left", color, size = 10 }: { direction?: "left" | "right" | "down"; color?: string; size?: number }) {
+export function Chevron({ direction = "left", color, size = 10 }: { direction?: "left" | "right" | "down" | "up"; color?: string; size?: number }) {
   const palette = usePalette();
   const s = useUiScale();
   const box = size * s;
@@ -32,6 +32,8 @@ export function Chevron({ direction = "left", color, size = 10 }: { direction?: 
         transform:
           direction === "down"
             ? [{ translateY: -box * 0.2 }, { rotate: "-45deg" }]
+            : direction === "up"
+            ? [{ translateY: box * 0.2 }, { rotate: "135deg" }]
             : [{ translateX: direction === "left" ? box * 0.2 : -box * 0.2 }, { rotate: direction === "left" ? "45deg" : "-135deg" }],
       }}
     />
