@@ -131,22 +131,22 @@ Read the sections your task touches.
     - 1754–1771 The Hills of Emyn Muil (~1.5K) ← 1
     - 1772–1792 The Dead Marshes (~2.1K) ← 2
     - 1793–1816 Return to Mirkwood (~2.3K) ← 4
-  - 1817–1870 Dwarrowdelf (~6.8K) ← 3
+  - 1817–1871 Dwarrowdelf (~6.9K) ← 3
     - 1828–1850 Into the Pit (~2.8K) ← 9
-    - 1851–1870 The Seventh Level (~2.9K) ← 5
-  - 1871–1879 Nightmare (~410) ← 22
-  - 1880–1920 Deckbuilding (~2.1K)
-  - 1921–2000 Effects (~3.7K)
-    - 1923–1981 Three layers (~2.4K) ← 10
-    - 1982–1992 Player side quests, contracts and saga cards (~940)
-    - 1993–1996 Window stack (~100)
-    - 1997–2000 Coverage test (~270)
-  - 2001–2023 Data sources (~710) ← 2
-  - 2024–2042 Card images (~1.3K) ← 9
-  - 2043–2070 Persistence and shipping (~3.2K) ← 10
-  - 2071–2112 Screens (~5.1K) ← 2
-    - 2097–2112 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~60.3K tok)
+    - 1851–1871 The Seventh Level (~3.0K) ← 5
+  - 1872–1880 Nightmare (~410) ← 22
+  - 1881–1921 Deckbuilding (~2.1K)
+  - 1922–2001 Effects (~3.7K)
+    - 1924–1982 Three layers (~2.4K) ← 10
+    - 1983–1993 Player side quests, contracts and saga cards (~940)
+    - 1994–1997 Window stack (~100)
+    - 1998–2001 Coverage test (~270)
+  - 2002–2024 Data sources (~710) ← 2
+  - 2025–2043 Card images (~1.3K) ← 9
+  - 2044–2071 Persistence and shipping (~3.2K) ← 10
+  - 2072–2113 Screens (~5.1K) ← 2
+    - 2098–2113 Table screen (~1.8K) ← 3
+- `docs/design-system-table.md` — Design system — Table (landscape) (~60.5K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
   - 24–27 Table menu (~570) ← 4
@@ -154,32 +154,32 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–110 Cards (~21.9K) ← 27
-  - 111–116 The Sailing test (~690) ← 5
-  - 117–130 The Island Map (~1.8K) ← 8
-  - 131–134 Tokens and effects (~360)
-  - 135–149 Piles (~2.0K) ← 7
-  - 150–155 Marks of the open moment (~400) ← 1
-  - 156–226 Motion (~3.3K) ← 7
-  - 227–252 Spotlight (~2.6K) ← 33
-  - 253–258 Gestures (~620) ← 4
-  - 259–262 Hold, slide and release (~940)
-  - 263–274 Pointer and keys (~1.0K) ← 5
-  - 275–280 Peeking at the other seat (~610) ← 1
-  - 281–300 Command column (~2.6K) ← 11
-  - 301–306 Two taps (~620) ← 9
-  - 307–310 One answer, one tap (~240)
-  - 311–314 Stops and Always use (~250)
-  - 315–318 Guide (~120)
-  - 319–335 Choice tray (~5.6K) ← 58
-  - 336–350 Reading panels (~1.6K) ← 5
-  - 351–360 Phase carousel (~680)
-  - 361–366 Quest advance (~530) ← 1
-  - 367–370 Undo (~150)
-  - 371–374 Haptics (~280)
-  - 375–386 Banner (~750) ← 5
-  - 387–406 Screen reader (~3.0K) ← 19
-  - 407–410 Android Back (~90)
+  - 59–111 Cards (~22.1K) ← 27
+  - 112–117 The Sailing test (~690) ← 5
+  - 118–131 The Island Map (~1.8K) ← 8
+  - 132–135 Tokens and effects (~360)
+  - 136–150 Piles (~2.0K) ← 7
+  - 151–156 Marks of the open moment (~400) ← 1
+  - 157–227 Motion (~3.3K) ← 7
+  - 228–253 Spotlight (~2.6K) ← 33
+  - 254–259 Gestures (~620) ← 4
+  - 260–263 Hold, slide and release (~940)
+  - 264–275 Pointer and keys (~1.0K) ← 5
+  - 276–281 Peeking at the other seat (~610) ← 1
+  - 282–301 Command column (~2.6K) ← 11
+  - 302–307 Two taps (~620) ← 9
+  - 308–311 One answer, one tap (~240)
+  - 312–315 Stops and Always use (~250)
+  - 316–319 Guide (~120)
+  - 320–336 Choice tray (~5.6K) ← 58
+  - 337–351 Reading panels (~1.6K) ← 5
+  - 352–361 Phase carousel (~680)
+  - 362–367 Quest advance (~530) ← 1
+  - 368–371 Undo (~150)
+  - 372–375 Haptics (~280)
+  - 376–387 Banner (~750) ← 5
+  - 388–407 Screen reader (~3.0K) ← 19
+  - 408–411 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~32.3K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
