@@ -3,15 +3,15 @@
 // The pieces The Battle of Lake-town's cards hold on the table, as top-bar dials: the damage on Lake-town against the 50 that loses the game (it warms near the limit), on stage 3 the Victory points in the display against that damage (a goal: more points wins, a tie loses), and the damage on
 // Smaug against the cap the stage gives him (6 or 12) or, on stage 3, against his hit points. The Smaug deck and its discard pile are piles of the table (store/pile-ids.ts). The engine decided every number (the damage tokens, the `damageCeiling` and `loseAtDamage` constants, the points of
 // the cards in the victory display); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
-import { modifiedStat } from "../../rules/core/keywords.ts";
-import { victoryPointsOf } from "../../rules/core/printed-stat.ts";
-import { heldAmount } from "../../rules/core/state.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
-import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import { lakeTownDamage, lakeTownId, smaugInPlay } from "../../rules/families/smaug/cards.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
+import { victoryPointsOf } from "../../../rules/core/printed-stat.ts";
+import { heldAmount } from "../../../rules/core/state.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import type { ReduceContext } from "../../../rules/engine/reduce.ts";
+import { lakeTownDamage, lakeTownId, smaugInPlay } from "../../../rules/families/smaug/cards.ts";
 
-import { scoreLimitWords, scoreWords, smaugLimitWords, smaugWords, townLimitWords, townNearWords, townWords } from "../words/scenarios/smaug-table.ts";
-import type { TableDial } from "./dials.ts";
+import { scoreLimitWords, scoreWords, smaugLimitWords, smaugWords, townLimitWords, townNearWords, townWords } from "../../words/scenarios/smaug-table.ts";
+import type { TableDial } from "../dials.ts";
 
 /** The last stage of the quest: the players win by defeating Smaug there, and the score decides it. */
 export const DRAGONS_WRATH = "50203";

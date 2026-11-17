@@ -16,7 +16,7 @@ import { rhudaurCurrentDials, rhudaurDials } from "./rhudaur.ts";
 import { gramHands } from "./gram.ts";
 import { isengardDials, isengardHands, type HandMark } from "./isengard.ts";
 import { lairDials, lairHands } from "./lair.ts";
-import { lakeTownDials } from "./lake-town.ts";
+import { lakeTownDials } from "./standalone-scenarios/lake-town.ts";
 import { mountDoomDials, mountDoomHands } from "./mount-doom.ts";
 import { marshesDials } from "./marshes.ts";
 import { pelennorDials, pelennorHands } from "./pelennor.ts";

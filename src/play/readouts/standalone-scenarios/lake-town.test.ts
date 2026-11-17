@@ -2,9 +2,9 @@
 // The top-bar dials of The Battle of Lake-town and the Smaug piles of its table: the damage on Lake-town against 50 (it warms near the limit), on stage 3 the Victory points against that damage, and the damage on Smaug against the cap of the stage.
 import { describe, expect, it } from "vitest";
 
-import { tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
-import { pileSelector } from "../store/selectors.ts";
-import { isDiscardPile, secondPilesOf } from "../store/pile-ids.ts";
+import { tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { pileSelector } from "../../store/selectors.ts";
+import { isDiscardPile, secondPilesOf } from "../../store/pile-ids.ts";
 import { lakeTownDials } from "./lake-town.ts";
 
 const ID = "the-battle-of-lake-town";
