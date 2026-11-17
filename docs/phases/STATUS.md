@@ -291,7 +291,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 ### Rules and engine (Dwarrowdelf)
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
 - Into the Pit readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Into the Pit). Not user-confirmed.
-- The Nightmare data carries quest-card removals, but `questDeckCodes` still deals the whole Nightmare quest deck; each scenario's Build applies them.
+- Renderer gaps, Into the Pit (behaviour proven by spec rows): `BottomOtherLooked`, `xReachesRemaining`, `inVictory`, `ShuffleSelfIntoEncounterDeck` and `GrantTrait` print as JSON; `optionalEngageThreat` shows as a stat; a before-damage Forced, a revealed-enemy replacement, an immune location left out of a count, a refused travel, Restricted, and a `noQuestProgress` exception are not said (03014:A:1, 03036:A:2, 03041:A:1, 03048:A:1, 03049:A:1, 03052:A:1, 03060:A:1, 03064:B:2, 03065:B:2, 901002:B:3, 901005:A:3, 901008:A:2).
 
 ### Rules and engine (Shadows of Mirkwood)
 - The rulesheets of The Hunt for Gollum and Conflict at the Carrock (MEC02, MEC03) have no text layer, so their rules have no span in `data/rules`; `docs/brief.md` (The Hunt for Gollum, Conflict at the Carrock) cites the PDFs.
