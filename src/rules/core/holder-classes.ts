@@ -70,12 +70,27 @@ export function addClassModifier(
   return { ...state, modifiers: [...state.modifiers, { instanceId: holder, sourceId, stat, amount, until }] };
 }
 
+// The round and phase a ready happens in, as a card keeps it (readiedIn).
+function phaseKey(state: ScenarioState): string {
+  return `${state.round}:${state.phase}`;
+}
+
+/** The card cannot be readied more than once per phase (readyOncePerPhase, 22134:B:2) and was readied in this one already. */
+export function readiedThisPhase(state: ScenarioState, id: string): boolean {
+  return state.cards[id]?.readiedIn === phaseKey(state) && flagged(state, id, "readyOncePerPhase");
+}
+
+/** The card readies: it is no longer exhausted, and a card readied at most once per phase notes the phase (readyOncePerPhase). */
+export function readyPatch(state: ScenarioState, id: string): { exhausted: false; readiedIn?: string } {
+  return flagged(state, id, "readyOncePerPhase") ? { exhausted: false, readiedIn: phaseKey(state) } : { exhausted: false };
+}
+
 // A card effect cannot ready the card: it cannot ready at all (cannotReady), or only not by card effects (cannotReadyByEffect,
 // "characters cannot ready from card effects", 12102:A:1; the refresh phase readies it), or not by player card effects
 // (cannotReadyByPlayerCard, on the card or on the class of characters, 19020:A:2). `byPlayer` is the printed cards of the game when
 // the effect comes from a player card; without it the player-card bar does not apply.
 export function readyBarred(state: ScenarioState, id: string, byPlayer?: ReadonlyMap<string, PrintedCard>): boolean {
-  if (flagged(state, id, "cannotReady") || flagged(state, id, "cannotReadyByEffect")) return true;
+  if (flagged(state, id, "cannotReady") || flagged(state, id, "cannotReadyByEffect") || readiedThisPhase(state, id)) return true;
   const card = state.cards[id];
   if (byPlayer == null || card == null) return false;
   const printed = printedOf(byPlayer, card.code);

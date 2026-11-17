@@ -14,6 +14,7 @@ import {
   removeDraftHero,
   restoreDraft,
   setDeckName,
+  setDraftTarget,
   startNewDeck,
   takeDraftCard,
 } from "./draft.ts";
@@ -187,5 +188,31 @@ describe("undo and order", () => {
     addDraftCard(gandalf);
     expect(getDeckDraft().cards.map((card) => card.code)).toEqual(["x", "01073"]);
     expect(draftIsDirty(getDeckDraft())).toBe(false);
+  });
+});
+
+describe("the side deck", () => {
+  it("adds to the side deck while the pool targets it, counting its copies on their own, and Undo puts it back", () => {
+    addDraftCard(gandalf);
+    setDraftTarget("side");
+    const change = addDraftCard(gandalf);
+    expect(change).toMatchObject({ ok: true, text: "Added Gandalf to the side deck · 1 of 3" });
+    expect(getDeckDraft()).toMatchObject({ cards: [{ code: "01073", count: 1 }], side: [{ code: "01073", count: 1 }] });
+    expect(draftIsDirty(getDeckDraft())).toBe(true);
+    if (change.ok) restoreDraft(change.before);
+    expect(getDeckDraft().side).toEqual([]);
+  });
+
+  it("refuses a hero or a contract", () => {
+    setDraftTarget("side");
+    expect(addDraftCard(sam)).toEqual({ ok: false, text: "Sam Gamgee: A hero is not a side deck card." });
+    expect(draftAddRefused({ heroes: [], cards: [] }, { code: "22024", name: "The Burglar's Turn", typeCode: "contract", deckLimit: 1 }, undefined, "side")).toBe(true);
+  });
+
+  it("takes a copy from the side deck with its stepper and keeps a saved side deck clean", () => {
+    editSavedDeck({ id: "d", name: "D", heroes: [], cards: [], side: [{ code: "01073", count: 2 }] });
+    expect(draftIsDirty(getDeckDraft())).toBe(false);
+    expect(changeDraftCount("01073", "Gandalf", 3, -1, undefined, "side")).toMatchObject({ ok: true, text: "Removed a copy of Gandalf in the side deck · 1 of 3" });
+    expect(draftIsDirty(getDeckDraft())).toBe(true);
   });
 });

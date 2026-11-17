@@ -22,6 +22,9 @@ const pool = new Map<string, PoolFact>([
   ["141004", { name: "Pippin", typeCode: "hero", deckLegal: true }],
   ["01073", { name: "Gandalf", typeCode: "ally", deckLegal: true }],
   ["01026", { name: "Steward of Gondor", typeCode: "attachment", deckLegal: false }],
+  ["01014", { name: "Faramir", typeCode: "ally", deckLegal: true }],
+  ["9901014", { name: "(MotK) Faramir", typeCode: "hero", deckLegal: false }],
+  ["22134", { name: "Messenger of the King", typeCode: "contract", deckLegal: true }],
 ]);
 
 describe("parseDecklistRef", () => {
@@ -97,20 +100,35 @@ describe("fetchFailureMessage", () => {
 });
 
 describe("buildDecklist", () => {
-  it("keeps deck-legal heroes and slots, and ignores sideslots", () => {
+  it("keeps deck-legal heroes and slots, and sideslots as the side deck", () => {
     const body = readDecklistBody({
       name: "Road",
       heroes: { "141002": 1, "141003": 1 },
       slots: { "01073": 3, "141004": 1, "99999": 2 },
-      sideslots: { "01073": 3 },
+      sideslots: { "01073": 3, "141002": 1, "01026": 1, "99999": 1 },
     });
     expect(body?.name).toBe("Road");
     const built = buildDecklist(body!, pool);
     expect(built.heroes).toEqual(["141002", "141003", "141004"]);
     expect(built.cards).toEqual([{ code: "01073", count: 3 }]);
-    expect(built.droppedCodes).toEqual(["99999"]);
+    // A hero is left out of the side deck without a word; a card outside the pool is dropped and named once.
+    expect(built.side).toEqual([{ code: "01073", count: 3 }]);
+    expect(built.droppedCodes).toEqual(["99999", "01026"]);
     expect(built.heroLimit).toBeNull();
     expect(droppedSentence(["99999"])).toBe("Dropped 99999.");
+  });
+
+  it("reads RingsDB's empty sideslots (an array) as no side deck", () => {
+    const built = buildDecklist(readDecklistBody({ name: "Bare", heroes: { "141002": 1 }, slots: {}, sideslots: [] })!, pool);
+    expect(built.side).toEqual([]);
+  });
+
+  it("reads a (MotK) hero as its ally in the deck, for Messenger of the King (22134:A:2)", () => {
+    const body = readDecklistBody({ name: "Messenger", heroes: { "141002": 1, "9901014": 1 }, slots: { "141002": 1, "9901014": 1, "22134": 1, "01073": 3 } });
+    const built = buildDecklist(body!, pool);
+    expect(built.heroes).toEqual(["141002"]);
+    expect(built.cards).toEqual([{ code: "01014", count: 1 }, { code: "22134", count: 1 }, { code: "01073", count: 3 }]);
+    expect(built.droppedCodes).toEqual([]);
   });
 
   it("refuses a hero quantity above 1", () => {

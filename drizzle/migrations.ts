@@ -10,6 +10,7 @@ import m0007 from "./0007_runs.sql";
 import m0008 from "./0008_run_active_ms.sql";
 import m0009 from "./0009_deck_position.sql";
 import m0010 from "./0010_checkpoint.sql";
+import m0011 from "./0011_deck_side.sql";
 
 export default {
   journal,
@@ -25,5 +26,6 @@ export default {
     m0008,
     m0009,
     m0010,
+    m0011,
   },
 };

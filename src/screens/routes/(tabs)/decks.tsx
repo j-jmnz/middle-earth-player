@@ -144,7 +144,7 @@ export default function Decks() {
     }, [refresh]),
   );
 
-  const faces = useMemo(() => deckFaces(catalog, saved.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)])), [catalog, saved]);
+  const faces = useMemo(() => deckFaces(catalog, saved.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code), ...deck.side.map((card) => card.code)])), [catalog, saved]);
   const readiness = useMemo(() => new Map(saved.map((deck) => [deck.id, deckReadiness(deck, faces)])), [saved, faces]);
   // The cards whose text the app does not apply: each deck says how many it holds (docs/brief.md, Three layers).
   const inactive = useMemo(() => notAppliedIn(faces), [faces]);

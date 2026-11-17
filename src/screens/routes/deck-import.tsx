@@ -137,6 +137,7 @@ export default function DeckImportScreen() {
       name: built.name,
       heroes: built.heroes,
       cards: built.cards,
+      side: built.side,
       // The editor's note line also carries the deck's note: a printed condition, or why a core deck is short of 50.
       droppedNote: [droppedSentence(built.droppedCodes), deck.note].filter((text) => text).join(" ") || null,
     });
@@ -151,7 +152,7 @@ export default function DeckImportScreen() {
       return;
     }
     const name = savedDeckName(built.name, listDecks(user).map((deck) => deck.name));
-    const id = writeDeck(user, { id: null, name, heroes: built.heroes, cards: built.cards });
+    const id = writeDeck(user, { id: null, name, heroes: built.heroes, cards: built.cards, side: built.side });
     if (!readDeck(user, id)) return;
     opening.current = true;
     // Back on the deck list, which reads the new deck on focus; the toast names what was dropped.

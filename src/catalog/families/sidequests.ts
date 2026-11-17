@@ -50,8 +50,10 @@ const VERBS = [
   // it. A contract's records name their side in their line ids (`21074:B:1`) and carry a `faceUp` condition for it.
   z.strictObject({ verb: z.literal("FlipCard"), ...when }),
   // The actor's loot deck is built from the cards they chose at deckbuilding (StartSeat.loot), shuffled and set aside under the
-  // contract (The Burglar's Turn, src/rules/families/sidequests/loot.ts).
-  z.strictObject({ verb: z.literal("BuildLootDeck"), ...when }),
+  // contract (The Burglar's Turn, src/rules/families/sidequests/loot.ts). `size` different cards of `type` with one of `traits`
+  // ("Choose 14 different Item or Artifact attachments"): the deck screens and the briefing take them from the deck's side deck
+  // (src/catalog/loot.ts).
+  z.strictObject({ verb: z.literal("BuildLootDeck"), size: z.number().int().positive(), type: z.string().min(1), traits: z.array(z.string().min(1)).min(1), ...when }),
   // The top card of the actor's loot deck is attached faceup to the location the answered event is about, as a guarded objective:
   // out of play under that location until it is explored.
   z.strictObject({ verb: z.literal("AttachLoot"), ...when }),

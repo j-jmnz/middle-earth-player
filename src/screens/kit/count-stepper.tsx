@@ -24,6 +24,7 @@ export function CountStepper({
   onChange,
   minus = true,
   ids: given,
+  where,
 }: {
   code: string;
   name: string;
@@ -33,7 +34,12 @@ export function CountStepper({
   // The pool shows − only on a card the deck holds.
   minus?: boolean;
   ids?: { dec: string; count: string; inc: string };
+  // The pile the count is in, for a screen reader: "the deck" when absent, "the side deck" for a side deck card.
+  where?: "side deck";
 }) {
+  const pile = where ?? "deck";
+  const to = where ? ` to the ${where}` : "";
+  const from = where ? ` from the ${where}` : "";
   const ids = given ?? { dec: `count-dec-${code}`, count: `count-${code}`, inc: `count-inc-${code}` };
   const palette = usePalette();
   const t = useTableTokens();
@@ -44,7 +50,7 @@ export function CountStepper({
           testID={ids.dec}
           collapsable={false}
           accessibilityRole="button"
-          accessibilityLabel={count <= 1 ? `Remove ${name}` : `Remove a copy of ${name}`}
+          accessibilityLabel={count <= 1 ? `Remove ${name}${from}` : `Remove a copy of ${name}${from}`}
           onPress={() => onChange(-1)}
         >
           {/* The pressed fill is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
@@ -58,7 +64,7 @@ export function CountStepper({
       {count > 0 || minus ? (
         <Text
           testID={ids.count}
-          accessibilityLabel={`${count} in the deck`}
+          accessibilityLabel={`${count} in the ${pile}`}
           className={`min-w-6 text-center font-display text-body ${count > 0 ? "text-accentHigh" : "text-faint"}`}
         >
           {String(count)}
@@ -68,7 +74,7 @@ export function CountStepper({
         testID={ids.inc}
         collapsable={false}
         accessibilityRole="button"
-        accessibilityLabel={`Add ${count > 0 ? "a copy of " : ""}${name}`}
+        accessibilityLabel={`Add ${count > 0 ? "a copy of " : ""}${name}${to}`}
         accessibilityState={{ disabled: full }}
         onPress={() => onChange(1)}
       >

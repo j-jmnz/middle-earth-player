@@ -1803,13 +1803,8 @@
   "outOfScope": [
     {
       "pack": "MotKA",
-      "reason": "The Messenger of the King hero versions of unique allies are left out of the card pool.",
-      "source": "user decision, 2026-10-26"
-    },
-    {
-      "code": "22134",
-      "reason": "The Messenger of the King contract, whose heroes are left out, is left out of the card pool with them.",
-      "source": "user decision, 2026-10-26"
+      "reason": "RingsDB's (MotK) hero versions of unique allies are a deckbuilding stand-in, not printed cards: the Messenger of the King contract (22134) turns the ally itself into a hero in play, so these stay out of the card pool, and an import reads each as its ally.",
+      "source": "user decision, 2026-11-16"
     }
   ],
   "productCodes": [

@@ -15,6 +15,8 @@ export type SavedDeck = {
   name: string;
   heroes: string[];
   cards: DeckCard[];
+  // The side deck (user-schema.ts, decks.side).
+  side: DeckCard[];
   updatedAt: number | null;
 };
 
@@ -24,6 +26,8 @@ export type DeckWrite = {
   name: string;
   heroes: readonly string[];
   cards: readonly DeckCard[];
+  // Empty when absent.
+  side?: readonly DeckCard[];
 };
 
 const STARTER_IDS: ReadonlySet<string> = new Set([STEALTH_ID, WISDOM_ID]);
@@ -39,7 +43,7 @@ export function newDeckId(now: number = Date.now(), random: () => number = Math.
   return `deck-${now.toString(36)}-${Math.floor(random() * 36 ** 8).toString(36).padStart(8, "0")}`;
 }
 
-const columns = { id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards, updatedAt: decks.updatedAt };
+const columns = { id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards, side: decks.side, updatedAt: decks.updatedAt };
 
 /**
  * Every saved deck in the player's order: the decks with no position first (new, imported or duplicated ones; the one saved last
@@ -66,8 +70,9 @@ export function readDeck<TRun>(user: Db<TRun>, id: string): SavedDeck | null {
   return user.select(columns).from(decks).where(eq(decks.id, id)).get() ?? null;
 }
 
-function copied(deck: Pick<DeckWrite, "heroes" | "cards">): { heroes: string[]; cards: DeckCard[] } {
-  return { heroes: [...deck.heroes], cards: deck.cards.map((card) => ({ code: card.code, count: card.count })) };
+function copied(deck: Pick<DeckWrite, "heroes" | "cards" | "side">): { heroes: string[]; cards: DeckCard[]; side: DeckCard[] } {
+  const copy = (cards: readonly DeckCard[]) => cards.map((card) => ({ code: card.code, count: card.count }));
+  return { heroes: [...deck.heroes], cards: copy(deck.cards), side: copy(deck.side ?? []) };
 }
 
 /** Inserts a new deck or rewrites a saved one, and returns its id. A deck saves whether or not it is ready to play. */
@@ -82,11 +87,11 @@ export function writeDeck<TRun>(user: Db<TRun>, deck: DeckWrite, now: number = D
   return id;
 }
 
-/** A new deck with the same heroes and cards under `name`. */
+/** A new deck with the same heroes, cards and side deck under `name`. */
 export function duplicateDeck<TRun>(user: Db<TRun>, id: string, name: string, now: number = Date.now()): SavedDeck | null {
   const source = readDeck(user, id);
   if (!source) return null;
-  const copy = writeDeck(user, { id: null, name, heroes: source.heroes, cards: source.cards }, now);
+  const copy = writeDeck(user, { id: null, name, heroes: source.heroes, cards: source.cards, side: source.side }, now);
   return readDeck(user, copy);
 }
 

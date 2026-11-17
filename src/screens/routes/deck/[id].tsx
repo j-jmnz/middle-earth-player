@@ -7,9 +7,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ActionBar, Chip, FloatingBarShade, NavBar, PaperSheet, PrimaryButton, Screen, SecondaryButton, TextButton, TwoPane } from "../../kit/chrome";
 import { CardPoolBody, type PoolTypeRequest } from "../../pool/card-pool";
 import { BANNER_HEIGHT, DeckGlance } from "../../deck/glance";
-import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, refusedCodes, TYPE_NOUN, type EditorCard, type EditorRow, type Jump } from "../../deck/grid";
-import { announceDraftChange, discardDraftChanges, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, startNewDeck, useDeckDraft, type TitleLookup } from "../../deck/draft";
-import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, notAppliedLine, savedDeckName, startingThreat } from "../../deck/status";
+import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, refusedCodes, refusedKey, sideRows, TYPE_NOUN, type EditorCard, type EditorRow, type Jump } from "../../deck/grid";
+import { announceDraftChange, discardDraftChanges, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, setDraftTarget, startNewDeck, useDeckDraft, type DraftCard, type DraftPile, type TitleLookup } from "../../deck/draft";
+import { deckContentsPhrase, deckCountLine, deckLootRule, deckReadiness, deckSections, notAppliedLine, savedDeckName, sideDeckNote, startingThreat, type DeckFace } from "../../deck/status";
 import { deckFaces, isStarterDeck, listDecks, notAppliedIn, readDeck, writeDeck } from "../../deck/store";
 import { notAppliedWords } from "../../../play/cards/not-applied";
 import { STARTER_NOTE } from "../../deck/starter-decks";
@@ -31,6 +31,25 @@ import { useTopInset } from "../../nav/use-top-inset";
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
 // The deck's head in an expanded window, in Medium's points (docs/design-system.md, Deck builder); its cards take the rest.
 const DECK_SIDE_RANGE = { min: 360, max: 420 };
+
+// The deck's or the side deck's cards with what the catalog says of each.
+function editorCardsOf(cards: readonly DraftCard[], faces: ReadonlyMap<string, DeckFace>, pile: DraftPile): EditorCard[] {
+  return cards.map((card) => {
+    const face = faces.get(card.code);
+    return {
+      code: card.code,
+      count: card.count,
+      cost: face?.cost ?? null,
+      name: face?.name ?? card.code,
+      typeCode: face?.typeCode ?? null,
+      imagesrc: face?.imagesrc ?? null,
+      deckLimit: face?.deckLimit ?? null,
+      sphereCode: face?.sphereCode ?? null,
+      sphereName: face?.sphereName ?? null,
+      pile,
+    };
+  });
+}
 
 function onViewableItemsChanged({ viewableItems }: { viewableItems: { item: EditorRow | null }[] }): void {
   const jobs = [];
@@ -74,38 +93,29 @@ export default function DeckEditor() {
     else startNewDeck();
   }, [id, user]);
 
-  const codeKey = [...draft.heroes, ...draft.cards.map((card) => card.code)].join("\0");
+  const codeKey = [...draft.heroes, ...draft.cards.map((card) => card.code), ...draft.side.map((card) => card.code)].join("\0");
   const faces = useMemo(() => deckFaces(catalog, codeKey.length === 0 ? [] : codeKey.split("\0")), [catalog, codeKey]);
   const lookup = useCallback<TitleLookup>((code) => faces.get(code), [faces]);
 
-  // The deck's cards with what the catalog says of each, rebuilt only when the cards or the faces change (not for each key of the name).
-  const editorCards = useMemo<EditorCard[]>(
-    () =>
-      draft.cards.map((card) => {
-        const face = faces.get(card.code);
-        return {
-          code: card.code,
-          count: card.count,
-          cost: face?.cost ?? null,
-          name: face?.name ?? card.code,
-          typeCode: face?.typeCode ?? null,
-          imagesrc: face?.imagesrc ?? null,
-          deckLimit: face?.deckLimit ?? null,
-          sphereCode: face?.sphereCode ?? null,
-          sphereName: face?.sphereName ?? null,
-        };
-      }),
-    [draft.cards, faces],
-  );
+  // The deck's and the side deck's cards with what the catalog says of each, rebuilt only when the cards or the faces change (not for
+  // each key of the name).
+  const editorCards = useMemo(() => editorCardsOf(draft.cards, faces, "deck"), [draft.cards, faces]);
+  const sideCards = useMemo(() => editorCardsOf(draft.side, faces, "side"), [draft.side, faces]);
   const sections = deckSections<EditorCard>(editorCards);
   // Which cards' + is refused, once per change of the heroes or the cards: the grid's cells are not asked one by one on each render.
-  const refused = useMemo(() => refusedCodes({ heroes: draft.heroes, cards: draft.cards }, editorCards, lookup), [draft.heroes, draft.cards, editorCards, lookup]);
+  const refused = useMemo(
+    () => refusedCodes({ heroes: draft.heroes, cards: draft.cards, side: draft.side }, [...editorCards, ...sideCards], lookup),
+    [draft.heroes, draft.cards, draft.side, editorCards, sideCards, lookup],
+  );
+  // The loot deck the deck's contract takes from the side deck (The Burglar's Turn), read once per change of the cards.
+  const loot = useMemo(() => deckLootRule(draft.cards), [draft.cards]);
   // A phone holds three cards a row (each wide enough for its stepper), a tablet in portrait six, the deck's pane in landscape five.
   const cols = size === "compact" ? 3 : size === "medium" ? 6 : 5;
   const rows: EditorRow[] = [
     { kind: "type", key: "type-hero", type: "hero", title: "Heroes", count: draft.heroes.length },
     { kind: "heroes", key: "heroes" },
     ...gridRows(sections, cols),
+    ...sideRows(sideCards, cols, sideDeckNote(loot, draft.side, faces), loot != null),
   ];
   const readiness = deckReadiness(draft, faces);
   // The cards whose printed text the app does not apply: a line under the readiness, and the loss on each row.
@@ -115,10 +125,13 @@ export default function DeckEditor() {
   const heroes: HeroFace[] = draft.heroes.map((code) => heroFace(faces, code));
   const emptySlots = Math.max(0, 3 - heroes.length);
 
-  // The pool, adding to this deck, on one type: an empty hero slot opens it on heroes, a subsection's Add on its type. Expanded, the
-  // pool is already on screen beside the deck, so the request sets its type chips (null: all) instead of pushing a route.
+  // The pool, adding to this deck, on one type: an empty hero slot opens it on heroes, a subsection's Add on its type. The side deck's
+  // Add opens it on every type, adding to the side deck. Expanded, the pool is already on screen beside the deck, so the request
+  // sets its type chips (null: all) instead of pushing a route.
   const [typeRequest, setTypeRequest] = useState<PoolTypeRequest | null>(null);
-  function addOfType(type: string | null): void {
+  function addOfType(asked: string | null): void {
+    setDraftTarget(asked === "side" ? "side" : "deck");
+    const type = asked === "side" ? null : asked;
     if (expanded) {
       setAdding(true);
       setTypeRequest({ type });
@@ -131,7 +144,7 @@ export default function DeckEditor() {
     const current = getDeckDraft();
     const others = listDecks(user).filter((deck) => deck.id !== current.id).map((deck) => deck.name);
     const name = savedDeckName(current.name, others);
-    const savedId = writeDeck(user, { id: current.id === NEW_DECK_ID ? null : current.id, name, heroes: current.heroes, cards: current.cards });
+    const savedId = writeDeck(user, { id: current.id === NEW_DECK_ID ? null : current.id, name, heroes: current.heroes, cards: current.cards, side: current.side });
     markDraftSaved(savedId, name);
     showToast(`Saved ${name}`, { carry: true });
   }
@@ -184,7 +197,9 @@ export default function DeckEditor() {
   );
 
   // The headings the jump chips lead to, with the row each starts at.
-  const jumps: Jump[] = rows.flatMap((row, index) => (row.kind === "type" ? [{ key: row.key, title: row.title, count: row.type === "hero" ? heroes.length : row.count, index }] : []));
+  // An empty side deck no contract asks for gets no chip.
+  const quietSide = loot == null && draft.side.length === 0;
+  const jumps: Jump[] = rows.flatMap((row, index) => (row.kind === "type" && !(row.type === "side" && quietSide) ? [{ key: row.key, title: row.title, count: row.type === "hero" ? heroes.length : row.count, index }] : []));
   // The page's side padding. Compact is the phone's. Medium keeps the rows (and the glance's words) in a reading column; expanded,
   // the deck is the left pane: it starts at the screen's edge and its rows stop 24 short of the pane's edge, in line with the bar's buttons.
   const base = { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right };
@@ -218,6 +233,13 @@ export default function DeckEditor() {
   function renderRow({ item }: { item: EditorRow }) {
     if (item.kind === "heroes") return heroStrip;
     if (item.kind === "type") return <DeckSectionHeader type={item.type} title={item.title} count={item.count} onAdd={addOfType} />;
+    if (item.kind === "note") {
+      return (
+        <Text testID={`deck-${item.key}`} className="pb-3 text-label text-muted">
+          {item.text}
+        </Text>
+      );
+    }
     if (item.kind === "empty") {
       return (
         <Text testID={`deck-empty-${item.type}`} className="pb-3 text-label text-faint">
@@ -232,7 +254,7 @@ export default function DeckEditor() {
             key={card.code}
             card={card}
             width={cellWidth}
-            full={refused.has(card.code)}
+            full={refused.has(refusedKey(card))}
             lookup={lookup}
             onPreview={preview.open}
             loss={inactive.has(card.code) ? notAppliedWords(card.code, card.typeCode) : null}
@@ -253,7 +275,7 @@ export default function DeckEditor() {
       getItemType={(item) => item.kind}
       style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: 24 * s }}
-      extraData={{ cards: draft.cards, heroes: draft.heroes, refused, cellWidth }}
+      extraData={{ cards: draft.cards, heroes: draft.heroes, side: draft.side, refused, cellWidth }}
       onViewableItemsChanged={onViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
       keyboardShouldPersistTaps="handled"

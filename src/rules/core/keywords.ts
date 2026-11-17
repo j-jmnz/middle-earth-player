@@ -176,7 +176,7 @@ export function lowerThreat(state: ScenarioState, seat: number, amount: number, 
 // Immune to player card effects: printed, or gained while a card says so (`immuneToPlayerCards`, families/nightmare.ts, 906201:A:2).
 // `source` is the printed player card whose effect it is, when known: "Immune to non-Fellowship player card effects" (`immuneToNonFellowship`, 144075:A:1) lets a Fellowship card's effect through. Every path a player card's effect takes (a pick, an attachment host, damage, the enemy list) asks this one predicate.
 export function playerCardEffectCanChoose(printed: PrintedCard, state?: ScenarioState, id?: string, source?: PrintedCard | null): boolean {
-  if (state && id && flagged(state, id, "immuneToPlayerCards")) return false;
+  if (state && id && (flagged(state, id, "immuneToPlayerCards") || flagged(state, id, "immuneToCardEffects"))) return false;
   if (state && id && source && isPlayerType(source) && source.sphere !== "fellowship" && flagged(state, id, "immuneToNonFellowship")) return false;
   return !printed.keywords.immuneToPlayerCardEffects;
 }
@@ -373,7 +373,7 @@ export function releaseAttachments(
     }
     const printed = printedOf(cards, attachment.code);
     const dest: Destination =
-      cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent
+      (cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent) || flagged(next, attachmentId, "removedWithHost")
         ? { zone: "removed" }
         : defeatedDestination(attachment, printed);
     next = moveCard(next, attachmentId, dest);
