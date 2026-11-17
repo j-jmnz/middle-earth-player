@@ -48,6 +48,7 @@ describe("effects render read fields, picks", () => {
     lowestAttack: true,
     lowestThreat: true,
     highestCost: true,
+    minCost: 0,
     fortitudeDiscarded: true,
     isHost: true,
     determined: true,
