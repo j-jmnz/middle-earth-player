@@ -5,6 +5,21 @@
     "the-massing-at-osgiliath"
   ],
   "kind": "cycle",
+  "later": [
+    "The Battle of Lake-town",
+    "The Stone of Erech",
+    "The Old Forest",
+    "Fog on the Barrow-downs",
+    "The Ruins of Belegost",
+    "Murder at the Prancing Pony",
+    "The Siege of Annúminas",
+    "Attack on Dol Guldur",
+    "The Wizard's Quest",
+    "The Woodland Realm",
+    "The Mines of Moria",
+    "Escape from Khazad-dûm",
+    "The Hunt for the Dreadnaught"
+  ],
   "starterDecks": [],
   "saga": false
 }

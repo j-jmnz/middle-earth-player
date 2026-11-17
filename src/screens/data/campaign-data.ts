@@ -88,14 +88,14 @@ export function campaignIds(): readonly string[] {
  * campaign whose flags (saga, booklet) the box's standalone games follow. The Oath and The Caves of Nibin-Dûm are in two campaigns
  * but one box, The Dark of Mirkwood. `name` is the printed product.
  */
-export type Box = { id: string; name: string; campaignId: string; scenarios: readonly string[] };
+export type Box = { id: string; name: string; campaignId: string; scenarios: readonly string[]; /** Titles of the cycle's scenarios not built yet, in release order (the campaign file's `later`); each waits under Coming later. */ later?: readonly string[] };
 
 export const BOXES: readonly Box[] = [
   // In the campaigns table's order (`position`): by release, the Lord of the Rings saga boxes together at the Fellowship's.
   // Shadows of Mirkwood is a cycle, not a campaign: its six Adventure Packs have no Campaign Mode and are played standalone only (docs/brief.md, Shadows of Mirkwood).
   { id: "shadows-of-mirkwood", name: "Shadows of Mirkwood", campaignId: "shadows-of-mirkwood", scenarios: ["the-hunt-for-gollum", "conflict-at-the-carrock", "a-journey-to-rhosgobel", "the-hills-of-emyn-muil", "the-dead-marshes", "return-to-mirkwood"] },
-  // The Standalone scenarios cycle likewise, one box per scenario as each is built (docs/brief.md, Standalone scenarios).
-  { id: "the-massing-at-osgiliath", name: "The Massing at Osgiliath", campaignId: "standalone-scenarios", scenarios: ["the-massing-at-osgiliath"] },
+  // The Standalone scenarios cycle likewise, one box in release order; its scenarios not built yet wait under Coming later (docs/brief.md, Standalone scenarios).
+  { id: "standalone-scenarios", name: "Standalone scenarios", campaignId: "standalone-scenarios", scenarios: ["the-massing-at-osgiliath"], later: standaloneScenarios.later },
   { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
   // The Lost Realm and the six Adventure Packs are one box with the Campaign Expansion on the Scenarios tab, as the other campaign expansions' are.

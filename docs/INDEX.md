@@ -31,18 +31,18 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` (~5.7K tok)
+- `README.md` (~5.8K tok)
   - 56–93 Features (~550)
     - 79–93 Themes (~190)
-  - 94–111 What you can play (~240)
-  - 112–119 Private by design (~170)
-  - 120–125 Accessibility (~120)
-  - 126–223 Install (~1.7K)
-  - 224–258 Roadmap (~1.2K)
-  - 259–269 Get involved (~210)
-  - 270–273 Support (~90)
-  - 274–289 Attribution (~410)
-  - 290–293 License (~50)
+  - 94–112 What you can play (~270)
+  - 113–120 Private by design (~170)
+  - 121–126 Accessibility (~120)
+  - 127–224 Install (~1.7K)
+  - 225–259 Roadmap (~1.2K)
+  - 260–270 Get involved (~210)
+  - 271–274 Support (~90)
+  - 275–290 Attribution (~410)
+  - 291–294 License (~50)
 - `docs/architecture.md` — Architecture (~28.5K tok)
   - 7–42 Stack (~1.3K)
   - 43–78 Processes (~690)
@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~218.7K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~218.9K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
@@ -131,8 +131,8 @@ Read the sections your task touches.
     - 1753–1770 The Hills of Emyn Muil (~1.5K) ← 1
     - 1771–1791 The Dead Marshes (~2.1K) ← 2
     - 1792–1815 Return to Mirkwood (~2.3K) ← 4
-  - 1816–1843 Standalone scenarios (~2.6K) ← 1
-    - 1820–1843 The Massing at Osgiliath (~2.4K)
+  - 1816–1843 Standalone scenarios (~2.8K) ← 1
+    - 1820–1843 The Massing at Osgiliath (~2.5K)
   - 1844–1852 Nightmare (~410) ← 21
   - 1853–1893 Deckbuilding (~2.1K)
   - 1894–1973 Effects (~3.7K)
@@ -179,7 +179,7 @@ Read the sections your task touches.
   - 374–385 Banner (~750) ← 5
   - 386–405 Screen reader (~3.0K) ← 19
   - 406–409 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~32.3K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~32.4K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
   - 35–45 Performance (~680) ← 4
@@ -199,7 +199,7 @@ Read the sections your task touches.
     - 290–295 Splash (~210) ← 3
     - 296–299 App icon (~80)
     - 300–315 Campaigns (campaign list) (~1.5K) ← 6
-    - 316–329 Scenarios (~1000) ← 1
+    - 316–329 Scenarios (~1.0K) ← 1
     - 330–341 History (~1.4K) ← 4
     - 342–359 Briefing (~2.0K) ← 6
     - 360–363 Campaign setup (~1.0K) ← 3

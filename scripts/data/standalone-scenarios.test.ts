@@ -21,6 +21,8 @@ const SCOUTS = ["00002", "00003", "00004"];
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
     expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath"]);
+    // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
+    expect(cycle.later).toEqual(["The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;

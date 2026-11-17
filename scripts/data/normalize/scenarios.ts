@@ -470,6 +470,6 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     );
   }
 
-  const campaigns = campaignsOf(campaignDefs, scenarios, campaignCards, preludes);
+  const campaigns = campaignsOf(campaignDefs, scenarios, campaignCards, preludes, raw.scenarioIndex);
   return { scenarios, campaigns, problems };
 }

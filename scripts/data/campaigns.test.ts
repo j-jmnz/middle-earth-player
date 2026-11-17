@@ -72,8 +72,8 @@ describe("data/campaigns/index.json", () => {
       "The Scouring of the Shire", "The Nine are Abroad", "The Siege of Erebor", "The Shire's Reckoning", "The Hobbit", "Strange News in Bree", "Fangs in the Dark",
       "First Age", "Trial Upon the Marches", "Among the Outlaws", "The Betrayal of Mîm", "The Fall of Nargothrond", "Skirmish in the Shire", "Down the Baranduin", "Dwarf Lord Battle",
     ];
-    // The Standalone scenarios cycle is built one scenario at a time: the products of the ones not built yet (README.md, Roadmap). Each moves to scripts/data/campaign-defs.ts as it is built.
-    const standaloneToBuild = ["2012", "2013", "2014", "2015", "2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"];
+    // The Standalone scenarios cycle is built one scenario at a time: the products of the ones not built yet are its `later` (scripts/data/campaign-defs.ts), moved to its products as each is built.
+    const standaloneToBuild = CAMPAIGNS.flatMap((campaign) => ("later" in campaign ? (campaign.later ?? []) : []));
     const unaccounted = [...products].filter((product) => !listed.has(product) && !reprinted.includes(product) && !fanMade.includes(product) && !standaloneToBuild.includes(product));
     expect(unaccounted).toEqual([]);
     // Each name above is a product Hall of Beorn lists, so a rename upstream fails here rather than hiding a product.

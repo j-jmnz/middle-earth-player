@@ -106,6 +106,7 @@ All eight official campaigns from the revised products, in the order the app lis
 | Dream-chaser | Dream-chaser Campaign Expansion | 9 |
 | Ered Mithrin | Ered Mithrin Campaign Expansion | 9 |
 | Shadows of Mirkwood (cycle) | The Hunt for Gollum to Return to Mirkwood (six Adventure Packs) | 6 |
+| Standalone scenarios (cycle) | The Massing at Osgiliath, the first of the scenarios printed on their own | 1 |
 
 There is no online multiplayer, and there won't be. The app is built for one device.
 
@@ -225,12 +226,12 @@ Each release lists the SHA-256 of every file, with a `.sha256` file beside each 
 
 Every official campaign and scenario, then the fan-made ones: first the content from [A Long-extended Party](https://alongextendedparty.com) (ALeP), then the other community projects listed below.
 
-The official campaigns are done, so the cycles are next. Shadows of Mirkwood is playable: six scenarios, each on Easy, Normal and Nightmare. The other cycles show under Coming later in the app until one of their scenarios is playable. They come in release order:
+The official campaigns are done, so the cycles are next. Shadows of Mirkwood is playable: six scenarios, each on Easy, Normal and Nightmare. The Standalone scenarios cycle has its first scenario, The Massing at Osgiliath, on Easy and Normal (it has no Nightmare deck), and the rest of the cycle follows one scenario at a time. The scenarios and cycles not built yet show under Coming later in the app. They come in release order:
 
 <details>
 <summary>Incoming cycles, in order of implementation</summary>
 
-- The Standalone scenarios cycle: The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
+- The rest of the Standalone scenarios cycle: The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
 - The Dwarrowdelf cycle: Into the Pit, The Seventh Level, Flight from Moria, The Redhorn Gate, Road to Rivendell, The Watcher in the Water, The Long Dark, Foundations of Stone, Shadow and Flame.
 - The Hobbit cycle (the two Hobbit saga boxes): "We Must Away, Ere Break of Day", Over the Misty Mountains Grim, Dungeons Deep and Caverns Dim, Flies and Spiders, The Lonely Mountain, The Battle of Five Armies.
 - The Against the Shadow cycle: Peril in Pelargir, Into Ithilien, The Siege of Cair Andros, The Steward's Fear, The Drúadan Forest, Encounter at Amon Dîn, Assault on Osgiliath, The Blood of Gondor, The Morgul Vale.

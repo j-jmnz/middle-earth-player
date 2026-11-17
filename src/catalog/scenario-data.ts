@@ -138,6 +138,8 @@ export const campaignDataSchema = z.strictObject({
   scenarios: z.array(z.string().min(1)),
   // "cycle": scenarios that belong to no campaign (Shadows of Mirkwood), played standalone only. Absent in a campaign's file.
   kind: z.literal("cycle").optional(),
+  // A cycle built a scenario at a time: the titles of the ones it lists that are not built yet, in release order. The Scenarios tab shows each under Coming later.
+  later: z.array(z.string().min(1)).optional(),
   // The campaign card of each scenario, by scenario id. Its Setup and Resolution lines are effect records. A cycle's file omits it (read as empty).
   campaignCards: z.record(z.string(), z.string().min(1)).default({}),
   // The booklet the campaign opens (src/screens/booklets/books.ts): the Fellowship's MEC109, the Learn to Play for Mirkwood

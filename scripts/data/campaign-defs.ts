@@ -193,7 +193,9 @@ type CampaignBase = {
 type PlayedCampaignDef = CampaignBase & { kind?: "campaign"; bookletId: string; bookletDoc: string };
 // A cycle (Shadows of Mirkwood) has no Campaign Mode: no campaign card, no booklet of its own, and its scenarios are played standalone. It names a booklet only
 // where its Adventure Packs' rules inserts are pinned (docs/brief.md, Data sources).
-type CycleDef = CampaignBase & { kind: "cycle"; bookletId?: string; bookletDoc?: string };
+// `later` names the Hall of Beorn products whose scenarios the cycle lists and the app has not built yet: the cycle's file carries their titles, which the hubs show under
+// Coming later. Each moves to `products` and `scenarios` as it is built.
+type CycleDef = CampaignBase & { kind: "cycle"; bookletId?: string; bookletDoc?: string; later?: readonly string[] };
 export type CampaignDef = PlayedCampaignDef | CycleDef;
 
 const OATH: ScenarioDef = { id: "the-oath", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-oath", crossCheck: { normal: "Q00.01B", easy: "E00.01B" } };
@@ -416,6 +418,8 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
       // DragnCards' deck Q99.01 has no Easy twin: Hall of Beorn's Easy counts equal the Normal ones, so Easy loads the same deck.
       { id: "the-massing-at-osgiliath", product: "The Massing at Osgiliath", deck: { normal: "Q99.01", easy: "Q99.01" } },
     ],
+    // The other products of the cycle, in release order (README.md, Roadmap): their scenario titles are the file's `later`.
+    later: ["2012", "2013", "2014", "2015", "2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
     saga: false,
     ledger: "standalone-scenarios",
   },
