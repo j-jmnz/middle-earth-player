@@ -105,6 +105,17 @@ describe("the update check", () => {
     stop();
   });
 
+  it("counts a body that cannot be read as no answer, keeping the release it knew", async () => {
+    const user = openUser();
+    const known = { checkedAt: NOW - CHECK_INTERVAL_MS * 2, latest: { version: "0.5.0", publishedAt: null }, dismissed: null };
+    writeStoredUpdate(user, known);
+    const cut: UpdateFetch = () => Promise.resolve({ status: 200, json: () => Promise.reject(new Error("aborted while reading")) });
+    const stop = startUpdateChecks(user, { current: "0.4.2", fetch: cut, now: () => NOW, onActive: () => () => undefined, warn: () => undefined });
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(updateStore.getState().stored).toEqual(known);
+    stop();
+  });
+
   it("drops a request that does not answer in time and asks again later", async () => {
     const user = openUser();
     let clock = NOW;

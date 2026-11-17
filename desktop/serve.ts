@@ -3,6 +3,8 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
+import { LATEST_RELEASE_URL } from "./policy.ts";
+
 const TYPES: Readonly<Record<string, string>> = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript",
@@ -91,7 +93,7 @@ export const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self' https://ringsdb.com https://api.github.com/repos/j-jmnz/middle-earth-player/releases/latest",
+  `connect-src 'self' https://ringsdb.com ${LATEST_RELEASE_URL}`,
   "worker-src 'self' blob:",
   "media-src 'self'",
   "object-src 'none'",

@@ -5,7 +5,7 @@
 //   - /e2e/duo seeds a save and /table/save-e2e-duo draws the table on a canvas (a pixel read of a screenshot, not the reader table);
 //   - a card picture loads from the bundle, and a booklet page renders (skipped when the export carries no pictures or no booklets: the release job packs them);
 //   - a Blob download (the Settings backup) is offered through a save dialog with its name;
-//   - no request left app:// (every request the window made is counted), no CSP violation or page error came up, and then a navigation away and a request to another host are refused;
+//   - no request left app:// but a packed release build's update check (every request the window made is counted), no CSP violation or page error came up, and then a navigation away and a request to another host are refused;
 //   - after closing and opening the app again on the same profile, the campaign list still shows the seeded save.
 // Flags (scripts/desktop/smoke-args.ts): --skip-build reuses the last export and bundle; --app <path> launches a packed app (an installer's unpacked app or an AppImage)
 // instead of the checkout's, which has no seeded export, so the seeded checks are skipped; with --require-bundle the picture and booklet checks must pass instead of being skipped
@@ -21,6 +21,7 @@ import type { Page } from "playwright";
 import sharp from "sharp";
 
 import { APP_ORIGIN, DESKTOP_API } from "../../desktop/identity.ts";
+import { LATEST_RELEASE_URL } from "../../desktop/policy.ts";
 import { duration, runScript, type Log } from "../log.ts";
 import { packedVersion } from "../desktop/asar.ts";
 import { openChecked, openPacked, type Opened } from "../desktop/launch.ts";
@@ -251,11 +252,13 @@ async function main(log: Log): Promise<void> {
     else skip(results, log, "picture from the bundle", "no scans packed");
     if (requireBundle || bookletsPacked()) await check(results, log, "booklet page renders", () => booklet(first));
     else skip(results, log, "booklet page renders", "no booklets packed");
+    // A packed release build (a stamped version) also makes the update check's one request (docs/architecture.md, Update check); nothing else may leave.
     await check(results, log, "no request left app://", async () => {
-      const left = first.requests.filter((url) => !url.startsWith(`${APP_ORIGIN}/`) && !url.startsWith("data:") && !url.startsWith("blob:"));
+      const left = first.requests.filter((url) => !url.startsWith(`${APP_ORIGIN}/`) && !url.startsWith("data:") && !url.startsWith("blob:") && url !== LATEST_RELEASE_URL);
       assert(left.length === 0, `${left.length} requests left app://: ${left.slice(0, 3).join(", ")}`);
       assert(first.requests.length > 0, "no request was seen at all, so the count proves nothing");
-      return `${first.requests.length} requests, all app://`;
+      const checked = first.requests.filter((url) => url === LATEST_RELEASE_URL).length;
+      return `${first.requests.length} requests, all app://${checked > 0 ? ` but the update check (${checked})` : ""}`;
     });
     await check(results, log, "no CSP violation, no page error", async () => {
       assert(first.csp.length === 0, `CSP: ${first.csp[0]}`);

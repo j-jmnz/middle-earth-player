@@ -24,7 +24,8 @@ import { useIsTablet } from "../../ui/use-size-class";
 import { PicturesReady } from "../../ui/showcase/pictures-ready";
 import { SplashGlow } from "../kit/splash-glow";
 import { startUpdateChecks } from "../update/check";
-import { APP_VERSION, UpdateFrame } from "../update/ribbon";
+import { APP_VERSION } from "../update/offer";
+import { UpdateFrame } from "../update/ribbon";
 
 void SplashScreen.preventAutoHideAsync();
 

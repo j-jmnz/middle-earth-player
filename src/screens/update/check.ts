@@ -42,18 +42,12 @@ export function afterAnswer(stored: StoredUpdate, status: number, body: unknown,
   return { ...stored, checkedAt: now };
 }
 
-// The answer's status and body, or null when the request did not complete (offline, a timeout, a refused host). A body that is not JSON reads as null.
+// The answer's status and body, or null when the request did not complete (offline, a timeout, a refused host) or a 200's body could not be read
+// whole (cut off by the timeout, not JSON): that is no answer, so what was known stays and the next launch or return asks again.
 async function ask(fetcher: UpdateFetch, signal: AbortSignal): Promise<{ status: number; body: unknown } | null> {
   try {
     const response = await fetcher(LATEST_RELEASE_URL, { signal });
-    let body: unknown = null;
-    if (response.status === 200) {
-      try {
-        body = await response.json();
-      } catch {
-        body = null;
-      }
-    }
+    const body: unknown = response.status === 200 ? await response.json() : null;
     return { status: response.status, body };
   } catch {
     return null;

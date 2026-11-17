@@ -2,7 +2,7 @@
 // reads the order and the words. The testIDs are the ones the controls had in the bar, so a Maestro flow taps `table-menu`
 // and then the same id.
 import type { IconName } from "../../ui/icon-map.ts";
-import { offerTitle } from "../../ui/update-offer.ts";
+import { OFFER_LINK_HINT, offerLinkLabel, offerTitle } from "../../ui/update-offer.ts";
 
 /** What the menu needs of the table's navigation: the word the table's back control names the screen it leads to. */
 export type MenuNav = { backLabel: string; backAccessibilityLabel: string };
@@ -36,8 +36,8 @@ export function menuItems(nav: MenuNav, without?: readonly MenuItemId[], update?
           id: "update",
           testID: "update-open",
           label: offerTitle(update),
-          accessibilityLabel: `Get version ${update}`,
-          accessibilityHint: "Opens the release page in your browser. The game is saved",
+          accessibilityLabel: offerLinkLabel(update),
+          accessibilityHint: `${OFFER_LINK_HINT}. The game is saved`,
           icon: "oneRing",
           tone: "accent",
         },

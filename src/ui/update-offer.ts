@@ -90,6 +90,8 @@ export function ribbonShows(offer: string | null, dismissed: string | null): boo
 export const offerTitle = (version: string) => `Version ${version} is out`;
 export const offerDetail = (current: string) => `You have ${current}. Your saves stay.`;
 export const OFFER_LINK_HINT = "Opens the release page in your browser";
+/** What a screen reader hears for Get it, and for the table menu's row. */
+export const offerLinkLabel = (version: string) => `Get version ${version}`;
 export const CHECK_LABEL = "Check for new versions";
 export const CHECK_LINE = "Once a day, asks GitHub for the latest release. Nothing about you or your games is sent.";
 
