@@ -253,7 +253,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       trigger: "revealed",
       byEncounterDeck: true,
       subject: { type: "enemy", control: "any" },
-      instructions: [{ verb: "MoveEncounterCard", card: "subject", to: "discard", when: { kind: "matches", card: "subject", pick: { type: "enemy", control: "any", stagingOnly: true } } }],
+      instructions: [{ verb: "MoveEncounterCard", card: "subject", to: "discard", when: { kind: "matches", card: "subject", inStaging: true, pick: { type: "enemy", control: "any" } } }],
     },
     { id: "03065:constant:1", cardCode: "03065", lines: ["03065:B:3"], timing: "constant", condition: { kind: "enemyInPlay", is: false }, instructions: [{ verb: "ModifyStat", stat: "advanceNow", amount: 1, until: "whileSourceInPlay", target: "self" }] },
 

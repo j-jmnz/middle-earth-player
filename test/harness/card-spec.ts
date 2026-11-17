@@ -83,7 +83,7 @@ export const notWon: Expect = { expect: "notWon" };
 /** A frame of this name was pushed while the action ran. */
 export const frame = (name: string): Expect => ({ expect: "frame", name });
 /** The intent is legal now (for a card, one of its own: a Response offered after the action). */
-export const offers = (intent: PlayerIntent["type"], code?: string): Expect => ({ expect: "offers", intent, ...(code ? { code } : {}) });
+export const offers = (intent: PlayerIntent["type"], code?: string, value = true): Expect => ({ expect: "offers", intent, ...(code ? { code } : {}), ...(value ? {} : { value }) });
 /**
  * What a row says is wrong when it runs on these records: the failed expectations, or the error an action threw. Empty when the row holds. `lenient` is the run without the row's records: an answer nobody asks
  * for is skipped there (the records that asked are gone), so only the expectation can pass the run.

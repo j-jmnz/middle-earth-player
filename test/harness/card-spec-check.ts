@@ -134,7 +134,7 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
         case "offers": {
           const id = item.code ? idOf(state, item.code) : undefined;
           const offered = legalIntents(state, done.table.ctx).some((intent) => intent.type === item.intent && (id === undefined || ("cardId" in intent && intent.cardId === id)));
-          if (!offered) problems.push(`${item.intent}${item.code ? ` of ${item.code}` : ""} is not offered`);
+          if (offered !== (item.value ?? true)) problems.push(`${item.intent}${item.code ? ` of ${item.code}` : ""} is ${offered ? "offered" : "not offered"}`);
           break;
         }
       }

@@ -1,6 +1,7 @@
 // Rules: rr.active-location, rr.travel, rr.step-4-2, rr.explored, rr.modifiers, rr.lasting-effects (data/rules/entries.json).
 // Locations and progress for the quest family: making a location the active location (not traveling), traveling without the
 // Travel effect, moving progress, and a Threat reduction that reports whether it reached 0.
+import { immuneToSource } from "../misc/guards.ts";
 import type { Instruction, SimpleInstruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -100,7 +101,8 @@ export function removeProgressFromQuest(state: ScenarioState, instruction: Verb<
 
 // RemoveAllProgress: every progress token comes off the card named (the picked card by default), or off each card in play that matches the filter, read from the actor's side (02023:A:2, 900409:A:1).
 export function removeAllProgress(state: ScenarioState, instruction: Verb<"RemoveAllProgress">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const ids = instruction.pick ? pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx) : [refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId))];
+  // A card immune to card effects keeps its progress (East-gate, 03016:A:1; dwd.immune-to-card-effects).
+  const ids = (instruction.pick ? pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx) : [refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId))]).filter((id) => id == null || !immuneToSource(state, id, focus.sourceId, ctx));
   return ids.reduce((current, id) => takeProgressOff(current, id, current.cards[id ?? ""]?.progress ?? 0, steps), state);
 }
 

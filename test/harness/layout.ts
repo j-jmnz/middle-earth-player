@@ -10,6 +10,7 @@ import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
 import { markCapture } from "../../src/rules/families/captured/entry.ts";
+import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
@@ -40,7 +41,10 @@ export type Layout = {
   seed?: number;
   stage?: string;
   progress?: number;
-  active?: string;
+  // A code, or a code with its tokens.
+  active?: Entry;
+  // The Nightmare setup card, side A faceup next to the quest deck, with its tokens (901001:A:2 counts on it).
+  nightmare?: Entry;
   deck?: readonly string[];
   discard?: readonly string[];
   staging?: readonly Entry[];
@@ -162,7 +166,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const code of layout.setAside ?? []) put(code, { zone: "setAside" }, code, "up");
   for (const item of layout.engaged ?? []) put(entry(item).code, { zone: "engaged", seat: seatOf(item) }, item);
   for (const code of layout.victory ?? []) put(code, { zone: "victory" });
-  if (layout.active) put(layout.active, { zone: "activeLocation" });
+  if (layout.active) put(entry(layout.active).code, { zone: "activeLocation" }, layout.active);
+  if (layout.nightmare) put(entry(layout.nightmare).code, { zone: "nightmare" }, layout.nightmare, "up");
   if (layout.campaign && world.dealt.campaignCard !== undefined) put(world.dealt.campaignCard, { zone: "campaign" });
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
   for (const attachment of layout.attached ?? []) {
@@ -186,6 +191,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   state = markProgressNoted(state, ctx);
   // The cards with Capture X, and the cards in every area, as Escape from Mount Gram's start notes them (families/captured/entry.ts markCapture).
   state = markCapture(state, ctx);
+  // The enemies whose own Forced effect hears the damage dealt to them (families/encounter/patrol.ts markEnemyDamage).
+  state = markEnemyDamage(state, ctx);
   state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
 }

@@ -1,6 +1,7 @@
 // Effect items that act on a picked or found card: ReturnToStaging, AttachSelf, the searches, ShuffleIntoDeck, DiscardRestricted, ReadyHero,
 // BarAttack, PlaceProgressOnLocation. The candidates are found, one is chosen (a player chooses only among different cards), and the verb applies.
 import type { Instruction } from "../../catalog/boundary.ts";
+import { immuneToSource } from "../families/misc/guards.ts";
 import { characters } from "../combat/combat.ts";
 import { frameScope, refCard } from "./amounts.ts";
 import { askTarget } from "../windows/choices.ts";
@@ -44,7 +45,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       if (target.kind === "activeLocation") {
         // The acting seat's own active location once stages are separate.
         const active = activeOf(state, item.seat);
-        return active && active !== sourceId ? [active] : [];
+        // An active location immune to card effects stays where it is (East-gate, 03016:A:1; dwd.immune-to-card-effects).
+        return active && active !== sourceId && !immuneToSource(state, active, sourceId, ctx) ? [active] : [];
       }
       if (target.kind === "picked" || target.kind === "previous" || target.kind === "subject" || target.kind === "attacker" || target.kind === "other") {
         const id = refCard(state, target.kind, frameScope(state, item.seat, sourceId));
