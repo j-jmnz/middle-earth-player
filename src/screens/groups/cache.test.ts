@@ -50,6 +50,20 @@ describe("the group cache", () => {
     }
   });
 
+  it("files every Nightmare card under its deck's set, so no card is a one-card set named for itself", () => {
+    const decks = data.scenario().products.find((product) => product.id === "nightmare")!.packs.flatMap((pack) => pack.sets);
+    expect(decks.length).toBeGreaterThan(60);
+    for (const set of decks) {
+      const typesOf = set.groups.flatMap((group) => group.cards.map((card) => card.typeCode));
+      expect(typesOf.filter((type) => type === "nightmare").length, set.name).toBeLessThanOrEqual(1);
+    }
+    // Only a setup card has no set (its name is the deck's); every other card of a deck is in a set, so none is its own one-card set.
+    expect(data.rows.filter((row) => row.packCode === "Nightmare" && row.encounterSet == null && row.typeCode !== "nightmare")).toEqual([]);
+    // The side quests of Intruders in Chetwood Nightmare sit with its setup card.
+    const chetwood = decks.find((set) => set.name === "Intruders in Chetwood Nightmare")!;
+    expect(chetwood.groups.flatMap((group) => group.cards.map((card) => card.code))).toEqual(expect.arrayContaining(["903701", "903709", "903710"]));
+  });
+
   it("ties each of the 84 heroes to the ally it stands for", () => {
     const heroes = data.motk();
     expect(heroes).toHaveLength(84);
