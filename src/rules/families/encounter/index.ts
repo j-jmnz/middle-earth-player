@@ -24,6 +24,7 @@ import { answeredRaise } from "./reveal.ts";
 import { revealTopEnemies } from "./top-enemies.ts";
 import { ambushChecks, discardTopEncounter, revealEnemies } from "./ambush.ts";
 import { noteFirstEnemy } from "./first-enemy.ts";
+import { exploreFull } from "./explore.ts";
 import { searchCollection } from "./collection.ts";
 import { returnFromDiscard } from "./returned.ts";
 import { queueFront } from "../play/refs.ts";
@@ -146,4 +147,4 @@ export function addTableModifier(state: ScenarioState, modifier: Omit<Modifier, 
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", ...modifier }] };
 }
 
-export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains"], run, revealed: noteFirstEnemy };
+export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains"], run, revealed: noteFirstEnemy, settle: { sweep: exploreFull } };

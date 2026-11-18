@@ -201,6 +201,8 @@ const FLAGS = [
   // Held by the table until the end of the round: a first enemy was noted for a FirstEnemyGains marker, with any keyword (`enemyRevealed`) or with the ambush keyword (`ambushEnemyRevealed`).
   "enemyRevealed",
   "ambushEnemyRevealed",
+  // On a location in play, while its source is in play: it is explored as soon as its progress equals its quest points as they stand now, whatever changed them ("Goblin Gate gets +1 quest point for each enemy engaged with a player", 901402:B:2; rr.explored; src/rules/families/encounter/explore.ts).
+  "exploredWhenFull",
 ] as const;
 
 export const manifest = { name: "encounter", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

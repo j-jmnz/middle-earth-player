@@ -4,6 +4,7 @@ import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { settle } from "../../engine/machine.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { definePrinted } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { withThreat } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
@@ -80,6 +81,46 @@ describe("Ambush (04049:A:1, dwd.ambush)", () => {
     const flags = [{ instanceId: "seat:0", stat: "engagementThreat", amount: 20 }];
     expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [10], flags }).state, "ambusher")).toBe("engaged:0");
     expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [4], flags }).state, "ambusher")).toBe("staging");
+  });
+});
+
+describe("Ambush's place in the staging (dwd.ambush)", () => {
+  it("04049:A:1 what hears the enemy added to the staging area resolves before the checks, so a card that stops its checks does", () => {
+    // A location that bars the checks against each enemy added to the staging area, as Ranger Spikes attaching itself to it does: its Forced line comes first.
+    const spikes: Effect = { id: "spikes:forced:1", cardCode: "spikes", lines: ["spikes:A:1"], timing: "forced", trigger: "addedToStaging", subject: { type: "enemy", control: "any" }, instructions: [{ verb: "ModifyStat", stat: "noEngagementChecks", amount: 1, until: "endOfPhase", target: "subject" }] };
+    const record: Effect = { id: "source:whenRevealed:1", cardCode: "source", lines: ["source:A:1"], timing: "whenRevealed", instructions: REVEAL };
+    const built = table({ cards: [hero("a"), SOURCE, AMBUSHER, definePrinted({ code: "spikes", name: "Spikes", type: "location", threat: 0, questPoints: 3 })], effects: [record, spikes], heroes: [{ code: "a" }], hand: [{ code: "source" }], staging: [{ code: "spikes" }] });
+    let state: ScenarioState = spawn(built.state, "ambusher", { zone: "encounterDeck" }).state;
+    state = withThreat(state, 0, 30);
+    const source = Object.values(state.cards).find((card) => card.code === "source")!;
+    const steps: EngineStep[] = [];
+    const done = settle(pushCardEffects({ ...state, phase: "Quest", window: null }, "whenRevealed", source.id, 0, false, [record], built.ctx, steps), built.ctx, steps);
+    expect(where(done, "ambusher")).toBe("staging");
+  });
+
+  it("04049:A:1 an enemy found by a search and added to the staging area makes its checks", () => {
+    expect(where(run({ instructions: [{ verb: "SearchMove", code: "ambusher", to: "staging" }], deck: ["mist", "ambusher"], threats: [30] }).state, "ambusher")).toBe("engaged:0");
+  });
+
+  it("04049:A:1 an enemy that moves to the staging area from play makes no check", () => {
+    const record: Effect = { id: "source:whenRevealed:1", cardCode: "source", lines: ["source:A:1"], timing: "whenRevealed", instructions: [{ verb: "ReturnToStaging", target: { kind: "engagedEnemies", who: "each", pick: "all" } }] };
+    const built = table({ cards: [hero("a"), SOURCE, AMBUSHER], effects: [record], heroes: [{ code: "a" }], hand: [{ code: "source" }], enemies: [{ code: "ambusher" }] });
+    const source = Object.values(built.state.cards).find((card) => card.code === "source")!;
+    const steps: EngineStep[] = [];
+    const done = settle(pushCardEffects({ ...withThreat(built.state, 0, 30), phase: "Quest", window: null }, "whenRevealed", source.id, 0, false, [record], built.ctx, steps), built.ctx, steps);
+    expect(where(done, "ambusher")).toBe("staging");
+  });
+});
+
+describe("ReturnToStaging with the ambush keyword (901409:A:1)", () => {
+  it("901409:A:1 returns only the engaged enemies that have the ambush keyword, and Tumultuous Assault's checks engage them again", () => {
+    const record: Effect = { id: "source:whenRevealed:1", cardCode: "source", lines: ["source:A:1"], timing: "whenRevealed", instructions: [{ verb: "ReturnToStaging", target: { kind: "engagedEnemies", keyword: "ambush", who: "each", pick: "all" } }] };
+    const built = table({ cards: [hero("a"), SOURCE, AMBUSHER, PLAIN], effects: [record], heroes: [{ code: "a" }], hand: [{ code: "source" }], enemies: [{ code: "ambusher" }, { code: "plain" }] });
+    const source = Object.values(built.state.cards).find((card) => card.code === "source")!;
+    const steps: EngineStep[] = [];
+    const done = settle(pushCardEffects({ ...withThreat(built.state, 0, 30), phase: "Quest", window: null }, "whenRevealed", source.id, 0, false, [record], built.ctx, steps), built.ctx, steps);
+    expect(where(done, "ambusher")).toBe("staging");
+    expect(where(done, "plain")).toBe("engaged:0");
   });
 });
 

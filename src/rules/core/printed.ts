@@ -413,6 +413,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       grapple: keywords.grapple ?? null,
       phantom: keywords.phantom === true,
       dire: keywords.dire === true,
+      ambush: keywords.ambush === true,
     },
   });
 }

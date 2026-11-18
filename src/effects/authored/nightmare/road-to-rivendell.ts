@@ -8,6 +8,7 @@ const ARWEN = "04041";
 const GOBLIN_GATE = "04043";
 const AMBUSH_ENEMY: PickSpec = { type: "enemy", control: "any", keyword: "ambush" };
 const ARWEN_ANYWHERE: PickSpec = { type: "card", control: "any", names: ["Arwen Undómiel"] };
+const GATE_HOLDER: PickSpec = { type: "location", control: "any", names: ["Goblin Gate"] };
 const GATE_IN_PLAY: PickSpec = { type: "location", control: "any", names: ["Goblin Gate"] };
 const NO_PLAYER_CONTROLS_ARWEN: Condition = { kind: "count", pick: { type: "ally", control: "any", names: ["Arwen Undómiel"] }, max: 0 };
 const ENGAGED_ENEMIES: PickSpec = { type: "enemy", control: "any" };
@@ -50,7 +51,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "901402",
     lines: ["901402:B:2"],
     timing: "constant",
-    instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { count: ENGAGED_ENEMIES }, until: "whileSourceInPlay", holders: { type: "location", control: "any", names: ["Goblin Gate"] } }],
+    instructions: [
+    { verb: "ModifyStat", stat: "questPoints", amount: { count: ENGAGED_ENEMIES }, until: "whileSourceInPlay", holders: GATE_HOLDER },
+    { verb: "ModifyStat", stat: "exploredWhenFull", amount: 1, until: "whileSourceInPlay", holders: GATE_HOLDER },
+  ],
   },
   {
     id: "901402:constant:2",

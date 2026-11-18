@@ -83,7 +83,7 @@ export function combatDamage(
   const toEachQuest = flagged(state, enemyId, "excessToEachQuest");
   // "Excess damage dealt by this attack must be assigned to Arwen Undómiel" (901407:A:2): the card in play with that title, wherever it lies; an undefended attack has none.
   const named = state.pendingAttack?.excessToCard;
-  const toCard = named != null && state.pendingAttack?.undefended !== true ? Object.values(state.cards).find((card) => inPlay(card.zone) && card.id !== targetId && printedOf(ctx.cards, card.code).name === named)?.id : undefined;
+  const toCard = named != null && state.pendingAttack?.undefended !== true && state.pendingAttack?.defenderId != null ? Object.values(state.cards).find((card) => inPlay(card.zone) && card.id !== targetId && printedOf(ctx.cards, card.code).name === named)?.id : undefined;
   // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
   const reads = gameReads(state, ctx, '"excessOf"');
   if (!toThreat && !toQuest && !toShip && !toDamage && !reads && !toStage && !toEachQuest && toCard == null) return placed;
