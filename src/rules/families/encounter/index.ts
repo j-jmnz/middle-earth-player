@@ -65,7 +65,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ShuffleEncounterDiscard":
       return shuffleDiscardIn(state, ctx, instruction.trait);
     case "DiscardUntil":
-      return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait);
+      return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait, instruction.reshuffle === true);
     case "ResolveWhenRevealed": {
       const id = refCard(state, instruction.card ?? "picked", frameScope(state, focus.seat, focus.sourceId));
       const code = id ? state.cards[id]?.code : undefined;

@@ -136,7 +136,7 @@ Read the sections your task touches.
     - 1844–1866 The Battle of Lake-town (~4.0K) ← 36
     - 1867–1883 The Stone of Erech (~2.2K) ← 20
     - 1884–1918 The Old Forest (~4.1K) ← 10
-    - 1919–1953 Fog on the Barrow-downs (~4.8K) ← 9
+    - 1919–1953 Fog on the Barrow-downs (~4.9K) ← 9
   - 1954–1962 Nightmare (~410) ← 21
   - 1963–2003 Deckbuilding (~2.1K)
   - 2004–2083 Effects (~3.7K)

@@ -106,7 +106,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "whenRevealed",
       instructions: [
         { verb: "EndQuestPhase", own: true },
-        { verb: "DiscardUntil", type: "enemy", trait: WIGHT },
+        { verb: "DiscardUntil", type: "enemy", trait: WIGHT, reshuffle: true },
         { verb: "MoveEncounterCard", card: "picked", to: "staging" },
         { verb: "Each", pick: ALLY_YOU, upTo: { count: ENGAGED_WITH_YOU }, instructions: [], rest: [{ verb: "Discard", target: { kind: "picked" } }] },
       ],

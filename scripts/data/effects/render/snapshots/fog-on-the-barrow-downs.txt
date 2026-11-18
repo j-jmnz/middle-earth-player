@@ -74,7 +74,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
   148004:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - end the acting player's own quest phase (no more cards are revealed for him, his characters stop being committed and his quest is not resolved; the other players finish theirs)
-    - cards are discarded from the top of the encounter deck until an enemy with the trait Wight is discarded, or the deck is empty; that card becomes the picked card
+    - cards are discarded from the top of the encounter deck until an enemy with the trait Wight is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
     - the picked card goes to the staging area (it is not revealed)
     - the actor must choose the number of enemy (any player controls) engaged with you of the ally (you control) to keep (all stay with no more than that many; nothing is asked then); for each of the others:
       - discard the picked card

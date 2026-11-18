@@ -79,7 +79,8 @@ const VERBS = [
   // Discards cards from the top of the encounter deck until one of `type` is discarded, or the deck is empty (rr.effects).
   // That card becomes the picked card. With `trait`, the card must have that trait too ("a Warg enemy", 142025:A:2).
   // `types` instead of `type`: a card of any of them ("until he discards an enemy or location", 18078:A:1).
-  z.strictObject({ verb: z.literal("DiscardUntil"), type: discardType.optional(), types: z.array(encounterType).min(2).optional(), trait: z.string().min(1).optional(), ...when }),
+  // `reshuffle`: a deck that runs out first has the encounter discard pile shuffled back in and the discarding goes on, when the discard pile holds such a card (faq.last-encounter-card, 148004:A:1); with none in either pile nothing is found.
+  z.strictObject({ verb: z.literal("DiscardUntil"), type: discardType.optional(), types: z.array(encounterType).min(2).optional(), trait: z.string().min(1).optional(), reshuffle: z.literal(true).optional(), ...when }),
   // The "when revealed" effects of the picked card (or `card`) resolve for the actor, as if it had just been revealed. It
   // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed.
   verbFlags(z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }), { runsInFrame: true }),

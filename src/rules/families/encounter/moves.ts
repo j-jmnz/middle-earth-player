@@ -166,11 +166,11 @@ export function shuffleVictoryIn(state: ScenarioState, ctx: ReduceContext): Scen
   return shuffleEncounterDeck(next);
 }
 
-// Cards come off the top of the encounter deck into its discard pile until one of `type` is among them. If the deck runs out first and
-// the discard pile holds one, the discard pile is shuffled back in and the discarding goes on (`rr.running-out-of-cards`,
-// `faq.last-encounter-card`); with none in either pile the deck is emptied and nothing is found.
+// Cards come off the top of the encounter deck into its discard pile until one of `type` is among them, or the deck is empty.
+// With `reshuffle`, a deck that runs out first has the discard pile shuffled back in when the discard pile holds one, and the discarding goes on (`rr.running-out-of-cards`,
+// `faq.last-encounter-card`: Trapped Inside a Barrow, 148004:A:1); with none in either pile the deck is emptied and nothing is found.
 // That card is the picked card ("" when none came). A list of types stops at a card of any of them.
-export function discardUntil(state: ScenarioState, wanted: CardType | readonly CardType[], ctx: ReduceContext, trait?: string): ScenarioState {
+export function discardUntil(state: ScenarioState, wanted: CardType | readonly CardType[], ctx: ReduceContext, trait?: string, reshuffle = false): ScenarioState {
   const types: readonly CardType[] = typeof wanted === "string" ? [wanted] : wanted;
   const matches = (current: ScenarioState, id: string) => {
     const kind = typeOf(current, id, ctx);
@@ -180,7 +180,7 @@ export function discardUntil(state: ScenarioState, wanted: CardType | readonly C
   for (;;) {
     const top = next.encounterDeck[0];
     if (!top) {
-      if (!next.encounterDiscard.some((id) => matches(next, id))) return pushPicked(next, "");
+      if (!reshuffle || !next.encounterDiscard.some((id) => matches(next, id))) return pushPicked(next, "");
       next = shuffleDiscardIn(next);
       continue;
     }
