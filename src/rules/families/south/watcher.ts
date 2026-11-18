@@ -35,9 +35,14 @@ export function engagedWithThreatening(state: ScenarioState, id: string, seat: n
   return state.cards[id]?.zone === "staging" && flagged(state, id, "engagedWithThreatening") && (state.seats[seat]?.threat ?? 0) >= 1 && state.seats[seat]?.eliminated !== true;
 }
 
-// The combat phase begins: the seats whose threat is below 1 are noted when an enemy that is engaged by threat is in the staging area. A seat raised to 1 later in the phase is attacked too, with no shadow card dealt for the attack (dwd.durins-bane; docs/brief.md, Shadow and Flame). Every other game's state stays as it was.
+// The combat phase begins: the seats whose threat is below 1 are noted when an enemy that is engaged by threat is in the staging area. A seat raised to 1 later in the phase is attacked too, with no shadow card dealt for the attack (dwd.durins-bane; docs/brief.md, Shadow and Flame). The note is cleared when no such enemy is in the staging area at the next combat phase; every other game's state stays as it was.
 export function noteBelowThreat(state: ScenarioState): ScenarioState {
-  if (state.modifiers.length === 0 || !state.staging.some((id) => flagged(state, id, "engagedWithThreatening"))) return state;
+  if (state.modifiers.length === 0 || !state.staging.some((id) => flagged(state, id, "engagedWithThreatening"))) {
+    // The enemy has left the staging area: the seats noted for an earlier combat phase no longer apply.
+    if (state.belowThreat === undefined) return state;
+    const { belowThreat: _noted, ...rest } = state;
+    return rest;
+  }
   return { ...state, belowThreat: livingSeats(state).filter((seat) => (state.seats[seat]?.threat ?? 0) < 1) };
 }
 

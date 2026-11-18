@@ -34,10 +34,12 @@ import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState, TableStor
 import type { LayoutOptions } from "../layout/layout.ts";
 import type { ReaderSeed, TableHighlight } from "../canvas/table-canvas-types.ts";
 import type { DockExtra } from "./dock/buttons.tsx";
+import { commitLimitWords } from "./commit-limit.ts";
 import { choiceFor, dockFor, fightPreview, headerOf, onTheTable, onlyAnswer, pickedWords, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
 
 // A sheet the player opened from the table, for the game it was opened in. `panel` keeps it on paper even when its choices
 // are cards on the table (the Actions list reads the printed lines).
+const NONE: readonly Unavailable[] = [];
 type Overlay = { sheet: Sheet; game: ScenarioState; panel: boolean };
 
 export type TableChoice = {
@@ -47,6 +49,8 @@ export type TableChoice = {
   header: { step: string; lead: string; title: string; note: string | null };
   picked: string | null;
   unavailable: readonly Unavailable[];
+  // The rows of a commit the tray lists as refused, no longer as choices (commit-limit.ts).
+  refusedRows: readonly Unavailable[];
   readout: Readout | null;
   highlight: TableHighlight;
   // What the reader table needs besides the highlight; null with no phone screen reader on, so the canvas gets nothing new.
@@ -181,7 +185,10 @@ export function useTableChoice({
   const raised = live ? playedCard(live.sheet) : null;
   // A reader hears the sheet's own sentence for it where the visible note names a glow or a drag (sheet-types.ts, readerNote).
   const headed = headerOf(sheet, game);
-  const baseHeader = readerMode && sheet.kind !== "outcome" && sheet.readerNote ? { ...headed, note: sheet.readerNote } : headed;
+  // A table that limits the allies a commit may hold adds what is picked to the note and lists the ally rows it refuses (commit-limit.ts).
+  const limit = commitLimitWords(game, ctx, sheet, choice.ids, names);
+  const noted = readerMode && sheet.kind !== "outcome" && sheet.readerNote ? { ...headed, note: sheet.readerNote } : headed;
+  const baseHeader = limit ? { ...noted, note: [noted.note, limit.note].filter(Boolean).join(" ") } : noted;
   // While stops are on, the eyebrow says so first (a long eyebrow is cut at its end): the table passes some windows.
   const header = settings.stopsOn ? { ...baseHeader, step: `Stops on, ${baseHeader.step}` } : baseHeader;
   const guide = useGuide(settings, game, sheet, legal, live != null, header.note);
@@ -236,6 +243,14 @@ export function useTableChoice({
     },
     [store, readerMode],
   );
+  // A line on the dock with no refusal tick: what a pick did beyond the pick (the allies a hero's unpick put back).
+  const say = useCallback(
+    (words: string) => {
+      store.getState().refuse(words);
+      if (readerMode) announce(words);
+    },
+    [store, readerMode],
+  );
   // Every sheet the player opens comes through here: a payment sheet (or an attachment's host pick) the pools cannot pay is refused
   // instead of opened (why.ts, cannotPay), whichever path asked for it.
   const open = useCallback(
@@ -280,11 +295,14 @@ export function useTableChoice({
         onButton(dock.primary);
         return true;
       }
-      if (result.kind === "choice") setHeld(result.choice);
-      else if (result.kind === "open") open(result.sheet);
+      if (result.kind === "refused") refuse(result.reason);
+      else if (result.kind === "choice") {
+        setHeld(result.choice);
+        if (result.said) say(result.said);
+      } else if (result.kind === "open") open(result.sheet);
       return result.kind !== "none";
     },
-    [dock, onButton, sheet, held, table, open],
+    [dock, onButton, sheet, held, table, open, refuse, say],
   );
   // A tap or a drop outside the open tray folds it and is swallowed (tapRoute).
   const foldOutside = useCallback((): boolean => {
@@ -325,13 +343,15 @@ export function useTableChoice({
         if (opened) open(opened);
       } else if (outcome.kind === "commit" || outcome.kind === "choose") {
         const result = tap(base, live ? null : held, cardId, table);
-        if (result.kind === "choice") {
+        if (result.kind === "refused") refuse(result.reason);
+        else if (result.kind === "choice") {
           setOverlay(null);
           setHeld(result.choice);
+          if (result.said) say(result.said);
         }
       }
     },
-    [foldOutside, game, ctx, legal, names, store, open, base, live, held, table],
+    [foldOutside, game, ctx, legal, names, store, open, base, live, held, table, refuse, say],
   );
 
   const dropOnTable = useStable(onDrop);
@@ -360,6 +380,7 @@ export function useTableChoice({
     // No line shows it (the cards' marks and the primary's verb say it); the primary's hint speaks it.
     picked: pickedWords(sheet, choice, names),
     unavailable: sheet.kind === "pick" ? (sheet.unavailable ?? []) : [],
+    refusedRows: limit?.refused ?? NONE,
     readout,
     highlight,
     raised,

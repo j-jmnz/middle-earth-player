@@ -8,15 +8,15 @@ import { flagged } from "../../core/state.ts";
 import { headOf } from "./areas.ts";
 
 /** The cards in the staging areas of the other players that add their Threat to the seat's staging area, with the Threat each adds now. Nothing while stages are not separate or the seat is not asked about. */
-export function threatFromOtherAreas(state: ScenarioState, seat: number | undefined, cards: ReadonlyMap<string, PrintedCard>): { id: string; threat: number }[] {
-  const found: { id: string; threat: number }[] = [];
+export function threatFromOtherAreas(state: ScenarioState, seat: number | undefined, cards: ReadonlyMap<string, PrintedCard>): { id: string; threat: number; area: number }[] {
+  const found: { id: string; threat: number; area: number }[] = [];
   if (!state.separate || seat == null || state.modifiers.length === 0) return found;
   const head = headOf(state, seat);
   state.seats.forEach((other, index) => {
     if (index >= state.seatCount || index === head) return;
     for (const id of other.staging) {
       const instance = state.cards[id];
-      if (instance && flagged(state, id, "threatInOtherAreas") && !flagged(state, id, "noThreatContribution")) found.push({ id, threat: modifiedStat(state, instance, "threat", cards) });
+      if (instance && flagged(state, id, "threatInOtherAreas") && !flagged(state, id, "noThreatContribution")) found.push({ id, threat: modifiedStat(state, instance, "threat", cards), area: index });
     }
   });
   return found;

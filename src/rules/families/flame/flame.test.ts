@@ -37,6 +37,13 @@ describe("04150:A:2 engagedWithThreatening", () => {
     const begun = dealShadows({ ...state, phase: "Combat" }, t.ctx, []);
     expect(begun.belowThreat).toEqual([1]);
   });
+
+  it("04150:A:2 clears the note once no such enemy is in the staging area at the next combat phase", () => {
+    const t = table({ seats: 2, staging: ["04150"], threat: [25, 0] });
+    const begun = dealShadows({ ...synced(t.state, t.ctx), phase: "Combat" }, t.ctx, []);
+    const gone = { ...begun, staging: [], modifiers: [] };
+    expect("belowThreat" in dealShadows(gone, t.ctx, [])).toBe(false);
+  });
 });
 
 describe("The Balrog deck (901801:A:2, A:3, A:4)", () => {

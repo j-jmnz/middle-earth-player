@@ -29,7 +29,7 @@ export function cancelEventEffects(state: ScenarioState, focus: Focus): Scenario
   return { ...state, stack: state.stack.map((frame, index) => (index === at && frame.data.kind === "effect" ? { ...frame, data: { ...frame.data, canceled: true } } : frame)) };
 }
 
-/** The amount `remaining` of `hitPoints` (the card named, in play): its hit points less its damage, never below 0 ("the remaining hit points of Durin's Bane", 04141:A:1). Null for any other amount. */
+/** The remaining hit points of the card `id` ("the remaining hit points of Durin's Bane", 04141:A:1): its hit points less its damage, never below 0; 0 for no card. */
 export function remainingHitPoints(state: ScenarioState, id: string | null, ctx: ReduceContext): number {
   const card = id ? state.cards[id] : undefined;
   return card ? Math.max(0, hitPointsOf(state, card, ctx) - card.damage) : 0;

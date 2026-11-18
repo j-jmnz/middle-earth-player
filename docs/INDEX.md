@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~256.0K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~256.1K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -131,7 +131,7 @@ Read the sections your task touches.
     - 1757–1774 The Hills of Emyn Muil (~1.5K) ← 1
     - 1775–1795 The Dead Marshes (~2.1K) ← 2
     - 1796–1819 Return to Mirkwood (~2.3K) ← 4
-  - 1820–2103 Dwarrowdelf (~39.6K) ← 3
+  - 1820–2103 Dwarrowdelf (~39.7K) ← 3
     - 1831–1853 Into the Pit (~2.8K) ← 9
     - 1854–1874 The Seventh Level (~3.0K) ← 5
     - 1875–1908 Flight from Moria (~5.5K) ← 4
@@ -153,7 +153,7 @@ Read the sections your task touches.
   - 2276–2303 Persistence and shipping (~3.2K) ← 10
   - 2304–2345 Screens (~5.1K) ← 2
     - 2330–2345 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~63.4K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~63.6K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
   - 24–27 Table menu (~570) ← 4
@@ -161,7 +161,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–118 Cards (~25.0K) ← 32
+  - 59–118 Cards (~25.2K) ← 32
   - 119–124 The Sailing test (~690) ← 5
   - 125–138 The Island Map (~1.8K) ← 8
   - 139–142 Tokens and effects (~360)

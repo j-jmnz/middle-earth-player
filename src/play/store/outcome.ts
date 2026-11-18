@@ -17,6 +17,7 @@ import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
 import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scenarios/gundabad-beats.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
+import { locateResultTitle } from "../words/scenarios/locate.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -238,7 +239,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape), step.stat ?? "willpower");
         return;
       case "locateTest":
-        open(1, step.success ? "Locate test passed" : "Locate test failed", step.success ? "good" : "bad");
+        open(1, locateResultTitle(step.success, step.seat, after.seatCount > 1), step.success ? "good" : "bad");
         // Each try: the hand card and the encounter card it discarded, and whether that card prints PASS (dwd.locate-test).
         step.dealtIds.forEach((dealt, at) => {
           const held = step.handIds[at];

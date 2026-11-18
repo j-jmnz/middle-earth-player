@@ -54,7 +54,8 @@ type Gate = (state: ScenarioState) => boolean;
 
 // One card's part of the total Threat in the staging area: where it stands (in staging, engaged but contributing, or the active location
 // that contributes) and the Threat it adds now.
-export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" | "elsewhere" };
+// `area`: for `elsewhere`, the seat whose staging area the card stands in.
+export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" | "elsewhere"; area?: number };
 
 // The cards that make up the total Threat in the staging area, and what the table's held effects add to or take from their sum
 // (withStagingThreat; the total never falls below 0). A card that "does not contribute its Threat" is left out.

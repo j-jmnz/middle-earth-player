@@ -7,6 +7,7 @@ import { runInstruction } from "../../interpret/interpret.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { settle } from "../../engine/machine.ts";
+import { topFrame } from "../../windows/windows.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { seatBarred } from "../../interpret/restrictions.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
@@ -142,10 +143,12 @@ describe("901605:A:1 Eastern Mines: the locate test after it becomes the active 
 });
 
 describe("04097:A:1 the discard after \"then\" resolves only when the draw did (rr.then)", () => {
-  const run = (deck: boolean) => {
-    const base = table({ cards: [hero("a"), treachery("h1"), treachery("h2"), treachery("h3"), treachery("h4"), treachery("h5"), treachery("dk")], effects: [], heroes: [{ code: "a" }], hand: ["h1", "h2", "h3", "h4", "h5"].map((code) => ({ code })) });
+  const steps: Instruction[] = [{ verb: "Draw", who: "firstPlayer" }, { verb: "ActAs", who: "firstPlayer" }, { verb: "DiscardFromHand", amount: 4, when: { kind: "drew" } }];
+  // A game notes the draw only when a record of its list reads the `drew` condition (Cave Spider, 04097:A:1).
+  const run = (deck: boolean, reads = true) => {
+    const record: Effect = { id: "04097:whenRevealed:1", cardCode: "04097", lines: ["04097:A:1"], timing: "whenRevealed", instructions: steps };
+    const base = table({ cards: [hero("a"), treachery("h1"), treachery("h2"), treachery("h3"), treachery("h4"), treachery("h5"), treachery("dk")], effects: reads ? [record] : [], heroes: [{ code: "a" }], hand: ["h1", "h2", "h3", "h4", "h5"].map((code) => ({ code })) });
     const stocked = deck ? spawn(base.state, "dk", { zone: "deck", seat: 0 }).state : base.state;
-    const steps: Instruction[] = [{ verb: "Draw", who: "firstPlayer" }, { verb: "ActAs", who: "firstPlayer" }, { verb: "DiscardFromHand", amount: 4, when: { kind: "drew" } }];
     const pushed = pushEffectFrame({ ...stocked, window: null }, { frame: "whenRevealed", sourceId: null, actor: 0, peril: false, effectId: "spider", instructions: [...steps, PARK], cancel: null, blockCancel: null }, []);
     return settle(pushed, base.ctx, []);
   };
@@ -158,7 +161,13 @@ describe("04097:A:1 the discard after \"then\" resolves only when the draw did (
   it("asks for the 4 discards when a card was drawn", () => {
     const state = run(true);
     expect(state.seats[0]?.hand).toHaveLength(6);
-    expect(state.window).toMatchObject({ kind: "choose", seat: 0 });
+    expect(topFrame(state)?.data).toMatchObject({ kind: "effect", drew: true });
+  });
+
+  it("leaves the frame as it was in a game whose records do not read the condition", () => {
+    const state = run(true, false);
+    expect(state.seats[0]?.hand).toHaveLength(6);
+    expect((topFrame(state)?.data as { drew?: boolean }).drew).toBeUndefined();
   });
 });
 
@@ -276,6 +285,13 @@ describe("EngageLastPlayer from another player's side (901603:A:2) and EngageNex
     expect(moved.cards[base.ids.s ?? ""]?.controller).toBe(1);
     const stays = runInstruction(moved, { verb: "EngageLastPlayer" }, { seat: 0, sourceId: base.ids.s ?? "" }, base.ctx, []);
     expect(stays).toBe(moved);
+  });
+
+  it("does not move an enemy that cannot engage the last player", () => {
+    const base = table({ ...two, enemies: [{ code: "s", seat: 0 }] });
+    const barred = { ...base.state, modifiers: [{ instanceId: base.ids.s ?? "", sourceId: base.ids.s ?? "", stat: "cannotEngageSeat" as const, amount: 1, seat: 1, until: "endOfGame" as const }] };
+    const next = runInstruction({ ...barred, window: null }, { verb: "EngageLastPlayer" }, { seat: 0, sourceId: base.ids.s ?? "" }, base.ctx, []);
+    expect(next.cards[base.ids.s ?? ""]?.controller).toBe(0);
   });
 
   it("announces the engagement of the next player only with `announces`", () => {

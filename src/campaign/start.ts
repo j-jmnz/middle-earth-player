@@ -44,6 +44,17 @@ export type StartInput = {
   modeCard?: ModeCard;
 };
 
+// A Nightmare quest card takes a removed stage's place: the stages in the order the quest deck deals them, each code once, a printed stage keeping its record.
+function stagesInDeckOrder(input: StartInput, definition: ScenarioDefinition, effects: readonly Effect[]): ScenarioDefinition["stages"] {
+  const known = new Map(definition.stages.map((stage) => [stage.code, stage]));
+  return [...new Set(questDeckCodes(input.scenario, input.difficulty, input.seatCount))].map((code) => known.get(code) ?? stageOf(code, effects));
+}
+
+// The printed stages, then the Nightmare quest cards after the last one.
+function stagesWithNightmareLast(input: StartInput, definition: ScenarioDefinition, effects: readonly Effect[]): ScenarioDefinition["stages"] {
+  return [...definition.stages, ...(input.scenario.nightmare?.questCards ?? []).map((code) => stageOf(code, effects))];
+}
+
 // The scenario's piles, the campaign card's Setup records (Campaign Mode only) and the campaign's prelude become the engine's start.
 // Printed order: the campaign card's Setup first, then the quest card's. Each prelude card (The One Ring) goes on the
 // Ring-bearer first; the first player's Ring-bearer is the host, so the loadout decides who carries it. The campaign
@@ -120,8 +131,7 @@ export function buildStart(start: StartInput): StartScenario {
   if (input.difficulty === "Nightmare") {
     const nightmare = input.scenario.nightmare;
     const replaces = nightmare?.removed?.some((removed) => removed.pile === "quest") === true && (nightmare.questCards ?? []).length > 0;
-    const known = new Map(definition.stages.map((stage) => [stage.code, stage]));
-    const stages = replaces ? [...new Set(questDeckCodes(input.scenario, input.difficulty, input.seatCount))].map((code) => known.get(code) ?? stageOf(code, effects)) : [...definition.stages, ...(nightmare?.questCards ?? []).map((code) => stageOf(code, effects))];
+    const stages = replaces ? stagesInDeckOrder(input, definition, effects) : stagesWithNightmareLast(input, definition, effects);
     definition = { ...definition, nightmareCard: nightmare?.setupCard, stages };
   }
   return {

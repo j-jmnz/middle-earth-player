@@ -8,9 +8,10 @@ import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import { characters } from "../../combat/combat.ts";
 
-/** Why the commitment of these cards would break the limit, or null. */
-export function commitLimitReason(state: ScenarioState, seat: number, cardIds: readonly string[], cards: ReadonlyMap<string, PrintedCard>): string | null {
+/** The heroes and allies a seat would have committed with these cards added, and the card that sets the limit; null while the table holds no limit. */
+export function commitCounts(state: ScenarioState, seat: number, cardIds: readonly string[], cards: ReadonlyMap<string, PrintedCard>): { heroes: number; allies: number; source: string } | null {
   if (state.modifiers.length === 0 || !flagged(state, "table", "commitAlliesLimitByHeroes")) return null;
+  const limit = state.modifiers.find((modifier) => modifier.instanceId === "table" && modifier.stat === "commitAlliesLimitByHeroes");
   const counted = new Set([...cardIds, ...characters(state, seat, cards).filter((id) => state.cards[id]?.committed)]);
   let allies = 0;
   let heroes = 0;
@@ -20,5 +21,11 @@ export function commitLimitReason(state: ScenarioState, seat: number, cardIds: r
     if (card.zone === "heroes") heroes += 1;
     else if (printedOf(cards, card.code).type === "ally") allies += 1;
   }
-  return allies > heroes ? "A player cannot commit more allies than the heroes he commits" : null;
+  return { heroes, allies, source: limit?.sourceId ?? "" };
+}
+
+/** Why the commitment of these cards would break the limit, or null. */
+export function commitLimitReason(state: ScenarioState, seat: number, cardIds: readonly string[], cards: ReadonlyMap<string, PrintedCard>): string | null {
+  const counts = commitCounts(state, seat, cardIds, cards);
+  return counts && counts.allies > counts.heroes ? "A player cannot commit more allies than the heroes he commits" : null;
 }

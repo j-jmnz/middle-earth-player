@@ -14,6 +14,7 @@ import { tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts
 import { windowSheet } from "./bar-sheets.ts";
 import { sheetFor } from "./sheets.ts";
 import { tap, type Choice, type TapContext } from "./table-choice.ts";
+import { commitLimitWords } from "./commit-limit.ts";
 
 const table = (layout: Layout) => tableFromLayout("foundations-of-stone", layout);
 
@@ -57,6 +58,36 @@ describe("Out of the Depths' commit window (04118:B:2)", () => {
     expect(choice.ids).toEqual([ally1, hero2]);
     expect(reduce(state, { type: "Commit", cardIds: [...choice.ids] }, made.ctx).ok).toBe(true);
   });
+
+  it("04118:B:2 a tap that would break the limit is refused with the engine's words, not ignored", () => {
+    expect(tap(sheet, key, ally1 ?? "", table4)).toEqual({ kind: "refused", reason: "A player cannot commit more allies than the heroes he commits" });
+    const one: Choice = { ...key, ids: [hero1 ?? "", ally1 ?? ""] };
+    expect(tap(sheet, one, ally2 ?? "", table4)).toMatchObject({ kind: "refused" });
+  });
+
+  it("04118:B:2 the note counts what is picked and the ally rows are refused while no hero has room", () => {
+    const none = commitLimitWords(state, made.ctx, sheet, [], names);
+    expect(none?.note).toContain("no more allies than heroes (0 heroes, 0 allies picked).");
+    expect(none?.refused.map((item) => item.id).sort()).toEqual([ally1, ally2, ally3].map((id) => id ?? "").sort());
+    const full = commitLimitWords(state, made.ctx, sheet, [hero1 ?? "", ally1 ?? ""], names);
+    expect(full?.note).toContain("(1 hero, 1 ally picked).");
+    expect(full?.refused.map((item) => item.id).sort()).toEqual([ally2, ally3].map((id) => id ?? "").sort());
+    expect(full?.refused[0]?.reason).toBe("A player cannot commit more allies than the heroes he commits");
+    const room = commitLimitWords(state, made.ctx, sheet, [hero1 ?? ""], names);
+    expect(room?.refused).toEqual([]);
+  });
+
+  it("04118:B:2 unpicking a hero names the allies it puts back on the dock", () => {
+    const held: Choice = { key: sheet.key, ids: [hero1 ?? "", ally1 ?? "", hero2 ?? "", ally2 ?? ""], shares: [] };
+    const result = tap(sheet, held, hero1 ?? "", table4);
+    expect(result).toMatchObject({ kind: "choice", said: `${ally2} goes back: a player cannot commit more allies than the heroes he commits.` });
+  });
+
+  it("adds nothing in a game with no such limit", () => {
+    const plain = table({ play: ["ally"], phase: "Quest" });
+    const loose = syncConstants({ ...plain.state }, plain.ctx);
+    expect(commitLimitWords(loose, plain.ctx, windowSheet(loose, plain.ctx, legalIntents(loose, plain.ctx), names), [], names)).toBeNull();
+  });
 });
 
 // The sheets of the scenario's choices (words/asks/foundations-of-stone.ts): each says who answers and what the card does, and a pick that spans seats names the owner of each row.
@@ -84,6 +115,19 @@ describe("Foundations of Stone's choice words", () => {
     if (sheet?.kind !== "pick") return;
     expect(sheet.note).toContain("the first player chooses a hero of any player to carry Cave Torch");
     expect(sheet.options.map((item) => item.label)).toEqual(["dh1 · Player 1's hero", "dh2 · Player 1's hero", "dh3 · Player 2's hero"]);
+  });
+
+  it("901701:A:2 Washed Away!'s discard says what the allies cost in all", () => {
+    const made = table({ nightmare: "901701", play: ["ally", "ally", "ally", "ally", "ally", "ally", "ally"] });
+    const card = Object.values(made.state.cards).find((item) => item.code === "901701");
+    // The record hears the stage revealed; its condition is left out so the discard opens at once.
+    const effects = made.ctx.effects.filter((effect) => effect.id === "901701:forced:1").map(({ condition: _held, ...effect }) => effect);
+    const steps: EngineStep[] = [];
+    const pushed = pushCardEffects({ ...made.state, window: null }, "forced", card?.id ?? "", 0, false, effects, made.ctx, steps);
+    const sheet = sheetOf(made, settle({ ...pushed, mode: "stopped" as const }, made.ctx, steps));
+    expect(sheet?.kind).toBe("pick");
+    if (sheet?.kind !== "pick") return;
+    expect(sheet.note).toContain("Your allies cost 7 in all; discard until they cost 6 or less.");
   });
 
   it("901703:A:1 a tie for the highest printed cost in hand asks which card goes into the deck", () => {
