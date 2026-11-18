@@ -272,7 +272,7 @@ STATUS.md, then the active phase file.
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
   - 22–311 Open items (~14.3K)
-    - 24–26 Reviews (~70)
+    - 24–26 Reviews (~80)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
     - 35–42 Desktop (~310)
@@ -282,7 +282,7 @@ STATUS.md, then the active phase file.
     - 250–274 Screens and code (~1.6K)
     - 275–294 Rules and engine (The Two Towers) (~1.4K)
     - 295–301 Rules and engine (Shadows of Mirkwood) (~380)
-    - 302–311 Rules and engine (Standalone scenarios) (~940)
+    - 302–311 Rules and engine (Standalone scenarios) (~930)
   - 312–337 Standing decisions (~940)
 
 ## Live plans
