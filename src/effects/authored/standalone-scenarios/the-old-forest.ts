@@ -36,8 +36,9 @@ const stageTwo = (code: string, first: Effect): Effect[] => [
     timing: "forced",
     trigger: "questProgressPlaced",
     instructions: [
-      { verb: "AdvanceToStage", code: STAGE_3, when: ENOUGH_VICTORY },
+      // One X test, decided before the advance: the "Otherwise" branch comes first, so 3A's When Revealed (Swaying Without Wind returns a location from the victory display) cannot turn the test over.
       { verb: "AdvanceToRandomStage", codes: [...STAGE_2], different: true, when: NOT_ENOUGH_VICTORY },
+      { verb: "AdvanceToStage", code: STAGE_3, when: ENOUGH_VICTORY },
     ],
   },
 ];
@@ -238,7 +239,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } },
       { verb: "TakeRevealedCard", who: "picked", committed: true },
-      { verb: "Delay", until: "endOfRound", uncancelable: { kind: "count", pick: { type: "hero", control: "any" }, min: 0 }, instructions: [{ verb: "Discard", target: { kind: "self" } }, { verb: "ShuffleEncounterDiscard" }] },
+      { verb: "Delay", until: "endOfRound", uncancelable: { kind: "count", pick: { type: "hero", control: "any" }, min: 0 }, instructions: [{ verb: "Discard", target: { kind: "self" } }, { verb: "ShuffleEncounterDiscard", when: { kind: "not", condition: { kind: "noneDiscarded" } } }] },
     ],
   },
 ];

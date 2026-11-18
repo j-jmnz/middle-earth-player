@@ -2,11 +2,12 @@
 import { describe, expect, it } from "vitest";
 
 import { forestStart, forestWorld } from "../../../../test/scenarios/the-old-forest/game.ts";
-import { first, idOf, legalIntents, legalTargets, resolveRecords, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { finish, first, idOf, legalIntents, legalTargets, opening, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { victoryPointsOf } from "../../../rules/core/printed-stat.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
 import { phasePlaysBarred } from "../../../rules/families/wilderland/rounds.ts";
-import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
+import { reduce, startScenario, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
 
 // What The Old Forest's quest does that a spec row cannot show: the opening, the stage 2s coming and going in the quest deck, the one trigger a successful quest raises, the seeded switch of locations, the play limit and the victory read from X.
@@ -74,6 +75,20 @@ describe("The Old Forest quest", () => {
     expect(done.steps.filter((step) => step.kind === "progress" && step.amount > 0)).toHaveLength(2);
     expect(done.state.cards[done.state.questStage ?? ""]?.code).toBe("147006");
     expect(done.steps.filter((step) => step.kind === "advance")).toHaveLength(1);
+  });
+
+  it("147003:B:2 the X test is decided once, before the advance: Victory exactly at X, and 3A's Swaying Without Wind returns a location from the victory display, the quest stays on stage 3", () => {
+    // 2 players: X is 10, the victory display holds 3 + 2 + 1 + 2 + 2 points (Wall of Trees scores the 2 players).
+    for (const seed of [1, 2, 3, 4, 5, 6]) {
+      const t = table({ seed, seats: 2, stage: "147003", victory: ["147011", "147013", "147014", "147016", "147015"], setAside: ["147007"], deck: ["147017", "f0", "f0"] });
+      const total = t.state.victory.reduce((sum, id) => sum + victoryPointsOf(t.state, id, t.cards), 0);
+      expect(total).toBe(10);
+      const run = resolveRecords(t.state, t.ctx, "147003", "forced", first(t.state, "147003"));
+      const staged = run.state.cards[run.state.questStage ?? ""]?.code;
+      expect(staged, `seed ${seed}`).toBe("147006");
+      // Swaying Without Wind was revealed by 3A and returned a location: the display is now below X.
+      expect(run.state.victory.reduce((sum, id) => sum + victoryPointsOf(run.state, id, t.cards), 0), `seed ${seed}`).toBeLessThan(10);
+    }
   });
 
   it("147002:B:2 a quest that does not succeed leaves the stage where it is", () => {
@@ -203,6 +218,34 @@ describe("Victory X (147015:A:1)", () => {
   });
 });
 
+describe("Old Man Willow's attacks (147007:A:2)", () => {
+  it("147007:A:2 on two seats he attacks each player in turn, and each defending player, not the first player, raises his threat by the Victory points of the location his attack discarded", () => {
+    for (const seed of [1, 2, 3, 4]) {
+      const t = table({ seed, seats: 2, phase: "Combat", stage: "147006", staging: ["147007"], victory: ["147013", "147016"], deck: ["f0", "f0", "f0", "f0", "f0", "f0"] });
+      let run = start(t.state);
+      const before = [t.state.seats[0]?.threat ?? 0, t.state.seats[1]?.threat ?? 0];
+      const defenders: number[] = [];
+      for (let guard = 0; guard < 60 && run.state.phase === "Combat"; guard += 1) {
+        const window = run.state.window;
+        if (window?.kind === "defense") {
+          defenders.push(run.state.activeSeat);
+          run = send(run, { type: "Undefended", heroId: run.state.seats[run.state.activeSeat]?.heroes[0] ?? "" }, t.ctx);
+        } else if (window?.kind === "choose") run = finish(run, t.ctx);
+        else {
+          const next = legalIntents(run.state, t.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack");
+          if (!next) break;
+          run = send(run, next, t.ctx);
+        }
+      }
+      // Both attacks were made, one on each seat, and the display held two locations (2 Victory points each): each defender raised his own threat by 2, and the Refresh phase that follows raised each by 1.
+      expect(defenders, `seed ${seed}`).toEqual([0, 1]);
+      expect(run.state.victory, `seed ${seed}`).toHaveLength(0);
+      expect(run.state.seats[0]?.threat, `seed ${seed}`).toBe(before[0]! + 3);
+      expect(run.state.seats[1]?.threat, `seed ${seed}`).toBe(before[1]! + 3);
+    }
+  });
+});
+
 describe("Travel and engagement lines", () => {
   it("147012:A:2 with no active location the players may travel only to Misleading Path", () => {
     const t = table({ phase: "Travel", staging: ["147012", "place"] });
@@ -218,5 +261,56 @@ describe("Travel and engagement lines", () => {
     const t = table({ phase: "Encounter", staging: ["147013", "f3"], deck: [] });
     const engaged = send(start(t.state), { type: "Engage", enemyId: idOf(t.state, "f3") }, t.ctx);
     expect(engaged.state.seats[0]?.threat).toBe((t.state.seats[0]?.threat ?? 0) + 1);
+  });
+});
+
+describe("Tom Bombadil (147022:A:1)", () => {
+  // Reveals Tom, optionally takes him out of play first, and plays the round to its end.
+  const throughRound = (leaves: boolean) => {
+    const t = table({ deck: ["f0", "f0", "f0", "f0", "f0"], discard: ["f0", "f0"] });
+    const revealed = resolveRecords(t.state, t.ctx, "147022", "whenRevealed", undefined);
+    const tom = revealed.id;
+    let run = { state: { ...revealed.state, ...opening("Quest") }, steps: revealed.steps };
+    if (leaves) run = { ...run, state: moveCard(run.state, tom, { zone: "encounterDiscard" }) };
+    for (let guard = 0; guard < 80 && run.state.round < 1; guard += 1) {
+      if (run.state.window?.kind === "choose") {
+        run = finish(run, t.ctx);
+        continue;
+      }
+      const next = legalIntents(run.state, t.ctx).find((intent) => ["Pass", "DeclineAttack", "DeclineEngage", "DeclineTravel"].includes(intent.type));
+      if (!next) break;
+      run = send(run, next as PlayerIntent, t.ctx);
+    }
+    return { state: run.state, tom };
+  };
+
+  it("147022:A:1 Tom is discarded at the end of the round and the encounter discard pile, Tom in it, is shuffled into the encounter deck", () => {
+    const { state, tom } = throughRound(false);
+    expect(state.encounterDiscard).toHaveLength(0);
+    expect(state.encounterDeck).toContain(tom);
+    // 5 cards less the quest phase's reveal, the 2 in the discard pile and Tom.
+    expect(state.encounterDeck).toHaveLength(7);
+  });
+
+  it("147022:A:1 Tom already out of play when the round ends: nothing is discarded, so the discard pile is not shuffled into the deck", () => {
+    const { state, tom } = throughRound(true);
+    expect(state.encounterDiscard).toContain(tom);
+    expect(state.encounterDiscard).toHaveLength(3);
+    expect(state.encounterDeck).toHaveLength(4);
+  });
+});
+
+describe("Song of Sleep (147019:A:2)", () => {
+  it("147019:A:2 with no questing hero, or only heroes that already carry a Song of Sleep, it attaches to none and is discarded as a treachery", () => {
+    const none = table({ deck: ["f0", "f0", "f0"] });
+    const noneRun = revealFromTop(none.state, none.ctx, "147019", []);
+    const afterNone = finish({ state: noneRun.state, steps: [] }, none.ctx).state;
+    expect(afterNone.cards[noneRun.id]?.zone).not.toBe("attached");
+    expect(Object.values(afterNone.cards).some((card) => card.host != null && card.code === "147019")).toBe(false);
+    const carrying = table({ committed: ["dh1", "dh2"], attached: [{ code: "147019", to: "dh1" }, { code: "147019", to: "dh2" }], deck: ["f0", "f0", "f0"] });
+    const spent = revealFromTop(carrying.state, carrying.ctx, "147019", []);
+    const afterCarrying = finish({ state: spent.state, steps: [] }, carrying.ctx).state;
+    expect(afterCarrying.cards[spent.id]?.zone).not.toBe("attached");
+    expect(Object.values(afterCarrying.cards).filter((card) => card.host != null && card.code === "147019")).toHaveLength(2);
   });
 });

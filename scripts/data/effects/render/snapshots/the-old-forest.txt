@@ -36,8 +36,8 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147002:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147002:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
-    - then, if the Victory points in the victory display is less than the number of players x 5 (checked when this step runs, after the steps above; not tied to whether they did anything): advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
 
 ## 147003 The Living Forest
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -56,8 +56,8 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147003:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147003:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
-    - then, if the Victory points in the victory display is less than the number of players x 5 (checked when this step runs, after the steps above; not tied to whether they did anything): advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
 
 ## 147004 The Living Forest
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -75,8 +75,8 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147004:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147004:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
-    - then, if the Victory points in the victory display is less than the number of players x 5 (checked when this step runs, after the steps above; not tied to whether they did anything): advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
 
 ## 147005 The Living Forest
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -95,8 +95,8 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147005:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147005:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
-    - then, if the Victory points in the victory display is less than the number of players x 5 (checked when this step runs, after the steps above; not tied to whether they did anything): advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
 
 ## 147006 The Wicked Willow
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -334,6 +334,6 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
     - [json TakeRevealedCard {"verb":"TakeRevealedCard","who":"picked","committed":true}]
     - later, at the end of the round (cannot be canceled while the number of hero (any player controls) is at least 0):
       - discard this card
-      - shuffle the encounter discard pile into the encounter deck
+      - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 211 by template, 7 as JSON)
+(rendered pieces: 213 by template, 7 as JSON)

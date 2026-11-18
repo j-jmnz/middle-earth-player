@@ -22,6 +22,7 @@ import { nextUint, shuffleIds } from "../core/seed.ts";
 import { afterProgress } from "../quest/stage-reveal.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { queueHeard } from "../families/quest/events.ts";
+import { countDiscarded } from "../families/south/damage.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
 import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
@@ -402,7 +403,10 @@ function discardTarget(
     const instance = state.cards[id];
     return instance && inPlay(instance.zone) ? destroyAndAnnounce(state, instance, printedOf(ctx.cards, instance.code), ctx.cards, steps) : state;
   }
-  return destroyCard(state, id, ctx.cards, steps);
+  const before = state.cards[id];
+  const next = destroyCard(state, id, ctx.cards, steps);
+  // A card that left play by this discard counts for the effect's `noneDiscarded` ("Then" resolves only if the discard did, rr.then).
+  return before && inPlay(before.zone) && !inPlay(next.cards[id]?.zone ?? "removed") ? countDiscarded(next, 1) : next;
 }
 
 // The reveal frame of the source card counts each separate instance of surge it was given (rr.surge) for the rest of that reveal.
