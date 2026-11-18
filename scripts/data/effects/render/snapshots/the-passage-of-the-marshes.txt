@@ -195,7 +195,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
     - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
-    - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","trait":"Undead","own":true}]
+    - each enemy engaged with a player with the trait Undead (the acting player's) makes an immediate attack, each dealt a shadow card of its own
 
 144026:A:3 (shadow): Shadow: Return the topmost Undead enemy in the encounter discard pile to the staging area.
   144026:shadow:1: Shadow
@@ -363,4 +363,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 236 by template, 6 as JSON)
+(rendered pieces: 237 by template, 5 as JSON)

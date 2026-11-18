@@ -1,0 +1,206 @@
+Scenario piles that place cards with no record (quest: 04038 Along the Misty Mountains; quest: 04039 Orc Outpost; quest: 04040 Approaching Rivendell; setAside: 04041 Arwen Undómiel)
+
+## 04038 Along the Misty Mountains
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04038:A:1 (front): Setup: Put Arwen Undómiel into play under the control of the first player. Shuffle the encounter deck. Reveal 1 card from the encounter deck per player, and add them to the staging area.
+  04038:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 04041 enters play under the first player's control, ready
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+## 04039 Orc Outpost
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04039:B:1 (back): When Revealed: Search the encounter deck and discard pile for Goblin Gate and add it to the staging area, if able. Then, if there is no active location, Goblin Gate becomes the active location.
+  04039:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 04043 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - then, if not (the active location is a location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "Goblin Gate"
+    - then, if not (the active location is a location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+
+## 04040 Approaching Rivendell
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04040:B:1 (back): When Revealed: Reveal 1 card from the encounter deck per player, and add it to the staging area.
+  04040:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+04040:B:2 (back): Characters cannot be healed.
+  04040:constant:1: Constant
+    - each character (any player controls): stat cannotBeHealed 1, while this card is in play
+
+04040:B:3 (back): If the players defeat this stage, they have won the game.
+  04040:constant:2: Constant
+    (no instructions)
+
+## 04041 Arwen Undómiel
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+04041:A:1 (front): The first player gains control of Arwen Undómiel, as an ally.
+  04041:constant:1: Constant
+    - this card is controlled by the first player while this holds
+
+04041:A:2 (front): Response: After Arwen Undómiel exhausts, choose a hero. Add 1 resource to that hero's resource pool.
+  04041:response:1: Response on the event exhausted (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls)
+    - add 1 resources to the picked card
+
+04041:A:3 (front): If Arwen Undómiel leaves play, the players are defeated.
+  04041:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 04042 Ruined Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04042:A:1 (front): Response: After you travel to Ruined Road, the first player places 2 progress tokens on it or readies 1 hero he controls.
+  04042:response:1: Response after the players travel
+    - the first player chooses one of:
+      * option "progress":
+        - place 2 progress on this card
+      * option "ready":
+        - choose hero (you control) chosen by the first player
+        - ready the picked card
+
+04042:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
+  04042:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 04043 Goblin Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04043:A:1 (front): While Goblin Gate is the active location, the first enemy revealed from the encounter deck each round gains ambush. If that enemy engages a player, it makes an immediate attack (deal and resolve a shadow card).
+  04043:constant:1: Constant
+    only if this card is the active location
+    - the first enemy revealed from the encounter deck each round gains ambush (counted from the round's start, whether or not this card is in play)
+  04043:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) that a card gave the ambush keyword (not one that prints it))
+    only if this card is the active location
+    - the card the event is about (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
+
+## 04044 Pathless Country
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04044:A:1 (front): Forced: After at least 1 progress token is placed on Pathless Country, remove 1 progress token from it.
+  04044:forced:1: Forced on the event progressPlaced (heard about this card)
+    - remove 1 progress from this card
+
+04044:A:2 (shadow): Shadow: Deal 1 damage to each ally in play.
+  04044:shadow:1: Shadow
+    - deal 1 damage to each ally (any player controls)
+
+## 04045 Barren Hills
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04045:A:1 (front): While Barren Hills is the active location, ignore ambush.
+  04045:constant:1: Constant
+    only if this card is the active location
+    - the table: stat ignoreAmbush 1, while this card is in play
+
+04045:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
+  04045:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 04046 Sleeping Sentry
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04046:A:1 (front): When Revealed: Deal 1 damage to each exhausted character. Then, exhaust all ready characters.
+  04046:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - deal 1 damage to each exhausted character (any player controls)
+    - for each ready character (any player controls):
+      - exhaust the picked card
+
+04046:A:2 (shadow): Shadow: Defending player must discard all exhausted characters he controls.
+  04046:shadow:1: Shadow
+    - the acting player discards each exhausted character (you control)
+
+## 04047 Followed by Night
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04047:A:1 (front): When Revealed: The first player (choose 1): deals 1 damage to all allies in play and Followed by Night gains surge, or all enemies engaged with players make an immediate attack, if able.
+  04047:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "damage":
+        - deal 1 damage to each ally (any player controls)
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
+      * option "attack":
+        - each enemy engaged with a player makes an immediate attack, each dealt a shadow card of its own
+
+04047:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
+  04047:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 04048 Orc Ambush
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04048:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+04048:A:2 (front): When Revealed: All Orc enemies in the staging area engage the first player. If there are no Orc enemies in the staging area, return all Orc enemies in the encounter discard pile to the staging area, if able.
+  04048:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the effect's X grows by the number of Orc enemy (any player controls) in the staging area only
+    - the rest of the effect is carried out by the first player
+    - repeat X times:
+      - choose Orc enemy (any player controls) in the staging area only
+      - engage the picked card
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): return every Orc enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+
+## 04049 Goblin Taskmaster
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04049:A:1: Ambush.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+04049:A:2 (front): Forced: After Goblin Taskmaster engages a player, that player deals 2 damage to 1 character he controls.
+  04049:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal 2 damage to the picked card
+
+## 04050 Orc Raiders
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04050:A:1: Ambush.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+04050:A:2 (front): Forced: After Orc Raiders engages a player, that player discards 2 attachments he controls, if able.
+  04050:forced:1: Forced after an enemy engages a player (heard about this card)
+    - repeat 2 times:
+      - choose attachment (you control)
+      - discard the picked card
+
+## 04051 Crebain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04051:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+04051:A:2 (front): While Crebain is in the staging area, encounter card effects cannot be canceled.
+  04051:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat encounterUncancelable 1, while this card is in play
+
+04051:A:3 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
+  04051:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 04052 Wild Bear
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04052:A:1: Ambush.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+04052:A:2 (front): Forced: After Wild Bear engages a player, it makes an immediate attack.
+  04052:forced:1: Forced after an enemy engages a player (heard about this card)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+(rendered pieces: 110 by template, 0 as JSON)

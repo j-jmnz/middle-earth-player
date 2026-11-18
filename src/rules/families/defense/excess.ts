@@ -81,9 +81,12 @@ export function combatDamage(
   const toStage = state.pendingAttack?.excessToStage === true && state.questStage != null && state.questStage !== targetId;
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play.
   const toEachQuest = flagged(state, enemyId, "excessToEachQuest");
+  // "Excess damage dealt by this attack must be assigned to Arwen Undómiel" (901407:A:2): the card in play with that title, wherever it lies; an undefended attack has none.
+  const named = state.pendingAttack?.excessToCard;
+  const toCard = named != null && state.pendingAttack?.undefended !== true ? Object.values(state.cards).find((card) => inPlay(card.zone) && card.id !== targetId && printedOf(ctx.cards, card.code).name === named)?.id : undefined;
   // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
   const reads = gameReads(state, ctx, '"excessOf"');
-  if (!toThreat && !toQuest && !toShip && !toDamage && !reads && !toStage && !toEachQuest) return placed;
+  if (!toThreat && !toQuest && !toShip && !toDamage && !reads && !toStage && !toEachQuest && toCard == null) return placed;
   const enemy = state.cards[enemyId];
   const target = state.cards[targetId];
   if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
@@ -97,7 +100,8 @@ export function combatDamage(
     return record ? effectCause(record) : ruleCause("rr.damage");
   };
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play; the enemy's other excess flags still apply.
-  const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(placed, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : placed;
+  const afterCard = toCard != null && !toStage ? placeDamage(placed, toCard, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")) : placed;
+  const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(afterCard, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : afterCard;
   if (toStage && state.questStage) return noteHitPointsOn(placeDamage(eachQuest, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(toDamage ? noteExcess(eachQuest, excess) : eachQuest, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.

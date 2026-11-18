@@ -1,5 +1,6 @@
 // The ambush pieces of the encounter family (src/catalog/families/encounter.ts, dwd.ambush): templates for the verbs the keyword and the Road to Rivendell cards add. read-fields-samples.ts holds their samples.
-import { str, type Ctx, type Obj } from "./kit.ts";
+import { cardRef } from "./amounts.ts";
+import { isObj, str, type Ctx, type Obj } from "./kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 
@@ -13,5 +14,13 @@ export const AMBUSH_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Mad
     text: `the first enemy${i.withKeyword === "ambush" ? " with the ambush keyword" : ""} revealed from the encounter deck each round gains ${str(i.keyword)} (counted from the round's start, whether or not this card is in play)`,
     read: ["keyword", "withKeyword"],
   }),
+  ExcessToCard: (i) => ({ text: `the damage this attack deals beyond the remaining hit points of the character it damages is assigned to the card in play titled ${str(i.name)}, wherever it lies (an undefended attack has none)`, read: ["name"] }),
+  GuardReturnedBy: (i) => ({
+    text: `the card in play with code ${str(i.code)} goes back to the staging area, controlled by no one, guarded by the last picked card${i.returns === "firstPlayer" ? " (which may be the active location); it stays in play with its damage, tokens and attachments and rejoins the first player's play area once nothing guards it" : ""}`,
+    read: ["code", "returns"],
+  }),
+  MakeEngagementChecks: (i) => ({ text: `the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none${isObj(i.lower) ? ` (the enemy titled ${str(i.lower.name)} checks with ${str(i.lower.amount)} less engagement cost)` : ""}`, read: ["lower"] }),
+  ImmediateAttackBy: (i) => ({ text: `${i.target === undefined ? "the card the answered event was about" : cardRef(i.target)} (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own`, read: ["target"] }),
+  ImmediateAttackEach: (i) => ({ text: `each enemy engaged with a player${typeof i.trait === "string" ? ` with the trait ${i.trait}` : ""}${typeof i.notTrait === "string" ? ` without the trait ${i.notTrait}` : ""}${typeof i.enemy === "string" ? ` titled ${i.enemy}` : ""}${i.own === true ? " (the acting player's)" : ""} makes an immediate attack, each dealt a shadow card of its own`, read: ["trait", "notTrait", "enemy", "own"] }),
   RevealEnemies: (i) => ({ text: `each enemy this effect discarded${Array.isArray(i.ids) ? ` (${i.ids.length} still to reveal)` : ""} is revealed in full, in the order discarded, and added to the staging area`, read: ["ids"] }),
 };

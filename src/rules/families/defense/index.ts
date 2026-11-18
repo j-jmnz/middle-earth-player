@@ -90,6 +90,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       for (let left = shadowCards(state.cards[enemyId]).length; left > 0; left -= 1) next = discardShadowOf(next, enemyId);
       return next;
     }
+    case "ExcessToCard":
+      return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, excessToCard: instruction.name } } : state;
     case "DealShadowTo":
       return dealShadowTo(state, ref(state, instruction.target, focus), steps, ctx);
     case "LookAtShadow":
@@ -131,4 +133,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "defense", verbs: ["ChooseAmount", "SpendFromPool", "RedirectDamage", "PreventAttacks", "DiscardShadowOf", "DealShadowTo", "LookAtShadow", "ShadowAttacks", "StartShadowAttack", "StrikeBack", "AddDefender", "EndDeclaring", "CancelAttack", "AssignAttackDamage", "ReadyUnharmed", "ReadyAfterAttack", "RedirectAttack", "ModifyStatVersus"], run };
+export const manifest: RulesFamily = { name: "defense", verbs: ["ChooseAmount", "SpendFromPool", "RedirectDamage", "PreventAttacks", "DiscardShadowOf", "ExcessToCard", "DealShadowTo", "LookAtShadow", "ShadowAttacks", "StartShadowAttack", "StrikeBack", "AddDefender", "EndDeclaring", "CancelAttack", "AssignAttackDamage", "ReadyUnharmed", "ReadyAfterAttack", "RedirectAttack", "ModifyStatVersus"], run };

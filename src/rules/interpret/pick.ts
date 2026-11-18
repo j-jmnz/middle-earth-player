@@ -160,6 +160,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (spec.control === "any") raw.push(...stagingFor(state, spec, asking), ...(state.separate ? activeFor(state, asking, spec.stagingArea === "any").slice(0, 1) : [state.activeLocation].filter((id): id is string => id != null)));
   } else {
     for (const index of seats) raw.push(...characters(state, index, ctx.cards));
+    // An ally a guard holds in the staging area (Arwen under Goblin Gate, 901402:B:1) is an ally in play that no player controls: any player's filter sees it.
+    if (spec.control !== "you" && state.modifiers.length > 0) raw.push(...state.staging.filter((id) => flagged(state, id, "guardedAlly")));
   }
   if (spec.captive === "include" && spec.control !== "you") raw.push(...captiveIds(state, "include", ctx.cards));
   return raw;
