@@ -53,6 +53,8 @@ export function lineTimings(line: string): Set<string> {
   // attachment with the text, "Each time attached hero readies, deal it 1 damage."", 900106:A:1).
   const quoted = /\bas an? (?:\w+ )?attachment with the text[,:]? "([^"]*)"/i.exec(line)?.[1];
   if (quoted != null && !LABEL.test(quoted.trim())) allowed.add("triggered");
+  // An attachment whose quoted text is a Lost line ("with the text: "Lost: Discard attached hero."", 901608:A:2) hears the Lost trigger: a triggered effect.
+  if (/\bwith the text[,:]? "Lost: /i.test(line)) allowed.add("triggered");
   // An unlabelled line that calls itself an action is one ("Any player may trigger this action", Ceorl 12058:A:1).
   if (/trigger this action/i.test(line)) allowed.add("action");
   // A Travel line that bars the trip until something is done ("Travel: Players must complete stage one of this quest before they can travel to Rhosgobel", 02065:A:3) is also a constant: the engine checks it while the card is in play.
