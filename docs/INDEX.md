@@ -8,72 +8,78 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~2.9K tok)
+- `CLAUDE.md` — Claude Code (~3.0K tok)
+- `.claude/rules/agent-standards.md` — Agent standards (~350 tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~990 tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~1.2K tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
-- `.claude/rules/release-standards.md` — Release standards (~1.2K tok)
+- `.claude/rules/release-standards.md` — Release standards (~1.3K tok)
 
 ## Agents
 
 Each agent reads its own file.
 
-- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
+- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.2K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.5K tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.1K tok)
-- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~1.0K tok)
+- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~1.1K tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.5K tok)
-- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.1K tok)
+- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.2K tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
 ## Product, code and design
 
 Read the sections your task touches.
 
-- `README.md` (~5.8K tok)
-  - 56–93 Features (~550)
-    - 79–93 Themes (~190)
-  - 94–112 What you can play (~280)
-  - 113–120 Private by design (~170)
-  - 121–126 Accessibility (~120)
-  - 127–224 Install (~1.7K)
-  - 225–259 Roadmap (~1.2K)
-  - 260–270 Get involved (~210)
-  - 271–274 Support (~90)
-  - 275–290 Attribution (~410)
-  - 291–294 License (~50)
+- `README.md` (~8.0K tok)
+  - 57–94 Features (~550)
+    - 80–94 Themes (~190)
+  - 95–113 What you can play (~280)
+  - 114–121 Private by design (~170)
+  - 122–127 Accessibility (~120)
+  - 128–225 Install (~1.7K)
+  - 226–451 FAQ (~2.2K)
+    - 230–316 At the table (~960)
+    - 317–367 Settings worth knowing (~460)
+    - 368–400 Decks and cards (~240)
+    - 401–451 Campaigns, saves and updates (~530)
+  - 452–486 Roadmap (~1.2K)
+  - 487–497 Get involved (~210)
+  - 498–501 Support (~90)
+  - 502–517 Attribution (~410)
+  - 518–521 License (~50)
 - `docs/architecture.md` — Architecture (~28.5K tok)
-  - 7–42 Stack (~1.3K)
-  - 43–78 Processes (~690)
-  - 79–162 Modules (~2.4K) ← 3
-    - 127–162 Repository map (~960) ← 1
-  - 163–188 State (~1.1K) ← 9
-  - 189–210 Play loop (~250)
-  - 211–236 Engine (~5.9K)
-    - 225–236 Mechanic families (~5.0K) ← 5
-  - 237–242 Effects (~600) ← 5
-  - 243–275 Scenario definition (~800)
-  - 276–322 Persistence (~3.4K) ← 2
-    - 299–302 Open games across an update (~50)
-    - 303–309 Open game rows (~660)
-    - 310–315 Opening a game (~350)
-    - 316–322 Continue, Restart and the checkpoint (~380)
-  - 323–328 Images (~980) ← 6
-  - 329–383 Screens (~5.1K) ← 9
-  - 384–395 Desktop (~1.3K) ← 5
-  - 396–405 Update check (~630) ← 7
+  - 7–41 Stack (~1.2K)
+  - 42–77 Processes (~690)
+  - 78–161 Modules (~2.4K) ← 3
+    - 126–161 Repository map (~960) ← 1
+  - 162–187 State (~1.1K) ← 9
+  - 188–209 Play loop (~250)
+  - 210–235 Engine (~5.9K)
+    - 224–235 Mechanic families (~5.0K) ← 5
+  - 236–241 Effects (~600) ← 5
+  - 242–274 Scenario definition (~800)
+  - 275–321 Persistence (~3.4K) ← 2
+    - 298–301 Open games across an update (~50)
+    - 302–308 Open game rows (~660)
+    - 309–314 Opening a game (~350)
+    - 315–321 Continue, Restart and the checkpoint (~380)
+  - 322–327 Images (~1.1K) ← 7
+  - 328–383 Screens (~5.3K) ← 9
+  - 384–395 Desktop (~1.4K) ← 5
+  - 396–405 Update check (~680) ← 7
   - 406–411 Catalog build (~410)
-  - 412–429 Tests (~2.3K) ← 5
-  - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~234.2K tok)
+  - 412–428 Tests (~1.9K) ← 5
+  - 429–444 Performance (~1.2K) ← 4
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~235.3K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
-  - 68–89 Decisions (~1000)
-  - 90–122 Stack (~1.2K)
+  - 68–89 Decisions (~1.1K)
+  - 90–122 Stack (~1.1K)
   - 123–140 Performance and feel (~750)
-  - 141–159 Repository layout (~500)
+  - 141–159 Repository layout (~490)
   - 160–396 Domain (~10.2K)
     - 162–250 Campaign (~2.2K) ← 1
     - 251–265 Mirkwood campaign cards and carry-over (~890)
@@ -138,21 +144,21 @@ Read the sections your task touches.
     - 1884–1918 The Old Forest (~4.1K) ← 10
     - 1919–1954 Fog on the Barrow-downs (~5.0K) ← 9
   - 1955–1963 Nightmare (~410) ← 21
-  - 1964–2004 Deckbuilding (~2.1K)
-  - 2005–2084 Effects (~3.7K)
-    - 2007–2065 Three layers (~2.4K) ← 10
-    - 2066–2076 Player side quests, contracts and saga cards (~940)
-    - 2077–2080 Window stack (~100)
-    - 2081–2084 Coverage test (~270)
-  - 2085–2107 Data sources (~730) ← 3
-  - 2108–2126 Card images (~1.3K) ← 9
-  - 2127–2154 Persistence and shipping (~3.2K) ← 10
-  - 2155–2196 Screens (~5.1K) ← 2
-    - 2181–2196 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~61.7K tok)
+  - 1964–2006 Deckbuilding (~2.5K) ← 1
+  - 2007–2086 Effects (~3.7K)
+    - 2009–2067 Three layers (~2.4K) ← 10
+    - 2068–2078 Player side quests, contracts and saga cards (~960)
+    - 2079–2082 Window stack (~100)
+    - 2083–2086 Coverage test (~270)
+  - 2087–2109 Data sources (~730) ← 3
+  - 2110–2128 Card images (~1.4K) ← 9
+  - 2129–2156 Persistence and shipping (~3.2K) ← 10
+  - 2157–2199 Screens (~5.9K) ← 2
+    - 2184–2199 Table screen (~1.8K) ← 3
+- `docs/design-system-table.md` — Design system — Table (landscape) (~62.1K tok)
   - 5–8 Overview (~170) ← 1
   - 9–27 Top bar (~4.7K) ← 5
-  - 28–31 Table menu (~570) ← 4
+  - 28–31 Table menu (~860) ← 8
   - 32–39 Quest scale (~830) ← 2
   - 40–43 Canvas (~560)
   - 44–56 Spacing and the play area's rows (~1.9K) ← 9
@@ -161,7 +167,7 @@ Read the sections your task touches.
   - 114–119 The Sailing test (~690) ← 5
   - 120–133 The Island Map (~1.8K) ← 8
   - 134–137 Tokens and effects (~360)
-  - 138–153 Piles (~2.1K) ← 7
+  - 138–153 Piles (~2.2K) ← 7
   - 154–159 Marks of the open moment (~400) ← 1
   - 160–230 Motion (~3.3K) ← 7
   - 231–256 Spotlight (~2.6K) ← 33
@@ -183,48 +189,50 @@ Read the sections your task touches.
   - 379–390 Banner (~750) ← 5
   - 391–410 Screen reader (~3.0K) ← 19
   - 411–414 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~32.4K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~35.7K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
-  - 35–45 Performance (~680) ← 4
+  - 35–45 Performance (~720) ← 4
   - 46–84 Color (~1.5K) ← 2
-  - 85–107 Surfaces (~840) ← 1
+  - 85–107 Surfaces (~850) ← 1
   - 108–129 Type (~1.5K) ← 13
   - 130–147 Spacing, radius, border (~600) ← 2
-  - 148–169 Backdrops (~1.0K) ← 5
-  - 170–178 Navigation (~560) ← 6
+  - 148–169 Backdrops (~1.1K) ← 5
+  - 170–178 Navigation (~570) ← 6
   - 179–182 Update ribbon (~340) ← 5
   - 183–220 Components (~1.8K) ← 9
   - 221–235 Screen reader (~970) ← 8
   - 236–250 Icons (~480) ← 7
   - 251–269 Card art (~750) ← 2
   - 270–285 Tablets (~630) ← 15
-  - 286–478 Screens (~18.5K)
+  - 286–504 Screens (~21.8K)
     - 290–295 Splash (~210) ← 3
     - 296–299 App icon (~80)
     - 300–315 Campaigns (campaign list) (~1.5K) ← 6
-    - 316–329 Scenarios (~1.0K) ← 1
-    - 330–341 History (~1.4K) ← 4
-    - 342–359 Briefing (~2.0K) ← 6
-    - 360–363 Campaign setup (~1.0K) ← 3
-    - 364–369 Campaign path (~890) ← 4
-    - 370–373 Campaign log (~840) ← 1
-    - 374–377 Spend XP (~610) ← 1
-    - 378–381 Table — landscape (~30) ← 1
-    - 382–385 Table opens stale (~750) ← 4
-    - 386–399 Resolution and standalone outcome (~1.9K) ← 2
-    - 400–409 Decks (~920) ← 2
-    - 410–419 Deck builder (deck editor) (~1.1K) ← 3
-    - 420–429 Card pool (the Cards tab) (~910) ← 3
-    - 430–435 Card (~490) ← 2
-    - 436–441 Packs and pack cards (~170)
-    - 442–456 Settings (~1.4K) ← 12
-    - 457–462 Rules (~470) ← 1
-    - 463–466 Rule (~220) ← 1
-    - 467–474 Booklet (~540) ← 2
-    - 475–478 Database (~110)
-  - 479–498 States (~620)
-- `docs/development.md` — Development (~2.8K tok)
+    - 316–331 Scenarios (~1.1K) ← 1
+    - 332–343 History (~1.4K) ← 4
+    - 344–361 Briefing (~2.2K) ← 7
+    - 362–367 Campaign setup (~1.5K) ← 8
+    - 368–373 Campaign path (~930) ← 4
+    - 374–377 Campaign log (~840) ← 1
+    - 378–381 Spend XP (~610) ← 1
+    - 382–385 Table — landscape (~30) ← 1
+    - 386–389 Table opens stale (~750) ← 4
+    - 390–403 Resolution and standalone outcome (~1.9K) ← 2
+    - 404–413 Decks (~920) ← 2
+    - 414–423 Deck builder (deck editor) (~1.1K) ← 3
+    - 424–433 Card pool (the Cards tab) (~1.3K) ← 3
+    - 434–445 Card groups (the Cards tab's Encounter cards view) (~1.3K) ← 9
+    - 446–451 Card (~490) ← 2
+    - 452–463 Collection (~530) ← 3
+    - 464–467 Deck import (~120)
+    - 468–482 Settings (~1.6K) ← 15
+    - 483–488 Rules (~470) ← 1
+    - 489–492 Rule (~220) ← 1
+    - 493–500 Booklet (~540) ← 2
+    - 501–504 Database (~110)
+  - 505–524 States (~620)
+- `docs/development.md` — Development (~2.6K tok)
 - `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1
   - 20–35 Jobs (~1.8K) ← 4
@@ -240,11 +248,11 @@ Read the sections your task touches.
 
 The scenario procedure and the effect-authoring cookbook; read when a task names one.
 
-- `docs/agents/agent-brief.md` — Brief for a mechanic-family or scenario agent (~5.2K tok)
+- `docs/agents/agent-brief.md` — Brief for a mechanic-family or scenario agent (~5.1K tok)
   - 19–37 Setup (~440)
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
-  - 71–85 Approach (~810) ← 1
+  - 71–85 Approach (~770) ← 1
   - 86–124 Scenario procedure (~1.9K) ← 43
   - 125–134 Commit often (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
@@ -270,41 +278,42 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~16.6K tok)
-  - 5–14 Rules (~380)
-  - 15–21 Phases (~20)
-  - 22–317 Open items (~15.2K)
-    - 24–26 Reviews (~90)
-    - 27–29 README (~90)
-    - 30–34 Releases (~150)
-    - 35–42 Desktop (~310)
-    - 43–91 Fixtures and Maestro (~2.7K)
-    - 92–130 Rules and engine (~1.6K)
-    - 131–251 Rules and engine (Angmar Awakened) (~5.3K)
-    - 252–276 Screens and code (~1.6K)
-    - 277–296 Rules and engine (The Two Towers) (~1.4K)
-    - 297–303 Rules and engine (Shadows of Mirkwood) (~380)
-    - 304–317 Rules and engine (Standalone scenarios) (~1.7K)
-  - 318–343 Standing decisions (~940)
+- `docs/phases/STATUS.md` — Phase status (~15.5K tok)
+  - 5–13 Rules (~340)
+  - 14–20 Phases (~20)
+  - 21–315 Open items (~14.1K)
+    - 23–25 Reviews (~90)
+    - 26–31 Cards tab views (~160)
+    - 32–34 README (~90)
+    - 35–39 Releases (~150)
+    - 40–47 Desktop (~310)
+    - 48–90 Fixtures (~1.5K)
+    - 91–129 Rules and engine (~1.6K)
+    - 130–250 Rules and engine (Angmar Awakened) (~5.3K)
+    - 251–274 Screens and code (~1.5K)
+    - 275–294 Rules and engine (The Two Towers) (~1.4K)
+    - 295–301 Rules and engine (Shadows of Mirkwood) (~380)
+    - 302–315 Rules and engine (Standalone scenarios) (~1.7K)
+  - 316–341 Standing decisions (~940)
 
 ## Live plans
 
 Read when a task names the plan.
 
-- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
-  - 3–14 Context (~450)
+- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.6K tok)
+  - 3–14 Context (~440)
   - 15–24 What does not move (~190)
   - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~960)
   - 49–57 B. One registry for scenarios, fixtures and goldens (~300)
-  - 58–71 C. A shared scenario kit and `pnpm scenario new` (~610)
-  - 72–83 D. One manifest per family (~460)
-  - 84–92 E. Data: seed what can be seeded (~300)
-  - 93–113 F. Faster feedback while authoring (~870)
-  - 114–138 Where a scenario's cost is now (~790)
-  - 139–155 Next steps (~410)
-  - 156–167 After each scenario phase (~220)
-  - 168–171 Order (~70)
-  - 172–179 Verification (~100)
+  - 58–70 C. A shared scenario kit and `pnpm scenario new` (~520)
+  - 71–82 D. One manifest per family (~460)
+  - 83–91 E. Data: seed what can be seeded (~300)
+  - 92–112 F. Faster feedback while authoring (~870)
+  - 113–137 Where a scenario's cost is now (~780)
+  - 138–154 Next steps (~410)
+  - 155–166 After each scenario phase (~220)
+  - 167–170 Order (~70)
+  - 171–178 Verification (~100)
 
 ## Handovers
 
@@ -328,11 +337,11 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/showcase`: design-system.md, Color (1)
 - `scripts/tools`: agents/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (3); architecture.md, Modules (1); design-system-table.md, Choice tray (1); development.md, Commands (1)
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (32); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (5); brief.md, The Battle of Lake-town (3); brief.md, The Old Forest (3); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); brief.md, Fog on the Barrow-downs (2); brief.md, The Stone of Erech (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)
-- `src/catalog`: brief.md, The Battle of Lake-town (4); brief.md, The Stone of Erech (4); architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Return of the King (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
+- `src/catalog`: brief.md, The Battle of Lake-town (4); brief.md, The Stone of Erech (4); architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Return of the King (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Deckbuilding (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Return to Mirkwood (2); brief.md, The Dead Marshes (2); brief.md, A Journey to Rhosgobel (1); brief.md, Angmar Awakened (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Conflict at the Carrock (1); brief.md, Fog on the Barrow-downs (1); brief.md, Nightmare (1); brief.md, The Battle of Lake-town (1); brief.md, The Hills of Emyn Muil (1); brief.md, The Hunt for Gollum (1); brief.md, The Old Forest (1); brief.md, The Stone of Erech (1)
-- `src/play`: design-system-table.md, Choice tray (53); design-system-table.md, Spotlight (29); design-system-table.md, Cards (26); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); brief.md, The Battle of Lake-town (8); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, The Stone of Erech (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); design-system-table.md, Pointer and keys (4); design-system-table.md, Top bar (4); design-system-table.md, Two taps (4); brief.md, Fog on the Barrow-downs (3); brief.md, Table screen (3); brief.md, The Old Forest (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
+- `src/play`: design-system-table.md, Choice tray (53); design-system-table.md, Spotlight (29); design-system-table.md, Cards (26); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); brief.md, The Battle of Lake-town (8); design-system-table.md, The Island Map (8); architecture.md, Images (6); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, The Stone of Erech (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); design-system-table.md, Pointer and keys (4); design-system-table.md, Top bar (4); design-system-table.md, Two taps (4); brief.md, Fog on the Barrow-downs (3); brief.md, Table screen (3); brief.md, The Old Forest (3); design-system-table.md, Table menu (3); design-system.md, Settings (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
 - `src/rules`: brief.md, The Battle of Lake-town (19); brief.md, The Stone of Erech (7); brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); brief.md, Angmar Awakened (2); brief.md, Return to Mirkwood (2); architecture.md, State (1); brief.md, Conflict at the Carrock (1); brief.md, Escape from Mount Gram (1); brief.md, The Black Gate Opens (1); brief.md, The Return of the King (1)
-- `src/screens`: design-system.md, Tablets (10); brief.md, Persistence and shipping (6); design-system.md, Briefing (6); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); design-system.md, Settings (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); architecture.md, Desktop (2); architecture.md, Update check (2); brief.md, Screens (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); design-system.md, Update ribbon (2); .claude/rules/code-standards.md, Saving (1); architecture.md, Images (1); architecture.md, Persistence (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Shadows of Mirkwood (1); brief.md, Standalone scenarios (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
+- `src/screens`: design-system.md, Tablets (10); design-system.md, Card groups (the Cards tab's Encounter cards view) (9); design-system.md, Campaign setup (8); design-system.md, Briefing (7); brief.md, Persistence and shipping (6); design-system.md, Campaigns (campaign list) (6); design-system.md, Settings (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system-table.md, Table menu (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Collection (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); architecture.md, Desktop (2); architecture.md, Update check (2); brief.md, Screens (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); design-system.md, Update ribbon (2); .claude/rules/code-standards.md, Saving (1); architecture.md, Images (1); architecture.md, Persistence (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Shadows of Mirkwood (1); brief.md, Standalone scenarios (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system-table.md, Two taps (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
 - `src/ui`: design-system-table.md, Screen reader (4); design-system.md, Settings (4); design-system.md, Type (4); design-system-table.md, Two taps (3); design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); architecture.md, Update check (1); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Standards (1); design-system.md, Surfaces (1); design-system.md, Update ribbon (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)
 - `test/scenarios`: .claude/rules/code-standards.md, Test cost (11)

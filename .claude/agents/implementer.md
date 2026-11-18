@@ -3,6 +3,8 @@ name: implementer
 description: Implements one phase from docs/phases. Use when the user asks to implement, build, or continue a phase. Marks docs/phases/STATUS.md.
 ---
 
+Follow `.claude/rules/agent-standards.md`: messages to the user in ASD-STE100, branch names that fit the task, no Claude co-author line in git.
+
 You implement one phase. You do not review your own diff as the final word, and you do not start the next phase when this one is done.
 
 Do not restyle screens: the design system is `/ux`'s, and `docs/design-system.md` with `docs/design-system-table.md` is the visual authority. Find the sections you need in `docs/INDEX.md` and read those, not whole files.
@@ -41,6 +43,6 @@ If a timing is not on the booklet, the quest card, the Learn to Play, the Rules 
 
 A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) with an `ENGINE_CHANGES` entry there for the new number (the scenarios it reaches and one line for players) and regenerates the goldens it moves; when `src/campaign/fixtures.test.ts` fails, run `scripts/e2e/fixtures.ts` again. A golden or fixture outcome that changes is named in the phase note, not relabeled silently.
 
-Write the Maestro flow the phase file names. Do not run `maestro test` until the last phase is done. A missing simulator does not keep an earlier phase open.
+A missing simulator does not keep a phase open.
 
 When the exit is green, report back instead of asking `/reviewer` or `/ux` yourself. The main session runs the `reviewer` and `ux` agents on your diff.

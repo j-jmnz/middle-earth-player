@@ -4,7 +4,7 @@
 // Modal: a Modal takes over the orientation lock and the status bar. The table menu (table-menu.tsx) and the dock's More
 // popover (dock/more.tsx) both draw in it; Android Back closes either first (back.ts).
 import { useEffect, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
-import { AccessibilityInfo, findNodeHandle, Pressable, StyleSheet, View } from "react-native";
+import { AccessibilityInfo, findNodeHandle, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { useFocusRing } from "./focus-ring.ts";
@@ -106,7 +106,8 @@ function focusRow(row: RefObject<PressableRef | null>): void {
 /**
  * The popover and the layer that closes it. Render it last among the table's panels so it sits over them. `place` positions it
  * (absolute, inside the safe-area insets); `origin` is the corner it grows from. `focusRef` is the first row: focus moves to it
- * when the popover opens, so a screen reader starts inside. The test ids are the caller's, so a flow keeps the ids it had.
+ * when the popover opens, so a screen reader starts inside. The test ids are the caller's, so a flow keeps the ids it had. `maxHeight`, when
+ * given, is the most the frame may stand: rows past it scroll inside the frame, so none runs off the screen out of reach.
  */
 export function PopoverFrame({
   open,
@@ -117,6 +118,7 @@ export function PopoverFrame({
   closeLabel,
   focusRef,
   surface,
+  maxHeight,
   onClose,
   children,
 }: {
@@ -129,6 +131,7 @@ export function PopoverFrame({
   focusRef?: RefObject<PressableRef | null>;
   // `notice`: the banner's plain fill (the table menu, noticeSurface), opaque as every popover is; else the lit night card.
   surface?: "notice";
+  maxHeight?: number;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -171,7 +174,13 @@ export function PopoverFrame({
           style,
         ]}
       >
-        {children}
+        {maxHeight == null ? (
+          children
+        ) : (
+          <ScrollView testID={`${ids.popover}-scroll`} style={{ maxHeight: Math.max(0, maxHeight - 2 * PAD * s) }} bounces={false} persistentScrollbar showsVerticalScrollIndicator>
+            {children}
+          </ScrollView>
+        )}
       </Animated.View>
     </View>
   );

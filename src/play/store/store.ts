@@ -7,6 +7,7 @@ import { createStore, type StoreApi } from "zustand/vanilla";
 
 import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { deckTopFaceUp } from "../../rules/player/deck-play.ts";
 import { clashesOf } from "./clash.ts";
 import { finishedRoundSteps } from "./outcome.ts";
 import { peekSeat } from "./peek.ts";
@@ -27,6 +28,8 @@ export type TableState = {
   game: ScenarioState;
   legal: readonly LegalIntent[];
   draggable: readonly string[];
+  // The seats that play with the top card of their deck faceup (Gandalf, 142002:A:1): the table shows that card on the deck, playable now or not.
+  faceUpDecks: readonly number[];
   // The engine steps of the round on the table, oldest first, for the log sheet.
   roundSteps: readonly EngineStep[];
   selected: string | null;
@@ -119,9 +122,10 @@ export type TableInput = {
   onUndo?: (game: ScenarioState) => void;
 };
 
-function windowState(game: ScenarioState, ctx: ReduceContext): Pick<TableState, "legal" | "draggable"> {
+function windowState(game: ScenarioState, ctx: ReduceContext): Pick<TableState, "legal" | "draggable" | "faceUpDecks"> {
   const legal = legalIntents(game, ctx);
-  return { legal, draggable: draggableIds(game, ctx, legal) };
+  const faceUpDecks = game.seats.slice(0, game.seatCount).flatMap((_, seat) => (deckTopFaceUp(game, seat, ctx) ? [seat] : []));
+  return { legal, draggable: draggableIds(game, ctx, legal), faceUpDecks };
 }
 
 export function createTableStore(input: TableInput): TableStore {

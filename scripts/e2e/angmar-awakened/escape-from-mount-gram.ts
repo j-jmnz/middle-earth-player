@@ -1,4 +1,4 @@
-// The Maestro fixtures of Escape from Mount Gram (angmar-awakened part 5), written into src/campaign/fixtures/escape-from-mount-gram.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
+// The fixtures of Escape from Mount Gram (angmar-awakened part 5), written into src/campaign/fixtures/escape-from-mount-gram.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `gram-won` is the first seed that wins, parked on the win (the Resolution waits); `gram-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

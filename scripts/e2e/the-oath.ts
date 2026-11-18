@@ -1,4 +1,4 @@
-// The Maestro fixtures of The Oath (The Dark of Mirkwood part 1), written into src/campaign/fixtures/the-oath.json by scripts/e2e/fixtures.ts: two real
+// The fixtures of The Oath (The Dark of Mirkwood part 1), written into src/campaign/fixtures/the-oath.json by scripts/e2e/fixtures.ts: two real
 // games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, from the blank log a new
 // `the-dark-of-mirkwood` playthrough starts on (tdom.mini-campaign), so each is a real save. Each seat chose an Adaptation at the Campaign Setup
 // Checklist (the first seat's first hero carries The Fervor of Lore, the second seat's The Might of Tactics). Played by the auto-player, every intent one the

@@ -1,4 +1,4 @@
-// The Maestro fixtures of Voyage Across Belegaer (Dream-chaser part 1), written into src/campaign/fixtures/voyage-across-belegaer.json by scripts/e2e/fixtures.ts:
+// The fixtures of Voyage Across Belegaer (Dream-chaser part 1), written into src/campaign/fixtures/voyage-across-belegaer.json by scripts/e2e/fixtures.ts:
 // real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json) from the blank log a new `dream-chaser`
 // playthrough starts on, so each is a real save. The Campaign Setup (a ship each, a Modification boon, the damage trade) is answered in the game by the auto-player.
 // `sea-solo`: true solo, parked on the first Sailing test's commit. `sea-duo`: two-handed, parked on the first player's planning window of round 1.

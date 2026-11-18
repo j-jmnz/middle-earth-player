@@ -33,7 +33,7 @@ export type HeathPolicy = {
   // The Resolution's Song boon of each seat (12175:B:6): the first or the last offered, or none (skip). And the treasure of the three drawn (12175:B:7): the first or the last.
   song: "first" | "last" | "skip";
   treasure: "first" | "last";
-  // Whether a character defends: the goldens' heroes are numbers that shrug an attack off and stay ready to attack (nobody defends), the Maestro fixtures' real decklists defend as the auto-player does.
+  // Whether a character defends: the goldens' heroes are numbers that shrug an attack off and stay ready to attack (nobody defends), the fixtures' real decklists defend as the auto-player does.
   defend: boolean;
 };
 export const DEFAULT_POLICY: HeathPolicy = { choose: "smart", accolades: [1, 2, 3, 4], song: "first", treasure: "first", defend: false };
@@ -56,7 +56,7 @@ const priority = (state: ScenarioState, id: string): number =>
   Object.values(state.cards).some((card) => card.code === CODES.dragonSign && card.host === id) ? 0 : isCold(state, id) ? 1 : 2;
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the answer the policy says; the Resolution's questions are answered as the policy says; the players travel to the locations above, engage an enemy at a time and attack together,
-// Cold-Drake first. Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/the-withered-heath.ts) play real decklists, so they turn card play on.
+// Cold-Drake first. Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the fixtures (scripts/e2e/the-withered-heath.ts) play real decklists, so they turn card play on.
 export function heathIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: HeathPolicy = DEFAULT_POLICY, options: PolicyOptions = HEATH_POLICY): PlayerIntent {
   if (state.window?.kind === "resolution") {
     const offered = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));

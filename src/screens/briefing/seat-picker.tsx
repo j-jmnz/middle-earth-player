@@ -13,7 +13,7 @@ import { OpenCardContext, type BriefingDecks } from "./parts";
 import { BodyText, Chevron, Label, Section, TextButton } from "../kit/chrome";
 import { editSavedDeck } from "../deck/draft";
 import { emptyDeckListFilter, useDeckListView } from "../deck/list";
-import { FoldHeader, useFolds } from "../kit/fold-section";
+import { FoldHeader, FoldSection, useFolds } from "../kit/fold-section";
 import { DeckListBar } from "../deck/list-bar";
 import { deckCountLine, deckShortLine, notAppliedCards, notAppliedLine } from "../deck/status";
 import { DeckCover, DeckRow, HeroTile, heroFace, PARTY_TILE_HEIGHT, type HeroFace } from "../art/hero-tile";
@@ -28,7 +28,7 @@ const COVER_HEIGHT = 112;
 
 /**
  * One seat's fellowship. Until a deck is picked, and while it is being changed, the seat lists the saved decks with the Decks
- * tab's search and chips, each a radio (a deck with a fallen hero, or one not ready to play, is shown and cannot be picked; the
+ * tab's search and chips under a Decks fold of their own, each a radio (a deck with a fallen hero, or one not ready to play, is shown and cannot be picked; the
  * seat's picked deck stays listed whatever the filter). Picked, it folds to the deck's name with Change, its heroes as pictures
  * under them and, once picked, the Ring-bearer as one more. For the first seat the Ring-bearer's rows show when the deck brings none.
  */
@@ -88,6 +88,9 @@ export function SeatPicker({
   const foldId = `briefing-seat-${index}`;
   const state = seatState({ seeded, deck: pickedDeck, fallen, nameOf, readiness, short, missingRingBearer: slot && !ringBearer });
   const folded = seatFolded(folds.folded(foldId), state);
+  // The deck list's own fold, stored per seat index like the seat's.
+  const decksFoldId = `briefing-decks-${index}`;
+  const decksFolded = folds.folded(decksFoldId);
   // A Ring-bearer the deck brings itself is one of the candidates (a Fellowship hero with the Ring-bearer trait).
   const carries = (code: string) => candidates.some((candidate) => candidate.code === code);
 
@@ -128,7 +131,8 @@ export function SeatPicker({
             ) : null}
           </View>
         ) : choosing ? (
-          <View>
+          // The list folds on its own, so a long one never keeps the player from what is under it: the seat itself stays open while it needs a deck.
+          <FoldSection id={decksFoldId} title="Decks" folded={decksFolded} onFold={(next) => folds.setFolded(decksFoldId, next)} count={listed.length} unit="deck">
             {pickedDeck ? <Label>Pick another deck for this seat.</Label> : null}
             <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={savedDecks.length} testIDPrefix={`briefing-decks-${index}`} />
             <View
@@ -190,7 +194,7 @@ export function SeatPicker({
                 </View>
               ) : null}
             </View>
-          </View>
+          </FoldSection>
         ) : (
           <View testID={`briefing-party-${index}`}>
             {/* The name gets the row's width less Change (a long one never breaks inside a word). The hero tiles show the heroes, so the count

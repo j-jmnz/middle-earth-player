@@ -31,7 +31,7 @@ describe("Passage Through Mirkwood (Mirkwood Paths part 1, phase 29)", () => {
     if (!resumed.ok) return;
     const view = resolutionView(resumed.state, world);
     expect(view.kind).toBe("settled");
-    // Beorn's Path (stage 3B 01122), which the Maestro flow's sentence and log rows name.
+    // Beorn's Path (stage 3B 01122), which the sentence and log rows name.
     expect(resumed.state.stagesReached).toEqual(["01120", "01122"]);
     if (view.kind === "settled") expect(settledSentence(view, world, "Journey Along the Anduin")).toBe("Confirming records 2 copies of Mendor's Support and the burden Ungoliant's Swarm in the campaign and unlocks Journey Along the Anduin.");
     const after = finish(save, world, resumed.state);

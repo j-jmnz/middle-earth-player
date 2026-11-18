@@ -1,4 +1,4 @@
-// The world a Maestro fixture's game is replayed in (src/campaign/fixtures.test.ts and the per-campaign fixture tests): the catalog the fixtures are checked against and the world a fixture's loadout and log deal.
+// The world a fixture's game is replayed in (src/campaign/fixtures.test.ts and the per-campaign fixture tests): the catalog the fixtures are checked against and the world a fixture's loadout and log deal.
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 

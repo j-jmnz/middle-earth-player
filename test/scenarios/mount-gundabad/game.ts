@@ -52,7 +52,7 @@ const stageIds = (state: ScenarioState, options: readonly string[]): boolean => 
 const STAGE_CODES = ["19134", "19135", "19137", "19138", "19139", "19140", "19141", "19142"];
 
 // The auto-player's answer (test/harness/auto-player.ts), except: the bypass, the stage put on the bottom or searched for, an engagement, the attack, a defender, the Responses and Actions and the Resolution's treasure are answered as the policy says;
-// a choice takes the first answer, or the last. Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/mount-gundabad.ts) play real decklists, so they turn card play on.
+// a choice takes the first answer, or the last. Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the fixtures (scripts/e2e/mount-gundabad.ts) play real decklists, so they turn card play on.
 export function gundabadIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: GundabadPolicy = DEFAULT_POLICY, options: PolicyOptions = GUNDABAD_POLICY): PlayerIntent {
   const intents = legalIntents(state, ctx);
   if (state.window?.kind === "resolution") {

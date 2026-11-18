@@ -7,8 +7,8 @@ import { loadAnyScenario, loadCampaignsInOrder } from "../data/load-scenarios.ts
 import { seedFinderRel } from "../data/effects/seed-finder-paths.ts";
 import { ROOT } from "../data/paths.ts";
 import { runScript, type Log } from "../log.ts";
-import { cycleFlowFile, cycleGameFile, cycleGoldenTestFile, cycleSeedFinderFile, standaloneTestFile } from "./scenario-new-cycle.ts";
-import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, seedFinderFile, specTestFile, winFlowFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
+import { cycleGameFile, cycleGoldenTestFile, cycleSeedFinderFile, standaloneTestFile } from "./scenario-new-cycle.ts";
+import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, seedFinderFile, specTestFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
 // (docs/agents/agent-brief.md, Scenario procedure):
@@ -17,12 +17,12 @@ import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile
 //
 // Files (never overwritten: if any exists the command refuses, listing them): the game (test/scenarios/<id>/), the golden test, the campaign test and the
 // spec rows (src/campaign/scenarios/<id>/), the choice words as an asks file (src/play/words/asks/<id>.ts, listed in its barrel by pnpm data build), the seed finder
-// (scripts/e2e/<id>.ts, or in the campaign's folder: scripts/data/effects/seed-finder-paths.ts), both Maestro flows (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
+// (scripts/e2e/<id>.ts, or in the campaign's folder: scripts/data/effects/seed-finder-paths.ts), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json). There is no scene file: the game, the golden test and the campaign test read the scenario from data/, and the card tests are spec rows
 // (on tableFromLayout).
 // A scenario of a cycle (Shadows of Mirkwood, data/campaigns kind "cycle") has no campaign card and no Campaign Mode: its game is the standalone game
 // (test/harness/game-kit.ts, standaloneGame), its golden suite the standalone one, `standalone.test.ts` stands in for the campaign test, its fixtures are one
-// open standalone game each (`kind: "standalone"` in the fixture registry) and its Maestro flows run the standalone subflows (.maestro/subflows/).
+// open standalone game each (`kind: "standalone"` in the fixture registry) 
 // Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/writers.ts,
 // and the golden registry (test/harness/golden-registry.ts), whose two lines are written as comments because that registry's test fails
 // on an entry with no golden.json. Nothing else runs: the next commands are printed.
@@ -185,8 +185,6 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
     { file: `src/campaign/scenarios/${id}/spec.test.ts`, text: specTestFile(facts) },
     { file: `src/play/words/asks/${id}.ts`, text: asksFile(facts) },
     { file: `scripts/e2e/${facts.finderRel}.ts`, text: facts.cycle ? cycleSeedFinderFile(facts) : seedFinderFile(facts) },
-    { file: `.maestro/scenarios/${id}/${id}.yaml`, text: facts.cycle ? cycleFlowFile("win", facts) : winFlowFile(facts) },
-    { file: `.maestro/scenarios/${id}/${id}-loss.yaml`, text: facts.cycle ? cycleFlowFile("loss", facts) : lossFlowFile(facts) },
     { file: authoredPath(facts), text: authoredFile(facts) },
     { file: `src/campaign/fixtures/${id}.json`, text: "{}\n" },
   ];
@@ -278,7 +276,7 @@ function nextSteps(facts: Facts, log: Log): void {
   log.info("  pnpm data build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
   log.info(`  pnpm scenario pack ${facts.id}   runs effects draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
   log.info("  pnpm effects open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");
-  log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts)${facts.cycle ? ", the standalone test" : ""}, asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder, the Maestro flows; then list the goldens in test/harness/golden-registry.ts`);
+  log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts)${facts.cycle ? ", the standalone test" : ""}, asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder; then list the goldens in test/harness/golden-registry.ts`);
 }
 
 function main(log: Log): void {

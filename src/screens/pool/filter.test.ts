@@ -4,12 +4,14 @@ import {
   activeFilterCount,
   applyTypeRequest,
   costOptions,
-  cycleGroups,
   emptyPoolFilter,
   filterPool,
   sortPool,
   filterSheetAnimation,
   packChooserRows,
+  packDetail,
+  packGroups,
+  poolCountLine,
   shownCost,
   traitChooserRows,
   typeRequestWords,
@@ -21,6 +23,14 @@ const packs: PoolPack[] = [
   { code: "Core", name: "Core Set", position: 1, cyclePosition: 1 },
   { code: "RevCore", name: "Revised Core", position: 2, cyclePosition: 1 },
   { code: "TBR", name: "The Black Riders", position: 1, cyclePosition: 50 },
+  { code: "TRD", name: "The Road Darkens", position: 2, cyclePosition: 50 },
+];
+
+// Two collection switches (data/collection.json): one of two packs and one of a pack.
+const sets = [
+  { id: "core", title: "Core Set (2011)", packs: ["Core", "RevCore"] },
+  { id: "lotr", title: "The Lord of the Rings", packs: ["TBR", "TRD"] },
+  { id: "solo", title: "Revised", packs: ["RevCore"] },
 ];
 
 function card(overrides: Partial<PoolCard> & Pick<PoolCard, "code" | "name">): PoolCard {
@@ -50,7 +60,7 @@ describe("sortPool", () => {
 });
 
 describe("filterPool", () => {
-  const groups = cycleGroups(packs);
+  const groups = packGroups(sets, packs);
   const rows = [
     card({ code: "01073", name: "Gandalf", sphereCode: "neutral", traits: "Istari.", isUnique: true, packCodes: ["Core", "RevCore"] }),
     card({ code: "141002", name: "Sam Gamgee", typeCode: "hero", packCode: "TBR", packCodes: ["TBR"], traits: "Hobbit." }),
@@ -68,24 +78,24 @@ describe("filterPool", () => {
   ];
 
   it("filters the loaded rows in memory", () => {
-    expect(groups[0]?.label).toBe("Core Set");
-    expect(filterPool(rows, "courage", emptyPoolFilter, groups, new Set()).map((row) => row.code)).toEqual(["01057"]);
+    expect(groups[0]?.label).toBe("Core Set (2011)");
+    expect(filterPool(rows, "courage", emptyPoolFilter, groups, new Set(), new Set()).map((row) => row.code)).toEqual(["01057"]);
     expect(
-      filterPool(rows, "", { ...emptyPoolFilter, trait: "Hobbit" }, groups, new Set()).map((row) => row.code),
+      filterPool(rows, "", { ...emptyPoolFilter, trait: "Hobbit" }, groups, new Set(), new Set()).map((row) => row.code),
     ).toEqual(["141002"]);
     expect(
-      filterPool(rows, "", { ...emptyPoolFilter, trait: "Hob" }, groups, new Set()),
+      filterPool(rows, "", { ...emptyPoolFilter, trait: "Hob" }, groups, new Set(), new Set()),
     ).toEqual([]);
     expect(
-      filterPool(rows, "", { ...emptyPoolFilter, pack: { kind: "cycle", cyclePosition: 1 } }, groups, new Set()).map(
+      filterPool(rows, "", { ...emptyPoolFilter, pack: { kind: "set", id: "core" } }, groups, new Set(), new Set()).map(
         (row) => row.code,
       ),
     ).toEqual(["01073", "01057"]);
     expect(
-      filterPool(rows, "", { ...emptyPoolFilter, unique: true }, groups, new Set()).map((row) => row.code),
+      filterPool(rows, "", { ...emptyPoolFilter, unique: true }, groups, new Set(), new Set()).map((row) => row.code),
     ).toEqual(["01073"]);
     expect(
-      filterPool(rows, "", { ...emptyPoolFilter, activeText: true }, groups, new Set(["01073", "141002", "04101", "priced"])).map((row) => row.code),
+      filterPool(rows, "", { ...emptyPoolFilter, activeText: true }, groups, new Set(["01073", "141002", "04101", "priced"]), new Set()).map((row) => row.code),
     ).toEqual(["01057"]);
   });
 
@@ -93,29 +103,50 @@ describe("filterPool", () => {
     expect(shownCost({ cost: null, threat: 5 })).toBe("5");
     expect(shownCost({ cost: "3", threat: 5 })).toBe("3");
     expect(
-      filterPool(rows, "", { ...emptyPoolFilter, cost: "5" }, groups, new Set()).map((row) => row.code),
+      filterPool(rows, "", { ...emptyPoolFilter, cost: "5" }, groups, new Set(), new Set()).map((row) => row.code),
     ).toEqual(["01057", "04101"]);
     expect(costOptions(rows)).toEqual(["2", "3", "5"]);
   });
 });
 
 describe("filter choosers", () => {
-  it("lists every cycle and pack, and every trait, without a sticky header", () => {
-    const groups = cycleGroups(packs);
-    expect(packChooserRows(groups).map((row) => row.key)).toEqual([
-      "any",
-      "cycle-1",
-      "pack-Core",
-      "pack-RevCore",
-      "cycle-50",
-      "pack-TBR",
-    ]);
+  it("lists every switch and its packs (a switch of one pack is that pack), and every trait, without a sticky header", () => {
+    const groups = packGroups(sets, packs);
+    expect(packChooserRows(groups, null).map((row) => row.key)).toEqual(["any", "set-core", "pack-Core", "pack-RevCore", "set-lotr", "pack-TBR", "pack-TRD", "pack-RevCore"]);
+    expect(packDetail({ ...emptyPoolFilter, pack: { kind: "set", id: "lotr" } }, groups)).toBe("The Lord of the Rings");
+    expect(packDetail({ ...emptyPoolFilter, pack: { kind: "pack", code: "TRD" } }, groups)).toBe("The Road Darkens");
     expect(traitChooserRows(["Hobbit", "Istari"]).map((row) => row.label)).toEqual(["Any", "Hobbit", "Istari"]);
+  });
+
+  it("lists only the packs owned while My collection is on, and no switch with none of them", () => {
+    const groups = packGroups(sets, packs);
+    expect(packChooserRows(groups, new Set(["TBR", "TRD", "Core"])).map((row) => row.key)).toEqual(["any", "set-core", "pack-RevCore", "pack-RevCore"]);
   });
 
   it("opens the filter sheet with no animation when reduced motion is on", () => {
     expect(filterSheetAnimation(true)).toBe("none");
     expect(filterSheetAnimation(false)).toBe("fade");
+  });
+});
+
+describe("My collection", () => {
+  const groups = packGroups(sets, packs);
+  const rows = [card({ code: "a", name: "Owned" }), card({ code: "b", name: "Not owned" })];
+
+  it("hides the cards outside the collection while on, and none while off", () => {
+    expect(filterPool(rows, "", emptyPoolFilter, groups, new Set(), new Set(["b"])).map((row) => row.code)).toEqual(["a"]);
+    expect(filterPool(rows, "", { ...emptyPoolFilter, owned: false }, groups, new Set(), new Set(["b"])).map((row) => row.code)).toEqual(["a", "b"]);
+  });
+
+  it("is not counted on the Filter button, like the type chips", () => {
+    expect(activeFilterCount({ ...emptyPoolFilter, owned: false })).toBe(0);
+  });
+
+  it("says whose cards the count is", () => {
+    expect(poolCountLine(1048, true, false, 0)).toBe("1,048 cards");
+    expect(poolCountLine(642, true, true, 0)).toBe("642 cards in your collection");
+    expect(poolCountLine(1048, false, true, 406)).toBe("1,048 cards · 406 you don't own");
+    expect(poolCountLine(1, false, true, 0)).toBe("1 card");
   });
 });
 

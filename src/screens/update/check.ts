@@ -1,8 +1,9 @@
 // The update check (docs/architecture.md, Update check; user request, 2026-11-17): once a day, while Check for new versions is on and the build is a
 // release, one GET of GitHub's latest-release endpoint, with no header, cookie or identifier of the app's own. The answer's version and date are kept
 // in user.db (`settings`, key "update") with the time of the answer and the version whose ribbon was closed; the offer itself is src/ui/update/offer.ts.
-// It runs a few seconds after the app opens and again when the app comes back to the foreground, each time only when a check is due. No network, a
-// refused request or an odd answer changes nothing the player sees.
+// It runs a few seconds after the app opens and again when the app comes back to the foreground, each time only when a check is due, and at once when
+// Settings' Check now is pressed (checkNow), whether or not the switch is on. No network, a refused request or an odd answer changes nothing the
+// player sees but Check now's line.
 import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { AppState } from "react-native";
@@ -80,6 +81,14 @@ function appActive(listener: () => void): () => void {
 
 const defaultFetch: UpdateFetch = (url, init) => fetch(url, init);
 
+// The running check's ask-now, set while startUpdateChecks runs; null before the databases open, so Check now does nothing then.
+let askNow: (() => void) | null = null;
+
+/** Settings' Check now: asks GitHub at once, past the daily wait and the switch, and leaves the outcome in `updateStore.manual`. */
+export function checkNow(): void {
+  askNow?.();
+}
+
 /**
  * Loads the stored row into the update store, writes each later change back, and checks whenever one is due: a few seconds after this call, when the
  * app comes back to the foreground and when Check for new versions is turned on. Returns the stop, which also drops a request in flight.
@@ -102,22 +111,31 @@ export function startUpdateChecks<TRun>(user: Db<TRun>, options: UpdateCheckOpti
   });
   if (!checksFor(options.current)) return unwrite;
 
-  // The request in flight, if any: one at a time, each with its own controller, so a timed-out request never cancels the next.
+  // The request in flight, if any: one at a time, each with its own controller, so a timed-out request never cancels the next. Check now pressed
+  // while one is in flight waits for that one's answer.
   let inFlight: AbortController | null = null;
   let stopped = false;
-  const check = (): void => {
-    if (stopped || inFlight || !tableSettings.getState().settings.checkUpdates) return;
-    if (!checkDue(updateStore.getState().stored.checkedAt, now())) return;
+  const request = (): void => {
     const controller = new AbortController();
     inFlight = controller;
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     void ask(fetcher, controller.signal).then((answer) => {
       clearTimeout(timeout);
       inFlight = null;
-      if (stopped || !answer) return;
-      const { stored, set } = updateStore.getState();
-      set(afterAnswer(stored, answer.status, answer.body, now()));
+      if (stopped) return;
+      const { stored, manual, set, setManual } = updateStore.getState();
+      if (answer) set(afterAnswer(stored, answer.status, answer.body, now()));
+      if (manual === "checking") setManual(answer && (answer.status === 200 || answer.status === 404) ? "answered" : "failed");
     });
+  };
+  const check = (): void => {
+    if (stopped || inFlight || !tableSettings.getState().settings.checkUpdates) return;
+    if (checkDue(updateStore.getState().stored.checkedAt, now())) request();
+  };
+  askNow = () => {
+    if (stopped) return;
+    updateStore.getState().setManual("checking");
+    if (!inFlight) request();
   };
 
   const first = setTimeout(check, options.firstDelayMs ?? FIRST_CHECK_DELAY_MS);
@@ -127,6 +145,8 @@ export function startUpdateChecks<TRun>(user: Db<TRun>, options: UpdateCheckOpti
   });
   return () => {
     stopped = true;
+    askNow = null;
+    if (updateStore.getState().manual === "checking") updateStore.getState().setManual("idle");
     clearTimeout(first);
     inFlight?.abort();
     unactive();

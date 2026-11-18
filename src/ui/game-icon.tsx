@@ -1,6 +1,6 @@
 // A game icon in React Native chrome: expo-image draws the committed SVG or PNG from assets/icons at the size asked. A
 // one-colour vector is tinted with a design-system token; the token-art PNGs keep their printed colours. An icon always
-// sits beside its word or carries an accessibility label, so Maestro's text assertions still read the word.
+// sits beside its word or carries an accessibility label, so a text assertion still reads the word.
 import { Image } from "expo-image";
 import { View } from "react-native";
 

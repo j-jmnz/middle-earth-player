@@ -1,6 +1,6 @@
 # Development
 
-Start with the Local setup section of [CONTRIBUTING.md](../CONTRIBUTING.md), which gets `pnpm test` passing. This page covers what comes after: running the app in a browser or on a phone, the Maestro flows, and every `pnpm` command. CONTRIBUTING.md also explains how a change lands.
+Start with the Local setup section of [CONTRIBUTING.md](../CONTRIBUTING.md), which gets `pnpm test` passing. This page covers what comes after: running the app in a browser or on a phone, and every `pnpm` command. CONTRIBUTING.md also explains how a change lands.
 
 ## In a browser
 
@@ -41,14 +41,6 @@ Leave off `--configuration Release` or `--variant release` to get a development 
 
 A build signed with a free Apple ID stops opening after 7 days. Run the command again to reinstall it; your saves are kept. The EAS cloud build profiles are in `eas.json`.
 
-## Maestro
-
-The Maestro flows live in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `maestro test .maestro` against an installed build. Flows that open a save fixture need `EXPO_PUBLIC_E2E_SEED` set, which the `e2e-test` profile in `eas.json` does.
-
-The screen-reader flow (`.maestro/features/screen-reader.yaml`, tagged `reader`) needs a development build made with `EXPO_PUBLIC_E2E_SEED=1 EXPO_PUBLIC_FORCE_READER=1`. Run it with `maestro test --include-tags=reader .maestro`.
-
-`.eas/workflows/e2e.yml` runs the flows on EAS. Nothing starts it automatically, not a push and not a pull request: someone signed in to the Expo account that owns the project starts it by hand with `eas workflow:run .eas/workflows/e2e.yml`.
-
 ## Commands
 
 Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `desktop`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
@@ -74,7 +66,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm effects open` | Regenerates `src/effects/open-lines.ts`. |
 | `pnpm scenario new <scenario-id>` | Writes and registers the skeleton files for a new scenario. Try `--dry-run` first. |
 | `pnpm scenario pack <scenario-id>` | Writes `.agent/pack/<id>.md`, the context a scenario author reads: vocabulary, schema entries, cookbook sections and drafts. |
-| `pnpm scenario fixtures [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
+| `pnpm scenario fixtures [scenario-id]` | Regenerates the save fixtures in `src/campaign/fixtures/`. |
 | `pnpm assets` | Runs `catalog`, `canvaskit`, `pdfjs`, `booklets` and `scans` in that order. `start`, `android`, `ios` and the native release builds run it for you (`start` with `--optional`). |
 | `pnpm assets catalog canvaskit pdfjs` | Any several packs, each run in the order named (`scripts/cli.ts`); the arguments after the last name go to every pack. |
 | `pnpm assets catalog` | Writes `assets/catalog.db`, which is never committed, and `src/catalog/version.ts`, which is. |

@@ -2,7 +2,7 @@ import { camel, pascal, upper, type Facts } from "./scenario-new-files.ts";
 
 // The skeleton files of `pnpm scenario new` for a scenario of a cycle (scripts/tools/scenario-new.ts).
 // A scenario of a cycle (Shadows of Mirkwood) has no Campaign Mode: its game is the standalone game (test/harness/game-kit.ts, standaloneGame), its golden suite the standalone
-// one (standalone: true), its test a standalone test, its fixtures one open standalone game each and its Maestro flows the standalone subflows.
+// one (standalone: true), its test a standalone test, its fixtures one open standalone game each.
 
 // What the cycle's game and golden test import: the cycle and the scenario, read from data/ (no scene file, no campaign card).
 const cycleImport = (depth: string): string => `import { loadAnyScenario, loadCampaign } from "${depth}scripts/data/load-scenarios.ts";`;
@@ -124,7 +124,7 @@ export function cycleSeedFinderFile(facts: Facts): string {
   const e2e = depth === 0 ? "./" : "../".repeat(depth);
   const scripts = "../".repeat(depth + 1);
   const root = `${scripts}../`;
-  return `// The Maestro fixtures of ${facts.name} (${facts.campaignId} cycle part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
+  return `// The save fixtures of ${facts.name} (${facts.campaignId} cycle part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
 // Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. \`${facts.short}-won\` is the first seed that wins, parked on the win (the outcome screen is one tap away); \`${facts.short}-lost\` the first that loses,
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
 // TODO: say which answers the saved decklists' policy gives the scenario's questions.
@@ -136,24 +136,6 @@ const say = createLog("e2e-${facts.short}");
 
 // TODO: the scenario's own answers in place of the saved decklists' policy, when the scenario needs them (scripts/e2e/temple-of-the-deceived.ts is the pattern).
 export const ${c}Fixtures = async () => standaloneWonLost(say, "${facts.short}", { campaignId: "${facts.campaignId}", scenarioId: "${facts.id}", seatCount: 2, answer: (state, ctx, memory) => nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory) }, "${U}_SEEDS");
-`;
-}
-
-/** .maestro/scenarios/<id>/<id>.yaml and <id>-loss.yaml for a scenario of a cycle. */
-export function cycleFlowFile(kind: "win" | "loss", facts: Facts): string {
-  const name = kind === "win" ? "won" : "lost";
-  return `appId: com.middleearth.player
-tags:
-  - scenario
----
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture \`${facts.short}-${name}\` (scripts/e2e/${facts.finderRel}.ts): a real two-handed
-# standalone game of ${facts.name}, parked on its ${kind === "win" ? "win" : "loss"}. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/standalone-${kind}.yaml); add this scenario's own assertions after the call.
-- runFlow:
-    file: ../../subflows/standalone-${kind}.yaml
-    env:
-      FIXTURE: ${facts.short}-${name}${kind === "win" ? `\n      SCENARIO_ID: ${facts.id}` : ""}
-# TODO: this scenario's own assertions on the ${kind === "win" ? "outcome screen after the win (the score)" : "outcome screen after the loss (the reason)"}.
 `;
 }
 

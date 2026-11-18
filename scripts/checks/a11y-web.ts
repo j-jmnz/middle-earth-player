@@ -32,7 +32,7 @@ const DIST = path.join(tmpdir(), "middle-earth-player-a11y-web");
 // blocks with no space on react-native-web ("1A Shadow of the Past3 quest stages", "20P1") and finds no such run in the name. They are axe's text
 // join on react-native-web's output, not wording; VoiceOver and TalkBack read the names as written.
 const OPEN: Readonly<Record<string, Readonly<Record<string, number>>>> = {
-  "label-content-name-mismatch": { Scenarios: 8, History: 1, Decks: 2 },
+  "label-content-name-mismatch": { Scenarios: 7, History: 1, Decks: 2 },
 };
 
 // Only these fail the run; minor and moderate findings are listed.

@@ -5,10 +5,9 @@ import { describe, expect, it } from "vitest";
 
 import { ROOT } from "./tracked.ts";
 
-// A release is only ever started by hand (.claude/rules/release-standards.md, Who releases): release.yml and the EAS e2e workflow
-// run on workflow_dispatch alone, and no other workflow makes a tag or a GitHub release.
+// A release is only ever started by hand (.claude/rules/release-standards.md, Who releases): release.yml runs on
+// workflow_dispatch alone, and no other workflow makes a tag or a GitHub release.
 const GITHUB = path.join(ROOT, ".github", "workflows");
-const EAS = path.join(ROOT, ".eas", "workflows");
 
 function workflows(dir: string): string[] {
   return readdirSync(dir).filter((name) => /\.ya?ml$/.test(name)).map((name) => path.join(dir, name));
@@ -27,10 +26,6 @@ function triggers(file: string): string[] {
 describe("release trigger", () => {
   it("starts release.yml by hand only", () => {
     expect(triggers(path.join(GITHUB, "release.yml"))).toEqual(["workflow_dispatch"]);
-  });
-
-  it("starts the EAS e2e workflow by hand only", () => {
-    expect(triggers(path.join(EAS, "e2e.yml"))).toEqual(["workflow_dispatch"]);
   });
 
   it("makes tags and GitHub releases only in release.yml", () => {

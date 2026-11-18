@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { COMMIT_TYPES, SUBJECT_MAX, bodyProblem, hookSubjects, subjectOf, subjectProblem } from "./commit-message.ts";
+import { COMMIT_TYPES, SUBJECT_MAX, actionProblem, bodyProblem, hookSubjects, subjectOf, subjectProblem } from "./commit-message.ts";
 
 describe("commit subjects (.claude/rules/commit-standards.md, Subject line)", () => {
   it("accepts every type followed by a summary", () => {
-    for (const type of COMMIT_TYPES) expect(subjectProblem(`${type}: Staging attackers make additional attacks`)).toBeUndefined();
+    for (const type of COMMIT_TYPES) expect(subjectProblem(`${type}: Make staging attackers take additional attacks`)).toBeUndefined();
   });
 
   it("refuses a missing or unknown type, a missing space, an empty summary and a scope", () => {
@@ -19,10 +19,19 @@ describe("commit subjects (.claude/rules/commit-standards.md, Subject line)", ()
   });
 
   it("refuses a trailing checkpoint marker but not a summary about the game's checkpoint", () => {
-    for (const subject of ["feat: Helm's Deep Defense keyword, checkpoint", "feat: Engine half (checkpoint)", "fix: Goldens - Checkpoint"]) {
+    for (const subject of ["feat: Add Helm's Deep Defense keyword, checkpoint", "feat: Build the engine half (checkpoint)", "fix: Record goldens - Checkpoint"]) {
       expect(subjectProblem(subject)).toMatch(/checkpoint marker/);
     }
-    expect(subjectProblem("fix: Continue reads the checkpoint written on a pause")).toBeUndefined();
+    expect(subjectProblem("fix: Read the checkpoint written on a pause on Continue")).toBeUndefined();
+  });
+
+  it("refuses a summary that is not an action (commit-standards.md, Subject line)", () => {
+    for (const subject of ["fix: The table menu scrolls on a short screen", "feat: Each contract shows both sides", "feat: Adds Check now", "fix: Fixed the menu", "feat: Showing both sides", "feat: Settings check for updates"]) {
+      expect(subjectProblem(subject)).toMatch(/starts with/);
+    }
+    for (const summary of ["Scroll the table menu", "Show both sides of a contract", "Bring back the ribbon", "Embed the font", "Speed up the replay", "Focus the first row", "Pass the turn", "Make the release notes list every change", "Keep all changes"]) {
+      expect(actionProblem(summary)).toBeUndefined();
+    }
   });
 
   it("reads a message file's subject past blank and comment lines", () => {

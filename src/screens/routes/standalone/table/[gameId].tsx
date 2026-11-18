@@ -67,5 +67,5 @@ export default function StandaloneTableScreen() {
     outcome: { pathname: "/standalone/outcome/[gameId]", params: { gameId } },
     booklet: bookletOf(session.stored.campaignId, session.stored.scenarioId),
   };
-  return <TableView session={session} store={table.store} clock={table.clock} nav={nav} />;
+  return <TableView session={session} store={table.store} clock={table.clock} nav={nav} intents={() => table.game().active?.intents ?? null} />;
 }

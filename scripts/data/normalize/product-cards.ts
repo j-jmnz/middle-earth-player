@@ -72,6 +72,30 @@ export function addProductCards(
   }
 }
 
+// The encounter and quest cards of every other pack data/collection.json lists (the cycles and boxes no campaign of the app plays
+// yet), from Hall of Beorn alone and keyed by its RingsDB code, so the Cards tab's Encounter cards view lists every product. They are
+// read, not dealt: no scenario names them. A pack's Hall of Beorn card set is its RingsDB name, the Hobbit boxes' with "The Hobbit: " before it.
+const BROWSE_TYPES = new Set([...PRODUCT_TYPES, "Objective_Hero"]);
+const BUILT_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => [...product.packs, ...(product.twinPack ? [product.twinPack] : [])]));
+
+export function addBrowseCards(
+  hob: readonly HobCard[],
+  byCode: Map<string, Card>,
+  packs: readonly { code: string; name: string }[],
+  claimed: ReadonlySet<string>,
+  merge: (code: string, twin: HobCard | undefined, source: HobCard) => Card,
+): void {
+  const packOf = new Map(packs.filter((pack) => claimed.has(pack.code) && !BUILT_PACKS.has(pack.code)).map((pack) => [pack.name, pack.code]));
+  for (const source of hob) {
+    const pack = packOf.get(source.CardSet.replace(/^The Hobbit: /, ""));
+    const code = source.RingsDbCardId;
+    if (!pack || !code || !BROWSE_TYPES.has(source.CardType) || byCode.has(code)) continue;
+    const merged = merge(code, source, source);
+    merged.printings = merged.printings.map((printing) => ({ ...printing, pack }));
+    byCode.set(code, merged);
+  }
+}
+
 // Every card of every Nightmare deck (nightmare-defs.ts), from Hall of Beorn alone: the setup card, the encounter cards and the
 // quest cards a deck adds. Coded by its deck's prefix and printed in the Nightmare pack. A Hall of Beorn set no row names is a
 // build error, so a new deck in the source is noticed.
@@ -83,6 +107,9 @@ export function addNightmareCards(hob: readonly HobCard[], byCode: Map<string, C
     const code = nightmareCode(deck, source.Number);
     if (byCode.has(code)) throw new Error(`Nightmare card ${code} (${source.Title}) is already built`);
     const merged = merge(code, source, source);
+    // The source gives a Nightmare side quest or ship enemy of the later decks no encounter set; the deck's own set ("Intruders in Chetwood Nightmare") is its
+    // Hall of Beorn card set. The setup card has none (it is the deck's one card of its own).
+    if (merged.type !== "nightmare" && merged.encounterSet == null) merged.encounterSet = deck.set;
     merged.printings = merged.printings.map((printing) => ({ ...printing, pack: NIGHTMARE_PACK }));
     byCode.set(code, merged);
   }

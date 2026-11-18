@@ -21,6 +21,8 @@ import { headingLook, headingPreviewSteps, headingPreviewTitle, headingStepOf } 
 import { inspectTargets } from "../store/selectors.ts";
 import { whyNotPlayable } from "../choice/why.ts";
 import { previewKeywords } from "./preview-keywords.ts";
+import { contractSides } from "./contract-sides.ts";
+import { printedOf } from "../../rules/core/printed.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
 // stage), whether it is printed sideways, its text, and the lines of it the app does not apply.
@@ -74,7 +76,8 @@ function earlierStage(game: ScenarioState, ctx: ReduceContext, code: string, des
 /**
  * The cards the preview lists, and which of them it opens on. `extra` adds cards that are not on the table (Look). `line` reads a
  * printed line of the ledger by id, for the quest stage's objective. The quest stage lists the stages defeated before it after its own
- * cards (earlier-stages.ts), so a swipe or the strip steps back through the quest.
+ * cards (earlier-stages.ts), so a swipe or the strip steps back through the quest. A two-sided contract shows the side it lies on
+ * with that side's lines, and its other side right after it (contract-sides.ts).
  */
 export function previewCards(
   game: ScenarioState,
@@ -91,7 +94,7 @@ export function previewCards(
 ): { cards: PreviewCard[]; start: number } {
   const earlier = earlierStages(game, ctx, cardId);
   const ids = [...inspectTargets(game, cardId), ...extra.filter((id) => id !== cardId), ...earlier];
-  const cards = ids.flatMap((id, index): PreviewCard[] => {
+  const groups = ids.map((id, index): PreviewCard[] => {
     const card = game.cards[id];
     if (!card) return [];
     if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
@@ -115,7 +118,16 @@ export function previewCards(
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
     const tokens = tokenLines(card);
     const keywords = previewKeywords(game, ctx, id, described.text, options.ruleDoc ?? null);
+    const sides = contractSides(printedOf(ctx.cards, card.code).type, described.text);
+    if (sides) {
+      const other = card.face === "B" ? "A" : "B";
+      const back = describe(card.code, pictureKey({ code: card.code, face: other }));
+      const up: PreviewCard = { code: card.code, ...described, text: sides[card.face === "B" ? "B" : "A"], ...(tokens.length > 0 ? { tokens } : {}), effects, role: role ?? `Side ${card.face === "B" ? "B" : "A"}`, ...(note ? { note } : {}) };
+      return [up, { code: card.code, ...back, text: sides[other], effects: [], role: `Side ${other}` }];
+    }
     return [{ code: card.code, ...described, ...(keywords.length > 0 ? { keywords } : {}), ...(tokens.length > 0 ? { tokens } : {}), ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), ...turned, ...steps, effects, ...(lostIsland ? { lostIsland } : {}), ...(role ? { role } : {}), ...(note ? { note } : {}), ...(refusal && note === refusal ? { noteTitle: "Cannot be chosen now" } : {}) }];
   });
-  return { cards, start: Math.max(0, ids.indexOf(cardId)) };
+  // The pressed card's place among the cards: each id before it gave none, one, or two (a contract's two sides).
+  const pressed = Math.max(0, ids.indexOf(cardId));
+  return { cards: groups.flat(), start: groups.slice(0, pressed).reduce((sum, group) => sum + group.length, 0) };
 }

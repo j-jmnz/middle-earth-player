@@ -15,10 +15,11 @@ import { CATALOG_VERSION } from "../../catalog/version";
 import { EFFECTS } from "../../effects";
 import { SettingGroup, SettingsRows } from "../../play/chrome/setting-rows";
 import { restoreDefaults, tableSettings } from "../../ui/table-settings";
-import { alwaysCodes, alwaysRows, CREDITS } from "../../play/chrome/settings-words";
+import { alwaysCodes, alwaysRows, CREDITS, DEBUG_LABEL, DEBUG_LINE } from "../../play/chrome/settings-words";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSplitColumns } from "../nav/use-split-columns";
-import { CHECK_LABEL, CHECK_LINE, OFFER_LINK_HINT, offerLinkLabel, offerTitle, releasedLine, updateStore } from "../../ui/update/offer";
+import { CHECK_LABEL, CHECK_LINE, CHECK_NOW_HINT, CHECK_NOW_LABEL, checksFor, manualLine, offerLinkLabel, offerOf, OFFER_LINK_HINT, offerTitle, releasedLine, updateStore } from "../../ui/update/offer";
+import { checkNow } from "../update/check";
 import { APP_VERSION, useUpdateOffer } from "../update/offer";
 import { openPrivacyPolicy, openReleasePage, openSupport } from "./links";
 
@@ -45,7 +46,11 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
     return () => clearTimeout(id);
   }, [confirming]);
   // The offer stays here after the ribbon is closed (src/ui/update/offer.ts): its line, the release date and Get it.
-  const offer = useUpdateOffer();
+  // Check now's answer shows its offer even with the switch off: the player asked.
+  const manual = useStore(updateStore, (state) => state.manual);
+  const asked = useStore(updateStore, (state) => (state.manual === "answered" ? offerOf(state.stored, APP_VERSION, true) : null));
+  const offer = useUpdateOffer() ?? asked;
+  const checkLine = manualLine(manual, offer, checksFor(APP_VERSION));
   const released = useStore(updateStore, (state) => releasedLine(state.stored.latest?.publishedAt ?? null));
   const about = (
     <SettingGroup title="About" testID="app-settings-about">
@@ -63,6 +68,24 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
         </View>
       ) : null}
       <SettingSwitch roomy label={CHECK_LABEL} detail={CHECK_LINE} value={settings.checkUpdates} onChange={(checkUpdates) => change({ checkUpdates })} testID="app-settings-check-updates" />
+      {checksFor(APP_VERSION) ? (
+        <View className="-mx-3 items-start">
+          <TextButton
+            label={CHECK_NOW_LABEL}
+            tone="accent"
+            testID="app-settings-check-now"
+            accessibilityHint={CHECK_NOW_HINT}
+            disabled={manual === "checking"}
+            onPress={checkNow}
+          />
+        </View>
+      ) : null}
+      {checkLine ? (
+        <Label className="pb-2" testID="app-settings-check-line">
+          {checkLine}
+        </Label>
+      ) : null}
+      <SettingSwitch roomy label={DEBUG_LABEL} detail={DEBUG_LINE} value={settings.debugTools} onChange={(debugTools) => change({ debugTools })} testID="app-settings-debug-tools" />
       <Label className="pb-2" testID="app-settings-credits">
         {CREDITS}
       </Label>
@@ -85,7 +108,7 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
       {confirming ? (
         <AskInPlace
           testID="app-settings-restore-ask"
-          sentence="Put every setting back to its default? Your games and decks are not touched."
+          sentence="Put every setting back to its default? Your games, decks and collection are not touched."
           confirm={{
             label: "Restore",
             testID: "app-settings-restore-confirm",

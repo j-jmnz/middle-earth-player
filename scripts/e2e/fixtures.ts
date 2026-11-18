@@ -1,5 +1,5 @@
 // Writes src/campaign/fixtures/scenario-1.json (saves parked on a moment of A Shadow of the Past), a-knife-in-the-dark.json
-// (A Knife in the Dark) and the file of every other scenario in the registry, for the Maestro flows. Run it again when
+// (A Knife in the Dark) and the file of every other scenario in the registry. Run it again when
 // src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
 //   pnpm scenario fixtures                 # `lost` and `duo`, then every other scenario's file
@@ -19,7 +19,7 @@
 //
 // `duo`: the same two decks, two-handed, Easy, parked on the first player's planning window of round 1 (the opening hands kept, the
 // first resource and the quest of nothing yet), for the flows that need two dials and a seat that is not acting (the peek,
-// `.maestro/features/seat-peek.yaml`). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
+// the seat-peek feature). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
 //
 // Every other scenario's fixtures (the names are in src/campaign/fixtures/registry.ts) are written by the scenario's own seed finder
 // in this folder, to src/campaign/fixtures/<scenario-id>.json, in campaign order (data/campaigns): a part after the first is dealt from
@@ -28,7 +28,7 @@
 // one open standalone game for each name (a loadout of saved decks, a seed and the intents), and the e2e route opens it on its table.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
-// (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its list with
+// (141078) and Gildor Inglorion (141077), as the scenario-1 tests answer it. Each seat plays its list with
 // a core set hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";

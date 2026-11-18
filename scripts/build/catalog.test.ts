@@ -213,6 +213,14 @@ describe("buildCatalog", () => {
     expect(backPictureOf({ ...campaign, type: "objective" }, new Map())).toBeNull();
   });
 
+  it("derives a two-sided contract's back picture from its Hall of Beorn SideA front", () => {
+    const hob = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/The-Burglar's-Turn";
+    const back = { name: null, text: "The active location gets +1 quest point.", questPoints: null, stage: null };
+    const contract = card({ code: "22024", type: "contract", back, printings: [{ pack: "WaR", number: 24, imageUrls: [`${hob}-SideA.jpg`] }] });
+    expect(backPictureOf(contract, new Map())).toBe(`${hob}-SideB.jpg`);
+    expect(backPictureOf({ ...contract, back: null }, new Map())).toBeNull();
+  });
+
   it("keeps only the ledger scans the app can download", () => {
     const hob = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/x.jpg";
     const scans = scansOfEntries([

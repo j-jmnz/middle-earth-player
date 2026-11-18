@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { parseKeywordTokens } from "../../src/catalog/keyword-line.ts";
 import type { Card } from "../../src/catalog/card-facts.ts";
+import { PRODUCTS } from "./campaign-defs.ts";
 import { loadCards } from "./load-cards.ts";
+import { NIGHTMARE_PACK } from "./nightmare-defs.ts";
 import { LEDGER_KEYWORD_PACKS } from "./normalize/printed.ts";
 import { loadLedger } from "./printed/ledger.ts";
 
@@ -13,8 +15,10 @@ const cards = new Map(loadCards().map((card) => [card.code, card]));
 const ledger = loadLedger();
 const entries = ledger.entries.filter((entry) => cards.has(entry.code) && entry.printing !== "Nightmare");
 // A ship is a card with the Ship trait that is not a location (a ship location is a place, not a ship card); its type line, read from its scan, is
-// ship-enemy, ship-objective or (the two Nightmare enemies whose scans print ENEMY) enemy.
-const ships = [...cards.values()].filter((card) => card.traits.includes("Ship") && card.type !== "location");
+// ship-enemy, ship-objective or (the two Nightmare enemies whose scans print ENEMY) enemy. Only the Dream-chaser boxes' and the Nightmare decks' ships
+// are read: The Hunt for the Dreadnaught's are listed in the Cards tab and never dealt, so no ledger reads them.
+const SEA_PACKS: ReadonlySet<string> = new Set([...PRODUCTS.filter((product) => product.home === "dream-chaser").flatMap((product) => product.packs), NIGHTMARE_PACK]);
+const ships = [...cards.values()].filter((card) => card.traits.includes("Ship") && card.type !== "location" && card.printings.some((printing) => SEA_PACKS.has(printing.pack)));
 
 // "Stats: Engagement cost 35, Threat 2, Attack 5, Defense 2, Hit points 7; Victory 6." as the numbers it gives.
 function noted(notes: string | undefined): Partial<Record<"engagementCost" | "threat" | "attack" | "defense" | "health" | "willpower" | "victory", number>> {

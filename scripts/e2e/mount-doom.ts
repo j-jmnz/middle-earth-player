@@ -1,4 +1,4 @@
-// The Maestro fixtures of Mount Doom (the-return-of-the-king part 6), written into src/campaign/fixtures/mount-doom.json by scripts/e2e/fixtures.ts: real games of saved decklists (the-one-deck and
+// The fixtures of Mount Doom (the-return-of-the-king part 6), written into src/campaign/fixtures/mount-doom.json by scripts/e2e/fixtures.ts: real games of saved decklists (the-one-deck and
 // defenders-of-gondor of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `doom-won` is the first seed that wins, parked on the win (the Resolution waits); `doom-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

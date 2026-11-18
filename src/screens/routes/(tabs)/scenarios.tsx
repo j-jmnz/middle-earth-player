@@ -6,10 +6,11 @@ import { isPlayable } from "../../../campaign/playable";
 import { isOpenStatus, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { BOXES, boxOf, scenarioName, scenarioOf } from "../../data/campaign-data";
 import { campaignListQueries } from "../../campaign/list";
-import { PillButton, PrimaryButton } from "../../kit/chrome";
+import { PillButton, PrimaryButton, TextButton } from "../../kit/chrome";
 import { deckFaces } from "../../deck/store";
 import { useDatabases } from "../../data/databases";
 import { FoldSection, useFolds } from "../../kit/fold-section";
+import { foldAllOffer } from "../../kit/fold-state";
 import { heroFace } from "../../art/hero-tile";
 import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow } from "../../campaign/hub-parts";
 import { comingLater, splitRuns } from "../../campaign/hub-runs";
@@ -102,8 +103,26 @@ export default function Scenarios() {
     const playable = box.scenarios.flatMap((id, index) => (isPlayable(id) ? [{ id, number: index + 1 }] : []));
     return playable.length > 0 ? [{ box, playable }] : [];
   });
+  // The scenarios list's folds, each box and Coming later: Collapse all folds every one while any is open, else Expand all opens them.
+  const waiting = comingLater(BOXES, campaignListQueries(catalog).campaigns.all(), isPlayable, scenarioName);
+  const listFolds = [...boxes.map(({ box }) => ({ id: `box-${box.id}`, defaultFolded: false })), ...(waiting.length > 0 ? [{ id: "scenarios-coming", defaultFolded: false }] : [])];
+  const offer = foldAllOffer(listFolds.map(({ id, defaultFolded }) => folds.folded(id, defaultFolded)));
+  const foldAll =
+    listFolds.length > 1 ? (
+      <View className="-mx-3 flex-row justify-end">
+        <TextButton
+          label={offer.label}
+          tone="accent"
+          small
+          testID="scenarios-fold-all"
+          accessibilityHint={offer.folds ? "Folds every box and Coming later" : "Opens every box and Coming later"}
+          onPress={() => folds.setAll(listFolds, offer.folds)}
+        />
+      </View>
+    ) : null;
   const catalogBlock = (
     <View testID="standalone-scenarios" style={{ gap: 18 * s }}>
+      {foldAll}
       {boxes.map(({ box, playable }) => (
         <View key={box.id} testID={`box-${box.id}`}>
           <FoldSection id={`box-${box.id}`} title={box.name} count={playable.length} unit="scenario" {...fold(`box-${box.id}`)}>
@@ -121,8 +140,8 @@ export default function Scenarios() {
     </View>
   );
 
-  // The scenarios no box can deal yet and the locked campaigns and cycles, in the campaigns table's order (no card is read for them).
-  const waiting = comingLater(BOXES, campaignListQueries(catalog).campaigns.all(), isPlayable, scenarioName);
+  // Coming later (`waiting`, above): the scenarios no box can deal yet and the locked campaigns and cycles, in the campaigns table's order
+  // (no card is read for them).
   const coming =
     waiting.length > 0 ? (
       <FoldSection id="scenarios-coming" title="Coming later" count={waiting.length} {...fold("scenarios-coming")}>

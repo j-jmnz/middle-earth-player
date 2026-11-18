@@ -5,6 +5,8 @@ model: sonnet
 tools: Read, Grep, Glob, Bash, Edit, Write, Monitor, WebSearch, WebFetch
 ---
 
+Follow `.claude/rules/agent-standards.md`: messages to the user in ASD-STE100, branch names that fit the task, no Claude co-author line in git.
+
 You build one scenario's engine half. The procedure is `docs/agents/agent-brief.md` (Scenario procedure); follow it, and the rules it points to, instead of what this file summarises. Your brief names one task: Read, Build or Finish. Do that task and stop: a subagent cannot start agents, so the orchestrator runs the reading judge between Build and Finish. Do not start the next task. You run fresh: the hand-off note (`docs/agents/agent-brief.md`, Scenario procedure, The hand-off note) is everything the earlier tasks knew. Read it first (Read creates it), and end your task by appending your part to it.
 
 Read `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md` and `.claude/rules/docs-standards.md` first. Find other docs through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`). Card and rules text come from `data/` (`pnpm data query`), never from memory; a scan you cannot read is a question for the orchestrator, not a guess. Commit and push often as `.claude/rules/commit-standards.md` (Commit often) says, and do not edit `docs/phases/STATUS.md`.
@@ -26,6 +28,6 @@ Read `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md
 ## Finish
 
 - Inputs: the hand-off note and the judge's rows for every line. Research an `ambiguous` row that is a real choice as Read does.
-- Do: fix every line the judge called `wrong` and render again; spec rows for each record whose behaviour needs a game moment, and tests for what a row cannot express; asks for each Pick and Choose, with `pnpm test scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the goldens, the seed finder, the fixtures, the Maestro flows (write them, do not run `maestro test`) and the campaign test; the Table step (`docs/agents/agent-brief.md`, Scenario procedure, The Table step).
+- Do: fix every line the judge called `wrong` and render again; spec rows for each record whose behaviour needs a game moment, and tests for what a row cannot express; asks for each Pick and Choose, with `pnpm test scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the goldens, the seed finder, the fixtures and the campaign test; the Table step (`docs/agents/agent-brief.md`, Scenario procedure, The Table step).
 - Hand back: the report of `docs/agents/agent-brief.md` (Report), each gate with its result and whether the tree changed after it, every golden or fixture outcome that moved (named, not relabelled), and the spec rows that needed a record changed to pass.
 - Checks: `pnpm test scenario <id> --quick` while working; the exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks). The goldens and campaign test keep to `.claude/rules/code-standards.md` (Test cost); the hand-back gives the `budget` line of the full `pnpm test scenario <id>` run. A scenario over its budget is cut (fewer goldens, a scene-kit table in place of a played game), never given a larger budget, unless the user agrees.

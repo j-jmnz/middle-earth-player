@@ -1,4 +1,4 @@
-// Saves parked on a moment of a scenario, for the Maestro flows that need a finished scenario (docs/architecture.md, Tests):
+// Saves parked on a moment of a scenario, for the tests that need a finished scenario (docs/architecture.md, Tests):
 // a flow opens a fixture instead of playing fifty rounds of unscripted draws. Each fixture is a real loadout of deck cards,
 // a seed and the intents that reach the moment; nothing in it is a number the engine computes. The names are in
 // `fixtures/registry.ts`, one line per scenario; the e2e fixtures script (`e2e/fixtures.ts` in the scripts folder) writes the JSON beside it and `fixtures.test.ts`

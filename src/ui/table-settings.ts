@@ -56,6 +56,9 @@ export type TableSettings = {
   timingTips: boolean;
   // Check for new versions: once a day the app asks GitHub for its latest release and offers a later one (src/ui/update/offer.ts). On by default (user decision, 2026-11-17).
   checkUpdates: boolean;
+  // Debug tools: the table menu gains Copy game state, which copies the whole game, hidden cards included, as text for a bug report
+  // (src/play/store/debug-snapshot.ts). Off by default.
+  debugTools: boolean;
 };
 
 export const UI_SCALE_OPTIONS = ["small", "medium", "large", "xlarge"] as const;
@@ -86,7 +89,7 @@ export function strongOutlines(option: StrongOutlinesOption, increaseContrast: b
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false, checkUpdates: true };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false, checkUpdates: true, debugTools: false };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -120,6 +123,7 @@ export function parseSettings(raw: unknown): TableSettings {
     titleFace: TITLE_FACE_OPTIONS.find((option) => option === value.titleFace) ?? DEFAULT_SETTINGS.titleFace,
     timingTips: flag(value.timingTips, DEFAULT_SETTINGS.timingTips),
     checkUpdates: flag(value.checkUpdates, DEFAULT_SETTINGS.checkUpdates),
+    debugTools: flag(value.debugTools, DEFAULT_SETTINGS.debugTools),
   };
 }
 
