@@ -14,7 +14,9 @@ import { cards, packs } from "../../catalog/schema";
 import { DIFFICULTIES, type Difficulty } from "../../catalog/scenario-data";
 import { GroundedScene } from "../art/art";
 import { dealSentence, problemWords } from "./words";
-import { ScenarioCards } from "./scenario-cards";
+import { CampaignCards } from "./campaign-cards";
+import { ScenarioCards, type EncounterSets } from "./scenario-cards";
+import type { CampaignCardEntry } from "./scenario-sides";
 import { useListPreview } from "../pool/list-preview";
 import { ActionBar, Chevron, Chip, Column, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "../kit/chrome";
 import { BRIEFING_SCENE_RANGE } from "./layout";
@@ -133,6 +135,8 @@ export function BriefingScreen({
   barTestID = "briefing-deal-bar",
   campaignCard,
   stages,
+  encounter,
+  campaignCards,
 }: {
   testID: string;
   scenarioId: string | null;
@@ -149,16 +153,21 @@ export function BriefingScreen({
   // The reference matter (the scenario's cards, Before the deal, the encounter): after the content in compact and medium, under the scene when expanded.
   aside?: ReactNode;
   bar?: ReactNode;
-  // The scenario's campaign card and quest cards: rows at the head of the aside open them large (ScenarioCards).
+  // The scenario's campaign card, quest cards and encounter sets: rows at the head of the aside open them large (ScenarioCards).
   campaignCard?: string;
   stages?: readonly string[];
+  // The scenario's encounter sets, one row each under the quest cards (ScenarioCards).
+  encounter?: EncounterSets;
+  // The campaign's cards in book order (the campaign setup): the first opens at once, the rest behind the spoiler ask (CampaignCards).
+  campaignCards?: readonly CampaignCardEntry[];
 }) {
   const insets = useSafeAreaInsets();
   const top = useTopInset();
   const preview = useListPreview();
   const reference = (
     <>
-      {campaignCard || stages ? <ScenarioCards stages={stages ?? []} onOpen={preview.openSides} {...(campaignCard ? { campaignCard } : {})} /> : null}
+      {campaignCard || stages ? <ScenarioCards stages={stages ?? []} onOpen={preview.openSides} {...(campaignCard ? { campaignCard } : {})} {...(encounter ? { encounter } : {})} /> : null}
+      {campaignCards && campaignCards.length > 0 ? <CampaignCards entries={campaignCards} onOpen={preview.openSides} /> : null}
       {aside}
     </>
   );

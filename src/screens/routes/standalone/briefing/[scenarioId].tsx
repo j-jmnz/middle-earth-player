@@ -4,6 +4,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 
+import { dealtCodes } from "../../../groups/scenario-sets";
 import { scenarioFacts, type BriefingSeat } from "../../../../campaign/briefing";
 import { dealStandalone, standaloneBriefing, type StandaloneInput, type StandaloneLoadout } from "../../../../campaign/standalone";
 import { isNightmarePlayable } from "../../../../campaign/playable";
@@ -66,6 +67,7 @@ export default function StandaloneBriefing() {
   const input: StandaloneInput | null = useMemo(() => (world ? { world, seatCount, seats, ringBearer, difficulty } : null), [world, seatCount, seats, ringBearer, difficulty]);
   const result = useMemo(() => (input ? standaloneBriefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty, "standalone") : null), [world, difficulty]);
+  const codes = useMemo(() => (world ? dealtCodes(world.scenario) : new Set<string>()), [world]);
 
   const frame = {
     testID: "standalone-briefing",
@@ -117,6 +119,7 @@ export default function StandaloneBriefing() {
       {...frame}
       campaignCard={world.scenario.campaignCard}
       stages={world.scenario.stages}
+      encounter={{ sets: facts.sets, codes }}
       banner={<ScenarioBanner facts={facts} eyebrow={`Standalone · Scenario ${facts.number}`} />}
       bar={<DealBar problems={result.problems} dealError={dealError} dealable={result.dealable} onDeal={onDeal} />}
       aside={<EncounterDetails facts={facts} />}

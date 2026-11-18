@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
 
+import { dealtCodes } from "../../../groups/scenario-sets";
 import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "../../../../campaign/briefing";
 import { deal } from "../../../../campaign/session";
 import { isNightmarePlayable, isPlayable } from "../../../../campaign/playable";
@@ -97,6 +98,7 @@ export default function Briefing() {
   );
   const result = useMemo(() => (input ? briefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty) : null), [world, difficulty]);
+  const codes = useMemo(() => (world ? dealtCodes(world.scenario) : new Set<string>()), [world]);
   const frame = {
     testID: "briefing",
     scenarioId,
@@ -176,6 +178,7 @@ export default function Briefing() {
       {...frame}
       campaignCard={world.scenario.campaignCard}
       stages={world.scenario.stages}
+      encounter={{ sets: facts.sets, codes }}
       banner={<ScenarioBanner facts={facts} eyebrow={`Scenario ${facts.number} · ${campaign.name}`} />}
       bar={
         <DealBar problems={result.problems} dealError={dealError} dropsOpen={save.loadout != null} dealable={result.dealable} waiting={asked?.waiting ?? null} onDeal={onDeal}>
