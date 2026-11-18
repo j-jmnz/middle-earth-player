@@ -4,7 +4,7 @@
 import { useSyncExternalStore } from "react";
 
 /** The one ask: its answer shows every encounter and campaign card until the app closes. */
-export const SPOILER_TEXT = "Encounter and campaign cards show what the scenarios hold. Show all of them?";
+export const SPOILER_TEXT = "Quest, encounter and campaign cards show what the scenarios hold. Show all of them?";
 
 let shown = false;
 const listeners = new Set<() => void>();

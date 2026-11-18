@@ -43,7 +43,7 @@ export function CampaignSetupCards({ campaign, onOpen }: { campaign: CampaignSet
         <ListRow
           testID="setup-campaign-first"
           label="Campaign card"
-          detail={`${card.name} · Setup`}
+          detail="Setup side"
           leading={<CardThumb code={cardCode} imagesrc={card.imagesrc} />}
           onPress={() => onOpen([{ code: cardCode, side: "A", label: `${name} · Setup` }])}
         />
@@ -52,6 +52,7 @@ export function CampaignSetupCards({ campaign, onOpen }: { campaign: CampaignSet
       {asking && !shown ? (
         <SpoilerAsk
           testID="setup-spoiler"
+          className="mb-4 mt-3"
           text={SPOILER_TEXT}
           showLabel="Show them"
           onShow={() => {
@@ -68,8 +69,8 @@ export function CampaignSetupCards({ campaign, onOpen }: { campaign: CampaignSet
           <Section title="Later scenarios" className="mt-4" />
           <ListRow
             testID="setup-later-scenarios"
-            label={`${later} ${later === 1 ? "scenario" : "scenarios"}`}
-            detail={`${later === 1 ? "Scenario 2" : `Scenarios 2 to ${later + 1}`}${spoilers}`}
+            label={later === 1 ? "Scenario 2" : `Scenarios 2 to ${later + 1}`}
+            detail={`${later} ${later === 1 ? "scenario" : "scenarios"}${spoilers}`}
             onPress={() => router.push({ pathname: "/campaign-cards/[campaignId]", params: { campaignId: campaign.id, after: "1" } })}
           />
         </>

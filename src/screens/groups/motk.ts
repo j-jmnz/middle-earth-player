@@ -18,7 +18,7 @@ export function untagged(name: string): string {
   return name.replace(/^\([^)]*\)\s*/, "");
 }
 
-/** The strip on a hero in the pool: the ally's pack, which tells two heroes of one name apart ("Ally · The Hunt for Gollum"). */
+/** The strip on a hero in the pool: the pack its ally is printed in, which tells two heroes of one name apart ("The Hunt for Gollum"). */
 export function allyNote(packName: string | undefined): string {
-  return packName ? `Ally · ${packName}` : "Ally";
+  return packName ?? "Ally";
 }

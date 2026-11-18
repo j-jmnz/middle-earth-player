@@ -347,7 +347,7 @@ export function CardPoolBody({
           />
         ) : null}
       </View>
-      <PoolFilterSheet open={open} rows={rows} groups={groups} notOwned={draftFilter.owned && collectionSet ? notOwned : null} collection={collectionSet} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
+      <PoolFilterSheet open={open} rows={rows} groups={groups} notOwned={draftFilter.owned && collectionSet ? notOwned : null} collection={collectionSet} heroes={motkOn} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
     </View>
   );
 }

@@ -33,7 +33,7 @@ describe("the pool cache", () => {
     expect(sortPool(pool.motk).map((row) => row.code)).toEqual(pool.motk.map((row) => row.code));
     for (const row of pool.motk) expect(pool.byCode.has(row.code)).toBe(false);
     // Each strip names its ally's pack, so two heroes of one name differ ("(MotK) Anborn", 9906114 and 99144004).
-    for (const row of pool.motk) expect(pool.motkNotes.get(row.code), row.code).toMatch(/^Ally · .+/);
+    for (const row of pool.motk) expect(pool.motkNotes.get(row.code), row.code).not.toBe("Ally");
     const anborn = pool.motk.filter((row) => row.name === "(MotK) Anborn").map((row) => pool.motkNotes.get(row.code));
     expect(anborn).toHaveLength(2);
     expect(new Set(anborn).size).toBe(2);

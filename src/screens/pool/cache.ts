@@ -60,7 +60,7 @@ export type PoolData = {
   notApplied: ReadonlySet<string>;
   /** The Messenger of the King's heroes, in name order: browse only, never added to a deck. */
   motk: readonly PoolEntry[];
-  /** Each hero's strip: the ally it stands for and that ally's pack ("Ally · The Hunt for Gollum"), which tells two heroes of one name apart. */
+  /** Each hero's strip: the pack the ally it stands for is printed in ("The Hunt for Gollum"), which tells two heroes of one name apart. */
   motkNotes: ReadonlyMap<string, string>;
 };
 

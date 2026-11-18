@@ -207,7 +207,7 @@ export default function CampaignPath() {
   const logButton = (
     <View className="-ml-3 mt-1 items-start">
       <TextButton label="Campaign log" icon="contract" testID="log-open" tone="accent" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
-      <TextButton label="Campaign cards" icon="treasure" testID="path-cards-open" tone="accent" onPress={() => router.push({ pathname: "/campaign-cards/[campaignId]", params: { campaignId: save.campaignId } })} />
+      <TextButton label="Campaign cards" testID="path-cards-open" tone="accent" onPress={() => router.push({ pathname: "/campaign-cards/[campaignId]", params: { campaignId: save.campaignId } })} />
     </View>
   );
   const pickedNode = picked ? (nodes.find((node) => node.id === picked && node.status === "completed") ?? null) : null;

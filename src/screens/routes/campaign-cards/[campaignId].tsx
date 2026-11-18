@@ -26,7 +26,7 @@ export default function CampaignCardsScreen() {
   return (
     <Screen scene="calm" testID="campaign-cards">
       <NavBar backLabel="Back" backTestID="campaign-cards-back" onBack={back} title={data?.name} subtitle={data ? subtitle : undefined} wrap />
-      <ScreenScroll top={4}>
+      <ScreenScroll top={4} max="readable">
         {!data ? (
           <BodyText tone="muted" className="mt-6">
             That campaign is not in the app.

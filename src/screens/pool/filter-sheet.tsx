@@ -36,6 +36,7 @@ export function PoolFilterSheet({
   groups,
   notOwned,
   collection,
+  heroes,
   filter,
   onChange,
   onDismiss,
@@ -48,6 +49,8 @@ export function PoolFilterSheet({
   notOwned: ReadonlySet<string> | null;
   // Whether the collection leaves something out, so the My collection switch hides cards and is shown.
   collection: boolean;
+  // The Messenger of the King heroes' chip is picked: the two switches that cannot narrow them are hidden.
+  heroes: boolean;
   filter: PoolFilter;
   onChange: (next: PoolFilter) => void;
   onDismiss: () => void;
@@ -104,6 +107,7 @@ export function PoolFilterSheet({
                 spheres={spheres}
                 groups={groups}
                 collection={collection}
+                heroes={heroes}
                 onChange={onChange}
                 onChoose={setChooser}
               />
@@ -191,6 +195,7 @@ function FilterBody({
   spheres,
   groups,
   collection,
+  heroes,
   onChange,
   onChoose,
 }: {
@@ -198,6 +203,7 @@ function FilterBody({
   spheres: { code: string; name: string }[];
   groups: readonly PackGroup[];
   collection: boolean;
+  heroes: boolean;
   onChange: (next: PoolFilter) => void;
   onChoose: (chooser: "pack" | "trait" | "cost") => void;
 }) {
@@ -222,8 +228,13 @@ function FilterBody({
       <OptionRow opens label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
       <OptionRow opens label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
       <SettingSwitch surface="paper" roomy label="Unique" value={filter.unique} onChange={(unique) => onChange({ ...filter, unique })} testID="pool-unique" />
-      <SettingSwitch surface="paper" roomy label="Applied only" value={filter.activeText} onChange={(activeText) => onChange({ ...filter, activeText })} testID="pool-active-text" />
-      {collection ? <SettingSwitch surface="paper" roomy label="My collection" value={filter.owned} onChange={(owned) => onChange({ ...filter, owned })} testID="pool-my-collection" /> : null}
+      {/* The Messenger of the King heroes are never played: what the app applies and what the player owns do not narrow them. */}
+      {heroes ? null : (
+        <SettingSwitch surface="paper" roomy label="Applied only" detail="Only cards whose text the app applies" value={filter.activeText} onChange={(activeText) => onChange({ ...filter, activeText })} testID="pool-active-text" />
+      )}
+      {collection && !heroes ? (
+        <SettingSwitch surface="paper" roomy label="My collection" detail="Only the cards you own" value={filter.owned} onChange={(owned) => onChange({ ...filter, owned })} testID="pool-my-collection" />
+      ) : null}
     </View>
   );
 }

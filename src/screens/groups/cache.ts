@@ -34,9 +34,15 @@ const columns = {
   imagesrc: cards.imagesrc,
 };
 
-/** The rows of every card that is not deck-legal, in code order. */
+/** The rows of every card that is not deck-legal, in code order. An empty set name (Hard Mode, Mendor, The One Ring's printings) is no set. */
 export function readGroupRows<TRun>(catalog: Db<TRun>): readonly GroupRow[] {
-  return catalog.select(columns).from(cards).where(eq(cards.deckLegal, false)).orderBy(asc(cards.code)).all();
+  return catalog
+    .select(columns)
+    .from(cards)
+    .where(eq(cards.deckLegal, false))
+    .orderBy(asc(cards.code))
+    .all()
+    .map((row) => (row.encounterSet === "" ? { ...row, encounterSet: null } : row));
 }
 
 export type ScenarioFacts = {
