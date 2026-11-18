@@ -147,7 +147,7 @@ Read the sections your task touches.
   - 1948–1970 Data sources (~700) ← 2
   - 1971–1989 Card images (~1.4K) ← 9
   - 1990–2017 Persistence and shipping (~3.2K) ← 10
-  - 2018–2060 Screens (~5.8K) ← 2
+  - 2018–2060 Screens (~5.9K) ← 2
     - 2045–2060 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~60.4K tok)
   - 5–8 Overview (~170) ← 1
@@ -207,7 +207,7 @@ Read the sections your task touches.
     - 332–343 History (~1.4K) ← 4
     - 344–361 Briefing (~2.1K) ← 7
     - 362–367 Campaign setup (~1.5K) ← 6
-    - 368–373 Campaign path (~890) ← 4
+    - 368–373 Campaign path (~930) ← 4
     - 374–377 Campaign log (~840) ← 1
     - 378–381 Spend XP (~610) ← 1
     - 382–385 Table — landscape (~30) ← 1
