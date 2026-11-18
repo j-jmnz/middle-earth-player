@@ -1,25 +1,24 @@
-// Which of its views the Cards tab shows: Player (the pool), Scenario (encounter sets) and Campaign (campaign cards, boons, burdens, treasures). Kept in user.db `settings.sections` like the
-// folds, as booleans (a fold's map holds nothing else): the Scenario entry is true while Scenario is picked, the Campaign entry while Campaign is. Pure.
+// Which of its views the Cards tab shows: Player cards (the pool) or Encounter cards (encounter sets and the campaigns' cards). Kept in user.db
+// `settings.sections` like the folds, as a boolean (a fold's map holds nothing else): the entry is true while Encounter cards is picked. The
+// entries the tab's earlier Scenario and Campaign views wrote read as Encounter cards, and a pick clears them. Pure.
 import { withFolded, type Sections } from "../kit/fold-state";
 
-export type CardsView = "Player" | "Scenario" | "Campaign";
+export type CardsView = "Player cards" | "Encounter cards";
 
 /** The views the switch offers, in order. */
-export const CARDS_VIEWS: readonly CardsView[] = ["Player", "Scenario", "Campaign"];
+export const CARDS_VIEWS: readonly CardsView[] = ["Player cards", "Encounter cards"];
 
-const KEYS = { Scenario: "cards-view-scenario", Campaign: "cards-view-campaign" } as const;
+const ENCOUNTER = "cards-view-encounter";
+const EARLIER = ["cards-view-scenario", "cards-view-campaign"] as const;
 
-/** The view the sections hold (`on` reads an entry, as `useFolds().folded` does), Player when none. */
+/** The view the sections hold (`on` reads an entry, as `useFolds().folded` does), Player cards when none. */
 export function viewOf(on: (id: string) => boolean): CardsView {
-  return on(KEYS.Campaign) ? "Campaign" : on(KEYS.Scenario) ? "Scenario" : "Player";
+  return on(ENCOUNTER) || EARLIER.some((id) => on(id)) ? "Encounter cards" : "Player cards";
 }
 
-/** The ids and values to write for a view: both entries, the picked one true (an entry set back to false is dropped, as a fold set back to its default is). */
+/** The ids and values to write for a view (an entry set back to false is dropped, as a fold set back to its default is). */
 export function viewWrites(view: CardsView): { id: string; value: boolean }[] {
-  return [
-    { id: KEYS.Scenario, value: view === "Scenario" },
-    { id: KEYS.Campaign, value: view === "Campaign" },
-  ];
+  return [{ id: ENCOUNTER, value: view === "Encounter cards" }, ...EARLIER.map((id) => ({ id, value: false }))];
 }
 
 /** The sections with the view set (what the store holds after viewWrites). */

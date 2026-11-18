@@ -1,4 +1,4 @@
-// The cards the Cards tab's Scenario and Campaign views list, read from catalog.db once per database handle: every card that is not a deck-legal
+// The cards the Cards tab's Encounter cards view lists, read from catalog.db once per database handle: every card that is not a deck-legal
 // player card (encounter and quest cards, the Nightmare decks, campaign cards, boons, burdens, treasures, the Messenger of the King's heroes),
 // with only the columns a row or a grid cell reads, and the trees built from them on first use. The catalog is read-only while the app
 // runs, so an entry never goes stale; a WeakMap frees it with the handle (the same rule as pool/cache.ts).

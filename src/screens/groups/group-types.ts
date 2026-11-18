@@ -1,4 +1,4 @@
-// The shapes the Cards tab's Scenario and Campaign views and the card-group route share (docs/design-system.md, Card groups): one card as a
+// The shapes the Cards tab's Encounter cards view and the card-group route share (docs/design-system.md, Card groups): one card as a
 // grid cell shows it, and the cards of a group sorted under their type's heading. Pure.
 
 /** The catalog columns the group rows read (groups/cache.ts): the non-player kinds and the Messenger of the King heroes. */

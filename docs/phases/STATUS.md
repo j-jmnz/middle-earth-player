@@ -27,7 +27,7 @@ No phase is open.
 ### Cards tab views
 - `pnpm data sync pictures` has not run since every card got a picture check: Google Drive's quota refused it (2026-11-18). Re-run it, then check that no pin moved to a smaller picture.
 - The Messenger of the King heroes keep RingsDB's pictures (about 430×600): no larger source was found (agent recommendation, not user-confirmed).
-- Six Nightmare cards (901810, 904109, 904307, 904308, 904309, 905005) are each a one-card set in the Scenario view: their scenario files name a set of their own.
+- Six Nightmare cards (901810, 904109, 904307, 904308, 904309, 905005) are each a one-card set in the Encounter cards view: their scenario files name a set of their own.
 - The light theme of the Cards tab views, the card-group route and the spoiler ask has not been checked.
 
 ### README
