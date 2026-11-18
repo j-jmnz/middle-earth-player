@@ -130,8 +130,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "04147:whenRevealed:1", cardCode: "04147", lines: ["04147:A:2"], timing: "whenRevealed", instructions: [cancelByRemoving({ verb: "Heal", amount: 5, target: "picked" })] },
 
   // 04148 Whip Lash. When Revealed: each player discards 1 attachment he controls, if able. Shadow: the defending player discards all attachments he controls when the attacker is Durin's Bane.
-  { id: "04148:whenRevealed:1", cardCode: "04148", lines: ["04148:A:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you" } }, { verb: "DiscardPicked" }] }] },
-  { id: "04148:shadow:1", cardCode: "04148", lines: ["04148:A:2"], timing: "shadow", instructions: [{ verb: "DiscardEach", pick: { type: "attachment", control: "you" }, when: ATTACKER_IS_BANE }] },
+  { id: "04148:whenRevealed:1", cardCode: "04148", lines: ["04148:A:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you", controlled: true } }, { verb: "DiscardPicked" }] }] },
+  { id: "04148:shadow:1", cardCode: "04148", lines: ["04148:A:2"], timing: "shadow", instructions: [{ verb: "DiscardEach", pick: { type: "attachment", control: "you", controlled: true }, when: ATTACKER_IS_BANE }] },
 
   // 04149 Leaping Flame. When Revealed: Durin's Bane makes an immediate attack against the first player, whatever his threat (a shadow card is dealt for it). The Shadow is Inner Flame's.
   { id: "04149:whenRevealed:1", cardCode: "04149", lines: ["04149:A:1"], timing: "whenRevealed", instructions: [{ verb: "Pick", pick: DURINS_BANE }, { verb: "AttackFromStaging", who: "firstPlayer" }] },
@@ -165,8 +165,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 04152 Fiery Sword, 04153 Many Thonged Whip (Weapon attachments on Durin's Bane). The Sword: attached enemy gets +3 Attack. The Whip: when Durin's Bane attacks, the defending player discards 1 card at random from his hand.
   attachToBane("04152", "04152:A:1"),
-  { id: "04152:constant:1", cardCode: "04152", lines: ["04152:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 3, until: "whileSourceInPlay", target: "host" }] },
+  { id: "04152:constant:1", cardCode: "04152", lines: ["04152:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Weapon" }] },
+  { id: "04152:constant:2", cardCode: "04152", lines: ["04152:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 3, until: "whileSourceInPlay", target: "host" }] },
   attachToBane("04153", "04153:A:1"),
+  { id: "04153:constant:1", cardCode: "04153", lines: ["04153:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Weapon" }] },
   { id: "04153:forced:1", cardCode: "04153", lines: ["04153:A:1"], timing: "forced", trigger: "attacks", subject: "host", instructions: [{ verb: "DiscardRandomFromHand" }] },
 ]);
 

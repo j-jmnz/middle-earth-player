@@ -131,7 +131,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       if (instance.held === true) continue;
       // A player card lying on a Nameless enemy is no attachment a player controls (rr.attachment-cards).
       if (instance.nameless === true) continue;
-      // An encounter attachment (a Condition) has no controller: any player's filter sees it.
+      // An encounter attachment (a Condition) has no controller: any player's filter sees it, `controlled` leaves it out (Whip Lash, 04148:A:1).
+      if (spec.controlled && instance.controller == null) continue;
       if (instance.controller != null && !seats.includes(instance.controller)) continue;
       raw.push(instance.id);
     }

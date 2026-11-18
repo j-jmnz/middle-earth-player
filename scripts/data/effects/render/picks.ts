@@ -93,7 +93,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["guardedByTrait"], typeof pick.guardedByTrait === "string" ? `guarded by (attached to) a ${pick.guardedByTrait} enemy` : null);
   note(["notGuardedByTrait"], typeof pick.notGuardedByTrait === "string" ? `not guarded by (attached to) a ${pick.notGuardedByTrait} enemy` : null);
   note(["guardsTrait"], typeof pick.guardsTrait === "string" ? `attached as the guard of a ${pick.guardsTrait} objective` : null);
-  note(["controlled"], pick.controlled === true ? (pick.type === "ally" ? "that a player controls (not one a guard holds in the staging area)" : "that is claimed (attached to a character a player controls)") : null);
+  note(["controlled"], pick.controlled === true ? (pick.type === "ally" ? "that a player controls (not one a guard holds in the staging area)" : pick.type === "attachment" ? "that a player controls (not an encounter attachment)" : "that is claimed (attached to a character a player controls)") : null);
   note(["questCard"], pick.questCard === true ? "that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)" : null);
   note(["maxHitPointsLeft"], typeof pick.maxHitPointsLeft === "number" ? `with ${pick.maxHitPointsLeft} or fewer hit points remaining` : null);
   note(["determined"], pick.determined === true ? "that the Campaign Log marks determined" : null);
