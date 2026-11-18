@@ -7,7 +7,7 @@
 // advanced already: the screen holds the moment so the stage is read before the round goes on, and the table answers nothing for
 // the player meanwhile (use-table-choice.ts). The table also opens on it (user request, 2026-10-29): the stage in play when the game is
 // loaded, so a new game shows its first quest card, usually the one whose Setup the game just ran, before the table. Pure, so a test reads it.
-import { isSeparate, stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
+import { isSeparate, parkedStage, stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { stagePlace } from "../../rules/families/quest/branch.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import type { CardFace } from "../../rules/core/state.ts";
@@ -58,7 +58,8 @@ export function askingStage(game: ScenarioState): string | null {
 
 /** The view of a game. */
 export function questView(game: ScenarioState): QuestView {
-  return { questStage: game.questStage, asking: askingStage(game), over: isOver(game), seatStages: stagesKey(game), callerStage: callerLastStage(game) };
+  // A parked stage (Fog on the Barrow-downs' stage 3B with no player at it) is no one's stage: the table opens on none and no advance tells it.
+  return { questStage: parkedStage(game) != null ? null : game.questStage, asking: askingStage(game), over: isOver(game), seatStages: stagesKey(game), callerStage: callerLastStage(game) };
 }
 
 /**

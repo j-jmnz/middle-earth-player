@@ -18,6 +18,7 @@ import { isengardDials, isengardHands, type HandMark } from "./isengard.ts";
 import { lairDials, lairHands } from "./lair.ts";
 import { erechDials, erechHands } from "./standalone-scenarios/erech.ts";
 import { lakeTownDials } from "./standalone-scenarios/lake-town.ts";
+import { downsDials, downsHands } from "./standalone-scenarios/barrow-downs.ts";
 import { forestDials } from "./standalone-scenarios/old-forest.ts";
 import { mountDoomDials, mountDoomHands } from "./mount-doom.ts";
 import { marshesDials } from "./marshes.ts";
@@ -29,7 +30,7 @@ import { wastesDials, wastesHands } from "./wastes.ts";
 
 /** Every scenario dial the game holds now. */
 export function scenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf), ...ungolDials(game, ctx, nameOf), ...blackGateDials(game, nameOf), ...mountDoomDials(game, nameOf), ...rhudaurCurrentDials(game, nameOf), ...angmarDials(game, ctx, nameOf), ...wastesDials(game, nameOf), ...ettenmoorsDials(game, nameOf), ...rhudaurDials(game, ctx, nameOf), ...dumDials(game, ctx, nameOf), ...realmDials(game, ctx, nameOf), ...lakeTownDials(game, ctx, nameOf), ...erechDials(game, ctx, nameOf), ...forestDials(game, ctx)];
+  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf), ...ungolDials(game, ctx, nameOf), ...blackGateDials(game, nameOf), ...mountDoomDials(game, nameOf), ...rhudaurCurrentDials(game, nameOf), ...angmarDials(game, ctx, nameOf), ...wastesDials(game, nameOf), ...ettenmoorsDials(game, nameOf), ...rhudaurDials(game, ctx, nameOf), ...dumDials(game, ctx, nameOf), ...realmDials(game, ctx, nameOf), ...lakeTownDials(game, ctx, nameOf), ...erechDials(game, ctx, nameOf), ...forestDials(game, ctx), ...downsDials(game, ctx, nameOf)];
 }
 
 /** The dials for the top bar: the same list while no dial's words or number changed, so the bar re-renders only when a token, a hit point or a card moves. */
@@ -37,10 +38,10 @@ export function useScenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf
   return useStableDials(scenarioDials(game, ctx, nameOf));
 }
 
-/** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B, Shelob's Lair's allies this round, The Passing of the Grey Company's Overcome by Fear and threat floor, The Siege of Gondor's Army of the Dead, The Battle of the Pelennor Fields' Aragorn, The Tower of Cirith Ungol's hero with Last of the Company, The Black Gate Opens' controller of Gwaihir, Mount Doom's hero with Heavy and Tired and Intruders in Chetwood's hands under Lost in the Wilderness and controller of Iârion, Deadmen's Dike's decks The Wastes of Eriador's starting threat lowered by Fend Off Despair, Escape from Mount Gram's captured deck and The Dread Realm's Reanimated Dead.
+/** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B, Shelob's Lair's allies this round, The Passing of the Grey Company's Overcome by Fear and threat floor, The Siege of Gondor's Army of the Dead, The Battle of the Pelennor Fields' Aragorn, The Tower of Cirith Ungol's hero with Last of the Company, The Black Gate Opens' controller of Gwaihir, Mount Doom's hero with Heavy and Tired and Intruders in Chetwood's hands under Lost in the Wilderness and controller of Iârion, Deadmen's Dike's decks The Wastes of Eriador's starting threat lowered by Fend Off Despair, Escape from Mount Gram's captured deck and The Dread Realm's Reanimated Dead and Fog on the Barrow-downs' players apart.
  * A seat wears one mark: when two scenarios' pieces fall on the same seat (Fear and the Army, the Army and Aragorn) their labels, notes and notches are merged into it. */
 export function seatMarks(game: ScenarioState, ctx: ReduceContext): readonly HandMark[] {
-  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game), ...pelennorHands(game), ...ungolHands(game, ctx), ...blackGateHands(game), ...mountDoomHands(game, ctx), ...angmarHands(game), ...wastesHands(game), ...gramHands(game, ctx), ...realmHands(game), ...erechHands(game)]);
+  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game), ...pelennorHands(game), ...ungolHands(game, ctx), ...blackGateHands(game), ...mountDoomHands(game, ctx), ...angmarHands(game), ...wastesHands(game), ...gramHands(game, ctx), ...realmHands(game), ...erechHands(game), ...downsHands(game, ctx)]);
 }
 
 // The label after the seat prefix ("P1 · Fear" is "Fear"); a bare seat ("P1") or "Threat" says nothing more.

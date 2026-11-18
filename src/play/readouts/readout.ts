@@ -23,6 +23,7 @@ import { defenseQuestResult } from "../words/scenarios/fortress.ts";
 import { defenseOutcome, stageHasDefense } from "./fortress.ts";
 import { companyProgressWords } from "./company.ts";
 import { erechQuestWords } from "./standalone-scenarios/erech.ts";
+import { downsHoldWords, downsQuestWords } from "./standalone-scenarios/barrow-downs.ts";
 import { forestHoldWords } from "./standalone-scenarios/old-forest.ts";
 import { lairProgressWords } from "./lair.ts";
 import { blackGateQuestEnd } from "./black-gate.ts";
@@ -193,11 +194,12 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const pelennor = pelennorQuestWords(game, ctx, willpower - threat);
     if (pelennor) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: pelennor };
     // Shelob's Lair holds some progress back (stage 2B's cap, an Underground location on stage 1): the split the engine would place; stage 3B of The Passing of the Grey Company says the progress pays the Stone's travel; stage 1B of The Siege of Gondor says Great Corsair Ship holds it.
-    const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat) ?? erechQuestWords(game, ctx, willpower - threat);
+    const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat) ?? erechQuestWords(game, ctx, willpower - threat) ?? downsQuestWords(game, ctx, willpower - threat);
     // The Siege's words carry their own "if nothing changes" ("4 progress if nothing changes: held while Great Corsair Ship is in play").
     const siege = siegeProgressWords(game, ctx, willpower - threat);
     // The Old Forest's stage 3B: progress that would fill it, and the card that holds the win.
-    const holds = forestHoldWords(game, ctx, willpower - threat);
+    // Fog on the Barrow-downs' stage 3B: the progress it takes none of while a Great Barrow is in play, and the defeat it holds until every player is at it with Standing Stones in the victory display.
+    const holds = forestHoldWords(game, ctx, willpower - threat) ?? downsHoldWords(game, ctx, willpower - threat);
     return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${holds ? `; ${holds}` : ""}${eliminationWords(game, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
   }
   return null;
