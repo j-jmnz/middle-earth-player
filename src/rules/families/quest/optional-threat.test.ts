@@ -28,4 +28,10 @@ describe("optionalEngageThreat (03060:A:1)", () => {
     const { state, ctx } = scene(40, false);
     expect(optionalEnemies(state, ctx.cards, 0)).toHaveLength(2);
   });
+
+  it("reads the threat an engagement check reads: a threat ceiling lowers it below the limit", () => {
+    const { state, ids, ctx } = scene(30);
+    const capped = { ...state, modifiers: [...state.modifiers, { instanceId: "seat:0", sourceId: "x", stat: "threatCeiling" as const, amount: 20, until: "endOfGame" as const }] };
+    expect(optionalEnemies(capped, ctx.cards, 0).sort()).toEqual([ids.scout!, ids.other!].sort());
+  });
 });

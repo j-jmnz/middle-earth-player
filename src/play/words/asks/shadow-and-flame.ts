@@ -9,8 +9,8 @@ const BANE_LEFT = { stat: "hitPoints", ofNamed: "Durin's Bane", remaining: true 
 
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 04140:B:1 (Last Lord of Moria) and 04149:A:1 (Leaping Flame, When Revealed): Durin's Bane attacks the first player at once, whatever his threat.
-  "04140:whenRevealed:1 @0 Pick": { note: "{card}: Durin's Bane attacks the first player at once from the staging area, whatever his threat, dealt a shadow card.", verb: "Attack" },
-  "04149:whenRevealed:1 @0 Pick": { note: "{card}: Durin's Bane attacks the first player at once from the staging area, whatever his threat, dealt a shadow card.", verb: "Attack" },
+  "04140:whenRevealed:1 @0 Pick": { note: "{card}: Durin's Bane attacks the first player at once from the staging area, whatever his threat, dealt a shadow card. Choose Durin's Bane.", verb: "Attack" },
+  "04149:whenRevealed:1 @0 Pick": { note: "{card}: Durin's Bane attacks the first player at once from the staging area, whatever his threat, dealt a shadow card. Choose Durin's Bane.", verb: "Attack" },
 
   // 04144:A:1, A:2 (Fires in the Deep): each player discards 1 ally he controls, if able; its Shadow does the same to the defending player.
   "04144:whenRevealed:1 @1.0 Pick": { owned: true, note: "{card}: choose 1 ally you control to discard. If no player discards one, it gains surge.", verb: "Discard" },
@@ -26,14 +26,14 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "04146:whenRevealed:1 @0 remove": { label: "Remove a questing hero you control from the quest to cancel the +3 Attack" },
   "04146:whenRevealed:1 @0 keep": { label: "Keep it: Durin's Bane gets +3 Attack until the end of the round" },
   "04146:whenRevealed:1 @0.remove.0 Pick": { note: "{card}: choose 1 questing hero you control to remove from the quest. It stays exhausted. The +3 Attack is canceled.", verb: "Remove" },
-  "04146:whenRevealed:1 @0.keep.0 Pick": { note: "{card}: Durin's Bane gets +3 Attack until the end of the round.", verb: "Boost" },
+  "04146:whenRevealed:1 @0.keep.0 Pick": { note: "{card}: Durin's Bane gets +3 Attack until the end of the round. Choose Durin's Bane.", verb: "Boost" },
 
   // 04147:A:2 (Inner Shadow, When Revealed): Surge, then 5 damage are healed from Durin's Bane; the first player may remove a questing hero from the quest to cancel the heal.
   "04147:whenRevealed:1 @0 Choose": { note: "{card}: 5 damage are healed from Durin's Bane. The first player may remove 1 questing hero from the quest to cancel the heal, not the surge.", verb: "Choose" },
   "04147:whenRevealed:1 @0 remove": { label: "Remove a questing hero you control from the quest to cancel the heal" },
   "04147:whenRevealed:1 @0 keep": { label: "Keep it: 5 damage are healed from Durin's Bane" },
   "04147:whenRevealed:1 @0.remove.0 Pick": { note: "{card}: choose 1 questing hero you control to remove from the quest. It stays exhausted. The heal is canceled.", verb: "Remove" },
-  "04147:whenRevealed:1 @0.keep.0 Pick": { note: "{card}: 5 damage are healed from Durin's Bane.", verb: "Heal" },
+  "04147:whenRevealed:1 @0.keep.0 Pick": { note: "{card}: 5 damage are healed from Durin's Bane. Choose Durin's Bane.", verb: "Heal" },
 
   // 04148:A:1 (Whip Lash, When Revealed): each player discards 1 attachment he controls, if able.
   "04148:whenRevealed:1 @0.0 Pick": { owned: true, note: "{card}: choose 1 attachment you control to discard. An encounter attachment on Durin's Bane is not yours to discard.", verb: "Discard" },
@@ -51,10 +51,10 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   },
 
   // 901803:A:1 (The Dark Fire, Shadow): 1 damage is healed from Durin's Bane for each point of damage this attack dealt.
-  "901803:shadow:1 @0.0 Pick": { note: "{card}, a Shadow effect: Durin's Bane heals 1 damage for each point of damage this attack dealt.", verb: "Heal" },
+  "901803:shadow:1 @0.0 Pick": { note: "{card}, a Shadow effect: Durin's Bane heals 1 damage for each point of damage this attack dealt. Choose Durin's Bane.", verb: "Heal" },
 
   // 901805:A:1 (Morgoth's Bidding, Shadow): a destroyed character brings an additional attack by Durin's Bane.
-  "901805:shadow:1 @0.0 Pick": { note: "{card}, a Shadow effect: this attack destroyed a character, so Durin's Bane attacks the defending player again, dealt a new shadow card.", verb: "Attack" },
+  "901805:shadow:1 @0.0 Pick": { note: "{card}, a Shadow effect: this attack destroyed a character, so Durin's Bane attacks the defending player again, dealt a new shadow card. Choose Durin's Bane.", verb: "Attack" },
 
   // 901807:A:2 (Servant of Flame, Shadow): the defending player searches the encounter deck for a treachery with the Shadow or Flame trait and reveals it, if able.
   "901807:shadow:1 @0 SearchReveal": { owned: true, note: "{card}, a Shadow effect: search the encounter deck for 1 treachery with the Shadow or Flame trait and reveal it. The deck is shuffled.", verb: "Reveal" },

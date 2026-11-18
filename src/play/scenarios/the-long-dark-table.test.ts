@@ -74,4 +74,11 @@ describe("The locate test's banner", () => {
     expect(moment?.lines.map((line) => line.text)).toEqual(["filler discarded, Fatigue has no PASS", "filler discarded, Twisting Passage has PASS"]);
     expect(moment?.lines[1]?.cards).toEqual([other, passage]);
   });
+
+  it("04087:B:1 leads with the player when two or more play", () => {
+    const made = table({ seats: 2, stage: "04087", hand: ["filler"], deck: ["04093"] });
+    const step = { kind: "locateTest" as const, seat: 1, handIds: [], dealtIds: [], success: false };
+    const moment = momentOf(made.state, made.state, [step], { card: (id: string) => id });
+    expect(moment?.title).toBe("Player 2's locate test failed");
+  });
 });

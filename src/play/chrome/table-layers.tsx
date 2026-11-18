@@ -123,7 +123,7 @@ function ThreatSourceReading({ store, ctx, names, picture, onRead, onClose }: { 
   const cards = read.sources.map((source) => {
     const card = game.cards[source.id];
     const made = listCard(source.id, card?.code ?? "", card && !hidesFace(card) ? pictureKey(card) : "", names, picture, ctx.cards);
-    return { ...made, detail: threatSourceWords(made.detail ?? null, source.threat, source.from), said: threatSourceSaid(made.detail ?? null, source.threat, source.from) };
+    return { ...made, detail: threatSourceWords(made.detail ?? null, source.threat, source.from, source.area), said: threatSourceSaid(made.detail ?? null, source.threat, source.from, source.area) };
   });
   const title = read.seat == null ? "Staging threat" : `Player ${read.seat + 1}'s staging threat`;
   return <ThreatSourceList title={title} total={read.total} cards={cards} adjust={adjustWords(read.adjust)} onRead={onRead} onClose={onClose} />;

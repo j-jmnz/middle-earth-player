@@ -93,6 +93,7 @@ export function ChoiceTray({
   onTile,
   onRead,
   onStep,
+  refusedRows,
 }: {
   open: boolean;
   sheet: Sheet;
@@ -104,6 +105,8 @@ export function ChoiceTray({
   onRead: ((cardId: string) => void) | null;
   // A screen reader's increment or decrement action on a share row (use-table-choice.ts, onStep); a touch never calls it.
   onStep?: ((id: string, delta: 1 | -1) => void) | null;
+  // Rows of the sheet the rules refuse now (a commit's allies past the limit): listed as refused, not as choices.
+  refusedRows?: readonly Unavailable[];
 }) {
   const s = useUiScale();
   // A phone screen reader hears each row as a radio, a checkbox, a button or an adjustable share (tray-logic.ts, tileRole); no one else does.
@@ -115,9 +118,10 @@ export function ChoiceTray({
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   const shown = useHeld(open ? sheet : null) ?? sheet;
   const picked = useHeld(open ? choice : null) ?? choice;
-  const tiles = trayTiles(shown);
+  const refusedHere = new Set((refusedRows ?? []).map((item) => item.id));
+  const tiles = trayTiles(shown).filter((tile) => !refusedHere.has(tile.id));
   const marks = new Set(picked.ids);
-  const refused = shown.kind === "pick" ? (shown.unavailable ?? []) : [];
+  const refused = [...(shown.kind === "pick" ? (shown.unavailable ?? []) : []), ...(refusedRows ?? [])];
   if (!open && !leaving) return null;
   return (
     <Animated.View testID="sheet" collapsable={false} pointerEvents={open ? "auto" : "none"} style={[{ flexShrink: 1, minHeight: 0 }, motion]}>

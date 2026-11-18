@@ -1,9 +1,13 @@
+import type { Amount } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
 
 // The choice words of Foundations of Stone (dwarrowdelf part 8), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario foundations-of-stone --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=foundations-of-stone` prints each sentence.
 // The first player answers for the group at the Setup's Torch; every other choice is the player's own (the hero or character he controls, his hand, his deck, the area he sends the Centipede to), so those sentences are owned: two-handed they lead with the player and the sheet adds no "Player N chooses."
 // (the rows of a pick that spans seats name their owner).
+// The allies the asked player controls, and their total printed cost (a card with no printed cost counts 0): the Nightmare setup card has him discard until it is 6 or less (901701:A:2).
+const ALLIES: Amount = { stat: "cost", totalOf: { type: "ally", control: "you" } };
+
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 04111:A:1 (Setup): the first player attaches Cave Torch to a hero of any player.
   "04111:setup:1 @1 Pick": { note: "{card}: the first player chooses a hero of any player to carry Cave Torch. The Torch is removed from the game if it would leave play.", verb: "Attach" },
@@ -30,7 +34,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "04124:whenRevealed:1 @0.0 Pick": { owned: true, note: "{card}: choose 1 hero you control to shuffle into your deck. It is put into play, ready and with no tokens, when you draw it.", verb: "Shuffle" },
 
   // 901701:A:2 (Nightmare setup card): each player discards allies until the allies he controls cost 6 or less in all.
-  "901701:forced:1 @1.0 DiscardAlliesToCost": { owned: true, note: "{card}: Washed Away! is revealed. Choose 1 of your allies to discard, until the allies you control cost 6 or less in all.", verb: "Discard" },
+  "901701:forced:1 @1.0 DiscardAlliesToCost": { owned: true, note: "{card}: Washed Away! is revealed. Your allies cost {total} in all; discard until they cost 6 or less.", bind: { total: ALLIES }, verb: "Discard" },
 
   // 901703:A:1 (Giant Cave Centipede, When Revealed): each player shuffles the card in his hand with the highest printed cost into his deck; he picks among ties.
   "901703:whenRevealed:1 @0.0 ShuffleHighestCostIntoDeck": { owned: true, note: "{card}: choose 1 of the cards in your hand tied for the highest printed cost to shuffle into your deck.", verb: "Shuffle" },
