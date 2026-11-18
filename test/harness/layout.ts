@@ -66,6 +66,8 @@ export type Layout = {
   captive?: { hero: string; under: string };
   // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2).
   under?: readonly { code: string; to: string }[];
+  // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
+  night?: Entry;
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
@@ -163,6 +165,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const item of layout.engaged ?? []) put(entry(item).code, { zone: "engaged", seat: seatOf(item) }, item);
   for (const code of layout.victory ?? []) put(code, { zone: "victory" });
   if (layout.active) put(layout.active, { zone: "activeLocation" });
+  if (layout.night) put(entry(layout.night).code, { zone: "nightObjective" }, layout.night, "up");
   if (layout.campaign && world.dealt.campaignCard !== undefined) put(world.dealt.campaignCard, { zone: "campaign" });
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
   for (const attachment of layout.attached ?? []) {

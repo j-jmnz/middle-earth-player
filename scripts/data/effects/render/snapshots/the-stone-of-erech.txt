@@ -222,7 +222,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
     only if the Night objective in play is Midnight
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat threat 2, while this card is in play
-    - each enemy (any player controls) that is this card itself gains doomed 2 (each player raises their threat by that much more when one is played)
+    - this card: stat gainsDoomed (the Doomed X it gains as it is revealed, each player raising their threat by it) 2, while this card is in play
 
 ## 50315 Shadow Host Captain
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -415,4 +415,4 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50327:whenRevealed:1: When revealed
     - place 1 progress on the Night objective in play (nothing with none); a Night objective at its limit then gives way to the next
 
-(rendered pieces: 229 by template, 7 as JSON)
+(rendered pieces: 228 by template, 7 as JSON)

@@ -207,7 +207,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });
       const revealing = next.seats[seat];
       // Each separate instance of surge reveals 1 additional card (rr.surge): the printed keyword, each gain from a card in play and each grant made during this reveal.
-      const surges = (printed.keywords.surge ? 1 : 0) + heldAmount(next, id, "gainsSurge") + (frame.data.kind === "reveal" ? (frame.data.surge ? 1 : 0) + (frame.data.extraSurge ?? 0) : 0);
+      // The surge a card gives itself is read before a treachery leaves the staging area, while its constants still hold (Groping Horror, 50324:A:2).
+      const surges = (printed.keywords.surge ? 1 : 0) + heldAmount(state, id, "gainsSurge") + (frame.data.kind === "reveal" ? (frame.data.surge ? 1 : 0) + (frame.data.extraSurge ?? 0) : 0);
       if (surges <= 0 || !revealing || revealing.eliminated || frame.data.kind !== "reveal") return next;
       // The instances still to answer wait in the frame (step 6 reveals the next card when the one just revealed is done).
       return startReveal(surges > 1 ? patchTop(next, { data: { ...frame.data, surgeLeft: surges - 1 } }) : next, seat, ctx, steps);

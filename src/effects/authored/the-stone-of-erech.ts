@@ -12,11 +12,10 @@ const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
 const A_CHARACTER = (maxWillpower: number): PickSpec => ({ type: "character", control: "any", maxWillpower });
 const OATHBREAKER: PickSpec = { type: "enemy", control: "any", trait: "Oathbreaker" };
 const READY_HERO: PickSpec = { type: "hero", control: "you", state: "ready" };
-const SELF_ENEMY: PickSpec = { type: "enemy", control: "any", isSource: true };
 const STONE = "The Stone of Erech";
 
 // A stat of the source card that holds while the Night objective is `when` ("Dusk. Whisperer gets +1 Threat").
-const SELF_STAT = (stat: "attack" | "defense" | "threat" | "questPoints" | "willpower" | "gainsSurge", amount: number): Instruction => ({ verb: "ModifyStat", stat, amount, until: "whileSourceInPlay", target: "self" });
+const SELF_STAT = (stat: "attack" | "defense" | "threat" | "questPoints" | "willpower" | "gainsSurge" | "gainsDoomed", amount: number): Instruction => ({ verb: "ModifyStat", stat, amount, until: "whileSourceInPlay", target: "self" });
 const NIGHT_STATS = (code: string, line: string, id: number, when: Condition, ...stats: Instruction[]): Effect => ({ id: `${code}:constant:${id}`, cardCode: code, lines: [line], timing: "constant", condition: when, instructions: stats });
 // "Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead)": the value of the Night in play, never summed.
 const ATTACK_BY_NIGHT = (base: number, dusk: number, midnight: number): Instruction[] => [
@@ -153,7 +152,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 50314 Whisperer (Spectral). Dusk +1 Threat; Midnight +2 Threat and doomed 2 (counted when it is revealed).
   NIGHT_STATS("50314", "50314:A:2", 2, DUSK, SELF_STAT("threat", 1)),
-  NIGHT_STATS("50314", "50314:A:3", 3, MIDNIGHT, SELF_STAT("threat", 2), { verb: "GainsDoomed", amount: 2, pick: SELF_ENEMY }),
+  NIGHT_STATS("50314", "50314:A:3", 3, MIDNIGHT, SELF_STAT("threat", 2), SELF_STAT("gainsDoomed", 2)),
 
   // 50315 Shadow Host Captain (Spectral). Dusk +1 Attack and +1 Defense; Midnight +2 and +2.
   NIGHT_STATS("50315", "50315:A:2", 2, DUSK, SELF_STAT("attack", 1), SELF_STAT("defense", 1)),
