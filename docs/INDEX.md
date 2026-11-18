@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~222.9K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~223.5K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
@@ -131,21 +131,22 @@ Read the sections your task touches.
     - 1753–1770 The Hills of Emyn Muil (~1.5K) ← 1
     - 1771–1791 The Dead Marshes (~2.1K) ← 2
     - 1792–1815 Return to Mirkwood (~2.3K) ← 4
-  - 1816–1866 Standalone scenarios (~6.8K) ← 1
+  - 1816–1874 Standalone scenarios (~7.4K) ← 1
     - 1820–1843 The Massing at Osgiliath (~2.5K) ← 1
     - 1844–1866 The Battle of Lake-town (~4.0K) ← 36
-  - 1867–1875 Nightmare (~410) ← 21
-  - 1876–1916 Deckbuilding (~2.1K)
-  - 1917–1996 Effects (~3.7K)
-    - 1919–1977 Three layers (~2.4K) ← 10
-    - 1978–1988 Player side quests, contracts and saga cards (~940)
-    - 1989–1992 Window stack (~100)
-    - 1993–1996 Coverage test (~270)
-  - 1997–2019 Data sources (~730) ← 3
-  - 2020–2038 Card images (~1.3K) ← 9
-  - 2039–2066 Persistence and shipping (~3.2K) ← 10
-  - 2067–2108 Screens (~5.1K) ← 2
-    - 2093–2108 Table screen (~1.8K) ← 3
+    - 1867–1874 The Stone of Erech (~670)
+  - 1875–1883 Nightmare (~410) ← 21
+  - 1884–1924 Deckbuilding (~2.1K)
+  - 1925–2004 Effects (~3.7K)
+    - 1927–1985 Three layers (~2.4K) ← 10
+    - 1986–1996 Player side quests, contracts and saga cards (~940)
+    - 1997–2000 Window stack (~100)
+    - 2001–2004 Coverage test (~270)
+  - 2005–2027 Data sources (~730) ← 3
+  - 2028–2046 Card images (~1.3K) ← 9
+  - 2047–2074 Persistence and shipping (~3.2K) ← 10
+  - 2075–2116 Screens (~5.1K) ← 2
+    - 2101–2116 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~60.4K tok)
   - 5–8 Overview (~170) ← 1
   - 9–24 Top bar (~3.4K) ← 5

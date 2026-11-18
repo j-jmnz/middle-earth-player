@@ -1,5 +1,5 @@
-// Rules: none (The Massing at Osgiliath and The Battle of Lake-town have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath and The Battle of Lake-town: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -17,19 +17,20 @@ const byCode = new Map(loadCards().map((card) => [card.code, card]));
 const cycle = loadCampaign("standalone-scenarios");
 const scenario = loadAnyScenario("the-massing-at-osgiliath");
 const lakeTown = loadAnyScenario("the-battle-of-lake-town");
+const stone = loadAnyScenario("the-stone-of-erech");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 2, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 3, playable: true, box: null })]);
   });
 });
 
@@ -101,5 +102,37 @@ describe("The Battle of Lake-town", () => {
     for (const key of sides) expect(ledger.byKey.has(key), key).toBe(true);
     expect(ledger.byKey.get(keyOf("50201", "A"))?.lines[0]).toMatch(/^Setup: Shuffle all copies of Smaug into a separate Smaug deck\./);
     expect(ledger.byKey.get(keyOf("50204", "A"))?.lines[1]).toMatch(/a shadow card for each attack/);
+  });
+});
+
+describe("The Stone of Erech", () => {
+  it("has codes 503 and the collector number, which Hall of Beorn's 00001 to 00027 would share with the earlier standalone packs' (overrides.productCodes)", () => {
+    expect(stone).toMatchObject({ id: "the-stone-of-erech", name: "The Stone of Erech", number: 3, stages: ["50301", "50302", "50303"] });
+    expect(stone.campaignCard).toBeUndefined();
+    expect(stone.campaignPlaced).toEqual([]);
+    expect(stone.source.dragnNormal).toBe("Q99.03");
+    expect(stone.nightmare).toBeUndefined();
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TSoE"));
+    expect(own.map((card) => card.code)).toEqual(Array.from({ length: 27 }, (_, at) => `503${String(at + 1).padStart(2, "0")}`));
+    expect(byCode.get("50307")?.name).toBe("Tarlang's Neck");
+  });
+
+  it("deals the same encounter deck on Normal and Easy, Tarlang's Neck the active location and Derufin, the Lord of the Dead, the Stone and the three Night objectives set aside (50301:A:1)", () => {
+    for (const seats of [1, 2, 3, 4]) {
+      expect(encounterCodes(stone, "Normal", seats), `${seats} seats`).toHaveLength(38);
+      expect(encounterCodes(stone, "Easy", seats), `${seats} seats`).toHaveLength(38);
+    }
+    for (const difficulty of ["Normal", "Easy"] as const) {
+      expect(setupInstructions(stone, difficulty).filter((step) => step.verb === "SetAside").map((step) => step.code).sort(), difficulty).toEqual(["50304", "50305", "50306", "50308", "50309", "50310"]);
+      expect(setupInstructions(stone, difficulty).filter((step) => step.verb === "MakeActiveLocation").map((step) => step.code), difficulty).toEqual(["50307"]);
+    }
+  });
+
+  it("has every printed side read from its scan, Tarlang's Neck as printed (Hall of Beorn has \"Next\")", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("503")).flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(30);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("50301", "A"))?.lines[0]).toMatch(/^Setup: Make Tarlang's Neck the active location\./);
   });
 });
