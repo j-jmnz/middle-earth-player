@@ -1,23 +1,19 @@
-// The groups the player chose to show while the app is open (the spoiler ask of docs/design-system.md, Card groups). Nothing is saved: a relaunch asks
-// again. A tiny store read through useSyncExternalStore with a selector that returns one boolean, so a group re-renders only for its own key.
+// Whether the player chose to see the encounter and campaign cards while the app is open (the spoiler ask of docs/design-system.md, Card groups).
+// One answer covers every set, scenario and campaign section (user decision, 2026-11-18): the first group that holds spoilers asks, and Show them
+// opens them all. Nothing is saved: a relaunch asks again. A tiny store read through useSyncExternalStore.
 import { useSyncExternalStore } from "react";
 
-const shown = new Set<string>();
+let shown = false;
 const listeners = new Set<() => void>();
 
-/** The key a group is remembered under. */
-export function groupKey(kind: string, id: string): string {
-  return `${kind}:${id}`;
-}
-
-export function reveal(key: string): void {
-  if (shown.has(key)) return;
-  shown.add(key);
+export function revealSpoilers(): void {
+  if (shown) return;
+  shown = true;
   for (const listener of [...listeners]) listener();
 }
 
-export function isRevealed(key: string): boolean {
-  return shown.has(key);
+export function spoilersRevealed(): boolean {
+  return shown;
 }
 
 function subscribe(listener: () => void): () => void {
@@ -27,16 +23,20 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
-/** Whether this group was shown already. */
-export function useRevealed(key: string): boolean {
-  return useSyncExternalStore(
-    subscribe,
-    () => shown.has(key),
-    () => false,
-  );
+function snapshot(): boolean {
+  return shown;
 }
 
-/** Forgets every shown group (tests). */
+function serverSnapshot(): boolean {
+  return false;
+}
+
+/** Whether the player has shown the spoilers since the app opened. */
+export function useSpoilersRevealed(): boolean {
+  return useSyncExternalStore(subscribe, snapshot, serverSnapshot);
+}
+
+/** Forgets the answer (tests). */
 export function resetRevealed(): void {
-  shown.clear();
+  shown = false;
 }
