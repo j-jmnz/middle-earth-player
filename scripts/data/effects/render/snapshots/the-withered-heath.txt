@@ -22,32 +22,32 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     only if the card the event is about is a card (any player controls) named "Searching for Dragon Sign" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) [also {"attachable":"12176"}] to choose)):
-          - choose hero (you control) [also {"attachable":"12176"}]
+        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) that the card with code 12176 can be attached to to choose)):
+          - choose hero (you control) that the card with code 12176 can be attached to
           - the set-aside copy of the card with code 12176 is attached to the last picked hero
         * option "decline":
   12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:3)
     only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) [also {"attachable":"12177"}] to choose)):
-          - choose hero (you control) [also {"attachable":"12177"}]
+        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) that the card with code 12177 can be attached to to choose)):
+          - choose hero (you control) that the card with code 12177 can be attached to
           - the set-aside copy of the card with code 12177 is attached to the last picked hero
         * option "decline":
   12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:4)
     only if the card the event is about is a card (any player controls) named "Hunting the Beast" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) [also {"attachable":"12178"}] to choose)):
-          - choose hero (you control) [also {"attachable":"12178"}]
+        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) that the card with code 12178 can be attached to to choose)):
+          - choose hero (you control) that the card with code 12178 can be attached to
           - the set-aside copy of the card with code 12178 is attached to the last picked hero
         * option "decline":
   12175:forced:4: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Cold-Drake") (record also names 12175:B:5)
     only if the players are on stage 4
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12179"}]) and (there is a hero (you control) [also {"attachable":"12179"}] to choose)):
-          - choose hero (you control) [also {"attachable":"12179"}]
+        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12179"}]) and (there is a hero (you control) that the card with code 12179 can be attached to to choose)):
+          - choose hero (you control) that the card with code 12179 can be attached to
           - the set-aside copy of the card with code 12179 is attached to the last picked hero
         * option "decline":
 
@@ -56,8 +56,8 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     only if the card the event is about is a card (any player controls) named "Searching for Dragon Sign" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) [also {"attachable":"12176"}] to choose)):
-          - choose hero (you control) [also {"attachable":"12176"}]
+        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) that the card with code 12176 can be attached to to choose)):
+          - choose hero (you control) that the card with code 12176 can be attached to
           - the set-aside copy of the card with code 12176 is attached to the last picked hero
         * option "decline":
 
@@ -66,8 +66,8 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) [also {"attachable":"12177"}] to choose)):
-          - choose hero (you control) [also {"attachable":"12177"}]
+        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) that the card with code 12177 can be attached to to choose)):
+          - choose hero (you control) that the card with code 12177 can be attached to
           - the set-aside copy of the card with code 12177 is attached to the last picked hero
         * option "decline":
 
@@ -76,8 +76,8 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     only if the card the event is about is a card (any player controls) named "Hunting the Beast" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) [also {"attachable":"12178"}] to choose)):
-          - choose hero (you control) [also {"attachable":"12178"}]
+        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) that the card with code 12178 can be attached to to choose)):
+          - choose hero (you control) that the card with code 12178 can be attached to
           - the set-aside copy of the card with code 12178 is attached to the last picked hero
         * option "decline":
 
@@ -86,8 +86,8 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     only if the players are on stage 4
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12179"}]) and (there is a hero (you control) [also {"attachable":"12179"}] to choose)):
-          - choose hero (you control) [also {"attachable":"12179"}]
+        * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12179"}]) and (there is a hero (you control) that the card with code 12179 can be attached to to choose)):
+          - choose hero (you control) that the card with code 12179 can be attached to
           - the set-aside copy of the card with code 12179 is attached to the last picked hero
         * option "decline":
 
@@ -390,4 +390,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 301 by template, 38 as JSON)
+(rendered pieces: 317 by template, 22 as JSON)

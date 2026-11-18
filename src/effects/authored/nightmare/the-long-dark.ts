@@ -7,6 +7,8 @@ const FAILED: Condition = { kind: "lastLocateFailed" };
 const ATTACHED: Condition = { kind: "sourceIn", zone: "attached" };
 const DESTROYED_A_CHARACTER: Condition = { kind: "x", min: 1 };
 const GREAVES: PickSpec = { type: "objective", control: "any", names: ["Durin's Greaves"] };
+/** "If you have no card in your hand": the defending player's own hand (a Shadow effect's actor), not every player's. */
+const NO_CARD_IN_HAND: Condition = { kind: "handSize", max: 0, actor: true };
 const LOCATE: Instruction = { verb: "LocateTest", who: "firstPlayer" };
 const LOST_IF_FAILED: Instruction = { verb: "TriggerLost", mode: "all", when: FAILED };
 
@@ -28,25 +30,25 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", target: "self" }],
   },
 
-  // 901603 Trapdoor Spider. A:1: a character its attack damages is discarded from play. A:2 (Lost): it engages the last player and makes an immediate attack, from the staging area or from another player's side.
+  // 901603 Trapdoor Spider. A:1: a character its attack damages is discarded from play. A:2 (Lost): it engages the last player and makes an immediate attack, from the staging area or from another player's side; when it cannot engage him it makes no attack.
   { id: "901603:forced:1", cardCode: "901603", lines: ["901603:A:1"], timing: "forced", trigger: "attackDamagedCharacter", subject: "self", instructions: [{ verb: "Discard", target: { kind: "other" } }] },
-  { id: "901603:forced:2", cardCode: "901603", lines: ["901603:A:2"], timing: "forced", trigger: "lost", instructions: [{ verb: "EngageLastPlayer" }, { verb: "ImmediateAttack" }] },
+  { id: "901603:forced:2", cardCode: "901603", lines: ["901603:A:2"], timing: "forced", trigger: "lost", instructions: [{ verb: "EngageLastPlayer" }, { verb: "ImmediateAttack", when: { kind: "engagedWithLastPlayer" } }] },
 
   // 901604 Sentinel of the Deep. A:1: the player it is engaged with cannot draw cards from card effects. A:2: the defending player chooses a Lost effect in play and triggers it.
   { id: "901604:constant:1", cardCode: "901604", lines: ["901604:A:1"], timing: "constant", instructions: [{ verb: "Restrict", what: "draw", engagedPlayer: true }] },
   { id: "901604:shadow:1", cardCode: "901604", lines: ["901604:A:2"], timing: "shadow", instructions: [{ verb: "TriggerLost", mode: "chooseOne" }] },
 
-  // 901605 Eastern Mines. A:1 (Travel): the first player makes a locate test; when it is failed the players travel nowhere (their travel is used) and the Lost effects trigger. A:2: as Sentinel's shadow.
-  { id: "901605:travel:1", cardCode: "901605", lines: ["901605:A:1"], timing: "travel", instructions: [LOCATE, { verb: "EndTravel", when: FAILED }, LOST_IF_FAILED] },
+  // 901605 Eastern Mines. A:1 (Travel): the players travel here, then the first player makes the locate test (the card is the active location, as Mount Doom's Travel tests are made once it is); when it is failed Eastern Mines returns to the staging area (the players' travel is used) and the Lost effects trigger. A:2: as Sentinel's shadow.
+  { id: "901605:travel:1", cardCode: "901605", lines: ["901605:A:1"], timing: "travel", instructions: [{ verb: "Travel", to: "self" }, LOCATE, { verb: "ReturnToStaging", target: { kind: "self" }, when: FAILED }, LOST_IF_FAILED] },
   { id: "901605:shadow:1", cardCode: "901605", lines: ["901605:A:2"], timing: "shadow", instructions: [{ verb: "TriggerLost", mode: "chooseOne" }] },
 
-  // 901606 Bottomless Chasm. A:1: for each progress placed on it the first player chooses a card in any player's hand and it is discarded. A:2: when the attack destroys a character the defending player discards his hand.
+  // 901606 Bottomless Chasm. A:1: for each progress placed on it (the placement that explores it too: the record hears `progressPlacedOnSelf`) the first player chooses a card in any player's hand and it is discarded. A:2: when the attack destroys a character the defending player discards his hand.
   {
     id: "901606:forced:1",
     cardCode: "901606",
     lines: ["901606:A:1"],
     timing: "forced",
-    trigger: "progressPlaced",
+    trigger: "progressPlacedOnSelf",
     instructions: [{ verb: "Repeat", times: { x: true }, instructions: [{ verb: "Pick", pick: { type: "card", control: "any", from: "hand", who: "firstPlayer" } }, { verb: "DiscardPicked" }] }],
   },
   { id: "901606:shadow:1", cardCode: "901606", lines: ["901606:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "DiscardHand", when: DESTROYED_A_CHARACTER }] }] },
@@ -70,7 +72,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "901608",
     lines: ["901608:A:3"],
     timing: "shadow",
-    instructions: [{ verb: "Pick", pick: { type: "character", control: "any", defending: true }, when: { kind: "handSize", max: 0 } }, { verb: "Discard", target: { kind: "picked" }, when: { kind: "handSize", max: 0 } }],
+    instructions: [{ verb: "Pick", pick: { type: "character", control: "any", defending: true }, when: NO_CARD_IN_HAND }, { verb: "Discard", target: { kind: "picked" }, when: NO_CARD_IN_HAND }],
   },
 ];
 

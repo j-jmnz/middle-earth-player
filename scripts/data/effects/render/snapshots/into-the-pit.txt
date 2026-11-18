@@ -311,7 +311,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   03064:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - a copy of the card with code 03041 is set aside, out of play
-    - choose hero (any player controls) chosen by the first player [also {"attachable":"03041"}]
+    - choose hero (any player controls) that the card with code 03041 can be attached to, chosen by the first player
     - the set-aside copy of the card with code 03041 is attached to the last picked hero; if it would leave play it is removed from the game
     - shuffle the encounter deck
 
@@ -356,4 +356,4 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   03066:constant:2: Constant
     (no instructions)
 
-(rendered pieces: 226 by template, 3 as JSON)
+(rendered pieces: 227 by template, 2 as JSON)

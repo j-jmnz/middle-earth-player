@@ -31,9 +31,27 @@ const choose = (run: Begun, state: ScenarioState, optionId: string) => send(stat
 const windowOptions = (state: ScenarioState) => (state.window?.kind === "choose" ? state.window.options : []);
 
 describe("TriggerLost all (04086:B:2, 04099:A:2)", () => {
-  it("runs the Lost line of every faceup card in play, each in full", () => {
+  it("runs the Lost line of every faceup card in play, each in full, the first player picking the order one effect at a time", () => {
     const run = begin({ instructions: [{ verb: "TriggerLost", mode: "all" }], staging: [{ code: "l1" }, { code: "l2" }, { code: "plain" }] });
-    expect(threat(run.state)).toBe(33);
+    expect(run.state.window).toMatchObject({ kind: "choose", seat: 0 });
+    expect(windowOptions(run.state)).toEqual([run.ids.l1, run.ids.l2]);
+    // The second Lost effect resolves first (the threat is 32 before the other is asked for); the one left needs no choice.
+    const first = choose(run, run.state, run.ids.l2 ?? "");
+    expect(threat(first)).toBe(33);
+  });
+
+  it("lets the first player order three effects, and a second player does not decide", () => {
+    const run = begin({ seatCount: 2, heroes: [{ code: "a" }, { code: "b", seat: 1 }], instructions: [{ verb: "TriggerLost", mode: "all" }], staging: [{ code: "l1" }, { code: "l2" }, { code: "l3" }] });
+    expect(run.state.window).toMatchObject({ kind: "choose", seat: 0 });
+    const first = choose(run, run.state, run.ids.l3 ?? "");
+    expect(first.window).toMatchObject({ kind: "choose", seat: 0 });
+    expect(windowOptions(first)).toEqual([run.ids.l1, run.ids.l2]);
+    expect(threat(choose(run, first, run.ids.l2 ?? ""))).toBe(37);
+  });
+
+  it("asks nothing for one effect or for copies of one card", () => {
+    expect(threat(begin({ instructions: [{ verb: "TriggerLost", mode: "all" }], staging: [{ code: "l1" }, { code: "plain" }] }).state)).toBe(31);
+    expect(threat(begin({ instructions: [{ verb: "TriggerLost", mode: "all" }], staging: [{ code: "l2", key: "one" }, { code: "l2", key: "two" }] }).state)).toBe(34);
   });
 
   it("counts each copy as its own Lost effect, and nothing in play as nothing happening", () => {

@@ -22,6 +22,8 @@ describe("effects render read fields, picks", () => {
     bottom: 2,
     staging: true,
     stagingOnly: true,
+    highestThreatPlusRemaining: true,
+    attachable: "03041",
     engaged: "other",
     names: ["Urdug"],
     exceptNames: ["Ufthak"],

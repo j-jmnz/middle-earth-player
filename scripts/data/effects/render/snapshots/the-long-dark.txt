@@ -7,19 +7,19 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
   04086:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - a copy of the card with code 03041 is set aside, out of play
-    - choose hero (any player controls) chosen by the first player [also {"attachable":"03041"}]
+    - choose hero (any player controls) that the card with code 03041 can be attached to, chosen by the first player
     - the set-aside copy of the card with code 03041 is attached to the last picked hero; if it would leave play it is removed from the game
     - shuffle the encounter deck
 
 04086:B:1 (back): When Revealed: Discard cards from the top of the encounter deck until you discard X locations, where X is one less than the number of players in the game (minimum of 1). Add those locations to the staging area, and shuffle the other discarded cards back into the encounter deck.
   04086:whenRevealed:1: When revealed
-    - discard cards from the top of the encounter deck until 1 location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area [also {"less":1,"atLeast":1,"returnOthers":true}]
+    - discard cards from the top of the encounter deck until 1 location(s) for each player in the game less 1, at least 1, are discarded, or the deck is empty, and add each location discarded to the staging area; the other cards this effect discarded are shuffled back into the encounter deck, and nothing else of the discard pile
 
 04086:B:2 (back): Each location gets +1 Threat. If the players quest unsuccessfully, trigger all "Lost:" effects in play.
   04086:constant:1: Constant
     - each location (any player controls): stat threat 1, while this card is in play
   04086:forced:1: Forced after the players quest unsuccessfully
-    - [json TriggerLost {"verb":"TriggerLost","mode":"all"}]
+    - trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 ## 04087 Continuing Eastward
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -27,14 +27,14 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 04087:B:1 (back): When Revealed: The first player makes a locate test. If this test is failed, reveal cards from the encounter deck equal to the number of players in the game and add them to the staging area. Then, trigger all "Lost:" effects in play.
   04087:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json LocateTest {"verb":"LocateTest","who":"firstPlayer"}]
+    - the first player makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)
     - repeat the number of players times:
-      - if [json condition {"kind":"lastLocateFailed"}]: the first player reveals an encounter card
-    - [json TriggerLost {"verb":"TriggerLost","mode":"all","when":{"kind":"lastLocateFailed"}}]
+      - if the last locate test the running effect made was failed (false before it has made one): the first player reveals an encounter card
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 04087:B:2 (back): If the players quest unsuccessfully, trigger all "Lost:" effects in play.
   04087:forced:1: Forced after the players quest unsuccessfully
-    - [json TriggerLost {"verb":"TriggerLost","mode":"all"}]
+    - trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 04087:B:3 (back): If the players defeat this stage, they have won the game.
   04087:constant:1: Constant
@@ -55,7 +55,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 04089:A:1 (front): Lost: Return the top 2 Goblin enemies in the encounter discard pile to the staging area, if able.
-  04089:forced:1: Forced on the event lost
+  04089:forced:1: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
     - return the topmost 2 Goblin enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
 
 04089:A:2: PASS.
@@ -65,7 +65,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 04090:A:1 (front): Lost: Each player must choose and discard 1 card from his hand.
-  04090:forced:1: Forced on the event lost
+  04090:forced:1: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
     - for each player, first player first:
       - discard 1 cards from hand
 
@@ -76,7 +76,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 04091:A:1 (front): Lost: Exhaust all characters.
-  04091:forced:1: Forced on the event lost
+  04091:forced:1: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
     - exhaust each character (any player controls)
 
 04091:A:2: PASS.
@@ -86,11 +86,11 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 04092:A:1 (front): Forced: Before placing progress tokens on Twisting Passage, the first player must make a locate test. If this test is failed, do not place any progress tokens on Twisting Passage and trigger all "Lost:" effects in play.
-  04092:forced:1: Forced on the event progressWouldBePlaced
+  04092:forced:1: Forced before progress is placed on this location (the whole placement, the effect's X, waits for this effect)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json LocateTest {"verb":"LocateTest","who":"firstPlayer"}]
-    - [json PlaceHeldProgress {"verb":"PlaceHeldProgress","when":{"kind":"lastLocatePassed"}}]
-    - [json TriggerLost {"verb":"TriggerLost","mode":"all","when":{"kind":"lastLocateFailed"}}]
+    - the first player makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)
+    - then, if the last locate test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the progress the event held back (the whole placement, the effect's X) is now placed on this location without another test; what does not fit goes on the current quest as an explored active location's overflow does
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 04092:A:2: PASS.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -102,7 +102,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
   04093:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - in player order, each player exhausts a ready character they control, choosing it (a player with none exhausts none)
-    - then, if [json condition {"kind":"playerWithoutReady"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if some player controls no unexhausted character (any one player, not every player) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 04093:A:2 (shadow): Shadow: The defending player must exhaust 1 character he controls, if able.
   04093:shadow:1: Shadow
@@ -116,9 +116,9 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 04094:A:1 (front): When Revealed: The first player makes a locate test. If this test is failed, deal 2 damage to all characters and trigger all "Lost:" effects in play.
   04094:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json LocateTest {"verb":"LocateTest","who":"firstPlayer"}]
-    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each character (any player controls)
-    - [json TriggerLost {"verb":"TriggerLost","mode":"all","when":{"kind":"lastLocateFailed"}}]
+    - the first player makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each character (any player controls)
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 04094:A:2: PASS.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -129,13 +129,13 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 04095:A:1 (front): When Revealed: Attach this card to a location in the staging area with the highest combined threat and remaining quest points. (Counts as a Condition attachment with the text: "Each enemy revealed from the encounter deck gains surge.")
   04095:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) in the staging area only, chosen by the first player [also {"highestThreatPlusRemaining":true}]
+    - choose location (any player controls) in the staging area only, with the highest sum of its current Threat and its remaining quest points (the quest points less the progress on it; a tie is the chooser's), chosen by the first player
     - this card attaches to the picked card (any number of copies may be attached to one card)
   04095:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   04095:constant:2: Constant
     only if this card is attached to a card
-    - [json EnemiesGainSurge {"verb":"EnemiesGainSurge"}]
+    - while this card is in force, each enemy revealed from the encounter deck gains surge as it is revealed (one dealt as a shadow card or added to the staging area gains none)
 
 04095:A:2: PASS.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -146,12 +146,12 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 04096:A:1 (front): When Revealed: The first player makes a locate test. If this test is failed, raise each player's threat by 7, remove all progress tokens from play, and trigger all "Lost:" effects in play.
   04096:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json LocateTest {"verb":"LocateTest","who":"firstPlayer"}]
-    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 7 (each player)
-    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
-    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): remove all the progress from each location (any player controls) with progress on it
-    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): remove all the progress from each card (any player controls) that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
-    - [json TriggerLost {"verb":"TriggerLost","mode":"all","when":{"kind":"lastLocateFailed"}}]
+    - the first player makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 7 (each player)
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): remove all the progress from each location (any player controls) with progress on it
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): remove all the progress from each card (any player controls) that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 ## 04097 Cave Spider
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -161,11 +161,11 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player draws 1 card(s)
     - the rest of the effect is carried out by the first player
-    - discard 4 cards from hand
+    - then, if a Draw this effect ran drew at least 1 card (what follows "then" resolves only when it did) (checked when this step runs, after the steps above; not tied to whether they did anything): discard 4 cards from hand
 
 04097:A:2 (front): Forced: After Cave Spider engages a player, that player must choose and discard 1 card from his hand, if able.
   04097:forced:1: Forced after an enemy engages a player (heard about this card)
-    - discard 1 cards from hand
+    - the player the enemy engaged discards 1 card from their hand
 
 ## 04098 Goblin Sneak
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -174,7 +174,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
   04098:forced:1: Forced after an enemy engages a player (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
-    - then, if the picked card is a treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy engages the next player [also {"announces":true}]
+    - then, if the picked card is a treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy engages the next player (a new engagement: the Forced effects that hear an engagement hear it)
 
 04098:A:2 (shadow): Shadow: Add Goblin Sneak to the staging area.
   04098:shadow:1: Shadow
@@ -184,14 +184,14 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 04099:A:1 (front): Lost: Each player must choose and discard 1 ally he controls from play, if able.
-  04099:forced:1: Forced on the event lost
+  04099:forced:1: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
     - for each player, first player first:
       - choose ally (you control)
       - discard the picked card
 
 04099:A:2 (shadow): Shadow: Trigger all "Lost:" effects in play.
   04099:shadow:1: Shadow
-    - [json TriggerLost {"verb":"TriggerLost","mode":"all"}]
+    - trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 ## 04100 Rock Adder
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -209,4 +209,4 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
     - if the attack has no defender: choose character (you control)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
-(rendered pieces: 82 by template, 24 as JSON)
+(rendered pieces: 112 by template, 0 as JSON)

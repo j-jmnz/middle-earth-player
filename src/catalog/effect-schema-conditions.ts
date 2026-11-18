@@ -60,6 +60,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("hasPass"), card: z.enum(["other", "picked", "subject"]) }),
   // Some living player controls no unexhausted character, hero or ally ("if any player controls no unexhausted characters", 04093:A:1; any player, not every player).
   z.strictObject({ kind: z.literal("playerWithoutReady") }),
+  // A Draw the running effect ran drew at least 1 card ("draws 1 card. Then, ... discard 4 cards", 04097:A:1: what follows "then" resolves only when the draw did, rr.then).
+  z.strictObject({ kind: z.literal("drew") }),
+  // The source is an enemy engaged with the last player, the first player in a one-player game (dwd.last-player): "it engages the last player and attacks him" only when the engagement was made (901603:A:2).
+  z.strictObject({ kind: z.literal("engagedWithLastPlayer") }),
   z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),
   // The source card is attached to a card the actor controls ("After you fail a Fortitude test, exhaust attached hero", 146057:A:1): an encounter card attached to a hero is controlled by nobody, so the Forced effect's actor, the player the event happened to, is compared with the host's controller.
   z.strictObject({ kind: z.literal("hostControlledByActor") }),
@@ -143,7 +147,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // with no Stormcaller's area. Read by the stormcaller family (src/rules/families/stormcaller/values.ts).
   z.strictObject({ kind: z.literal("stormcaller"), is: z.enum(["sameStage", "ahead"]) }),
   // No player holds more than `max` cards in hand ("If no cards were discarded by this effect": no player holds more than 3 cards, 12080:A:1).
-  z.strictObject({ kind: z.literal("handSize"), max: z.number().int().min(0) }),
+  z.strictObject({ kind: z.literal("handSize"), max: z.number().int().min(0), actor: z.boolean().optional() }),
+  // `actor`: only the acting player's hand is read, the defending player's in a Shadow effect ("if you have no cards in your hand", 901608:A:3), not every player's.
   // The Island Map (src/rules/families/island/pick.ts): at most `flippedAtMost` of its double-sided (Uncharted) locations are flipped over to the location side ("4 or fewer Uncharted locations are faceup", 11197:B:6, read as the flipped ones: a short route; user decision, 2026-11-01), and/or the last travel went to the right
   // ("When you travel to the right", 12077:A:1), and/or at least `revealed.min` copies of the card with this code are in the game and not secrets under a Temple location ("For each Recurring Nightmare that is not a secret", 11197:B:1).
   z.strictObject({ kind: z.literal("island"), flippedAtMost: z.number().int().min(0).optional(), movedRight: z.literal(true).optional(), revealed: z.strictObject({ code: z.string().min(1), min: z.number().int().positive() }).optional() }),

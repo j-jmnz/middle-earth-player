@@ -9,6 +9,7 @@ import { holdCaptive } from "../../src/rules/families/captives/index.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
+import { markProgressHeld } from "../../src/rules/families/long-dark/hold.ts";
 import { markCapture } from "../../src/rules/families/captured/entry.ts";
 import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
 import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
@@ -192,6 +193,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
   state = markSideQuests(state, cards);
   state = markProgressNoted(state, ctx);
+  // A game that deals Twisting Passage holds the progress placed on it for its test, as the start notes it (families/long-dark/hold.ts markProgressHeld).
+  state = markProgressHeld(state, ctx);
   // The cards with Capture X, and the cards in every area, as Escape from Mount Gram's start notes them (families/captured/entry.ts markCapture).
   state = markCapture(state, ctx);
   // The enemies whose own Forced effect hears the damage dealt to them (families/encounter/patrol.ts markEnemyDamage).
