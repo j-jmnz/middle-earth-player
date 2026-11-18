@@ -43,7 +43,7 @@ export type DownsGolden = { name: string; seatCount: 1 | 2; seed: number; diffic
 // two-handed win through two splits (a location revealed at stage 4B raises the threat); the losses: every player's threat at 50 in stage 2, a solo player destroyed at stage 4B with stage 3B parked, and two players destroyed one after the
 // other while apart (the player left at stage 3B raises his threat by 10). No card of the scenario ends the game itself and it has no Nightmare deck.
 export const DOWNS_GOLDENS: readonly DownsGolden[] = [
-  { name: "solo win through a split", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", returns: 1 },
+  { name: "solo win through a split", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won", returns: 1 },
   { name: "two-handed win through two splits", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", returns: 2 },
   { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain", returns: 0 },
   { name: "solo loss: destroyed at stage 4B with stage 3B parked", seatCount: 1, seed: 4, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain", returns: 0, parked: true },

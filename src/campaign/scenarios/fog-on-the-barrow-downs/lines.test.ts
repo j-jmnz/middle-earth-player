@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.travel, rr.immune, rr.engaged, rr.card-effects, rr.lasting-effects, rr.shuffling (data/rules/entries.json); ledger lines 148001:A:1, 148002:B:1, 148007:A:1, 148010:A:1, 148011:A:1, 148012:A:1, 148013:A:1, 148014:A:1, 148017:A:2.
+// Rules: rr.forced, rr.travel, rr.immune, rr.engaged, rr.effects, rr.lasting-effects (data/rules/entries.json); ledger lines 148001:A:1, 148002:B:1, 148007:A:1, 148010:A:1, 148011:A:1, 148012:A:1, 148013:A:1, 148014:A:1, 148017:A:2.
 // The lines of Fog on the Barrow-downs a spec row cannot express: the Setup shuffle, the refresh phase's own end, what a seat's flags bar, and the keywords of Great Barrow. Each test starts its title with its line id.
 import { describe, expect, it } from "vitest";
 

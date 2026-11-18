@@ -260,6 +260,8 @@ export type PutOnStageOptions = { readonly counted: boolean; readonly reduced?: 
 // `reduced`: Orc Grunts reduce it, as progress placed on the current quest (false for progress placed on the main quest card while a side quest is the current quest).
 export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, options: PutOnStageOptions): ScenarioState {
   const { counted, reduced = true } = options;
+  // "Progress cannot be placed here" (148003:B:1, while a Great Barrow is in play): the stage takes none, whatever places it.
+  if (flagged(from, stageId, "noProgressPlaced")) return from;
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
   const { state, remaining: absorbed } = absorbProgress(from, wanted, cards, steps);
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
