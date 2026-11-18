@@ -40,6 +40,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
+- `stone-won` is not committed: no seed in 100 wins Foundations of Stone with the saved decklists. Until it exists `.maestro/scenarios/foundations-of-stone/foundations-of-stone.yaml` cannot run.
 - `rivendell-won` is not committed: no seed in 500 wins Road to Rivendell with the saved decklists. Until it exists `.maestro/scenarios/road-to-rivendell/road-to-rivendell.yaml` cannot run.
 - `gate-won` is not committed: no seed in 500 wins The Redhorn Gate with the saved decklists. Until it exists `.maestro/scenarios/the-redhorn-gate/the-redhorn-gate.yaml` cannot run.
 - `frommoria-won` is not committed: no seed in 400 wins Flight from Moria with the saved decklists (heroes destroyed by round 3). Until it exists `.maestro/scenarios/flight-from-moria/flight-from-moria.yaml` cannot run.
@@ -298,6 +299,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
 - With two Blinding Blizzards (901307) the first in staging takes the progress, with no first-player choice between them; Blinding Blizzard's progress readout ("3 / 5") does not warm near 5 (agent recommendation, `docs/brief.md`, The Redhorn Gate).
 - Hand-discard entries in an asks file (04090, 04097, Goblin Warlord) never reach the sheet: the engine expands a hand discard into synthetic Picks `src/play/words/asks.ts` cannot map back to the record, so the sheet shows the generic words.
+- Foundations of Stone: the Giant Cave Centipede's area pick with 3 or more separate areas is written but untested (the scene kit builds 1 or 2 seats).
 - Foundations of Stone readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Foundations of Stone). Not user-confirmed.
 - The Long Dark readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Long Dark). Not user-confirmed.
 - The Watcher in the Water readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Watcher in the Water). Not user-confirmed.
