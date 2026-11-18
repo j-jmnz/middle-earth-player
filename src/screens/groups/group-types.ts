@@ -1,4 +1,4 @@
-// The shapes the Cards tab's Scenario and Campaign views and the card-group route share (docs/design-system.md, Card groups): one card as a
+// The shapes the Cards tab's Encounter cards view and the card-group route share (docs/design-system.md, Card groups): one card as a
 // grid cell shows it, and the cards of a group sorted under their type's heading. Pure.
 
 /** The catalog columns the group rows read (groups/cache.ts): the non-player kinds and the Messenger of the King heroes. */
@@ -40,6 +40,22 @@ export type TypeGroup = { id: string; title: string; cards: readonly GroupCard[]
 
 /** What a scenario file says of a card: the copies it deals in Normal and in Easy Mode, summed over its placements. */
 export type EasyCopies = { normal: number; easy: number };
+
+/** The copies a scenario file deals of each card in Normal and in Easy Mode, its placements summed; `skip` leaves codes out (the stages). */
+export function placementCopies(cards: readonly { code: string; normal: number; easy: number }[], skip: ReadonlySet<string> = new Set()): Map<string, EasyCopies> {
+  const counts = new Map<string, EasyCopies>();
+  for (const card of cards) {
+    if (skip.has(card.code)) continue;
+    const found = counts.get(card.code) ?? { normal: 0, easy: 0 };
+    counts.set(card.code, { normal: found.normal + card.normal, easy: found.easy + card.easy });
+  }
+  return counts;
+}
+
+/** The booklet's Normal count of a scenario's encounter sets: the number the briefing and the campaign's lists say. */
+export function setsCount(sets: readonly { count: number }[]): number {
+  return sets.reduce((sum, set) => sum + set.count, 0);
+}
 
 /** What decorates a card: its note, and the scenario files' Easy counts by code. The catalog's own `EasyModeQuantity` is not used: it reads 0 for a card Easy keeps whole. */
 export type Decorate = { note?: (row: GroupRow) => string | undefined; easy?: ReadonlyMap<string, EasyCopies> };

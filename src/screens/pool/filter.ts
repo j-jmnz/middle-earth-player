@@ -42,6 +42,14 @@ export type PoolFilter = {
   owned: boolean;
 };
 
+/** The Messenger of the King heroes' type chip: not a printed type, so its code cannot meet one. Shown while browsing only. */
+export const MOTK_TYPE = "motk-heroes";
+
+/** The heroes are filtered as the pool is, but the chip is their type, and nothing about them is owned or not applied: they are never played. */
+export function motkFilter(filter: PoolFilter): PoolFilter {
+  return { ...filter, typeCode: null, activeText: false, owned: false };
+}
+
 export const emptyPoolFilter: PoolFilter = {
   sphere: null,
   typeCode: null,

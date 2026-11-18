@@ -1,5 +1,5 @@
 // A card group on screen (docs/design-system.md, Card groups): the spoiler ask in place on first open, then the cards under their type's heading as
-// a grid, ten points between cards each way (a sideways quest or setup card has a wider cell, in fewer columns). The card-group route and the Cards tab's detail pane on a tablet both draw it; the ask is remembered while the app is open (reveal.ts).
+// a grid, ten points between cards each way (a sideways quest or setup card has a wider cell, in fewer columns). The card-group route and the Cards tab's detail pane on a tablet both draw it; one answer to the ask covers every group while the app is open (reveal.ts).
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -16,7 +16,7 @@ import { groupDataOf } from "./cache";
 import { cardGroupOf, type CardGroup, type GroupKind } from "./card-group";
 import { GroupCell } from "./group-cell";
 import type { GroupCard } from "./group-types";
-import { groupKey, reveal, useRevealed } from "./reveal";
+import { revealSpoilers, SPOILER_TEXT, useSpoilersRevealed } from "./reveal";
 
 type Item = { kind: "head"; id: string; title: string } | { kind: "cards"; id: string; cards: readonly GroupCard[]; columns: number };
 
@@ -109,8 +109,7 @@ export function useCardGroup(kind: GroupKind | null, id: string | null): CardGro
 
 /** The group: the ask, then the grid; "That group is not in the catalog." for none. `onDecline` is Not now. */
 export function CardGroupBody({ group, onDecline, onPreview }: { group: CardGroup | null; onDecline: () => void; onPreview: ReturnType<typeof useListPreview>["open"] }) {
-  const key = group ? groupKey(group.kind, group.id) : "";
-  const shown = useRevealed(key);
+  const shown = useSpoilersRevealed();
   if (!group) {
     return (
       <BodyText testID="group-missing" tone="muted" className="mt-6">
@@ -124,9 +123,9 @@ export function CardGroupBody({ group, onDecline, onPreview }: { group: CardGrou
         <SpoilerAsk
           testID="group-spoiler"
           className="mt-6"
-          text={group.kind === "campaign" ? "These cards show what the campaign holds. Show them anyway?" : "These cards show what the scenario holds. Show them anyway?"}
+          text={SPOILER_TEXT}
           showLabel="Show them"
-          onShow={() => reveal(key)}
+          onShow={revealSpoilers}
           onCancel={onDecline}
         />
       ) : (

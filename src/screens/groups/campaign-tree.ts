@@ -1,4 +1,4 @@
-// The Cards tab's Campaign view as data: each campaign and cycle of data/campaigns/index.json in its `position` order, with the sections its
+// The campaigns' sections of the Cards tab's Encounter cards view as data: each campaign and cycle of data/campaigns/index.json in its `position` order, with the sections its
 // cards fall in: the campaign cards, Boons, Burdens and Treasures, and the cards a campaign holds that fit none ("Other cards": The One Ring
 // of a saga box, Hard Mode, the side quests a campaign card adds). A campaign card is tied to its campaign by the pack it is printed in
 // (`campaignId`); the Hobbit treasures, in packs no campaign owns, are filed under the collection's saga entry that holds their pack, a section for
@@ -20,10 +20,19 @@ export type CampaignSection = {
 };
 
 // A "box" is a collection entry no campaign or cycle of the index names (the print-on-demand packs): its campaign cards, boons and treasures stand alone.
-export type CampaignNode = { id: string; name: string; kind: "campaign" | "cycle" | "box"; sections: readonly CampaignSection[] };
+export type CampaignNode = {
+  id: string;
+  name: string;
+  kind: "campaign" | "cycle" | "box";
+  sections: readonly CampaignSection[];
+  /** The packs its cards are printed in, with how many of its cards each holds: what files the campaign under a product of the collection. */
+  packs: ReadonlyMap<string, number>;
+};
 
 export type CampaignTree = {
   campaigns: readonly CampaignNode[];
+  /** A campaign by its id. */
+  byId: ReadonlyMap<string, CampaignNode>;
   byKey: ReadonlyMap<string, { campaign: CampaignNode; section: CampaignSection }>;
 };
 
@@ -31,7 +40,7 @@ type CampaignLike = { id: string; name: string; kind: "campaign" | "cycle" | "bo
 type CollectionLike = { id: string; title: string; packs: readonly string[] };
 type PackLike = { code: string; name: string };
 
-/** Whether a row belongs to the Campaign view: a campaign, boon, burden or treasure card, or any other card of a campaign that no Scenario set holds. */
+/** Whether a row belongs to a campaign section: a campaign, boon, burden or treasure card, or any other card of a campaign that no set holds. */
 export function isCampaignRow(row: GroupRow): boolean {
   return row.packCode !== MOTK_PACK && !isScenarioRow(row);
 }
@@ -91,9 +100,11 @@ export function campaignTree(rows: readonly GroupRow[], campaigns: readonly Camp
         });
       }
     }
-    if (sections.length > 0) nodes.push({ id: campaign.id, name: campaign.name, kind: campaign.kind, sections });
+    const held = new Map<string, number>();
+    for (const row of members) held.set(row.packCode, (held.get(row.packCode) ?? 0) + 1);
+    if (sections.length > 0) nodes.push({ id: campaign.id, name: campaign.name, kind: campaign.kind, sections, packs: held });
   }
   const byKey = new Map<string, { campaign: CampaignNode; section: CampaignSection }>();
   for (const campaign of nodes) for (const section of campaign.sections) byKey.set(section.key, { campaign, section });
-  return { campaigns: nodes, byKey };
+  return { campaigns: nodes, byId: new Map(nodes.map((node) => [node.id, node])), byKey };
 }

@@ -22,7 +22,7 @@ describe("scenarioTree", () => {
     row({ code: "20", name: "Bat", typeCode: "enemy", packCode: "P1", encounterSet: "Cave Dwellers", quantity: 1 }),
     row({ code: "30", name: "Rat", typeCode: "enemy", packCode: "P2", encounterSet: "Wilderlands", quantity: 2 }),
     row({ code: "40", name: "Gollum", typeCode: "enemy", packCode: "P1", packCodes: ["P1", "P2"], encounterSet: "Shared" }),
-    // Not the Scenario view's: a burden, a campaign card, a boon, a player card.
+    // Not a set's: a burden, a campaign card, a boon, a player card.
     row({ code: "50", name: "Debt", typeCode: "treachery", packCode: "P1", encounterSet: "Wilderlands", campaignKind: "burden" }),
     row({ code: "51", name: "Setup", typeCode: "campaign", packCode: "P1" }),
     row({ code: "52", name: "Ally", typeCode: "ally", packCode: "P1", campaignKind: "boon" }),
@@ -64,7 +64,7 @@ describe("scenarioTree", () => {
     expect(deck.count).toBe(2);
   });
 
-  it("leaves out what the Campaign view holds", () => {
+  it("leaves out what the campaign sections hold", () => {
     expect(rows.filter(isScenarioRow).map((one) => one.code)).not.toContain("50");
     expect(rows.filter(isScenarioRow).map((one) => one.code)).not.toContain("51");
     expect(rows.filter(isScenarioRow).map((one) => one.code)).not.toContain("52");

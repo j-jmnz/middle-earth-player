@@ -14,9 +14,8 @@ import { cards, packs } from "../../catalog/schema";
 import { DIFFICULTIES, type Difficulty } from "../../catalog/scenario-data";
 import { GroundedScene } from "../art/art";
 import { dealSentence, problemWords } from "./words";
-import { CampaignCards } from "./campaign-cards";
+import { CampaignSetupCards, type CampaignSetupCardsProps } from "./campaign-cards";
 import { ScenarioCards } from "./scenario-cards";
-import type { CampaignCardEntry } from "./scenario-sides";
 import { groupDataOf } from "../groups/cache";
 import { cardsWord } from "../groups/card-group";
 import { setKeyFor } from "../groups/scenario-sets";
@@ -138,7 +137,7 @@ export function BriefingScreen({
   barTestID = "briefing-deal-bar",
   campaignCard,
   stages,
-  campaignCards,
+  campaignSetup,
 }: {
   testID: string;
   scenarioId: string | null;
@@ -158,8 +157,8 @@ export function BriefingScreen({
   // The scenario's campaign card and quest cards: rows at the head of the aside open them large (ScenarioCards).
   campaignCard?: string;
   stages?: readonly string[];
-  // The campaign's cards in book order (the campaign setup): the first opens at once, the rest behind the spoiler ask (CampaignCards).
-  campaignCards?: readonly CampaignCardEntry[];
+  // The campaign setup's cards: its first scenario's, the later scenarios' and the campaign's own (CampaignSetupCards).
+  campaignSetup?: CampaignSetupCardsProps;
 }) {
   const insets = useSafeAreaInsets();
   const top = useTopInset();
@@ -167,7 +166,7 @@ export function BriefingScreen({
   const reference = (
     <>
       {campaignCard || stages ? <ScenarioCards stages={stages ?? []} onOpen={preview.openSides} {...(campaignCard ? { campaignCard } : {})} /> : null}
-      {campaignCards && campaignCards.length > 0 ? <CampaignCards entries={campaignCards} onOpen={preview.openSides} /> : null}
+      {campaignSetup ? <CampaignSetupCards campaign={campaignSetup} onOpen={preview.openSides} /> : null}
       {aside}
     </>
   );
@@ -214,7 +213,7 @@ export function BriefingScreen({
             <>
               <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingBottom: 24 * s }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEventThrottle={64} onScroll={onScroll}>
                 {scene}
-                {aside || campaignCard || stages ? <View style={{ paddingLeft: side.paddingLeft, paddingRight: 24 * s }}>{reference}</View> : null}
+                {aside || campaignCard || stages || campaignSetup ? <View style={{ paddingLeft: side.paddingLeft, paddingRight: 24 * s }}>{reference}</View> : null}
               </ScrollView>
               <FloatingBarShade shown={past} top={top} />
               {navBar}
@@ -382,7 +381,7 @@ export function ModePicker({ mode, onMode, testIDPrefix, campaignName, setup }: 
 }
 
 /**
- * The encounter: each set the scenario deals with its card count at the difficulty, as a row that opens the set on the card-group route (which asks its
+ * Encounter cards: each set the scenario deals with its card count at the difficulty, as a row that opens the set on the card-group route (which asks its
  * own spoiler question), and the scenario's special rules as tags (words to read, not controls). `codes` are the cards the scenario deals, which pick the
  * set of a name several packs hold (groups/scenario-sets.ts). The tree that names each row's set is read after the first paint; a set no pack lists gets no row.
  */
@@ -403,7 +402,7 @@ export function EncounterDetails({ facts, codes }: { facts: ScenarioFacts; codes
   };
   return (
     <>
-      <Section title="The encounter" className="mt-5" />
+      <Section title="Encounter cards" className="mt-5" />
       <View testID="briefing-sets">
         {facts.sets.map((set) =>
           current?.get(set.name) === null ? null : <ListRow key={set.name} testID={`briefing-set-${set.name}`} label={set.name} detail={cardsWord(set.count)} onPress={() => openSet(set.name)} />,

@@ -202,10 +202,12 @@ export default function CampaignPath() {
   const wilderland = keepsWilderlandLog(campaign) ? wilderlandView(save.log, save.seatCount) : null;
   const wilderlandPool = wilderland ? <PoolEncounterLine view={wilderland} name={name} onCard={preview.openCode} /> : null;
   const wilderlandLine = wilderland ? <WilderlandLine view={wilderland} name={name} onCard={preview.openCode} /> : null;
-  // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29).
+  // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29), and under it the campaign's cards:
+  // every scenario's cards and the campaign's sections, behind the one spoiler answer (user decision, 2026-11-18).
   const logButton = (
     <View className="-ml-3 mt-1 items-start">
       <TextButton label="Campaign log" icon="contract" testID="log-open" tone="accent" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
+      <TextButton label="Campaign cards" testID="path-cards-open" tone="accent" onPress={() => router.push({ pathname: "/campaign-cards/[campaignId]", params: { campaignId: save.campaignId } })} />
     </View>
   );
   const pickedNode = picked ? (nodes.find((node) => node.id === picked && node.status === "completed") ?? null) : null;

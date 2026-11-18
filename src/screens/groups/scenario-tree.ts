@@ -1,4 +1,4 @@
-// The Cards tab's Scenario view as data: the products of data/collection.json in its order (Core Set, the cycles with their packs, the saga
+// The encounter sets of the Cards tab's Encounter cards view as data: the products of data/collection.json in its order (Core Set, the cycles with their packs, the saga
 // boxes), each pack's encounter sets, and each set's cards under their type's heading. A set carries its scenario's quest cards, which print
 // the set's name, and a Nightmare deck is its own product at the end (the decks are sold apart from the boxes), one set to a deck with its setup
 // card. A pack with no encounter card is left out, and so is a product with no pack left. Pure; groups/cache.ts reads the rows once per catalog.
@@ -28,7 +28,7 @@ export type ScenarioTree = {
 type CollectionLike = { id: string; title: string; packs: readonly string[] };
 type PackLike = { code: string; name: string };
 
-/** Whether a row belongs to the Scenario view: an encounter card (a burden is the Campaign view's) or a Nightmare deck's card. */
+/** Whether a row belongs to a set: an encounter card (a burden is a campaign section's) or a Nightmare deck's card. */
 export function isScenarioRow(row: GroupRow): boolean {
   if (row.campaignKind != null || row.typeCode === "treasure" || row.typeCode === "campaign") return false;
   return row.packCode === NIGHTMARE_PACK || row.encounterSet != null;
