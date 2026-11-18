@@ -8,7 +8,6 @@ import { printedOf } from "../../core/printed.ts";
 import { inPlay, type ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { healDamage } from "../dreamchaser/heal-cap.ts";
-import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 
 export function regenerateEnemies(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
@@ -20,7 +19,7 @@ export function regenerateEnemies(state: ScenarioState, ctx: ReduceContext, step
     const healed = healDamage(next, card.id, amount, ctx);
     if (healed.healed <= 0) continue;
     next = healed.state;
-    steps.push({ kind: "damage", targetId: card.id, amount: -healed.healed, cause: currentCause(steps, UNATTRIBUTED) });
+    steps.push({ kind: "damage", targetId: card.id, amount: -healed.healed, cause: { rule: "dwd.regenerate" } });
   }
   return next;
 }

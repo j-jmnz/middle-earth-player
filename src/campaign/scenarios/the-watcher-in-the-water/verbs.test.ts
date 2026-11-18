@@ -291,11 +291,18 @@ describe("901501:A:2 to A:4 the Nightmare setup card", () => {
     expect(flagged(without.state, idOf(without.state, "901502"), "cannotBeEngaged")).toBe(false);
   });
 
-  it("901501:A:4 the stage cannot be defeated until Doors of Durin and The Watcher are both in the victory display", () => {
+  it("901501:A:4 the players cannot win until Doors of Durin and The Watcher (901502 on Nightmare, 04072 standing for it) are both in the victory display", () => {
     const none = table({ nightmare: "901501", stage: "04064", progress: 5, victory: ["04065"] });
     expect(restricted(none.state, none.ctx, "advance")).toHaveLength(1);
+    const watcherOnly = table({ nightmare: "901501", stage: "04064", progress: 5, victory: ["901502"] });
+    expect(restricted(watcherOnly.state, watcherOnly.ctx, "advance")).toHaveLength(1);
     const both = table({ nightmare: "901501", stage: "04064", progress: 5, victory: ["04065", "901502"] });
     expect(restricted(both.state, both.ctx, "advance")).toHaveLength(0);
+  });
+
+  it("901501:A:4 holds only the last stage: To the West-door is defeated as usual with neither card in the victory display", () => {
+    const first = table({ nightmare: "901501", stage: "04063", progress: 13 });
+    expect(restricted(first.state, first.ctx, "advance")).toHaveLength(0);
   });
 });
 

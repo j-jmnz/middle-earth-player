@@ -8,6 +8,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 const DOORS = "04065";
 const WATCHER = "04072";
 const WATCHER_NIGHTMARE = "901502";
+const LAST_STAGE = "04064";
 const THE_WATCHER: PickSpec = { type: "enemy", control: "any", staging: true, names: ["The Watcher"] };
 const ATTACHED = { kind: "sourceIn", zone: "attached" } as const;
 const HOST_IS = (type: "character" | "hero") => ({ kind: "matches", card: "host", pick: { type, control: "any" } }) as const;
@@ -34,13 +35,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       subject: { type: "enemy", control: "any", trait: "Tentacle" },
       instructions: [{ verb: "Pick", pick: THE_WATCHER, when: { kind: "canPick", pick: THE_WATCHER } }, { verb: "DamageCard", amount: 1, target: "picked", when: { kind: "canPick", pick: THE_WATCHER } }],
     },
-    // A:4: the stage cannot be defeated, so the game cannot be won, until both Doors of Durin and The Watcher (the Nightmare one when it replaced it) are in the victory display.
+    // A:4: the players cannot win the game unless both Doors of Durin and The Watcher (04072, or 901502 when the Nightmare card took its place: twinCode, families/nightmare/guards.ts) are in the victory display. Defeating the last stage wins (rr.winning-the-game), so
+    // the bar holds only that stage (04064, as Flight to the Ford's 906301:A:2 holds 141029): To the West-door is defeated as usual.
     {
       id: "901501:constant:2",
       cardCode: "901501",
       lines: ["901501:A:4"],
       timing: "constant",
-      condition: { kind: "any", conditions: [{ kind: "inVictory", code: DOORS, is: false }, { kind: "inVictory", code: WATCHER, is: false }] },
+      condition: { kind: "all", conditions: [{ kind: "inPlay", code: LAST_STAGE, is: true }, { kind: "any", conditions: [{ kind: "inVictory", code: DOORS, is: false }, { kind: "inVictory", code: WATCHER, is: false }] }] },
       instructions: [{ verb: "Restrict", what: "advance" }],
     },
 
