@@ -71,7 +71,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~216.4K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~216.5K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
@@ -144,7 +144,7 @@ Read the sections your task touches.
     - 1940–1943 Window stack (~100)
     - 1944–1947 Coverage test (~270)
   - 1948–1970 Data sources (~700) ← 2
-  - 1971–1989 Card images (~1.3K) ← 9
+  - 1971–1989 Card images (~1.4K) ← 9
   - 1990–2017 Persistence and shipping (~3.2K) ← 10
   - 2018–2059 Screens (~5.1K) ← 2
     - 2044–2059 Table screen (~1.8K) ← 3

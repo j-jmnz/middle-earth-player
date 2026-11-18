@@ -131,6 +131,10 @@ export function backPictureOf(card: Card, backs: ReadonlyMap<string, string>): s
   // A campaign card's Hall of Beorn front is its `<title>-SetupA.jpg`; its back is the `SetupB` picture beside it (a full-colour scan with the Resolution text, checked
   // online for the Angmar Awakened Campaign Expansion's nine campaign cards; no source lists the URL).
   const setup = card.type === "campaign" ? urls.find((url) => url.includes("hallofbeorn") && url.endsWith("-SetupA.jpg")) : undefined;
+  // A two-sided contract's Hall of Beorn front is its `<title>-SideA.jpg`; its back is the `SideB` picture beside it (checked online for the six
+  // two-sided contracts, 2026-11-18; no source lists the URL).
+  const contract = card.type === "contract" && card.back ? urls.find((url) => url.includes("hallofbeorn") && url.endsWith("-SideA.jpg")) : undefined;
+  if (contract) return contract.replace(/-SideA\.jpg$/, "-SideB.jpg");
   return urls.find((url) => url.includes("hallofbeorn") && /-\d+B\.jpg$/.test(url)) ?? urls.find((url) => url.includes("dragncards") && url.endsWith(".B.jpg")) ?? (setup ? setup.replace(/-SetupA\.jpg$/, "-SetupB.jpg") : null);
 }
 

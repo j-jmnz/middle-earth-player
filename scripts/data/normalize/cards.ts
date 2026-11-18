@@ -181,6 +181,11 @@ function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts
   };
 }
 
+// A contract printed on two sides: Hall of Beorn lists side B's text but no picture for it, and files side A as `<title>-SideA.jpg`.
+function isTwoSidedContract(card: HobCard): boolean {
+  return card.CardType === "Contract" && Boolean(card.Back?.Text.some((line) => line.trim() !== "")) && (card.Front.ImagePath?.endsWith("-SideA.jpg") ?? false);
+}
+
 // DragnCards' scan is listed first, Hall of Beorn's after it: both are full card art, which RingsDB lacks for encounter cards.
 function printingOf(pack: string, card: HobCard, dragnImage: string | null): Printing {
   const imageUrls = [dragnImage, card.Front.ImagePath, card.Back?.ImagePath].filter((url): url is string => typeof url === "string" && url !== "");
@@ -305,6 +310,8 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
         number: card.position,
         ...(hob && pack.code === primary.pack.code && hob.OctgnGuid ? { octgnGuid: hob.OctgnGuid } : {}),
         ...(hob && pack.code === primary.pack.code ? { hobSlug: hob.Slug } : {}),
+        // A two-sided contract's Hall of Beorn front (`-SideA.jpg`): the catalog finds its side B picture beside it (catalog.ts, backPictureOf).
+        ...(hob && pack.code === primary.pack.code && isTwoSidedContract(hob) && hob.Front.ImagePath ? { imageUrls: [hob.Front.ImagePath] } : {}),
       })),
     });
   }
