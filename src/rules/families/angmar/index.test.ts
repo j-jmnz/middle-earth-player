@@ -5,8 +5,10 @@ import { describe, expect, it } from "vitest";
 import type { EngineStep } from "../../core/intents.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { modifiedStat } from "../../core/keywords.ts";
+import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
-import { spawn } from "../../core/zones.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
+import { giveControl } from "../play/control.ts";
 import { settle } from "../../engine/machine.ts";
 import { questCapTally } from "../caves/progress.ts";
 import { resolveAmount } from "../../interpret/amounts.ts";
@@ -16,7 +18,7 @@ import { syncConstants } from "../../interpret/constants.ts";
 import { placeQuestProgress } from "../../quest/quest.ts";
 import { probeTable } from "../../../../scripts/card-smoke/encounter.ts";
 import { encounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
-import { HERO, HERO2, idOf, resolveRecords, revealFromTop, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { HERO, HERO2, finish, idOf, legalIntents, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { announceHurt, noteHurt } from "./damage.ts";
 import { chooseCurrentQuest, setCurrentQuest } from "./quest.ts";
 import { removeTimeCounters, timeAtRefreshEnd, timeOf } from "./time.ts";
@@ -261,6 +263,45 @@ describe("a card held under a side quest", () => {
     const returned = resolveRecords(back, t.ctx, "09051", "forced", quest);
     expect(returned.state.seats[0]?.hand.map((id) => returned.state.cards[id]?.code).sort()).toEqual(["ally", "event"]);
     expect(returned.state.seats[1]?.hand.map((id) => returned.state.cards[id]?.code)).toEqual(["event"]);
+  });
+});
+
+describe("an encounter card that leaves a player's control is still the scenario's (rr.ownership-and-control)", () => {
+  it("09016:A:4 giving control of Iârion makes no player his owner, so he never leaves play into a player's pile", () => {
+    const t = built({ seats: 2, play: [IARION] });
+    const iarion = idOf(t.state, IARION);
+    const given = giveControl(t.state, iarion, 1, t.cards);
+    expect(given.cards[iarion]).toMatchObject({ controller: 1 });
+    expect(given.cards[iarion]?.owner).toBeUndefined();
+    const gone = moveCard(given, iarion, { zone: "encounterDiscard" });
+    expect(gone.seats[0]?.discard).not.toContain(iarion);
+    expect(gone.seats[1]?.discard).not.toContain(iarion);
+  });
+
+  it("09016:A:4 02029 Born Aloft puts Iârion in the encounter discard pile, not a hand, and the players lose the game", async () => {
+    const t = built({ play: [IARION], attached: [{ code: "02029", to: IARION }], phase: "Planning" });
+    for (const [code, card] of await loadPrinted(["02029"])) t.cards.set(code, card);
+    const iarion = idOf(t.state, IARION);
+    const action = legalIntents(t.state, t.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === idOf(t.state, "02029"));
+    if (action?.type !== "Trigger") throw new Error("Born Aloft's Action is not offered");
+    const run = finish(send({ state: t.state, steps: [] }, action, t.ctx), t.ctx);
+    expect(run.state.cards[iarion]).toMatchObject({ zone: "encounterDiscard", controller: null });
+    expect(run.state.seats[0]?.hand).not.toContain(iarion);
+    expect(run.state.lost).toBe(true);
+  });
+
+  it("09051:A:2 leaves the hands under Lost in the Wilderness in place when the side quest leaves play by any exit but its defeat", () => {
+    const t = built({ seats: 2, staging: ["09051"], hand: [{ code: "event", seat: 0 }, { code: "event", seat: 1 }] });
+    const quest = idOf(t.state, "09051");
+    const revealed = resolveRecords(t.state, t.ctx, "09051", "whenRevealed", quest).state;
+    // A revealed encounter card carries the seat that revealed it as controller.
+    const current = updateCard(setCurrentQuest(revealed, quest, t.ctx), quest, { controller: 0 });
+    const held = Object.values(current.cards).filter((card) => card.zone === "under" && card.host === quest).map((card) => card.id);
+    expect(held).toHaveLength(2);
+    const gone = moveCard(current, quest, { zone: "encounterDiscard" });
+    expect(held.map((id) => gone.cards[id]?.zone)).toEqual(["under", "under"]);
+    expect(gone.seats[0]?.discard).toEqual([]);
+    expect(gone.seats[1]?.discard).toEqual([]);
   });
 });
 

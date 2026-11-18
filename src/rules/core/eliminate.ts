@@ -20,6 +20,20 @@ export function markLoss(state: ScenarioState, reason: string): ScenarioState {
   return { ...state, lost: true, lossReason: reason };
 }
 
+// "If X leaves play, the players lose the game" (printed `leavesPlayLoses`, or the flag `lossOnLeavingPlay` a card gives its host) holds however X leaves play: destroyed, discarded, eliminated with its controller,
+// or returned to a hand or a deck. `before` and `after` are the state either side of one intent, the flag is read from `before` (its modifier ends with the card), and a won scenario loses nothing. A card removed from the game by a stage's own text is not
+// one that left play for a player's effect: stage 2A of Breaking of the Fellowship removes the Ring-bearer with The One Ring's text blank (families/breaking/index.ts removeRingBearer), so the removed zone never loses.
+export function loseWhenLeftPlay(before: ScenarioState, after: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
+  if (after.lost || after.stageCleared) return after;
+  for (const was of Object.values(before.cards)) {
+    const now = after.cards[was.id];
+    if (!inPlay(was.zone) || now === was || (now && (inPlay(now.zone) || now.zone === "removed"))) continue;
+    const printed = printedOf(cards, was.code);
+    if (printed.leavesPlayLoses || flagged(before, was.id, "lossOnLeavingPlay")) return markLoss(after, `${printed.name} left play`);
+  }
+  return after;
+}
+
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
 // owners' discard piles, and the enemies engaged with it return to the staging area with their damage. An attack on
 // that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,

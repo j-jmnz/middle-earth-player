@@ -123,6 +123,7 @@ No phase is open.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
 ### Rules and engine (Angmar Awakened)
+- Objective allies (Wilyador, Iârion, Amarthiúl, Captain Sahír, Na'asiyah): a player card that returns one to "its owner's hand" puts it in the encounter discard pile, and the players lose when it leaves play (agent recommendation; no ruling found, `docs/brief.md`, A Journey to Rhosgobel). Not user-confirmed.
 - Angmar Awakened data: Easy counts of Angmar Captain (09045, 1) and Angmar Marauder (09044, 2) in Escape from Mount Gram and Ruins of Arnor (09056, 2) in The Treachery of Rhudaur follow Hall of Beorn against DragnCards' E05 decks; no printed icon check. Not user-confirmed.
 - Angmar Awakened data: `MEC108_CHANGED` is empty because no scan shows the MEC108 printing of the 155 reprinted encounter cards; a rewording cannot be found until one is read. Not user-confirmed.
 - Angmar Awakened data: the Prison Cell, Savage Trollspawn and Amarthiúl (Wastes) piles follow each quest's Setup over DragnCards' load layout (agent recommendation). Not user-confirmed.

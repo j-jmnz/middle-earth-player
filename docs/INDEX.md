@@ -72,7 +72,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~217.2K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~217.6K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
@@ -130,25 +130,25 @@ Read the sections your task touches.
     - 1573–1610 The Tower of Cirith Ungol (~4.4K)
     - 1611–1647 The Black Gate Opens (~4.4K) ← 2
     - 1648–1676 Mount Doom (~4.3K)
-  - 1677–1815 Shadows of Mirkwood (~14.1K) ← 3
+  - 1677–1816 Shadows of Mirkwood (~14.5K) ← 3
     - 1685–1706 The Hunt for Gollum (~2.1K) ← 2
     - 1707–1726 Conflict at the Carrock (~2.4K) ← 2
-    - 1727–1752 A Journey to Rhosgobel (~2.9K) ← 1
-    - 1753–1770 The Hills of Emyn Muil (~1.5K) ← 1
-    - 1771–1791 The Dead Marshes (~2.1K) ← 2
-    - 1792–1815 Return to Mirkwood (~2.3K) ← 4
-  - 1816–1824 Nightmare (~410) ← 21
-  - 1825–1867 Deckbuilding (~2.5K) ← 1
-  - 1868–1947 Effects (~3.7K)
-    - 1870–1928 Three layers (~2.4K) ← 10
-    - 1929–1939 Player side quests, contracts and saga cards (~960)
-    - 1940–1943 Window stack (~100)
-    - 1944–1947 Coverage test (~270)
-  - 1948–1970 Data sources (~700) ← 2
-  - 1971–1989 Card images (~1.4K) ← 9
-  - 1990–2017 Persistence and shipping (~3.2K) ← 10
-  - 2018–2060 Screens (~5.9K) ← 2
-    - 2045–2060 Table screen (~1.8K) ← 3
+    - 1727–1753 A Journey to Rhosgobel (~3.2K) ← 2
+    - 1754–1771 The Hills of Emyn Muil (~1.5K) ← 1
+    - 1772–1792 The Dead Marshes (~2.1K) ← 2
+    - 1793–1816 Return to Mirkwood (~2.3K) ← 4
+  - 1817–1825 Nightmare (~410) ← 21
+  - 1826–1868 Deckbuilding (~2.5K) ← 1
+  - 1869–1948 Effects (~3.7K)
+    - 1871–1929 Three layers (~2.4K) ← 10
+    - 1930–1940 Player side quests, contracts and saga cards (~960)
+    - 1941–1944 Window stack (~100)
+    - 1945–1948 Coverage test (~270)
+  - 1949–1971 Data sources (~700) ← 2
+  - 1972–1990 Card images (~1.4K) ← 9
+  - 1991–2018 Persistence and shipping (~3.2K) ← 10
+  - 2019–2061 Screens (~5.9K) ← 2
+    - 2046–2061 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~60.4K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
@@ -272,10 +272,10 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~13.6K tok)
+- `docs/phases/STATUS.md` — Phase status (~13.7K tok)
   - 5–13 Rules (~340)
   - 14–20 Phases (~20)
-  - 21–296 Open items (~12.2K)
+  - 21–297 Open items (~12.3K)
     - 23–25 Reviews (~70)
     - 26–31 Cards tab views (~160)
     - 32–34 README (~90)
@@ -283,11 +283,11 @@ STATUS.md, then the active phase file.
     - 40–47 Desktop (~310)
     - 48–85 Fixtures (~1.3K)
     - 86–124 Rules and engine (~1.6K)
-    - 125–245 Rules and engine (Angmar Awakened) (~5.3K)
-    - 246–269 Screens and code (~1.5K)
-    - 270–289 Rules and engine (The Two Towers) (~1.4K)
-    - 290–296 Rules and engine (Shadows of Mirkwood) (~380)
-  - 297–322 Standing decisions (~940)
+    - 125–246 Rules and engine (Angmar Awakened) (~5.4K)
+    - 247–270 Screens and code (~1.5K)
+    - 271–290 Rules and engine (The Two Towers) (~1.4K)
+    - 291–297 Rules and engine (Shadows of Mirkwood) (~380)
+  - 298–323 Standing decisions (~940)
 
 ## Live plans
 

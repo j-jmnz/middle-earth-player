@@ -337,6 +337,12 @@ export function fromEncounterDeck(printed: PrintedCard): boolean {
   return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure" || printed.type === "player-side-quest" || printed.type === "contract");
 }
 
+// A card the scenario owns (rr.ownership-and-control: "The scenario is considered to be the owner of the encounter deck and each encounter card"): an encounter card of an encounter set. An objective ally with no encounter set (Mendor, Gwaihir)
+// is a campaign card a player adds to their deck, so a player owns it.
+export function scenarioOwned(printed: PrintedCard): boolean {
+  return fromEncounterDeck(printed) && printed.encounterSet != null && printed.encounterSet !== "";
+}
+
 // A quest card (mec108.side-quests: "Side quests are a new type of quest card"): a quest stage, an encounter side quest or a player side quest.
 export function isQuestCardType(type: CardType): boolean {
   return type === "quest" || type === "encounter-side-quest" || type === "player-side-quest";

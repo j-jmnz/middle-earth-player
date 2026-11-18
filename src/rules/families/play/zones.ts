@@ -30,8 +30,8 @@ export function leaveWith(state: ScenarioState, card: CardInstance, released: re
     next = sendAway(next, id, owner != null ? { zone: "discard", seat: owner } : { zone: "encounterDiscard" });
     gone.push(id);
   }
-  // Facedown player cards under a player card (an encounter card under one, like Saruman's, has its own rule).
-  if (card.controller != null) {
+  // Facedown player cards under a player card (an encounter card under one, like Saruman's, has its own rule). A revealed encounter card (an encounter side quest in the staging area) carries the seat that revealed it as controller: it is no player's card, and its own effect decides what becomes of the cards under it (09051:A:2), so only a card in a player's own areas counts.
+  if (card.controller != null && (card.zone === "heroes" || card.zone === "play" || card.zone === "attached" || card.zone === "seatQuest")) {
     for (const id of cardsUnder(next, card.id)) {
       const owner = next.cards[id]?.owner;
       if (owner == null) continue;
