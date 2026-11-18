@@ -5395,9 +5395,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "124bcd502e9d212b8adcf047021f87fc4f2af1e3a2cdba59df8833821261d75c"
+        "value": "3c39f7ab795d9a2f8f988847789ff807e8f34bc6889935fa94ab50270bad34a4"
       },
-      "fetchedAt": "2026-11-18T08:16:16.894Z",
+      "fetchedAt": "2026-11-18T12:58:29.130Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -16722,6 +16722,156 @@
           "bytes": 4369955
         },
         {
+          "path": "pictures/148001.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-1-front-Quest-The_House_of_Tom_Bombadil-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "b2a64e1f8be79180bad482fce4c150c91ec754a20461acab1417df120205ae5c",
+          "bytes": 688628
+        },
+        {
+          "path": "pictures/148001.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-1-back-Quest-The_House_of_Tom_Bombadil-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "da9c42b82d34d642ae17860e6498ebe0e6ec902cd14780732b8f3524b3d6665f",
+          "bytes": 668089
+        },
+        {
+          "path": "pictures/148002.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-2-front-Quest-Across_the_Downs-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "3152b144f1ab275a0c8a7dfedd458114cbc00ef035e8df3a4c23ac7761da0a73",
+          "bytes": 714140
+        },
+        {
+          "path": "pictures/148002.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-2-back-Quest-Across_the_Downs-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "3e963ef9d575b9c1f5b48384fc0803a624feedac629082b3179a9acdc514e60b",
+          "bytes": 697929
+        },
+        {
+          "path": "pictures/148003.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-3-front-Quest-Lost_in_the_Fog-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "a6c80672b1947704cf258fe97558e598ef0ba5decec64db6e13f2506558deb52",
+          "bytes": 704248
+        },
+        {
+          "path": "pictures/148003.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-3-back-Quest-Lost_in_the_Fog-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "345a3f69f2edf46c523eb9bff545ecf35eeb68170d654587cced16ecbeae40fa",
+          "bytes": 697591
+        },
+        {
+          "path": "pictures/148004.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-4-front-Quest-Trapped_Inside_a_Barrow-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "d4bf2365dc58c8379df1e444a8f8893995172f8e5067f91cbf99ccef5a4efeac",
+          "bytes": 690307
+        },
+        {
+          "path": "pictures/148004.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-4-back-Quest-Trapped_Inside_a_Barrow-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "c27cf8a112ad5d453dbed0903bd6f3e82df23967116940d516bc54f7bf975447",
+          "bytes": 688032
+        },
+        {
+          "path": "pictures/148005.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-5-front-Location-Hollow_Circle-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "028310b474f70cd492ec6312759066dec14dcf8bdb778ef317b75268072d8299",
+          "bytes": 673651
+        },
+        {
+          "path": "pictures/148006.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-6-front-Location-Standing_Stones-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "8bba7b7566c93a58f27d11d37104f2a62e4165af79f21d0b5194e7d71d4e4448",
+          "bytes": 657821
+        },
+        {
+          "path": "pictures/148007.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-7-front-Location-Great_Barrow-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "c540298fa563357fb76e84334dc7ec0eb40b8dea894da8a97fa00544b12c7608",
+          "bytes": 638983
+        },
+        {
+          "path": "pictures/148008.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-8-front-Location-Ancient_Barrow-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "44f63b6e49c317a7aafeff3767800757a93ad25eca0a8c926a9721b94292c167",
+          "bytes": 652279
+        },
+        {
+          "path": "pictures/148009.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-9-front-Location-Stone_Ring-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "00827723699f7f4720b93002e1deaf6776467dc7e208578abd90e0dc992c39d0",
+          "bytes": 645342
+        },
+        {
+          "path": "pictures/148010.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-10-front-Location-North_Downs-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "ba997ad1d1d053d03d925f656f6a7ce821e504cc180fa25404ffc1deb3040e91",
+          "bytes": 661581
+        },
+        {
+          "path": "pictures/148011.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-11-front-Enemy-Barrow_wight-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "ae0735a58ac855b8f3ad66dd73d94cdd148924e4ae89653b053b3db886a050f6",
+          "bytes": 641111
+        },
+        {
+          "path": "pictures/148012.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-12-front-Enemy-Cold_wight-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "713fdebd2a36e014cee6fd2f7f306aec2639de50e6280a2d2c90ec5592983c2c",
+          "bytes": 620470
+        },
+        {
+          "path": "pictures/148013.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-13-front-Enemy-Dark_wight-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "ca1a457f762869ed1ca85ef354c5f33d90dd18fc031960149393a217fecfb657",
+          "bytes": 655730
+        },
+        {
+          "path": "pictures/148014.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-14-front-Treachery-Im_Waiting_for_You-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "4fab002dc02fa9177fdafd30cf11c12d2d5d86af3df3179b81722a255a98d64c",
+          "bytes": 631119
+        },
+        {
+          "path": "pictures/148015.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-15-front-Treachery-Long_Groping_Arm-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "64a82f88cf27ead2712398e020ae521c1d402e3f9f5f77ec31a3a2b82d54d39e",
+          "bytes": 648057
+        },
+        {
+          "path": "pictures/148016.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-16-front-Treachery-Chill_Fog-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "fb4317182bc37f696866e0865526cea48d939704e571b19e35906eca04a96a0a",
+          "bytes": 645277
+        },
+        {
+          "path": "pictures/148017.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-17-front-Treachery-Frozen_by_Fear-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "a6eceb3e8e17c4ff8fb5ac21abe1d25e0cab515d89601db49853819b71baeb92",
+          "bytes": 672190
+        },
+        {
+          "path": "pictures/148018.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-18-front-Treachery-Dreadful_Song-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "d4be8fc170f05d2783b2a4340fa40318d11131691dcfff05ceb481fe78f5808a",
+          "bytes": 677455
+        },
+        {
+          "path": "pictures/148019.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-19-front-ObjectiveAlly-Tom_Bombadil-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "108c544d19a0626f015ad276995fb4e120522d848d976680493d9497159414ac",
+          "bytes": 719427
+        },
+        {
+          "path": "pictures/148020.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-20-front-Campaign-Fog_on_the_Barrow_downs-The_Lord_of_the_Rings_Part_12-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "b254204a82c1c7b603d495755ad028d80d4aa7514005880f15be47088f6ff38c",
+          "bytes": 657219
+        },
+        {
+          "path": "pictures/148020.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC36-20-back-Campaign-Fog_on_the_Barrow_downs-The_Lord_of_the_Rings_Part_12-A-Fog_on_the_Barrow_downs.jpg",
+          "sha256": "81f5ad6f8f2b0a8591ac45e4edc56d3f7d157c784166130787b2c3bb02d8abf4",
+          "bytes": 620408
+        },
+        {
           "path": "pictures/148021.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1c-1uIqHu3NCk-D_6xqtdersUYt1RnHwD&export=download&confirm=t",
           "sha256": "f1dc2078e13f52c0772ca09177d3e914b8288314fd684f398bc23834b9ff76b1",
@@ -21430,9 +21580,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "77493242fb326dead080d933430d7a9e098f837ee6279401451b496f0313416c"
+        "value": "393ec0c64cbde95baacff0a255d6abf06f34f1f857c678c25b867edc3d9098c4"
       },
-      "fetchedAt": "2026-11-18T08:08:11.041Z",
+      "fetchedAt": "2026-11-18T12:41:05.408Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -30031,6 +30181,162 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Old-Bogey-stories.jpg",
           "sha256": "879aa0fe12648227205d419981bdc2ff6ada4b4972d6033a7a012a92d7aef069",
           "bytes": 145382
+        },
+        {
+          "path": "scans/148001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/The-House-of-Tom-Bombadil-1A.jpg",
+          "sha256": "49964c1334df092e4602194759ab501272121541c59f6dcb85cad9e18e6f843a",
+          "bytes": 165890
+        },
+        {
+          "path": "scans/148001.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/The-House-of-Tom-Bombadil-1B.jpg",
+          "sha256": "8402ae6c02a08a373d3eb041f689763362a13fd2aa8b791087eb44bb87c23d65",
+          "bytes": 170896
+        },
+        {
+          "path": "scans/148002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Across-the-Downs-2A.jpg",
+          "sha256": "a1b5052e13ae3bd41129ea7a2dc876c32b48cd06fa2885961eba7795621aded5",
+          "bytes": 161742
+        },
+        {
+          "path": "scans/148002.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Across-the-Downs-2B.jpg",
+          "sha256": "4d69d5076ddde78bfde901258aaeaa3d04938b1e7b31b3a1d189464f551c7a9d",
+          "bytes": 162301
+        },
+        {
+          "path": "scans/148003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Lost-in-the-Fog-3A.jpg",
+          "sha256": "b4ff7cc9d07f7fd0433e0f36a687501ffb80a03ca90ee2d1333376bcd618e3f3",
+          "bytes": 162407
+        },
+        {
+          "path": "scans/148003.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Lost-in-the-Fog-3B.jpg",
+          "sha256": "74772306136759471c16721b5937f04a5651ac30154b2a3154ffa6bc0a9e3e07",
+          "bytes": 164364
+        },
+        {
+          "path": "scans/148004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Trapped-Inside-a-Barrow-4A.jpg",
+          "sha256": "9de11c52d39a1d8a81d310c059013ae13da7c79052083c59f2a3ee871c6e4f36",
+          "bytes": 177358
+        },
+        {
+          "path": "scans/148004.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Trapped-Inside-a-Barrow-4B.jpg",
+          "sha256": "969c8e19dc8640e1e8e10bfab828ce4c18e65e96125454181b7305c26674310f",
+          "bytes": 178505
+        },
+        {
+          "path": "scans/148005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Hollow-Circle.jpg",
+          "sha256": "52e31c9b57bfaf0c4d3a072fdc659b0acbe4390da9eac15cbfd32260a966a058",
+          "bytes": 129682
+        },
+        {
+          "path": "scans/148006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Standing-Stones.jpg",
+          "sha256": "da8b5656633b103e51e0c47786188fefc5203df7afe0dad47994bbb72c72dc6c",
+          "bytes": 127675
+        },
+        {
+          "path": "scans/148007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Great-Barrow.jpg",
+          "sha256": "0334b237f414469e5204bf6176c1b8e0e135f6dc0388c094f4b8d9c42356d739",
+          "bytes": 131186
+        },
+        {
+          "path": "scans/148008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Ancient-Barrow.jpg",
+          "sha256": "843c3d2b682ff12df1cee41cc220701f5d1427fbe3e3713d586b397ec4a170f6",
+          "bytes": 132532
+        },
+        {
+          "path": "scans/148009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Stone-Ring.jpg",
+          "sha256": "027742da036a504361cd123a3014f012153efcaa375bddaacd17d87a841e6664",
+          "bytes": 131865
+        },
+        {
+          "path": "scans/148010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/North-Downs.jpg",
+          "sha256": "af9f0d7142f6fc7d9d36d519dabf15591e689707482f81c41d3e6e311f49553a",
+          "bytes": 127684
+        },
+        {
+          "path": "scans/148011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Barrow-wight.jpg",
+          "sha256": "e7a8b77aa8ad43cdf5c15373668d418f0934609c6de1ff477f702b53ba4a94fc",
+          "bytes": 133442
+        },
+        {
+          "path": "scans/148012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Cold-wight.jpg",
+          "sha256": "837c87744b7b6be65b4ac26521ad7e4ebb2a1151267fcae108a69a80bff67994",
+          "bytes": 125071
+        },
+        {
+          "path": "scans/148013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Dark-wight.jpg",
+          "sha256": "1f54cc7af91e786c4aada393680f1539eddff6e37924c9715f74a5f6b8cbc7c0",
+          "bytes": 137247
+        },
+        {
+          "path": "scans/148014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/I'm-Waiting-for-You.jpg",
+          "sha256": "2597ad2c653ce7fa1acf64c09d8615b1b749aa03e207c8a1b9161426f615ff21",
+          "bytes": 125187
+        },
+        {
+          "path": "scans/148015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Long-Groping-Arm.jpg",
+          "sha256": "860587b262ca953d446c1a22d760d46b7a8868f181ecc98bac34bba6ded2ad89",
+          "bytes": 132487
+        },
+        {
+          "path": "scans/148016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Chill-Fog.jpg",
+          "sha256": "0dce7126b61de964262ca6d125f8480dbbee109de06ab79f926aeb297b2352dc",
+          "bytes": 131329
+        },
+        {
+          "path": "scans/148017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Frozen-by-Fear.jpg",
+          "sha256": "02606f79eaab57a084e50d777413d31477ba465d84076d4279c0ed16781a8f4c",
+          "bytes": 128944
+        },
+        {
+          "path": "scans/148018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Dreadful-Song.jpg",
+          "sha256": "242cf3cf398b3f317ca813b5cc02f8a5c11d5c3076063c91462d60d42c01dc36",
+          "bytes": 149266
+        },
+        {
+          "path": "scans/148019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Tom-Bombadil.jpg",
+          "sha256": "bdeb940495dda818d72a577894c3fa13ef9a0fad738bf9110be7f2ce7be3851c",
+          "bytes": 148512
+        },
+        {
+          "path": "scans/148020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Fog-on-the-Barrow-downs-SetupA.jpg",
+          "sha256": "bc2f9beac8fa6656ef0a2677cead9839a75e0692ab8550fd9780525eccba0d46",
+          "bytes": 131812
+        },
+        {
+          "path": "scans/148020.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Fog-on-the-Barrow-downs-SetupB.jpg",
+          "sha256": "c0847ebc50f55a4d6b5de77f649643fc0a8994adf51d949d4812e93b8507ffb5",
+          "bytes": 104517
+        },
+        {
+          "path": "scans/148021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Ho-Tom-Bombadil.jpg",
+          "sha256": "a6c29b82e07af6e34edbf985ee5d5cd1dd4c1d9e28002147fb37bd0e0f2c8242",
+          "bytes": 133796
         },
         {
           "path": "scans/18016.A.jpg",

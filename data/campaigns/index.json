@@ -92,7 +92,7 @@
   {
     "id": "standalone-scenarios",
     "name": "Standalone scenarios",
-    "scenarioCount": 4,
+    "scenarioCount": 5,
     "playable": true,
     "kind": "cycle",
     "box": null,

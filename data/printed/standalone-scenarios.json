@@ -1894,6 +1894,466 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "148001",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/The-House-of-Tom-Bombadil-1A.jpg",
+        "sha256": "49964c1334df092e4602194759ab501272121541c59f6dcb85cad9e18e6f843a"
+      },
+      "lines": [
+        "Setup: Set each copy of Great Barrow, Standing Stones, and Hollow Circle aside, out of play. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148001",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/The-House-of-Tom-Bombadil-1B.jpg",
+        "sha256": "8402ae6c02a08a373d3eb041f689763362a13fd2aa8b791087eb44bb87c23d65"
+      },
+      "lines": [
+        "Skip the quest phase.",
+        "Forced: At the end of the round, place 1 progress on this stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148002",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Across-the-Downs-2A.jpg",
+        "sha256": "a1b5052e13ae3bd41129ea7a2dc876c32b48cd06fa2885961eba7795621aded5"
+      },
+      "lines": [
+        "When Revealed: Add Hollow Circle to the staging area. Each player reveals 1 encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148002",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Across-the-Downs-2B.jpg",
+        "sha256": "4d69d5076ddde78bfde901258aaeaa3d04938b1e7b31b3a1d189464f551c7a9d"
+      },
+      "lines": [
+        "Forced: At the end of the refresh phase, raise each player's threat by 1.",
+        "The players cannot defeat this stage unless Hollow Circle is in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148003",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Lost-in-the-Fog-3A.jpg",
+        "sha256": "b4ff7cc9d07f7fd0433e0f36a687501ffb80a03ca90ee2d1333376bcd618e3f3"
+      },
+      "lines": [
+        "When Revealed: The first player adds Standing Stones to the staging area. Each other player reveals 1 encounter card. Shuffle the encounter discard pile and each copy of Great Barrow into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148003",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Lost-in-the-Fog-3B.jpg",
+        "sha256": "74772306136759471c16721b5937f04a5651ac30154b2a3154ffa6bc0a9e3e07"
+      },
+      "lines": [
+        "Progress cannot be placed here while Great Barrow is in play.",
+        "Forced: After a player is eliminated (at any stage), raise the threat of each player at this stage by 10.",
+        "The players cannot defeat this stage unless each player in the game is at this stage and Standing Stones is in the victory display. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148004",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Trapped-Inside-a-Barrow-4A.jpg",
+        "sha256": "9de11c52d39a1d8a81d310c059013ae13da7c79052083c59f2a3ee871c6e4f36"
+      },
+      "lines": [
+        "When Revealed: End your quest phase (do not resolve the quest). Discard cards from the encounter deck until a Wight enemy is discarded. Add the discarded Wight enemy to the staging area. Discard all but X allies you control where X is the number of enemies engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148004",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Trapped-Inside-a-Barrow-4B.jpg",
+        "sha256": "969c8e19dc8640e1e8e10bfab828ce4c18e65e96125454181b7305c26674310f"
+      },
+      "lines": [
+        "Forced: When a location is revealed at this stage, cancel its effects and discard it. Then, raise your threat by that card's Threat (including modifiers).",
+        "Forced: After this stage is defeated, advance to stage 3B at the beginning of the travel phase (combining staging areas with stage 3B) and place 1 progress on a Great Barrow at that stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148005",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Hollow-Circle.jpg",
+        "sha256": "52e31c9b57bfaf0c4d3a072fdc659b0acbe4390da9eac15cbfd32260a966a058"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: Each player searches the encounter deck and discard pile for a Wight enemy and puts it into play engaged with him. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148006",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Standing-Stones.jpg",
+        "sha256": "da8b5656633b103e51e0c47786188fefc5203df7afe0dad47994bbb72c72dc6c"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: The first player searches the encounter deck, discard pile, and victory display for a Great Barrow and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148007",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Great-Barrow.jpg",
+        "sha256": "0334b237f414469e5204bf6176c1b8e0e135f6dc0388c094f4b8d9c42356d739"
+      },
+      "lines": [
+        "Peril. Immune to player card effects. The players cannot travel here.",
+        "Forced: After Great Barrow enters the staging area, remove each character you control from the quest and create your own staging area. Then advance to a separate stage 4A by yourself."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148008",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Ancient-Barrow.jpg",
+        "sha256": "843c3d2b682ff12df1cee41cc220701f5d1427fbe3e3713d586b397ec4a170f6"
+      },
+      "lines": [
+        "X is 1 plus the number of facedown cards under this location.",
+        "Forced: After Ancient Barrow enters play, each player places an ally he controls facedown under this location. When Ancient Barrow leaves play as an explored location, return each ally under this location to its owner's hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148009",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Stone-Ring.jpg",
+        "sha256": "027742da036a504361cd123a3014f012153efcaa375bddaacd17d87a841e6664"
+      },
+      "lines": [
+        "While Stone Ring is in the staging area, each Wight enemy engaged with a player gets +1 Attack and +1 Defense and applies the first sentence of its game text to each player at this stage as if it were engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148010",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/North-Downs.jpg",
+        "sha256": "af9f0d7142f6fc7d9d36d519dabf15591e689707482f81c41d3e6e311f49553a"
+      },
+      "lines": [
+        "While North Downs is in the staging area, characters use their Willpower instead of their Defense when defending against Wight enemies.",
+        "Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148011",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Barrow-wight.jpg",
+        "sha256": "e7a8b77aa8ad43cdf5c15373668d418f0934609c6de1ff477f702b53ba4a94fc"
+      },
+      "lines": [
+        "While Barrow-wight is engaged with a player, that player's threat cannot be reduced.",
+        "Forced: After Barrow-wight attacks and destroys a character, that character's controller raises his threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148012",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Cold-wight.jpg",
+        "sha256": "837c87744b7b6be65b4ac26521ad7e4ebb2a1151267fcae108a69a80bff67994"
+      },
+      "lines": [
+        "While Cold-wight is engaged with a player, that player cannot draw cards from card effects.",
+        "Forced: After Cold-wight attacks and destroys a character, that character's controller discards a random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148013",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Dark-wight.jpg",
+        "sha256": "1f54cc7af91e786c4aada393680f1539eddff6e37924c9715f74a5f6b8cbc7c0"
+      },
+      "lines": [
+        "While Dark-wight is engaged with a player, that player's heroes cannot gain resources from card effects.",
+        "Forced: After Dark-wight attacks and destroys a character, that character's controller discards all resources from each hero he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148014",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/I'm-Waiting-for-You.jpg",
+        "sha256": "2597ad2c653ce7fa1acf64c09d8615b1b749aa03e207c8a1b9161426f615ff21"
+      },
+      "lines": [
+        "When Revealed: Each Wight enemy engaged with a player makes an immediate attack. If no attacks were made this way, I'm Waiting for You! gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending character is an ally)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148015",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Long-Groping-Arm.jpg",
+        "sha256": "860587b262ca953d446c1a22d760d46b7a8868f181ecc98bac34bba6ded2ad89"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Until the end of the phase, each Wight enemy engaged with you contributes its Threat to the total Threat in the staging area. If no enemies are engaged with you, search the encounter deck and discard pile for a Wight enemy and put it into play engaged with you. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148016",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Chill-Fog.jpg",
+        "sha256": "0dce7126b61de964262ca6d125f8480dbbee109de06ab79f926aeb297b2352dc"
+      },
+      "lines": [
+        "When Revealed: Discard all resources in play. Each player raises his threat by 1 for each resource he discarded this way. If no resources were discarded this way, Chill Fog gains surge.",
+        "Shadow: Raise your threat by 1 for each damage dealt by this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148017",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Frozen-by-Fear.jpg",
+        "sha256": "02606f79eaab57a084e50d777413d31477ba465d84076d4279c0ed16781a8f4c"
+      },
+      "lines": [
+        "Surge. Doomed 1.",
+        "When Revealed: Until the end of the round, players cannot trigger Action or Response effects.",
+        "Shadow: Until the end of the round, attacking enemy cannot take damage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148018",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Dreadful-Song.jpg",
+        "sha256": "242cf3cf398b3f317ca813b5cc02f8a5c11d5c3076063c91462d60d42c01dc36"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Attach to a questing hero you control. Counts as a Condition attachment with the text: \"Limit 1 per hero. Attached hero's Willpower is reduced to 0. Forced: At the end of the round, raise your threat by 1 for each Wight enemy engaged with you.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148019",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Tom-Bombadil.jpg",
+        "sha256": "bdeb940495dda818d72a577894c3fa13ef9a0fad738bf9110be7f2ce7be3851c"
+      },
+      "lines": [
+        "When Revealed: Choose a player. That player gains control of Tom Bombadil, ready and committed to the quest. At the end of the round, discard Tom Bombadil. Then, shuffle the encounter discard pile into the encounter deck. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148020",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Fog-on-the-Barrow-downs-SetupA.jpg",
+        "sha256": "bc2f9beac8fa6656ef0a2677cead9839a75e0692ab8550fd9780525eccba0d46"
+      },
+      "lines": [
+        "You are playing Campaign Mode.",
+        "While any player is at stage 4B, the first player cannot lose control of the first player token."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        },
+        {
+          "line": 2,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148020",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Fog-on-the-Barrow-downs-SetupB.jpg",
+        "sha256": "c0847ebc50f55a4d6b5de77f649643fc0a8994adf51d949d4812e93b8507ffb5"
+      },
+      "lines": [
+        "Resolution: The players have earned the Ho! Tom Bombadil! boon card."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148021",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Ho-Tom-Bombadil.jpg",
+        "sha256": "a6c29b82e07af6e34edbf985ee5d5cd1dd4c1d9e28002147fb37bd0e0f2c8242"
+      },
+      "lines": [
+        "Setup: The first player adds this card to his hand.",
+        "Response: Add this card to the victory display and remove it from the campaign pool to cancel the \"when revealed\" effects of an encounter card just revealed from the encounter deck."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        },
+        {
+          "line": 2,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

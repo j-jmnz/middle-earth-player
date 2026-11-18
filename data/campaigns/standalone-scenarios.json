@@ -5,11 +5,11 @@
     "the-massing-at-osgiliath",
     "the-battle-of-lake-town",
     "the-stone-of-erech",
-    "the-old-forest"
+    "the-old-forest",
+    "fog-on-the-barrow-downs"
   ],
   "kind": "cycle",
   "later": [
-    "Fog on the Barrow-downs",
     "The Ruins of Belegost",
     "Murder at the Prancing Pony",
     "The Siege of Annúminas",

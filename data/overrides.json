@@ -1825,6 +1825,56 @@
       "easy": 0,
       "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 1 of Oppressive Forest's 2 copies (Easy 1); the copy a player finds with the Setup search is the one set out, the copy in the deck stays; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
       "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148008",
+      "easy": 2,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Ancient Barrow's 3 copies (Easy 2); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148011",
+      "easy": 3,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Barrow-wight's 4 copies (Easy 3); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148018",
+      "easy": 1,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Dreadful Song's 2 copies (Easy 1); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148017",
+      "easy": 2,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Frozen by Fear's 3 copies (Easy 2); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148009",
+      "easy": 3,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Stone Ring's 4 copies (Easy 3); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148014",
+      "easy": 0,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) drop both copies of I'm Waiting for You! (Easy 0); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148007",
+      "pile": "setAside",
+      "easy": 3,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 2 of Great Barrow's 5 copies (Easy 3); all copies are set aside by stage 1A's Setup, so the setAside pile loses them; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
     }
   ],
   "campaigns": [

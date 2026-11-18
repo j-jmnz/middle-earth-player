@@ -1,5 +1,5 @@
 // Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech and The Old Forest: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest and Fog on the Barrow-downs: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -19,19 +19,20 @@ const scenario = loadAnyScenario("the-massing-at-osgiliath");
 const lakeTown = loadAnyScenario("the-battle-of-lake-town");
 const stone = loadAnyScenario("the-stone-of-erech");
 const forest = loadAnyScenario("the-old-forest");
+const fog = loadAnyScenario("fog-on-the-barrow-downs");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 4, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 5, playable: true, box: null })]);
   });
 });
 
@@ -171,5 +172,42 @@ describe("The Old Forest", () => {
     expect(sides).toHaveLength(28);
     for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
     expect(ledger.byKey.get(keyOf("147002", "B"))?.lines[0]).toBe("Forced: At the end of the planning phase, each player must exhaust a hero he controls.");
+  });
+});
+
+describe("Fog on the Barrow-downs", () => {
+  it("has Hall of Beorn's own codes 148001 to 148021 (RingsDB's pack FotBd), four stages with Tom Bombadil a card of its own beside The Old Forest's 147022", () => {
+    expect(fog).toMatchObject({ id: "fog-on-the-barrow-downs", name: "Fog on the Barrow-downs", number: 5, stages: ["148001", "148002", "148003", "148004"] });
+    expect(fog.campaignCard).toBeUndefined();
+    expect(fog.campaignPlaced).toEqual([]);
+    expect(fog.source.dragnNormal).toBe("Q99.05");
+    expect(fog.nightmare).toBeUndefined();
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "FotBd"));
+    expect(own.map((card) => card.code)).toEqual(["148001", "148002", "148003", "148004", "148005", "148006", "148007", "148008", "148009", "148010", "148011", "148012", "148013", "148014", "148015", "148016", "148017", "148018", "148019", "148020", "148021"]);
+    expect(byCode.get("01001")?.printings.some((printing) => printing.pack === "FotBd")).toBe(false);
+    expect(byCode.get("148019")?.text).toBe(byCode.get("147022")?.text);
+  });
+
+  it("deals the 34 cards of the encounter deck on Normal and the 7 fewer (and 2 fewer Great Barrows set aside) Hall of Beorn's Easy counts remove on Easy, the Hollow Circle, the Standing Stones and the Great Barrows set aside (148001:A:1)", () => {
+    for (const seats of [1, 2, 3, 4]) {
+      expect(encounterCodes(fog, "Normal", seats), `${seats} seats`).toHaveLength(34);
+      expect(encounterCodes(fog, "Easy", seats), `${seats} seats`).toHaveLength(27);
+    }
+    const aside = (difficulty: "Normal" | "Easy") => setupInstructions(fog, difficulty).filter((step) => step.verb === "SetAside").map((step) => step.code);
+    expect(aside("Normal").sort()).toEqual(["148005", "148006", "148007", "148007", "148007", "148007", "148007"]);
+    expect(aside("Easy").sort()).toEqual(["148005", "148006", "148007", "148007", "148007"]);
+    const dealt = (code: string, difficulty: "Normal" | "Easy") => encounterCodes(fog, difficulty, 1).filter((item) => item === code).length;
+    expect([dealt("148014", "Normal"), dealt("148014", "Easy")]).toEqual([2, 0]);
+    expect([dealt("148008", "Normal"), dealt("148008", "Easy")]).toEqual([3, 2]);
+    expect([dealt("148011", "Normal"), dealt("148011", "Easy")]).toEqual([4, 3]);
+  });
+
+  it("has every printed side read from its scan, the campaign card and boon inert, the Great Barrow lines as printed (Hall of Beorn has typos)", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("148") && card.code <= "148019").flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(23);
+    for (const key of [...sides, keyOf("148020", "A"), keyOf("148020", "B"), keyOf("148021", "A")]) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("148007", "A"))?.lines[0]).toBe("Peril. Immune to player card effects. The players cannot travel here.");
+    expect(ledger.byKey.get(keyOf("148013", "A"))?.lines[0]).toBe("While Dark-wight is engaged with a player, that player's heroes cannot gain resources from card effects.");
   });
 });
