@@ -300,6 +300,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - With two Blinding Blizzards (901307) the first in staging takes the progress, with no first-player choice between them; Blinding Blizzard's progress readout ("3 / 5") does not warm near 5 (agent recommendation, `docs/brief.md`, The Redhorn Gate).
 - Hand-discard entries in an asks file (04090, 04097, Goblin Warlord) never reach the sheet: the engine expands a hand discard into synthetic Picks `src/play/words/asks.ts` cannot map back to the record, so the sheet shows the generic words.
 - Foundations of Stone: the Giant Cave Centipede's area pick with 3 or more separate areas is written but untested (the scene kit builds 1 or 2 seats).
+- Shadow and Flame readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Shadow and Flame); its two readings from A Long-extended Party's Semi-official Errata and FAQ (3.026, 3.057) rest on a fan FAQ, not an FFG ruling. Not user-confirmed.
 - Foundations of Stone readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Foundations of Stone). Not user-confirmed.
 - The Long Dark readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Long Dark). Not user-confirmed.
 - The Watcher in the Water readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Watcher in the Water). Not user-confirmed.
