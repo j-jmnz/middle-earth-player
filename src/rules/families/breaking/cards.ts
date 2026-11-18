@@ -6,14 +6,14 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
-import { lastPicked } from "../../interpret/player-verbs.ts";
+import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { fallenBase, FALLEN_SUFFIX } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { raiseFor } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { areaOf, areaSeats, headOf, stagingDest } from "./areas.ts";
+import { areaOf, headOf, stagingDest } from "./areas.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { ringBearerId } from "../burden/deck.ts";
 
@@ -78,14 +78,14 @@ function moveToFirstStaging(state: ScenarioState, id: string | null): ScenarioSt
   return updateCard(moved, id, { controller: state.separate ? state.firstPlayer : null });
 }
 
-// MoveToOtherPlayerArea (901703:A:2): the engaged enemy goes to another player's staging area as a staging card. Players who share an area (not separate, or joined) send it to that shared area; with one player, and no other area, it stays engaged.
+// MoveToOtherPlayerArea (901703:A:2): the engaged enemy goes to the staging area of the player the engaged player picked (a player of a different area), as a staging card. With no other area to pick, players who share an area send it to that shared area (not separate, or joined);
+// with one player it stays engaged.
 function moveToOtherPlayerArea(state: ScenarioState, id: string | null): ScenarioState {
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.zone !== "engaged" || card.controller == null) return state;
   const own = headOf(state, card.controller);
-  const other = state.separate ? areaSeats(state).find((seat) => seat !== own) : undefined;
-  if (other != null) return updateCard(moveCard(state, id, { zone: "staging", area: other }), id, { controller: other });
-  // No other area: another living player at the shared area is the one it is sent to, as a card of that staging area.
+  const picked = seatOf(lastPicked(state));
+  if (picked != null && state.separate && headOf(state, picked) !== own) return updateCard(moveCard(state, id, { zone: "staging", area: headOf(state, picked) }), id, { controller: headOf(state, picked) });
   if (livingSeats(state).every((seat) => seat === card.controller)) return state;
   return updateCard(moveCard(state, id, stagingDest(state, card.controller)), id, { controller: state.separate ? own : null });
 }

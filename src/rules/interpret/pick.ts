@@ -22,7 +22,7 @@ import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "../core/printed.ts";
-import { activeFor, sharedStaging, sharing } from "../families/breaking/areas.ts";
+import { activeFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { flagged, heldAmount, inPlay, livingSeats } from "../core/state.ts";
@@ -62,6 +62,7 @@ function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[]
   if (spec.control === "you") return [asking];
   // "At this stage": the chooser's own once stages are separate (mec109.multiple-staging-areas).
   if (spec.atStage && state.separate) return sharing(state, asking);
+  if (spec.otherArea === true && state.separate) return livingSeats(state).filter((seat) => headOf(state, seat) !== headOf(state, asking));
   if (spec.control === "other") return livingSeats(state).filter((seat) => seat !== asking);
   return livingSeats(state);
 }

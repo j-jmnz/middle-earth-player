@@ -14,6 +14,7 @@ import { prisonerWords } from "../readouts/widgets.ts";
 import { pelennorDetail } from "./pelennor-preview.ts";
 import { angmarDetail } from "./angmar-preview.ts";
 import { ungolDetail } from "./ungol-preview.ts";
+import { stoneDetail } from "./stone-preview.ts";
 import { rhovanionDetail } from "./rhovanion-preview.ts";
 
 /**
@@ -48,6 +49,8 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   // The Ring-bearer under Topmost Chamber, the boons on Shagrat and Last of the Company are told before the held-hero words of Lost in Mirkwood, which would call the Chamber an enemy that holds a hero facedown.
   const ungol = ungolDetail(game, card, name);
   if (ungol) return ungol;
+  const stone = stoneDetail(game, ctx, cardId, name);
+  if (stone) return stone;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
   const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card);

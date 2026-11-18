@@ -5,6 +5,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 // (Foundations of Stone).
 // Rules: mec109.multiple-staging-areas, mec108.create-staging-area, rr.forced, rr.attachment-cards, rr.reveal, rr.travel, rr.shadow-effects, rr.first-player, rr.the-word-choose (data/rules/entries.json).
 const A_NAMELESS_ENEMY_ATTACKS: Condition = { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: "Nameless" } };
+const OTHER_AREA: PickSpec = { type: "player", control: "other", otherArea: true };
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
 const IN_EVERY_HAND: PickSpec = { type: "card", control: "you", from: "hand" };
 
@@ -45,7 +46,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "forced",
     trigger: "endOfPhase",
     condition: { kind: "all", conditions: [{ kind: "phase", is: "Combat" }, { kind: "sourceIn", zone: "engaged" }] },
-    instructions: [{ verb: "MoveToOtherPlayerArea" }],
+    instructions: [{ verb: "ForEachPlayer", order: "firstFirst", seats: "engaged", instructions: [{ verb: "Pick", pick: OTHER_AREA, when: { kind: "canPick", pick: OTHER_AREA } }, { verb: "MoveToOtherPlayerArea" }] }],
   },
 
   // 901704 Unspeakable Thing. A:1: when it engages a player or attacks one it gets the top card of that player's deck. A:2: X, its Attack and hit points, is the printed cost of the attached cards (5 with none).

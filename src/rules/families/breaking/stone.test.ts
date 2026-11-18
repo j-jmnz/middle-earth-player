@@ -103,22 +103,36 @@ describe("The separate areas of stage 4", () => {
     expect(resolveAmount(table({ seats: 2 }).state, amount, { actor: 0, sourceId: null }, t.ctx)).toBe(2);
   });
 
-  it("901703:A:2 moves the engaged Giant Cave Centipede to the other player's staging area, sends it to the shared area as a staging card for players who share one, and leaves it engaged with one player", () => {
+  it("901703:A:2 lets the engaged player pick another area: the engaged Giant Cave Centipede goes there as a staging card, to the shared area for players who share one, and stays engaged with one player", () => {
     const { t, state } = divided();
-    const made = spawn(state, "901703", { zone: "engaged", seat: 0 });
-    const run = runInstruction({ ...made.state, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: made.id }, t.ctx, []);
-    expect(run.cards[made.id]?.zone).toBe("staging");
-    expect(areaOf(run, made.id)).toBe(1);
-    const alone = table({ stage: "04113" });
-    const solo = spawn(alone.state, "901703", { zone: "engaged", seat: 0 });
-    expect(runInstruction({ ...solo.state, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: solo.id }, alone.ctx, []).cards[solo.id]?.zone).toBe("engaged");
-    const shared = { ...made.state, seats: [{ ...made.state.seats[0], joined: 1 }, made.state.seats[1]] as ScenarioState["seats"] };
-    const together = runInstruction({ ...shared, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: made.id }, t.ctx, []);
-    expect(together.cards[made.id]?.zone).toBe("staging");
-    expect(areaOf(together, made.id)).toBe(1);
+    const centipede = (from: ScenarioState, seat: number, ctx = t.ctx) => {
+      const made = spawn({ ...from, phase: "Combat" }, "901703", { zone: "engaged", seat });
+      const asked: string[] = [];
+      const run = resolveRecords(made.state, ctx, "901703", "forced", made.id, (open) => {
+        if (open.window?.kind === "choose") asked.push(...open.window.options);
+        return open.window?.kind === "choose" ? (open.window.options[0] ?? "") : "";
+      });
+      return { run: run.state, id: made.id, asked };
+    };
+    const apart = centipede(state, 0);
+    // One other area is the only candidate: nothing is asked.
+    expect(apart.asked).toEqual([]);
+    expect(apart.run.cards[apart.id]?.zone).toBe("staging");
+    expect(areaOf(apart.run, apart.id)).toBe(1);
+    // It goes to the area of the player other than the engaged one, whoever is the first player.
+    const back = centipede(state, 1);
+    expect(areaOf(back.run, back.id)).toBe(0);
+    const shared = { ...state, seats: [{ ...state.seats[0], joined: 1 }, state.seats[1]] as ScenarioState["seats"] };
+    const together = centipede(shared, 0);
+    expect(together.asked).toEqual([]);
+    expect(together.run.cards[together.id]?.zone).toBe("staging");
+    expect(areaOf(together.run, together.id)).toBe(1);
     const common = table({ seats: 2 });
-    const unshared = spawn(common.state, "901703", { zone: "engaged", seat: 0 });
-    expect(runInstruction({ ...unshared.state, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: unshared.id }, common.ctx, []).cards[unshared.id]?.zone).toBe("staging");
+    const unshared = centipede(common.state, 0, common.ctx);
+    expect(unshared.run.cards[unshared.id]?.zone).toBe("staging");
+    const alone = table({ stage: "04113" });
+    const solo = centipede(alone.state, 0, alone.ctx);
+    expect(solo.run.cards[solo.id]?.zone).toBe("engaged");
   });
 
   it("04114:B:2 holds the stage at its quest points; at the beginning of the travel phase the first player to complete joins the other, and the second takes everyone to stage 5", () => {
