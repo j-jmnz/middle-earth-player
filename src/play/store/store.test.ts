@@ -16,6 +16,8 @@ import { hitSlot } from "../layout/hits.ts";
 import { inspectTargets, onTableFor, pileSelector, PILES, threatSelector, zoneSelector, type PileId, type PileView, type ZoneId } from "./selectors.ts";
 import { draggableIds, dropOutcome, dropRects, dropTargets, targetFromKey, targetKey } from "./selection.ts";
 import { createTableStore, nextRoundSteps } from "./store.ts";
+import { EFFECTS } from "../../effects/index.ts";
+import { attachmentCtx, put as putCard, seat as seatTable } from "../../rules/families/attachments/fixture.ts";
 
 // The table's screen state: the store reads the reducer, keeps references for zones that did not change, and moves nothing
 // until the reducer accepts the intent a drop maps to (docs/architecture.md, State and Play loop).
@@ -160,6 +162,14 @@ describe("drops", () => {
     const outcome = dropOutcome(planning, ctx, legal, cardId, target);
     const printed = printedOf(ctx.cards, planning.cards[cardId]?.code ?? "");
     expect(outcome).toEqual({ kind: "play", cardId, hostId: printed.type === "attachment" && target?.kind === "card" ? target.cardId : null });
+  });
+
+  it("a Trap played into your play area unattached is dropped on the play area, and the drop names your area as its host (19062:A:1)", () => {
+    const trapCtx = attachmentCtx(EFFECTS);
+    const trap = putCard(seatTable().state, "19062", "hand");
+    const legal = legalIntents(trap.state, trapCtx);
+    expect(dropTargets(trap.state, trapCtx, legal, trap.id)).toEqual([{ kind: "zone", zone: "play" }]);
+    expect(dropOutcome(trap.state, trapCtx, legal, trap.id, { kind: "zone", zone: "play" })).toEqual({ kind: "play", cardId: trap.id, hostId: "seat:0" });
   });
 
   it("a character dropped on the quest stage joins the commit being built, not the quest", () => {

@@ -90,7 +90,7 @@ export function runPlayerVerb(
         return state.cards[id] ? readyCard(state, id, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
       }
       if (instruction.target === "host") {
-        const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
+        const hostId = refCard(state, "host", frameScope(state, focus.seat, focus.sourceId));
         return hostId && state.cards[hostId] && !readyBarred(state, hostId, byPlayerCards(state, focus.sourceId, ctx)) ? updateCard(state, hostId, readyPatch(state, hostId)) : state;
       }
       if (instruction.target !== "allCharacters") return null;

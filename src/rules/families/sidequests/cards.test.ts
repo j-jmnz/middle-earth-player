@@ -81,13 +81,16 @@ describe("a side quest in the victory display and an ally that reads it", () => 
     expect(stat(synced(state, ctx), ranger.id, "willpower")).toBe(3);
   });
 
-  it("Legacy Blade gives +1 Attack for each side quest in the victory display, up to +3 (17117:A:2)", () => {
+  it("Legacy Blade gives +1 Attack for each side quest in the victory display, encounter side quests too, up to +3 (17117:A:2)", () => {
     const table = seat(1, ["dwarf", "rohan"]);
     const blade = put(table.state, "17117", "play");
     const hero = table.heroes[0] ?? "";
     let state = synced(attachTo(blade.state, blade.id, hero), ctx);
     const base = stat(state, hero, "attack");
-    for (const [index, code] of ["09014", "10034", "10009", "10058"].entries()) {
+    // An encounter side quest counts as a side quest (mec108.side-quests); a location in the display does not.
+    state = inVictory(state, "marsh", ctx).state;
+    expect(stat(state, hero, "attack")).toBe(base);
+    for (const [index, code] of ["wilds", "10034", "10009", "10058"].entries()) {
       state = inVictory(state, code, ctx).state;
       expect(stat(state, hero, "attack")).toBe(base + Math.min(index + 1, 3));
     }

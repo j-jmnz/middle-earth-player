@@ -275,6 +275,7 @@ A new verb extends an existing one where it can. Before adding one, read the dra
 
 Read each new record against these before the review. Each one is a card bug a review has found.
 
+- **"Side quest".** The words mean either kind, a player side quest or an encounter side quest (`mec108.side-quests`): a record counts or picks them with the pick filter `sideQuest: true`, not `cardType`.
 - **"Then".** The part after "then" resolves only if the part before it did (`rr.then`). Give the later instructions the same condition, or put them on a `then` branch.
 - **"One player" or "any player".** Either phrase lets any player take it, not the first player: use a `Pick` of a player, or `ChooseCards` `who: "onePlayer"` in a Campaign Setup. "The first player" is the only phrase that means seat order.
 - **"After a 'When Revealed' effect is canceled".** It hears only a cancel of a card that has a When Revealed effect: a revealed enemy with none, canceled by a Response, announces nothing (`announceCanceled`, nightmare family).
