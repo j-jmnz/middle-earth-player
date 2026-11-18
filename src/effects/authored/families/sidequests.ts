@@ -24,8 +24,8 @@ const taken = (flag: (typeof COUNCIL)[number]) => ({ verb: "ModifyStat", stat: f
 // The first player chooses a player (rr.first-player): "The first player chooses a player to take control of ~."
 const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
 const encounterKeyword = (code: string, line: string, n: number): Effect => ({ id: `${code}:constant:${n}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "EncounterKeyword" }] });
-// Each side quest in the victory display.
-const SIDE_QUESTS_IN_VICTORY = { type: "card", control: "any", from: "victory", cardType: "player-side-quest" } as const;
+// Each side quest in the victory display, a player side quest or an encounter side quest (mec108.side-quests).
+const SIDE_QUESTS_IN_VICTORY = { type: "card", control: "any", from: "victory", sideQuest: true } as const;
 const SIDE_QUEST_IN_VICTORY = { kind: "count", pick: SIDE_QUESTS_IN_VICTORY, min: 1 } as const;
 // "Response: When/After this stage is defeated, ...": the side quest hears it from the victory display or its owner's discard pile.
 const defeated = { timing: "response", trigger: "questDefeated", subject: "self" } as const;
