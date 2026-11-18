@@ -26,10 +26,11 @@ describe("The Stone of Erech golden", () => {
     world: erechWorld,
     play: playGolden,
     opening: {
-      title: "starts at The Disappearance with Tarlang's Neck active, Eventide in play beside the quest, and Derufin, the Lord of the Dead, the Stone and the other two Night objectives set aside",
+      title: "starts at The Disappearance with Tarlang's Neck in play (active, unless the stage's own reveal replaced it), Eventide in play beside the quest, and Derufin, the Lord of the Dead, the Stone and the other two Night objectives set aside",
       check(state, golden) {
         expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("50301");
-        expect(cardsOf(state, "50307").map((card) => card.id), golden.name).toContain(state.activeLocation);
+        // Setup made Tarlang's Neck the active location; stage 1's When Revealed (1 encounter card for each player) may have replaced it (a Vale of Shadows revealed there sends it back to the staging area).
+        expect(cardsOf(state, "50307").map((card) => card.zone), golden.name).toEqual([expect.stringMatching(/^(activeLocation|staging)$/)]);
         expect(zoneOf(state, "50308"), golden.name).toEqual(["nightObjective"]);
         for (const code of ["50309", "50310", "50304", "50305", "50306"]) expect(zoneOf(state, code), `${golden.name} ${code}`).toEqual(["setAside"]);
         expect(["50302", "50303"].map((code) => zoneOf(state, code)), golden.name).toEqual([["questDeck"], ["questDeck"]]);
