@@ -16,7 +16,7 @@ const SELF_ENEMY: PickSpec = { type: "enemy", control: "any", isSource: true };
 const STONE = "The Stone of Erech";
 
 // A stat of the source card that holds while the Night objective is `when` ("Dusk. Whisperer gets +1 Threat").
-const SELF_STAT = (stat: "attack" | "defense" | "threat" | "questPoints" | "willpower", amount: number): Instruction => ({ verb: "ModifyStat", stat, amount, until: "whileSourceInPlay", target: "self" });
+const SELF_STAT = (stat: "attack" | "defense" | "threat" | "questPoints" | "willpower" | "gainsSurge", amount: number): Instruction => ({ verb: "ModifyStat", stat, amount, until: "whileSourceInPlay", target: "self" });
 const NIGHT_STATS = (code: string, line: string, id: number, when: Condition, ...stats: Instruction[]): Effect => ({ id: `${code}:constant:${id}`, cardCode: code, lines: [line], timing: "constant", condition: when, instructions: stats });
 // "Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead)": the value of the Night in play, never summed.
 const ATTACK_BY_NIGHT = (base: number, dusk: number, midnight: number): Instruction[] => [
@@ -140,7 +140,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "forced",
     trigger: "declaredAttacker",
     subject: "host",
-    condition: { kind: "matches", card: "other", pick: OATHBREAKER },
+    condition: { kind: "all", conditions: [{ kind: "matches", card: "host", pick: { type: "hero", control: "any" } }, { kind: "matches", card: "other", pick: OATHBREAKER }] },
     instructions: [{ verb: "ModifyStat", stat: "losesSpectral", amount: 1, until: "endOfPhase", target: "other" }],
   },
 
@@ -201,10 +201,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 50324 Groping Horror. When Revealed: the first player chooses: skip the next travel phase, or each player passes his hand to the player on his left (the only player discards his hand). Midnight: it gains surge.
   { id: "50324:whenRevealed:1", cardCode: "50324", lines: ["50324:A:1"], timing: "whenRevealed", instructions: [{ verb: "Choose", who: "firstPlayer", options: [{ id: "skipTravel", instructions: [{ verb: "SkipTravelPhase" }] }, { id: "passHands", instructions: [{ verb: "PassHand", direction: "left" }] }] }] },
-  { id: "50324:whenRevealed:2", cardCode: "50324", lines: ["50324:A:2"], timing: "whenRevealed", instructions: [{ verb: "GainSurge", when: MIDNIGHT }] },
+  NIGHT_STATS("50324", "50324:A:2", 2, MIDNIGHT, SELF_STAT("gainsSurge", 1)),
 
   // 50325 Driven by Fear. When Revealed: the first player attaches it to a hero he controls. A Condition attachment: the hero's Willpower is 0 (no modifier raises it) and its text box is blank except Traits.
-  { id: "50325:whenRevealed:1", cardCode: "50325", lines: ["50325:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } }] },
+  { id: "50325:whenRevealed:1", cardCode: "50325", lines: ["50325:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer", unlimited: true } }] },
   { id: "50325:constant:1", cardCode: "50325", lines: ["50325:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
   {
     id: "50325:constant:2",

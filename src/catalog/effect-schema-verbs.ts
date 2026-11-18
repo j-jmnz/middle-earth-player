@@ -234,7 +234,9 @@ export const simpleVerbs = [
         // "Attach to a Warrior hero." (143015:A:2): only a hero with this printed trait (rr.attachment-cards: a play restriction is checked as the attachment enters play).
         trait: z.string().min(1).optional(),
         // "Attach it to a hero with 1 or more Willpower" (900806:A:1): only a hero whose current Willpower is at least this.
-        minWillpower: z.number().int().min(1).optional() }),
+        minWillpower: z.number().int().min(1).optional(),
+        // The card has no limit per hero ("Driven by Fear", 50325:A:1: a second copy may go on the same hero): a hero that carries a copy is offered too.
+        unlimited: z.literal(true).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),

@@ -176,7 +176,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50311:constant:1: Constant
     - this card counts as a Artifact attachment while it is attached
   50311:forced:1: Forced after a character is declared as an attacker (heard about the host)
-    only if the event's other card is a Oathbreaker enemy (any player controls)
+    only if all of: (its host is a hero (any player controls)) and (the event's other card is a Oathbreaker enemy (any player controls))
     - the event's other card: stat losesSpectral 1, until the end of the phase
 
 ## 50312 Shadow-man
@@ -377,15 +377,16 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
         - every player passes his whole hand to the player on his left (the next seat in player order) at once; the only player discards his hand instead
 
 50324:A:2 (front): Midnight. Groping Horror gains surge.
-  50324:whenRevealed:2: When revealed
-    - if the Night objective in play is Midnight: this card gains surge (one more encounter card is revealed when it has been resolved)
+  50324:constant:2: Constant
+    only if the Night objective in play is Midnight
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
 
 ## 50325 Driven by Fear
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 50325:A:1 (front): When Revealed: The first player attaches Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attached character's text box as if it was blank (except for Traits.)'
   50325:whenRevealed:1: When revealed
-    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
+    - attach this card to a hero the first player controls (any number of copies may be attached to one hero) (the first player chooses it; with none this card is discarded)
   50325:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   50325:constant:2: Constant
@@ -414,4 +415,4 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50327:whenRevealed:1: When revealed
     - place 1 progress on the Night objective in play (nothing with none); a Night objective at its limit then gives way to the next
 
-(rendered pieces: 226 by template, 7 as JSON)
+(rendered pieces: 229 by template, 7 as JSON)
