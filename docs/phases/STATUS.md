@@ -14,9 +14,10 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ## Phases
 
+No phase is open.
+
 | Phase | Work | Status | Note |
 | --- | --- | --- | --- |
-| 62 | [Dwarrowdelf cycle](phase-62-dwarrowdelf.md) | active | 2026-11-18: all nine scenarios built; review round open |
 
 ## Open items
 
@@ -296,10 +297,12 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ### Rules and engine (Dwarrowdelf)
+- Refuse an effect's CommitToQuest for a character that cannot quest in every game (today only games dealing Freezing Cold 04023), and have Hobbit Pony 10007, Grappling Hook 11005, Windfola 12116 and Late Adventurer 131017 check the character can quest. Needs an `ENGINE_VERSION` change and moves replays of the games with 08112 and The Road to Isengard.
+- Expanded `DiscardFromHand` picks (Cave Spider 04097, Saruman's Voice 143080) read the generic "Choose a card to discard.": asks entries keyed on `DiscardFromHand` are not read, and the sheet does not count the picks left.
+- Foundations of Stone's commit-limit refusal and note wording is agent wording, not user-confirmed.
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
 - Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
 - With two Blinding Blizzards (901307) the first in staging takes the progress, with no first-player choice between them; Blinding Blizzard's progress readout ("3 / 5") does not warm near 5 (agent recommendation, `docs/brief.md`, The Redhorn Gate).
-- Hand-discard entries in an asks file (04090, 04097, Goblin Warlord) never reach the sheet: the engine expands a hand discard into synthetic Picks `src/play/words/asks.ts` cannot map back to the record, so the sheet shows the generic words.
 - Foundations of Stone: the Giant Cave Centipede's area pick with 3 or more separate areas is written but untested (the scene kit builds 1 or 2 seats).
 - Shadow and Flame readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Shadow and Flame); its two readings from A Long-extended Party's Semi-official Errata and FAQ (3.026, 3.057) rest on a fan FAQ, not an FFG ruling. Not user-confirmed.
 - Foundations of Stone readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Foundations of Stone). Not user-confirmed.
@@ -308,7 +311,6 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Road to Rivendell readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Road to Rivendell). Not user-confirmed.
 - The Redhorn Gate readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Redhorn Gate). Not user-confirmed.
 - Flight from Moria readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Flight from Moria). Not user-confirmed.
-- Flight from Moria's banner beats (`src/play/words/scenarios/gundabad-beats.ts`) say a flipped stage flips "at the beginning of the quest phase" (Moria flips at the staging step) and a Nightmare bypass goes to "the bottom of the quest deck" (it is shuffled in).
 - The pinned FAQ (`lotr_faq_19.pdf`) entries 1.21, 1.29, 1.45, 1.47, 1.53 and 1.54 have no `faq.*` span yet, so Flight from Moria's readings cite the PDF.
 - The Seventh Level readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Seventh Level). Not user-confirmed.
 - The Caves of Nibin-Dûm reads "attach Cave Torch to a hero of his choice" (41004:A:1) as the first player's own hero; the Dwarrowdelf cards with the same phrase read any player's hero, as the Khazad-dûm insert says of Cave Torch. Not reconciled: changing the Caves moves its goldens.

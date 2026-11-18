@@ -38,11 +38,11 @@ Read the sections your task touches.
   - 112–119 Private by design (~170)
   - 120–125 Accessibility (~120)
   - 126–223 Install (~1.7K)
-  - 224–258 Roadmap (~1.2K)
-  - 259–269 Get involved (~210)
-  - 270–273 Support (~90)
-  - 274–289 Attribution (~410)
-  - 290–293 License (~50)
+  - 224–257 Roadmap (~1.1K)
+  - 258–268 Get involved (~210)
+  - 269–272 Support (~90)
+  - 273–288 Attribution (~410)
+  - 289–292 License (~50)
 - `docs/architecture.md` — Architecture (~28.5K tok)
   - 7–42 Stack (~1.3K)
   - 43–78 Processes (~690)
@@ -124,7 +124,7 @@ Read the sections your task touches.
     - 1577–1614 The Tower of Cirith Ungol (~4.4K)
     - 1615–1651 The Black Gate Opens (~4.4K) ← 2
     - 1652–1680 Mount Doom (~4.3K)
-  - 1681–1819 Shadows of Mirkwood (~14.1K) ← 4
+  - 1681–1819 Shadows of Mirkwood (~14.1K) ← 3
     - 1689–1710 The Hunt for Gollum (~2.1K) ← 2
     - 1711–1730 Conflict at the Carrock (~2.4K) ← 2
     - 1731–1756 A Journey to Rhosgobel (~2.9K) ← 1
@@ -276,21 +276,20 @@ STATUS.md, then the active phase file.
 
 - `docs/phases/STATUS.md` — Phase status (~16.6K tok)
   - 5–14 Rules (~380)
-  - 15–20 Phases (~50)
-  - 21–331 Open items (~15.2K)
-    - 23–25 Reviews (~70)
-    - 26–28 README (~90)
-    - 29–33 Releases (~150)
-    - 34–41 Desktop (~310)
-    - 42–92 Fixtures and Maestro (~2.8K)
-    - 93–131 Rules and engine (~1.6K)
-    - 132–252 Rules and engine (Angmar Awakened) (~5.3K)
-    - 253–277 Screens and code (~1.6K)
-    - 278–297 Rules and engine (The Two Towers) (~1.4K)
-    - 298–324 Rules and engine (Dwarrowdelf) (~1.6K)
-    - 325–331 Rules and engine (Shadows of Mirkwood) (~380)
-  - 332–357 Standing decisions (~940)
-- `docs/phases/phase-62-dwarrowdelf.md` — Phase 62: The Dwarrowdelf cycle, standalone with Nightmare (~690 tok)
+  - 15–21 Phases (~20)
+  - 22–333 Open items (~15.2K)
+    - 24–26 Reviews (~70)
+    - 27–29 README (~90)
+    - 30–34 Releases (~150)
+    - 35–42 Desktop (~310)
+    - 43–93 Fixtures and Maestro (~2.8K)
+    - 94–132 Rules and engine (~1.6K)
+    - 133–253 Rules and engine (Angmar Awakened) (~5.3K)
+    - 254–278 Screens and code (~1.6K)
+    - 279–298 Rules and engine (The Two Towers) (~1.4K)
+    - 299–326 Rules and engine (Dwarrowdelf) (~1.6K)
+    - 327–333 Rules and engine (Shadows of Mirkwood) (~380)
+  - 334–359 Standing decisions (~940)
 
 ## Live plans
 
