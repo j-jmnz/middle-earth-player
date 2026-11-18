@@ -34,7 +34,7 @@ Read the sections your task touches.
 - `README.md` (~5.8K tok)
   - 56–93 Features (~550)
     - 79–93 Themes (~190)
-  - 94–112 What you can play (~270)
+  - 94–112 What you can play (~280)
   - 113–120 Private by design (~170)
   - 121–126 Accessibility (~120)
   - 127–224 Install (~1.7K)

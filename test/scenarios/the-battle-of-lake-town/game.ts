@@ -69,7 +69,7 @@ export const TOWN_GOLDENS: readonly TownGolden[] = [
   { name: "Easy solo win", seatCount: 1, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
-  { name: "solo loss: 50 damage on Lake-town", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { burn: "town", quest: "all" }, lossReason: "Lake-town holds 50 damage" },
+  { name: "solo loss: 50 damage on Lake-town", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { burn: "town", quest: "all" }, lossReason: "Lake-town holds 51 damage" },
   { name: "solo loss: Smaug defeated with too few points", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { burn: "town" }, lossReason: "Smaug was defeated, but the victory display holds no more Victory points than the damage on Lake-town" },
 ];
 

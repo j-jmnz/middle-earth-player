@@ -16,10 +16,7 @@ const lakeDamage = (state: ScenarioState) => cardsOf(state, "50207")[0]?.damage 
 // A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed on Normal and on Easy: each round a Smaug is revealed into the play area, the players travel, quest with one hero and
 // attack him with the others; the quest goes a stage a round to The Dragon's Wrath, which Smaug's defeat ends with more Victory points in the victory display than damage on Lake-town (one win has the heroes take the Burn damage, 14 rounds, the other
 // leaves it all on Lake-town). The losses are every player's threat at 50, every hero destroyed, 50 damage on Lake-town and Smaug defeated for too few points. Update the snapshot only when the change is meant.
-//
-// Open until the scenario is playable (`readBy` on its ledger sides, data/printed/standalone-scenarios.json): the suite is skipped, so it writes no golden.json. To finish it, change `describe.skip` to `describe`, run this file (it writes golden.json),
-// and uncomment this scenario's two lines in test/harness/golden-registry.ts (its test fails on a golden.json that is not listed).
-describe.skip("The Battle of Lake-town golden (open: not playable until readBy is set)", () => {
+describe("The Battle of Lake-town golden", () => {
   goldenSuite<TownGolden, TownDecks>({
     title: "The Battle of Lake-town",
     file: new URL("./golden.json", import.meta.url).pathname,
@@ -48,7 +45,7 @@ describe.skip("The Battle of Lake-town golden (open: not playable until readBy i
     },
     lost(state, golden) {
       const seats = state.seats.slice(0, golden.seatCount);
-      if (golden.lossReason === "Lake-town holds 50 damage") expect(lakeDamage(state), golden.name).toBeGreaterThanOrEqual(50);
+      if (golden.lossReason === "Lake-town holds 51 damage") expect(lakeDamage(state), golden.name).toBeGreaterThanOrEqual(50);
       else if (golden.lossReason?.startsWith("Smaug was defeated")) expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("50203");
       else {
         expect(seats.every((seat) => seat.eliminated), golden.name).toBe(true);
