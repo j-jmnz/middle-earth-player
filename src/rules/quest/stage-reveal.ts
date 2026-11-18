@@ -40,7 +40,9 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const resolved = resolveSideQuests(quested, sides, ctx, steps);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
-  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);
+  // Progress placed anywhere in this resolution (the active location, a location that takes it first, the stage), for the trigger the table hears once.
+  const placed = steps.slice(before).some((step) => step.kind === "progress" && step.amount > 0);
+  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps, placed);
 }
 
 // A card in the game answers a failed quest with an X amount (Urdug's Gambit, 19051:B:2): the event carries the shortfall for it.

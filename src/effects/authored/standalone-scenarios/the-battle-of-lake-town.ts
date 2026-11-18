@@ -1,5 +1,5 @@
-import type { Condition, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
-import { ALWAYS } from "./conditions.ts";
+import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
+import { ALWAYS } from "../conditions.ts";
 
 // Records for The Battle of Lake-town (standalone-scenarios cycle part 2, no campaign card). Every line is read from the scan ledger (data/printed/); the Burn X lines are read by the keyword (pnpm data build) and "Immune to player card effects" by its template.
 // The Smaug deck, Burn X and the way a Smaug enters play are not printed on the cards: docs/brief.md (The Battle of Lake-town) holds them with their sources (the Quest Companion), and src/catalog/families/smaug.ts the vocabulary.

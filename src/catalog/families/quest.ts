@@ -13,7 +13,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("CommitToQuest"), target: cardRefSchema.optional(), stat: z.literal("attack").optional(), ...when }),
   // The location (the picked card by default) becomes the active location; any other active location returns to the staging
   // area. This is not traveling: no Travel cost or Travel effect, no `traveled` event (131013:A:2, 19034:A:1).
-  z.strictObject({ verb: z.literal("MakeActive"), target: cardRefSchema.optional(), ...when }),
+  z.strictObject({ verb: z.literal("MakeActive"), target: cardRefSchema.optional(), random: z.literal(true).optional(), ...when }),
+  // With `random` ("randomly choose a location in the staging area and switch it with the active location", 147020:A:2): the location is chosen from the staging area with the game's seed, not named; the old active location returns to the staging area keeping its tokens,
+  // and the new one hears that it became active. Nothing happens with no location in the staging area. The record's `when` holds the rest ("If there is a non-unique active location").
   // Moves progress tokens to the last picked location, from the source card, the current quest card or the card picked before
   // the last: `amount` (at most what is there), or `all`. With `choose` the actor chooses how many, from 1 to `amount` (or to
   // all of them). Progress placed on a location can explore it (04008:A:1, 12037:A:2, 17034:A:2).
@@ -87,6 +89,9 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // About the table, once: the quest resolved successfully and placed progress on the active location, on a card that takes it first or on the stage ("After placing progress as the result of questing successfully", 147002:B:2). Not about one placement: a quest that fills a location
+  // and goes on to the stage still raises it once.
+  "questProgressPlaced",
   // About each character committed to the quest when it resolved: the quest succeeded ("After ~ quests successfully"), or it
   // resolved at all ("After resolving a quest to which ~ was committed").
   "questedSuccessfully",

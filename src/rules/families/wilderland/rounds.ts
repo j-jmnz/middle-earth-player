@@ -17,32 +17,39 @@ export function noteTreacheryReveal(state: ScenarioState, cardId: string, ctx: R
   return { ...state, modifiers: [...state.modifiers, mark("table", "treacheryRevealed"), mark(cardId, "firstTreachery")] };
 }
 
-/** A LimitPlaysPerPhase that bars the card: the name of the card that holds it, the most cards a player plays in a phase and the number the active player has played. */
-type PhasePlayLimit = { source: string; max: number; played: number };
+/** A LimitPlaysPerPhase or LimitPlaysPerRound that bars the card: the name of the card that holds it, the most cards a player plays in the phase or the round and the number the active player has played. */
+type PlayLimit = { source: string; max: number; played: number; per: "phase" | "round" };
 
 /**
- * The LimitPlaysPerPhase in force that bars the card from being played: the active player has played as many cards this phase as it allows (`state.played`, whose entries leave the phase out for the Planning phase). A card put into play is not played, so `how.putting`
- * is never barred. Null when nothing bars it.
+ * The LimitPlaysPerPhase or LimitPlaysPerRound in force that bars the card from being played: the active player has played as many cards this phase (or this round, any phase) as it allows (`state.played`, whose entries leave the phase out for the Planning phase).
+ * A card put into play is not played, so `how.putting` is never barred. Null when nothing bars it.
  */
-function phasePlayLimit(state: ScenarioState, cardId: string, ctx: ReduceContext, how: PlayHow): PhasePlayLimit | null {
+function playLimit(state: ScenarioState, cardId: string, ctx: ReduceContext, how: PlayHow): PlayLimit | null {
   const card = state.cards[cardId];
-  if (how.putting === true || !card || inPlay(card.zone) || !gameReads(state, ctx, '"LimitPlaysPerPhase"')) return null;
-  const played = (state.played ?? []).filter((entry) => entry.round === state.round && entry.seat === state.activeSeat && (entry.phase ?? "Planning") === state.phase).length;
-  const held = constantInstructions(state, ctx).find(({ instruction }) => instruction.verb === "LimitPlaysPerPhase" && played >= instruction.max);
-  return held && held.instruction.verb === "LimitPlaysPerPhase" ? { source: stageName(state, ctx, held.source.id, printedOf(ctx.cards, held.source.code).name), max: held.instruction.max, played } : null;
+  if (how.putting === true || !card || inPlay(card.zone) || (!gameReads(state, ctx, '"LimitPlaysPerPhase"') && !gameReads(state, ctx, '"LimitPlaysPerRound"'))) return null;
+  const mine = (state.played ?? []).filter((entry) => entry.round === state.round && entry.seat === state.activeSeat);
+  const inPhase = mine.filter((entry) => (entry.phase ?? "Planning") === state.phase).length;
+  const held = constantInstructions(state, ctx).find(({ instruction }) => (instruction.verb === "LimitPlaysPerPhase" && inPhase >= instruction.max) || (instruction.verb === "LimitPlaysPerRound" && mine.length >= instruction.max));
+  if (!held) return null;
+  const source = stageName(state, ctx, held.source.id, printedOf(ctx.cards, held.source.code).name);
+  if (held.instruction.verb === "LimitPlaysPerPhase") return { source, max: held.instruction.max, played: inPhase, per: "phase" };
+  return held.instruction.verb === "LimitPlaysPerRound" ? { source, max: held.instruction.max, played: mine.length, per: "round" } : null;
 }
 
-/** Whether a LimitPlaysPerPhase in force bars the card from being played (families/wilderland/index.ts, the `play` hook). */
+/** Whether a LimitPlaysPerPhase or LimitPlaysPerRound in force bars the card from being played (families/wilderland/index.ts, the `play` hook). */
 export function phasePlaysBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, how: PlayHow): boolean {
-  return phasePlayLimit(state, cardId, ctx, how) != null;
+  return playLimit(state, cardId, ctx, how) != null;
 }
 
 /** The words for a refused play (the `playReason` hook): "Exploring Gundabad (play limit): each player can play only 1 card per phase. You have played 1 this planning phase." Null when no limit bars the card. */
 export function phasePlayRefusal(state: ScenarioState, cardId: string, ctx: ReduceContext): string | null {
-  const limit = phasePlayLimit(state, cardId, ctx, {});
+  const limit = playLimit(state, cardId, ctx, {});
   if (!limit) return null;
   const who = state.seatCount > 1 ? `Player ${state.activeSeat + 1} has` : "You have";
-  return `${limit.source}: each player can play only ${limit.max} ${limit.max === 1 ? "card" : "cards"} per phase. ${who} played ${limit.played} this ${state.phase.toLowerCase()} phase.`;
+  const cards = limit.max === 1 ? "card" : "cards";
+  return limit.per === "phase"
+    ? `${limit.source}: each player can play only ${limit.max} ${cards} per phase. ${who} played ${limit.played} this ${state.phase.toLowerCase()} phase.`
+    : `${limit.source}: each player can play only ${limit.max} ${cards} each round. ${who} played ${limit.played} this round.`;
 }
 
 // The cards this seat has played or put into play from its hand this round (`handPlays`, noted by noteHandPlay), and the LimitHandPlaysPerRound in force that the seat has used up, if any.

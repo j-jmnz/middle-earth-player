@@ -24,11 +24,11 @@ import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locatio
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
-import { randomStageFrom } from "../families/wilderland/random-stage.ts";
+import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
 import { rescueRandom } from "../families/captured/rescue.ts";
 import { oweDiscards } from "../families/breaking/progress.ts";
-import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
+import { arrivalFace, orderedNext } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
@@ -320,7 +320,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     const nextCode = next.cards[nextId]?.code;
     // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards), the Sorcery cards of a stage that hands them on excepted (10150:B:2).
     next = releaseAttachments(noteHostDefeated(passSorcery(next, currentId, nextId, cards), currentId), currentId, cards, steps);
-    next = moveCard(next, currentId, { zone: stageToVictory(next, cards, current.code) ? "victory" : rolled?.remove ? "removed" : "setAside" });
+    next = leaveStage(next, currentId, current.code, cards, rolled, steps);
     if (rolled || (ordered && next.stages.some((stage) => stage.deck === true))) next = { ...next, stageLeft: { to: nextId, from: currentId } };
     next = moveCard(next, nextId, { zone: "questStage" });
     next = updateCard(next, nextId, { face: arrivalFace(next, nextCode) });

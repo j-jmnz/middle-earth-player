@@ -3,7 +3,7 @@
 // and the Burn keyword.
 import { describe, expect, it } from "vitest";
 
-import { AUTHORED_EFFECTS } from "../../../effects/authored/the-battle-of-lake-town.ts";
+import { AUTHORED_EFFECTS } from "../../../effects/authored/standalone-scenarios/the-battle-of-lake-town.ts";
 import { parseKeywordTokens } from "../../../catalog/keyword-line.ts";
 import { legalIntents, type PlayerIntent } from "../../engine/reduce.ts";
 import { enemy, send, treachery, type Table } from "../defense/table.ts";

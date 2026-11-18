@@ -1,4 +1,4 @@
-import type { Condition, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 // Records for The Massing at Osgiliath (standalone-scenarios cycle part 1, no campaign card). Every line is read from the scan ledger (data/printed/). The players "have crossed the Anduin" on stage 4, Race to Minas Tirith (00019:B:2):
 // the condition `onStage` 4 reads it live. Rules: rr.keywords, rr.defending-player, rr.travel, rr.active-location, rr.shadow-effects, faq.lasting-effects, faq.triggering-forced-effects (data/rules/entries.json).

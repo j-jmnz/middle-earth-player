@@ -37,8 +37,10 @@ export function questOutcome(state: ScenarioState, ctx: ReduceContext): QuestOut
 
 // After the quest resolved: each character that was committed hears it, and so, when the quest succeeded, does each one that
 // quested successfully. The delayed effects waiting for success resolve now (the first one scheduled first), or are dropped.
-export function afterQuestOutcome(state: ScenarioState, outcome: QuestOutcome, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function afterQuestOutcome(state: ScenarioState, outcome: QuestOutcome, ctx: ReduceContext, steps: EngineStep[], placed = false): ScenarioState {
   let next = state;
+  // The table hears once that a successful quest placed progress (`placed`: any of it, wherever it went), whatever is committed (147002:B:2).
+  if (placed && outcome.result === "success") next = queueHeard(next, ctx, { trigger: "questProgressPlaced", seat: null });
   for (const id of outcome.committed) {
     const card = next.cards[id];
     if (!card || !inPlay(card.zone)) continue;

@@ -1,4 +1,4 @@
-import type { Condition, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 // Records for The Stone of Erech (standalone-scenarios cycle part 3, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
 // The Night objectives (Eventide, Dusk, Midnight) lie one at a time beside the current quest (the zone nightObjective, src/rules/families/erech/): "Dusk." lines are live only while Dusk is in play and "Midnight." lines only while Midnight is, and Midnight's values replace
