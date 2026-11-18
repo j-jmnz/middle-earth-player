@@ -1,6 +1,7 @@
-// The campaign's own cards on the campaign setup (user request, 2026-11-18): the first scenario's campaign card, open at once on both sides (Setup and
-// Resolution, rr.campaign-cards), and "All campaign cards", every scenario's in book order, which asks the same in-place spoiler question as the
-// briefing's "All quest cards" before it shows them. Rows and the ask are the briefing's (card-rows.tsx); the cards open in the list preview.
+// The campaign's own cards on the campaign setup (user request, 2026-11-18): the first scenario's campaign card, open at once on its Setup side only (its
+// Resolution side is turned over after the scenario is defeated, rr.campaign-cards), and "All campaign cards", every scenario's in book order and both
+// sides, which asks the same in-place spoiler question as the briefing's "All quest cards" before it shows them. Rows and the ask are the briefing's
+// (card-rows.tsx); the cards open in the list preview.
 import { useState } from "react";
 import { View } from "react-native";
 
@@ -22,9 +23,9 @@ export function CampaignCards({ entries, onOpen }: { entries: readonly CampaignC
       <ListRow
         testID="setup-campaign-first"
         label={firstRow.name}
-        detail={`${first.scenario} · Setup and Resolution`}
+        detail="Scenario 1 · Setup"
         leading={<CardThumb code={first.code} imagesrc={firstRow.imagesrc} />}
-        onPress={() => onOpen(campaignSides([first]))}
+        onPress={() => onOpen([{ code: first.code, side: "A", label: `${first.scenario} · Setup` }])}
       />
       {later ? <ListRow testID="setup-campaign-all" label="All campaign cards" detail={`${entries.length} scenarios · spoilers`} onPress={() => setWarning(true)} /> : null}
       {later && warning ? (

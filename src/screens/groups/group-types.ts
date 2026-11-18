@@ -101,7 +101,13 @@ export function typeGroups(rows: readonly GroupRow[], specs: readonly TypeSpec[]
   const sorted = [...rows].sort((left, right) => left.position - right.position || left.code.localeCompare(right.code));
   const named = new Set(specs.flatMap((spec) => spec.types));
   const make = (id: string, title: string, members: readonly GroupRow[]): TypeGroup[] => (members.length === 0 ? [] : [{ id, title, cards: members.map((row) => groupCard(row, decorate)) }]);
-  const known = specs.flatMap((spec) => make(spec.id, spec.title, sorted.filter((row) => spec.types.includes(row.typeCode))));
+  // A type two specs name (boons and burdens take the player and the scenario headings, and both name objectives) goes under the first.
+  const taken = new Set<string>();
+  const known = specs.flatMap((spec) => {
+    const types = spec.types.filter((type) => !taken.has(type));
+    for (const type of types) taken.add(type);
+    return make(spec.id, spec.title, sorted.filter((row) => types.includes(row.typeCode)));
+  });
   const extra = [...new Set(sorted.filter((row) => !named.has(row.typeCode)).map((row) => row.typeCode))].flatMap((type) => {
     const members = sorted.filter((row) => row.typeCode === type);
     return make(type, otherTitle(members[0]!), members);

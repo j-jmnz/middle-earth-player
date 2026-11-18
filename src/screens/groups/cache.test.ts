@@ -8,6 +8,7 @@ import { groupDataOf, scenarioFacts } from "./cache.ts";
 import { cardGroupOf, MOTK_GROUP_ID } from "./card-group.ts";
 import { MOTK_NOTE } from "./motk.ts";
 import { isCampaignRow } from "./campaign-tree.ts";
+import type { TypeGroup } from "./group-types.ts";
 import { isScenarioRow } from "./scenario-tree.ts";
 
 describe("the group cache", () => {
@@ -31,6 +32,21 @@ describe("the group cache", () => {
       const where = [scenario.has(row.code), campaign.has(row.code), motk.has(row.code)].filter(Boolean).length;
       expect(where, `${row.code} ${row.name}`).toBe(1);
       expect(isScenarioRow(row) !== isCampaignRow(row) || row.packCode === "MotKA").toBe(true);
+    }
+  });
+
+  it("counts each group's cards once: a group's count is its cards and no card repeats in a section or a set", () => {
+    const trees = data.trees();
+    type Listed = { id: string; groups: readonly TypeGroup[]; count: number };
+    const lists: Listed[] = [
+      ...[...trees.scenario.byKey.values()].map(({ set }): Listed => ({ id: set.key, groups: set.groups.filter((group) => group.id !== "quest" && group.id !== "nightmare"), count: set.count })),
+      ...[...trees.campaign.byKey.values()].map(({ section }): Listed => ({ id: section.key, groups: section.groups, count: section.count })),
+    ];
+    for (const list of lists) {
+      const codes = list.groups.flatMap((group) => group.cards.map((card) => card.code));
+      expect(new Set(codes).size, list.id).toBe(codes.length);
+      expect(new Set(list.groups.map((group) => group.id)).size, list.id).toBe(list.groups.length);
+      expect(list.count, list.id).toBe(list.groups.reduce((sum, group) => sum + group.cards.reduce((inner, card) => inner + card.copies, 0), 0));
     }
   });
 
