@@ -74,6 +74,8 @@ export type ZoneName =
   // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
   // nothing that reads the Nightmare setup card reads it.
   | "modeCard"
+  // The Night objective beside the current quest (docs/brief.md, The Stone of Erech): in play, controlled by nobody, one card at a time (families/erech/).
+  | "nightObjective"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by nobody; the host is the Watcher.
   | "captive"
   // Out of play, facedown, under no player's control, still owned (`CardInstance.owner`): a card captured underneath another card (the host), or in a player's captured deck (no host, listed in `Seat.captured`; mec108.captured-cards, mec108.captured-deck).

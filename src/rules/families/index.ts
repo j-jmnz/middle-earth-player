@@ -49,6 +49,7 @@ import { manifest as captured } from "./captured/index.ts";
 import { manifest as escape } from "./escape/index.ts";
 import { manifest as guardian } from "./guardian/index.ts";
 import { manifest as smaug } from "./smaug/index.ts";
+import { manifest as erech } from "./erech/index.ts";
 import { registerFamilies } from "../interpret/family-hooks.ts";
 
 export type { Focus };
@@ -56,7 +57,7 @@ export type { Focus };
 // The mechanic families' rules, in play order: where two runners could answer one verb, the first in this list does (docs/architecture.md, Mechanic families).
 // The order is the catalog list's (src/catalog/families/index.ts).
 export const RULES_FAMILIES: readonly RulesFamily[] = [
-  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian, smaug,
+  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian, smaug, erech,
 ];
 
 // The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle), in this order.
@@ -65,7 +66,7 @@ export const RULES_FAMILIES: readonly RulesFamily[] = [
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
   before: ["burden", "island", "south"],
   after: ["sea", "stormcaller", "island", "wilderland", "captives"],
-  sweep: ["aflame", "objectives", "sea", "wilderland", "south", "deck", "angmar", "quest", "escape"],
+  sweep: ["aflame", "objectives", "sea", "wilderland", "south", "deck", "angmar", "quest", "escape", "erech"],
 };
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */

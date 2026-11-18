@@ -21,6 +21,7 @@ export const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   sailing: "sailing",
   uncharted: "uncharted",
   phantom: "phantom",
+  spectral: "spectral",
   dire: "dire",
 };
 

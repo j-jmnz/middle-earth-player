@@ -72,6 +72,8 @@ export type Keywords = {
   grapple: "highestThreat" | "lowestThreat" | "highestQuestPoints" | "lowestQuestPoints" | null;
   // Phantom (mec113.phantom): the damage the enemy's attack would deal becomes a threat raise for the defending player (families/grey-company/).
   phantom: boolean;
+  // Spectral (docs/brief.md, The Stone of Erech): characters attacking the enemy use their Willpower instead of their Attack (families/attack/spectral.ts).
+  spectral: boolean;
   // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
   dire: boolean;
 };
@@ -142,6 +144,7 @@ const EMPTY_KEYWORDS: Keywords = {
   burn: null,
   grapple: null,
   phantom: false,
+  spectral: false,
   dire: false,
 };
 
@@ -413,6 +416,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       burn: keywords.burn ?? null,
       grapple: keywords.grapple ?? null,
       phantom: keywords.phantom === true,
+      spectral: keywords.spectral === true,
       dire: keywords.dire === true,
     },
   });

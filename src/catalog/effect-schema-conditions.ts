@@ -42,6 +42,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("noneDiscarded") }),
   // The Embassy from the Dark Tower's pair the running effect is on (EmbassyNext): `pair`, there is one (its player card still lies faceup); `playable`, its player card can be played at no cost by its owner now (146072:B:1). Read by src/rules/families/black-gate/embassy.ts.
   z.strictObject({ kind: z.literal("embassy"), is: z.enum(["pair", "playable"]) }),
+  // The erech family's conditions (src/rules/families/erech/conditions.ts). `night`: the Night objective lying beside the quest is Dusk, Midnight, or either ("Dusk. ...", "Midnight. ...", "Dusk/Midnight. ..."; docs/brief.md, The Stone of Erech); false with none in play.
+  // `playersControl`: a player controls a hero or an ally in play with this code ("unless they control Derufin", 50303:B:2), whoever of them.
+  z.strictObject({ kind: z.literal("night"), is: z.enum(["dusk", "midnight", "duskOrMidnight"]) }),
+  z.strictObject({ kind: z.literal("playersControl"), code: z.string().min(1) }),
   // The mount-doom family's conditions (src/rules/families/mount-doom/conditions.ts). `lastFortitudeFailed`, `lastFortitudePassed`: the last Fortitude test the running effect made was failed, or passed ("If you fail this test", 146051:A:1; "If a player passes this test", 146076:B:1);
   // false before the effect has made one. `fortitudeFailed`: a player failed a Fortitude test this round, `who` the actor ("If you failed a Fortitude test this round", 146055:A:3) or any player ("If a player has failed a Fortitude test this round", 146046:A:1).
   z.strictObject({ kind: z.literal("lastFortitudeFailed") }),

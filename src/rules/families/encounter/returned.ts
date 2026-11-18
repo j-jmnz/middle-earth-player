@@ -15,7 +15,7 @@ export function returnFromDiscard(state: ScenarioState, instruction: Extract<Ins
   const count = Math.max(0, resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx));
   const ids = [...state.encounterDiscard].reverse().filter((id) => typeOf(state, id, ctx) === "enemy" && hasTrait(state, id, instruction.trait, ctx)).slice(0, count);
   let next = state;
-  for (const id of ids) next = moveEncounter(next, id, "staging", focus.seat, ctx, steps);
+  for (const id of ids) next = instruction.to === "engagedFirstPlayer" ? moveEncounter(next, id, "engaged", state.firstPlayer, ctx, steps) : moveEncounter(next, id, "staging", focus.seat, ctx, steps);
   const data = topFrame(next)?.data;
   return data?.kind === "effect" ? patchTop(next, { data: { ...data, returned: data.returned + ids.length } }) : next;
 }
