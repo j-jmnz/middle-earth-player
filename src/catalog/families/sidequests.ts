@@ -25,9 +25,6 @@ const VERBS = [
   // most `copies` of its title. A copy that would be added beyond that goes to its owner's discard pile instead
   // (src/rules/families/sidequests/victory.ts).
   z.strictObject({ verb: z.literal("VictoryLimit"), copies: z.number().int().positive(), ...when }),
-  // Constant on a side quest ("Battle.", "Siege."): the characters committed to it quest with this stat instead of their
-  // Willpower (src/rules/families/sidequests/quest.ts).
-  z.strictObject({ verb: z.literal("QuestsWith"), stat: z.enum(["attack", "defense"]), ...when }),
   // The actor is eliminated from the game by a card effect ("At the end of the round, you are eliminated from the game",
   // rr.player-elimination).
   z.strictObject({ verb: z.literal("EliminatePlayer"), ...when }),

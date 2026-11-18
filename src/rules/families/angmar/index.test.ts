@@ -54,7 +54,7 @@ describe("quest cards in play (the amount questCards)", () => {
     expect(resolveAmount(t.state, { questCards: true }, scope, t.ctx)).toBe(3);
     const bare = built();
     expect(resolveAmount(bare.state, { questCards: true }, scope, bare.ctx)).toBe(1);
-    const quested = spawn(t.state, "psq", { zone: "seatQuest", seat: 0 }).state;
+    const quested = spawn(t.state, "psq", { zone: "staging" }).state;
     expect(resolveAmount(quested, { questCards: true }, scope, t.ctx)).toBe(4);
     const done = { ...bare.state, questStage: null };
     expect(resolveAmount(done, { questCards: true }, scope, bare.ctx)).toBe(1);

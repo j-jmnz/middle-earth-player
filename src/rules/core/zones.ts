@@ -18,7 +18,6 @@ import { flagged, heldHero, inPlay, updateCard, updateCards, withSeat } from "./
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
-  | { zone: "seatQuest"; seat: number }
   // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking/areas.ts); the card is in
   // `staging` and in that seat's list.
   | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap" | PileZone; area?: number }
@@ -84,12 +83,6 @@ function detach(state: ScenarioState, id: string): ScenarioState {
   // The decks beside the encounter deck (Corsair, Uncharted, Ered Mithrin's) leave through one accessor (piles.ts).
   if (isDeckZone(current.zone)) return leavePile(state, current.zone, id);
   switch (current.zone) {
-    case "seatQuest": {
-      if (current.controller == null) return state;
-      const seat = state.seats[current.controller];
-      if (!seat || seat.questStage !== id) return state;
-      return withSeat(state, current.controller, { ...seat, questStage: null });
-    }
     case "staging": {
       const left = { ...state, staging: without(state.staging, id) };
       if (!state.separate) return left;
@@ -206,7 +199,7 @@ export function unhost(state: ScenarioState, id: string): ScenarioState {
 
 // A destination that is one of a seat's own lists.
 function seatList(dest: Destination): dest is Extract<Destination, { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging" }> {
-  return "seat" in dest && dest.zone !== "captured" && dest.zone !== "seatQuest" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
+  return "seat" in dest && dest.zone !== "captured" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
 }
 
 function attach(state: ScenarioState, id: string, dest: Destination): ScenarioState {
@@ -219,12 +212,6 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
     if (!seat) return state;
     const listed = patchSeatList(state, dest.seat, key, append(seat[key], id));
     return updateCard(listed, id, { zone: dest.zone, controller: dest.seat });
-  }
-  if (dest.zone === "seatQuest") {
-    const seat = state.seats[dest.seat];
-    if (!seat) return state;
-    const seated = withSeat(state, dest.seat, { ...seat, questStage: id });
-    return updateCard(seated, id, { zone: "seatQuest", controller: dest.seat });
   }
   // Under a location: out of play, facedown, controlled by nobody, and not one of the location's attachments (141049:A:1).
   if (dest.zone === "under") {

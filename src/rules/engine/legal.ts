@@ -25,7 +25,6 @@ import { optionalEnemies, stagingLocations } from "../quest/quest.ts";
 import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, travelProgressReason, seatBarred } from "../interpret/restrictions.ts";
 import { flagged, modifierActive, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
-import { sideQuestReason } from "../families/sidequests/quest.ts";
 import { familyAttackReason, familyDefenseReason, familyMayTravel, familyTravelReach } from "../interpret/family-hooks.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploring } from "../families/island/map.ts";
@@ -284,7 +283,7 @@ function commitReason(
   for (const id of intent.cardIds) {
     if (!legal.has(id)) return "That character cannot commit";
   }
-  return intent.sideQuestId ? sideQuestReason(state, intent.sideQuestId) : null;
+  return null;
 }
 
 function travelReason(

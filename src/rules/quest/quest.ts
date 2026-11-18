@@ -32,7 +32,7 @@ import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
 import { absorbProgress } from "../families/angmar/sponge.ts";
-import { currentSideQuest, hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
+import { currentSideQuest, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -113,8 +113,7 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
     if (seat.eliminated || (only != null && headOf(view, index) !== headOf(view, only))) continue;
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = view.cards[id];
-      // A character committed to a side quest places its Willpower on that quest, not against the staging area (families/sidequests/quest.ts).
-      if (!instance?.committed || instance.questTo != null) continue;
+      if (!instance?.committed) continue;
       // "Using its Attack instead of its Willpower" (11005:A:2).
       total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
     }
@@ -215,27 +214,28 @@ export function placeQuestProgress(
   let next = placedOn.state;
   let remaining = placedOn.remaining;
   if (remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps, questing));
+  const onSide = currentSideQuest(next) != null; // the progress goes on the side quest, so the stage's replacements below read none (mec108.side-quests-in-play)
   // Progress a stage turns into discards from the encounter deck (families/breaking/progress.ts).
-  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressDiscards")) {
+  if (remaining > 0 && !onSide && next.questStage && flagged(next, next.questStage, "progressDiscards")) {
     next = oweDiscards(next, remaining);
     remaining = 0;
   }
   // Progress a stage turns into rescued captured cards, at random, instead of progress on it (families/captured/rescue.ts, 10039:B:1).
-  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressRescues")) {
+  if (remaining > 0 && !onSide && next.questStage && flagged(next, next.questStage, "progressRescues")) {
     next = rescueRandom(next, next.questStage, remaining);
     remaining = 0;
   }
   // Progress a stage turns into an event its record hears (progressReplaced, with the amount) instead of progress on it.
   const stage = next.questStage;
-  if (remaining > 0 && stage && PROGRESS_REPLACED.some((one) => (!one.questingOnly || questing) && flagged(next, stage, one.flag))) {
+  if (remaining > 0 && !onSide && stage && PROGRESS_REPLACED.some((one) => (!one.questingOnly || questing) && flagged(next, stage, one.flag))) {
     next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: stage, amount: remaining });
     remaining = 0;
   }
   // Assault (mec113.assault): no progress is placed on the stage by questing or by a player card effect; the active location above took its share as usual.
-  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "assault")) remaining = 0;
+  if (remaining > 0 && !onSide && next.questStage && flagged(next, next.questStage, "assault")) remaining = 0;
   // A side quest that is the current quest takes it instead of the main quest card; what it cannot take is discarded (emce.side-quests-in-play, families/wilderland/night-quest.ts).
-  if (remaining > 0 && hasSideQuests(next)) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
-  // The main quest card takes none while it cannot be the current quest and no side quest was chosen (10094:B:3): the progress is lost.
+  if (remaining > 0 && onSide) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
+  // The main quest card takes none while barred as the current quest with no side quest chosen (10094:B:3).
   if (remaining > 0 && next.questStage && !next.stageCleared && !mainQuestBarred(next)) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];

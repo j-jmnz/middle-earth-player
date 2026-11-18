@@ -20,7 +20,6 @@ const READ_AS_DATA: Record<string, string> = {
   FixedX: "src/rules/families/misc/cost.ts",
   GrantSecrecy: "src/rules/families/misc/cost.ts",
   VictoryLimit: "src/rules/families/sidequests/victory.ts",
-  QuestsWith: "src/rules/families/sidequests/quest.ts",
   InPlayLimit: "src/rules/families/sidequests/play.ts",
   EncounterKeyword: "src/rules/families/sidequests/encounter.ts",
   CannotPlay: "src/rules/families/sidequests/contract.ts",

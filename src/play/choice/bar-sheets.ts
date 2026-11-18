@@ -2,7 +2,6 @@
 // opens (playing it, paying for it, using its Action), and the intents a multi-choice or distribute sheet sends for what the
 // player picked. The reducer still checks every intent.
 import { legalAttackEnemies } from "../../rules/combat/combat.ts";
-import { sideQuestIds } from "../../rules/families/sidequests/quest.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { flagged } from "../../rules/core/state.ts";
 import { questSeat } from "../store/selectors.ts";
@@ -92,19 +91,15 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
   if (commit) {
     // Once a character is committed, passing ends the commit rather than sending no one.
     const some = Object.values(game.cards).some((card) => card.committed && card.controller === game.activeSeat);
-    // A player side quest in a quest area takes characters committed to it instead (families/sidequests/quest.ts).
-    const sideQuests = sideQuestIds(game).map((id) => ({ id, label: names.card(id) }));
     // A hero that must commit has not: passing is not legal, so the window offers Commit only (the dock's primary waits for a pick).
     const owed = mustCommitWords(game, names, commit, legal);
-    const toSide = sideQuests.length > 0 ? ` Or send them to ${sideQuests.map((quest) => quest.label).join(" or ")}: its willpower goes on it as progress.` : "";
-    if (owed != null) return { ...base, sideQuests, title: commitTitle(game, names), note: `${owed}. Tap a character to commit.${toSide}`, mustCommit: owed, pass: null, passNote: null, armed: null };
+    if (owed != null) return { ...base, title: commitTitle(game, names), note: `${owed}. Tap a character to commit.`, mustCommit: owed, pass: null, passNote: null, armed: null };
     return some
-      ? { ...base, sideQuests, title: commitTitle(game, names), note: `Tap more characters to quest, or end the commit.${toSide}`, pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
+      ? { ...base, title: commitTitle(game, names), note: "Tap more characters to quest, or end the commit.", pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
       : {
           ...base,
-          sideQuests,
           title: commitTitle(game, names),
-          note: `Tap characters to quest. They exhaust, so they cannot defend or attack this round.${toSide}`,
+          note: "Tap characters to quest. They exhaust, so they cannot defend or attack this round.",
           pass: "Commit no one",
           passNote: "Pass sends no one.",
           // The quest is never skipped (rr.step-3-3): staging still reveals and its threat still counts against no willpower.

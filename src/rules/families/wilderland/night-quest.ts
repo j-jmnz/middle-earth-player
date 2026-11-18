@@ -23,7 +23,11 @@ export function markSideQuests(state: ScenarioState, cards: ReduceContext["cards
   return { ...state, sideQuests: true };
 }
 
-export const isSideQuest = (state: ScenarioState, id: string, ctx: Pick<ReduceContext, "cards">): boolean => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "encounter-side-quest";
+/** A side quest card, encounter or player: a player side quest in play lies in the staging area like an encounter one (The Lost Realm rules, mec108.side-quests-in-play). */
+export const isSideQuest = (state: ScenarioState, id: string, ctx: Pick<ReduceContext, "cards">): boolean => {
+  const type = printedOf(ctx.cards, state.cards[id]?.code ?? "").type;
+  return type === "encounter-side-quest" || type === "player-side-quest";
+};
 
 /** The side quests in the staging area, in the order they were added. */
 export function stagedSideQuests(state: ScenarioState, ctx: Pick<ReduceContext, "cards">): string[] {

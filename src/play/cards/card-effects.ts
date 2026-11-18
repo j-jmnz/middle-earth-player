@@ -260,7 +260,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
   const card = game.cards[cardId];
   const effects = cardEffects(game, ctx, cardId);
   // The Stormcaller's current quest stage wears the strip a quest card does (dcce.stormcallers-area).
-  const questing = card != null && (stagedSideQuest(game, ctx, cardId) || card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest" || areaRoleOf(game, cardId) === "stage");
+  const questing = card != null && (stagedSideQuest(game, ctx, cardId) || card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || areaRoleOf(game, cardId) === "stage");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
   return {

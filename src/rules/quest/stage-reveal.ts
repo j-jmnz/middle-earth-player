@@ -5,7 +5,6 @@ import { runQuestResolution } from "./explore.ts";
 import { afterQuestOutcome, questOutcome } from "../families/quest/outcome.ts";
 import { questFailureRaise } from "../families/quest/threat.ts";
 import { askQuestProgress } from "../families/attachments/quest.ts";
-import { resolveSideQuests, sideQuestTotals } from "../families/sidequests/quest.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { gameReadsOnTrigger } from "../core/game-reads.ts";
 import { isLocationId } from "../core/printed.ts";
@@ -32,12 +31,9 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const before = steps.length;
   // Who was committed, read before resolving clears it, and the threat a failed quest raises (families/quest/).
   const outcome = questOutcome(state, ctx);
-  // The progress each side quest takes from its committed characters, read before resolution clears who is committed.
-  const sides = sideQuestTotals(state, ctx);
   const canAdvance = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
   // Once stages are separate each seat resolves the quest of its own stage in player order, against its own staging area (mec109.multiple-staging-areas).
-  const quested = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
-  const resolved = resolveSideQuests(quested, sides, ctx, steps);
+  const resolved = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
   return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);

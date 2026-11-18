@@ -5,16 +5,16 @@ import { describe, expect, it } from "vitest";
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
 import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
-import { passQuestWindow, put, questArea, questing, run, seat, send, sideCtx, trigger } from "./fixture.ts";
+import { asCurrentQuest, passQuestWindow, put, stagedQuest, questing, run, seat, send, sideCtx, trigger } from "./fixture.ts";
 
 const ctx = sideCtx(RECORDS);
 
-// The side quest is one commit from defeat; the quest phase is resolved, and the window the Response is offered in is open.
+// The side quest is one point from defeat, so the quest this round fills it; the quest phase is resolved, and the window the Response is offered in is open.
 function defeated(code: string, seats: 1 | 2, prepare: (state: ScenarioState) => ScenarioState = (state) => state) {
   const table = seat(seats, ["dwarf", "rohan"]);
-  const quest = questArea(table.state, code);
-  let state = prepare([0, 1].reduce((acc, index) => (index < seats ? withThreat(acc, index, 20) : acc), updateCard(quest.state, quest.id, { progress: 100 })));
-  state = send(questing(state), { type: "Commit", cardIds: [table.heroes[0] ?? ""], sideQuestId: quest.id }, ctx);
+  const quest = stagedQuest(table.state, code);
+  let state = prepare([0, 1].reduce((acc, index) => (index < seats ? withThreat(acc, index, 20) : acc), updateCard(quest.state, quest.id, { progress: (ctx.cards.get(code)?.questPoints ?? 1) - 1 })));
+  state = send(questing(asCurrentQuest(state, quest.id)), { type: "Commit", cardIds: [table.heroes[0] ?? ""] }, ctx);
   state = run(passQuestWindow(state, ctx), ctx);
   return { table, quest, state };
 }

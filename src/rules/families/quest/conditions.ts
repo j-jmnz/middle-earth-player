@@ -7,6 +7,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, reached } from "../../core/state.ts";
+import { currentQuestId } from "../wilderland/night-quest.ts";
 
 type Step = Extract<Condition, { kind: "step" }>["is"];
 
@@ -44,7 +45,9 @@ export function questHasKeywords(state: ScenarioState, ctx: ReduceContext): bool
 // The current quest card has this keyword, printed (Hall of Beorn's keywords) or gained from an effect (a flag on the card):
 // Battle and Siege change what the committed characters count (hon.battle, hon.siege; quest.ts questStatOf).
 export function currentQuestHas(state: ScenarioState, keyword: "battle" | "siege", cards: ReduceContext["cards"]): boolean {
-  const stage = state.questStage ? state.cards[state.questStage] : undefined;
+  // A side quest that is the current quest counts instead of the main quest card (emce.side-quests-in-play).
+  const id = currentQuestId(state);
+  const stage = id ? state.cards[id] : undefined;
   if (!stage) return false;
   return printedOf(cards, stage.code).keywords[keyword] || flagged(state, stage.id, keyword);
 }

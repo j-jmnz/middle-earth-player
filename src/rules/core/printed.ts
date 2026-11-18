@@ -31,11 +31,11 @@ export type CardType =
   | "campaign"
   // The Nightmare setup card, next to the quest deck on Nightmare (zone `nightmare`): its side A's lines stay active all game.
   | "nightmare"
-  // A player card played in the planning phase into its player's quest area (families/sidequests/play.ts), and a contract
+  // A player card played in the planning phase into the staging area (families/sidequests/play.ts), and a contract
   // card that begins the game in its player's play area (families/sidequests/contract.ts).
   | "player-side-quest"
   | "contract"
-  // An encounter side quest (Fire in the Night, emce.side-quests): a quest card with an encounter card back. It is revealed into the staging area and may be the current quest (families/wilderland/night-quest.ts).
+  // An encounter side quest (Fire in the Night, emce.side-quests): a quest card with an encounter card back. It is revealed into the staging area and may be the current quest, as a player side quest in play may (families/sidequests/play.ts) (families/wilderland/night-quest.ts).
   | "encounter-side-quest";
 
 export type Keywords = {

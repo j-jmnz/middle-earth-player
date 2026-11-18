@@ -33,6 +33,8 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 29, scenarios: "all", note: "Cram readies the hero it was attached to after it is discarded." },
   { version: 30, scenarios: ["mount-gundabad"], note: "Dagnir and the other cards that count quest cards in the victory display count player side quests too." },
   { version: 30, scenarios: "all", note: "A card that attaches to a quest card in play, like The Long Defeat, can attach to a side quest." },
+  { version: 30, scenarios: "all", note: "A player side quest is placed in the staging area when you play it, so you can play several. The first player may choose one side quest in the staging area as the current quest at the start of the quest phase, and all committed willpower is compared with the staging threat once: questing successfully on a side quest no longer raises your threat." },
+  { version: 30, scenarios: "all", note: "While a side quest is the current quest, progress goes on it, not on the main quest card, even when the main quest card turns progress into something else, like Gornákh's Dungeons." },
   { version: 30, scenarios: ["lost-in-mirkwood", "across-the-ettenmoors", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "An Objective-Location counts as a location for cards that look for a location: it can be chosen as the active location, and exploring or travelling to it triggers them." },
 ];
 

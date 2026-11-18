@@ -199,14 +199,14 @@ No phase is open.
 - The Treachery of Rhudaur: each Clue's boon (10184:B:1) goes into its controller's deck as well as the pool (agent recommendation). Not user-confirmed.
 - Renderer gaps, The Treachery of Rhudaur (behaviour proven by tests): unclaimed side quests counted by 10094:B:4, Ghostly Ruins' unpayable Travel (10103:A:2), the main quest barred from Centuries of Sorrow's choice and Haunting Fog with no current quest (10105:A:2, 10108:A:1), Amarthiúl as an ally and the shared limit (10113), the boon into the deck (10184:B:1), "Restricted." on 10185 to 10187.
 - `modifiedStat` (`src/rules/core/keywords.ts`) reads traits with no effect list, so a trait an effect grants is not seen by stat conditions such as `defendingAgainst` (the condition path sees it).
-- Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
+- Intruders in Chetwood: quest cards in play are the main quest, the staged side quests, encounter and player, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
 - Intruders in Chetwood: Time counters come off after the end-of-refresh Forced effects. Not user-confirmed.
 - Intruders in Chetwood: Outlying Homestead (09020:A:2) bars threat reduction by player card effects only. Not user-confirmed.
 - Intruders in Chetwood: Sudden Assault (09021:A:1) attacks first and searches for an Orc War Party only if no attack was made. Not user-confirmed.
 - Intruders in Chetwood: Angmar Orc's ally choice (09043:A:1) may take Iârion; the first player chooses. Not user-confirmed.
-- Intruders in Chetwood: Pressing Needs (09049:A:2): search-and-reveal a side quest or make a different quest card current; player side quests not eligible. Not user-confirmed.
+- Intruders in Chetwood: Pressing Needs (09049:A:2): search-and-reveal a side quest or make a different quest card current; a staged player side quest is eligible. Not user-confirmed.
 - Intruders in Chetwood: Weight of Responsibility (09050) counts quest cards when it resolves. Not user-confirmed.
 - Intruders in Chetwood: Stop the War Party's Setup (09068:A:1): each player searches for one location with a different title. Not user-confirmed.
 - Intruders in Chetwood: Protect the Innocent (10158:A:1) takes 1 damage per attack that damages a character. Not user-confirmed.
@@ -248,7 +248,6 @@ No phase is open.
 - Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
 - Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
-- A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
 - `items-baseline` collapsed on Android in the path; it is still in `card-pool.tsx` and `log/[saveId].tsx`.
 - Why the path screen was laid out taller than the window on Android is not known. The action bar's overrun measure stays for screens that keep a bar.
 - Web only: opening Cards, Import or a deck first can raise "error during concurrent rendering" (expo-sqlite "Sync operation timeout"; React recovers). Rows ending in a stepper warn "nested button".

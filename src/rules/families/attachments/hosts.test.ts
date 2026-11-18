@@ -71,12 +71,11 @@ describe("an attachment on a side quest (mec108.side-quests: a side quest is a q
   const cards = new Map([...ATTACHMENT_CARDS, ["esq", definePrinted({ code: "esq", name: "Encounter Side Quest", type: "encounter-side-quest", questPoints: 6 })], ["psq", definePrinted({ code: "psq", name: "Player Side Quest", type: "player-side-quest", questPoints: 4 })]]);
   const sideCtx = { ...ctx, cards };
 
-  it("an encounter side quest in the staging area and a player side quest in a quest area are hosts of \"Attach to a quest card in play\"", () => {
+  it("an encounter side quest in the staging area and a player side quest in the staging area are hosts of \"Attach to a quest card in play\"", () => {
     const table = seat(1, ["ranger", "hobbit"], "stage1");
     const encounter = put(table.state, "esq", "staging");
-    const player = spawn(encounter.state, "psq", { zone: "seatQuest", seat: 0 });
-    const state: ScenarioState = { ...player.state, seats: [{ ...player.state.seats[0], questStage: player.id }, player.state.seats[1]] };
-    const defeat = put(state, "10122", "hand");
+    const player = spawn(encounter.state, "psq", { zone: "staging" });
+    const defeat = put(player.state, "10122", "hand");
     const road = put(defeat.state, "16012", "hand");
     const stage = defeat.state.questStage ?? "";
     for (const id of [defeat.id, road.id]) expect([...legalTargets(road.state, { type: "PlayCard", cardId: id }, sideCtx)].sort()).toEqual([stage, encounter.id, player.id].sort());

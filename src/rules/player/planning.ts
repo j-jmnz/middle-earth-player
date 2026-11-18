@@ -22,7 +22,7 @@ import { gainedDoomed } from "../families/deck/gains-doomed.ts";
 import { doomedRaise } from "../families/deck/rules.ts";
 import { chosenX } from "../families/misc/cost.ts";
 import { playBlocked } from "../families/sidequests/contract.ts";
-import { enterQuestArea, inPlayLimitReason, sideQuestPlayReason } from "../families/sidequests/play.ts";
+import { enterStaging, inPlayLimitReason } from "../families/sidequests/play.ts";
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { pickCandidates } from "../interpret/pick.ts";
@@ -81,8 +81,8 @@ export function playCard(
     const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
     return playEvent(queueEvent(next, { trigger: "played", seat, cardId: intent.cardId }), intent.cardId, seat, ctx, steps, x);
   }
-  // A player side quest enters its player's quest area (families/sidequests/play.ts).
-  if (printed.type === "player-side-quest") return enterQuestArea(next, intent.cardId, seat, steps);
+  // A player side quest is placed in the staging area (families/sidequests/play.ts).
+  if (printed.type === "player-side-quest") return enterStaging(next, intent.cardId, seat, steps);
   // An attachment played unattached, onto a threat dial, or guarded (families/attachments/play.ts).
   const elsewhere = printed.type === "attachment" ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
   if (elsewhere) return elsewhere;
@@ -238,9 +238,6 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   const limit = playLimit(state, cardId, ctx);
   if (limit) return playLimitReason(limit);
   if (!hasResourceMatch(state, state.activeSeat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
-  // A player side quest needs a free quest area (families/sidequests/play.ts).
-  const area = printed.type === "player-side-quest" ? sideQuestPlayReason(state, state.activeSeat) : null;
-  if (area) return area;
   // "Limit 2 copies of ~ in play" (families/sidequests/play.ts).
   const limited = inPlayLimitReason(state, cardId, ctx);
   if (limited) return limited;
