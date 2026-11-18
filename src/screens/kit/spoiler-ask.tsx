@@ -1,5 +1,5 @@
 // The in-place question that stands before cards which show what a scenario or a campaign holds (docs/design-system.md, Card groups): the card-group
-// route and the Cards tab's pane, the briefing's "All quest cards" and the campaign setup's "All campaign cards" all draw it, so it looks the same
+// route and the Cards tab's pane, the briefing's "All quest cards" and the campaign setup's Quest cards all draw it, so it looks the same
 // everywhere. Show is the dominant control, a secondary capsule in the accent; Not now is a muted text button beside it. `<testID>` is the block,
 // `<testID>-show` and `<testID>-cancel` its two buttons.
 import { View } from "react-native";

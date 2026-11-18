@@ -12,6 +12,7 @@ import { campaignIds, campaignOf, scenarioOf } from "../data/campaign-data";
 import { campaignTree, type CampaignTree } from "./campaign-tree";
 import type { EasyCopies, GroupRow } from "./group-types";
 import { motkAllyCode, motkHeroes, MOTK_PACK, type MotkHero } from "./motk";
+import { scenarioCards, type ScenarioCards } from "./scenario-group";
 import { scenarioTree, type ScenarioTree } from "./scenario-tree";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
@@ -77,7 +78,11 @@ export type GroupData = {
   scenario: () => ScenarioTree;
   campaign: () => CampaignTree;
   motk: () => readonly MotkHero[];
+  /** One scenario's cards by its id (scenario-group.ts), with its printed name and number; null for an id no scenario file has. */
+  scenarioCards: (id: string) => ScenarioGroup | null;
 };
+
+export type ScenarioGroup = { name: string; number: number; cards: ScenarioCards };
 
 const groups = new WeakMap<object, GroupData>();
 
@@ -87,6 +92,8 @@ function build<TRun>(catalog: Db<TRun>): GroupData {
   let campaign: CampaignTree | null = null;
   let motk: readonly MotkHero[] | null = null;
   let packRows: { code: string; name: string }[] | null = null;
+  let byCode: ReadonlyMap<string, GroupRow> | null = null;
+  const scenarios = new Map<string, ScenarioGroup | null>();
   let scenarioFactsRead: ScenarioFacts | null = null;
   const facts = () => (scenarioFactsRead ??= scenarioFacts());
   const packList = () => (packRows ??= catalog.select({ code: packs.code, name: packs.name }).from(packs).all());
@@ -114,6 +121,14 @@ function build<TRun>(catalog: Db<TRun>): GroupData {
         facts().givenBy,
       )),
     motk: () => (motk ??= motkHeroes(rows, allyPacks())),
+    scenarioCards: (id) => {
+      if (!scenarios.has(id)) {
+        const scenario = scenarioOf(id);
+        byCode ??= new Map(rows.map((row) => [row.code, row]));
+        scenarios.set(id, scenario ? { name: printedScenarioName(scenario.name), number: scenario.number, cards: scenarioCards(scenario, byCode) } : null);
+      }
+      return scenarios.get(id) ?? null;
+    },
   };
   return data;
 }

@@ -3,6 +3,9 @@
 // opens them all. Nothing is saved: a relaunch asks again. A tiny store read through useSyncExternalStore.
 import { useSyncExternalStore } from "react";
 
+/** The one ask: its answer shows every encounter and campaign card until the app closes. */
+export const SPOILER_TEXT = "Encounter and campaign cards show what the scenarios hold. Show all of them?";
+
 let shown = false;
 const listeners = new Set<() => void>();
 

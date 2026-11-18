@@ -1,45 +1,92 @@
-// The campaign's own cards on the campaign setup (user request, 2026-11-18): the first scenario's campaign card, open at once on its Setup side only (its
-// Resolution side is turned over after the scenario is defeated, rr.campaign-cards), and "All campaign cards", every scenario's in book order and both
-// sides, which asks the same in-place spoiler question as the briefing's "All quest cards" before it shows them. Rows and the ask are the briefing's
-// (card-rows.tsx); the cards open in the list preview.
-import { useState } from "react";
+// The campaign's cards on the campaign setup (docs/design-system.md, Campaign setup; user decision, 2026-11-18), in three sections. Scenario 1:
+// its campaign card, open at once on its Setup side only (its Resolution side is turned over after the scenario is defeated, rr.campaign-cards),
+// its quest cards (every stage, both sides) and its encounter cards (the scenario's card group). Later scenarios: one row that opens the
+// campaign's cards screen on the scenarios after the first. Campaign: the campaign's sections (campaign cards, Boons, Burdens, Treasures),
+// read after the first paint. Every row that shows spoilers waits on the one spoiler answer (groups/reveal.ts): the quest cards ask it in
+// place, the groups on their route.
+import { useRouter } from "expo-router";
+import { useDeferredValue, useMemo, useState } from "react";
 import { View } from "react-native";
 
+import { printedScenarioName } from "../../campaign/printed-name";
+import { scenarioOf } from "../data/campaign-data";
+import { useDatabases } from "../data/databases";
+import { groupDataOf } from "../groups/cache";
+import { cardsWord } from "../groups/card-group";
+import { encounterWords, stagesWords } from "../groups/campaign-scenarios";
+import { revealSpoilers, SPOILER_TEXT, useSpoilersRevealed } from "../groups/reveal";
 import { ListRow, Section } from "../kit/chrome";
 import { SpoilerAsk } from "../kit/spoiler-ask";
 import type { CardSide } from "../pool/list-preview";
 import { CardThumb } from "./card-thumb";
 import { useCardFacts } from "./card-rows";
-import { campaignSides, type CampaignCardEntry } from "./scenario-sides";
+import { questSides } from "./scenario-sides";
 
-export function CampaignCards({ entries, onOpen }: { entries: readonly CampaignCardEntry[]; onOpen: (sides: readonly CardSide[]) => void }) {
-  const [warning, setWarning] = useState(false);
-  const first = entries[0];
-  const firstRow = useCardFacts(first?.code);
-  if (!first || !firstRow) return null;
-  const later = entries.length > 1;
+export type CampaignSetupCardsProps = { id: string; scenarios: readonly string[]; campaignCards: Readonly<Record<string, string>> };
+
+export function CampaignSetupCards({ campaign, onOpen }: { campaign: CampaignSetupCardsProps; onOpen: (sides: readonly CardSide[]) => void }) {
+  const router = useRouter();
+  const { catalog } = useDatabases();
+  const shown = useSpoilersRevealed();
+  const [asking, setAsking] = useState(false);
+  const firstId = campaign.scenarios[0];
+  const first = firstId ? scenarioOf(firstId) : null;
+  const cardCode = firstId ? campaign.campaignCards[firstId] : undefined;
+  const card = useCardFacts(cardCode);
+  // The sections need the catalog's campaign tree: read after the first paint.
+  const ready = useDeferredValue(true, false);
+  const sections = useMemo(() => (ready ? (groupDataOf(catalog).campaign().campaigns.find((node) => node.id === campaign.id)?.sections ?? []) : []), [ready, catalog, campaign.id]);
+  if (!first || !firstId) return null;
+  const name = printedScenarioName(first.name);
+  const spoilers = shown ? "" : " · spoilers";
+  const later = campaign.scenarios.length - 1;
+  const openQuest = () => onOpen(questSides(first.stages));
+  const openGroup = (kind: "scenario" | "campaign", id: string) => router.push({ pathname: "/card-group/[kind]/[id]", params: { kind, id, from: "setup" } });
   return (
     <View testID="setup-campaign-cards" className="mt-5">
-      <Section title="Campaign cards" />
-      <ListRow
-        testID="setup-campaign-first"
-        label={firstRow.name}
-        detail="Scenario 1 · Setup"
-        leading={<CardThumb code={first.code} imagesrc={firstRow.imagesrc} />}
-        onPress={() => onOpen([{ code: first.code, side: "A", label: `${first.scenario} · Setup` }])}
-      />
-      {later ? <ListRow testID="setup-campaign-all" label="All campaign cards" detail={`${entries.length} scenarios · spoilers`} onPress={() => setWarning(true)} /> : null}
-      {later && warning ? (
-        <SpoilerAsk
-          testID="setup-campaign-spoiler"
-          text="The later campaign cards show what this campaign holds before you meet it. Read them anyway?"
-          showLabel="Show all cards"
-          onShow={() => {
-            setWarning(false);
-            onOpen(campaignSides(entries));
-          }}
-          onCancel={() => setWarning(false)}
+      <Section title={`Scenario 1 · ${name}`} />
+      {cardCode && card ? (
+        <ListRow
+          testID="setup-campaign-first"
+          label="Campaign card"
+          detail={`${card.name} · Setup`}
+          leading={<CardThumb code={cardCode} imagesrc={card.imagesrc} />}
+          onPress={() => onOpen([{ code: cardCode, side: "A", label: `${name} · Setup` }])}
         />
+      ) : null}
+      <ListRow testID="setup-quest-cards" label="Quest cards" detail={`${stagesWords(first.stages.length)}${spoilers}`} onPress={() => (shown ? openQuest() : setAsking(true))} />
+      {asking && !shown ? (
+        <SpoilerAsk
+          testID="setup-spoiler"
+          text={SPOILER_TEXT}
+          showLabel="Show them"
+          onShow={() => {
+            setAsking(false);
+            revealSpoilers();
+            openQuest();
+          }}
+          onCancel={() => setAsking(false)}
+        />
+      ) : null}
+      <ListRow testID="setup-encounter-cards" label="Encounter cards" detail={`${encounterWords(first.encounterSets)}${spoilers}`} onPress={() => openGroup("scenario", firstId)} />
+      {later > 0 ? (
+        <>
+          <Section title="Later scenarios" className="mt-4" />
+          <ListRow
+            testID="setup-later-scenarios"
+            label={`${later} ${later === 1 ? "scenario" : "scenarios"}`}
+            detail={`${later === 1 ? "Scenario 2" : `Scenarios 2 to ${later + 1}`}${spoilers}`}
+            onPress={() => router.push({ pathname: "/campaign-cards/[campaignId]", params: { campaignId: campaign.id, after: "1" } })}
+          />
+        </>
+      ) : null}
+      {sections.length > 0 ? (
+        <>
+          <Section title="Campaign" className="mt-4" />
+          {sections.map((section) => (
+            <ListRow key={section.key} testID={`setup-section-${section.key}`} label={section.title} detail={`${cardsWord(section.count)}${spoilers}`} onPress={() => openGroup("campaign", section.key)} />
+          ))}
+        </>
       ) : null}
     </View>
   );

@@ -4,14 +4,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { View } from "react-native";
 
-import { printedScenarioName } from "../../../campaign/printed-name";
 import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { RETURN_OF_THE_KING_CAMPAIGN } from "../../../campaign/saga";
 import type { ModeCard } from "../../../campaign/xp";
 import { BriefingScreen, CampaignBanner, ModePicker } from "../../briefing/parts";
 import { campaignListQueries } from "../../campaign/list";
-import { campaignCardEntries } from "../../briefing/scenario-sides";
-import { campaignOf, scenarioOf } from "../../data/campaign-data";
+import { campaignOf } from "../../data/campaign-data";
 import { createSave } from "../../data/campaign-store";
 import { useCarryChoices } from "../../campaign/carry-choices";
 import { BodyText, Label, PrimaryButton, Section, Segmented } from "../../kit/chrome";
@@ -75,10 +73,7 @@ export default function CampaignSetup() {
     <BriefingScreen
       {...frame}
       scenarioId={data.scenarios[0] ?? null}
-      campaignCards={campaignCardEntries(
-        data.scenarios.map((scenarioId) => ({ id: scenarioId, name: printedScenarioName(scenarioOf(scenarioId)?.name ?? scenarioId) })),
-        data.campaignCards,
-      )}
+      campaignSetup={{ id, scenarios: data.scenarios, campaignCards: data.campaignCards }}
       banner={<CampaignBanner eyebrow={`Campaign · ${words}`} name={name} />}
       bar={
         <View className="gap-2">

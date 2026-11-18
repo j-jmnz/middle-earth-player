@@ -16,10 +16,7 @@ import { groupDataOf } from "./cache";
 import { cardGroupOf, type CardGroup, type GroupKind } from "./card-group";
 import { GroupCell } from "./group-cell";
 import type { GroupCard } from "./group-types";
-import { revealSpoilers, useSpoilersRevealed } from "./reveal";
-
-/** The one ask: its answer shows every encounter and campaign card until the app closes. */
-export const SPOILER_TEXT = "Encounter and campaign cards show what the scenarios hold. Show all of them?";
+import { revealSpoilers, SPOILER_TEXT, useSpoilersRevealed } from "./reveal";
 
 type Item = { kind: "head"; id: string; title: string } | { kind: "cards"; id: string; cards: readonly GroupCard[]; columns: number };
 

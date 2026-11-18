@@ -13,7 +13,7 @@ function source(over: Partial<GroupSource>): GroupSource {
   const never = (name: string) => () => {
     throw new Error(`${name} tree built`);
   };
-  return { scenario: never("scenario"), campaign: never("campaign"), ...over };
+  return { scenario: never("scenario"), campaign: never("campaign"), scenarioCards: never("scenarioCards"), ...over };
 }
 
 describe("cardGroupOf", () => {
