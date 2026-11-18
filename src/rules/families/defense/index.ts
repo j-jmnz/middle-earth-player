@@ -93,7 +93,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ExcessToCard":
       return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, excessToCard: instruction.name } } : state;
     case "DealShadowTo":
-      return dealShadowTo(state, ref(state, instruction.target, focus), steps, ctx);
+      return dealShadowTo(state, ref(state, instruction.target, focus), steps, ctx, instruction.from === "encounter");
     case "LookAtShadow":
       return lookAtShadow(state, ref(state, instruction.target ?? "picked", focus), focus.seat, instruction.markEffect === true, ctx);
     case "ShadowAttacks":

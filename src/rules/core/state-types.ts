@@ -151,7 +151,7 @@ export type CardInstance = {
   carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
   // leaves play (emce.evil-creatures-deck). Absent on every other card.
-  deck?: "evilCreatures";
+  deck?: "evilCreatures" | "balrog";
 };
 
 export type Seat = {
@@ -391,6 +391,8 @@ export type ScenarioState = {
   // The codes of the cards whose Forced effect hears `progressWouldBePlaced` (Twisting Passage, 04092:A:1): progress that would be placed on one of them in play waits for that effect (families/long-dark/hold.ts). Set at the start, absent in every other game.
   progressHeldBy?: readonly string[];
   pendingStrike: PendingStrike | null;
+  // The seats whose threat was below 1 when the combat phase began, kept only in a game with an enemy that is considered engaged by threat (Durin's Bane, families/south/watcher.ts noteBelowThreat): an attack by it on such a seat is dealt no shadow card.
+  belowThreat?: readonly number[];
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
   // The cards in play that hear their own leaving by any route (`exitedPlay`); settle announces one once it is out of play (families/island/hand.ts). Kept only in a game with such a card.

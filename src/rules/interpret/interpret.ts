@@ -22,6 +22,8 @@ import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
 import { readyNamedCard, seatBarred } from "./restrictions.ts";
 import { withFrame } from "../windows/windows.ts";
 import { moveCard, turnedUp } from "../core/zones.ts";
+import { refillDeck } from "../core/decks.ts";
+import { DECKS } from "../core/piles.ts";
 import { shadowFace } from "../families/defense/shadow.ts";
 import { drawCards } from "../families/dungeon/deck.ts";
 import { withView } from "../families/breaking/areas.ts";
@@ -236,11 +238,13 @@ export function dealOneShadow(state: ScenarioState, enemyId: string, steps: Engi
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
-export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
+// An enemy that holds `shadowsFromBalrog` is dealt from the Balrog deck, which is refilled from its discard pile when it is empty (901801:A:3, A:4); `fromEncounter` deals from the encounter deck whatever the enemy holds ("from the encounter deck (not the Balrog deck)", 901806:A:1).
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, fromEncounter = false): ScenarioState {
+  const balrog = !fromEncounter && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
   // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
-  const state = refillEncounterDeck(given, steps, ctx);
+  const state = balrog ? refillDeck(given, DECKS.balrog) : refillEncounterDeck(given, steps, ctx);
   const enemy = state.cards[enemyId];
-  const top = state.encounterDeck[0];
+  const top = balrog ? state.piles?.balrogDeck?.[0] : state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).
   if (!enemy || !top || flagged(state, enemyId, "noShadowDealt")) return state;
   // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).
