@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
     - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
   148018:forced:1: Forced at the end of the round
     only if not (this card is in the staging area)
-    - raise threat by the number of Wight enemy (any player controls) engaged with you (hostController)
+    - raise threat by the number of Wight enemy (any player controls) [also {"engagedWith":"host"}] (hostController)
 
 ## 148019 Tom Bombadil
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -320,4 +320,4 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
       - discard this card [also {"counted":true}]
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 204 by template, 22 as JSON)
+(rendered pieces: 203 by template, 23 as JSON)

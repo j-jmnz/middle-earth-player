@@ -12,6 +12,7 @@
 //   `secondActiveLocation` mirror seat 0's and seat 1's active location, so code that reads them outside a seat's view still sees them; in a seat's view
 //   `activeLocation` is that seat's and `secondActiveLocation` is null.
 // - A game that never separates has no `separate`, empty seat lists and no `Seat.stage`, so each function here returns what the shared state holds.
+// - Fog on the Barrow-downs separates only some of its players (families/breaking/barrow.ts): `ScenarioState.isolated` makes each area resolve alone (`isolatedAreas`), and a stage no player is at is parked in `ScenarioState.questStage` (`parkedStage`).
 // - The engine asks per seat through `viewOf`: the state as that seat sees it, with `staging` its own area and `questStage` its own stage, so
 //   the threat total, the engagement checks, the travel and pick helpers and the quest's progress and advance read the seat's staging area and stage
 //   without knowing about seats. `mergeView` writes what a view changed back. Nothing is cached on the view.

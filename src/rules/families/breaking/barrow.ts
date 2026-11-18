@@ -134,6 +134,11 @@ export function discardIsolated(state: ScenarioState, seat: number): ScenarioSta
     for (const id of owner.staging) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
     if (owner.active) next = updateCard(moveCard(next, owner.active, { zone: "encounterDiscard" }), owner.active, { face: "up", controller: null });
     if (owner.stage) next = updateCard(moveCard(next, owner.stage, { zone: "questDeck" }), owner.stage, { face: "A", controller: null, progress: 0 });
+    // A defeated stage 4B still held for its Forced effect leaves with it, so the copy, used again, is held anew.
+    if (owner.stage && next.stageHeld === owner.stage) {
+      const { stageHeld: _held, ...rest } = next;
+      next = rest;
+    }
   }
   return foldIfShared(mirrorActive(next));
 }

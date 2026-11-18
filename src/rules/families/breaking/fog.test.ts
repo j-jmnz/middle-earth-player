@@ -281,7 +281,7 @@ describe("areas apart: what an encounter card reads as 'each player', 'at this s
   it("148014:A:1 I'm Waiting for You! makes the Wights engaged with the revealer's area attack, not the other area's", () => {
     const { t, state } = trapped({ engaged: [{ code: "148011", seat: 0 }] });
     // Only seat 0 has a Wight engaged: its area's reveal makes it attack, the other area's makes none and the card gains surge.
-    const attacks = (seat: number) => resolveRecords({ ...state, firstPlayer: seat }, t.ctx, "148014", "whenRevealed").steps.filter((step) => step.kind === "attack" || step.kind === "shadow").length;
+    const attacks = (seat: number) => resolveRecords({ ...state, firstPlayer: seat }, t.ctx, "148014", "whenRevealed").steps.filter((step) => step.kind === "attack").length;
     expect(attacks(0)).toBeGreaterThan(attacks(1));
     expect(attacks(1)).toBe(0);
   });

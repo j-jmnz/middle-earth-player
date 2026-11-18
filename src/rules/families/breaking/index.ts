@@ -46,7 +46,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SplitToOwnStage":
       return splitToOwnStage(state, instruction.code, focus.seat, ctx, steps);
     case "ReturnToSharedStage":
-      return returnToSharedStage(state, instruction.code, focus.seat);
+      return returnToSharedStage(state, instruction.code, stageController(state, focus));
     case "DealOutStaging":
       return state;
     case "MovePickedToOwnStaging":
@@ -85,6 +85,12 @@ export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceCo
   // Only a game with a card that hears "after a quest card is defeated" keeps the stage it left (Lost in Mirkwood's letters), so every other game's state stays as it was.
   if (currentId && questCardDefeatedHeard(next, ctx)) next = noteSkippedStage(next, nextId, currentId);
   return afterProgress(next, before, ctx, steps);
+}
+
+// The seat that is at the stage the source is (its controller), else the acting seat: the Forced effect of a stage resolves for the seat whose stage it is, and this holds for a delayed effect scheduled from it (148004:B:2) too.
+function stageController(state: ScenarioState, focus: Focus): number {
+  const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  return source?.zone === "questStage" && source.controller != null ? source.controller : focus.seat;
 }
 
 // SplitToOwnStage (148007:A:2): families/breaking/barrow.ts leaves the shared stage; the stage 4A copy is revealed for the seat as an advanced stage is.
