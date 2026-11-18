@@ -16,7 +16,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 | Phase | Work | Status | Note |
 | --- | --- | --- | --- |
-| 62 | [Dwarrowdelf cycle](phase-62-dwarrowdelf.md) | active | 2026-11-17: data first, then the nine scenarios |
+| 62 | [Dwarrowdelf cycle](phase-62-dwarrowdelf.md) | active | 2026-11-18: all nine scenarios built; review round open |
 
 ## Open items
 
@@ -40,6 +40,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
+- `flame-won` is not committed: no seed in 100 wins Shadow and Flame with the saved decklists (they cannot damage Durin's Bane enough for Dark Pit to discard it). Until it exists `.maestro/scenarios/shadow-and-flame/shadow-and-flame.yaml` cannot run.
 - `stone-won` is not committed: no seed in 100 wins Foundations of Stone with the saved decklists. Until it exists `.maestro/scenarios/foundations-of-stone/foundations-of-stone.yaml` cannot run.
 - `rivendell-won` is not committed: no seed in 500 wins Road to Rivendell with the saved decklists. Until it exists `.maestro/scenarios/road-to-rivendell/road-to-rivendell.yaml` cannot run.
 - `gate-won` is not committed: no seed in 500 wins The Redhorn Gate with the saved decklists. Until it exists `.maestro/scenarios/the-redhorn-gate/the-redhorn-gate.yaml` cannot run.
