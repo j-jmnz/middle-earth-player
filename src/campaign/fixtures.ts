@@ -63,6 +63,7 @@ import osgiliathFixtures from "./fixtures/the-massing-at-osgiliath.json";
 import townFixtures from "./fixtures/the-battle-of-lake-town.json";
 import erechFixtures from "./fixtures/the-stone-of-erech.json";
 import forestFixtures from "./fixtures/the-old-forest.json";
+import downsFixtures from "./fixtures/fog-on-the-barrow-downs.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -144,6 +145,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-battle-of-lake-town": townFixtures,
   "the-stone-of-erech": erechFixtures,
   "the-old-forest": forestFixtures,
+  "fog-on-the-barrow-downs": downsFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
