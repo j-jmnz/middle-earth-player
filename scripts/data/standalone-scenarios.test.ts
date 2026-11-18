@@ -1,5 +1,5 @@
 // Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech and The Old Forest: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -18,19 +18,20 @@ const cycle = loadCampaign("standalone-scenarios");
 const scenario = loadAnyScenario("the-massing-at-osgiliath");
 const lakeTown = loadAnyScenario("the-battle-of-lake-town");
 const stone = loadAnyScenario("the-stone-of-erech");
+const forest = loadAnyScenario("the-old-forest");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 3, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 4, playable: true, box: null })]);
   });
 });
 
@@ -134,5 +135,41 @@ describe("The Stone of Erech", () => {
     expect(sides).toHaveLength(30);
     for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
     expect(ledger.byKey.get(keyOf("50301", "A"))?.lines[0]).toMatch(/^Setup: Make Tarlang's Neck the active location\./);
+  });
+});
+
+describe("The Old Forest", () => {
+  it("has Hall of Beorn's own codes 147001 to 147024, six stages with Aragorn left a Core Set card and the Wicked Willow named as printed", () => {
+    expect(forest).toMatchObject({ id: "the-old-forest", name: "The Old Forest", number: 4, stages: ["147001", "147002", "147003", "147004", "147005", "147006"] });
+    expect(forest.campaignCard).toBeUndefined();
+    expect(forest.campaignPlaced).toEqual([]);
+    expect(forest.source.dragnNormal).toBe("Q99.04");
+    expect(forest.nightmare).toBeUndefined();
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TOF"));
+    expect(own.map((card) => card.code)).toEqual(Array.from({ length: 24 }, (_, at) => `1470${String(at + 1).padStart(2, "0")}`));
+    expect(byCode.get("01001")?.printings.some((printing) => printing.pack === "TOF")).toBe(false);
+    expect(byCode.get("147006")?.name).toBe("The Wicked Willow");
+  });
+
+  it("deals 38 cards (the searched locations among them) on Normal and the 7 fewer Hall of Beorn's Easy counts remove on Easy, Old Man Willow and Withywindle set aside (147001:A:1)", () => {
+    for (const seats of [1, 2, 3, 4]) {
+      expect(encounterCodes(forest, "Normal", seats), `${seats} seats`).toHaveLength(38);
+      expect(encounterCodes(forest, "Easy", seats), `${seats} seats`).toHaveLength(31);
+    }
+    for (const difficulty of ["Normal", "Easy"] as const) {
+      expect(setupInstructions(forest, difficulty).filter((step) => step.verb === "SetAside").map((step) => step.code).sort(), difficulty).toEqual(["147007", "147011"]);
+    }
+    const dealt = (code: string, difficulty: "Normal" | "Easy") => encounterCodes(forest, difficulty, 1).filter((item) => item === code).length;
+    expect([dealt("147018", "Normal"), dealt("147018", "Easy")]).toEqual([3, 1]);
+    expect([dealt("147008", "Normal"), dealt("147008", "Easy")]).toEqual([4, 2]);
+    expect([dealt("147019", "Normal"), dealt("147019", "Easy")]).toEqual([2, 1]);
+  });
+
+  it("has every printed side read from its scan, the stage 2B's end of the planning phase as printed (Hall of Beorn has \"beginning\")", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("147") && card.code <= "147022").flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(28);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("147002", "B"))?.lines[0]).toBe("Forced: At the end of the planning phase, each player must exhaust a hero he controls.");
   });
 });

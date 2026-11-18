@@ -148,6 +148,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       const card = bySlug.get(quest.Slug);
       return card && !isNightmareCard(card) ? [card.code] : [];
     });
+    for (const rule of overrides.scenarioStages) if (rule.scenario === id && !questCodes.includes(rule.code)) questCodes.push(rule.code);
     let stages = questCodes;
 
     // The printed Setup of the first quest stage and of the campaign card.

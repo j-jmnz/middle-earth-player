@@ -1352,6 +1352,548 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "147001",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Farewell-to-the-Shire-1A.jpg",
+        "sha256": "c239abc630d8ac5f3d121a7caa58113a3f9a5e626c0987ffed60825329b9ca67"
+      },
+      "lines": [
+        "Setup: Set Old Man Willow and Withywindle aside, out of play. Each player searches the encounter deck and adds 1 different location to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147001",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Farewell-to-the-Shire-1B.jpg",
+        "sha256": "b78595fdcc4a3a84340fb215f974b921c8e759253ed1286b79942e68007ca7d3"
+      },
+      "lines": [
+        "When Revealed: Each player draws 1 card. Advance to a random stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147002",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Dark-Bad-Place-2A.jpg",
+        "sha256": "39f2d612f7028efc985aa8a4912a0c9723299c0827a3a5c9d6145b24b9a42030"
+      },
+      "lines": [
+        "When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147002",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Dark-Bad-Place-2B.jpg",
+        "sha256": "dde855e9d4657b2696d12194fc432b353009d74d23d3c72f5b8b6765fbfc9494"
+      },
+      "lines": [
+        "Forced: At the end of the planning phase, each player must exhaust a hero he controls.",
+        "Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147003",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Choked-with-Brambles-2A.jpg",
+        "sha256": "39f2d612f7028efc985aa8a4912a0c9723299c0827a3a5c9d6145b24b9a42030"
+      },
+      "lines": [
+        "When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147003",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Choked-with-Brambles-2B.jpg",
+        "sha256": "fd7797887d01ad886a37dfa9279a63397b54d4bf800d37d5ad57b2baf98a7141"
+      },
+      "lines": [
+        "Forced: At the beginning of the round, remove all progress from each location in play.",
+        "Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147004",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Shifting-Trees-2A.jpg",
+        "sha256": "39f2d612f7028efc985aa8a4912a0c9723299c0827a3a5c9d6145b24b9a42030"
+      },
+      "lines": [
+        "When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147004",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Shifting-Trees-2B.jpg",
+        "sha256": "04ac912d2cac592920f79d58ba101ed484dadec3ada27eef5f83173bee0ced7e"
+      },
+      "lines": [
+        "Forced: At the end of the round, discard a random location from the victory display.",
+        "Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147005",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Closing-in-Around-Them-2A.jpg",
+        "sha256": "39f2d612f7028efc985aa8a4912a0c9723299c0827a3a5c9d6145b24b9a42030"
+      },
+      "lines": [
+        "When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147005",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Closing-in-Around-Them-2B.jpg",
+        "sha256": "960c7d9c22a5f3a38504f1e343961d8bfe1ab3b85a84c493e0f5c4d57600449a"
+      },
+      "lines": [
+        "Forced: The first player reveals 1 additional encounter card during the quest phase.",
+        "Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147006",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3A.jpg",
+        "sha256": "fed9b639be03a9fad55eded1f62d703a663e68b12b08cb7815a547e1b9becd73"
+      },
+      "lines": [
+        "When Revealed: Add Old Man Willow and Withywindle to the staging area. Reveal X encounter cards where X is the number of players in the game minus 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147006",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3B.jpg",
+        "sha256": "c1016d4f40308c7714f67a675124d6964e3a1deadbe503356dd292f366ed9144"
+      },
+      "lines": [
+        "Old Man Willow cannot leave the staging area but is considered to be engaged with each player and attacks each player in turn order during the combat phase (deal and resolve a shadow card for each attack).",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147007",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Old-Man-Willow.jpg",
+        "sha256": "763c11bb5175ae8223cae164a520ba713ce65282de67d400ab51563d0f0340df"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects.",
+        "Forced: When Old Man Willow attacks, discard a random location from the victory display. The defending player raises his threat by X, where X is that location's victory point value."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147008",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Long-Trailer.jpg",
+        "sha256": "cdea9605bdb07a0252e959dde06144c6ed9049791ec68aa3d7cb0d511e703d0f"
+      },
+      "lines": [
+        "While Long Trailer is in the staging area it gains: 'Forced: After the active location leaves play as an explored location, Long Trailer makes an immediate attack against the first player.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147009",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Grasping-Root.jpg",
+        "sha256": "3628c34f9a15ae45ca7e67100a07a97668e312415d15978a36a085a581c56c98"
+      },
+      "lines": [
+        "Forced: After Grasping Root engages a player, that player must assign X damage among characters he controls. X is the number of locations in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147010",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Army-of-Flies.jpg",
+        "sha256": "cc276e2b4c857df57b5aca9f63bd5fd95bb9049b8fbd7d750418673b0df8ba29"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Army of Flies engages a player, that player discards a non-objective attachment he controls.",
+        "Shadow: Defending player discards a non-objective attachment he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147011",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Withywindle.jpg",
+        "sha256": "b3b02a7df8144c15116a6cbaa51b37f0c2780aac91fe80cc6e812dd19c959a2e"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "The players cannot win the game while Withywindle is in play.",
+        "While Withywindle is the active location, the first player reveals 1 additional encounter card during the quest phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147012",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Misleading-Path.jpg",
+        "sha256": "e65562665b254c4eb89a25b3092dd54f11c902c447b0e40f16bb002d46f15b66"
+      },
+      "lines": [
+        "Surge.",
+        "When faced with the option to travel, the players must travel to Misleading Path if there is no active location.",
+        "Shadow: Defending player discards each ally card in his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147013",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Deep-Gulley.jpg",
+        "sha256": "e8e64c08ff7feffb28a1a1a015b8fe0064ed1c8cc0acf34017ccdac151b01567"
+      },
+      "lines": [
+        "While Deep Gulley is in the staging area, it gains: 'Forced: After a player optionally engages an enemy, that player raises his threat by X, where X is the engaged enemy's Attack.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147014",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Strange-Woods.jpg",
+        "sha256": "156960b9d5eb4dc070455f49d2d02af73eebe98cce17ba47ece150a25ce5dfc4"
+      },
+      "lines": [
+        "While Strange Woods is in the staging area, characters cannot be healed.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147015",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Wall-of-Trees.jpg",
+        "sha256": "12e16baaf12ddaa467bbfe8c7db5190e04d9ba1606b03178e26a0e9a53ada011"
+      },
+      "lines": [
+        "X equals the number of players in the game.",
+        "While Wall of Trees is in the staging area, progress must be placed on Wall of Trees before it can be placed on the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147016",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Oppressive-Forest.jpg",
+        "sha256": "ec88cce3bf9f57dd27f88741b6ec370091db7ce0337939f4776c94c9ef923d4f"
+      },
+      "lines": [
+        "While Oppressive Forest is in the staging area, each player cannot play more than 1 card each round.",
+        "Shadow: If there are no locations in the staging area, add this location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147017",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Swaying-Without-Wind.jpg",
+        "sha256": "091b0aa8e529f82eae646919b0f4807b256d39f9cdf76e8c6963352487533a3e"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Choose a location in the victory display and return it to the staging area. If no location was returned to the staging area this way, Swaying Without Wind gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147018",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Falling-Branches.jpg",
+        "sha256": "79efb910c0da8339374ee10eb8364b0d891ebe0b9c1537f0c5bf1db4cdac6c9a"
+      },
+      "lines": [
+        "When Revealed: Each player removes a character he controls from the quest and deals 2 damage to that character (3 damage instead if that character is an ally).",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is an ally.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147019",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Song-of-Sleep.jpg",
+        "sha256": "67dfbf0ead1451f582880817e52b62005015e82e1c348008c061bac2486e6be5"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Remove a questing hero you control from the quest and attach Song of Sleep to that hero. Counts as a Condition attachment with the text: 'Limit 1 per hero. Treat attached hero's printed text box as if it were blank (except for Traits). Attached hero cannot ready.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147020",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Lost-and-Witless.jpg",
+        "sha256": "af09540af3792550d2091ea341322580269487f5e9282711faaf204d280a67cd"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Discard all progress from each location in the staging area. If there is a non-unique active location, randomly choose a location in the staging area and switch it with the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147021",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Ending-and-Failing.jpg",
+        "sha256": "d4bbf5dbf00be0b8ac187a65b1024ec4e5c25e4ecb5e059f0b2eb6f42d447350"
+      },
+      "lines": [
+        "Doomed 2.",
+        "When Revealed: At the end of the phase, raise each player's threat by X where X is the number of enemies in the staging area.",
+        "Shadow: Return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147022",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Tom-Bombadil.jpg",
+        "sha256": "bdeb940495dda818d72a577894c3fa13ef9a0fad738bf9110be7f2ce7be3851c"
+      },
+      "lines": [
+        "When Revealed: Choose a player. That player gains control of Tom Bombadil, ready and committed to the quest. At the end of the round, discard Tom Bombadil. Then, shuffle the encounter discard pile into the encounter deck. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147023",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Old-Forest-SetupA.jpg",
+        "sha256": "aa3a7c9b7579efe4d18eaac218a1a957867c2042f38ef881855c36246cba9733"
+      },
+      "lines": [
+        "You are playing Campaign Mode.",
+        "Setup: The first player attaches Old Bogey-stories to a hero in play."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        },
+        {
+          "line": 2,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147023",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Old-Forest-SetupB.jpg",
+        "sha256": "8d7ed614226bc89a4cc95d58cfc713ef688566fa5a2fc6cfd3d90bb3f411dbf2"
+      },
+      "lines": [
+        "Resolution: If there are at least 12 damage tokens on Old Man Willow, the players have earned the Old Bogey-stories boon card."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147024",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Old-Bogey-stories.jpg",
+        "sha256": "879aa0fe12648227205d419981bdc2ff6ada4b4972d6033a7a012a92d7aef069"
+      },
+      "lines": [
+        "Setup: The first player attaches Old Bogey-stories to a hero in play.",
+        "Action: Add Old Bogey-stories to the victory display to shuffle your hand of at least 6 cards into your deck. Then, draw 6 cards."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        },
+        {
+          "line": 2,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

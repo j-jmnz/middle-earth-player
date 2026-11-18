@@ -1330,6 +1330,20 @@
       },
       "reason": "Hall of Beorn spells the card's title \"Vile Afflication\"; the scan and DragnCards print Vile Affliction.",
       "source": "scan 10137.A (data/printed/angmar-awakened.json); data/raw/dragncards/cardDb.tsv"
+    },
+    {
+      "match": {
+        "code": "147006"
+      },
+      "set": {
+        "name": "The Wicked Willow",
+        "imageUrls": [
+          "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3A.jpg",
+          "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3B.jpg"
+        ]
+      },
+      "reason": "Hall of Beorn spells the stage 3 quest card 'The Wiched Willow' in its title and slug and in the scan addresses, which answer 403. The card prints 'The Wicked Willow' (DragnCards' deck Q99.04 and RulesPal's transcription name it so), and the spelled-right addresses serve both sides.",
+      "source": "hallofbeorn.com/Export/EncounterCards (Slug The-Wiched-Willow-TOF); s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3A.jpg; dragncards Q99.04"
     }
   ],
   "scenarioPiles": [
@@ -1764,6 +1778,43 @@
       "easy": 3,
       "reason": "The Black Gate Opens set prints 40 cards (Reeking Moat 11/40, scan 146029.A). Hall of Beorn's quantities for the set's encounter cards sum to 40 with 3 Reeking Moat; DragnCards' Q0C.17 and E0C.17 load 2, which makes 39. Hall of Beorn lists 3 in both Normal and Easy; no printed source shows an Easy mark, and the DragnCards Easy deck repeats the Normal count, so Easy keeps all 3. Not confirmed by a printed source.",
       "source": "scan 146029.A (11/40); hallofbeorn.com/Export/Scenarios/The-Black-Gate-Opens; dragncards Q0C.17, E0C.17"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147018",
+      "easy": 1,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 2 of Falling Branches's 3 copies (Easy 1); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147008",
+      "easy": 2,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 2 of Long Trailer's 4 copies (Easy 2); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147019",
+      "easy": 1,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 1 of Song of Sleep's 2 copies (Easy 1); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147012",
+      "pile": "staging",
+      "easy": 0,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 1 of Misleading Path's 2 copies (Easy 1); the copy a player finds with the Setup search is the one set out, the copy in the deck stays; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147016",
+      "pile": "staging",
+      "easy": 0,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 1 of Oppressive Forest's 2 copies (Easy 1); the copy a player finds with the Setup search is the one set out, the copy in the deck stays; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
     }
   ],
   "campaigns": [
@@ -2175,6 +2226,14 @@
       "code": "100158",
       "reason": "Protect the Innocent and Arnor Ravaged are the two sides of one card (#158; the Deadmen's Dike campaign card: \"Add Arnor Ravaged to the Campaign Pool in its place (found on the opposite side of Protect the Innocent)\"), and Hall of Beorn gives both RingsDbCardId 10158. Protect the Innocent keeps RingsDB's code; Arnor Ravaged, which RingsDB lists no record for, takes '100' and the collector number, which no other card bears.",
       "source": "data/raw/hallofbeorn (EncounterCards.json); data/raw/ringsdb/cards/AACE.json; mec108.campaign-setup-deadmens-dike"
+    }
+  ],
+  "scenarioStages": [
+    {
+      "scenario": "the-old-forest",
+      "code": "147006",
+      "reason": "Hall of Beorn's scenario file lists the quest cards of stages 1 and 2 only. The Wicked Willow (stage 3A, 3B, card 6 of 24 in the box; the stage 2B text advances to stage 3A) is a quest card of the encounter set, and DragnCards' deck Q99.04 deals it as the last quest stage.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
     }
   ]
 }

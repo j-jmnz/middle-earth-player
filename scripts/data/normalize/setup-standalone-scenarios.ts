@@ -37,6 +37,10 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 ? null : [{ kind: "putIntoPlay", codes }];
   }
+  // The Old Forest (147001): "Each player searches the encounter deck and adds 1 different location to the staging area": each player finds one location of a title no other player took.
+  if ((match = /^Each player searches the encounter deck and adds (\d+|an?|one) different locations? to the staging area$/i.exec(sentence))) {
+    return [{ kind: "eachPlayerAddsLocation", count: /^\d+$/.test(match[1] ?? "") ? Number(match[1]) : 1 }];
+  }
   if ((match = /^Remove (.+?) from the encounter deck and set (?:him|her|it|them) aside, out of play$/.exec(sentence))) {
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 || names.without(match[1] ?? "").replace(/\bThe\b|\s/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];
