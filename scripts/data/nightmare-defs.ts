@@ -111,3 +111,15 @@ export function nightmareCode(deck: Pick<NightmareDeckDef, "prefix">, number: nu
   if (!Number.isInteger(number) || number < 1 || number > 99) throw new Error(`nightmare-defs: collector number ${number} is not 1 to 99`);
   return `${deck.prefix}${String(number).padStart(2, "0")}`;
 }
+
+// A Nightmare card whose printed set icon is the scenario's set-aside encounter set (the Data task put every card in the
+// `encounter` pile; the scan's icon decides): it is shuffled into that set, not into the standard deck. Foundations of Stone:
+// 901702 and 901703 bear the Goblins of the Deep icon, 901704 to 901708 the Foundations of Stone icon (set aside at Setup,
+// `encounterDeck2`; scans .cache/scans/9017*.A.jpg, docs/brief.md, Foundations of Stone).
+export const NIGHTMARE_CARD_PILES: Readonly<Record<string, "encounterDeck2">> = {
+  "901704": "encounterDeck2",
+  "901705": "encounterDeck2",
+  "901706": "encounterDeck2",
+  "901707": "encounterDeck2",
+  "901708": "encounterDeck2",
+};

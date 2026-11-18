@@ -240,7 +240,7 @@
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,
-    "perSeatStaging": false
+    "perSeatStaging": true
   },
   "source": {
     "dragnNormal": "Q02.8",
@@ -315,27 +315,27 @@
       {
         "code": "901704",
         "copies": 3,
-        "pile": "encounter"
+        "pile": "encounterDeck2"
       },
       {
         "code": "901705",
         "copies": 2,
-        "pile": "encounter"
+        "pile": "encounterDeck2"
       },
       {
         "code": "901706",
         "copies": 3,
-        "pile": "encounter"
+        "pile": "encounterDeck2"
       },
       {
         "code": "901707",
         "copies": 3,
-        "pile": "encounter"
+        "pile": "encounterDeck2"
       },
       {
         "code": "901708",
         "copies": 3,
-        "pile": "encounter"
+        "pile": "encounterDeck2"
       }
     ]
   }

@@ -130,6 +130,13 @@ describe("The Dwarrowdelf Nightmare decks", () => {
     expect(removed.filter((item) => item.pile === "encounterDeck2").map((item) => byCode.get(item.code)?.name).sort()).toEqual(["Drowned Treasury", "Mithril Lode", "Moria Bats"]);
   });
 
+  it("shuffles Foundations of Stone's Nightmare cards by their set icon: Goblins of the Deep into the standard deck, Foundations of Stone into the set-aside set", () => {
+    const cards = loadAnyScenario("foundations-of-stone").nightmare?.cards ?? [];
+    expect(cards.filter((card) => card.pile === "encounter").map((card) => card.code)).toEqual(["901702", "901703"]);
+    expect(cards.filter((card) => card.pile === "encounterDeck2").map((card) => [card.code, card.copies])).toEqual([["901704", 3], ["901705", 2], ["901706", 3], ["901707", 3], ["901708", 3]]);
+    expect(loadAnyScenario("foundations-of-stone").widgets.perSeatStaging).toBe(true);
+  });
+
   it("reads every side of every card of the nine decks from its Nightmare proxy picture, the card's printed words over Hall of Beorn's", () => {
     const sides = Object.values(NIGHTMARE).flatMap((pin) => cards.filter((card) => card.code.startsWith(pin.prefix) && card.code.length === pin.prefix.length + 2).flatMap((card) => (card.back ? [`${card.code}.A`, `${card.code}.B`] : [`${card.code}.A`])));
     expect(sides).toHaveLength(92);

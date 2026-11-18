@@ -429,7 +429,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const widgets = {
       hide: /\bHide (?:test|\d)/.test(everything) || placed.some((item) => byCode.get(item.code)?.keywords?.hide != null),
       secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))),
-      perSeatStaging: stages.some((code) => /creates? (?:his|their) own staging area/.test(textOf(code))),
+      perSeatStaging: stages.some((code) => /creates? (?:his|their|your) own staging area/i.test(textOf(code))),
     };
 
     // DragnCards' decks, where a deck of the same cards exists (copy counts only, not piles).
