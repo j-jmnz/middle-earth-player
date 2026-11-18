@@ -23,6 +23,9 @@ No phase is open.
 ### Reviews
 - Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, and the card frames' ux fix. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
 
+### Readings (not user-confirmed)
+- Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
+
 ### Cards tab views
 - `pnpm data sync pictures` has not run since every card got a picture check: Google Drive's quota refused it (2026-11-18). Re-run it, then check that no pin moved to a smaller picture.
 - The Messenger of the King heroes keep RingsDB's pictures (about 430×600): no larger source was found (agent recommendation, not user-confirmed).
