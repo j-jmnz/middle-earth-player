@@ -17,7 +17,7 @@ import { KEYWORD_RULES, type KeywordKey } from "./keyword-rules.ts";
 export type CardKeyword = { key: KeywordKey; word: string; lost: boolean };
 
 // Keywords with a printed flag or value and no reader of their own: shown while the text counts, struck through when the card lost its keywords.
-const PRINTED_FLAGS = ["peril", "permanent", "battle", "siege", "sailing", "dire"] as const;
+const PRINTED_FLAGS = ["peril", "permanent", "battle", "siege", "sailing", "dire", "pass"] as const;
 const PRINTED_VALUES = ["hide", "secrecy", "boarding", "aflame"] as const;
 
 /** The card's keywords now, in KEYWORD_RULES' order. Empty for a card that is not in the game. */

@@ -245,7 +245,7 @@ export function dealAdditionalShadow(given: ScenarioState, enemyId: string, step
   const face = shadowFace(state, enemyId);
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
   // The enemy hears that it was dealt the card (Thaurdir's stage 1B, the Werewolf of Angmar, 10125:B:3, 10131:A:2).
-  return queueHeard(updateCard(moved, top, { face }), ctx, { trigger: "shadowDealtTo", seat: null, cardId: enemyId, subject: enemyId });
+  return queueHeard(updateCard(moved, top, { face }), ctx, { trigger: "shadowDealtTo", seat: null, cardId: enemyId, subject: enemyId, other: top });
 }
 
 function dealInstructionDamage(

@@ -37,6 +37,7 @@ import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
 import { embassyPool, highestThreatOf } from "../families/black-gate/pick.ts";
+import { highestThreatPlusRemaining } from "../families/long-dark/pick.ts";
 import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 
@@ -360,6 +361,8 @@ export function pickCandidates(
   if (spec.lowestThreat) return lowestOf(state, found, "threat", ctx);
   // "The highest threat encounter card remaining" (families/black-gate/pick.ts).
   if (spec.highestThreat) return highestThreatOf(state, found, ctx);
+  // "The location with the highest combined threat and remaining quest points" (families/long-dark/pick.ts).
+  if (spec.highestThreatPlusRemaining) return highestThreatPlusRemaining(state, found, ctx);
   // "The highest cost attachment you control" (families/costs/pick.ts).
   if (spec.highestCost) return highestCost(state, found, ctx);
   // "The ally you control with the highest Willpower" (901304:A:2).

@@ -2,6 +2,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 
 import { redirectProgress } from "../families/quest/blizzard.ts";
 import { progressToQuest, sendsProgressToQuest } from "../families/quest/doors.ts";
+import { holdPlacement, holdsProgress } from "../families/long-dark/hold.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "../quest/explore.ts";
@@ -114,11 +115,13 @@ export function progressPlacer(state: ScenarioState, ctx: ReduceContext, seat: n
 }
 
 // Progress on a location in play. A location that is full is explored and leaves play. `placedBy` is the player whose card effect placed it (progressPlacer).
-export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number): ScenarioState {
+export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number, held = false): ScenarioState {
   const location = state.cards[id];
   if (!location) return state;
   // "Progress that would be placed on Doors of Durin is instead placed on the current quest card" (04065:A:1, families/quest/doors.ts).
   if (sendsProgressToQuest(state, id)) return progressToQuest(state, amount, ctx, steps);
+  // "Before placing progress tokens on Twisting Passage" (04092:A:1, families/long-dark/hold.ts): the placement waits for the location's Forced effect, which places what is let through with `held`.
+  if (!held && holdsProgress(state, id)) return holdPlacement(state, id, Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards)));
   const points = questPointsOf(state, location, ctx.cards);
   // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south/locations.ts).
   const wanted = Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards));

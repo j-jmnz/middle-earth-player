@@ -74,6 +74,8 @@ export type Keywords = {
   phantom: boolean;
   // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
   dire: boolean;
+  // PASS (dwd.locate-test): the card passes a locate test it is discarded for (families/long-dark/).
+  pass: boolean;
   // Ambush (dwd.ambush): the enemy makes the players engagement checks against it when it enters play (families/encounter/ambush.ts).
   ambush: boolean;
 };
@@ -145,6 +147,7 @@ const EMPTY_KEYWORDS: Keywords = {
   grapple: null,
   phantom: false,
   dire: false,
+  pass: false,
   ambush: false,
 };
 
@@ -417,6 +420,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       grapple: keywords.grapple ?? null,
       phantom: keywords.phantom === true,
       dire: keywords.dire === true,
+      pass: keywords.pass === true,
       ambush: keywords.ambush === true,
     },
   });

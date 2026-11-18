@@ -296,6 +296,9 @@ export const pickSchema = z.strictObject({
   // `highestThreat`: of the cards that matched, those with the highest current Threat, a card with none counting 0 ("the highest threat encounter card remaining"); every one when tied, and the chooser decides.
   embassy: z.enum(["player", "encounter"]).optional(),
   highestThreat: z.literal(true).optional(),
+  // The long-dark family's filter (src/rules/families/long-dark/pick.ts): of the cards that matched, those whose current Threat plus remaining quest points (its quest points less the progress on it, as the card stands now; none for a card with no quest points) is the highest;
+  // every one when tied, and the chooser decides ("a location in the staging area with the highest combined threat and remaining quest points", 04095:A:1).
+  highestThreatPlusRemaining: z.literal(true).optional(),
   // The mount-doom family's filter (src/rules/families/mount-doom/pick.ts): a card discarded for the Fortitude test in progress that still lies in the encounter discard pile ("choose an encounter card discarded for this test", 146049:A:3).
   fortitudeDiscarded: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).
