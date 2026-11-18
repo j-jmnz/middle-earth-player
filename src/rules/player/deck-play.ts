@@ -21,22 +21,23 @@ function record(ctx: ReduceContext, code: string): { effect: Effect; icons: read
 // Whether the seat plays with the top card of its deck faceup: one of its heroes in play carries PlayFromDeckTop ("Play with
 // the top card of your deck faceup", 142002:A:1), whether or not the card can be played now.
 export function deckTopFaceUp(state: ScenarioState, seat: number, ctx: ReduceContext): boolean {
-  return (state.seats[seat]?.heroes ?? []).some((heroId) => {
+  return deckPlayHeroes(state, seat, ctx).length > 0;
+}
+
+// The seat's heroes in play that carry PlayFromDeckTop, spent this phase or not.
+function deckPlayHeroes(state: ScenarioState, seat: number, ctx: ReduceContext): DeckPlay[] {
+  return (state.seats[seat]?.heroes ?? []).flatMap((heroId) => {
     const hero = state.cards[heroId];
-    return hero != null && record(ctx, hero.code) !== undefined;
+    const found = hero ? record(ctx, hero.code) : undefined;
+    return found ? [{ heroId, effect: found.effect, icons: found.icons }] : [];
   });
 }
 
 // The hero that lets the seat play its top card now: in play, with the permission unspent this phase.
 export function deckPlayHero(state: ScenarioState, seat: number, ctx: ReduceContext): DeckPlay | undefined {
-  for (const heroId of state.seats[seat]?.heroes ?? []) {
-    const hero = state.cards[heroId];
-    const found = hero ? record(ctx, hero.code) : undefined;
-    if (!hero || !found) continue;
-    const spent = state.uses.some((use) => use.effectId === found.effect.id && use.sourceId === heroId && use.round === state.round && use.phase === state.phase);
-    if (!spent) return { heroId, effect: found.effect, icons: found.icons };
-  }
-  return undefined;
+  return deckPlayHeroes(state, seat, ctx).find(
+    (play) => !state.uses.some((use) => use.effectId === play.effect.id && use.sourceId === play.heroId && use.round === state.round && use.phase === state.phase),
+  );
 }
 
 // The icons the hero is considered to have while it pays for this card: all of them when the card is the top of the deck of

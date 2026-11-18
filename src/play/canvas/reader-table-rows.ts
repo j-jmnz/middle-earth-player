@@ -58,9 +58,10 @@ function seaNotes(game: ScenarioState, seat: number, deps: ReaderRowsDeps): Read
 // A pile's words: the count (and the points a victory display scores), a card playable from it, and the card on top or attached, as the reader table says them.
 function pileItem(game: ScenarioState, view: PileView, deps: ReaderRowsDeps): ReaderItem {
   const id = `pile:${view.pile}`;
-  const speech = pileSpeech({ zone: view.pile, count: view.ids.length, points: view.points }, deps.playable.has(id), view.pile === "grottoDeck" && view.top ? deps.nameOf(view.top.code) : null);
-  // The grotto deck's label already names its top card.
   const faceUp = view.pile === "deck" && deps.deckFaceUp ? view.ids[0] : undefined;
+  const playable = deps.playable.has(id) || (faceUp != null && deps.playable.has(faceUp));
+  const speech = pileSpeech({ zone: view.pile, count: view.ids.length, points: view.points }, playable, view.pile === "grottoDeck" && view.top ? deps.nameOf(view.top.code) : null, faceUp != null);
+  // The grotto deck's label already names its top card.
   const topId = faceUp ?? (view.top && view.pile !== "grottoDeck" ? view.top.id : undefined);
   const top = topId ? `, ${nameOfCard(game.cards, topId, deps.nameOf)} on top` : "";
   const held = (view.attached ?? []).length > 0 ? `, ${(view.attached ?? []).map((card) => deps.nameOf(card.code)).join(", ")} attached` : "";

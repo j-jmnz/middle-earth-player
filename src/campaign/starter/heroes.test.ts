@@ -172,7 +172,9 @@ describe("Gandalf, the hero (142002:A:1)", () => {
     // The next card is not offered again this phase.
     const next = run.state.seats[0]?.deck[0] ?? "";
     expect(legalIntents(run.state, tab.ctx)).not.toContainEqual({ type: "PlayCard", cardId: next });
-    expect(refusal(run.state, { type: "PlayCard", cardId: next, payments: [] }, tab.ctx)).toBe("That card is not in hand");
+    expect(refusal(run.state, { type: "PlayCard", cardId: next, payments: [] }, tab.ctx)).toBe("The top card of the deck was already played from this phase");
+    // A card under the top is out of the hand as ever.
+    expect(refusal(run.state, { type: "PlayCard", cardId: run.state.seats[0]?.deck[1] ?? "", payments: [] }, tab.ctx)).toBe("That card is not in hand");
   });
 
   it("keeps the top card of the deck faceup while he is in play, whether or not it can be played", () => {

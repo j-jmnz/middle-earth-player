@@ -96,16 +96,17 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const deckTopId = useStore(store, (state) => state.game.seats[seat]?.deck[0] ?? null);
   const deckTopCard = useStore(store, (state) => (deckTopId ? (state.game.cards[deckTopId] ?? null) : null));
 
-  // The top of the deck lies faceup, a card, while a hero of the seat says to play with it faceup (Gandalf, 142002:A:1), and whenever the rules let it be played from there.
+  // The top of the deck is a card while the rules let it be played from there (Gandalf, 142002), and lies face up on the pile while a hero of the seat says to play with it faceup (142002:A:1).
   const deckFaceUp = useStore(store, (state) => state.faceUpDecks.includes(seat));
-  const deckTop = deckTopId && (deckFaceUp || draggable.includes(deckTopId)) ? deckTopCard : null;
+  const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
+  const deckShown = deckFaceUp && !deckTop ? deckTopCard : null;
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   // What a row's fold must keep on the table: the cards the open moment asks about, the picked ones, a card being dragged and the banner's beat (row-fold.ts).
   // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
   const keep = useMemo(() => new Set([...marked.keep, ...targetIds, ...beating, ...(selected ? [selected] : [])]), [marked, targetIds, beating, selected]);
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks, column, reach: reach ?? 0 }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, stacks, column, reach],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, deckShown, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks, column, reach: reach ?? 0 }),
+    [width, height, views, piles, raised, deckTop, deckShown, attacker, fight, bottomInset, s, keep, strip, discovered, stacks, column, reach],
   );
   // The rows' feet go up to the screen, which counts how many the command column's empty top covers (column-reach.ts). They do not move with the reach.
   const feet = rowFeet(layout);

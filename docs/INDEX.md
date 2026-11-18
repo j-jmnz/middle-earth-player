@@ -148,7 +148,7 @@ Read the sections your task touches.
   - 1990–2017 Persistence and shipping (~3.2K) ← 10
   - 2018–2059 Screens (~5.1K) ← 2
     - 2044–2059 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~60.3K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~60.4K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
   - 24–27 Table menu (~860) ← 8
