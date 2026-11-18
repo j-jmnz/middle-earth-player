@@ -94,6 +94,15 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       const amount = amountWords(instruction.amount);
       return `place ${amount} resource${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : "the card you chose"}`;
     }
+    // The Stone of Erech's Tarlang's Neck (the asks file words the choice again for the sheet).
+    case "EndPhase":
+      return "end the phase now";
+    case "EngageAll":
+      return instruction.who === "firstPlayer" && instruction.trait == null && instruction.inPlay == null ? "the first player engages every enemy in the staging area" : null;
+    case "SkipTravelPhase":
+      return "skip the travel phase";
+    case "PassHand":
+      return "pass your whole hand to the player on your left";
     case "FlipGollum":
       return instruction.to === "smeagol" ? "flip Gollum to Sméagol" : "flip Sméagol to Gollum";
     case "GollumAttacks":
@@ -134,6 +143,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
         const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
         return `${refWords(instruction.target === "picked" || instruction.target == null ? undefined : instruction.target)} gains a ${capital(icon)} icon${until}`;
       }
+      if (instruction.stat === "skipPlanning") return "skip the planning phase";
+      if (instruction.stat === "noCollect") return "collect no resources this round";
       const flag = cavesFlagWords(instruction);
       if (flag) return flag;
       const stat = STAT_WORDS[instruction.stat] ?? instruction.stat;
