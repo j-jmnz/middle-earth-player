@@ -167,7 +167,7 @@ export type Seat = {
   staging: readonly string[];
   // The seat's player side quest (zone seatQuest), not a stage of the scenario's quest.
   questStage: string | null;
-  // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null.
+  // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null, unless a stage no player is at is parked in it (Fog on the Barrow-downs, `parkedStage`).
   // Absent in every other game (families/breaking/areas.ts).
   stage?: string;
   // The seat's own active location while stages are separate (the card, zone activeLocation); `ScenarioState.activeLocation` and `secondActiveLocation` then mirror the

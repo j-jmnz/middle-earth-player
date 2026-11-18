@@ -6,7 +6,7 @@
 // - `Seat.staging` lists the encounter cards in that seat's area; `Seat.stage` is its quest stage (the stage 3 and 4 cards). `ScenarioState.separate`
 //   is true from then on. Every card in an area is still in the zone `staging`, and `ScenarioState.staging` still lists every staging card in any
 //   area plus the cards in no area yet (the shared staging area stage 2B empties), so the code that does not care which area reads it unchanged.
-//   `ScenarioState.questStage`, the shared stage, is null while stages are separate.
+//   `ScenarioState.questStage`, the shared stage, is null while stages are separate, except a stage no player is at (Fog on the Barrow-downs' parked 3B, `parkedStage`), which stays in it.
 // - Each seat has an active location of its own at its stage (`Seat.active`, the card in the zone activeLocation): the quest only applies to a player's own stage
 //   (mec109.multiple-staging-areas), and the active location takes that quest's progress first (rr.active-location). `ScenarioState.activeLocation` and
 //   `secondActiveLocation` mirror seat 0's and seat 1's active location, so code that reads them outside a seat's view still sees them; in a seat's view
@@ -62,10 +62,12 @@ export function areaHeadOf(state: ScenarioState, id: string): number | null {
   return card.zone === "engaged" && card.controller != null ? headOf(state, card.controller) : null;
 }
 
-// The seat a card's constants and records read as "you" and "the first player": its controller (the first player with none), or, while the areas are isolated, the first player of the area it lies in (a staging card's controller is whoever revealed it, not whoever is there now).
+// The seat a card's constants and records read as "you" and "the first player": its controller (the first player with none), or, while the areas are isolated, the engaged player of an engaged enemy, else the first player of the area it lies in (a staging card's controller is whoever revealed it, not whoever is there now).
 // Null for a staging card or an active location in no area while a stage is parked: no player is at it, so its constants hold for nobody. (Escape from Mount Gram's cards in every area have no area either, and keep their controller.)
 export function sideOf(state: ScenarioState, card: CardInstance): number | null {
   if (!isolatedAreas(state)) return card.controller ?? state.firstPlayer;
+  // An enemy engaged with a player is that player's: its "you" is the engaged player, not the first of the area.
+  if (card.zone === "engaged" && card.controller != null) return card.controller;
   const head = areaHeadOf(state, card.id);
   if (head != null) return firstOfArea(state, head);
   return parkedStage(state) != null && (card.zone === "staging" || card.zone === "activeLocation") ? null : (card.controller ?? state.firstPlayer);
