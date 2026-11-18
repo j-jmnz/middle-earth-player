@@ -58,6 +58,12 @@ describe("campaignTree", () => {
     expect(hobbit.sections[0]!.key).toBe("the-hobbit~treasures~OHaUH");
   });
 
+  it("keeps a boxed Treasures section's box apart from its title, for the route's subtitle", () => {
+    const section = tree.byKey.get("the-hobbit~treasures~OHaUH")!.section;
+    expect(section.box).toBe("Over Hill and Under Hill");
+    expect(tree.byKey.get("earlier~treasures")!.section.box).toBeUndefined();
+  });
+
   it("leaves the scenario view's encounter cards out", () => {
     expect([...tree.byKey.values()].flatMap(({ section }) => section.groups.flatMap((group) => group.cards.map((card) => card.code)))).not.toContain("9");
   });

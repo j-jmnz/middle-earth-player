@@ -119,10 +119,9 @@ export default function StandaloneBriefing() {
       {...frame}
       campaignCard={world.scenario.campaignCard}
       stages={world.scenario.stages}
-      encounter={{ sets: facts.sets, codes }}
       banner={<ScenarioBanner facts={facts} eyebrow={`Standalone · Scenario ${facts.number}`} />}
       bar={<DealBar problems={result.problems} dealError={dealError} dealable={result.dealable} onDeal={onDeal} />}
-      aside={<EncounterDetails facts={facts} />}
+      aside={<EncounterDetails facts={facts} codes={codes} />}
     >
       <Section title="Players" className="mt-4" />
       <Segmented options={SEAT_WORDS} value={seatWord(seatCount)} onChange={(next) => setSeatCount(seatCountOf(next))} testIDPrefix="seats" stretch accessibilityLabel="Number of players" />

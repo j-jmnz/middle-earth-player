@@ -3,6 +3,7 @@
 // of a saga box, Hard Mode, the side quests a campaign card adds). A campaign card is tied to its campaign by the pack it is printed in
 // (`campaignId`); the Hobbit treasures, in packs no campaign owns, are filed under the collection's saga entry that holds their pack, a section for
 // each box. A boon or a burden says the scenario that gives it where `data/` says (a scenario's `campaignPlaced`, a burden's set). Pure.
+import { MOTK_PACK } from "./motk";
 import { PLAYER_TYPES, SCENARIO_TYPES, copiesOf, typeGroups, type GroupRow, type TypeGroup } from "./group-types";
 import { isScenarioRow } from "./scenario-tree";
 
@@ -11,6 +12,8 @@ export type CampaignSection = {
   key: string;
   kind: "campaign-cards" | "boons" | "burdens" | "treasures" | "other";
   title: string;
+  /** The box a Treasures section is printed in ("Over Hill and Under Hill"), which the title carries after a dot. */
+  box?: string;
   /** Copies the section holds. */
   count: number;
   groups: readonly TypeGroup[];
@@ -30,7 +33,7 @@ type PackLike = { code: string; name: string };
 
 /** Whether a row belongs to the Campaign view: a campaign, boon, burden or treasure card, or any other card of a campaign that no Scenario set holds. */
 export function isCampaignRow(row: GroupRow): boolean {
-  return row.packCode !== "MotKA" && !isScenarioRow(row);
+  return row.packCode !== MOTK_PACK && !isScenarioRow(row);
 }
 
 const SECTION_TITLES = { "campaign-cards": "Campaign cards", boons: "Boons", burdens: "Burdens", treasures: "Treasures", other: "Other cards" } as const;
@@ -82,6 +85,7 @@ export function campaignTree(rows: readonly GroupRow[], campaigns: readonly Camp
           key: pack == null ? `${campaign.id}~${kind}` : `${campaign.id}~${kind}~${pack}`,
           kind,
           title: pack == null ? SECTION_TITLES[kind] : `${SECTION_TITLES[kind]} · ${packNames.get(pack) ?? pack}`,
+          ...(pack == null ? {} : { box: packNames.get(pack) ?? pack }),
           count: copiesOf(groups),
           groups,
         });

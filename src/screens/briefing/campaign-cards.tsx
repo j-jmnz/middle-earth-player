@@ -6,9 +6,10 @@ import { useState } from "react";
 import { View } from "react-native";
 
 import { ListRow, Section } from "../kit/chrome";
+import { SpoilerAsk } from "../kit/spoiler-ask";
 import type { CardSide } from "../pool/list-preview";
 import { CardThumb } from "./card-thumb";
-import { SpoilerAsk, useCardFacts } from "./card-rows";
+import { useCardFacts } from "./card-rows";
 import { campaignSides, type CampaignCardEntry } from "./scenario-sides";
 
 export function CampaignCards({ entries, onOpen }: { entries: readonly CampaignCardEntry[]; onOpen: (sides: readonly CardSide[]) => void }) {

@@ -1,4 +1,4 @@
-// The "Fold all / Open all" button over a list of folds (the Cards tab's Scenario and Campaign lists). `ids` are the folds the list holds, each with
+// The "Collapse all / Expand all" button over a list of folds (the Cards tab's Scenario and Campaign lists). `ids` are the folds the list holds, each with
 // its default; the label offers what the next tap does (kit/fold-state.ts, foldAllOffer).
 import { View } from "react-native";
 

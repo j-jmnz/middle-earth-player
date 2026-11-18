@@ -9,10 +9,9 @@ export const CARDS_VIEWS: readonly CardsView[] = ["Player", "Scenario", "Campaig
 
 const KEYS = { Scenario: "cards-view-scenario", Campaign: "cards-view-campaign" } as const;
 
-/** The view the sections hold (`on` reads an entry, as `useFolds().folded` does), Player when none or when the stored one is not offered. */
-export function viewOf(on: (id: string) => boolean, offered: readonly CardsView[] = CARDS_VIEWS): CardsView {
-  const stored: CardsView = on(KEYS.Campaign) ? "Campaign" : on(KEYS.Scenario) ? "Scenario" : "Player";
-  return offered.includes(stored) ? stored : "Player";
+/** The view the sections hold (`on` reads an entry, as `useFolds().folded` does), Player when none. */
+export function viewOf(on: (id: string) => boolean): CardsView {
+  return on(KEYS.Campaign) ? "Campaign" : on(KEYS.Scenario) ? "Scenario" : "Player";
 }
 
 /** The ids and values to write for a view: both entries, the picked one true (an entry set back to false is dropped, as a fold set back to its default is). */

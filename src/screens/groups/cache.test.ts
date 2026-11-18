@@ -36,7 +36,7 @@ describe("the group cache", () => {
   });
 
   it("counts each group's cards once: a group's count is its cards and no card repeats in a section or a set", () => {
-    const trees = data.trees();
+    const trees = { scenario: data.scenario(), campaign: data.campaign() };
     type Listed = { id: string; groups: readonly TypeGroup[]; count: number };
     const lists: Listed[] = [
       ...[...trees.scenario.byKey.values()].map(({ set }): Listed => ({ id: set.key, groups: set.groups.filter((group) => group.id !== "quest" && group.id !== "nightmare"), count: set.count })),
@@ -68,19 +68,23 @@ describe("the group cache", () => {
     const heroes = data.motk();
     expect(heroes).toHaveLength(84);
     for (const hero of heroes) expect(hero.card.code).toBe(`99${hero.allyCode}`);
-    // Each says it is for browsing, on its strip.
-    for (const hero of heroes) expect(hero.card.note).toBe(MOTK_NOTE);
+    // Each strip names its ally's pack, so two heroes of one name differ ("(MotK) Anborn", 9906114 and 99144004).
+    for (const hero of heroes) expect(hero.card.note, hero.card.code).toMatch(/^Ally · .+/);
+    const anborn = heroes.filter((hero) => hero.card.name === "(MotK) Anborn").map((hero) => hero.card.note);
+    expect(anborn).toHaveLength(2);
+    expect(new Set(anborn).size).toBe(2);
   });
 
   it("resolves a set, a campaign section and the heroes by the route's kind and id", () => {
-    const trees = data.trees();
+    const trees = { scenario: data.scenario(), campaign: data.campaign() };
     const set = [...trees.scenario.byKey.keys()][0]!;
-    expect(cardGroupOf(trees, "set", set)?.spoiler).toBe(true);
+    expect(cardGroupOf(data, "set", set)?.spoiler).toBe(true);
     const section = [...trees.campaign.byKey.keys()][0]!;
-    expect(cardGroupOf(trees, "campaign", section)?.groups.length).toBeGreaterThan(0);
-    expect(cardGroupOf(trees, "motk", MOTK_GROUP_ID)).toMatchObject({ spoiler: false, title: "Messenger of the King heroes" });
-    expect(cardGroupOf(trees, "set", "nowhere~Nothing")).toBeNull();
-    expect(cardGroupOf(trees, "motk", "other")).toBeNull();
+    expect(cardGroupOf(data, "campaign", section)?.groups.length).toBeGreaterThan(0);
+    expect(cardGroupOf(data, "motk", MOTK_GROUP_ID)).toMatchObject({ spoiler: false, title: "Messenger of the King heroes", subtitle: `84 cards · ${MOTK_NOTE}` });
+    expect(cardGroupOf(data, "motk", MOTK_GROUP_ID)).toBe(cardGroupOf(data, "motk", MOTK_GROUP_ID));
+    expect(cardGroupOf(data, "set", "nowhere~Nothing")).toBeNull();
+    expect(cardGroupOf(data, "motk", "other")).toBeNull();
   });
 
   it("names the scenario that gives Turayn", () => {

@@ -1,5 +1,5 @@
-// One card of a card group's grid (docs/design-system.md, Card groups): the picture, a badge on its foot with the copies ("×3", "×3 · Easy ×1"),
-// the name under it and, where data says, where the card comes from. A tap opens the card, a long press shows it large, as in the pool.
+// One card of a card group's grid (docs/design-system.md, Card groups): the picture (upright, or sideways for a quest or setup card), a badge on its
+// foot with the copies ("×3", "×3 · Easy ×1"), the name under it and, where data says, where the card comes from or its stage. A tap opens the card, a long press shows it large, as in the pool.
 import { memo } from "react";
 import { Pressable, View } from "react-native";
 
@@ -17,25 +17,22 @@ import { copyBadge, copyWords, type GroupCard } from "./group-types";
 export const GroupCell = memo(function GroupCell({
   card,
   width,
-  offset,
   onOpen,
   onPreview,
 }: {
   card: GroupCard;
   width: number;
-  // How far it sits into its column (gridOffset).
-  offset: number;
   onOpen: (code: string) => void;
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const palette = usePalette();
   const s = useUiScale();
   const picture = useCardPreview(card.code, card.imagesrc);
-  const height = Math.round(width * CARD_RATIO);
+  const height = Math.round(card.landscape ? width / CARD_RATIO : width * CARD_RATIO);
   const badge = copyBadge(card);
   const words = [card.name, copyWords(card), card.note].filter((part) => part != null).join(", ");
   return (
-    <View style={{ width, marginLeft: offset, marginBottom: 14 * s }}>
+    <View style={{ width, marginBottom: 14 * s }}>
       <Pressable
         testID={`group-card-${card.code}`}
         collapsable={false}

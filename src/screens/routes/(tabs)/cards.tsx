@@ -4,6 +4,7 @@ import { ScrollView, View } from "react-native";
 
 import { CardDetailPane } from "../../pool/card-detail";
 import { CardPool, CardPoolBody } from "../../pool/card-pool";
+import { cardsWord } from "../../groups/card-group";
 import { CardGroupBody, useCardGroup } from "../../groups/group-body";
 import { CampaignList } from "../../groups/campaign-list";
 import { MotkRow } from "../../groups/motk-row";
@@ -13,6 +14,7 @@ import { BodyText, HubHeader, PillButton, Screen, Segmented } from "../../kit/ch
 import { useFolds } from "../../kit/fold-section";
 import { useListPreview } from "../../pool/list-preview";
 import { ToastView } from "../../kit/toast-view";
+import { Text } from "../../../ui/text";
 import { useSizeClass } from "../../../ui/use-size-class";
 
 // The detail pane beside the pool on a tablet in landscape.
@@ -64,7 +66,14 @@ export default function Cards() {
             </View>
             <View className="min-w-0 flex-1" testID="cards-set-pane">
               {openKey ? (
-                <CardGroupBody group={group} onDecline={() => setOpen(null)} onPreview={preview.open} />
+                <>
+                  {group ? (
+                    <Text testID="cards-pane-title" numberOfLines={1} className="mt-2 font-display text-body text-bone">
+                      {`${group.title} · ${cardsWord(group.count)}`}
+                    </Text>
+                  ) : null}
+                  <CardGroupBody group={group} onDecline={() => setOpen(null)} onPreview={preview.open} />
+                </>
               ) : (
                 <BodyText tone="muted" className="mt-6 text-center">
                   {view === "Scenario" ? "Pick a set to see its cards here." : "Pick a section to see its cards here."}

@@ -12,6 +12,9 @@ export type GroupRow = {
   position: number;
   encounterSet: string | null;
   quantity: number;
+  /** A quest card's printed stage ("3A"). */
+  stage: string | null;
+  questPoints: number | null;
   campaignKind: string | null;
   burdenSet: string | null;
   campaignId: string | null;
@@ -27,8 +30,10 @@ export type GroupCard = {
   copies: number;
   /** Copies kept in Easy Mode, only where it differs from `copies`. */
   easy: number | null;
-  /** A line under the name where `data/` says where the card comes from ("From Journey up the Anduin"). */
+  /** A line under the name where `data/` says where the card comes from ("From Journey up the Anduin"), or a quest card's stage ("Stage 3A · 10 quest points"). */
   note?: string;
+  /** Printed sideways: a quest card or a Nightmare setup card, drawn in a wide cell. */
+  landscape: boolean;
 };
 
 export type TypeGroup = { id: string; title: string; cards: readonly GroupCard[] };
@@ -49,9 +54,19 @@ function easyOf(row: GroupRow, counts: ReadonlyMap<string, EasyCopies> | undefin
   return found.normal === row.quantity && found.easy < found.normal ? found.easy : null;
 }
 
+// The types printed sideways.
+const LANDSCAPE_TYPES: ReadonlySet<string> = new Set(["quest", "nightmare"]);
+
+/** A quest card's line: its stage and its quest points, which tell two cards of one name apart (Passage Through Mirkwood's two "A Chosen Path"). */
+export function questNote(row: Pick<GroupRow, "typeCode" | "stage" | "questPoints">): string | undefined {
+  if (row.typeCode !== "quest" || row.stage == null) return undefined;
+  return row.questPoints == null ? `Stage ${row.stage}` : `Stage ${row.stage} · ${row.questPoints} quest ${row.questPoints === 1 ? "point" : "points"}`;
+}
+
 export function groupCard(row: GroupRow, decorate: Decorate = {}): GroupCard {
-  const note = decorate.note?.(row);
-  return { code: row.code, name: row.name, typeCode: row.typeCode, imagesrc: row.imagesrc, copies: row.quantity, easy: easyOf(row, decorate.easy), ...(note ? { note } : {}) };
+  const note = decorate.note?.(row) ?? questNote(row);
+  const landscape = LANDSCAPE_TYPES.has(row.typeCode);
+  return { code: row.code, name: row.name, typeCode: row.typeCode, imagesrc: row.imagesrc, copies: row.quantity, easy: easyOf(row, decorate.easy), landscape, ...(note ? { note } : {}) };
 }
 
 /** The badge on a card: "×3", "×3 · Easy ×1", "×2 · Not in Easy"; null for a single copy that Easy keeps. */

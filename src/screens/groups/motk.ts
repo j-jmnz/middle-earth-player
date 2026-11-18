@@ -4,7 +4,7 @@ import { groupCard, type GroupCard, type GroupRow } from "./group-types";
 
 export const MOTK_PACK = "MotKA";
 
-/** The line each hero carries (its strip in the grid, its card screen): they are for browsing, the contract plays the ally. */
+/** The line a hero's card screen and the heroes' route carry: they are for browsing, the contract plays the ally. */
 export const MOTK_NOTE = "Browse only · played with the Messenger of the King contract";
 
 // The ally's code is five digits, or six for a Hobbit saga ally (99131006 stands for 131006).
@@ -17,13 +17,18 @@ export function motkAllyCode(code: string): string | null {
   return MOTK_HERO.exec(code)?.[1] ?? null;
 }
 
-// The name a printing carries ("(MotK) Faramir") without the tag, to sort and to say.
+/** A printing's name without its leading tag ("(MotK) Faramir" is "Faramir"), to sort and to say (the pool sorts by it too). */
 export function untagged(name: string): string {
-  return name.replace(/^\(MotK\)\s*/, "");
+  return name.replace(/^\([^)]*\)\s*/, "");
 }
 
-/** The heroes in name order, the tag ignored. */
-export function motkHeroes(rows: readonly GroupRow[]): MotkHero[] {
+/** The line under a hero in the grid: the ally's pack, which tells two heroes of one name apart ("Ally · The Hunt for Gollum"). */
+export function allyNote(packName: string | undefined): string {
+  return packName ? `Ally · ${packName}` : "Ally";
+}
+
+/** The heroes in name order, the tag ignored. `allyPacks` names the pack each ally (by its code) is printed in. */
+export function motkHeroes(rows: readonly GroupRow[], allyPacks: ReadonlyMap<string, string> = new Map()): MotkHero[] {
   return rows
     .filter((row) => row.packCode === MOTK_PACK)
     .flatMap((row) => {
@@ -31,5 +36,5 @@ export function motkHeroes(rows: readonly GroupRow[]): MotkHero[] {
       return allyCode ? [{ row, allyCode }] : [];
     })
     .sort((left, right) => untagged(left.row.name).localeCompare(untagged(right.row.name)) || left.row.code.localeCompare(right.row.code))
-    .map(({ row, allyCode }) => ({ card: groupCard(row, { note: () => MOTK_NOTE }), allyCode }));
+    .map(({ row, allyCode }) => ({ card: groupCard(row, { note: () => allyNote(allyPacks.get(allyCode)) }), allyCode }));
 }

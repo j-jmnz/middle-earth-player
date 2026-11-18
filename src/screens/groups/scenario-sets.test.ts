@@ -9,7 +9,7 @@ import { groupDataOf } from "./cache.ts";
 import { dealtCodes, setKeyFor } from "./scenario-sets.ts";
 import type { ScenarioTree } from "./scenario-tree.ts";
 
-const card = (code: string) => ({ code, name: code, typeCode: "enemy", imagesrc: null, copies: 1, easy: null });
+const card = (code: string) => ({ code, name: code, typeCode: "enemy", imagesrc: null, copies: 1, easy: null, landscape: false });
 const node = (pack: string, name: string, codes: string[]) => ({ key: `${pack}~${name}`, name, count: codes.length, groups: [{ id: "enemy", title: "Enemies", cards: codes.map(card) }] });
 function tree(...sets: ReturnType<typeof node>[]): ScenarioTree {
   const byKey = new Map(sets.map((set) => [set.key, { product: { id: "p", title: "P", packs: [] }, pack: { code: set.key.split("~")[0]!, name: "", sets: [] }, set }]));

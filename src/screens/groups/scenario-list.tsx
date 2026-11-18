@@ -2,15 +2,12 @@
 // sets as rows ("Wilderlands", "14 cards"), every fold closed until opened and kept in `settings.sections` like the other folds. A row opens the set:
 // `onOpen` gets its key, and the tab pushes the card-group route or, on a tablet in landscape, fills the pane beside the list.
 import { useMemo } from "react";
-import { View } from "react-native";
 
-import { useUiScale } from "../../ui/ui-scale";
 import { useDatabases } from "../data/databases";
-import { FoldSection, type useFolds } from "../kit/fold-section";
-import { ListRow, ScreenScroll, Section } from "../kit/chrome";
+import { type useFolds } from "../kit/fold-section";
 import { groupDataOf } from "./cache";
 import { cardsWord } from "./card-group";
-import { FoldAllBar } from "./fold-all-bar";
+import { FoldList, type FoldBlock } from "./fold-list";
 
 /** A pack's fold id; every pack starts closed. */
 export function packFoldId(code: string): string {
@@ -19,32 +16,22 @@ export function packFoldId(code: string): string {
 
 export function ScenarioList({ folds, selected, onOpen }: { folds: ReturnType<typeof useFolds>; selected: string | null; onOpen: (key: string) => void }) {
   const { catalog } = useDatabases();
-  const s = useUiScale();
-  const tree = useMemo(() => groupDataOf(catalog).scenario(), [catalog]);
-  const ids = useMemo(() => tree.products.flatMap((product) => product.packs.map((pack) => ({ id: packFoldId(pack.code), defaultFolded: true }))), [tree]);
-  return (
-    <ScreenScroll testID="cards-scenarios" top={4}>
-      <FoldAllBar folds={folds} ids={ids} noun="pack" />
-      <View style={{ gap: 6 * s }}>
-        {tree.products.map((product) => (
-          <View key={product.id} testID={`cards-product-${product.id}`}>
-            {product.packs.length > 1 ? <Section title={product.title} className="mt-3" /> : null}
-            {product.packs.map((pack) => {
-              const id = packFoldId(pack.code);
-              const folded = folds.folded(id, true);
-              return (
-                <FoldSection key={pack.code} id={id} title={product.packs.length > 1 ? pack.name : product.title} count={pack.sets.length} unit="set" folded={folded} onFold={(next) => folds.setFolded(id, next, true)}>
-                  {folded
-                    ? null
-                    : pack.sets.map((set) => (
-                        <ListRow key={set.key} testID={`cards-set-${set.key}`} label={set.name} detail={cardsWord(set.count)} selected={selected == null ? undefined : selected === set.key} onPress={() => onOpen(set.key)} />
-                      ))}
-                </FoldSection>
-              );
-            })}
-          </View>
-        ))}
-      </View>
-    </ScreenScroll>
+  const blocks = useMemo(
+    (): FoldBlock[] =>
+      groupDataOf(catalog)
+        .scenario()
+        .products.map((product) => ({
+          id: product.id,
+          testID: `cards-product-${product.id}`,
+          ...(product.packs.length > 1 ? { heading: product.title } : {}),
+          folds: product.packs.map((pack) => ({
+            id: packFoldId(pack.code),
+            title: product.packs.length > 1 ? pack.name : product.title,
+            unit: "set",
+            rows: pack.sets.map((set) => ({ key: set.key, testID: `cards-set-${set.key}`, label: set.name, detail: cardsWord(set.count) })),
+          })),
+        })),
+    [catalog],
   );
+  return <FoldList testID="cards-scenarios" noun="pack" blocks={blocks} folds={folds} selected={selected} onOpen={onOpen} />;
 }

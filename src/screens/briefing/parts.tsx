@@ -2,8 +2,8 @@
 // Booklet), the saved decks and the Ring-bearer candidates, the scenario's details (stages, difficulty, sets, special rules) and the
 // pinned Deal bar. One seat's fellowship is seat-picker.tsx.
 import { and, eq, like } from "drizzle-orm";
-import { useFocusEffect } from "expo-router";
-import { createContext, useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { createContext, useCallback, useDeferredValue, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -15,10 +15,13 @@ import { DIFFICULTIES, type Difficulty } from "../../catalog/scenario-data";
 import { GroundedScene } from "../art/art";
 import { dealSentence, problemWords } from "./words";
 import { CampaignCards } from "./campaign-cards";
-import { ScenarioCards, type EncounterSets } from "./scenario-cards";
+import { ScenarioCards } from "./scenario-cards";
 import type { CampaignCardEntry } from "./scenario-sides";
+import { groupDataOf } from "../groups/cache";
+import { cardsWord } from "../groups/card-group";
+import { setKeyFor } from "../groups/scenario-sets";
 import { useListPreview } from "../pool/list-preview";
-import { ActionBar, Chevron, Chip, Column, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "../kit/chrome";
+import { ActionBar, Chevron, Chip, Column, FloatingBarShade, IconButton, Label, ListRow, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "../kit/chrome";
 import { BRIEFING_SCENE_RANGE } from "./layout";
 import { deckListSpheres, emptyDeckListFilter, filterDecks, type DeckListFilter } from "../deck/list";
 import { deckReadiness, type DeckReadiness } from "../deck/status";
@@ -135,7 +138,6 @@ export function BriefingScreen({
   barTestID = "briefing-deal-bar",
   campaignCard,
   stages,
-  encounter,
   campaignCards,
 }: {
   testID: string;
@@ -150,14 +152,12 @@ export function BriefingScreen({
   // The words over the scene (ScenarioBanner); null while the scenario is loading or missing.
   banner: ReactNode;
   children: ReactNode;
-  // The reference matter (the scenario's cards, Before the deal, the encounter): after the content in compact and medium, under the scene when expanded.
+  // The reference matter (the scenario's cards, Before the deal, the encounter sets): after the content in compact and medium, under the scene when expanded.
   aside?: ReactNode;
   bar?: ReactNode;
-  // The scenario's campaign card, quest cards and encounter sets: rows at the head of the aside open them large (ScenarioCards).
+  // The scenario's campaign card and quest cards: rows at the head of the aside open them large (ScenarioCards).
   campaignCard?: string;
   stages?: readonly string[];
-  // The scenario's encounter sets, one row each under the quest cards (ScenarioCards).
-  encounter?: EncounterSets;
   // The campaign's cards in book order (the campaign setup): the first opens at once, the rest behind the spoiler ask (CampaignCards).
   campaignCards?: readonly CampaignCardEntry[];
 }) {
@@ -166,7 +166,7 @@ export function BriefingScreen({
   const preview = useListPreview();
   const reference = (
     <>
-      {campaignCard || stages ? <ScenarioCards stages={stages ?? []} onOpen={preview.openSides} {...(campaignCard ? { campaignCard } : {})} {...(encounter ? { encounter } : {})} /> : null}
+      {campaignCard || stages ? <ScenarioCards stages={stages ?? []} onOpen={preview.openSides} {...(campaignCard ? { campaignCard } : {})} /> : null}
       {campaignCards && campaignCards.length > 0 ? <CampaignCards entries={campaignCards} onOpen={preview.openSides} /> : null}
       {aside}
     </>
@@ -381,18 +381,33 @@ export function ModePicker({ mode, onMode, testIDPrefix, campaignName, setup }: 
   );
 }
 
-/** The encounter sets with their counts, and the scenario's special rules as tags (words to read, not controls). */
-export function EncounterDetails({ facts }: { facts: ScenarioFacts }) {
+/**
+ * The encounter: each set the scenario deals with its card count at the difficulty, as a row that opens the set on the card-group route (which asks its
+ * own spoiler question), and the scenario's special rules as tags (words to read, not controls). `codes` are the cards the scenario deals, which pick the
+ * set of a name several packs hold (groups/scenario-sets.ts). The tree that names each row's set is read after the first paint; a set no pack lists gets no row.
+ */
+export function EncounterDetails({ facts, codes }: { facts: ScenarioFacts; codes: ReadonlySet<string> }) {
+  const router = useRouter();
+  const { catalog } = useDatabases();
+  // The first render has the rows as listed; the deferred render, after the first paint, reads the tree and drops a set no pack lists.
+  const ready = useDeferredValue(true, false);
+  const names = facts.sets;
+  const current = useMemo(() => {
+    if (!ready) return null;
+    const tree = groupDataOf(catalog).scenario();
+    return new Map(names.map((set) => [set.name, setKeyFor(tree, set.name, codes)]));
+  }, [ready, catalog, names, codes]);
+  const openSet = (name: string) => {
+    const key = current?.get(name) ?? setKeyFor(groupDataOf(catalog).scenario(), name, codes);
+    if (key) router.push({ pathname: "/card-group/[kind]/[id]", params: { kind: "set", id: key, from: "briefing" } });
+  };
   return (
     <>
       <Section title="The encounter" className="mt-5" />
-      <View testID="briefing-sets" className="gap-1.5">
-        {facts.sets.map((set) => (
-          <View key={set.name} className="flex-row items-center justify-between">
-            <Text className="text-body text-bone">{set.name}</Text>
-            <Text className="font-display text-body text-muted">{String(set.count)}</Text>
-          </View>
-        ))}
+      <View testID="briefing-sets">
+        {facts.sets.map((set) =>
+          current?.get(set.name) === null ? null : <ListRow key={set.name} testID={`briefing-set-${set.name}`} label={set.name} detail={cardsWord(set.count)} onPress={() => openSet(set.name)} />,
+        )}
       </View>
       {facts.rules.length > 0 ? (
         <View testID="briefing-rules" className="mt-3 flex-row flex-wrap gap-2">

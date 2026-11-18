@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { row } from "./fixtures";
-import { copyBadge, copyWords, groupCard, SCENARIO_TYPES, typeGroups } from "./group-types";
+import { copyBadge, copyWords, groupCard, PLAYER_TYPES, questNote, SCENARIO_TYPES, typeGroups } from "./group-types";
 
 describe("the copy badge", () => {
   it("says the copies, and Easy Mode's where it differs", () => {
@@ -47,5 +47,34 @@ describe("typeGroups", () => {
     expect(groups.map((group) => group.title)).toEqual(["Quest cards", "Enemies", "Locations", "Treacheries", "Ship cards", "Gadgets"]);
     expect(groups[1]!.cards.map((card) => card.name)).toEqual(["Wolf", "Troll"]);
     expect(groups[4]!.cards.map((card) => card.name)).toEqual(["Sea", "Boat"]);
+  });
+});
+
+describe("a quest card's line and shape", () => {
+  const quest = (code: string, stage: string | null, questPoints: number | null) => row({ code, name: "A Chosen Path", typeCode: "quest", stage, questPoints });
+
+  it("names the stage and the quest points, which tell two cards of one name apart", () => {
+    expect(questNote(quest("01121", "3A", 0))).toBe("Stage 3A · 0 quest points");
+    expect(questNote(quest("01122", "3A", 10))).toBe("Stage 3A · 10 quest points");
+    expect(questNote(quest("1", "1A", 1))).toBe("Stage 1A · 1 quest point");
+    expect(questNote(quest("2", "2A", null))).toBe("Stage 2A");
+    expect(questNote(quest("3", null, 4))).toBeUndefined();
+    expect(questNote(row({ code: "4", name: "Wolf", typeCode: "enemy", stage: "1A", questPoints: 2 }))).toBeUndefined();
+    expect(groupCard(quest("01122", "3A", 10)).note).toBe("Stage 3A · 10 quest points");
+  });
+
+  it("draws a quest card and a Nightmare setup card sideways, and no other type", () => {
+    expect(groupCard(quest("1", "1A", 1)).landscape).toBe(true);
+    expect(groupCard(row({ code: "2", name: "Setup", typeCode: "nightmare" })).landscape).toBe(true);
+    expect(groupCard(row({ code: "3", name: "Wolf", typeCode: "enemy" })).landscape).toBe(false);
+  });
+});
+
+describe("typeGroups with overlapping specs", () => {
+  it("lists a type under the first heading that names it, so a card shows and counts once", () => {
+    const rows = [row({ code: "1", name: "The One Ring", typeCode: "objective" }), row({ code: "2", name: "Sword", typeCode: "attachment" })];
+    const groups = typeGroups(rows, [...PLAYER_TYPES, ...SCENARIO_TYPES]);
+    expect(groups.map((group) => group.id)).toEqual(["attachment", "objective"]);
+    expect(groups.flatMap((group) => group.cards.map((card) => card.code))).toEqual(["2", "1"]);
   });
 });

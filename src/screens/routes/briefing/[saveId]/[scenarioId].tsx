@@ -178,7 +178,6 @@ export default function Briefing() {
       {...frame}
       campaignCard={world.scenario.campaignCard}
       stages={world.scenario.stages}
-      encounter={{ sets: facts.sets, codes }}
       banner={<ScenarioBanner facts={facts} eyebrow={`Scenario ${facts.number} · ${campaign.name}`} />}
       bar={
         <DealBar problems={result.problems} dealError={dealError} dropsOpen={save.loadout != null} dealable={result.dealable} waiting={asked?.waiting ?? null} onDeal={onDeal}>
@@ -207,7 +206,7 @@ export default function Briefing() {
             </Label>
           ) : null}
 
-          <EncounterDetails facts={facts} />
+          <EncounterDetails facts={facts} codes={codes} />
         </>
       }
     >

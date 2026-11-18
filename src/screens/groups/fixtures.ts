@@ -9,6 +9,8 @@ export function row(over: Partial<GroupRow> & Pick<GroupRow, "code" | "name" | "
     position: Number(over.code) || 1,
     encounterSet: null,
     quantity: 1,
+    stage: null,
+    questPoints: null,
     campaignKind: null,
     burdenSet: null,
     campaignId: null,
