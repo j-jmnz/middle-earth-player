@@ -70,7 +70,7 @@ describe("useReaderMode", () => {
   });
 });
 
-// The development override Maestro's reader flow uses (.maestro/features/screen-reader.yaml): it needs a development build and the variable.
+// The development override that forces the reader table: it needs a development build and the variable.
 describe("useReaderMode with EXPO_PUBLIC_FORCE_READER", () => {
   afterEach(() => {
     vi.unstubAllEnvs();

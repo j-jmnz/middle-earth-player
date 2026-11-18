@@ -50,7 +50,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
   scenario: {
     new: { steps: [{ script: "tools/scenario-new.ts" }], about: "writes and registers a scenario's skeleton files (--dry-run first)" },
     pack: { steps: [{ script: "tools/author-pack.ts" }], about: "writes .agent/pack/<id>.md, the scenario author's context" },
-    fixtures: { steps: [{ script: "e2e/fixtures.ts" }], about: "rewrites the Maestro save fixtures in src/campaign/fixtures" },
+    fixtures: { steps: [{ script: "e2e/fixtures.ts" }], about: "rewrites the save fixtures in src/campaign/fixtures" },
   },
   test: {
     all: { steps: [{ script: VITEST, args: ["run"] }], about: "vitest run (any arguments go to vitest)" },

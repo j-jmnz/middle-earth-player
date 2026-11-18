@@ -34,7 +34,7 @@ export type FramsburgPolicy = {
   engage: boolean;
   // Whether a character defends: every attack ("all") or none. A defender is exhausted, so it cannot quest or attack; with nobody defending the attack falls on the character with the least damage.
   defend: "none" | "all";
-  // The quest: the first two characters of a seat quest (the goldens' heroes have willpower far above the staging area's threat, and Afraid of the Dark or Scatha's Teeth may take one of them out of the quest) or every character that can does (the Maestro fixtures' real decklists).
+  // The quest: the first two characters of a seat quest (the goldens' heroes have willpower far above the staging area's threat, and Afraid of the Dark or Scatha's Teeth may take one of them out of the quest) or every character that can does (the fixtures' real decklists).
   quest: "pair" | "all";
   // Whether the players use the Responses and Actions of the Loot objectives and the treasure for Fram's Shade, or pass them.
   use: boolean;
@@ -53,7 +53,7 @@ const inVictory = (state: ScenarioState, code: string): boolean => Object.values
 const shadeHeld = (state: ScenarioState): boolean => state.cards[state.questStage ?? ""]?.code === CODES.stage3 && !inVictory(state, CODES.theCursedTomb);
 
 // The auto-player's answer (test/harness/auto-player.ts), except: the Resolution's questions, the travel, an engagement, the attack, a defender and the Responses and Actions are answered as the policy says; a choice takes the first answer, or the last.
-// Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/the-ghost-of-framsburg.ts) play real decklists, so they turn card play on.
+// Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the fixtures (scripts/e2e/the-ghost-of-framsburg.ts) play real decklists, so they turn card play on.
 export function framsburgIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: FramsburgPolicy = DEFAULT_POLICY, options: PolicyOptions = FRAMSBURG_POLICY): PlayerIntent {
   if (state.window?.kind === "resolution") {
     const offered = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));

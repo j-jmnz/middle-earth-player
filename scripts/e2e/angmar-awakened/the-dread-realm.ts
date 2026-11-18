@@ -1,4 +1,4 @@
-// The Maestro fixtures of The Dread Realm (angmar-awakened part 9), written into src/campaign/fixtures/the-dread-realm.json by scripts/e2e/fixtures.ts: real games of saved decklists (the One Deck and
+// The fixtures of The Dread Realm (angmar-awakened part 9), written into src/campaign/fixtures/the-dread-realm.json by scripts/e2e/fixtures.ts: real games of saved decklists (the One Deck and
 // Defenders of Gondor lists, `FIXTURE_DECKS` in scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `realm-won` is the first seed that wins, parked on the win (the Resolution waits); `realm-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

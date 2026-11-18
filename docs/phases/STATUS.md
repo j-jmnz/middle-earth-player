@@ -8,7 +8,6 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - When you start a phase, set it to `active` with a one-line note. Do not mark the next phase active. More than one phase may be active only when their files say they can run beside each other.
 - A phase is completed when its exit is green and `/reviewer` reports no blocks (one review round when `orchestrator` runs it: `.claude/agents/orchestrator.md`, One review round). A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Then delete its row and its file; what is still open goes under Open items.
 - A scenario phase has an engine half and a screen half (`docs/agents/agent-brief.md`, Scenario procedure). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active`. The phase is completed when both halves are.
-- Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - Phone and tablet checks are not tracked: no phase waits on one, and none is listed here (user instruction, 2026-11-06).
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects open`).
 
@@ -46,53 +45,47 @@ No phase is open.
 - Windows and macOS packaging has been proven only in CI (`docs/releasing.md`); open each packed app by hand on each OS once before the first release.
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
-### Fixtures and Maestro
-- `flame-won` is not committed: no seed in 100 wins Shadow and Flame with the saved decklists (they cannot damage Durin's Bane enough for Dark Pit to discard it). Until it exists `.maestro/scenarios/shadow-and-flame/shadow-and-flame.yaml` cannot run.
-- `stone-won` is not committed: no seed in 100 wins Foundations of Stone with the saved decklists. Until it exists `.maestro/scenarios/foundations-of-stone/foundations-of-stone.yaml` cannot run.
-- `rivendell-won` is not committed: no seed in 500 wins Road to Rivendell with the saved decklists. Until it exists `.maestro/scenarios/road-to-rivendell/road-to-rivendell.yaml` cannot run.
-- `gate-won` is not committed: no seed in 500 wins The Redhorn Gate with the saved decklists. Until it exists `.maestro/scenarios/the-redhorn-gate/the-redhorn-gate.yaml` cannot run.
-- `frommoria-won` is not committed: no seed in 400 wins Flight from Moria with the saved decklists (heroes destroyed by round 3). Until it exists `.maestro/scenarios/flight-from-moria/flight-from-moria.yaml` cannot run.
-- `level-won` is not committed: no seed in 500 wins The Seventh Level with the saved decklists (their heroes are gone by round 3). Until it exists `.maestro/scenarios/the-seventh-level/the-seventh-level.yaml` cannot run.
-- `pit-won` is not committed: no seed in 500 wins Into the Pit with the saved decklists (their heroes are destroyed by round 3 or 4). Until it exists `.maestro/scenarios/into-the-pit/into-the-pit.yaml` cannot run.
-- `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50). Until it exists `.maestro/scenarios/conflict-at-the-carrock/conflict-at-the-carrock.yaml` cannot run.
-- `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists. Until it exists `.maestro/scenarios/return-to-mirkwood/return-to-mirkwood.yaml` cannot run.
-- `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.
-- `dum-won` is not committed: no seed in 600 wins The Battle of Carn Dûm with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-carn-dum/the-battle-of-carn-dum.yaml` cannot run.
-- `rhudaur-won` is not committed: no seed wins The Treachery of Rhudaur with the saved decklists under the golden policy. Until it exists `.maestro/scenarios/the-treachery-of-rhudaur/the-treachery-of-rhudaur.yaml` cannot run.
-- `ettenmoors-won` is not committed: no seed in 100 wins Across the Ettenmoors with the saved decklists. Until it exists `.maestro/scenarios/across-the-ettenmoors/across-the-ettenmoors.yaml` cannot run.
-- `gram-won` is not committed: no seed in 100 wins Escape from Mount Gram with the saved decklists. Until it exists `.maestro/scenarios/escape-from-mount-gram/escape-from-mount-gram.yaml` cannot run.
-- `eriador-won` is not committed: no seed in 700 wins The Wastes of Eriador with the saved decklists. Until it exists `.maestro/scenarios/the-wastes-of-eriador/the-wastes-of-eriador.yaml` cannot run.
-- `dike-won` is not committed: no seed in 600 wins Deadmen's Dike with the saved decklists (their heroes cannot put 9 damage on Thaurdir). Until it exists `.maestro/scenarios/deadmens-dike/deadmens-dike.yaml` cannot run; its Resolution step is unverified against the `to: player` view.
-- `hills-won` is not committed: no seed in 100 wins The Weather Hills with the saved decklists (Defenders of Gondor, Swords of the Noldor, Easy). Until it exists `.maestro/scenarios/the-weather-hills/the-weather-hills.yaml` cannot run.
-- `chetwood-won` is not committed: no seed in 100 wins Intruders in Chetwood with The One Deck and Defenders of Gondor under five policies. Until it exists `.maestro/scenarios/intruders-in-chetwood/intruders-in-chetwood.yaml` cannot run.
-- `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
-- `doom-won` is not committed: no seed in 800 wins Mount Doom with the saved decklists (the Ring-bearer falls in combat in round 1). Until it exists `.maestro/scenarios/mount-doom/mount-doom.yaml` and `mount-doom-keep.yaml` cannot run.
-- `ungol-won` is not committed: no seed in 600 wins The Tower of Cirith Ungol with the saved decklists. Until it exists `.maestro/scenarios/the-tower-of-cirith-ungol/the-tower-of-cirith-ungol.yaml` cannot run.
-- `fields-won` is not committed: no seed in 100 wins The Battle of the Pelennor Fields with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-the-pelennor-fields/the-battle-of-the-pelennor-fields.yaml` cannot run.
-- `gondor-won` is not committed: no seed in 400 wins The Siege of Gondor with the saved decklists (threat or Aragorn's death ends every game by round 3). Until it exists `.maestro/scenarios/the-siege-of-gondor/the-siege-of-gondor.yaml` cannot run.
-- `company-won` is not committed: no seed in 400 wins The Passing of the Grey Company with the saved decklists (threat ends every game by round 4). Until it exists `.maestro/scenarios/the-passing-of-the-grey-company/the-passing-of-the-grey-company.yaml` cannot run.
-- `lair-won` is not committed: no seed in 600 wins Shelob's Lair with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/shelobs-lair/shelobs-lair.yaml` cannot run.
-- `roads-won` is not committed: no seed in 600 wins Journey to the Cross-roads with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/journey-to-the-cross-roads/journey-to-the-cross-roads.yaml` cannot run.
-- `isengard-won` is not committed: no seed in 600 wins The Road to Isengard with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/the-road-to-isengard/the-road-to-isengard.yaml` cannot run.
-- `deep-won` is not committed: no seed in 100 wins Helm's Deep with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/helms-deep/helms-deep.yaml` cannot run.
-- `hai-won` is not committed: no seed in 1000 wins The Uruk-hai with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/the-uruk-hai/the-uruk-hai.yaml` cannot run.
-- `wilderland-won` is not committed: none of 100 seeds (and 750 more under five other policies) wins The Fate of Wilderland with the starter decklists. Until it exists `.maestro/scenarios/the-fate-of-wilderland/the-fate-of-wilderland.yaml` cannot run.
-- `gundabad-won` is not committed: none of 100 seeds wins Mount Gundabad with the starter decklists; the hero carrying Wormsbane leaves play in the first rounds or threat runs out. Until it exists `.maestro/scenarios/mount-gundabad/mount-gundabad.yaml` cannot run.
-- `framsburg-won` is not committed: none of 100 seeds wins The Ghost of Framsburg with the starter decklists. Until it exists `.maestro/scenarios/the-ghost-of-framsburg/the-ghost-of-framsburg.yaml` cannot run; its `CHOICE_*` lines are commented out.
-- `night-won` is not committed: none of 100 seeds wins Fire in the Night with the starter decklists. Until it exists `.maestro/scenarios/fire-in-the-night/fire-in-the-night.yaml` cannot run; a win can ask up to four Resolution questions and `subflows/scenario-win.yaml` takes two.
-- `rhovanion-won` is not committed: none of 100 seeds wins Roam Across Rhovanion with the starter decklists. Until it exists `.maestro/scenarios/roam-across-rhovanion/roam-across-rhovanion.yaml` cannot run, and it still needs the `CHOICE_*` and `CHOICE2_*` answers for the Resolution's location choice.
-- `heath-won` is not committed: none of 100 seeds wins The Withered Heath with the starter decklists. Until it exists `.maestro/scenarios/the-withered-heath/the-withered-heath.yaml` (with `CHOICE2_SEAT`) cannot run.
-- `kingsquest-won` is not committed: none of 100 seeds wins The King's Quest with the starter decklists. Until it exists `.maestro/scenarios/the-kings-quest/the-kings-quest.yaml` (and its `CHOICE2_*` path in `scenario-win.yaml`) cannot run.
-- `lostmirk-won` is not committed: none of 100 seeds wins Lost in Mirkwood with the starter decklists. Until it exists `.maestro/scenarios/lost-in-mirkwood/lost-in-mirkwood.yaml` cannot run, and its pool and treasure asserts do not yet prove part 2 wrote them.
-- `upanduin-won` is not committed: no seed in 600 wins Journey Up the Anduin with the starter decks under the scenario's policy. Until it exists `.maestro/scenarios/journey-up-the-anduin/journey-up-the-anduin.yaml` cannot run.
-- Scenario 1's `won` fixture is not committed. `scripts/e2e/fixtures.ts --won` searches for it. Until it exists `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/scenarios/a-knife-in-the-dark/a-knife-in-the-dark-loss.yaml` cannot run either.
-- A Knife in the Dark's won flow has no genuine win (user-accepted, 2026-10-25).
+### Fixtures
+- `flame-won` is not committed: no seed in 100 wins Shadow and Flame with the saved decklists (they cannot damage Durin's Bane enough for Dark Pit to discard it).
+- `stone-won` is not committed: no seed in 100 wins Foundations of Stone with the saved decklists.
+- `rivendell-won` is not committed: no seed in 500 wins Road to Rivendell with the saved decklists.
+- `gate-won` is not committed: no seed in 500 wins The Redhorn Gate with the saved decklists.
+- `frommoria-won` is not committed: no seed in 400 wins Flight from Moria with the saved decklists (heroes destroyed by round 3).
+- `level-won` is not committed: no seed in 500 wins The Seventh Level with the saved decklists (their heroes are gone by round 3).
+- `pit-won` is not committed: no seed in 500 wins Into the Pit with the saved decklists (their heroes are destroyed by round 3 or 4).
+- `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50).
+- `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists.
+- `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists.
+- `dum-won` is not committed: no seed in 600 wins The Battle of Carn Dûm with the saved decklists.
+- `rhudaur-won` is not committed: no seed wins The Treachery of Rhudaur with the saved decklists under the golden policy.
+- `ettenmoors-won` is not committed: no seed in 100 wins Across the Ettenmoors with the saved decklists.
+- `gram-won` is not committed: no seed in 100 wins Escape from Mount Gram with the saved decklists.
+- `eriador-won` is not committed: no seed in 700 wins The Wastes of Eriador with the saved decklists.
+- `dike-won` is not committed: no seed in 600 wins Deadmen's Dike with the saved decklists (their heroes cannot put 9 damage on Thaurdir).
+- `hills-won` is not committed: no seed in 100 wins The Weather Hills with the saved decklists (Defenders of Gondor, Swords of the Noldor, Easy).
+- `chetwood-won` is not committed: no seed in 100 wins Intruders in Chetwood with The One Deck and Defenders of Gondor under five policies.
+- `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4).
+- `doom-won` is not committed: no seed in 800 wins Mount Doom with the saved decklists (the Ring-bearer falls in combat in round 1).
+- `ungol-won` is not committed: no seed in 600 wins The Tower of Cirith Ungol with the saved decklists.
+- `fields-won` is not committed: no seed in 100 wins The Battle of the Pelennor Fields with the saved decklists.
+- `gondor-won` is not committed: no seed in 400 wins The Siege of Gondor with the saved decklists (threat or Aragorn's death ends every game by round 3).
+- `company-won` is not committed: no seed in 400 wins The Passing of the Grey Company with the saved decklists (threat ends every game by round 4).
+- `lair-won` is not committed: no seed in 600 wins Shelob's Lair with The One Deck and Defenders of Gondor.
+- `roads-won` is not committed: no seed in 600 wins Journey to the Cross-roads with The One Deck and Defenders of Gondor.
+- `isengard-won` is not committed: no seed in 600 wins The Road to Isengard with The One Deck and Defenders of Gondor.
+- `deep-won` is not committed: no seed in 100 wins Helm's Deep with The One Deck and Defenders of Gondor.
+- `hai-won` is not committed: no seed in 1000 wins The Uruk-hai with The One Deck and Defenders of Gondor.
+- `wilderland-won` is not committed: none of 100 seeds (and 750 more under five other policies) wins The Fate of Wilderland with the starter decklists.
+- `gundabad-won` is not committed: none of 100 seeds wins Mount Gundabad with the starter decklists; the hero carrying Wormsbane leaves play in the first rounds or threat runs out.
+- `framsburg-won` is not committed: none of 100 seeds wins The Ghost of Framsburg with the starter decklists.
+- `night-won` is not committed: none of 100 seeds wins Fire in the Night with the starter decklists.yaml` takes two.
+- `rhovanion-won` is not committed: none of 100 seeds wins Roam Across Rhovanion with the starter decklists.
+- `heath-won` is not committed: none of 100 seeds wins The Withered Heath with the starter decklists.
+- `kingsquest-won` is not committed: none of 100 seeds wins The King's Quest with the starter decklists.
+- `lostmirk-won` is not committed: none of 100 seeds wins Lost in Mirkwood with the starter decklists.
+- `upanduin-won` is not committed: no seed in 600 wins Journey Up the Anduin with the starter decks under the scenario's policy.
+- Scenario 1's `won` fixture is not committed. `scripts/e2e/fixtures.ts --won` searches for it. `knife-lost` (dealt from its log) is missing until it exists.
 - Fixtures not committed, because no real win of the earlier scenarios exists to chain from: `ford-start`, `ford-won`, `ford-lost`; `south-start`, `south-stage-4`, `south-won`, `south-lost`; `anduin-won`; `dol-guldur-won`, `dol-guldur-lost`; `nibin-dum-won`; Mirkwood Paths parts 4 and 5; `moria-won`, `moria-pairs`, `moria-lost`; `breaking-solo`, `breaking-pair`, `breaking-won`, `breaking-lost`. A fixture is a real save: each starts from the log the earlier parts write when won, and joins `src/campaign/fixtures.ts` when `scripts/e2e/fixtures.ts --won` finds that chain.
-- No Maestro flow has run. The flows that cross a stage advance must pass the quest advance screen (`quest-advance-progress`, Progress is optional); a fixture parked on a When Revealed question shows the question instead.
-- `.maestro/features/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
-- `.maestro/features/deck.yaml` and `.maestro/features/rules.yaml` are phone flows; they cannot run on an expanded tablet.
-- No Maestro flow plays an attack through the redesigned combat spotlight.
-- `.maestro/config.yaml` lists `scenarios/*/*` and `features/*`: not yet run to see `maestro test .maestro` and the EAS `e2e` workflow (`flow_path: .maestro`) pick up every flow through it.
 - The committed `journey-along-the-anduin.json` and `the-caves-of-nibin-dum.json` fixtures predate the log's `modes`, `modeDefault`, `xpGained` and `marks` fields; `scripts/e2e/fixtures.ts` rewrites them with those fields, the same seeds and the same intents.
 - `voyage-won`, `fate-won`, `raid-won`, `stormcaller-won`, `depths-won`, `temple-won`, `ruins-won` and `haven-won` are not committed (the Fate fixtures carry a Voyage win played from the golden): no auto-played win with real decks was found (the shipped pair in 100 seeds, each prebuilt deck solo in 40, 17 two-handed pairs in 60). The goldens win only with synthetic heroes.
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
@@ -272,7 +265,6 @@ No phase is open.
 - Run `pnpm assets scans` on the build machine before a release, so side B pictures and the `.scene` files are bundled.
 - Scenario pipeline (`docs/plans/scenario-pipeline.md`): section E's ledger seed is built (`pnpm data ledger-seed`); its pile overrides and XP rows in data are not, nor are its Next steps; the core's remaining direct family calls (travel, pick, condition, amount, `syncThreatSaves`, `playSweep`, `heldByLapsedStage`) move behind the hooks when their family is next changed.
 - Choice words: the entries marked Open in the allowlist of `src/play/words/scenario-words.test.ts` are bare prompts still to be named.
-- The Maestro subflows in `.maestro/subflows/` and the eight Dream-chaser flows that call them are checked statically only, not run.
 - Accessibility: the drawn canvas takes no keyboard focus and its own text and fixed alphas do not follow Bold Text or Reduce Transparency; on iOS, Escape and Z do nothing (React Native sends no key events there).
 - Accessibility: at font scale 2 on a phone in landscape the dock's worst moment (a why line, a three-line primary, Cancel and More, an attack readout) passes its column even with the aids folded (`it.fails` in `dock/text-size-fit.test.ts`); at font scale 1 the longest caution with an attack readout passes it by up to 16 pt (`HAND_SLACK`, `budget.test.ts`). Needs a dock design.
 - Accessibility: the Label in Name entries held in `OPEN` (`scripts/checks/a11y-web.ts`) are axe joining sibling text with no space on react-native-web; the names start with their visible words.

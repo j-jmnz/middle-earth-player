@@ -1,6 +1,0 @@
-appId: com.middleearth.player
----
-- launchApp
-- assertVisible:
-    id: campaign-list
-- assertVisible: "Campaigns"

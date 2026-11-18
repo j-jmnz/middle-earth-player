@@ -1,4 +1,4 @@
-// The Maestro fixtures of The Tower of Cirith Ungol (the-return-of-the-king part 4), written into src/campaign/fixtures/the-tower-of-cirith-ungol.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck in the first seat, Defenders of
+// The fixtures of The Tower of Cirith Ungol (the-return-of-the-king part 4), written into src/campaign/fixtures/the-tower-of-cirith-ungol.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck in the first seat, Defenders of
 // Gondor in the second: FIXTURE_DECKS in scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `ungol-won` is the first seed that wins, parked on the win (the Resolution waits); `ungol-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

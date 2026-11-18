@@ -43,6 +43,6 @@ If a timing is not on the booklet, the quest card, the Learn to Play, the Rules 
 
 A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) with an `ENGINE_CHANGES` entry there for the new number (the scenarios it reaches and one line for players) and regenerates the goldens it moves; when `src/campaign/fixtures.test.ts` fails, run `scripts/e2e/fixtures.ts` again. A golden or fixture outcome that changes is named in the phase note, not relabeled silently.
 
-Write the Maestro flow the phase file names. Do not run `maestro test` until the last phase is done. A missing simulator does not keep an earlier phase open.
+A missing simulator does not keep a phase open.
 
 When the exit is green, report back instead of asking `/reviewer` or `/ux` yourself. The main session runs the `reviewer` and `ux` agents on your diff.

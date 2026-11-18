@@ -12,7 +12,7 @@ export function useScreenReader(): boolean {
   return useSyncExternalStore(subscribeAccessibility, screenReaderOn, off);
 }
 
-// A development build started with EXPO_PUBLIC_FORCE_READER=1 acts as if a screen reader were on (the phone's Maestro flow uses it; a dev web build can too).
+// A development build started with EXPO_PUBLIC_FORCE_READER=1 acts as if a screen reader were on (a dev web build can too).
 function forced(): boolean {
   return typeof __DEV__ !== "undefined" && __DEV__ && process.env.EXPO_PUBLIC_FORCE_READER === "1";
 }

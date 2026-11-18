@@ -1,13 +1,18 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import type { PrintedKeywords, RingsDbCard, RingsDbPack } from "../../../src/catalog/boundary.ts";
+import { claimedPacks, collectionSchema } from "../../../src/catalog/collection.ts";
 import { cardSchema, type Card, type Printing } from "../../../src/catalog/card-facts.ts";
 import { deckLegal } from "../../../src/catalog/deck-legal.ts";
 import { PRODUCTS, REPRINTS } from "../campaign-defs.ts";
+import { DATA_DIR } from "../paths.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
 import { titleKey } from "./names.ts";
 import { pairTwins, sameCard, twinSetsOf } from "./card-twins.ts";
-import { addDragnBacks, addNightmareCards, addProductCards, dragnOnlyCards, dragnRowOf, fillShipSets, fillSideQuestSets, foldTwoSided, productCodeOf, setName } from "./product-cards.ts";
+import { addBrowseCards, addDragnBacks, addNightmareCards, addProductCards, dragnOnlyCards, dragnRowOf, fillShipSets, fillSideQuestSets, foldTwoSided, productCodeOf, setName } from "./product-cards.ts";
 import type { Overrides } from "./overrides.ts";
 import { timingLabels } from "./timings.ts";
 
@@ -27,6 +32,8 @@ const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> 
   Quest: { type: "quest", typeName: "Quest" },
   Objective: { type: "objective", typeName: "Objective" },
   Objective_Ally: { type: "objective", typeName: "Objective Ally" },
+  // The Sands of Harad's objective heroes (Kahliel, Firyal, Yazan, Jubayr): listed in the Cards tab, not dealt.
+  Objective_Hero: { type: "objective", typeName: "Objective Hero" },
   Campaign: { type: "campaign", typeName: "Campaign" },
   Nightmare_Setup: { type: "nightmare", typeName: "Nightmare" },
   // Ered Mithrin: an objective that is also a location (The Old Ford), and the treasure a discovered campaign card becomes (emce.treasure).
@@ -411,6 +418,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   }
 
   addProductCards(hobCards, byCode, hobCode, merge);
+  addBrowseCards(hobCards, byCode, raw.packs, claimedPacks(collectionSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "collection.json"), "utf8")))), merge);
   addNightmareCards(hobCards, byCode, merge);
   fillShipSets(raw, byCode);
   fillSideQuestSets(raw, byCode);

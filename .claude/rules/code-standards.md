@@ -66,4 +66,4 @@ Run the cheap checks often and the full suite once.
 - `pnpm test changed` and `pnpm vitest related` follow imports only. A change under `data/`, `scripts/data/` or a file a test reads at run time needs `pnpm test fast`, then the full run.
 - Once, at the end: the full `pnpm test` (an agent task run under the orchestrator follows `.claude/agents/orchestrator.md`, Implementer tasks, instead), and `pnpm data check` when the engine or `data/` could move. Do not run the full suite again on an unchanged tree: a green run stands until a file changes. Fix a failure with the failing file (`pnpm vitest run <file> -t "<name>"`), then run the full suite once more.
 - Report each command with its result and whether the tree changed after it ran.
-- A cloud session has no phone, simulator or Maestro. Phone and tablet checks are not tracked (user instruction, 2026-11-06): check what the web build and the tests can show, and write no note for the rest.
+- A cloud session has no phone or simulator. Phone and tablet checks are not tracked (user instruction, 2026-11-06): check what the web build and the tests can show, and write no note for the rest.

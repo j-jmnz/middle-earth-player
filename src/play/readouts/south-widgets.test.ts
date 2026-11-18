@@ -26,7 +26,7 @@ describe("the facedown Ring-bearer readout", () => {
     expect(locationReadout(southTable(south, { stage: "142023" }).state)).toEqual({ heldUnder: null, heldBy: null });
   });
 
-  it("words it for the dial, exactly as the Maestro flow asserts it", () => {
+  it("words it for the dial, exactly as the screen shows it", () => {
     const { state } = southTable(south, { stage: "142023", active: DOORS, captive: true });
     expect(ringWords(locationReadout(state), (code) => (code === WATCHER ? "Watcher in the Water" : code))).toBe("The Ring-bearer is facedown under Watcher in the Water");
     expect(ringWords(null, (code) => code)).toBeNull();

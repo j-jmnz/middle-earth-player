@@ -32,7 +32,7 @@ export type KingsquestPolicy = {
 export const DEFAULT_POLICY: KingsquestPolicy = { choose: "smart", isolde: "pool", burden: "threat" };
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says; the Resolution's questions are answered as the policy says; Fire-drake is engaged and
-// attacked by every character together. Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures
+// attacked by every character together. Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the fixtures
 // (scripts/e2e/the-kings-quest.ts) play real decklists, so they turn card play on.
 export function kingsquestIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: KingsquestPolicy = DEFAULT_POLICY, options: PolicyOptions = KINGSQUEST_POLICY): PlayerIntent {
   if (state.window?.kind === "resolution") {

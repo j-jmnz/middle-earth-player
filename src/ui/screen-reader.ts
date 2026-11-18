@@ -15,8 +15,8 @@ export function useScreenReader(): boolean {
   return useSyncExternalStore(subscribeAccessibility, screenReaderOn, off);
 }
 
-// A development build started with EXPO_PUBLIC_FORCE_READER=1 acts as if a screen reader were on (native only): Maestro cannot turn VoiceOver or
-// TalkBack on, so its reader flow (.maestro/features/screen-reader.yaml) forces the reader table this way. `__DEV__` is false in a release build, so
+// A development build started with EXPO_PUBLIC_FORCE_READER=1 acts as if a screen reader were on (native only): a script cannot turn VoiceOver or
+// TalkBack on, so a scripted run forces the reader table this way. `__DEV__` is false in a release build, so
 // the variable does nothing there. Expo inlines the variable at bundle time.
 function forced(): boolean {
   return typeof __DEV__ !== "undefined" && __DEV__ && process.env.EXPO_PUBLIC_FORCE_READER === "1";
