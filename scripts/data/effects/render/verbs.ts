@@ -9,9 +9,10 @@ import { ESCAPE_STAT_NOTES, ESCAPE_TEMPLATES } from "./escape.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES, guardianRestrict } from "./guardian.ts";
 import { SMAUG_SAMPLES, SMAUG_STAT_NOTES, SMAUG_TEMPLATES } from "./smaug.ts";
 import { ERECH_SAMPLES, ERECH_STAT_NOTES, ERECH_TEMPLATES } from "./erech.ts";
+import { FOG_SAMPLES, FOG_STAT_NOTES, FOG_TEMPLATES } from "./fog.ts";
 
 export { ESCAPE_SAMPLES } from "./escape.ts";
-export { ERECH_SAMPLES, GUARDIAN_SAMPLES, SMAUG_SAMPLES };
+export { ERECH_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, SMAUG_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -52,6 +53,7 @@ const DELAY_UNTIL: Readonly<Record<string, string>> = {
   questFailed: "if the players quest unsuccessfully this phase (never, if they do not)",
   endOfAttack: "when the attack ends",
   startOfGame: "once the opening hands are done, before the first round",
+  beginningOfTravel: "when the next travel phase begins",
 };
 const TARGET_STAT: Readonly<Record<string, string>> = {
   stagingCards: "every enemy and location in the staging area, now and arriving there later while the effect lasts",
@@ -70,6 +72,7 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   ...ESCAPE_STAT_NOTES,
   ...SMAUG_STAT_NOTES,
   ...ERECH_STAT_NOTES,
+  ...FOG_STAT_NOTES,
   questProgressCap: " (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count)",
   cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
   cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",
@@ -122,6 +125,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...GUARDIAN_TEMPLATES,
   ...SMAUG_TEMPLATES,
   ...ERECH_TEMPLATES,
+  ...FOG_TEMPLATES,
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
@@ -168,8 +172,8 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     return { text: `return ${target(i.target)} to the staging area`, read: ["target"] };
   },
   PlaceFacedownUnder: (i) => ({
-    text: `${i.afterAttack === true ? "once the attack in progress has ended, " : ""}place ${cardRef(i.target ?? "picked")} facedown under the card with code ${str(i.code)} in play (out of play there; its attachments are discarded, its tokens go)`,
-    read: ["code", "target", "afterAttack"],
+    text: `${i.afterAttack === true ? "once the attack in progress has ended, " : ""}place ${cardRef(i.target ?? "picked")} facedown under ${i.host === "self" ? "this card" : `the card with code ${str(i.code)} in play`} (out of play there; its attachments are discarded, its tokens go${i.host === "self" ? "; a player card stays its owner's" : ""})`,
+    read: ["code", "target", "afterAttack", "host"],
   }),
   AttachToDial: (i) => ({
     text: typeof i.code === "string" ? `the acting player attaches a set-aside copy of the card with code ${str(i.code)} to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)` : "this card attaches itself to the acting player's threat dial (nothing when the dial holds a copy already)",
@@ -224,7 +228,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ReleaseGuards: (i) => ({ text: `the encounter cards that guard ${i.target === undefined ? "the picked card" : cardRef(i.target)} stay in the staging area and no longer guard it`, read: ["target"] }),
   RevealSetAsideForTokens: (i) => ({ text: `if this card holds at least ${str(i.tokens)} resource tokens and a copy of the card with code ${str(i.code)} is set aside: ${str(i.tokens)} tokens come off this card and that copy is revealed as an encounter card (nothing otherwise)`, read: ["code", "tokens"] }),
   EarnEncounterCopies: (i) => ({ text: `one copy of the card${Array.isArray(i.codes) && i.codes.length > 1 ? "s" : ""} with code ${Array.isArray(i.codes) ? joinAnd(i.codes.map(str)) : "?"} joins the Campaign Pool for each copy lying in the encounter deck or the encounter discard pile (a copy set aside, in the staging area or attached does not count)`, read: ["codes"] }),
-  ShuffleSetAsideIntoEncounterDeck: (i) => ({ text: `one set-aside copy of the card with code ${str(i.code)}${i.own === true ? " (the acting player's own)" : ""} is shuffled into the encounter deck (nothing with none set aside)`, read: ["code", "own"] }),
+  ShuffleSetAsideIntoEncounterDeck: (i) => ({ text: `${i.all === true ? "every" : "one"} set-aside copy of the card with code ${str(i.code)}${i.own === true ? " (the acting player's own)" : ""} is shuffled into the encounter deck (nothing with none set aside)`, read: ["code", "own", "all"] }),
   AddStageProgress: (i, ctx) => ({ text: `${typeof i.amount === "number" ? `${i.amount} progress is` : `progress equal to ${amount(i.amount, ctx)} is`} placed on the main quest stage (a quest effect: a full stage advances)`, read: ["amount"] }),
   AddToVictory: (i) => ({ text: `${i.target === undefined ? "the picked card" : cardRef(i.target)} is added to the victory display`, read: ["target"] }),
   HeroesGainResources: (i, ctx) => ({ text: `each hero ${i.who === "picked" ? "the picked player controls" : "the acting player controls"} gains ${amount(i.amount, ctx)} resource(s)${i.unspent === true ? " if it spent none this round" : ""}`, read: ["amount", "who", "unspent"] }),
@@ -322,7 +326,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     read: ["trait", "type", "who", "to", "cost"],
   }),
   AttachSelf: (i) => (isObj(i.to) && i.to.kind === "character" ? { text: `attach this card to ${typeof i.to.name === "string" ? `the character titled "${i.to.name}"` : `a ${typeof i.to.trait === "string" ? `${i.to.trait} ` : ""}character of any player (the first player chooses it)`}${i.to.unlimited === true ? " (any number of copies may be attached)" : " that carries no copy of this card"}; with none this card is discarded`, read: ["to"] } : isObj(i.to) && i.to.kind === "hero" ? { text: `attach this card to ${i.to.control === "firstPlayer" ? `a hero the first player controls${i.to.unlimited === true ? " (any number of copies may be attached to one hero)" : " that has no copy of this card attached"} (the first player chooses it; with none this card is discarded)` : typeof i.to.trait === "string" ? `a ${i.to.trait} hero` : `a hero${typeof i.to.minWillpower === "number" ? ` with ${i.to.minWillpower} or more Willpower` : ""}${i.to.control === "any" ? " of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)" : ""}`}`, read: ["to"] } : null),
-  EndQuestPhase: () => ({ text: "end the quest phase at once (no quest resolution)", read: [] }),
+  EndQuestPhase: (i) => ({ text: i.own === true ? "end the acting player's own quest phase (no more cards are revealed for him, his characters stop being committed and his quest is not resolved; the other players finish theirs)" : "end the quest phase at once (no quest resolution)", read: ["own"] }),
   ImmediateAttack: (i, ctx) => ({
     text: `${i.afterThis === true ? "the attacking enemy makes an additional attack against the defending player once this attack has ended" : ctx.attacker !== true ? "this enemy attacks now" : ctx.engagedNext === true ? "the attacking enemy makes an immediate attack against the player it just engaged" : "the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack)"}${i.shadow === false ? (i.keepShadows === true ? ", dealt no new shadow card (the shadow cards it holds all resolve)" : ", dealt no shadow card") : i.afterThis === true ? ", dealt a new shadow card" : ", dealt a new shadow card after its old ones are discarded"}`,
     read: ["shadow", "afterThis", "keepShadows"],
@@ -443,9 +447,9 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     children: Array.isArray(i.options) ? (i.options as readonly Obj[]) : [],
   }),
   Each: (i, ctx) => ({
-    text: `for each ${pick(i.pick, ctx)}${eachLimits(i, ctx)}:`,
-    read: ["pick", "upTo", "instructions", "totalCost", "taken"],
-    children: Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
+    text: Array.isArray(i.rest) ? `the actor must choose ${amount(i.upTo, ctx)} of the ${pick(i.pick, ctx)} to keep (all stay with no more than that many; nothing is asked then); for each of the others${Array.isArray(i.instructions) && i.instructions.length > 0 ? " (the chosen ones get the steps in the second list)" : ""}:` : `for each ${pick(i.pick, ctx)}${eachLimits(i, ctx)}:`,
+    read: ["pick", "upTo", "instructions", "totalCost", "taken", "rest"],
+    children: Array.isArray(i.rest) ? (i.rest as readonly Obj[]) : Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
   }),
   Delay: (i, ctx) => ({
     text: `later, ${DELAY_UNTIL[str(i.until)] ?? `at ${str(i.until)}`}${i.subject === "picked" ? ", acting on the card last picked" : ""}${isObj(i.uncancelable) ? ` (cannot be canceled while ${renderCondition(i.uncancelable, ctx)})` : ""}:`,

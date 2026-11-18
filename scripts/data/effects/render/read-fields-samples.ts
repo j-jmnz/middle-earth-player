@@ -1,5 +1,5 @@
 import type { Obj } from "./kit.ts";
-import { ERECH_SAMPLES, ESCAPE_SAMPLES, GUARDIAN_SAMPLES, SMAUG_SAMPLES } from "./verbs.ts";
+import { ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, SMAUG_SAMPLES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
@@ -9,6 +9,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...GUARDIAN_SAMPLES,
   ...SMAUG_SAMPLES,
   ...ERECH_SAMPLES,
+  ...FOG_SAMPLES,
   ModifyStat: [
     { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true },
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", target: "heroes" },
@@ -56,7 +57,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   SetX: [{ verb: "SetX", value: 2 }],
   DiscardTopOfDeck: [{ verb: "DiscardTopOfDeck" }],
   DiscardResources: [{ verb: "DiscardResources", amount: 2, target: "self" }, { verb: "DiscardResources", all: true, target: "self" }],
-  PlaceFacedownUnder: [{ verb: "PlaceFacedownUnder", code: "144027", target: "self", afterAttack: true }],
+  PlaceFacedownUnder: [{ verb: "PlaceFacedownUnder", code: "144027", target: "self", afterAttack: true }, { verb: "PlaceFacedownUnder", host: "self", target: "subject" }],
   AttachToDial: [{ verb: "AttachToDial", code: "145016" }],
   DetachFromDial: [{ verb: "DetachFromDial", code: "145016" }],
   RemoveSetAside: [{ verb: "RemoveSetAside", code: "145016" }],
@@ -73,7 +74,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ReleaseGuards: [{ verb: "ReleaseGuards", target: "self" }],
   RevealSetAsideForTokens: [{ verb: "RevealSetAsideForTokens", code: "10183", tokens: 3 }],
   EarnEncounterCopies: [{ verb: "EarnEncounterCopies", codes: ["10183"] }],
-  ShuffleSetAsideIntoEncounterDeck: [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: "10081", own: true }],
+  ShuffleSetAsideIntoEncounterDeck: [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: "10081", own: true }, { verb: "ShuffleSetAsideIntoEncounterDeck", code: "148007", all: true }],
   AddStageProgress: [{ verb: "AddStageProgress", amount: 3 }, { verb: "AddStageProgress", amount: { count: HERO } }],
   AddToVictory: [{ verb: "AddToVictory", target: "self" }],
   HeroesGainResources: [{ verb: "HeroesGainResources", amount: 2, who: "picked", unspent: true }],
@@ -193,7 +194,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   CancelEffect: [{ verb: "CancelEffect" }],
   SetAsideFromDeck: [{ verb: "SetAsideFromDeck", code: "900503" }],
   RemoveFromGame: [{ verb: "RemoveFromGame", self: true }, { verb: "RemoveFromGame", card: "other" }],
-  EndQuestPhase: [{ verb: "EndQuestPhase" }],
+  EndQuestPhase: [{ verb: "EndQuestPhase" }, { verb: "EndQuestPhase", own: true }],
   ImmediateAttack: [{ verb: "ImmediateAttack", shadow: false, keepShadows: true }],
   ConsiderUndefended: [{ verb: "ConsiderUndefended" }],
   DiscardShadowOf: [{ verb: "DiscardShadowOf", target: "other", all: true }],
@@ -264,7 +265,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   Attack: [{ verb: "Attack" }],
   MovePicked: [{ verb: "MovePicked", to: "hand", who: "firstPlayer" }, { verb: "MovePicked", to: "play", who: "actor" }],
   Choose: [{ verb: "Choose", who: "firstPlayer", different: true, options: [] }, { verb: "Choose", who: "actor", upTo: 2, options: [] }],
-  Each: [{ verb: "Each", pick: HERO, upTo: 2, totalCost: 5, taken: ["i1"], instructions: [] }],
+  Each: [{ verb: "Each", pick: HERO, upTo: 2, totalCost: 5, taken: ["i1"], instructions: [] }, { verb: "Each", pick: HERO, upTo: 2, instructions: [], rest: [{ verb: "Discard", target: { kind: "picked" } }] }],
   Delay: [{ verb: "Delay", until: "endOfRound", uncancelable: { kind: "firstPlayer" }, subject: "picked", instructions: [] }],
   AfterAttack: [{ verb: "AfterAttack", instructions: [] }],
   Repeat: [{ verb: "Repeat", times: 2, instructions: [] }],

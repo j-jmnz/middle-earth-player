@@ -5,10 +5,12 @@ import { renderPick } from "./picks.ts";
 import { ESCAPE_CONDITIONS } from "./escape.ts";
 import { GUARDIAN_CONDITIONS } from "./guardian.ts";
 import { ERECH_CONDITIONS } from "./erech.ts";
+import { FOG_CONDITIONS } from "./fog.ts";
 
 export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
 export { ERECH_CONDITION_SAMPLES } from "./erech.ts";
+export { FOG_CONDITION_SAMPLES } from "./fog.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
   activeLocation: "is the active location",
@@ -35,6 +37,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_CONDITIONS,
   ...GUARDIAN_CONDITIONS,
   ...ERECH_CONDITIONS,
+  ...FOG_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
   subjectExplored: () => ({ text: "the card the event is about had enough progress to be explored", read: [] }),
