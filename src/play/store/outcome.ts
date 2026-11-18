@@ -18,6 +18,7 @@ import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
 import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scenarios/gundabad-beats.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
+import { hostName } from "../cards/host-words.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).
@@ -320,7 +321,7 @@ export function intentWords(intent: PlayerIntent, card: (cardId: string) => stri
     case "Pass":
       return "Passed";
     case "PlayCard":
-      return intent.hostId ? `Played ${card(intent.cardId)} on ${card(intent.hostId)}` : `Played ${card(intent.cardId)}`;
+      return intent.hostId ? `Played ${card(intent.cardId)} on ${hostName(card, intent.hostId)}` : `Played ${card(intent.cardId)}`;
     case "Commit":
       return `${listed(intent.cardIds, card)} committed to the ${before && askingToCommit(before) ? "Sailing test" : "quest"}`;
     case "CommitHide":
