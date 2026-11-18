@@ -10,7 +10,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { flagged, updateCard } from "../../../rules/core/state.ts";
-import { finish, fightEnemy, idOf, legalIntents, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
+import { finish, fightEnemy, idOf, legalIntents, resolveRecords, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-watcher-in-the-water";
 const table = (layout: Layout) => tableFromLayout(SCENARIO, layout);
@@ -175,6 +175,14 @@ describe("901504:A:1 Choking Tentacle", () => {
     const refreshed = settle(doRefresh({ ...tired, phase: "Refresh", window: null, pendingAttack: null }, fought.ctx, steps), fought.ctx, steps);
     expect(refreshed.cards[host]?.exhausted).toBe(false);
     expect(refreshed.cards[host]?.damage).toBe(1);
+  });
+
+  it("901504:A:1 two-handed, it attaches to a character of the defending player (seat 1), not of the first player who chooses", () => {
+    const made = table({ seats: 2, engaged: [{ code: "901504", seat: 1 }], deck: ["04066", "f0", "f0"] });
+    const enemy = idOf(made.state, "901504");
+    const run = resolveRecords(made.state, made.ctx, "901504", "forced", enemy);
+    expect(run.state.cards[enemy]?.zone).toBe("attached");
+    expect(made.state.seats[1]?.heroes).toContain(run.state.cards[enemy]?.host ?? "");
   });
 
   it("901504:A:1 stays an enemy when the discarded card is no match", () => {

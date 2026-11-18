@@ -45,7 +45,7 @@ export function waterIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
     return { type: "Choose", optionId: (policy.choose === "last" ? options.at(-1) : options[0]) ?? "" };
   }
   const used = legalIntents(state, ctx).find((intent) => intent.type === "Trigger" && ["040076", "04065"].includes(state.cards[intent.cardId]?.code ?? ""));
-  if (used) return used;
+  if (used?.type === "Trigger") return used;
   if (state.window?.kind === "defense") {
     const heroes = (state.seats[state.window.seat]?.heroes ?? []).filter((id) => state.cards[id]?.zone === "heroes");
     const least = [...heroes].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
