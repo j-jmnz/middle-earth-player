@@ -8,7 +8,7 @@ import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { nightCard } from "../../../rules/families/erech/night.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { derufinFreeWords, derufinHeldWords, derufinStageWords, midnightWords, nightLimitWords, nightNearWords, nightWords } from "../../words/scenarios/erech-table.ts";
+import { derufinFreeWords, derufinHeldWords, derufinStageWords, midnightWords, nightLimitWords, nightNearWords, nightWords } from "./erech-words.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 import type { HandMark } from "../isengard.ts";
 
