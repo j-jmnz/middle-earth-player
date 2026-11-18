@@ -840,6 +840,518 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "50301",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Disappearance-1A.jpg",
+        "sha256": "5e969b0cb674cfdcb04188ec1299a2f810eb103fef88853112320d2557546842"
+      },
+      "lines": [
+        "Setup: Make Tarlang's Next the active location. Set Derufin, The Lord of the Dead, The Stone of Erech, and the 3 Night objectives aside, out of play. Shuffle the encounter deck. Place Eventide into play, next to the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50301",
+      "side": "B",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Disappearance-1B.jpg",
+        "sha256": "9eb5136cb79b0eca023d9590060e25ec39f27d41934841df85aa852e1b42d7d6"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player, adding them to the staging area.",
+        "Players cannot defeat this stage while Tarlang's Next is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50302",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Terror-of-the-Dead-2A.jpg",
+        "sha256": "6e3b0bb4632f5c95a127211f50640dbee48d8a6ba1d3e3d49b50512e3b457dd0"
+      },
+      "lines": [
+        "When Revealed: Add The Stone of Erech to the staging area and attach Derufin to it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50302",
+      "side": "B",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Terror-of-the-Dead-2B.jpg",
+        "sha256": "85e3868ff580baadb368bb6ebc8057145e7a2ef2c9ebb5a4d54554664c0d1f2c"
+      },
+      "lines": [
+        "Forced: At the beginning of each round, the players must choose: each player skips the next planning phase, or heroes do not collect resources during the resource phase this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50303",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Shadow-Host-3A.jpg",
+        "sha256": "b28116724c2a00fede7e22735d88d7484ffc507407f45287fbabd2aae3886316"
+      },
+      "lines": [
+        "When Revealed: Starting with the first player, each player searches the encounter deck and discard pile for 1 Oathbreaker enemy, reveals it, and adds it to the staging area. Add the Lord of the Dead to the staging area.",
+        "Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50303",
+      "side": "B",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Shadow-Host-3B.jpg",
+        "sha256": "dcc88f21bc3bced4b7ff45c109898775778ef242b6b909e291f1028e2800bb07"
+      },
+      "lines": [
+        "Midnight. Battle (Characters use their Attack instead of Willpower when questing.)",
+        "Players cannot place progress on this stage unless they control Derufin.",
+        "If the players defeat this stage, they have escaped the Blackroot Vale with Derufin and won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50304",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Derufin.jpg",
+        "sha256": "690cd2ad63c1f0c27266d232d8e92f716238385975fc0056bd02c19d803e53f7"
+      },
+      "lines": [
+        "Forced: After the players travel to The Stone of Erech, the first player gains control of Derufin.",
+        "Dusk. Derufin gets -1 Willpower",
+        "Midnight. Derufin gets -2 Willpower",
+        "If Derufin leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50305",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Lord-of-the-Dead.jpg",
+        "sha256": "4da872385a4344da88442024c93499c6e6000addff52202eba31229b1255653e"
+      },
+      "lines": [
+        "Spectral. Cannot have attachments.",
+        "While you are engaged with The Lord of the Dead, treat all printed text boxes on characters you control as if they were blank (except Traits.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50306",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Stone-of-Erech-Location.jpg",
+        "sha256": "3779bf04a1924e4c45a0ef2f6bddf018cf3112a25c108d7bc11aee30f67cedcd"
+      },
+      "lines": [
+        "Immune to player card effects. X is twice the number of players in the game.",
+        "While The Stone of Erech is that active location, characters with less than 2 Willpower cannot ready.",
+        "Travel: Exhaust each character with less than 2 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50307",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Tarlang's-Neck.jpg",
+        "sha256": "d1a5fad90565042da81e802b1892ed8bed8279b907c97f5170d8032b8945d9a9"
+      },
+      "lines": [
+        "While Tarlang's Next is the active location, it gains, 'Forced: At the beginning of the encounter phase, the players must either immediately end the encounter phase, or the first player must engaged all enemies in the staging area.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50308",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Eventide.jpg",
+        "sha256": "6541caffc17875cf5fabb64b70c4054eaad93f61d35f8af18aeda87676cde374"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 progress on Eventide.",
+        "If there are 4 or more progress on Eventide, add it to the victory display and put Dusk into play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50309",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Dusk.jpg",
+        "sha256": "67d9687dfa76ca48f23003232eed18a03f784df22ebe22e125788a35c64009c0"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 progress on Dusk.",
+        "If there are 4 or more progress on Dusk, add it to the victory display and put Midnight into play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50310",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Midnight.jpg",
+        "sha256": "170bc2b3513b48d63d13396cde65044bff39ff1bf04567a421e4801f3327cbcb"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 progress on Midnight. Then, raise each player's threat by the number of progress on Midnight."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50311",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Relic-from-the-Dark-Years.jpg",
+        "sha256": "14da7d8f3265bb9ea0a7e1b337033e59f9ac2f60aaf9d311134443dac55eb247"
+      },
+      "lines": [
+        "Midnight. Action: Claim this objective and attach it to a hero you control. Counts as an Artifact attachment with the text: 'When attached hero attacks and Oathbreaker, that enemy loses the Spectral keyword until the end of the phase.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50312",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-man.jpg",
+        "sha256": "4f27dbb68f1e3ec23417ef4f8e750eb88004a4ec791666e7c0e01bbad5f90f34"
+      },
+      "lines": [
+        "Spectral.",
+        "When Revealed: Players cannot play events until the end of the round.",
+        "Shadow: Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50313",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Restless-Dead.jpg",
+        "sha256": "f5c6ba8b8f183220a276465a5ce3d4358d14328a9076323a6bb65001e37ef134"
+      },
+      "lines": [
+        "Spectral.",
+        "When Revealed: Return the topmost Undead enemy in the encounter discard pile to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50314",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Whisperer.jpg",
+        "sha256": "3ce7b04fe568644eae959787d74330942bfe885d908ba9c620e86764a471b529"
+      },
+      "lines": [
+        "Spectral.",
+        "Dusk. Whisperer gets +1 Threat.",
+        "Midnight. Whisperer gets +2 Threat and gains Doomed 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50315",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-Host-Captain.jpg",
+        "sha256": "59a14623bca46e09c7afb44b617361aaf3808fcd83e18338cc673d5a3eb09f35"
+      },
+      "lines": [
+        "Spectral.",
+        "Dusk. Shadow Host Captain gets +1 Attack and +1 Defense.",
+        "Midnight. Shadow Host Captain gets +2 Attack and +2 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50316",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Regretful-Shade.jpg",
+        "sha256": "1a8e53803f4df05f74a28a566b0ad8f65ad14a15f668e40d4d59964273b1c325"
+      },
+      "lines": [
+        "Spectral. Surge.",
+        "Shadow: Deal Attacking enemy 1 additional shadow card (Dusk. 2 additional cards instead. Midnight. 3 additional cards instead)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50317",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Banks-of-Morthond.jpg",
+        "sha256": "65ed5a968769ae7cdcb52423c99640b42d026f6b0dc09056a936c005cf24f738"
+      },
+      "lines": [
+        "While Banks of Morthond is the active location, each location in the staging area gets -1 Threat.",
+        "Shadow: If this attack destroys a character, add 1 progress to the current Night objective."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50318",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Vale-of-Shadows.jpg",
+        "sha256": "ca72c483b196b668bb689f8dd263628d848f9ec3a7a05f40f3907ef5cd494998"
+      },
+      "lines": [
+        "When Revealed: Make Vale of Shadows the active location. If another location is currently active, return it to the staging area.",
+        "Dusk. Vale of Shadows gets +2 quest points.",
+        "Midnight. Vale of Shadows gets +4 quest points."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50319",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Blackroot-Graves.jpg",
+        "sha256": "034513f2e46ab398a419dd7cdd2ee38dbb3b3b36035b9a044150c81c23362bbb"
+      },
+      "lines": [
+        "Forced: When Blackroot Graves is explored, return the topmost Undead enemy in the encounter discard pile to play, engaged with the first player.",
+        "Shadow: If defending character has 0 Willpower, deal 2 damage to that character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50320",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-of-Dwimorberg.jpg",
+        "sha256": "352d97ff783f9d46962cd0fffdad01e572643f3ffb30a752e539c2680ccdf715"
+      },
+      "lines": [
+        "Dusk. Shadow of Dwimorberg gets +2 Threat.",
+        "Midnight. Shadow of Dwimorberg gets +4 Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50321",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Haunted-Valley.jpg",
+        "sha256": "d601d438526c62191edbd0fee5a77be735c7a8c426f1db29f32782e9148f1914"
+      },
+      "lines": [
+        "While this location is in the staging area, all ready heroes lose all Lore, Leadership, Spirit and Tactics icons.",
+        "Planning Action: Exhuast a hero. Any player may trigger this action."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50322",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Midnight-Throng.jpg",
+        "sha256": "db9b4efbf90c99f2f2cf9559f57ddbb130eb03d98bb2a2fa7b8a4d7510ded6f7"
+      },
+      "lines": [
+        "When Revealed: Starting with the first player, each player must search the encounter deck and discard pile for an Undead enemy, reveal it, and add it to the staging area. Shuffle the encounter deck.",
+        "Midnight. This effect cannot be canceled.",
+        "Shadow: Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50323",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Murmurs-of-Dread.jpg",
+        "sha256": "739c4582eda2b2ab333fd5b053407b899d1a4be5f406bd0d4b796438ec38b6d0"
+      },
+      "lines": [
+        "When Revealed: All characters get -1 Willpower until the end of the round.",
+        "Shadow: Dusk/Midnight. Attack enemy makes an additional attack after this one.",
+        "Midnight. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50324",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Groping-Horror.jpg",
+        "sha256": "31b4c855874942ee880e6e72bbaca899cc10c0e765f9e15020721cc99cea4384"
+      },
+      "lines": [
+        "When Revealed: The first player must choose: skip the next travel phase, or each player must pass his hand to the player on his left (discard your hand instead if you are the only player in the game).",
+        "Midnight. Groping Horror gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50325",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Driven-by-Fear.jpg",
+        "sha256": "2eb8297161be54bf8d433629051fe8fcfbc8f473ad471d5d7b4243e851720320"
+      },
+      "lines": [
+        "When Revealed: The first player attached Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attacked character's text box as if it was blank (except for Traits.)'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50326",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Dead-Ride-Behind.jpg",
+        "sha256": "29d2c4dc0dfa68645e86fd01ea31716ccfd4bd866b2bf28eaa2a627f2a4cd32f"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each character with less than 2 Willpower. (Dusk. less than 3 Willpower insread. Midnight. less than 4 Willpower instead)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "50327",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Gloaming.jpg",
+        "sha256": "cf9106e68de1e5188f3b17ca41fb998411831bc3c48fe33e73abb118a7a75369"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Add 1 progress to the current Night objective."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
     }
   ]
 }

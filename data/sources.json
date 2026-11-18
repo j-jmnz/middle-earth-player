@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "2b585a1c218eef05dbca52e5821a2e3e00e95b1be5924ffedd5e210a3aab99a0"
+        "value": "c33bc3bb29bee638f382b1b402dc46ca24ffb7c0d48f091b14be0452b4062ded"
       },
-      "fetchedAt": "2026-11-17T18:27:03.780Z",
+      "fetchedAt": "2026-11-18T01:58:56.339Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -463,6 +463,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Battle-of-Lake-town",
           "sha256": "5466ee6e248674d7ba8fc4577fc264912cb7dd3f5ac43a74747693b18d266373",
           "bytes": 10840
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Stone-of-Erech.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Stone-of-Erech",
+          "sha256": "56add3eb8f0cdf28742510056e6ad809eb44b7cd014e13fb85c5b7a82807ad62",
+          "bytes": 11011
         }
       ]
     },
@@ -21052,9 +21058,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "0b539c2c999ccd8b5e8a5b6b5b3308234d9cdba2bab6046269538c2248ce970e"
+        "value": "36cdb261b5faff11288d4d4f244e3cd39d944ae5b9a3b771fbe99e0547fa8460"
       },
-      "fetchedAt": "2026-11-17T18:38:11.538Z",
+      "fetchedAt": "2026-11-18T02:08:25.063Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -31261,6 +31267,186 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Esgaroth-Wharf.jpg",
           "sha256": "7cc087baa09fc6d3916e01aeb60111f947f5d10699fefb57f82a4553be5047d5",
           "bytes": 144102
+        },
+        {
+          "path": "scans/50301.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Disappearance-1A.jpg",
+          "sha256": "5e969b0cb674cfdcb04188ec1299a2f810eb103fef88853112320d2557546842",
+          "bytes": 124470
+        },
+        {
+          "path": "scans/50301.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Disappearance-1B.jpg",
+          "sha256": "9eb5136cb79b0eca023d9590060e25ec39f27d41934841df85aa852e1b42d7d6",
+          "bytes": 125895
+        },
+        {
+          "path": "scans/50302.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Terror-of-the-Dead-2A.jpg",
+          "sha256": "6e3b0bb4632f5c95a127211f50640dbee48d8a6ba1d3e3d49b50512e3b457dd0",
+          "bytes": 123262
+        },
+        {
+          "path": "scans/50302.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Terror-of-the-Dead-2B.jpg",
+          "sha256": "85e3868ff580baadb368bb6ebc8057145e7a2ef2c9ebb5a4d54554664c0d1f2c",
+          "bytes": 122394
+        },
+        {
+          "path": "scans/50303.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Shadow-Host-3A.jpg",
+          "sha256": "b28116724c2a00fede7e22735d88d7484ffc507407f45287fbabd2aae3886316",
+          "bytes": 137168
+        },
+        {
+          "path": "scans/50303.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Shadow-Host-3B.jpg",
+          "sha256": "dcc88f21bc3bced4b7ff45c109898775778ef242b6b909e291f1028e2800bb07",
+          "bytes": 128849
+        },
+        {
+          "path": "scans/50304.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Derufin.jpg",
+          "sha256": "690cd2ad63c1f0c27266d232d8e92f716238385975fc0056bd02c19d803e53f7",
+          "bytes": 121236
+        },
+        {
+          "path": "scans/50305.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Lord-of-the-Dead.jpg",
+          "sha256": "4da872385a4344da88442024c93499c6e6000addff52202eba31229b1255653e",
+          "bytes": 137238
+        },
+        {
+          "path": "scans/50306.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Stone-of-Erech-Location.jpg",
+          "sha256": "3779bf04a1924e4c45a0ef2f6bddf018cf3112a25c108d7bc11aee30f67cedcd",
+          "bytes": 131677
+        },
+        {
+          "path": "scans/50307.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Tarlang's-Neck.jpg",
+          "sha256": "d1a5fad90565042da81e802b1892ed8bed8279b907c97f5170d8032b8945d9a9",
+          "bytes": 141578
+        },
+        {
+          "path": "scans/50308.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Eventide.jpg",
+          "sha256": "6541caffc17875cf5fabb64b70c4054eaad93f61d35f8af18aeda87676cde374",
+          "bytes": 112434
+        },
+        {
+          "path": "scans/50309.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Dusk.jpg",
+          "sha256": "67d9687dfa76ca48f23003232eed18a03f784df22ebe22e125788a35c64009c0",
+          "bytes": 114376
+        },
+        {
+          "path": "scans/50310.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Midnight.jpg",
+          "sha256": "170bc2b3513b48d63d13396cde65044bff39ff1bf04567a421e4801f3327cbcb",
+          "bytes": 113460
+        },
+        {
+          "path": "scans/50311.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Relic-from-the-Dark-Years.jpg",
+          "sha256": "14da7d8f3265bb9ea0a7e1b337033e59f9ac2f60aaf9d311134443dac55eb247",
+          "bytes": 140438
+        },
+        {
+          "path": "scans/50312.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-man.jpg",
+          "sha256": "4f27dbb68f1e3ec23417ef4f8e750eb88004a4ec791666e7c0e01bbad5f90f34",
+          "bytes": 125086
+        },
+        {
+          "path": "scans/50313.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Restless-Dead.jpg",
+          "sha256": "f5c6ba8b8f183220a276465a5ce3d4358d14328a9076323a6bb65001e37ef134",
+          "bytes": 128616
+        },
+        {
+          "path": "scans/50314.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Whisperer.jpg",
+          "sha256": "3ce7b04fe568644eae959787d74330942bfe885d908ba9c620e86764a471b529",
+          "bytes": 122674
+        },
+        {
+          "path": "scans/50315.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-Host-Captain.jpg",
+          "sha256": "59a14623bca46e09c7afb44b617361aaf3808fcd83e18338cc673d5a3eb09f35",
+          "bytes": 132029
+        },
+        {
+          "path": "scans/50316.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Regretful-Shade.jpg",
+          "sha256": "1a8e53803f4df05f74a28a566b0ad8f65ad14a15f668e40d4d59964273b1c325",
+          "bytes": 124623
+        },
+        {
+          "path": "scans/50317.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Banks-of-Morthond.jpg",
+          "sha256": "65ed5a968769ae7cdcb52423c99640b42d026f6b0dc09056a936c005cf24f738",
+          "bytes": 130979
+        },
+        {
+          "path": "scans/50318.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Vale-of-Shadows.jpg",
+          "sha256": "ca72c483b196b668bb689f8dd263628d848f9ec3a7a05f40f3907ef5cd494998",
+          "bytes": 126812
+        },
+        {
+          "path": "scans/50319.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Blackroot-Graves.jpg",
+          "sha256": "034513f2e46ab398a419dd7cdd2ee38dbb3b3b36035b9a044150c81c23362bbb",
+          "bytes": 127374
+        },
+        {
+          "path": "scans/50320.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-of-Dwimorberg.jpg",
+          "sha256": "352d97ff783f9d46962cd0fffdad01e572643f3ffb30a752e539c2680ccdf715",
+          "bytes": 124931
+        },
+        {
+          "path": "scans/50321.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Haunted-Valley.jpg",
+          "sha256": "d601d438526c62191edbd0fee5a77be735c7a8c426f1db29f32782e9148f1914",
+          "bytes": 123091
+        },
+        {
+          "path": "scans/50322.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Midnight-Throng.jpg",
+          "sha256": "db9b4efbf90c99f2f2cf9559f57ddbb130eb03d98bb2a2fa7b8a4d7510ded6f7",
+          "bytes": 121263
+        },
+        {
+          "path": "scans/50323.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Murmurs-of-Dread.jpg",
+          "sha256": "739c4582eda2b2ab333fd5b053407b899d1a4be5f406bd0d4b796438ec38b6d0",
+          "bytes": 116222
+        },
+        {
+          "path": "scans/50324.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Groping-Horror.jpg",
+          "sha256": "31b4c855874942ee880e6e72bbaca899cc10c0e765f9e15020721cc99cea4384",
+          "bytes": 122614
+        },
+        {
+          "path": "scans/50325.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Driven-by-Fear.jpg",
+          "sha256": "2eb8297161be54bf8d433629051fe8fcfbc8f473ad471d5d7b4243e851720320",
+          "bytes": 128672
+        },
+        {
+          "path": "scans/50326.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Dead-Ride-Behind.jpg",
+          "sha256": "29d2c4dc0dfa68645e86fd01ea31716ccfd4bd866b2bf28eaa2a627f2a4cd32f",
+          "bytes": 114242
+        },
+        {
+          "path": "scans/50327.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Gloaming.jpg",
+          "sha256": "cf9106e68de1e5188f3b17ca41fb998411831bc3c48fe33e73abb118a7a75369",
+          "bytes": 117195
         },
         {
           "path": "scans/900101.A.jpg",

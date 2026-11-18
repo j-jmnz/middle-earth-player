@@ -1595,6 +1595,14 @@
       "pile": "smaugDeck",
       "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Magnificent is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/brief.md, The Battle of Lake-town).",
       "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
+    },
+    {
+      "scenario": "the-stone-of-erech",
+      "code": "50307",
+      "from": "setAside",
+      "pile": "activeLocation",
+      "reason": "DragnCards loads Tarlang's Neck set aside (Q99.03). The quest card The Disappearance (50301) prints \"Setup: Make Tarlang's Neck the active location.\", so it is the active location at the start of the game.",
+      "source": "dragncards preBuiltDecks.json (Q99.03); The Disappearance 50301 printed Setup"
     }
   ],
   "scenarioRemovals": [
@@ -1865,6 +1873,12 @@
     }
   ],
   "productCodes": [
+    {
+      "set": "The Stone of Erech",
+      "prefix": "503",
+      "reason": "Hall of Beorn numbers The Stone of Erech's cards 00001 to 00027 (RingsDbCardId), which are the codes of The Massing at Osgiliath's and The Battle of Lake-town's 00001 to 00019 and 00024, and RingsDB lists no card of TSoE. A code must name one card, so the earlier two keep their codes and the Stone's are 503 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 3 for the pack's position in it (50301 The Disappearance, 50327 The Gloaming).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Stone of Erech, Number, RingsDbCardId); ringsdb.com packs (TSoE, cycle 50, position 3; no cards listed)"
+    },
     {
       "set": "The Battle of Lake-town",
       "prefix": "502",

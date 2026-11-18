@@ -25,6 +25,20 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
   if ((match = /^Then,? reveal (\d+|an?|one) cards? from the encounter deck per player, and add it to the staging area$/i.exec(sentence))) {
     return [{ kind: "eachPlayerReveals", count: /^\d+$/.test(match[1] ?? "") ? Number(match[1]) : 1 }];
   }
+  // The Stone of Erech (50301): "Set Derufin, The Lord of the Dead, The Stone of Erech, and the 3 Night objectives aside, out of play": the three Night-trait objectives (Eventide, Dusk, Midnight) are set aside
+  // with the named cards.
+  if ((match = /^Set (.+?),? and the (\d+) Night objectives aside,? out of play$/i.exec(sentence))) {
+    const night = names.cards.filter((card) => card.type === "objective" && card.traits.includes("Night") && card.encounterSet === "The Stone of Erech");
+    const codes = [...names.codesOf(match[1] ?? ""), ...night.map((card) => card.code)];
+    return night.length !== Number(match[2]) || names.without(match[1] ?? "").replace(/\bThe\b|[\s,]|and/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];
+  }
+  // "Place Eventide into play, next to the current quest": the first Night objective is in play beside the quest deck from the start.
+  if ((match = /^Place (.+?) into play, next to the current quest$/i.exec(sentence))) {
+    const codes = names.codesOf(match[1] ?? "");
+    return codes.length === 0 ? null : [{ kind: "putIntoPlay", codes }];
+  }
+  // TEMP-NEXT
+  if (/^Make Tarlang's Next the active location$/.test(sentence)) return [{ kind: "active", codes: names.codesOf("Tarlang's Neck") }];
   if ((match = /^Remove (.+?) from the encounter deck and set (?:him|her|it|them) aside, out of play$/.exec(sentence))) {
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 || names.without(match[1] ?? "").replace(/\bThe\b|\s/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];

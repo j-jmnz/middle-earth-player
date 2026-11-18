@@ -116,6 +116,7 @@ export const PRODUCTS: readonly ProductDef[] = [
   // Standalone scenarios: each official scenario printed on its own, Hall of Beorn's cards of it alone. Hall of Beorn lists the event scenarios of 2011 to 2017 under the year (`scenarioProduct`).
   { name: "The Massing at Osgiliath", packs: ["TMaO"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2011" },
   { name: "The Battle of Lake-town", packs: ["TBoLT"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2012" },
+  { name: "The Stone of Erech", packs: ["TSoE"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2013" },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
   { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
@@ -414,15 +415,17 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     name: "Standalone scenarios",
     kind: "cycle",
     released: "2011-09-21",
-    products: ["The Massing at Osgiliath", "The Battle of Lake-town"],
+    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech"],
     scenarios: [
       // DragnCards' deck Q99.01 has no Easy twin: Hall of Beorn's Easy counts equal the Normal ones, so Easy loads the same deck.
       { id: "the-massing-at-osgiliath", product: "The Massing at Osgiliath", deck: { normal: "Q99.01", easy: "Q99.01" } },
       // DragnCards' deck Q99.02 has no Easy twin either; its sharedEncounterDeck2 is the Smaug deck.
       { id: "the-battle-of-lake-town", product: "The Battle of Lake-town", deck: { normal: "Q99.02", easy: "Q99.02" }, groups: { sharedEncounterDeck2: "setAside" } },
+      // DragnCards' deck Q99.03 has no Easy twin either.
+      { id: "the-stone-of-erech", product: "The Stone of Erech", deck: { normal: "Q99.03", easy: "Q99.03" } },
     ],
     // The other products of the cycle, in release order (README.md, Roadmap): their scenario titles are the file's `later`.
-    later: ["2013", "2014", "2015", "2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
+    later: ["2014", "2015", "2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
     saga: false,
     ledger: "standalone-scenarios",
   },
