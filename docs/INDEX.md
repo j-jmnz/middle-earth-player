@@ -265,8 +265,8 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
-  - 274–289 Readings the review catches (~630) ← 4
-  - 290–309 Not expressible yet: leave open, report (~390)
+  - 274–290 Readings the review catches (~680) ← 4
+  - 291–310 Not expressible yet: leave open, report (~390)
 
 ## Phases
 
