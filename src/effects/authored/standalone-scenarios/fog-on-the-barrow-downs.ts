@@ -329,7 +329,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "endOfRound",
       condition: { kind: "not", condition: IN_STAGING },
-      instructions: [{ verb: "RaiseThreat", amount: { count: { type: "enemy", control: "any", engaged: "you", trait: WIGHT } }, who: "hostController" }],
+      instructions: [{ verb: "RaiseThreat", amount: { count: { type: "enemy", control: "any", trait: WIGHT, engagedWith: "host" } }, who: "hostController" }],
     },
 
     // 148019 Tom Bombadil (copy of The Old Forest's 147022:A:1: the player is chosen by the first player of the revealer's area).

@@ -247,12 +247,53 @@ describe("148018:A:2 Dreadful Song's end-of-round raise reads the hero's control
     const t = table({ seats: 2, firstPlayer: 0, engaged: [{ code: "148011", seat: 1 }, { code: "148012", seat: 1 }, { code: "148013", seat: 0 }] });
     const hero = t.state.seats[1].heroes[0] ?? "";
     const song = spawn(t.state, "148018", { zone: "attached" });
-    const attached = { ...updateCard(song.state, song.id, { host: hero, controller: 1 }), cards: song.state.cards };
+    const attached = updateCard(song.state, song.id, { host: hero, controller: 1 });
     const withHost = updateCard(attached, hero, { attachments: [song.id] });
     const record = t.ctx.effects.find((effect) => effect.id === "148018:forced:1");
     const pushed = pushCardEffects({ ...withHost, window: null }, "forced", song.id, 0, false, record ? [record] : [], t.ctx, []);
     const done = settle({ ...pushed, mode: "stopped" }, t.ctx, []);
     expect(done.seats[1].threat).toBe(t.state.seats[1].threat + 2);
     expect(done.seats[0].threat).toBe(t.state.seats[0].threat);
+  });
+});
+
+describe("areas apart: what an encounter card reads as 'each player', 'at this stage' and 'in play'", () => {
+  it("148016:A:1 Chill Fog discards the resources of the heroes at the revealer's stage only, and only its players raise their threat", () => {
+    const { t, state } = trapped({ heroResources: 2 });
+    const first = state.firstPlayer;
+    const run = resolveRecords(state, t.ctx, "148016", "whenRevealed");
+    const mine = state.seats[first].heroes.map((id) => run.state.cards[id]?.resources);
+    const theirs = state.seats[1 - first].heroes.map((id) => run.state.cards[id]?.resources);
+    expect(mine.every((count) => count === 0)).toBe(true);
+    expect(theirs.every((count) => count === 2)).toBe(true);
+    expect(run.state.seats[first].threat).toBe(state.seats[first].threat + 2 * state.seats[first].heroes.length);
+    expect(run.state.seats[1 - first].threat).toBe(state.seats[1 - first].threat);
+  });
+
+  it("148017:A:2 Frozen by Fear holds the players at the revealer's stage only", () => {
+    const { t, state } = trapped();
+    const run = resolveRecords(state, t.ctx, "148017", "whenRevealed");
+    const held = (seat: number) => flagged(run.state, `seat:${seat}`, "cannotTriggerEffects");
+    expect(held(state.firstPlayer)).toBe(true);
+    expect(held(1 - state.firstPlayer)).toBe(false);
+  });
+
+  it("148014:A:1 I'm Waiting for You! makes the Wights engaged with the revealer's area attack, not the other area's", () => {
+    const { t, state } = trapped({ engaged: [{ code: "148011", seat: 0 }] });
+    // Only seat 0 has a Wight engaged: its area's reveal makes it attack, the other area's makes none and the card gains surge.
+    const attacks = (seat: number) => resolveRecords({ ...state, firstPlayer: seat }, t.ctx, "148014", "whenRevealed").steps.filter((step) => step.kind === "attack" || step.kind === "shadow").length;
+    expect(attacks(0)).toBeGreaterThan(attacks(1));
+    expect(attacks(1)).toBe(0);
+  });
+
+  it("148010:A:1 characters defend against a Wight with their Willpower, and against any other enemy with their Defense", () => {
+    const t = table({ seats: 1, staging: ["148010"], engaged: ["148011", "f3"] });
+    const settled = settle({ ...t.state, mode: "stopped", window: null }, t.ctx, []);
+    const hero = settled.seats[0].heroes[0] ?? "";
+    const card = settled.cards[hero]!;
+    const printed = printedOf(t.ctx.cards, card.code);
+    const against = (enemy: string) => ({ ...settled, pendingAttack: { enemyId: idOf(settled, enemy), seat: 0, defenderId: hero } }) as ScenarioState;
+    expect(modifiedStat(against("148011"), card, "defense", t.ctx.cards)).toBe(printed.willpower ?? 0);
+    expect(modifiedStat(against("f3"), card, "defense", t.ctx.cards)).toBe(printed.defense ?? 0);
   });
 });

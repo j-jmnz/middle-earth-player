@@ -34,6 +34,10 @@ export function attackPickMatches(state: ScenarioState, id: string, spec: PickSp
     const seat = pickedSeat(at.picked && at.picked.length > 0 ? at.picked : (frame?.picked ?? []));
     if (seat == null || instance.zone !== "engaged" || instance.controller !== seat) return false;
   }
+  if (spec.engagedWith === "host") {
+    const host = at.sourceId ? state.cards[state.cards[at.sourceId]?.host ?? ""] : undefined;
+    if (host?.controller == null || instance.zone !== "engaged" || instance.controller !== host.controller) return false;
+  }
   if (spec.engagedWith === "notYou") {
     const asking = spec.who === "firstPlayer" ? state.firstPlayer : at.seat;
     if (instance.zone === "engaged" && instance.controller === asking) return false;

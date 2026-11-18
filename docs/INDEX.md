@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~233.3K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~233.5K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
@@ -131,24 +131,24 @@ Read the sections your task touches.
     - 1753–1770 The Hills of Emyn Muil (~1.5K) ← 1
     - 1771–1791 The Dead Marshes (~2.1K) ← 2
     - 1792–1815 Return to Mirkwood (~2.3K) ← 4
-  - 1816–1950 Standalone scenarios (~17.2K) ← 1
+  - 1816–1951 Standalone scenarios (~17.4K) ← 1
     - 1820–1843 The Massing at Osgiliath (~2.5K) ← 1
     - 1844–1866 The Battle of Lake-town (~4.0K) ← 36
     - 1867–1883 The Stone of Erech (~2.2K) ← 20
     - 1884–1918 The Old Forest (~4.1K) ← 10
-    - 1919–1950 Fog on the Barrow-downs (~4.1K) ← 3
-  - 1951–1959 Nightmare (~410) ← 21
-  - 1960–2000 Deckbuilding (~2.1K)
-  - 2001–2080 Effects (~3.7K)
-    - 2003–2061 Three layers (~2.4K) ← 10
-    - 2062–2072 Player side quests, contracts and saga cards (~940)
-    - 2073–2076 Window stack (~100)
-    - 2077–2080 Coverage test (~270)
-  - 2081–2103 Data sources (~730) ← 3
-  - 2104–2122 Card images (~1.3K) ← 9
-  - 2123–2150 Persistence and shipping (~3.2K) ← 10
-  - 2151–2192 Screens (~5.1K) ← 2
-    - 2177–2192 Table screen (~1.8K) ← 3
+    - 1919–1951 Fog on the Barrow-downs (~4.3K) ← 3
+  - 1952–1960 Nightmare (~410) ← 21
+  - 1961–2001 Deckbuilding (~2.1K)
+  - 2002–2081 Effects (~3.7K)
+    - 2004–2062 Three layers (~2.4K) ← 10
+    - 2063–2073 Player side quests, contracts and saga cards (~940)
+    - 2074–2077 Window stack (~100)
+    - 2078–2081 Coverage test (~270)
+  - 2082–2104 Data sources (~730) ← 3
+  - 2105–2123 Card images (~1.3K) ← 9
+  - 2124–2151 Persistence and shipping (~3.2K) ← 10
+  - 2152–2193 Screens (~5.1K) ← 2
+    - 2178–2193 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~60.8K tok)
   - 5–8 Overview (~170) ← 1
   - 9–26 Top bar (~3.8K) ← 5
