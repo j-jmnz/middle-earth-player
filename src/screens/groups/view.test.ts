@@ -13,9 +13,10 @@ describe("the Cards tab's view", () => {
     expect(withView({ "box-core": true }, "Scenario")).toEqual({ "box-core": true, "cards-view-scenario": true });
   });
 
-  it("falls back to Player for a view the switch does not offer yet", () => {
-    expect(CARDS_VIEWS).toEqual(["Player", "Scenario"]);
-    expect(viewOf(withView({}, "Campaign"))).toBe("Player");
-    expect(viewOf(withView({}, "Campaign"), ["Player", "Scenario", "Campaign"])).toBe("Campaign");
+  it("keeps Campaign, and falls back to Player for a view the switch does not offer", () => {
+    expect(CARDS_VIEWS).toEqual(["Player", "Scenario", "Campaign"]);
+    expect(viewOf(withView({}, "Campaign"))).toBe("Campaign");
+    expect(withView(withView({}, "Campaign"), "Scenario")).toEqual({ "cards-view-scenario": true });
+    expect(viewOf(withView({}, "Campaign"), ["Player", "Scenario"])).toBe("Player");
   });
 });

@@ -7,10 +7,10 @@ import { View } from "react-native";
 import { useUiScale } from "../../ui/ui-scale";
 import { useDatabases } from "../data/databases";
 import { FoldSection, type useFolds } from "../kit/fold-section";
-import { foldAllOffer } from "../kit/fold-state";
-import { ListRow, ScreenScroll, Section, TextButton } from "../kit/chrome";
+import { ListRow, ScreenScroll, Section } from "../kit/chrome";
 import { groupDataOf } from "./cache";
 import { cardsWord } from "./card-group";
+import { FoldAllBar } from "./fold-all-bar";
 
 /** A pack's fold id; every pack starts closed. */
 export function packFoldId(code: string): string {
@@ -22,12 +22,9 @@ export function ScenarioList({ folds, selected, onOpen }: { folds: ReturnType<ty
   const s = useUiScale();
   const tree = useMemo(() => groupDataOf(catalog).scenario(), [catalog]);
   const ids = useMemo(() => tree.products.flatMap((product) => product.packs.map((pack) => ({ id: packFoldId(pack.code), defaultFolded: true }))), [tree]);
-  const offer = foldAllOffer(ids.map(({ id, defaultFolded }) => folds.folded(id, defaultFolded)));
   return (
     <ScreenScroll testID="cards-scenarios" top={4}>
-      <View className="-mx-3 flex-row justify-end">
-        <TextButton label={offer.label} tone="accent" small testID="cards-fold-all" accessibilityHint={offer.folds ? "Folds every pack" : "Opens every pack"} onPress={() => folds.setAll(ids, offer.folds)} />
-      </View>
+      <FoldAllBar folds={folds} ids={ids} noun="pack" />
       <View style={{ gap: 6 * s }}>
         {tree.products.map((product) => (
           <View key={product.id} testID={`cards-product-${product.id}`}>

@@ -1,11 +1,11 @@
-// Which of its views the Cards tab shows: Player (the pool), Scenario (encounter sets), and later Campaign. Kept in user.db `settings.sections` like the
+// Which of its views the Cards tab shows: Player (the pool), Scenario (encounter sets) and Campaign (campaign cards, boons, burdens, treasures). Kept in user.db `settings.sections` like the
 // folds, as booleans (a fold's map holds nothing else): the Scenario entry is true while Scenario is picked, the Campaign entry while Campaign is. Pure.
 import { withFolded, type Sections } from "../kit/fold-state";
 
 export type CardsView = "Player" | "Scenario" | "Campaign";
 
 /** The views the switch offers, in order. */
-export const CARDS_VIEWS: readonly CardsView[] = ["Player", "Scenario"];
+export const CARDS_VIEWS: readonly CardsView[] = ["Player", "Scenario", "Campaign"];
 
 const KEYS = { Scenario: "cards-view-scenario", Campaign: "cards-view-campaign" } as const;
 
