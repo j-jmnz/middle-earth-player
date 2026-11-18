@@ -382,7 +382,7 @@ export function ModePicker({ mode, onMode, testIDPrefix, campaignName, setup }: 
 }
 
 /**
- * The encounter: each set the scenario deals with its card count at the difficulty, as a row that opens the set on the card-group route (which asks its
+ * Encounter cards: each set the scenario deals with its card count at the difficulty, as a row that opens the set on the card-group route (which asks its
  * own spoiler question), and the scenario's special rules as tags (words to read, not controls). `codes` are the cards the scenario deals, which pick the
  * set of a name several packs hold (groups/scenario-sets.ts). The tree that names each row's set is read after the first paint; a set no pack lists gets no row.
  */
@@ -403,7 +403,7 @@ export function EncounterDetails({ facts, codes }: { facts: ScenarioFacts; codes
   };
   return (
     <>
-      <Section title="The encounter" className="mt-5" />
+      <Section title="Encounter cards" className="mt-5" />
       <View testID="briefing-sets">
         {facts.sets.map((set) =>
           current?.get(set.name) === null ? null : <ListRow key={set.name} testID={`briefing-set-${set.name}`} label={set.name} detail={cardsWord(set.count)} onPress={() => openSet(set.name)} />,
