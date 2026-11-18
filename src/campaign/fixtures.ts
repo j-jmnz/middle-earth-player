@@ -67,6 +67,7 @@ import rivendellFixtures from "./fixtures/road-to-rivendell.json";
 import waterFixtures from "./fixtures/the-watcher-in-the-water.json";
 import darkFixtures from "./fixtures/the-long-dark.json";
 import stoneFixtures from "./fixtures/foundations-of-stone.json";
+import flameFixtures from "./fixtures/shadow-and-flame.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -152,6 +153,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-watcher-in-the-water": waterFixtures,
   "the-long-dark": darkFixtures,
   "foundations-of-stone": stoneFixtures,
+  "shadow-and-flame": flameFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
