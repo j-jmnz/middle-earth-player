@@ -121,7 +121,8 @@ export function excessDamageAfter(state: ScenarioState, attack: NonNullable<Scen
   if (excess <= 0 || !enemy || !flagged(state, attack.enemyId, "excessToDamage")) return null;
   const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "excessToDamage"));
   return {
-    instructions: [{ verb: "Repeat", times: excess, instructions: [{ verb: "Pick", pick: { type: "character", control: "you", notOther: true } }, { verb: "DamageCard", amount: 1 }] }],
+    // `excessExhausts` (Terrible Strength, 901802:A:1): each character so damaged is exhausted.
+    instructions: [{ verb: "Repeat", times: excess, instructions: [{ verb: "Pick", pick: { type: "character", control: "you", notOther: true } }, { verb: "DamageCard", amount: 1 }, ...(flagged(state, attack.enemyId, "excessExhausts") ? [{ verb: "Exhaust" as const, target: { kind: "picked" as const } }] : [])] }],
     cause: record ? effectCause(record) : ruleCause("rr.damage"),
   };
 }

@@ -27,6 +27,8 @@ export const amountExprSchema = z.strictObject({
   // With `stat`: read it from the card in play with this title instead of `of` ("Add Bilbo Baggins' total Willpower").
   ofNamed: z.string().min(1).optional(),
   printed: z.boolean().optional(),
+  // With `stat: hitPoints`: the hit points the card has left, its hit points less its damage and at least 0 (damage can pass the hit points of an indestructible enemy, FAQ 3.057: "the remaining hit points of Durin's Bane", 04141:A:1). Read by the flame family.
+  remaining: z.literal(true).optional(),
   // The X the event was played for, or the X an earlier instruction fixed (the discarded card's cost).
   x: z.literal(true).optional(),
   // The stage number of the current quest card: its place in the quest deck, counting from 1 ("X is the stage number of the quest", 41027:A:1).

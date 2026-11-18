@@ -161,7 +161,9 @@ export function noteEvent(state: ScenarioState, event: GameEvent, ctx: ReduceCon
     if (!gameReads(state, ctx, '"kind":"questFailed"')) return state;
     return (now.failed ?? []).includes(event.seat) ? state : { ...state, quested: { ...now, failed: [...(now.failed ?? []), event.seat] } };
   }
-  if (!gameReads(state, ctx, '"kind":"questSucceeded"')) return state;
+  // The commitments are kept for `questSucceeded` and for `committedThisRound` (04139:B:1, families/flame/index.ts).
+  if (event.trigger === "committed" && !gameReads(state, ctx, '"kind":"questSucceeded"') && !gameReads(state, ctx, '"kind":"committedThisRound"')) return state;
+  if (event.trigger !== "committed" && !gameReads(state, ctx, '"kind":"questSucceeded"')) return state;
   if (event.trigger === "committed") return event.cardId ? { ...state, quested: { ...now, committed: [...now.committed, event.cardId] } } : state;
   return now.succeeded.includes(event.seat) ? state : { ...state, quested: { ...now, succeeded: [...now.succeeded, event.seat] } };
 }

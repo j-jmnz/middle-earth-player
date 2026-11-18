@@ -343,6 +343,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("questLeads") }),
   // The card in play with this code has any hit points remaining: its damage is below its hit points now ("cannot defeat this stage while Thaurdir has any hit points remaining", 09074:B:2). False while no such card is in play. Read by the angmar family.
   z.strictObject({ kind: z.literal("hitPointsLeft"), code: z.string().min(1) }),
+  // A hero of any player was committed to the quest this round, a hero that was committed when the commit step ended counting after a card removed it from the quest ("If at least 1 hero committed to the quest this round", 04139:B:1). Read by the flame family (src/rules/families/flame/index.ts); the commitments are kept only in a game with a record that reads it.
+  z.strictObject({ kind: z.literal("committedThisRound") }),
   // The time of day, read by the angmar family: the Time objective (Daybreak, Nightfall) shows the side the state is, `day` while Daybreak is faceup, `night` while Nightfall is ("While it is Night, Wolf of Angmar gets +2 Attack", 10022:A:2; mec108.day-and-night).
   // False while no Time objective is in play.
   z.strictObject({ kind: z.literal("timeOfDay"), is: z.enum(["day", "night"]) }),

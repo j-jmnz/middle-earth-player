@@ -90,6 +90,9 @@ const FLAGS = [
   // attack against each player in the combat phase, in player order; each player may attack it; it adds no Threat to the staging
   // area (rr.engaged) (142024:A:2).
   "engagedWithAll",
+  // On an enemy in the staging area: as `engagedWithAll`, but it is considered engaged only with each player whose threat is 1 or greater, read live: it attacks each of them once in the combat phase and only they declare attackers against it; a player whose threat was below 1 when the combat phase began and is raised during it is attacked
+  // with no shadow card dealt (Durin's Bane, 04150:A:2, dwd.durins-bane).
+  "engagedWithThreatening",
   // On a location: at most this much progress can be placed on it each round (142036:A:1), and the progress placed on it this round
   // (engine use).
   "progressCap",

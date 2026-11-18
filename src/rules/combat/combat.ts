@@ -25,7 +25,7 @@ import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
 import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
-import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
+import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -93,7 +93,7 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
 // Each seat's enemies in player order, the highest engagement cost first (rr.step-6-2). Equal costs keep the order
 // they engaged in.
 export function dealShadows(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
+  let next = noteBelowThreat(state);
   for (const seat of livingSeats(next)) {
     const cost = (id: string) => {
       const instance = next.cards[id];
@@ -137,7 +137,7 @@ export function beginEnemyAttack(
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   // An attack an effect makes from the staging area was dealt its shadow card already (attackFromStaging).
-  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps, ctx) : state;
+  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps, ctx, seat) : state;
   const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {
@@ -265,6 +265,11 @@ export function canAttack(
   // attackers against it, with their own characters and ranged characters of the others (rr.ranged).
   if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithFirst")) {
     if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
+    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
+  }
+  // An enemy in the staging area that is considered engaged with each player whose threat is 1 or greater (Durin's Bane, 04150:A:2): such a player declares attackers against it, with their own characters and ranged characters of the others (rr.ranged).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithThreatening")) {
+    if (flagged(state, attackerId, "cannotAttack") || !engagedWithThreatening(state, enemyId, seat)) return false;
     return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
   // Goblin Archer (03032:A:2): in the staging area it is attacked by characters with ranged, of any player, in the combat phase.
