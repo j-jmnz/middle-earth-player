@@ -9,12 +9,9 @@ import { ESCAPE_STAT_NOTES, ESCAPE_TEMPLATES } from "./escape.ts";
 import { ATTACH_TEMPLATES } from "./attach.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES, guardianRestrict } from "./guardian.ts";
 import { AMBUSH_TEMPLATES } from "./ambush.ts";
-import { LONG_DARK_TEMPLATES } from "./long-dark.ts";
-
+import { LONG_DARK_SAMPLES, LONG_DARK_TEMPLATES, longDarkRestrict } from "./long-dark.ts";
 export { ESCAPE_SAMPLES } from "./escape.ts";
-export { GUARDIAN_SAMPLES };
-export { LONG_DARK_SAMPLES } from "./long-dark.ts";
-
+export { GUARDIAN_SAMPLES, LONG_DARK_SAMPLES };
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
 
@@ -359,7 +356,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     }
     const guarded = guardianRestrict(i); if (guarded) return guarded;
     if (i.what === "commit") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot commit characters to the quest`, read: ["what", "unlessControls"] };
-    if (i.what === "draw" && i.engagedPlayer === true) return { text: "the player this enemy is engaged with cannot draw cards through card effects while it is engaged (the framework's draws are not card effects)", read: ["what", "engagedPlayer"] };
+    const engaged = longDarkRestrict(i); if (engaged) return engaged;
     if (i.what === "draw") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot draw cards through card effects (the framework's draws are not card effects)`, read: ["what", "unlessControls"] };
     if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : "any location"} while this holds`, read: ["what", "location", "guarding"] };
     return null;

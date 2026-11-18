@@ -11,6 +11,11 @@ const LOST: Readonly<Record<string, string>> = {
   eachDifferent: "starting with the first player, each player in turn chooses a \"Lost:\" effect in play that no earlier player chose in this resolution and triggers it before the next player chooses (two copies of one card are two effects; a player with none left does nothing)",
 };
 
+/** The restriction The Long Dark's Sentinel of the Deep adds to Restrict (901604:A:1), or null for any other. */
+export function longDarkRestrict(i: Obj): Made | null {
+  return i.what === "draw" && i.engagedPlayer === true ? { text: "the player this enemy is engaged with cannot draw cards through card effects while it is engaged (the framework's draws are not card effects)", read: ["what", "engagedPlayer"] } : null;
+}
+
 export const LONG_DARK_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Made>> = {
   LocateTest: (i) => ({
     text: `${TESTER[str(i.who ?? "actor")] ?? str(i.who)} makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)`,
