@@ -4,7 +4,7 @@
 import type { Condition, Instruction } from "../../../catalog/boundary.ts";
 
 import { isPlayerType, printedOf } from "../../core/printed.ts";
-import { inPlay } from "../../core/state.ts";
+import { inPlay, livingSeats } from "../../core/state.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { frameScope } from "../../interpret/amounts.ts";
@@ -40,4 +40,11 @@ export function committedThisRound(state: ScenarioState, condition: Condition, c
   if (condition.kind !== "committedThisRound") return null;
   const now = state.quested;
   return now?.round === state.round && now.committed.some((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "hero");
+}
+
+/** The Travel line that moves damage from Durin's Bane to a hero for each player (901809:A:2) cannot be paid unless Durin's Bane holds a damage for each player (rr.travel). False for any other instruction. */
+export function moveDamageUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext): boolean {
+  if (instruction.verb !== "ForEachPlayer" || !instruction.instructions.some((inner) => inner.verb === "MoveDamage")) return false;
+  const bane = Object.values(state.cards).find((card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).name === "Durin's Bane");
+  return (bane?.damage ?? 0) < livingSeats(state).length;
 }

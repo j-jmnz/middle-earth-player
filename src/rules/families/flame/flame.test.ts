@@ -11,6 +11,7 @@ import { discardShadowOf } from "../../combat/shadow.ts";
 import { dealShadows } from "../../combat/combat.ts";
 import { finish, start, idOf, idsOf, send, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 import { stagingAttackers } from "../south/watcher.ts";
+import { moveDamageUnpayable } from "./bane.ts";
 
 // Rules: dwd.durins-bane, rr.hit-points, rr.shadow-effects, rr.cancel (data/rules/entries.json); ledger lines 04150:A:2, 04141:A:1, 04139:B:1, 901801:A:2, 901801:A:3, 901801:A:4, 901806:A:1.
 // The flame family and the flag engagedWithThreatening on tables of the scenario's own cards.
@@ -109,6 +110,16 @@ describe("Dark Pit and the hit points left (04141:A:1)", () => {
     expect(resolveAmount(state, { stat: "hitPoints", ofNamed: "Durin's Bane", remaining: true }, scope, t.ctx)).toBe(0);
     const hurt = updateCard(state, idOf(state, "04150"), { damage: 20 });
     expect(resolveAmount(hurt, { stat: "hitPoints", ofNamed: "Durin's Bane", remaining: true }, scope, t.ctx)).toBe(7);
+  });
+});
+
+describe("901809:A:2 Fiery Depths' travel cost", () => {
+  it("901809:A:2 is unpayable unless Durin's Bane holds a damage for each player", () => {
+    const line: Instruction = { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "MoveDamage", amount: 1 }] };
+    const poor = table({ seats: 2, staging: [{ code: "04150", damage: 1 }] });
+    expect(moveDamageUnpayable(poor.state, line, poor.ctx)).toBe(true);
+    const rich = table({ seats: 2, staging: [{ code: "04150", damage: 2 }] });
+    expect(moveDamageUnpayable(rich.state, line, rich.ctx)).toBe(false);
   });
 });
 
