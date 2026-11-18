@@ -134,7 +134,7 @@
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,
-    "perSeatStaging": false
+    "perSeatStaging": true
   },
   "source": {
     "dragnNormal": "Q99.05",

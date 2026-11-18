@@ -428,7 +428,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       hide: /\bHide (?:test|\d)/.test(everything) || placed.some((item) => byCode.get(item.code)?.keywords?.hide != null),
       // A stage that says "There can be 2 active locations", or a dealt card that grants the slot (Fisherman's Dock: "There are now 2 active locations").
       secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))) || /There are now 2 active locations/.test(everything),
-      perSeatStaging: stages.some((code) => /creates? (?:his|their) own staging area/.test(textOf(code))),
+      // A stage that creates a staging area for each player (Breaking of the Fellowship, Escape from Mount Gram), or a dealt card that sends a player to a staging area of his own (Great Barrow, 148007).
+      perSeatStaging: stages.some((code) => /creates? (?:his|their) own staging area/.test(textOf(code))) || /create your own staging area/.test(everything),
     };
 
     // DragnCards' decks, where a deck of the same cards exists (copy counts only, not piles).
