@@ -284,6 +284,8 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
       return game.uncharted?.deck ?? NONE;
     case "evilCreaturesDeck":
     case "evilCreaturesDiscard":
+    case "balrogDeck":
+    case "balrogDiscard":
     case "cavesDeck":
     case "haradDeck":
     case "angmarOrcDeck":

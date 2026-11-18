@@ -15,6 +15,7 @@ import { pelennorDetail } from "./pelennor-preview.ts";
 import { angmarDetail } from "./angmar-preview.ts";
 import { ungolDetail } from "./ungol-preview.ts";
 import { stoneDetail } from "./stone-preview.ts";
+import { flameDetail } from "./flame-preview.ts";
 import { rhovanionDetail } from "./rhovanion-preview.ts";
 
 /**
@@ -51,6 +52,8 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (ungol) return ungol;
   const stone = stoneDetail(game, ctx, cardId, name);
   if (stone) return stone;
+  const flame = flameDetail(game, cardId, name);
+  if (flame) return flame;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
   const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card);

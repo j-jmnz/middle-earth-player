@@ -36,16 +36,21 @@ export const flameStart = (seatCount: 1 | 2, seed: number, difficulty: Difficult
 export type FlamePolicy = {
   // The option a Choose window with these answers takes: the first or the last.
   choose: "first" | "last";
+  // Real decklists (the fixtures): the characters defend, the cards in hand are played and the Actions other than Dark Pit's are used. The goldens' stand-in heroes defend with nobody and play nothing.
+  cards?: boolean;
 };
 export const DEFAULT_POLICY: FlamePolicy = { choose: "first" };
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// The Action exhausts the characters it discards for: it is used only when the cost of the cards it discards (up to three, of Gandalf's 5) tops what Durin's Bane has left, so it is not spent on a round that discards nothing.
+// The Action exhausts the characters it discards for: it is used only when the printed cost of the top cards of the deck it would discard (one for each of up to three ready characters, the first the choice offers) tops what Durin's Bane has left,
+// so it is not spent on a round that discards nothing.
 function discardsBane(state: ScenarioState, ctx: ReduceContext): boolean {
   const bane = Object.values(state.cards).find((card) => card.code === BANE && inPlay(card.zone));
   const seat = state.seats[state.activeSeat];
-  const ready = (seat?.heroes ?? []).filter((id) => state.cards[id]?.zone === "heroes" && !state.cards[id]?.exhausted).length;
-  return bane != null && 5 * Math.min(3, ready, seat?.deck.length ?? 0) > (printedOf(ctx.cards, BANE).health ?? 0) - bane.damage;
+  const ready = Object.values(state.cards).filter((card) => card.controller === state.activeSeat && !card.exhausted && (card.zone === "heroes" || (card.zone === "play" && card.host == null && printedOf(ctx.cards, card.code).type === "ally"))).length;
+  const top = (seat?.deck ?? []).slice(0, Math.min(3, ready));
+  const cost = top.reduce((sum, id) => sum + (printedOf(ctx.cards, state.cards[id]?.code ?? "").cost ?? 0), 0);
+  return bane != null && cost > (printedOf(ctx.cards, BANE).health ?? 0) - bane.damage;
 }
 
 export function flameIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: FlamePolicy = DEFAULT_POLICY): PlayerIntent {
@@ -62,7 +67,7 @@ export function flameIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
     }
   }
   // Nobody defends (a hero has the health for it): the damage of an undefended attack goes to the seat's least damaged hero.
-  if (state.window?.kind === "defense") {
+  if (state.window?.kind === "defense" && !policy.cards) {
     const heroes = (state.seats[state.window.seat]?.heroes ?? []).filter((id) => state.cards[id]?.zone === "heroes");
     const least = [...heroes].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
     if (least) return { type: "Undefended", heroId: least };
@@ -73,7 +78,10 @@ export function flameIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
   if (attackers) return attackers;
   const engage = engageOneEach(state, ctx, 6);
   if (engage) return engage;
-  return nextIntent(state, ctx, FLAME_POLICY, memory, intents);
+  // Dark Pit's Action is the policy's alone: the auto-player never sees it, so it cannot spend it on a round that discards nothing.
+  const others = intents.filter((intent) => !(intent.type === "Trigger" && intent.effectId === DARK_PIT_ACTION));
+  const scout = policy.cards ? (state.cards[state.seats[0]?.heroes.at(-1) ?? ""]?.code ?? "") : FLAME_POLICY.scout;
+  return nextIntent(state, ctx, { ...FLAME_POLICY, scout, play: policy.cards === true, act: policy.cards === true }, memory, others);
 }
 
 export type FlameGame = PlayedGame;
@@ -81,8 +89,20 @@ export type FlameGame = PlayedGame;
 // The goldens (src/campaign/scenarios/shadow-and-flame/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type FlameGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: FlameDecks; outcome: "won" | "lost"; policy?: Partial<FlamePolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const FLAME_GOLDENS: readonly FlameGolden[] = [];
+// The games to pin (about 700 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal, Easy and Nightmare (Durin's Bane is damaged by the players that are engaged with it, Dark Pit is the active location, its Refresh Action discards Durin's
+// Bane and the game is won), and the ways to lose: the threat of every player at 50 (heroes too weak to quest) and every hero destroyed (heroes too brittle to survive Durin's Bane).
+export const FLAME_GOLDENS: readonly FlameGolden[] = [
+  { name: "solo win", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "Easy solo win", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Nightmare solo win", seatCount: 1, seed: 1, difficulty: "Nightmare", decks: "strong", outcome: "won" },
+  { name: "Nightmare two-handed win", seatCount: 2, seed: 1, difficulty: "Nightmare", decks: "strong", outcome: "won" },
+  { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: threat 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "solo loss: every hero destroyed", seatCount: 1, seed: 3, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<FlameDecks, FlamePolicy>({
   campaign: cycle,
