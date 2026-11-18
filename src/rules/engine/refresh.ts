@@ -1,4 +1,4 @@
-// Rules: rr.refresh-phase, rr.step-7-3, ltp.phase-7-refresh (data/rules/entries.json).
+// Rules: rr.refresh-phase, rr.step-7-3, ltp.phase-7-refresh, dwd.regenerate (data/rules/entries.json).
 import { ruleCause } from "../core/cause.ts";
 import type { GameEvent } from "../windows/frame-types.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -10,6 +10,7 @@ import { fireForced } from "../windows/triggers.ts";
 import { flagged, livingSeats, updateCards, withMode, type CardInstance, type ScenarioState } from "../core/state.ts";
 import { inPlay } from "../core/zones.ts";
 import { readiedThisPhase, readyPatch } from "../core/holder-classes.ts";
+import { regenerateEnemies } from "../families/encounter/regenerate.ts";
 
 export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // A Response to "After a character readies during the refresh phase" (02102:A:1) hears each card that readies here.
@@ -29,7 +30,8 @@ export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: Engin
   // "Players do not raise their threat at the end of the refresh phase" (noRefreshThreat, 146042:A:1).
   // The campaign card of Escape from Mount Gram raises it by its own count instead (families/captured/values.ts).
   if (!flagged(next, "table", "noRefreshThreat") && next.capture?.refresh !== true) for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
-  return withMode(passToken(next, ctx, steps), "endRound");
+  // Regenerate X (dwd.regenerate): right after the first player token passes, before player actions.
+  return withMode(regenerateEnemies(passToken(next, ctx, steps), ctx, steps), "endRound");
 }
 
 // The token moves to the next seat still in the game, then the event is announced to cards in play.

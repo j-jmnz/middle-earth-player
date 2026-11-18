@@ -46,6 +46,8 @@ export const printedKeywordsSchema = z.strictObject({
   surge: z.boolean().optional(),
   // Ambush (dwd.ambush): an enemy entering play makes each player, the first player first, an engagement check against it alone (src/rules/families/encounter/ambush.ts).
   ambush: z.boolean().optional(),
+  // Regenerate X (dwd.regenerate): the enemy heals X damage from itself right after the first player token passes in the Refresh phase (src/rules/families/encounter/regenerate.ts).
+  regenerate: z.number().int().positive().optional(),
   doomed: z.number().int().positive().optional(),
   peril: z.boolean().optional(),
   archery: z.number().int().positive().optional(),

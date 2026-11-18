@@ -1,6 +1,6 @@
 // Rules: rr.keywords, rr.action, rr.response, rr.forced, rr.triggered-ability, rr.shadow-effects, rr.travel, rr.setup, rr.surge, rr.sentinel, rr.ranged, rr.restricted,
 // rr.immune, rr.permanent, rr.doomed-x, rr.guarded, mec109.archery, mec109.peril, mec109.indestructible, mec109.toughness, mec109.hide-x, mec113.dire, mec113.phantom,
-// dwd.ambush, dcce.sailing, dcce.boarding, dcce.uncharted, dcce.aflame, dcce.grapple, hon.battle, hon.siege, trg.secrecy, bts.valour (data/rules/entries.json).
+// dwd.ambush, dwd.regenerate, dcce.sailing, dcce.boarding, dcce.uncharted, dcce.aflame, dcce.grapple, hon.battle, hon.siege, trg.secrecy, bts.valour (data/rules/entries.json).
 //
 // Which rule span explains a keyword or a timing word in the table's card preview. Candidates are rule ids; the book of the open scenario's
 // own wording wins, then the Rules Reference, then Learn to Play (`pickRule`). Pure: the screen turns the id into text (screens/rules/glossary.ts).
@@ -8,7 +8,7 @@ import { ruleDoc } from "./ledger.ts";
 
 export type KeywordKey =
   | "surge" | "peril" | "indestructible" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
-  | "phantom" | "dire" | "ambush" | "hide" | "doomed" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple";
+  | "phantom" | "dire" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple";
 
 /** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. */
 export type RuleWord = { word: string; rules: readonly string[] };
@@ -18,6 +18,7 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
   hide: { word: "Hide", rules: ["mec109.hide-x"] },
   surge: { word: "Surge", rules: ["rr.surge", "ltp.surge"] },
   doomed: { word: "Doomed", rules: ["rr.doomed-x", "ltp.doomed-x"] },
+  regenerate: { word: "Regenerate", rules: ["dwd.regenerate"] },
   peril: { word: "Peril", rules: ["mec109.peril", "mec112.peril", "mec113.peril"] },
   archery: { word: "Archery", rules: ["mec109.archery", "mec112.archery", "mec113.archery", "dcce.archery", "hon.archery"] },
   toughness: { word: "Toughness", rules: ["mec109.toughness", "mec112.toughness"] },

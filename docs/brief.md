@@ -368,6 +368,7 @@ These live in `src/rules`, not in a card file. Each names its rule ids in its mo
 | --- | --- |
 | Surge, doomed, peril | `rr.surge`, `rr.doomed-x`, `mec109.peril` |
 | Ambush | `dwd.ambush`, `rr.engagement-check` (`src/rules/families/encounter/ambush.ts`: an enemy that enters the staging area from outside play makes each player in turn an engagement check against it alone, once what hears it enter has resolved; the keyword is read from the card, so its lines have no record) |
+| Regenerate X | `dwd.regenerate` (`src/rules/families/encounter/regenerate.ts`: an enemy with it, in the staging area or engaged, heals X damage from itself right after the first player token passes in the Refresh phase, before player actions, and no more than it has; the keyword is read from the card, so its lines have no record) |
 | Archery X | `mec109.archery`, `dcce.archery` |
 | Immune to player card effects | `rr.immune`, `mec109.immune-to-player-card-effects` |
 | Indestructible, toughness X | `mec109.indestructible`, `mec109.toughness` |
