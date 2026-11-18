@@ -29,6 +29,7 @@ import { withAlphaHex, type TableTokens } from "../../ui/tokens";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { useUiScale } from "../../ui/ui-scale";
 import { Text } from "../../ui/text";
+import { MOTK_NOTE, motkAllyCode } from "../groups/motk";
 
 export type CardRow = {
   code: string;
@@ -194,6 +195,11 @@ export function CardName({ row, size = 28 }: { row: CardRow; size?: number }) {
           </Text>
         ) : null}
       </View>
+      {motkAllyCode(row.code) ? (
+        <Text testID="card-browse-only" className="mt-1.5 text-center text-label text-muted">
+          {MOTK_NOTE}
+        </Text>
+      ) : null}
     </View>
   );
 }

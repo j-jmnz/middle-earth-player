@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
 import { groupDataOf, scenarioFacts } from "./cache.ts";
 import { cardGroupOf, MOTK_GROUP_ID } from "./card-group.ts";
+import { MOTK_NOTE } from "./motk.ts";
 import { isCampaignRow } from "./campaign-tree.ts";
 import { isScenarioRow } from "./scenario-tree.ts";
 
@@ -37,6 +38,8 @@ describe("the group cache", () => {
     const heroes = data.motk();
     expect(heroes).toHaveLength(84);
     for (const hero of heroes) expect(hero.card.code).toBe(`99${hero.allyCode}`);
+    // Each says it is for browsing, on its strip.
+    for (const hero of heroes) expect(hero.card.note).toBe(MOTK_NOTE);
   });
 
   it("resolves a set, a campaign section and the heroes by the route's kind and id", () => {

@@ -73,7 +73,7 @@ export const GroupCell = memo(function GroupCell({
         {card.name}
       </Text>
       {card.note ? (
-        <Text className="text-micro text-muted" numberOfLines={1}>
+        <Text className="text-micro text-muted" numberOfLines={4}>
           {card.note}
         </Text>
       ) : null}

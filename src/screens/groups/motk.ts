@@ -4,6 +4,9 @@ import { groupCard, type GroupCard, type GroupRow } from "./group-types";
 
 export const MOTK_PACK = "MotKA";
 
+/** The line each hero carries (its strip in the grid, its card screen): they are for browsing, the contract plays the ally. */
+export const MOTK_NOTE = "Browse only · played with the Messenger of the King contract";
+
 // The ally's code is five digits, or six for a Hobbit saga ally (99131006 stands for 131006).
 const MOTK_HERO = /^99(\d{5,6})$/;
 
@@ -28,5 +31,5 @@ export function motkHeroes(rows: readonly GroupRow[]): MotkHero[] {
       return allyCode ? [{ row, allyCode }] : [];
     })
     .sort((left, right) => untagged(left.row.name).localeCompare(untagged(right.row.name)) || left.row.code.localeCompare(right.row.code))
-    .map(({ row, allyCode }) => ({ card: groupCard(row), allyCode }));
+    .map(({ row, allyCode }) => ({ card: groupCard(row, { note: () => MOTK_NOTE }), allyCode }));
 }
