@@ -9,7 +9,8 @@ const cycle = loadCampaign("standalone-scenarios");
 const forest = loadAnyScenario("the-old-forest");
 
 // Test helper. A whole standalone game of The Old Forest played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The players travel to the first location they
+// may, quest with everyone, answer every search and choice with the first option (or the last as the policy says) and attack what the auto-player attacks; Old Man Willow comes at stage 3 and attacks each player in turn.
 export const FOREST_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type ForestDecks = "strong" | "weak" | "brittle";
@@ -27,7 +28,6 @@ export type ForestPolicy = {
 export const DEFAULT_POLICY: ForestPolicy = { choose: "first" };
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
 export function forestIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: ForestPolicy = DEFAULT_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
   return nextIntent(state, ctx, FOREST_POLICY, memory, legalIntents(state, ctx));
@@ -38,8 +38,15 @@ export type ForestGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-old-forest/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type ForestGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: ForestDecks; outcome: "won" | "lost"; policy?: Partial<ForestPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const FOREST_GOLDENS: readonly ForestGolden[] = [];
+// The games to pin (about 400 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and true solo on Easy (stage 3B defeated with Withywindle out of play), and the two ways to lose: every player's
+// threat at 50 (heroes too small to quest) and every hero destroyed (brittle heroes under Old Man Willow's and the stage 2 enemies' attacks). No card of the scenario ends the game itself and it has no Nightmare deck.
+export const FOREST_GOLDENS: readonly ForestGolden[] = [
+  { name: "solo win", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "Easy solo win", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "solo loss: threat 50", seatCount: 1, seed: 3, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<ForestDecks, ForestPolicy>({
   campaign: cycle,

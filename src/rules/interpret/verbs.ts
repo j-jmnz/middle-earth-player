@@ -194,7 +194,7 @@ export function runExtraVerb(
       return next;
     }
     case "Discard":
-      return discardTarget(state, instruction.target.kind, focus, ctx, steps);
+      return discardTarget(state, instruction.target.kind, focus, ctx, steps, false, instruction.counted === true);
     case "Destroy":
       return discardTarget(state, instruction.target.kind, focus, ctx, steps, true);
     case "UncommitAll": {
@@ -392,6 +392,7 @@ function discardTarget(
   ctx: ReduceContext,
   steps: EngineStep[],
   destroy = false,
+  counted = false,
 ): ScenarioState {
   const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" || kind === "other" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
@@ -405,8 +406,8 @@ function discardTarget(
   }
   const before = state.cards[id];
   const next = destroyCard(state, id, ctx.cards, steps);
-  // A card that left play by this discard counts for the effect's `noneDiscarded` ("Then" resolves only if the discard did, rr.then).
-  return before && inPlay(before.zone) && !inPlay(next.cards[id]?.zone ?? "removed") ? countDiscarded(next, 1) : next;
+  // A `counted` discard of a card that left play counts for the effect's `noneDiscarded` ("Then" resolves only if the discard did, rr.then).
+  return counted && before && inPlay(before.zone) && !inPlay(next.cards[id]?.zone ?? "removed") ? countDiscarded(next, 1) : next;
 }
 
 // The reveal frame of the source card counts each separate instance of surge it was given (rr.surge) for the rest of that reveal.

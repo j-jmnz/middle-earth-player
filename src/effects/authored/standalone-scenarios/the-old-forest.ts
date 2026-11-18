@@ -239,7 +239,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } },
       { verb: "TakeRevealedCard", who: "picked", committed: true },
-      { verb: "Delay", until: "endOfRound", uncancelable: { kind: "count", pick: { type: "hero", control: "any" }, min: 0 }, instructions: [{ verb: "Discard", target: { kind: "self" } }, { verb: "ShuffleEncounterDiscard", when: { kind: "not", condition: { kind: "noneDiscarded" } } }] },
+      { verb: "Delay", until: "endOfRound", uncancelable: { kind: "count", pick: { type: "hero", control: "any" }, min: 0 }, instructions: [{ verb: "Discard", target: { kind: "self" }, counted: true }, { verb: "ShuffleEncounterDiscard", when: { kind: "not", condition: { kind: "noneDiscarded" } } }] },
     ],
   },
 ];

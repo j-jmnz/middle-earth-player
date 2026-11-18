@@ -58,7 +58,7 @@ import * as returnmirkwood from "../scenarios/return-to-mirkwood/game.ts";
 import * as osgiliath from "../scenarios/the-massing-at-osgiliath/game.ts";
 import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
 import * as erech from "../scenarios/the-stone-of-erech/game.ts";
-// import * as forest from "../scenarios/the-old-forest/game.ts";
+import * as forest from "../scenarios/the-old-forest/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -143,5 +143,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),
-  // entry("the-old-forest", "The Old Forest", forest.FOREST_GOLDENS, forest.forestWorld, forest.playGolden),
+  entry("the-old-forest", "The Old Forest", forest.FOREST_GOLDENS, forest.forestWorld, forest.playGolden),
 ];

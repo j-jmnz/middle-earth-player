@@ -333,7 +333,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
     - choose player (any player controls) chosen by the first player
     - [json TakeRevealedCard {"verb":"TakeRevealedCard","who":"picked","committed":true}]
     - later, at the end of the round (cannot be canceled while the number of hero (any player controls) is at least 0):
-      - discard this card
+      - discard this card [also {"counted":true}]
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 213 by template, 7 as JSON)
+(rendered pieces: 212 by template, 8 as JSON)

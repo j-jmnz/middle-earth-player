@@ -216,7 +216,8 @@ export const simpleVerbs = [
     inPlay: z.literal(true).optional(),
     ...when,
   }),
-  z.strictObject({ verb: z.literal("Discard"), target: targetSchema, ...when }),
+  // `counted`: the running effect counts a card this discards out of play for its `noneDiscarded` condition ("discard Tom Bombadil. Then, shuffle ...", 147022:A:1: the part after "then" resolves only if the discard did, rr.then).
+  z.strictObject({ verb: z.literal("Discard"), target: targetSchema, counted: z.literal(true).optional(), ...when }),
   // The card is destroyed (rr.destroy), not discarded: a hero or ally lies in its owner's discard pile and the table hears it was destroyed ("Destroy all heroes with the card 'Sacked!' attached", 02049:A:1).
   z.strictObject({ verb: z.literal("Destroy"), target: targetSchema, ...when }),
   z.strictObject({
