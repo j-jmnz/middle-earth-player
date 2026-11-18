@@ -108,12 +108,23 @@ describe("questingCharacters (04022:A:1)", () => {
 });
 
 describe("CommitToQuest and cannotQuest (04023:A:1, 04024:A:1)", () => {
-  it("04024:A:1 does not commit a character that cannot quest, and commits one that can", () => {
-    const built = table({ cards: [hero("a"), hero("b")], effects: [], heroes: [{ code: "a" }, { code: "b" }] });
-    const frozen = addModifier(built.state, built.ids.a!, built.ids.a!, "cannotQuest", 1, "whileSourceInPlay");
+  function frozenHero(cards: ReturnType<typeof treachery>[]) {
+    const built = table({ cards: [hero("a"), hero("b"), ...cards], effects: [], heroes: [{ code: "a" }, { code: "b" }] });
+    const spawned = cards.length > 0 ? spawn(built.state, "04023", { zone: "staging" }).state : built.state;
+    return { built, frozen: addModifier(spawned, built.ids.a!, built.ids.a!, "cannotQuest", 1, "whileSourceInPlay") };
+  }
+
+  it("04024:A:1 does not commit a character that cannot quest in a game that deals Freezing Cold, and commits one that can", () => {
+    const { built, frozen } = frozenHero([treachery("04023")]);
     let next = runInstruction(frozen, { verb: "CommitToQuest", target: "self" }, { seat: 0, sourceId: built.ids.a! }, built.ctx, []);
     expect(next.cards[built.ids.a!]?.committed).toBe(false);
     next = runInstruction(frozen, { verb: "CommitToQuest", target: "self" }, { seat: 0, sourceId: built.ids.b! }, built.ctx, []);
     expect(next.cards[built.ids.b!]?.committed).toBe(true);
+  });
+
+  it("an earlier game (no Freezing Cold dealt) commits the character as before", () => {
+    const { built, frozen } = frozenHero([]);
+    const next = runInstruction(frozen, { verb: "CommitToQuest", target: "self" }, { seat: 0, sourceId: built.ids.a! }, built.ctx, []);
+    expect(next.cards[built.ids.a!]?.committed).toBe(true);
   });
 });

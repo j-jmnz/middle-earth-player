@@ -5,7 +5,7 @@
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
 import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
+import { flagged, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
 import { cardsUnder, shadowCards } from "../../rules/core/zones.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 import { captivesOf, captivesUnder } from "../../rules/families/captives/values.ts";
@@ -158,10 +158,10 @@ function shipsFirst(game: ScenarioState, ids: readonly string[], facts: ZoneFact
 
 // The staging area's cards in the order the table draws them: each guarded objective is followed by the encounter cards attached to it
 // (rr.guarded), so a guard stands beside the objective it guards.
-// An ally the active location guards (Arwen under Goblin Gate, 901402:B:1) is drawn under it in the active location's zone, not in the staging area.
+// An ally the active location guards (Arwen under Goblin Gate, 901402:B:1, the `guardedAlly` flag) is drawn under it in the active location's zone, not in the staging area.
 const heldUnderActive = (game: ScenarioState): string | null => {
   const active = game.activeLocation ? game.cards[game.activeLocation] : undefined;
-  return active?.guard === true && active.host != null ? active.host : null;
+  return active?.guard === true && active.host != null && flagged(game, active.host, "guardedAlly") ? active.host : null;
 };
 
 function stagingOrder(game: ScenarioState, staging: readonly string[]): readonly string[] {
@@ -230,7 +230,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
     // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2).
     const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : NONE;
-    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" && card.guard === true && card.host != null ? [card.host] : [])]);
+    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" && card.guard === true && card.host != null && flagged(game, card.host, "guardedAlly") ? [card.host] : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
     const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;

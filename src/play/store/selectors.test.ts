@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import { fixtureDefinition } from "../../rules/core/test-fixture.ts";
-import { blankScenario, withSeat, type ScenarioState } from "../../rules/core/state.ts";
+import { blankScenario, updateCard, withSeat, type ScenarioState } from "../../rules/core/state.ts";
+import { addModifier } from "../../rules/core/keywords.ts";
+import { spawn } from "../../rules/core/zones.ts";
 
 import { tableLayout } from "../layout/layout.ts";
 import { seaFixture, seaViews } from "../dream-chaser/sea-fixture.ts";
@@ -195,5 +197,28 @@ describe("victoryPileSelector", () => {
     expect(opensList("victory")).toBe(true);
     expect(opensList("deck")).toBe(false);
     expect(PILE_WORDS.victory).toBe("Victory display");
+  });
+});
+
+describe("a guarded card under the active location", () => {
+  function guarded(flag: boolean) {
+    const { state, staging } = twoHanded();
+    const objective = spawn(state, "foe", { zone: "staging" });
+    const place = spawn(objective.state, "foe", { zone: "activeLocation" });
+    let next = updateCard(place.state, place.id, { guard: true, host: objective.id });
+    next = { ...next, activeLocation: place.id };
+    if (flag) next = addModifier(next, objective.id, place.id, "guardedAlly", 1, "endOfGame");
+    return { game: next, objective: objective.id, staging };
+  }
+
+  it("901402:B:1 draws the guarded ally under the active location, out of the staging area", () => {
+    const { game, objective } = guarded(true);
+    expect(zoneSelector("staging", 0)(game).entries.map((entry) => entry.card.id)).not.toContain(objective);
+  });
+
+  it("keeps a guarded objective whose guard became active in the staging area in an older scenario", () => {
+    const { game, objective } = guarded(false);
+    expect(zoneSelector("staging", 0)(game).entries.map((entry) => entry.card.id)).toContain(objective);
+    expect(zoneSelector("activeLocation", 0)(game).entries.flatMap((entry) => entry.attached.map((card) => card.id))).not.toContain(objective);
   });
 });

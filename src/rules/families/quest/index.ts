@@ -125,6 +125,12 @@ function askNumber(state: ScenarioState, max: number, option: (n: number) => Sim
   return openBranch(state, item, 0, ctx);
 }
 
+// A character that cannot quest stays out of an effect's commitment too ("Attached hero ... cannot commit to a quest", 04023:A:1). Only a game that deals
+// Freezing Cold (04023, The Redhorn Gate) refuses it, so the earlier games' Hobbit Pony, Grappling Hook, Windfola and Late Adventurer replay as before.
+function barredFromCommitting(state: ScenarioState, id: string): boolean {
+  return flagged(state, id, "cannotQuest") && Object.values(state.cards).some((card) => card.code === "04023");
+}
+
 // The card commits to the quest without exhausting (rr.step-3-2 exhausts only for the commitment step itself), and the cards that
 // answer a commitment hear it; a character that cannot quest stays out. With `stat: "attack"` it quests with its Attack until the phase ends.
 function commitToQuest(state: ScenarioState, instruction: Verb<"CommitToQuest">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -132,8 +138,7 @@ function commitToQuest(state: ScenarioState, instruction: Verb<"CommitToQuest">,
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.committed || card.controller == null || (card.zone !== "heroes" && card.zone !== "play")) return state;
   if (!isCharacterType(printedOf(ctx.cards, card.code))) return state;
-  // A character that cannot quest ("Attached hero ... cannot commit to a quest", 04023:A:1) or a table where no character may commit (143078:B:1) is not committed by an effect either.
-  if (flagged(state, id, "cannotQuest") || flagged(state, "table", "cannotCommit")) return state;
+  if (barredFromCommitting(state, id)) return state;
   let next = updateCard(state, id, { committed: true });
   steps.push({ kind: "commit", cardId: id });
   if (instruction.stat === "attack") next = addModifier(next, id, focus.sourceId ?? id, "questsWithAttack", 1, "endOfPhase");
