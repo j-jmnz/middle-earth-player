@@ -7,6 +7,7 @@ import { costPayer } from "../../src/rules/player/usage.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "../../src/rules/core/intents.ts";
 import { hideCommitLimit } from "../../src/rules/families/nightmare/guards.ts";
 import { escapeCommitLimit } from "../../src/rules/families/escape/commit.ts";
+import { commitLimitReason } from "../../src/rules/families/play/commit-limit.ts";
 import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 // Test helper. A fixed policy that answers every window from the legal intents the reducer offers, so a
@@ -24,6 +25,17 @@ export type PolicyOptions = {
   // Uses each Action it can once per round and answers each Response offered to it, when it can pay.
   act?: boolean;
 };
+
+// Out of the Depths (04118:B:2) allows no more allies than heroes among the characters committed: the allies picked last are left out until the limit holds (every other table's set is returned as it is).
+function withinCommitLimit(state: ScenarioState, ids: readonly string[], ctx: ReduceContext): string[] {
+  const kept = [...ids];
+  while (kept.length > 0 && commitLimitReason(state, state.activeSeat, kept, ctx.cards) != null) {
+    const last = kept.findLastIndex((id) => state.cards[id]?.zone !== "heroes");
+    if (last < 0) break;
+    kept.splice(last, 1);
+  }
+  return kept;
+}
 
 // What the policy has done this round, so an Action with no limit is not used over and over.
 type Memory = Set<string>;
@@ -119,11 +131,11 @@ export function nextIntent(
       // Each seat commits once, its own characters: a card committed by another seat does not count (a policy, not a rule).
       const quested = Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat);
       if (state.mode === "questCommit" && !quested && has(intents, "Commit")) {
-        const ids = legalTargets(state, { type: "Commit" }, ctx).filter((id) => !scoutIds.has(id));
+        const ids = withinCommitLimit(state, legalTargets(state, { type: "Commit" }, ctx).filter((id) => !scoutIds.has(id)), ctx);
         if (ids.length > 0) return { type: "Commit", cardIds: ids };
       }
       // A hero that must commit to the quest leaves no Pass open until it has (101163:A:1, the flag `mustCommit`): commit what the engine lists.
-      if (state.mode === "questCommit" && !has(intents, "Pass") && has(intents, "Commit")) return { type: "Commit", cardIds: legalTargets(state, { type: "Commit" }, ctx) };
+      if (state.mode === "questCommit" && !has(intents, "Pass") && has(intents, "Commit")) return { type: "Commit", cardIds: withinCommitLimit(state, legalTargets(state, { type: "Commit" }, ctx), ctx) };
       return { type: "Pass" };
     }
     case "escapeCommit":
