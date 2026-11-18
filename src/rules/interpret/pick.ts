@@ -185,7 +185,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const base = printed.type === "ally" && instance.host != null && instance.zone !== "heroes" ? "attachment" : cardTypeOf(instance, printed);
     // An objective ally with printed combat stats (Mendor, 01135) a player controls is an ally in play (isAllyLike), and still an objective card.
     const type = base === "objective" && instance.zone === "play" && instance.host == null && isAllyLike(printed) ? "ally" : base;
-    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
+    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "location" && printed.objectiveLocation && type === "objective") || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
   }
   if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;

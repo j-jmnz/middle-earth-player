@@ -13,6 +13,8 @@ import { reduce } from "../../engine/reduce.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { guardWith } from "../objectives/guard.ts";
+import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
+import { subjectMatches } from "../../windows/listen.ts";
 import { discardToPoolFromSets, freeTreasures, putObjectiveLocation } from "./mirkwood.ts";
 import { run } from "./index.ts";
 import { codesOf } from "./fixture.ts";
@@ -185,5 +187,25 @@ describe("an Objective-Location is a location (rr.victory)", () => {
     const guard = spawn(spawned.state, "spider", { zone: "staging" });
     const guarded = guardWith(guard.state, guard.id, spawned.id);
     expect(guarded.cards[guard.id]).toMatchObject({ host: spawned.id, guard: true });
+  });
+
+  it("matches a location pick as the active location and in the victory display, and a Forest location trigger subject", () => {
+    const active = spawn(base(), "path", { zone: "activeLocation" });
+    const won = spawn({ ...active.state, activeLocation: active.id }, "path", { zone: "victory" });
+    const hall = spawn(won.state, "hall", { zone: "staging" });
+    const state = hall.state;
+    const pick = { type: "location", control: "any", trait: "Forest" } as const;
+    const at = { seat: 0, sourceId: null };
+    expect(matchesPick(state, active.id, pick, at, ctx())).toBe(true);
+    expect(matchesPick(state, won.id, pick, at, ctx())).toBe(true);
+    expect(matchesPick(state, active.id, { type: "objective", control: "any" }, at, ctx())).toBe(true);
+    expect(pickCandidates(state, { type: "location", control: "any", trait: "Forest", active: true }, 0, [], null, ctx())).toContain(active.id);
+    const listener = state.cards[hall.id]!;
+    expect(subjectMatches(state, active.id, pick, listener, ctx())).toBe(true);
+  });
+
+  it("stays an objective in the staging area, not a location pick's candidate", () => {
+    const staged = spawn(base(), "path", { zone: "staging" });
+    expect(pickCandidates(staged.state, { type: "location", control: "any" }, 0, [], null, ctx())).not.toContain(staged.id);
   });
 });
