@@ -1,11 +1,12 @@
 import type { Obj } from "./kit.ts";
-import { ESCAPE_SAMPLES, GUARDIAN_SAMPLES } from "./verbs.ts";
+import { ESCAPE_SAMPLES, GUARDIAN_SAMPLES, LONG_DARK_SAMPLES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
 export const HERO = { type: "hero", control: "you" };
 export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...ESCAPE_SAMPLES,
+  ...LONG_DARK_SAMPLES,
   ...GUARDIAN_SAMPLES,
   ModifyStat: [
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: HERO, eachResource: true, doesNotStack: true },
@@ -105,7 +106,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   RecordDetermined: [{ verb: "RecordDetermined", code: "10172" }],
   GainsDoomed: [{ verb: "GainsDoomed", amount: 1, pick: HERO }],
   ChangeControl: [{ verb: "ChangeControl", to: "eventSeat" }],
-  EngageNextPlayer: [{ verb: "EngageNextPlayer" }],
+  EngageNextPlayer: [{ verb: "EngageNextPlayer" }, { verb: "EngageNextPlayer", announces: true }],
   DealShadowTo: [{ verb: "DealShadowTo", target: "picked" }],
   AttachSelfToPicked: [{ verb: "AttachSelfToPicked" }, { verb: "AttachSelfToPicked", unlimited: true }],
   RemoveAllQuestProgress: [{ verb: "RemoveAllQuestProgress", of: "stage" }],
@@ -239,7 +240,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "Restrict", what: "defend", belowSourceHitPoints: true },
     { verb: "Restrict", what: "travel", location: "18068", guarding: "Tiny" },
     { verb: "Restrict", what: "commit", unlessControls: HERO },
-    { verb: "Restrict", what: "draw", unlessControls: HERO }, { verb: "Restrict", what: "commit", guardian: true, exceptAlone: true }, { verb: "Restrict", what: "playFromHand", guardian: true },
+    { verb: "Restrict", what: "draw", unlessControls: HERO }, { verb: "Restrict", what: "draw", engagedPlayer: true }, { verb: "Restrict", what: "commit", guardian: true, exceptAlone: true }, { verb: "Restrict", what: "playFromHand", guardian: true },
   ],
   ShuffleEncounterDeck: [{ verb: "ShuffleEncounterDeck" }],
   ActAs: [{ verb: "ActAs", who: "firstPlayer" }, { verb: "ActAs", who: "pickedPlayer" }],
@@ -259,7 +260,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   FirstEnemyGains: [{ verb: "FirstEnemyGains", keyword: "surge", withKeyword: "ambush" }],
   RevealEnemies: [{ verb: "RevealEnemies", ids: ["a"] }],
   DiscardEncounterTop: [{ verb: "DiscardEncounterTop", count: 2 }],
-  DiscardUntilEnemies: [{ verb: "DiscardUntilEnemies", perPlayer: 2, to: "staging", trait: "Warg", less: 1 }, { verb: "DiscardUntilEnemies", perPlayer: 1, to: "reveal" }],
+  DiscardUntilEnemies: [{ verb: "DiscardUntilEnemies", perPlayer: 2, to: "staging", trait: "Warg", less: 1 }, { verb: "DiscardUntilEnemies", perPlayer: 1, to: "reveal" }, { verb: "DiscardUntilEnemies", perPlayer: 1, cardType: "location", less: 1, atLeast: 1, returnOthers: true }],
   RevealEncounter: [{ verb: "RevealEncounter", who: "firstPlayer" }, { verb: "RevealEncounter", times: 2 }],
   AdvanceStage: [{ verb: "AdvanceStage" }],
   WinGame: [{ verb: "WinGame" }],

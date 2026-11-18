@@ -97,8 +97,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "04095:constant:1", cardCode: "04095", lines: ["04095:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
     { id: "04095:constant:2", cardCode: "04095", lines: ["04095:A:1"], timing: "constant", condition: ATTACHED, instructions: [{ verb: "EnemiesGainSurge" }] },
 
-    // 04097 Cave Spider. A:1: the first player draws 1 card, then chooses and discards 4 from his hand. A:2: the player it engages discards 1 card of his choice.
-    { id: "04097:whenRevealed:1", cardCode: "04097", lines: ["04097:A:1"], timing: "whenRevealed", instructions: [{ verb: "Draw", who: "firstPlayer" }, { verb: "ActAs", who: "firstPlayer" }, { verb: "DiscardFromHand", amount: 4 }] },
+    // 04097 Cave Spider. A:1: the first player draws 1 card, then (only if he drew, rr.then) chooses and discards 4 from his hand. A:2: the player it engages discards 1 card of his choice.
+    { id: "04097:whenRevealed:1", cardCode: "04097", lines: ["04097:A:1"], timing: "whenRevealed", instructions: [{ verb: "Draw", who: "firstPlayer" }, { verb: "ActAs", who: "firstPlayer" }, { verb: "DiscardFromHand", amount: 4, when: { kind: "drew" } }] },
     { id: "04097:forced:1", cardCode: "04097", lines: ["04097:A:2"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "DiscardFromHand", amount: 1 }] },
 
     // 04098 Goblin Sneak. A:1: after it engages a player the top card of the encounter deck is discarded; when it is a treachery the Sneak engages the next player (a new engagement: this Forced effect fires again). A:2: the shadow card is added to the staging area, as Goblin Swordsman's.

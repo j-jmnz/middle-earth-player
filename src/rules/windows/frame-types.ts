@@ -131,6 +131,8 @@ export type EffectData = {
   escape?: "failed" | "passed";
   // The last locate test this effect made (LocateTest; the `lastLocateFailed` and `lastLocatePassed` conditions, families/long-dark/conditions.ts).
   locate?: "failed" | "passed";
+  // A Draw this effect ran drew a card (the `drew` condition: the text after "then" resolves only when the draw did, rr.then).
+  drew?: boolean;
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action

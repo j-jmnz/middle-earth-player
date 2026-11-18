@@ -7,7 +7,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41004:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - a copy of the card with code 41029 is set aside, out of play
-    - choose hero (you control) [also {"attachable":"41029"}]
+    - choose hero (you control) that the card with code 41029 can be attached to
     - the set-aside copy of the card with code 41029 is attached to the last picked hero
     - shuffle the encounter deck
 
@@ -308,4 +308,4 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
     - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
 
-(rendered pieces: 179 by template, 12 as JSON)
+(rendered pieces: 180 by template, 11 as JSON)

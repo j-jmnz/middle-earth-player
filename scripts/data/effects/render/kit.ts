@@ -5,8 +5,9 @@ export type Tally = { template: number; json: number };
 // `effects` and `cardName` are the card being rendered and the records around it, read by the barred-effect note (bars.ts).
 // `attacker`: the instructions run when an attack ends (AfterAttack), where "this card" is the attacking enemy whose shadow it is.
 // `engagedNext`: an EngageNextPlayer step ran before this one in the same list, so an attack here is against the player the enemy just engaged.
+// `engagedSeat`: the record answers an enemy's engagement, so its actor is the player the enemy engaged (a hand discard there is that player's).
 // `reads`: set by read-fields.test.ts to collect the keys each finished template claimed (the last entry is the outermost piece), so the test can check each one shows in the English.
-export type Ctx = { tally: Tally; effects?: readonly Obj[]; cardName?: string; attacker?: boolean; engagedNext?: boolean; reads?: (readonly string[])[] };
+export type Ctx = { tally: Tally; effects?: readonly Obj[]; cardName?: string; attacker?: boolean; engagedNext?: boolean; engagedSeat?: boolean; reads?: (readonly string[])[] };
 export type Obj = Readonly<Record<string, unknown>>;
 
 export const newCtx = (extra: { effects?: readonly Obj[]; cardName?: string } = {}): Ctx => ({ tally: { template: 0, json: 0 }, ...extra });

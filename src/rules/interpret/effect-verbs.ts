@@ -20,7 +20,7 @@ import { livingSeats, updateCard } from "../core/state.ts";
 import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { byPlayerCards, lastPicked, seatOf } from "./player-verbs.ts";
-import { topFrame } from "../windows/windows.ts";
+import { patchTop, topFrame } from "../windows/windows.ts";
 import { exploring } from "../families/island/map.ts";
 import { gameReadsOnTrigger } from "../core/game-reads.ts";
 import { playerSource } from "../families/quest/threat.ts";
@@ -54,7 +54,10 @@ export function drawVerb(
   const trait = instruction.perHero;
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
   const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
-  return drawMany(state, target, count, steps, UNATTRIBUTED, ctx, instruction.from === "bottom", playerSource(state, topFrame(state)?.cardId ?? null, ctx));
+  const drawn = drawMany(state, target, count, steps, UNATTRIBUTED, ctx, instruction.from === "bottom", playerSource(state, topFrame(state)?.cardId ?? null, ctx));
+  // The effect notes that a card was drawn, for "Then" text that follows it (the `drew` condition, rr.then).
+  const grew = (drawn.seats[target]?.hand.length ?? 0) > (state.seats[target]?.hand.length ?? 0);
+  return grew && data?.kind === "effect" ? patchTop(drawn, { data: { ...data, drew: true } }) : drawn;
 }
 
 // The cards a player may pick for the verb.

@@ -9,12 +9,15 @@ import { pickCandidates } from "../../interpret/pick.ts";
 import { settle } from "../../engine/machine.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { seatBarred } from "../../interpret/restrictions.ts";
-import { updateCard } from "../../core/state.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { syncConstants } from "../../interpret/constants.ts";
-import { moveCard } from "../../core/zones.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { announceProgress } from "../burden/effects.ts";
 import { placeProgress } from "../../interpret/effect-verbs.ts";
 import { makeActiveIn, placeOnActive } from "../south/locations.ts";
 import { enemy, hero, send, table, treachery, type TableSpec } from "../defense/table.ts";
+import { opening } from "../../../../test/harness/scene-kit.ts";
 import { STOP as PARK } from "../mount-doom/stop.ts";
 import { markProgressHeld } from "./hold.ts";
 import { STOP } from "./locate.ts";
@@ -35,6 +38,8 @@ describe("PASS (04089:A:2 and every other line that prints only it)", () => {
     expect(definePrinted({ code: "x", name: "x", type: "location" }).keywords.pass).toBe(false);
   });
 });
+
+const forced04092 = (): Effect => record("tp:forced:1", "tp", { timing: "forced", trigger: "progressWouldBePlaced", instructions: instructions({ verb: "LocateTest", who: "firstPlayer" }, { verb: "PlaceHeldProgress", when: { kind: "lastLocatePassed" } }, PARK) });
 
 describe("holding progress (04092:A:1): PlaceHeldProgress and progressWouldBePlaced", () => {
   const FAILED: Instruction = { verb: "RaiseThreat", amount: 4, when: { kind: "lastLocateFailed" } };
@@ -97,17 +102,33 @@ describe("holding progress (04092:A:1): PlaceHeldProgress and progressWouldBePla
   });
 });
 
-describe("EndTravel (901605:A:1)", () => {
+describe("04092:A:1 the progress beyond its room goes to the quest in every phase (rr.active-location)", () => {
+  it("sends what a passed test's placement leaves over to the current quest outside the quest phase too", () => {
+    const stage = definePrinted({ code: "qs", name: "qs", type: "quest", questPoints: 10 });
+    const base = table({ cards: [hero("a"), spot("tp"), treachery("h1"), treachery("e0"), passing, stage], effects: [forced04092()], heroes: [{ code: "a" }], staging: [{ code: "tp" }, { code: "qs" }], hand: [{ code: "h1" }], encounter: ["p1", "e0"], threat: 30 });
+    const id = base.ids.tp ?? "";
+    const questId = base.ids.qs ?? "";
+    const ready = markProgressHeld({ ...makeActiveIn(base.state, id), window: null, phase: "Combat", questStage: questId }, base.ctx);
+    const asked = settle(placeOnActive(ready, 5, base.ctx.cards, []).state, base.ctx, []);
+    const done = send(asked, { type: "Choose", optionId: base.ids.h1 ?? "" }, base.ctx);
+    expect(done.cards[id]?.zone).toBe("encounterDiscard");
+    expect(done.cards[questId]?.progress).toBe(2);
+  });
+});
+
+describe("901605:A:1 Eastern Mines: the locate test after it becomes the active location", () => {
   function traveled(failed: boolean) {
-    const mines = record("mines:travel:1", "mines", { timing: "travel", instructions: instructions({ verb: "LocateTest", who: "firstPlayer" }, { verb: "EndTravel", when: { kind: "lastLocateFailed" } }) });
+    const mines = record("mines:travel:1", "mines", { timing: "travel", instructions: instructions({ verb: "Travel", to: "self" }, { verb: "LocateTest", who: "firstPlayer" }, { verb: "ReturnToStaging", target: { kind: "self" }, when: { kind: "lastLocateFailed" } }) });
     const base = table({ cards: [hero("a"), spot("mines"), treachery("h1"), passing], effects: [mines], heroes: [{ code: "a" }], staging: [{ code: "mines" }], hand: [{ code: "h1" }], encounter: ["p1"] });
     const id = base.ids.mines ?? "";
-    const pushed = pushEffectFrame({ ...base.state, window: null, phase: "Travel" }, { frame: "travel", sourceId: id, actor: 0, peril: false, effectId: "mines:travel:1", instructions: [...mines.instructions, { verb: "Travel", to: "self" }], cancel: null, blockCancel: null }, []);
-    const asked = settle(pushed, base.ctx, []);
+    const asked = send({ ...base.state, ...opening("Travel") }, { type: "Travel", locationId: id }, base.ctx);
+    // The test is asked with the location already the active location: it is not in the staging area.
+    expect(asked.cards[id]?.zone).toBe("activeLocation");
+    expect(asked.window).toMatchObject({ kind: "choose", seat: 0 });
     return { state: send(asked, { type: "Choose", optionId: failed ? STOP : (base.ids.h1 ?? "") }, base.ctx), id };
   }
 
-  it("leaves the location in the staging area and takes the travel when the test is failed", () => {
+  it("asks the test with the location already active, and returns it to the staging area with the travel used when the test is failed", () => {
     const { state, id } = traveled(true);
     expect(state.cards[id]?.zone).toBe("staging");
     expect(state.failure ?? null).toBeNull();
@@ -117,6 +138,56 @@ describe("EndTravel (901605:A:1)", () => {
   it("lets the travel go on when the test is passed", () => {
     const { state, id } = traveled(false);
     expect(state.cards[id]?.zone).toBe("activeLocation");
+  });
+});
+
+describe("04097:A:1 the discard after \"then\" resolves only when the draw did (rr.then)", () => {
+  const run = (deck: boolean) => {
+    const base = table({ cards: [hero("a"), treachery("h1"), treachery("h2"), treachery("h3"), treachery("h4"), treachery("h5"), treachery("dk")], effects: [], heroes: [{ code: "a" }], hand: ["h1", "h2", "h3", "h4", "h5"].map((code) => ({ code })) });
+    const stocked = deck ? spawn(base.state, "dk", { zone: "deck", seat: 0 }).state : base.state;
+    const steps: Instruction[] = [{ verb: "Draw", who: "firstPlayer" }, { verb: "ActAs", who: "firstPlayer" }, { verb: "DiscardFromHand", amount: 4, when: { kind: "drew" } }];
+    const pushed = pushEffectFrame({ ...stocked, window: null }, { frame: "whenRevealed", sourceId: null, actor: 0, peril: false, effectId: "spider", instructions: [...steps, PARK], cancel: null, blockCancel: null }, []);
+    return settle(pushed, base.ctx, []);
+  };
+
+  it("discards nothing when no card could be drawn", () => {
+    const state = run(false);
+    expect(state.seats[0]?.hand).toHaveLength(5);
+  });
+
+  it("asks for the 4 discards when a card was drawn", () => {
+    const state = run(true);
+    expect(state.seats[0]?.hand).toHaveLength(6);
+    expect(state.window).toMatchObject({ kind: "choose", seat: 0 });
+  });
+});
+
+describe("901606:A:1 progressPlacedOnSelf hears every placement, the one that explores the card too", () => {
+  const chasm = record("ch:forced:1", "ch", { timing: "forced", trigger: "progressPlacedOnSelf", instructions: instructions({ verb: "RaiseThreat", amount: 1, who: "eachSeat" }) });
+  const heard = (state: ScenarioState) => (state.pendingEvents ?? []).filter((event) => event.trigger === "progressPlacedOnSelf" || event.trigger === "progressPlaced");
+  const run = (amount: number) => {
+    const base = table({ cards: [hero("a"), spot("ch", { questPoints: 3 })], effects: [chasm], heroes: [{ code: "a" }], staging: [{ code: "ch" }], threat: 30 });
+    const steps: EngineStep[] = [];
+    const placed = placeProgress({ ...base.state, window: null }, base.ids.ch ?? "", amount, base.ctx, steps);
+    return { base, placed, steps };
+  };
+
+  it("queues the amount for a card the placement explored, which has left play", () => {
+    const { base, placed, steps } = run(3);
+    expect(placed.cards[base.ids.ch ?? ""]?.zone).toBe("encounterDiscard");
+    expect(heard(announceProgress(placed, steps, base.ctx))).toEqual([{ trigger: "progressPlacedOnSelf", seat: null, cardId: base.ids.ch, amount: 3 }]);
+  });
+
+  it("queues it for a card that stays in play too", () => {
+    const { base, placed, steps } = run(2);
+    expect(heard(announceProgress(placed, steps, base.ctx))).toEqual([{ trigger: "progressPlacedOnSelf", seat: null, cardId: base.ids.ch, amount: 2 }]);
+  });
+
+  it("is raised only in a game that deals a record that hears it", () => {
+    const base = table({ cards: [hero("a"), spot("ch", { questPoints: 3 })], effects: [], heroes: [{ code: "a" }], staging: [{ code: "ch" }] });
+    const steps: EngineStep[] = [];
+    const placed = placeProgress({ ...base.state, window: null }, base.ids.ch ?? "", 3, base.ctx, steps);
+    expect(heard(announceProgress(placed, steps, base.ctx))).toEqual([]);
   });
 });
 
@@ -234,5 +305,25 @@ describe("the conditions hasPass and playerWithoutReady (901602:A:2, 04093:A:1)"
     expect(holds(one, condition, scope, base.ctx)).toBe(true);
     const state = updateCard(one, base.ids.b ?? "", { exhausted: true });
     expect(holds(state, condition, scope, base.ctx)).toBe(true);
+  });
+});
+
+describe("901603:A:2 engagedWithLastPlayer: the attack follows only an engagement of the last player", () => {
+  const condition = { kind: "engagedWithLastPlayer" } as const;
+  const two = { seatCount: 2 as const, cards: [hero("a"), hero("b"), enemy("s")], effects: [] as Effect[], heroes: [{ code: "a" }, { code: "b", seat: 1 }] };
+
+  it("is true for an enemy engaged with the last player, false for one engaged with another player or in the staging area", () => {
+    const withLast = table({ ...two, enemies: [{ code: "s", seat: 1 }] });
+    const scope = (id: string) => ({ actor: 0, sourceId: id, returned: 0 });
+    expect(holds(withLast.state, condition, scope(withLast.ids.s ?? ""), withLast.ctx)).toBe(true);
+    const withFirst = table({ ...two, enemies: [{ code: "s", seat: 0 }] });
+    expect(holds(withFirst.state, condition, scope(withFirst.ids.s ?? ""), withFirst.ctx)).toBe(false);
+    const staged = table({ ...two, staging: [{ code: "s" }] });
+    expect(holds(staged.state, condition, scope(staged.ids.s ?? ""), staged.ctx)).toBe(false);
+  });
+
+  it("is the first player's in a one-player game", () => {
+    const solo = table({ cards: [hero("a"), enemy("s")], effects: [], heroes: [{ code: "a" }], enemies: [{ code: "s", seat: 0 }] });
+    expect(holds(solo.state, condition, { actor: 0, sourceId: solo.ids.s ?? "", returned: 0 }, solo.ctx)).toBe(true);
   });
 });

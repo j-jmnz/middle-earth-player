@@ -1,7 +1,7 @@
 // Rules: dwd.lost-effects, rr.in-play-and-out-of-play, rr.shadow-effects, rr.first-player, faq.simultaneous-effects, rr.forced (data/rules/entries.json); ledger lines 04086:B:2, 04087:B:1, 04099:A:2, 901604:A:2, 901607:A:1.
 //
 // A Lost line's record answers the trigger `lost`, which only a card effect raises (TriggerLost). Every faceup card in play hears it: locations in the staging area and the active location, engaged and staged enemies, attachments, the Nightmare setup card; a shadow card is not in
-// play, so its Lost line is not heard (rr.shadow-effects). `all` raises it for every card at once (the set is fixed as it is raised, each effect resolves in full, the oldest card first as every simultaneous Forced effect does, faq.simultaneous-effects); `chooseOne` and `eachDifferent`
+// play, so its Lost line is not heard (rr.shadow-effects). `all` raises it for every card in the set fixed as it is raised, each effect resolving in full before the next, and the first player orders them (rr.first-player, faq.simultaneous-effects: he picks the next Lost effect one at a time; one effect, or effects that are all the same card, need no choice and go oldest first); `chooseOne` and `eachDifferent`
 // raise it for the cards the players choose, one card at a time.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -33,10 +33,28 @@ function raise(state: ScenarioState, id: string, ctx: ReduceContext, steps: Engi
   return fireForced(state, { trigger: "lost", seat: null, cardId: id }, ctx, steps);
 }
 
+// "Trigger all Lost: effects in play": the set was fixed when the verb first ran (`rest` holds what is left of it). The first player picks the effect that resolves next; it resolves in full and the verb comes back for the rest.
+function lostInOrder(state: ScenarioState, instruction: Verb, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const data = effectData(state);
+  const left = instruction.rest ?? lostCards(state, ctx);
+  if (!data || left.length === 0) return state;
+  // The order matters only between different cards: one effect, or copies of one card, resolve oldest first.
+  const alike = left.every((id) => state.cards[id]?.code === state.cards[left[0] ?? ""]?.code);
+  const chosen = focus.chosen != null && left.includes(focus.chosen) ? focus.chosen : alike ? left[0] : undefined;
+  if (chosen == null) return askTarget(state, { instruction: { ...instruction, rest: left }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, left);
+  const rest = left.filter((id) => id !== chosen);
+  let next = state;
+  if (rest.length > 0) {
+    const again: QueueItem = { instruction: { ...instruction, rest }, seat: focus.seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) };
+    next = patchTop(next, { data: { ...data, queue: [again, ...data.queue] } });
+  }
+  return raise(next, chosen, ctx, steps);
+}
+
 /** TriggerLost: see src/catalog/families/long-dark.ts. */
 export function triggerLost(state: ScenarioState, instruction: Verb, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (instruction.mode === "all") return fireForced(state, { trigger: "lost", seat: null }, ctx, steps);
   const data = effectData(state);
+  if (instruction.mode === "all") return data ? lostInOrder(state, instruction, focus, ctx, steps) : fireForced(state, { trigger: "lost", seat: null }, ctx, steps);
   if (!data) return state;
   const eachDifferent = instruction.mode === "eachDifferent";
   const taken = instruction.taken ?? [];
