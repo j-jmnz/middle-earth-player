@@ -267,7 +267,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
                 { verb: "RemoveAllProgress", target: "questStage" },
                 { verb: "RemoveAllProgress", pick: { type: "card", control: "any", cardType: "player-side-quest" } },
                 { verb: "RemoveAllProgress", pick: { type: "card", control: "any", cardType: "encounter-side-quest" } },
-                { verb: "RemoveAllProgress", pick: { type: "treachery", control: "any", names: ["Blinding Blizzard"] } },
+                { verb: "RemoveAllProgress", pick: { type: "card", control: "any", names: ["Blinding Blizzard"] } },
               ],
             },
             { id: "reveal", instructions: [{ verb: "RevealEncounter", who: "firstPlayer", times: 2 }] },
