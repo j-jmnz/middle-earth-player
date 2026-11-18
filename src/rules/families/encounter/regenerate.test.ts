@@ -16,6 +16,8 @@ function refresh(damage: number, zone: "staging" | "engaged") {
   let state = updateCard(updateCard(built.state, built.ids.monster!, { damage }), built.ids.plain!, { damage });
   const steps: EngineStep[] = [];
   state = doRefresh(state, built.ctx, steps);
+  // The heal is a number the log names the rule for (dwd.regenerate).
+  for (const step of steps) if (step.kind === "damage") expect(step.cause).toEqual({ rule: "dwd.regenerate" });
   return { monster: state.cards[built.ids.monster!]!.damage, plain: state.cards[built.ids.plain!]!.damage };
 }
 
