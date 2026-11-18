@@ -2,6 +2,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../interpret/interpret.ts";
+import { effectsOf } from "../windows/listen.ts";
 import type { Sphere } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 
@@ -10,11 +11,20 @@ import type { ScenarioState } from "../core/state.ts";
 export type DeckPlay = { heroId: string; effect: Effect; icons: readonly Sphere[] };
 
 function record(ctx: ReduceContext, code: string): { effect: Effect; icons: readonly Sphere[] } | undefined {
-  for (const effect of ctx.effects) {
-    if (effect.cardCode !== code || effect.timing !== "constant") continue;
+  for (const effect of effectsOf(ctx, code)) {
+    if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) if (instruction.verb === "PlayFromDeckTop") return { effect, icons: instruction.icons };
   }
   return undefined;
+}
+
+// Whether the seat plays with the top card of its deck faceup: one of its heroes in play carries PlayFromDeckTop ("Play with
+// the top card of your deck faceup", 142002:A:1), whether or not the card can be played now.
+export function deckTopFaceUp(state: ScenarioState, seat: number, ctx: ReduceContext): boolean {
+  return (state.seats[seat]?.heroes ?? []).some((heroId) => {
+    const hero = state.cards[heroId];
+    return hero != null && record(ctx, hero.code) !== undefined;
+  });
 }
 
 // The hero that lets the seat play its top card now: in play, with the permission unspent this phase.

@@ -37,6 +37,8 @@ export type ReaderRowsDeps = {
   playable: ReadonlySet<string>;
   // How many cards the banner's beat lays in the Discover look strip (0 when none).
   discover: number;
+  // Whether the seat shown plays with the top card of its deck faceup (Gandalf, 142002:A:1): the deck then names that card.
+  deckFaceUp?: boolean;
 };
 
 // The sea family's lines the reader table prints above the zones: the Heading, the seat's ships with their damage, and the Sailing test's look.
@@ -58,7 +60,9 @@ function pileItem(game: ScenarioState, view: PileView, deps: ReaderRowsDeps): Re
   const id = `pile:${view.pile}`;
   const speech = pileSpeech({ zone: view.pile, count: view.ids.length, points: view.points }, deps.playable.has(id), view.pile === "grottoDeck" && view.top ? deps.nameOf(view.top.code) : null);
   // The grotto deck's label already names its top card.
-  const top = view.top && view.pile !== "grottoDeck" ? `, ${nameOfCard(game.cards, view.top.id, deps.nameOf)} on top` : "";
+  const faceUp = view.pile === "deck" && deps.deckFaceUp ? view.ids[0] : undefined;
+  const topId = faceUp ?? (view.top && view.pile !== "grottoDeck" ? view.top.id : undefined);
+  const top = topId ? `, ${nameOfCard(game.cards, topId, deps.nameOf)} on top` : "";
   const held = (view.attached ?? []).length > 0 ? `, ${(view.attached ?? []).map((card) => deps.nameOf(card.code)).join(", ")} attached` : "";
   return { kind: "pile", id, pile: view.pile, label: `${speech.label}${top}${held}`, hint: speech.hint, opens: speech.hint != null };
 }

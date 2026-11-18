@@ -96,8 +96,9 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const deckTopId = useStore(store, (state) => state.game.seats[seat]?.deck[0] ?? null);
   const deckTopCard = useStore(store, (state) => (deckTopId ? (state.game.cards[deckTopId] ?? null) : null));
 
-  // The top of the deck is a card when the rules let it be played from there (Gandalf, 142002).
-  const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
+  // The top of the deck lies faceup, a card, while a hero of the seat says to play with it faceup (Gandalf, 142002:A:1), and whenever the rules let it be played from there.
+  const deckFaceUp = useStore(store, (state) => state.faceUpDecks.includes(seat));
+  const deckTop = deckTopId && (deckFaceUp || draggable.includes(deckTopId)) ? deckTopCard : null;
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   // What a row's fold must keep on the table: the cards the open moment asks about, the picked ones, a card being dragged and the banner's beat (row-fold.ts).
   // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
