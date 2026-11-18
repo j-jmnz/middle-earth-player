@@ -182,7 +182,7 @@ Read the sections your task touches.
   - 374–385 Banner (~750) ← 5
   - 386–405 Screen reader (~3.0K) ← 19
   - 406–409 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~33.3K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~33.4K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
   - 35–45 Performance (~720) ← 4
@@ -198,32 +198,32 @@ Read the sections your task touches.
   - 236–250 Icons (~480) ← 7
   - 251–269 Card art (~750) ← 2
   - 270–285 Tablets (~630) ← 15
-  - 286–488 Screens (~19.4K)
+  - 286–490 Screens (~19.5K)
     - 290–295 Splash (~210) ← 3
     - 296–299 App icon (~80)
     - 300–315 Campaigns (campaign list) (~1.5K) ← 6
-    - 316–329 Scenarios (~1000) ← 1
-    - 330–341 History (~1.4K) ← 4
-    - 342–359 Briefing (~2.0K) ← 6
-    - 360–363 Campaign setup (~1.0K) ← 3
-    - 364–369 Campaign path (~890) ← 4
-    - 370–373 Campaign log (~840) ← 1
-    - 374–377 Spend XP (~610) ← 1
-    - 378–381 Table — landscape (~30) ← 1
-    - 382–385 Table opens stale (~750) ← 4
-    - 386–399 Resolution and standalone outcome (~1.9K) ← 2
-    - 400–409 Decks (~920) ← 2
-    - 410–419 Deck builder (deck editor) (~1.1K) ← 3
-    - 420–429 Card pool (the Cards tab) (~1.1K) ← 3
-    - 430–435 Card (~490) ← 2
-    - 436–447 Collection (~530) ← 3
-    - 448–451 Deck import (~120)
-    - 452–466 Settings (~1.6K) ← 15
-    - 467–472 Rules (~470) ← 1
-    - 473–476 Rule (~220) ← 1
-    - 477–484 Booklet (~540) ← 2
-    - 485–488 Database (~110)
-  - 489–508 States (~620)
+    - 316–331 Scenarios (~1.1K) ← 1
+    - 332–343 History (~1.4K) ← 4
+    - 344–361 Briefing (~2.0K) ← 6
+    - 362–365 Campaign setup (~1.0K) ← 3
+    - 366–371 Campaign path (~890) ← 4
+    - 372–375 Campaign log (~840) ← 1
+    - 376–379 Spend XP (~610) ← 1
+    - 380–383 Table — landscape (~30) ← 1
+    - 384–387 Table opens stale (~750) ← 4
+    - 388–401 Resolution and standalone outcome (~1.9K) ← 2
+    - 402–411 Decks (~920) ← 2
+    - 412–421 Deck builder (deck editor) (~1.1K) ← 3
+    - 422–431 Card pool (the Cards tab) (~1.1K) ← 3
+    - 432–437 Card (~490) ← 2
+    - 438–449 Collection (~530) ← 3
+    - 450–453 Deck import (~120)
+    - 454–468 Settings (~1.6K) ← 15
+    - 469–474 Rules (~470) ← 1
+    - 475–478 Rule (~220) ← 1
+    - 479–486 Booklet (~540) ← 2
+    - 487–490 Database (~110)
+  - 491–510 States (~620)
 - `docs/development.md` — Development (~2.8K tok)
 - `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1
