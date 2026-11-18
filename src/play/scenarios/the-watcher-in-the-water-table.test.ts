@@ -7,7 +7,7 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { finish, idOf, revealFromTop, send, start, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
-import { tableLayout, type CardSlot, type LayoutViews, type PileViews } from "../layout/layout.ts";
+import { tableLayout, type LayoutViews, type PileViews } from "../layout/layout.ts";
 import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, zoneSelector } from "../store/selectors.ts";
 import { zoneFactsOf } from "../store/zone-facts.ts";
 
