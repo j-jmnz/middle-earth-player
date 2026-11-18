@@ -151,7 +151,8 @@ export function BriefingScreen({
   // The words over the scene (ScenarioBanner); null while the scenario is loading or missing.
   banner: ReactNode;
   children: ReactNode;
-  // The reference matter (the scenario's cards, Before the deal, the encounter sets): after the content in compact and medium, under the scene when expanded.
+  // The reference matter (the scenario's cards, Before the deal, the encounter sets): after the content in compact and medium, under the scene when expanded
+  // (the campaign setup's cards stay after the content there too).
   aside?: ReactNode;
   bar?: ReactNode;
   // The scenario's campaign card and quest cards: rows at the head of the aside open them large (ScenarioCards).
@@ -163,10 +164,18 @@ export function BriefingScreen({
   const insets = useSafeAreaInsets();
   const top = useTopInset();
   const preview = useListPreview();
+  const setupCards = campaignSetup ? <CampaignSetupCards campaign={campaignSetup} onOpen={preview.openSides} /> : null;
   const reference = (
     <>
       {campaignCard || stages ? <ScenarioCards stages={stages ?? []} onOpen={preview.openSides} {...(campaignCard ? { campaignCard } : {})} /> : null}
-      {campaignSetup ? <CampaignSetupCards campaign={campaignSetup} onOpen={preview.openSides} /> : null}
+      {setupCards}
+      {aside}
+    </>
+  );
+  // Expanded, the campaign setup's cards follow the choices in the right pane, under the players (docs/design-system.md, Campaign setup).
+  const sceneReference = (
+    <>
+      {campaignCard || stages ? <ScenarioCards stages={stages ?? []} onOpen={preview.openSides} {...(campaignCard ? { campaignCard } : {})} /> : null}
       {aside}
     </>
   );
@@ -213,7 +222,7 @@ export function BriefingScreen({
             <>
               <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingBottom: 24 * s }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEventThrottle={64} onScroll={onScroll}>
                 {scene}
-                {aside || campaignCard || stages || campaignSetup ? <View style={{ paddingLeft: side.paddingLeft, paddingRight: 24 * s }}>{reference}</View> : null}
+                {aside || campaignCard || stages ? <View style={{ paddingLeft: side.paddingLeft, paddingRight: 24 * s }}>{sceneReference}</View> : null}
               </ScrollView>
               <FloatingBarShade shown={past} top={top} />
               {navBar}
@@ -222,7 +231,10 @@ export function BriefingScreen({
           end={
             <>
               <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingTop: top + 8 * s, paddingBottom: 24 * s, paddingRight: trailing }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                <Column>{children}</Column>
+                <Column>
+                  {children}
+                  {setupCards}
+                </Column>
               </ScrollView>
               {bar ? (
                 <View style={{ paddingRight: trailing }}>
