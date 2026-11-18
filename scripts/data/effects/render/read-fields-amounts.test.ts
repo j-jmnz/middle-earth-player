@@ -26,6 +26,7 @@ describe("effects render read fields, amounts", () => {
     { threat: "tens" },
     { hand: true },
     { dealt: true },
+    { attackDamage: true },
     { resourcesOn: PICK, max: true },
     { damageOn: PICK },
   ];

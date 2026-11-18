@@ -30,5 +30,8 @@ export const ANGMAR_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Mad
     };
   },
   DealSourceAsShadow: () => ({ text: "this card, out of play, is dealt facedown as a shadow card to the card the effect picked last, an enemy in play (with no progress or damage on it; nothing when no enemy is picked)", read: [] }),
-  AttachEnemyToPicked: () => ({ text: "this enemy, out of play, attaches to the picked card as an attachment: it has no enemy text there and returns to the staging area as an enemy when that card leaves play", read: [] }),
+  AttachEnemyToPicked: (i) => ({
+    text: `${i.returns === "discard" ? "this enemy" : "this enemy, out of play,"} attaches to ${i.to === "other" ? "the event's other card (the defending character, when there was one and it is still in play)" : "the picked card"} as an attachment: it has no enemy text there and ${i.returns === "discard" ? "is discarded to the encounter discard pile with it when that card leaves play (it is no enemy while it lies there)" : "returns to the staging area as an enemy when that card leaves play"}`,
+    read: ["to", "returns"],
+  }),
 };

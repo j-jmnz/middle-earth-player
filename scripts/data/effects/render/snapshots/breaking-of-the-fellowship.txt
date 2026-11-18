@@ -93,7 +93,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
   142064:response:1: Response after the players quest successfully (event happened to the controller)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls)
-    - for each hero (any player controls) [also {"controlledBy":"picked"}]:
+    - for each hero (any player controls) controlled by the player picked last:
       - ready the picked card
 
 ## 142065 The Seat of Amon Hen
@@ -429,8 +429,8 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
   142090:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
-  142090:forced:1: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])
+  142090:forced:1: Forced on the event characterDestroyed (heard about character (any player controls) controlled by the player who controls this card's host)
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 201 by template, 45 as JSON)
+(rendered pieces: 203 by template, 43 as JSON)

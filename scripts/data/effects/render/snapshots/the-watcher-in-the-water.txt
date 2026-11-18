@@ -1,0 +1,183 @@
+Scenario piles that place cards with no record (quest: 04063 To the West-door; quest: 04064 The Seething Lake; setAside: 04065 Doors of Durin; setAside: 04072 The Watcher)
+
+## 040076 Wrapped!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+040076:A:1 (front): When Revealed: The first player attaches Wrapped! to a hero he controls. (Counts as a Tentacle attachment with the text: "Limit 1 per hero. Attached hero cannot exhaust or ready. At the end of the round, discard attached hero from play. Combat Action: Exhaust a hero you control without a Tentacle attachment to discard Wrapped!.")
+  040076:whenRevealed:1: When revealed
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
+  040076:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Tentacle attachment while it is attached
+    - this attachment may be attached to a hero (limit 1 of it per host)
+    - its host: stat cannotExhaust 1, while this card is in play
+    - its host: stat cannotReady 1, while this card is in play
+  040076:triggered:1: Triggered (mandatory, not printed as Forced) at the end of the round
+    only if this card is attached to a card
+    - discard its host
+  040076:action:1: Action (any player may use it)
+    only if all of: (it is the Combat phase) and (there is a ready hero (you control) that can exhaust (not held by a rule that stops it exhausting), with no Tentacle card attached to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control) that can exhaust (not held by a rule that stops it exhausting), with no Tentacle card attached
+    - exhaust the picked card
+    - discard this card
+
+## 04063 To the West-door
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04063:A:1 (front): Setup: Remove The Watcher and Doors of Durin from the encounter deck and set them aside, out of play.
+  04063:setup:1: Setup
+    - shuffle the encounter deck
+
+04063:B:1 (back): When Revealed: Reveal cards from the encounter deck and add them to the staging area until there is at least X Threat in the staging area. X is twice the number of players in the game.
+  04063:whenRevealed:1: When revealed
+    - the first player reveals cards from the encounter deck one after the other, each resolved in full, until the staging area holds at least 2 times the number of players Threat or the deck and its discard pile are empty (cards already in the staging area count; a treachery adds none)
+
+## 04064 The Seething Lake
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04064:B:1 (back): When Revealed: Add The Watcher to the staging area. Doors of Durin becomes the active location, moving any previous active location to the staging area. Shuffle all Tentacle cards in the encounter discard pile back into the encounter deck.
+  04064:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 04072 joins the staging area (it is not revealed)
+    - the set-aside card with code 04065 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
+    - shuffle the Tentacle cards of the encounter discard pile into the encounter deck
+
+04064:B:2 (back): If the players have at least 3 victory points and defeat this stage, they have won the game.
+  04064:constant:1: Constant
+    only if the Victory points of the cards in the victory display added up (read live) is less than 3
+    - the players cannot defeat this stage while this holds
+  04064:constant:2: Constant
+    (no instructions)
+
+## 04065 Doors of Durin
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+04065:A:1 (front): Progress tokens that would be placed on Doors of Durin are instead placed on the current quest card.
+  04065:constant:1: Constant
+    - this card: stat progressToQuest 1, while this card is in play
+
+04065:A:2 (front): Action: Each player may discard any number of cards from his hand. Then, discard the top card of the encounter deck. If the first letter of the encounter card's title matches that of one of the discarded player cards, add Doors of Durin to your victory display. (Limit once per round.)
+  04065:action:1: Action (limit once per round; any player may use it)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - for each card (you control) in hand (up to any number chosen):
+        - discard the picked card
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the title of the encounter card this effect just discarded starts with the same letter (case and accents aside) as the title of a player card this effect had discarded from a hand (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
+
+## 04066 Stair Falls
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04066:A:1 (front): Travel: The first player must exhaust 2 characters to travel here.
+  04066:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control) chosen by the first player
+    - exhaust the picked card
+    - choose ready character (you control) chosen by the first player
+    - exhaust the picked card
+
+04066:A:2 (shadow): Shadow: Remove 1 progress token from the current quest.
+  04066:shadow:1: Shadow
+    - remove 1 progress from the current quest card (all of it when it holds less)
+
+## 04067 Perilous Swamp
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04067:A:1 (front): No more than 1 progress token can be placed on Perilous Swamp each round.
+  04067:constant:1: Constant
+    - this card: stat progressCap 1, while this card is in play
+
+04067:A:2 (shadow): Shadow: Remove 1 progress token from the current quest.
+  04067:shadow:1: Shadow
+    - remove 1 progress from the current quest card (all of it when it holds less)
+
+## 04068 Makeshift Passage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04068:A:1 (front): Forced: After you travel to Makeshift Passage, place 2 progress tokens on the current quest card, bypassing any active location.
+  04068:forced:1: Forced after the players travel (heard about this card)
+    - 2 progress is placed on the main quest stage (a quest effect: a full stage advances)
+
+## 04069 Stagnant Creek
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04069:A:1 (front): When Revealed: Discard the top card of the encounter deck. If the discarded card is a Tentacle enemy, add that card to the staging area and raise each player's threat by 5.
+  04069:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a Tentacle enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+    - then, if the picked card is a Tentacle enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 5 (each player)
+
+## 04070 Ill Purpose
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04070:A:1 (front): When Revealed: All enemies in the staging area engage the player with the highest threat. Then, each player raises his threat by the total Threat of all cards in the staging area.
+  04070:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the player with the highest threat becomes the picked player (the first player chooses among a tie)
+    - the effect goes on with the picked player as the acting player
+    - the acting player engages every enemy in the staging area
+    - raise threat by the total Threat of all cards in the staging area now (each player)
+
+04070:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if it is a Tentacle.)
+  04070:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Tentacle enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Tentacle enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 04072 The Watcher
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+04072:A:1: Regenerate 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+04072:A:2 (front): While there is another Tentacle enemy in play, The Watcher cannot be optionally engaged.
+  04072:constant:1: Constant
+    only if there is Tentacle enemy in play (in the staging area or engaged, other than this card)
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+04072:A:3 (front): If The Watcher is in the staging area at the end of the combat phase, each player must deal 3 damage to 1 character he controls.
+  04072:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (this card is in the staging area)
+    - each player assigns 3 damage among the character (you control), one at a time
+
+## 04073 Grasping Tentacle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04073:A:1 (front): Forced: When Grasping Tentacle is attacked, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, attach this card to an attacking character as a Tentacle attachment with the text: "Attached character's Attack and Defense are reduced to 0."
+  04073:forced:1: Forced on the event enemyAttacked (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (any player controls) chosen by the first player, that took part in the attack this effect answers
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attaches to the picked card as an attachment: it has no enemy text there and is discarded to the encounter discard pile with it when that card leaves play (it is no enemy while it lies there)
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): the player attack in progress deals no damage; its attackers stay exhausted
+  04073:constant:1: Constant
+    - this card counts as a Tentacle attachment while it is attached
+  04073:constant:2: Constant
+    only if all of: (this card is attached to a card) and (its host is a character (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card this one is attached to: stat attack is set to 0, overriding every other modifier of it
+    - the card this one is attached to: stat defense is set to 0, overriding every other modifier of it
+
+## 04074 Thrashing Tentacle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04074:A:1 (front): Forced: When Thrashing Tentacle is attacked, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, deal the damage from the attack to 1 character an attacking player controls (ignoring defense).
+  04074:forced:1: Forced on the event enemyAttacked (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (any player controls) chosen by the first player, controlled by a player whose character took part in the attack this effect answers
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): deal the damage the player attack this effect answers would deal this enemy: the attackers' total Attack less this enemy's Defense (0 at the least) damage to the picked card
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): the player attack in progress deals no damage; its attackers stay exhausted
+
+## 04075 Striking Tentacle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04075:A:1 (front): Forced: When Striking Tentacle attacks, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, this attack is considered undefended.
+  04075:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this attack is considered undefended
+
+(rendered pieces: 120 by template, 0 as JSON)

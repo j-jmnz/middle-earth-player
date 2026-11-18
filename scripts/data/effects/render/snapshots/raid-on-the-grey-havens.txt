@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11037:B:3 (back): If Captain Sahír is in the victory display and each location in play has no damage, the players win the game.
   11037:constant:2: Constant
-    only if all of: ([json condition {"kind":"inVictory","code":"11076","is":true}]) and (the number of damaged location (any player controls) is at most 0)
+    only if all of: (the card with code 11076 is in the victory display) and (the number of damaged location (any player controls) is at most 0)
     - the players win the game
 
 ## 11038 The Havens Burn
@@ -421,7 +421,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
   11182:resolution:1: Resolution
-    - if [json condition {"kind":"inVictory","code":"11188","is":true}]: the first player takes "11189" or "11190" attached to a hero [also {"anyHero":true}]
+    - if the card with code 11188 is in the victory display: the first player takes "11189" or "11190" attached to a hero [also {"anyHero":true}]
 
 11182:B:2 (back): Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool.
   11182:resolution:2: Resolution
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 298 by template, 38 as JSON)
+(rendered pieces: 300 by template, 36 as JSON)

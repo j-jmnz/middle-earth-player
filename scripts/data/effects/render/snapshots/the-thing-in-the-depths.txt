@@ -117,7 +117,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12039:B:3 (back): Progress cannot be placed on this stage unless Helm of the Stormcaller is in the victory display.
   12039:constant:2: Constant
-    - if [json condition {"kind":"inVictory","code":"12042","is":false}]: the table: stat noQuestProgress 1, while this card is in play
+    - if the card with code 12042 is not in the victory display: the table: stat noQuestProgress 1, while this card is in play
 
 ## 12040 Change of Plans
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 171 by template, 31 as JSON)
+(rendered pieces: 172 by template, 30 as JSON)

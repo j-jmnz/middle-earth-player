@@ -17,7 +17,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141028:B:1 (back): The players cannot advance unless The Last Bridge is in the victory display.
   141028:constant:1: Constant
-    only if [json condition {"kind":"inVictory","code":"141058","is":false}]
+    only if the card with code 141058 is not in the victory display
     - the players cannot defeat this stage while this holds
 
 141028:B:2 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
@@ -304,4 +304,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141084:shadow:1: Shadow
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 128 by template, 26 as JSON)
+(rendered pieces: 129 by template, 25 as JSON)

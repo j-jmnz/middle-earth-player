@@ -31,7 +31,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
   142021:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the set-aside card with code 142029 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
-    - [json RevealUntilThreat {"verb":"RevealUntilThreat","threat":{"players":true,"times":2}}]
+    - the first player reveals cards from the encounter deck one after the other, each resolved in full, until the staging area holds at least 2 times the number of players Threat or the deck and its discard pile are empty (cards already in the staging area count; a treachery adds none)
 
 142021:B:1 (back): During the travel phase, the players must travel to a location, if able.
   142021:constant:1: Constant
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - raise threat by 1 (each player)
     - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
 
-(rendered pieces: 183 by template, 13 as JSON)
+(rendered pieces: 184 by template, 12 as JSON)

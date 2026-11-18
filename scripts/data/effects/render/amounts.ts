@@ -53,6 +53,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.stage === true) return { text: "the stage number of the quest", read: ["stage"] };
   if (typeof expr.threat === "string") return { text: expr.threat === "tens" ? "the tens digit of your threat" : "your threat", read: ["threat"] };
   if (expr.hand === true) return { text: "the cards in your hand", read: ["hand"] };
+  if (expr.attackDamage === true) return { text: "the damage the player attack this effect answers would deal this enemy: the attackers' total Attack less this enemy's Defense (0 at the least)", read: ["attackDamage"] };
   if (expr.dealt === true) return { text: "the damage just dealt", read: ["dealt"] };
   if (isObj(expr.resourcesOn)) return { text: `the resource tokens on ${pick(expr.resourcesOn, ctx)}${expr.max === true ? " (the most on any one)" : ""}`, read: ["resourcesOn", "max"] };
   if (isObj(expr.damageOn)) return { text: `the damage tokens on ${pick(expr.damageOn, ctx)}`, read: ["damageOn"] };

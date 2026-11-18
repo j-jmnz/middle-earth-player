@@ -77,8 +77,11 @@ export const renderPick: PickRenderer = (value, ctx) => {
   const attached = isObj(pick.hasAttachment) && Array.isArray(pick.hasAttachment.names) && Object.keys(pick.hasAttachment).every((key) => key === "names" || key === "none") ? pick.hasAttachment : null;
   const attachedNone = isObj(pick.hasAttachment) && pick.hasAttachment.none === true && Object.keys(pick.hasAttachment).length === 1;
   const attachedTrait = isObj(pick.hasAttachment) && typeof pick.hasAttachment.trait === "string" && Object.keys(pick.hasAttachment).length === 1 ? pick.hasAttachment.trait : null;
-  note(["hasAttachment"], attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : attachedTrait ? `with a ${attachedTrait} card attached` : attachedNone ? "with no attachment of any kind" : null);
+  const attachedTraitNone = isObj(pick.hasAttachment) && typeof pick.hasAttachment.trait === "string" && pick.hasAttachment.none === true && Object.keys(pick.hasAttachment).length === 2 ? pick.hasAttachment.trait : null;
+  note(["hasAttachment"], attachedTraitNone ? `with no ${attachedTraitNone} card attached` : attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : attachedTrait ? `with a ${attachedTrait} card attached` : attachedNone ? "with no attachment of any kind" : null);
   note(["active"], pick.active === true ? "that is the active location" : null);
+  note(["participating"], pick.participating === true ? "that took part in the attack this effect answers" : null);
+  note(["controlledBy"], pick.controlledBy === "actor" ? "controlled by the player this effect runs for" : pick.controlledBy === "attackers" ? "controlled by a player whose character took part in the attack this effect answers" : pick.controlledBy === "host" ? "controlled by the player who controls this card's host" : pick.controlledBy === "picked" ? "controlled by the player picked last" : null);
   note(["hasGuard"], pick.hasGuard === true ? "that has an encounter card attached as its guard" : pick.hasGuard === false ? "that has no encounter card attached (free of encounters)" : null);
   note(["isGuard"], pick.isGuard === true ? "that is attached to an objective as its guard" : pick.isGuard === false ? "that is not guarding an objective" : null);
   note(["questedThisRound"], pick.questedThisRound === true ? "that was committed to this round's quest (the quest's resolution already cleared the commitment)" : null);

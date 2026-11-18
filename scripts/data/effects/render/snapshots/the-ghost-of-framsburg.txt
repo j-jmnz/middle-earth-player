@@ -359,12 +359,12 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19111:B:2 (back): While The Cursed Tomb is in the victory display, Fram's Shade gains victory 6.
   19111:constant:2: Constant
-    only if [json condition {"kind":"inVictory","code":"19097","is":true}]
+    only if the card with code 19097 is in the victory display
     - each card (any player controls) named "Fram's Shade", (enemies engaged with a player included): stat gainsVictory 6, while this card is in play
 
 19111:B:3 (back): This stage cannot be defeated unless Fram's Shade is in the victory display. When the players defeat this stage, they win the game.
   19111:constant:3: Constant
-    only if [json condition {"kind":"inVictory","code":"19098","is":false}]
+    only if the card with code 19098 is not in the victory display
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 191 by template, 41 as JSON)
+(rendered pieces: 193 by template, 39 as JSON)

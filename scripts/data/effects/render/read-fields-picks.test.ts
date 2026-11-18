@@ -76,6 +76,8 @@ describe("effects render read fields, picks", () => {
     guardsTrait: "Clue",
     soleMostDamaged: true,
     attached: true,
+    participating: true,
+    controlledBy: "attackers",
   };
   const SAMPLES: readonly Obj[] = [
     BIG,
@@ -86,6 +88,10 @@ describe("effects render read fields, picks", () => {
     { type: "hero", control: "you", committed: false, progress: false, damaged: false },
     { type: "hero", control: "you", hasAttachment: { trait: "Clue" }, hasGuard: false, isGuard: false },
     { type: "hero", control: "you", hasAttachment: { none: true }, attached: false },
+    { type: "hero", control: "you", hasAttachment: { trait: "Tentacle", none: true } },
+    { type: "character", control: "any", controlledBy: "actor" },
+    { type: "character", control: "any", controlledBy: "host" },
+    { type: "character", control: "any", controlledBy: "picked" },
   ];
   const render: Render = (value, ctx) => renderPick(value, ctx);
 
