@@ -850,11 +850,11 @@
         "sha256": "5e969b0cb674cfdcb04188ec1299a2f810eb103fef88853112320d2557546842"
       },
       "lines": [
-        "Setup: Make Tarlang's Next the active location. Set Derufin, The Lord of the Dead, The Stone of Erech, and the 3 Night objectives aside, out of play. Shuffle the encounter deck. Place Eventide into play, next to the current quest."
+        "Setup: Make Tarlang's Neck the active location. Set Derufin, The Lord of the Dead, The Stone of Erech, and the 3 Night objectives aside, out of play. Shuffle the encounter deck. Place Eventide into play, next to the current quest."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -867,11 +867,11 @@
       },
       "lines": [
         "When Revealed: Reveal 1 encounter card per player, adding them to the staging area.",
-        "Players cannot defeat this stage while Tarlang's Next is in play."
+        "Players cannot defeat this stage while Tarlang's Neck is in play."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -887,7 +887,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -903,7 +903,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -920,7 +920,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -938,7 +938,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -957,7 +957,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -970,11 +970,11 @@
       },
       "lines": [
         "Spectral. Cannot have attachments.",
-        "While you are engaged with The Lord of the Dead, treat all printed text boxes on characters you control as if they were blank (except Traits.)"
+        "While you are engaged with The Lord of the Dead, treat all printed text boxes on characters you control as if they were blank (except for Traits.)"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -992,7 +992,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1004,11 +1004,11 @@
         "sha256": "d1a5fad90565042da81e802b1892ed8bed8279b907c97f5170d8032b8945d9a9"
       },
       "lines": [
-        "While Tarlang's Next is the active location, it gains, 'Forced: At the beginning of the encounter phase, the players must either immediately end the encounter phase, or the first player must engaged all enemies in the staging area.'"
+        "While Tarlang's Neck is the active location, it gains, 'Forced: At the beginning of the encounter phase, the players must either immediately end the encounter phase, or the first player must engage all enemies in the staging area.'"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1025,7 +1025,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1042,7 +1042,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1058,7 +1058,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1070,11 +1070,11 @@
         "sha256": "14da7d8f3265bb9ea0a7e1b337033e59f9ac2f60aaf9d311134443dac55eb247"
       },
       "lines": [
-        "Midnight. Action: Claim this objective and attach it to a hero you control. Counts as an Artifact attachment with the text: 'When attached hero attacks and Oathbreaker, that enemy loses the Spectral keyword until the end of the phase.'"
+        "Midnight. Action: Claim this objective and attach it to a hero you control. Counts as an Artifact attachment with the text: 'When attached hero attacks an Oathbreaker, that enemy loses the Spectral keyword until the end of the phase.'"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1092,7 +1092,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1109,7 +1109,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1123,11 +1123,11 @@
       "lines": [
         "Spectral.",
         "Dusk. Whisperer gets +1 Threat.",
-        "Midnight. Whisperer gets +2 Threat and gains Doomed 2."
+        "Midnight. Whisperer gets +2 Threat and gains doomed 2."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1145,7 +1145,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1158,11 +1158,11 @@
       },
       "lines": [
         "Spectral. Surge.",
-        "Shadow: Deal Attacking enemy 1 additional shadow card (Dusk. 2 additional cards instead. Midnight. 3 additional cards instead)."
+        "Shadow: Deal attacking enemy 1 additional shadow card (Dusk. 2 additional cards instead. Midnight. 3 additional cards instead)."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1179,7 +1179,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1197,7 +1197,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1214,7 +1214,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1231,7 +1231,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1244,11 +1244,11 @@
       },
       "lines": [
         "While this location is in the staging area, all ready heroes lose all Lore, Leadership, Spirit and Tactics icons.",
-        "Planning Action: Exhuast a hero. Any player may trigger this action."
+        "Planning Action: Exhaust a hero. Any player may trigger this action."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1266,7 +1266,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1279,12 +1279,12 @@
       },
       "lines": [
         "When Revealed: All characters get -1 Willpower until the end of the round.",
-        "Shadow: Dusk/Midnight. Attack enemy makes an additional attack after this one.",
+        "Shadow: Dusk/Midnight. Attacking enemy makes an additional attack after this one.",
         "Midnight. This effect cannot be canceled."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1301,7 +1301,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1313,11 +1313,11 @@
         "sha256": "2eb8297161be54bf8d433629051fe8fcfbc8f473ad471d5d7b4243e851720320"
       },
       "lines": [
-        "When Revealed: The first player attached Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attacked character's text box as if it was blank (except for Traits.)'"
+        "When Revealed: The first player attaches Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attached character's text box as if it was blank (except for Traits.)'"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1329,11 +1329,11 @@
         "sha256": "29d2c4dc0dfa68645e86fd01ea31716ccfd4bd866b2bf28eaa2a627f2a4cd32f"
       },
       "lines": [
-        "When Revealed: Deal 1 damage to each character with less than 2 Willpower. (Dusk. less than 3 Willpower insread. Midnight. less than 4 Willpower instead)."
+        "When Revealed: Deal 1 damage to each character with less than 2 Willpower (Dusk. less than 3 Willpower instead. Midnight. less than 4 Willpower instead)."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1350,7 +1350,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     }
   ]

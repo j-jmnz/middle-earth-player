@@ -37,8 +37,6 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 ? null : [{ kind: "putIntoPlay", codes }];
   }
-  // TEMP-NEXT
-  if (/^Make Tarlang's Next the active location$/.test(sentence)) return [{ kind: "active", codes: names.codesOf("Tarlang's Neck") }];
   if ((match = /^Remove (.+?) from the encounter deck and set (?:him|her|it|them) aside, out of play$/.exec(sentence))) {
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 || names.without(match[1] ?? "").replace(/\bThe\b|\s/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];
