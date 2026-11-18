@@ -1,6 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { NIGHTMARE_PILES, type NightmareData, type Placement } from "../../../src/catalog/scenario-data.ts";
-import { isNightmareCard, nightmareDeckOf, nightmareDeckOfCode } from "../nightmare-defs.ts";
+import { isNightmareCard, nightmareDeckOf, nightmareDeckOfCode, NIGHTMARE_CARD_PILES } from "../nightmare-defs.ts";
 import { sameName, titleKey } from "./names.ts";
 
 // A built scenario's Nightmare deck (docs/brief.md, Nightmare). The setup card's side B prints the recipe: "Begin with the
@@ -90,7 +90,7 @@ export function nightmareOf(scenarioId: string, placed: readonly Placement[], ca
   if (lines.length === 0) problem(`setup card ${setupCard.code} prints no removal list`);
   const slots: Slots = own
     .filter((card) => card.type !== "nightmare" && card.type !== "quest" && card.quantity > 0)
-    .map((card) => ({ code: card.code, copies: card.quantity, pile: "encounter" as const }));
+    .map((card) => ({ code: card.code, copies: card.quantity, pile: NIGHTMARE_CARD_PILES[card.code] ?? ("encounter" as const) }));
   for (const line of lines) {
     const named = resolveRemoval(line.name, dealt, byCode);
     const code = named[0];
