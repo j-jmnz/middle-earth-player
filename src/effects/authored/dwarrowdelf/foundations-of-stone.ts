@@ -99,7 +99,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     copyLine("04040:B:3", "04118:B:3"),
 
     // 04119 Durin's Axe, 04120 Durin's Helm. A:2: the attached hero gets +3 Attack (+1 Defense), and a Dwarf also +1 Willpower (+2 hit points). A:3 Action: any player exhausts a hero to claim the objective (in the staging area) and it attaches to that hero.
-    { id: "04119:constant:1", cardCode: "04119", lines: ["04119:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 3, until: "whileSourceInPlay", target: "host" }] },
+    { id: "04119:constant:1", cardCode: "04119", lines: ["04119:A:2"], timing: "constant", condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any" } }, instructions: [{ verb: "ModifyStat", stat: "attack", amount: 3, until: "whileSourceInPlay", target: "host" }] },
     { id: "04119:constant:2", cardCode: "04119", lines: ["04119:A:2"], timing: "constant", condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any", trait: "Dwarf" } }, instructions: [{ verb: "ModifyStat", stat: "willpower", amount: 1, until: "whileSourceInPlay", target: "host" }] },
     {
       id: "04119:action:1",
@@ -110,7 +110,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "freeOfEncounters" }, { kind: "canPick", pick: { type: "hero", control: "you", state: "ready", canExhaust: true } }] },
       instructions: [{ verb: "Pick", pick: { type: "hero", control: "you", state: "ready", canExhaust: true } }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
     },
-    { id: "04120:constant:1", cardCode: "04120", lines: ["04120:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "defense", amount: 1, until: "whileSourceInPlay", target: "host" }] },
+    { id: "04120:constant:1", cardCode: "04120", lines: ["04120:A:2"], timing: "constant", condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any" } }, instructions: [{ verb: "ModifyStat", stat: "defense", amount: 1, until: "whileSourceInPlay", target: "host" }] },
     { id: "04120:constant:2", cardCode: "04120", lines: ["04120:A:2"], timing: "constant", condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any", trait: "Dwarf" } }, instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: 2, until: "whileSourceInPlay", target: "host" }] },
     copyLine("04119:A:3", "04120:A:3"),
 

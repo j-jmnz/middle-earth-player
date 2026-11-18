@@ -20,6 +20,7 @@ import { firstShares, shareOf, sharesReady, tapShare, type Share } from "./pay.t
 import type { LegalIntent } from "../store/store.ts";
 import type { Sheet, SheetNames, SheetStat } from "./sheet-types.ts";
 import { fortitudeCommitCaution } from "../readouts/fortitude.ts";
+import { commitLimitReason } from "../../rules/families/play/commit-limit.ts";
 
 /** What the player has picked for the open sheet. `key` is the sheet's: a new sheet starts a new choice. */
 export type Choice = { key: string; ids: readonly string[]; shares: readonly Share[] };
@@ -128,6 +129,28 @@ function toggle(ids: readonly string[], id: string): readonly string[] {
 }
 
 /**
+ * A tap on a character of a commit: the set offered stays one the reducer accepts. Out of the Depths (04118:B:2) allows no more allies than heroes among the characters committed, so a tap that would break it
+ * does nothing, and unpicking a hero also drops the last allies picked that it leaves over.
+ */
+export function toggleCommit(ids: readonly string[], id: string, table: TapContext): readonly string[] {
+  const refused = (set: readonly string[]) => commitLimitReason(table.game, table.game.activeSeat, set, table.ctx.cards) != null;
+  if (!ids.includes(id)) {
+    const added = [...ids, id];
+    return refused(added) ? ids : added;
+  }
+  const kept = ids.filter((item) => item !== id);
+  if (!refused(kept)) return kept;
+  // Drop the allies picked last until the rest is legal (the hero first of the set stays: only allies can break the limit).
+  const trimmed = [...kept];
+  while (trimmed.length > 0 && refused(trimmed)) {
+    const last = trimmed.findLastIndex((item) => table.game.cards[item]?.zone !== "heroes");
+    if (last < 0) break;
+    trimmed.splice(last, 1);
+  }
+  return trimmed;
+}
+
+/**
  * What a tap on a card (or on its tile in a panel) does: it picks or unpicks it, adds one to its share, or opens the sheet
  * that card leads to (a host for an attachment, the attackers of an enemy, the payment of a card). Never an intent. A trigger
  * tile names its ability (`cardId|effectId`); a tap on the card moves through its abilities.
@@ -144,7 +167,7 @@ export function tap(sheet: Sheet, held: Choice | null, id: string, table: TapCon
     }
     case "multi":
       if (!sheet.options.some((item) => item.id === id)) return { kind: "none" };
-      return { kind: "choice", choice: { ...choice, ids: toggle(choice.ids, id) } };
+      return { kind: "choice", choice: { ...choice, ids: sheet.build.kind === "Commit" ? toggleCommit(choice.ids, id, table) : toggle(choice.ids, id) } };
     case "distribute": {
       const item = sheet.options.find((candidate) => candidate.id === id);
       if (!item) return { kind: "none" };
@@ -159,7 +182,7 @@ export function tap(sheet: Sheet, held: Choice | null, id: string, table: TapCon
       return { kind: "choice", choice: { ...choice, ids: next ? [next.id] : [] } };
     }
     case "window": {
-      if (sheet.commit?.options.some((item) => item.id === id)) return { kind: "choice", choice: { ...choice, ids: toggle(choice.ids, id) } };
+      if (sheet.commit?.options.some((item) => item.id === id)) return { kind: "choice", choice: { ...choice, ids: toggleCommit(choice.ids, id, table) } };
       if (sheet.plays.includes(id)) {
         const opened = playSheet(table.game, table.ctx, table.legal, table.names, id);
         return opened ? { kind: "open", sheet: opened } : { kind: "none" };

@@ -116,6 +116,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04119:A:2 (front): Attached hero gets +3 Attack. If attached hero is a Dwarf, it gets +1 Willpower.
   04119:constant:1: Constant
+    only if its host is a hero (any player controls)
     - its host: stat attack 3, while this card is in play
   04119:constant:2: Constant
     only if its host is a Dwarf hero (any player controls)
@@ -137,6 +138,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04120:A:2 (front): Attached hero gets +1 Defense. If attached hero is a Dwarf, it gets +2 hit points.
   04120:constant:1: Constant
+    only if its host is a hero (any player controls)
     - its host: stat defense 1, while this card is in play
   04120:constant:2: Constant
     only if its host is a Dwarf hero (any player controls)
@@ -253,4 +255,4 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
     only if this card is engaged with the player
     - this card: stat attack the number of enemy (any player controls) engaged with you, other than this card, while this card is in play
 
-(rendered pieces: 175 by template, 0 as JSON)
+(rendered pieces: 179 by template, 0 as JSON)
