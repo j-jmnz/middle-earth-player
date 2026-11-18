@@ -51,6 +51,11 @@ export function attachSetAsideTo(state: ScenarioState, instruction: Verb<"Attach
   const id = state.setAside.find((other) => state.cards[other]?.code === instruction.code);
   const host = Object.values(state.cards).find((card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).name === instruction.to);
   if (!id || !host) return state;
+  // An objective ally nobody controls yet lies attached to a staged host: the zone is attached, with no seat (50302:A:1).
+  if (instruction.uncontrolled) {
+    const lying = updateCard(attachTo(moveCard(state, id, { zone: "attached" }), id, host.id), id, { face: "up", exhausted: false });
+    return queueEvent(lying, { trigger: "attached", seat: state.firstPlayer, subject: id, other: host.id });
+  }
   const seat = host.controller ?? state.firstPlayer;
   const placed = updateCard(moveCard(state, id, { zone: "play", seat }), id, { face: turnedUpCode(state, instruction.code) });
   return queueEvent(attachTo(placed, id, host.id), { trigger: "attached", seat, subject: id, other: host.id });

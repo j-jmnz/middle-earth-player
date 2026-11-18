@@ -88,7 +88,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
   matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}${c.inPlay === false ? " that is out of play now" : ""}`, read: ["card", "pick", "inPlay"] }),
   tokens: (c) => ({ text: `the card with code ${str(c.code)} in play holds at least ${str(c.min)} resource token(s)${c.perPlayer === true ? " for each player" : ""}`, read: ["code", "min", "perPlayer"] }),
-  controls: (c) => ({ text: `the actor controls the card with code ${str(c.code)}`, read: ["code"] }),
+  controls: (c) => ({ text: `${c.who === "anyPlayer" ? "a player" : "the actor"} controls the card with code ${str(c.code)}`, read: ["code", "who"] }),
 };
 
 export function renderCondition(value: unknown, ctx: Ctx): string {

@@ -2,15 +2,12 @@
 import { grantedIcons } from "../interpret/conditions.ts";
 import { heroPaysFor } from "./cost-rules.ts";
 import { deckPlayIcons } from "./deck-play.ts";
-import { allyPools, cannotPay, flagIcons, payerOk, payingIcons } from "../families/costs/pay.ts";
+import { allyPools, cannotPay, flagIcons, iconLost, payerOk, payingIcons } from "../families/costs/pay.ts";
 import { openPools } from "../families/misc/guards.ts";
 import type { Payment } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { printedOf, spherePays, type Sphere } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { flagged } from "../core/state.ts";
-
-const LOSABLE: ReadonlySet<Sphere> = new Set(["leadership", "lore", "spirit", "tactics"]);
 
 // A hero pays a sphere with its own icon or one an attachment gives it (Celebrían's Stone gives Aragorn a Spirit icon).
 // `forCard` is the card being played: the top card of a deck is paid for by the hero that lets it be played (Gandalf).
@@ -19,8 +16,7 @@ export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | 
   if (!hero) return false;
   // Icons held as flags, icons a hero has while paying for some cards, pools that cannot pay for some (families/costs/pay.ts).
   if (forCard != null && cannotPay(state, heroId, forCard, ctx)) return false;
-  // A hero that lost its Lore, Leadership, Spirit and Tactics icons (Haunted Valley, 50321:A:1) pays with none of them: a neutral, Fellowship or Baggins icon stays.
-  if (hero.zone === "heroes" && flagged(state, heroId, "losesIcons") && sphere != null && LOSABLE.has(sphere)) return false;
+  if (iconLost(state, heroId, sphere)) return false;
   if (spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return true;
   if (grantedIcons(state, heroId, ctx).some((icon) => spherePays(icon, sphere))) return true;
   if (flagIcons(state, heroId).some((icon) => spherePays(icon, sphere))) return true;

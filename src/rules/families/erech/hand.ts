@@ -7,14 +7,20 @@ import { moveCard } from "../../core/zones.ts";
 /** PassHand: the hands move one seat on, in seat order; the only seat discards its hand. */
 export function passHand(state: ScenarioState): ScenarioState {
   const seats = livingSeats(state);
+  // The only player discards his hand instead.
+  if (seats.length === 1) {
+    const seat = seats[0]!;
+    let alone = state;
+    for (const id of state.seats[seat]?.hand ?? []) alone = moveCard(alone, id, { zone: "discard", seat: alone.cards[id]?.owner ?? alone.cards[id]?.controller ?? seat });
+    return alone;
+  }
   const hands = seats.map((seat) => ({ seat, ids: [...(state.seats[seat]?.hand ?? [])] }));
   let next = state;
   hands.forEach(({ seat, ids }, index) => {
-    const to = hands.length === 1 ? seat : hands[(index + 1) % hands.length]!.seat;
+    const to = hands[(index + 1) % hands.length]!.seat;
     for (const id of ids) {
       const owner = next.cards[id]?.owner ?? next.cards[id]?.controller ?? seat;
-      const moved = moveCard(next, id, hands.length === 1 ? { zone: "discard", seat: owner } : { zone: "hand", seat: to });
-      next = updateCard(moved, id, { owner: owner === to ? undefined : owner });
+      next = updateCard(moveCard(next, id, { zone: "hand", seat: to }), id, { owner: owner === to ? undefined : owner });
     }
   });
   return next;

@@ -1,5 +1,5 @@
 // The erech family (The Stone of Erech, docs/brief.md, The Stone of Erech): the Night objectives (Eventide, Dusk, Midnight: one lies in play beside the quest, takes progress and gives way to the next), Derufin who is attached to the Stone and
-// joins the first player, the hand passed to the left, and the table flags the quest and the encounter cards set (no planning phase, no resource collection, no events, lost icons). src/rules/families/erech/ runs and reads them.
+// joins the first player, the hand passed to the left, and the table flags the quest and the encounter cards set (no planning phase, no resource collection, no events). src/rules/families/erech/ runs and reads them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -15,8 +15,6 @@ const VERBS = [
   // A constant marker on a Night objective: "If there are 4 or more progress on Eventide, add it to the victory display and put Dusk into play" (50308:A:2). A passive check, made whenever the state settles: at `at` progress the card goes to the victory display with its
   // progress and the set-aside `next` comes into play in the Night slot with none. Does nothing when run.
   z.strictObject({ verb: z.literal("NightAdvance"), at: z.number().int().positive(), next: z.string().min(1) }),
-  // "Attach Derufin to it" (50302:A:1): the set-aside card with this code is attached to the card in play with this title, still in the staging area, uncontrolled and not revealed (it is an objective ally nobody controls yet).
-  z.strictObject({ verb: z.literal("AttachSetAsideToStaged"), code: z.string().min(1), to: z.string().min(1), ...when }),
   // "The first player gains control of Derufin" (50304:A:1): the source, an objective ally attached to a card, leaves its host and joins the first player's play area, ready, as an ally.
   z.strictObject({ verb: z.literal("FreeAttachedObjective"), who: z.literal("firstPlayer"), ...when }),
   // "Each player must pass his hand to the player on his left" (50324:A:1; rr.first-player: the left is the next seat in player order): every player's whole hand goes to the next living seat at once. The only player discards his hand instead.
@@ -24,14 +22,10 @@ const VERBS = [
 ] as const;
 
 const FLAGS = [
-  // On the table, until the end of the round: the planning phase is skipped ("each player skips the next planning phase", 50302:B:1).
-  "skipPlanning",
-  // On the table, until the end of the round: no hero collects resources in the resource phase ("heroes do not collect resources during the resource phase this round", 50302:B:1); an effect that adds resources still works.
+  // On the table, until the end of the round: no hero collects resources in the resource phase ("heroes do not collect resources during the resource phase this round", 50302:B:1); an effect that adds resources still works. The same rule on one hero is angmar's `noCollection` (No Rest, 10080:A:1); this one is the table's, for every hero, for the round.
   "noCollect",
   // On the table, until the end of the round: no player plays an event ("Players cannot play events until the end of the round", 50312:A:2).
   "cannotPlayEvents",
-  // On a hero: it has none of its Lore, Leadership, Spirit and Tactics icons, printed or gained ("all ready heroes lose all Lore, Leadership, Spirit and Tactics icons", 50321:A:1).
-  "losesIcons",
 ] as const;
 
 export const manifest = { name: "erech", verbs: VERBS, triggers: [], flags: FLAGS } as const satisfies CatalogFamily;

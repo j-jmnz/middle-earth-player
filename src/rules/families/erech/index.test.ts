@@ -172,7 +172,7 @@ describe("50302:A:1 and 50304:A:1 Derufin", () => {
   function stoneAndDerufin(): { state: ScenarioState; stone: string; derufin: string } {
     const staged = run(table, { verb: "AddSetAsideToStaging", code: "50306" });
     const stone = staged.staging.find((id) => staged.cards[id]?.code === "50306") ?? "";
-    const attached = run(staged, { verb: "AttachSetAsideToStaged", code: "50304", to: "The Stone of Erech" });
+    const attached = run(staged, { verb: "AttachSetAsideTo", code: "50304", to: "The Stone of Erech", uncontrolled: true });
     return { state: attached, stone, derufin: at(attached, "50304")?.id ?? "" };
   }
 
@@ -186,8 +186,8 @@ describe("50302:A:1 and 50304:A:1 Derufin", () => {
   });
 
   it("attaches nothing when the Stone is not in play or Derufin is not set aside", () => {
-    expect(run(table, { verb: "AttachSetAsideToStaged", code: "50304", to: "The Stone of Erech" })).toBe(table);
-    expect(run(table, { verb: "AttachSetAsideToStaged", code: "50299", to: "Tarlang's Neck" })).toBe(table);
+    expect(run(table, { verb: "AttachSetAsideTo", code: "50304", to: "The Stone of Erech", uncontrolled: true })).toBe(table);
+    expect(run(table, { verb: "AttachSetAsideTo", code: "50299", to: "Tarlang's Neck", uncontrolled: true })).toBe(table);
   });
 
   it("is gained by the first player: he leaves the Stone and joins that player's area ready", () => {
@@ -207,11 +207,11 @@ describe("50302:A:1 and 50304:A:1 Derufin", () => {
     expect(run(table, { verb: "FreeAttachedObjective", who: "firstPlayer" }, hero)).toBe(table);
   });
 
-  it("is the condition playersControl that 50303:B:2 reads: false while attached, true once controlled", () => {
+  it("is the condition controls (anyPlayer) that 50303:B:2 reads: false while attached, true once controlled", () => {
     const { state, derufin } = stoneAndDerufin();
     const scope = { actor: 0, sourceId: null, returned: 0 };
-    expect(holds(state, { kind: "playersControl", code: "50304" }, scope, ctxOf())).toBe(false);
-    expect(holds(run(state, { verb: "FreeAttachedObjective", who: "firstPlayer" }, derufin), { kind: "playersControl", code: "50304" }, scope, ctxOf())).toBe(true);
+    expect(holds(state, { kind: "controls", code: "50304", who: "anyPlayer" }, scope, ctxOf())).toBe(false);
+    expect(holds(run(state, { verb: "FreeAttachedObjective", who: "firstPlayer" }, derufin), { kind: "controls", code: "50304", who: "anyPlayer" }, scope, ctxOf())).toBe(true);
   });
 });
 

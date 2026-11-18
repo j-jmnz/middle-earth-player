@@ -37,7 +37,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 50302 Terror of the Dead. Stage 2A: the Stone (set aside) is added to the staging area and Derufin (set aside) attached to it, not revealed. Stage 2B: at the beginning of each round the first player chooses for the players: everyone skips the next planning phase, or
   // no hero collects resources in the resource phase this round (effects that add resources still work). The choice is per round.
-  { id: "50302:whenRevealed:1", cardCode: "50302", lines: ["50302:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: "50306" }, { verb: "AttachSetAsideToStaged", code: "50304", to: STONE }] },
+  { id: "50302:whenRevealed:1", cardCode: "50302", lines: ["50302:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: "50306" }, { verb: "AttachSetAsideTo", code: "50304", to: STONE, uncontrolled: true }] },
   {
     id: "50302:forced:1",
     cardCode: "50302",
@@ -72,7 +72,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "50303",
     lines: ["50303:B:2"],
     timing: "constant",
-    condition: { kind: "not", condition: { kind: "playersControl", code: "50304" } },
+    condition: { kind: "not", condition: { kind: "controls", code: "50304", who: "anyPlayer" } },
     instructions: [{ verb: "ModifyStat", stat: "noQuestProgress", amount: 1, until: "whileSourceInPlay", target: "table" }],
   },
   { id: "50303:triggered:1", cardCode: "50303", lines: ["50303:B:3"], timing: "triggered", trigger: "questDefeated", instructions: [{ verb: "WinGame" }] },

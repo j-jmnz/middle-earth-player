@@ -61,7 +61,7 @@ describe("effects render read fields, conditions", () => {
     hostControlledByActor: [{ kind: "hostControlledByActor" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
     matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false }],
-    controls: [{ kind: "controls", code: "12345" }],
+    controls: [{ kind: "controls", code: "12345" }, { kind: "controls", code: "12345", who: "anyPlayer" }],
     freeOfEncounters: [{ kind: "freeOfEncounters" }],
     // The combinators are not in the table: renderCondition words them.
     not: [{ kind: "not", condition: { kind: "firstPlayer" } }],

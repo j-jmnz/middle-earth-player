@@ -20,8 +20,8 @@ export function mergeEffects(generated: readonly Effect[], authored: readonly Ef
   return [...generated.filter((effect) => !replaced.has(effect.id)), ...authored];
 }
 
-// The records of each box (scenario cards and both starter lists: the Fellowship's, the Revised Core Set's, The Dark of Mirkwood's, Dream-chaser's, Ered Mithrin's, The Two Towers' and The Return of the King's) and the rest of the player pool's, one file per pack or
-// per mechanic family.
+// The records of each box (scenario cards and the starter lists: the Fellowship's, the Revised Core Set's, Shadows of Mirkwood's, The Dark of Mirkwood's, Dream-chaser's, Ered Mithrin's, Angmar Awakened's, The Two Towers', The Return of the King's and the standalone scenarios')
+// and the rest of the player pool's, one file per pack or per mechanic family.
 export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...DREAM_CHASER_GENERATED, ...ERED_MITHRIN_GENERATED, ...ANGMAR_AWAKENED_GENERATED, ...TWO_TOWERS_GENERATED, ...RETURN_OF_THE_KING_GENERATED, ...SHADOWS_OF_MIRKWOOD_GENERATED, ...STANDALONE_SCENARIOS_GENERATED, ...POOL_GENERATED_EFFECTS];
 
 // The authored files, in the order pnpm data build writes them (src/effects/generated/authored.ts, scripts/data/effects/barrel.ts):

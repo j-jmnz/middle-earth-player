@@ -100,6 +100,8 @@ const FLAGS = [
   "skipCombat",
   // On "table": the travel phase is skipped (SkipTravelPhase, 142062:A:1; rules/engine/machine.ts).
   "skipTravel",
+  // On "table", until the end of the round: the planning phase is skipped ("each player skips the next planning phase", 50302:B:1; rules/engine/machine.ts).
+  "skipPlanning",
   // On "table", while a card holds it: the encounter phase is skipped, with its optional engagements and engagement checks ("Skip the encounter phase",
   // 142061:B:1; rules/engine/machine.ts). The combat phase still follows.
   "skipEncounter",

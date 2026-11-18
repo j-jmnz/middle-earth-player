@@ -49,7 +49,7 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
       source: "Quest Companion (community source)",
     },
   },
-  // Spectral (The Stone of Erech): printed in the scenario's rulesheet, which data/rules does not hold (docs/brief.md, The Stone of Erech, Spectral).
+  // Spectral (The Stone of Erech): from RulesPal's transcription of the scenario's rulesheet, which data/rules does not hold (docs/brief.md, The Stone of Erech, Spectral).
   spectral: {
     word: "Spectral",
     rules: [],
@@ -57,7 +57,7 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
       paragraphs: [
         "Spectral: characters attacking a Spectral enemy must use their Willpower instead of their Attack to determine their attack strength. The enemy's Defense is still subtracted. Damage that is not an attack (a card effect) is not changed.",
       ],
-      source: "The Stone of Erech rulesheet",
+      source: "RulesPal transcription (community source)",
     },
   },
   phantom: { word: "Phantom", rules: ["mec113.phantom"] },

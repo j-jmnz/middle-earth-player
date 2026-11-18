@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50302:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 50306 joins the staging area (it is not revealed)
-    - the set aside card with code 50304 is attached to the card in play titled The Stone of Erech, wherever it lies (not revealed, controlled by nobody)
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"50304","to":"The Stone of Erech","uncontrolled":true}]
 
 50302:B:1 (back): Forced: At the beginning of each round, the players must choose: each player skips the next planning phase, or heroes do not collect resources during the resource phase this round.
   50302:forced:1: Forced when a phase begins
@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50303:B:2 (back): Players cannot place progress on this stage unless they control Derufin.
   50303:constant:2: Constant
-    only if not (a player controls the hero or ally in play with code 50304)
+    only if not (a player controls the card with code 50304)
     - the table: stat noQuestProgress 1, while this card is in play
 
 50303:B:3 (back): If the players defeat this stage, they have escaped the Blackroot Vale with Derufin and won the game.
@@ -115,7 +115,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50306:A:2 (front): While The Stone of Erech is that active location, characters with less than 2 Willpower cannot ready.
   50306:constant:2: Constant
     only if this card is the active location
-    - each character (any player controls) [also {"maxWillpower":1}]: stat doesNotReady 1, while this card is in play
+    - each character (any player controls) [also {"maxWillpower":1}]: stat cannotReady 1, while this card is in play
 
 50306:A:3 (front): Travel: Exhaust each character with less than 2 Willpower.
   50306:travel:1: Travel
@@ -415,4 +415,4 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50327:whenRevealed:1: When revealed
     - place 1 progress on the Night objective in play (nothing with none); a Night objective at its limit then gives way to the next
 
-(rendered pieces: 228 by template, 7 as JSON)
+(rendered pieces: 227 by template, 8 as JSON)

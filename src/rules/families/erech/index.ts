@@ -1,6 +1,6 @@
 // Rules: docs/brief.md (The Stone of Erech); ledger lines 50301:A:1, 50302:A:1, 50303:B:2, 50304:A:1, 50308:A:2, 50312:A:2, 50321:A:1, 50324:A:1. The Stone of Erech's mechanics: the Night objectives (night.ts), Derufin attached to the Stone and freed to the first player (derufin.ts),
-// the hand passed to the left (hand.ts), and the table flags the quest and the encounter cards set. The flags are read where their rule is: skipPlanning and noCollect by the round (engine/machine.ts),
-// cannotPlayEvents by the play hook below, losesIcons where a hero pays (player/payments.ts).
+// the hand passed to the left (hand.ts), and the table flags the quest and the encounter cards set. The flags are read where their rule is: skipPlanning (a breaking flag) and noCollect by the round (engine/machine.ts),
+// cannotPlayEvents by the play hook below. (losesIcons, the Haunted Valley flag, is a costs flag: families/costs/pay.ts.)
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -11,7 +11,7 @@ import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { attachSetAsideToStaged, freeAttachedObjective } from "./derufin.ts";
+import { freeAttachedObjective } from "./derufin.ts";
 import { passHand } from "./hand.ts";
 import { advanceNight, nightHolds, placeNightProgress, putNight } from "./night.ts";
 
@@ -29,8 +29,6 @@ function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: 
       return placeNightProgress(state, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), ctx, steps);
     case "NightAdvance":
       return state;
-    case "AttachSetAsideToStaged":
-      return attachSetAsideToStaged(state, instruction, ctx);
     case "FreeAttachedObjective":
       return freeAttachedObjective(state, focus.sourceId);
     case "PassHand":
@@ -40,14 +38,16 @@ function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: 
   }
 }
 
+const ERECH = "the-stone-of-erech";
+
 export const manifest: RulesFamily = {
   name: "erech",
-  verbs: ["PutNightObjective", "PlaceNightProgress", "NightAdvance", "AttachSetAsideToStaged", "FreeAttachedObjective", "PassHand"],
+  verbs: ["PutNightObjective", "PlaceNightProgress", "NightAdvance", "FreeAttachedObjective", "PassHand"],
   run,
-  settle: { sweep: (state, ctx) => (Object.values(state.cards).some((card) => card.zone === "nightObjective") ? advanceNight(state, ctx) : state) },
+  // Only The Stone of Erech has a Night slot: any other scenario skips the scan of its cards.
+  settle: { sweep: (state, ctx) => (state.scenarioId === ERECH && Object.values(state.cards).some((card) => card.zone === "nightObjective") ? advanceNight(state, ctx) : state) },
   condition: (state, condition) => {
     if (condition.kind === "night") return nightHolds(state, condition.is);
-    if (condition.kind === "playersControl") return Object.values(state.cards).some((card) => card.code === condition.code && card.controller != null && (card.zone === "heroes" || card.zone === "play"));
     return null;
   },
   play: (state, cardId, ctx, how) => how.putting !== true && eventsBarred(state, cardId, ctx),
