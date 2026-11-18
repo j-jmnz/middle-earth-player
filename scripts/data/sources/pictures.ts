@@ -13,7 +13,7 @@ import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, RAW_DIR } from "../paths.ts
 import { MEC108_CHANGED, MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
-import { driveFileUrl, JVZIJP_FOLDER, JVZIJP_SITE, jvzijpFile, jvzijpPictures, listDriveTree, onDriveRefusal } from "./jvzijp.ts";
+import { driveFileUrl, JVZIJP_FOLDER, JVZIJP_SITE, isDriveRefusal, jvzijpFile, jvzijpPictures, listDriveTree, NotAnImageError, onDriveRefusal } from "./jvzijp.ts";
 import { lettersOf } from "./names.ts";
 import { isNightmareCard } from "../nightmare-defs.ts";
 import { extensionOf, widthOf } from "./scans.ts";
@@ -186,27 +186,23 @@ async function fetchInto(url: string, file: string, log: Log): Promise<SourceFil
 
 const SYNC_CONCURRENCY = 8;
 
-// The pictures data/sources.json pins now, by `<code>.<side>`: what a sync keeps for a card Drive refuses.
+// The pictures data/sources.json pins now, by `<code>.<side>`: a card with a pin takes no lower source when Drive refuses it. A missing
+// sources.json is no pin; any other read or parse failure stops the sync, since an empty map would let a refusal downgrade a card.
 function pinnedPictures(): Map<string, SourceFile> {
+  const pinned = new Map<string, SourceFile>();
+  let text: string;
   try {
-    const sources = (JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, SourceRecord> }).sources;
-    const pinned = new Map<string, SourceFile>();
-    for (const file of sources.pictures?.files ?? []) {
-      const key = /^pictures\/([^/]+)\.(?:jpg|png)$/.exec(file.path)?.[1];
-      if (key) pinned.set(key, file);
-    }
-    return pinned;
-  } catch {
-    return new Map();
+    text = readFileSync(path.join(DATA_DIR, "sources.json"), "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return pinned;
+    throw error;
   }
-}
-
-function cachedSha256(pinned: SourceFile): string | null {
-  try {
-    return sha256(readFileSync(path.join(PICTURE_CACHE_DIR, path.basename(pinned.path))));
-  } catch {
-    return null;
+  const sources = (JSON.parse(text) as { sources: Record<string, SourceRecord> }).sources;
+  for (const file of sources.pictures?.files ?? []) {
+    const key = /^pictures\/([^/]+)\.(?:jpg|png)$/.exec(file.path)?.[1];
+    if (key) pinned.set(key, file);
   }
+  return pinned;
 }
 
 export async function syncPictures(log: Log = createLog("pictures")): Promise<SourceRecord> {
@@ -282,20 +278,7 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
       try {
         const body = await source.load();
         // Drive answers a quota or sign-in page as HTML: that is not a picture.
-        if (extensionOf(body) === null) {
-          if (source.from === "jvzijp") {
-            const pin = previous.get(key);
-            const decision = onDriveRefusal(pin, pin ? cachedSha256(pin) : null);
-            if (decision.action === "keep" && pin) {
-              refused.push(key);
-              files.push(pin);
-              log.warn(`${key}: Drive refused ${source.url} (not an image, probably over quota); keeping the pin ${pin.sha256.slice(0, 12)}${decision.cached ? "" : ", whose cached file is missing or changed"}`);
-              tick(`${key} kept`);
-              return;
-            }
-          }
-          throw new Error("not a JPEG or PNG");
-        }
+        if (extensionOf(body) === null) throw new NotAnImageError("not a JPEG or PNG");
         const extension = extensionOf(body) ?? "jpg";
         writeFileSync(path.join(PICTURE_CACHE_DIR, `${key}.${extension}`), body);
         files.push({ path: `pictures/${key}.${extension}`, url: source.url, sha256: sha256(body), bytes: body.byteLength });
@@ -303,7 +286,15 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
         tick(`${key} ${widthOf(body)} px, ${bytes(body.byteLength)}`);
         return;
       } catch (error) {
-        log.warn(`${key}: ${source.url}: ${error instanceof Error ? error.message : String(error)}; trying the next source`);
+        const message = error instanceof Error ? error.message : String(error);
+        // A refused Drive download of a pinned card ends the sync (below) and takes no lower source, so the pin is not downgraded.
+        if (source.from === "jvzijp" && isDriveRefusal(error) && onDriveRefusal(previous.get(key)) === "refuse") {
+          refused.push(key);
+          log.warn(`${key}: Drive refused ${source.url} (${message}); not trying a lower source for a pinned picture`);
+          tick(`${key} refused`);
+          return;
+        }
+        log.warn(`${key}: ${source.url}: ${message}; trying the next source`);
       }
     }
     kept.push(key);
@@ -321,7 +312,7 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
   log.info(`pictures from JvZijp ${from.jvzijp}, FFG's PDFs ${from.pdf}, cardgame.tools ${from.cardgameTools}, RingsDB or Hall of Beorn ${from.other}`);
   if (kept.length > 0) log.info(`${kept.length} side${kept.length === 1 ? "" : "s"} have no picture (a scanned one keeps its scan): ${kept.sort().join(", ")}`);
   if (refused.length > 0) {
-    throw new Error(`Google Drive refused ${refused.length} picture download${refused.length === 1 ? "" : "s"} (its quota page, not an image), so no pin was changed: run pnpm data sync pictures again after the quota resets (about a day)`);
+    throw new Error(`Google Drive refused ${refused.length} picture download${refused.length === 1 ? "" : "s"} (its quota page, not an image), so the sync wrote no pins: run pnpm data sync pictures again after the quota resets (about a day)`);
   }
   files.sort((left, right) => left.path.localeCompare(right.path));
   return { id: "pictures", site: JVZIJP_SITE, pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
