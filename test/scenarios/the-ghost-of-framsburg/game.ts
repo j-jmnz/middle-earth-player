@@ -235,7 +235,7 @@ export const FRAMSBURG_GOLDENS: readonly FramsburgGolden[] = [
   { name: "two-handed, Easy, won from a blank log, Gundabad Hunter, the Hazard card first", seatCount: 2, seed: 14, difficulty: "Easy", decks: "strong", outcome: "won", policy: USE },
   { name: "two-handed, Easy, won from a blank log, a burden of the two Hazard cards for the pool", seatCount: 2, seed: 20, difficulty: "Easy", decks: "strong", outcome: "won", policy: USE },
   { name: "two-handed, won, after the earlier parts, Misplaced Trust, the discard pile shuffled", seatCount: 2, seed: 28, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "pool", policy: SHUFFLE },
-  { name: "two-handed, won, after the earlier parts, Urdug's Cunning, a treasure attached to Fram's Shade", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning", policy: SHUFFLE },
+  { name: "two-handed, won, after the earlier parts, Urdug's Cunning, a treasure attached to Fram's Shade", seatCount: 2, seed: 136, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning", policy: SHUFFLE },
   { name: "two-handed, Easy, won, the oath and guidance lines, a treasure attached to Fram's Shade", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: SHUFFLE },
   { name: "true solo, lost with the threat at 50", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "lost", policy: USE, lossReason: "No seats remain" },
   { name: "two-handed, lost with the threat of every player at 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: SHUFFLE, lossReason: "No seats remain" },
@@ -244,7 +244,7 @@ export const FRAMSBURG_GOLDENS: readonly FramsburgGolden[] = [
   { name: "true solo, brittle, lost with every hero dead", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, brittle, lost with every hero dead", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, Easy, lost after the earlier parts, Melanwar's and Isolde's lines", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "lost", after: true, variant: "oathline", policy: USE, lossReason: "No seats remain" },
-  { name: "two-handed, lost after the earlier parts, Urdug's Cunning", seatCount: 2, seed: 3, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, variant: "cunning", policy: USE, lossReason: "No seats remain" },
+  { name: "two-handed, lost after the earlier parts, Urdug's Cunning", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, variant: "cunning", policy: USE, lossReason: "No seats remain" },
 ];
 
 /** The log a golden's Resolution is written onto: the earlier parts' real Resolutions, or a blank log. */
