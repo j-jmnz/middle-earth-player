@@ -1,4 +1,4 @@
-// The Maestro fixtures of Flight from Moria (dwarrowdelf cycle part 3), written into src/campaign/fixtures/flight-from-moria.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
+// The fixtures of Flight from Moria (dwarrowdelf cycle part 3), written into src/campaign/fixtures/flight-from-moria.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
 // Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. `frommoria-won` is the first seed that wins, parked on the win (the outcome screen is one tap away); `frommoria-lost` the first that loses,
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
 // The saved decklists' policy answers the scenario's questions: the auto-player plays cards and answers each Response it can pay for; the first player stays on a stage the quest can defeat and bypasses Escape from Darkness and Blocked by Flame

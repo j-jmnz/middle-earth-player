@@ -1,4 +1,4 @@
-// The Maestro fixtures of Shadow and Flame (dwarrowdelf cycle part 9), written into src/campaign/fixtures/shadow-and-flame.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
+// The fixtures of Shadow and Flame (dwarrowdelf cycle part 9), written into src/campaign/fixtures/shadow-and-flame.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
 // Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. `flame-won` is the first seed that wins, parked on the win (the outcome screen is one tap away); `flame-lost` the first that loses,
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
 // The saved decklists' policy answers the scenario's questions: the characters defend, the auto-player plays cards and uses each Action once, except Dark Pit's, which only the scenario's policy takes (test/scenarios/shadow-and-flame/game.ts, flameIntent): when the top cards of

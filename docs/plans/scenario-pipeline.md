@@ -5,7 +5,7 @@
 Adding a scenario costs far more than the scenario's own judgement: reading its cards, writing records for lines no other card shares, choosing its intents and expectations. The rest is repeated by hand each time:
 
 - **Effects.** The scenario templates (`scripts/data/effects/*-templates.ts`) own almost only Fellowship lines; every later scenario's lines are authored. Many authored lines share their text, once normalized, with a line already owned on another card, and are still written again. `pnpm effects draft` ranks "similar" records by word overlap with the whole card, so it misses a line that is word for word another card's line.
-- **Tests and fixtures.** Each scenario folder copies most of its scene, game, golden test, campaign test, seed finder and Maestro flows from the previous scenario and renames them.
+- **Tests and fixtures.** Each scenario folder copies most of its scene, game, golden test, campaign test, seed finder from the previous scenario and renames them.
 - **Registration.** `src/effects/index.ts`, `src/campaign/fixtures.ts`, the list repeated in `src/campaign/standalone.test.ts`, `scripts/e2e/fixtures.ts`, the per-scenario block of `src/campaign/fixtures.test.ts` and the campaign order in `src/campaign/path.test.ts` are kept by hand. `causes.test.ts` and `replay.test.ts` do not read every scenario's goldens.
 - **Families.** A family is listed by hand in three index files, and the core calls family internals by name (the settle chain in `src/rules/engine/machine.ts`, conditions, picks, travel). Nothing checks that a declared verb has a runner; a missing one fails at run time as an unimplemented instruction.
 - **Data.** The printed-text ledger is typed whole by hand. Most `scenarioPiles` overrides quote a Setup sentence the Setup parser already reads. `XP_ROWS` in `src/campaign/xp.ts` copies the MEC111 log sheet into code.
@@ -59,11 +59,10 @@ Exit: the plan's checks (Verification). Adding a fixture name is one registry li
 
 - Move the scene helpers repeated across the Dream-chaser scenes into `test/harness/`: id lookups, `answer`, `finish`, `resolveRecords`, the fight helper, the phase, mode and window mapping, the stand-in cards and the filler effects. No scene imports another scenario's scene.
 - `test/harness/game-kit.ts` gets a campaign game factory: world, plan, start, the earlier parts' log (from the campaign order and the earlier part's golden), and `playGolden`. A scenario passes its id, extra codes, intent policy and goldens. A scenario with armed ships passes `shipStats` and `shipCodes` (the factory's `world()` applies them).
-- `test/harness/next-part.ts` derives the next part's status ("current" or "soon") and the next step ("begin" or "soon") from `src/campaign/playable.ts` and the campaign order. The golden suite asserts them, so making a part playable edits no earlier part's test. `scripts/checks/maestro.test.ts` pins that a flow asserting a part as soon belongs to a part followed by one not playable.
+- `test/harness/next-part.ts` derives the next part's status ("current" or "soon") and the next step ("begin" or "soon") from `src/campaign/playable.ts` and the campaign order. The golden suite asserts them, so making a part playable edits no earlier part's test.
 - A golden suite helper holds the snapshot test, the cause test, the won loop (XP, the next part on the campaign path) and the lost loop. A scenario passes its opening assertions, its expected XP and its own checks.
 - `scripts/e2e/seed-kit.ts` gets `play`, `firstSeed` and the earlier part's won log.
-- Maestro: one win subflow and one loss subflow under `.maestro/`, run with `runFlow` and `env` (the fixture, the scenario id, an optional choice id). Each scenario's flows call them and keep their own extra assertions.
-- `pnpm scenario new <scenario-id>` (with `--dry-run`) writes the skeletons and the registry entries: the scene with its codes read from `data/scenarios/<id>.json`, the game, the golden test, the campaign test, the seed finder, both Maestro flows, `src/effects/authored/<id>.ts`, and the line in the fixture registry. It refuses an id that is not in `data/scenarios`.
+- `pnpm scenario new <scenario-id>` (with `--dry-run`) writes the skeletons and the registry entries: the scene with its codes read from `data/scenarios/<id>.json`, the game, the golden test, the campaign test, the seed finder, `src/effects/authored/<id>.ts`, and the line in the fixture registry. It refuses an id that is not in `data/scenarios`.
 - Move every existing scenario onto the kit, one campaign at a time, with the goldens byte-identical after each step.
 - `docs/agents/agent-brief.md` (Approach, Scenario procedure) and `.claude/agents/effect-author.md` name the scaffold and the kit. The family list in the effect-author file points to `src/catalog/families/index.ts` instead of copying it.
 
@@ -109,7 +108,7 @@ Exit: the plan's checks (Verification), and `pnpm data check` shows no differenc
 - `scripts/checks/record-routes.test.ts` walks every record whose route the engine picks from a verb list: a quest card's Setup (`revealsPerPlayer`), a Shadow (`runsInFrame`) and a campaign card's Setup (the setup roles, the start and the checklist). It names a record that would be skipped or fail with "Unimplemented instruction".
 - `scripts/e2e/fixtures.ts <scenario-id>` writes only that scenario's fixture file; the earlier parts' won games come from their committed files.
 
-Not built: a search-based win finder for the missing won fixtures (`docs/phases/STATUS.md`, Fixtures and Maestro).
+Not built: a search-based win finder for the missing won fixtures (`docs/phases/STATUS.md`, Fixtures).
 
 ## Where a scenario's cost is now
 
@@ -129,7 +128,7 @@ Sections A to D and F are built (E waits for a new campaign or pack). What each 
   - A record that no golden reaches is found only by the reviewer. The fix pass then writes card tests for it.
   - The player-card smoke runs only player cards; the encounter smoke (`scripts/card-smoke/encounter.ts`, Faster feedback while authoring) plays each encounter card's When Revealed, Shadow, Travel and Setup before a golden does.
   - The box-wide check (`scripts/checks/box-dealt.test.ts`) finds a scenario's undealt card; the golden finds the rest.
-- **Fixtures and Maestro.** With real decks the seed finder finds a loss but no win, so the win flow cannot run (`docs/phases/STATUS.md`, Fixtures and Maestro).
+- **Fixtures.** With real decks the seed finder finds a loss but no win, so the won fixture is missing (`docs/phases/STATUS.md`, Fixtures).
 - **Review and fix.** The one fix pass is the largest single task of the phase. Its findings fall into classes the author can check before the review:
   - card readings (`docs/agents/effect-authoring.md`, Readings the review catches);
   - records with no test and no golden that reaches them;
@@ -151,7 +150,7 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
    - It is the search player: a beam search over legal intents, built on `test/harness/auto-player.ts` and scored on threat, progress, hero health and stage.
    - It replaces each scenario's policy in `game.ts`.
    - It is the only way the Dream-chaser win flows can run.
-   - Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures and Maestro.
+   - Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures.
 
 ## After each scenario phase
 

@@ -1,4 +1,4 @@
-// The Maestro fixtures of Into the Pit (dwarrowdelf cycle part 1), written into src/campaign/fixtures/into-the-pit.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
+// The fixtures of Into the Pit (dwarrowdelf cycle part 1), written into src/campaign/fixtures/into-the-pit.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
 // Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. `pit-won` is the first seed that wins, parked on the win (the outcome screen is one tap away); `pit-lost` the first that loses,
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out: no seed in 500 wins with the saved decklists (their heroes are destroyed by round 3 or 4), so `pit-won` is not committed.
 // The saved decklists' policy answers the scenario's questions: the auto-player plays cards and answers each Response it can pay for, takes the first option of a choice, engages an enemy after the quest while a seat has fewer engaged than heroes, and
