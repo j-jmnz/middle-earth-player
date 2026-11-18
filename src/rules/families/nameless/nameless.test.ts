@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import type { Instruction } from "../../../catalog/boundary.ts";
 import { modifiedStat } from "../../core/keywords.ts";
-import { printedOf } from "../../core/printed.ts";
+import { definePrinted, printedOf } from "../../core/printed.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { settle } from "../../engine/machine.ts";
 import { fireForced } from "../../windows/triggers.ts";
@@ -87,6 +88,25 @@ describe("The printed cost of the attached cards (04125:A:2, 901704:A:2)", () =>
     const run = synced(runInstruction({ ...t.state, window: null }, attach({ verb: "AttachDeckTop", count: 2 }), focus(0, thing), t.ctx, []), t.ctx);
     expect(attachedCost(run, thing, t.ctx.cards)).toBe(2);
     expect(modifiedStat(run, run.cards[thing]!, "hitPoints", t.ctx.cards)).toBe(2);
+  });
+
+  it("04125:A:2 counts the printed cost of every attached card: a player attachment (Forest Snare, cost 3) adds its cost and makes 'no cards attached' false", () => {
+    const t = table({ engaged: ["04125"], deckOf: ["c2", "c1"] });
+    const thing = idOf(t.state, "04125");
+    t.cards.set("01069", definePrinted({ code: "01069", name: "Forest Snare", type: "attachment", sphere: "neutral", cost: 3 }));
+    const spawned = spawn(t.state, "01069", { zone: "play", seat: 0 });
+    const held = { ...attachTo(spawned.state, spawned.id, thing), window: null };
+    expect(attachedCost(held, thing, t.ctx.cards)).toBe(3);
+    const run = synced(runInstruction(held, attach({ verb: "AttachDeckTop", count: 2 }), focus(0, thing), t.ctx, []), t.ctx);
+    expect(modifiedStat(run, run.cards[thing]!, "attack", t.ctx.cards)).toBe(6);
+    expect(modifiedStat(run, run.cards[thing]!, "hitPoints", t.ctx.cards)).toBe(6);
+  });
+
+  it("04125:A:2 makes X 0 (the enemy is discarded) when the only attached card has no printed cost, not 3", () => {
+    const t = table({ engaged: ["04125"], attached: [{ code: "attachment", to: "04125" }] });
+    const thing = idOf(t.state, "04125");
+    const run = settle({ ...t.state, window: null, mode: "stopped" }, t.ctx, []);
+    expect(run.cards[thing]?.zone).toBe("encounterDiscard");
   });
 
   it("901704:A:2 makes X 5 with nothing attached, and Elder Nameless Thing's 04126:A:2 X 4", () => {

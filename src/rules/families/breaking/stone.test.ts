@@ -103,7 +103,7 @@ describe("The separate areas of stage 4", () => {
     expect(resolveAmount(table({ seats: 2 }).state, amount, { actor: 0, sourceId: null }, t.ctx)).toBe(2);
   });
 
-  it("901703:A:2 moves the engaged Giant Cave Centipede to the other player's staging area, and leaves it engaged with one player or shared areas", () => {
+  it("901703:A:2 moves the engaged Giant Cave Centipede to the other player's staging area, sends it to the shared area as a staging card for players who share one, and leaves it engaged with one player", () => {
     const { t, state } = divided();
     const made = spawn(state, "901703", { zone: "engaged", seat: 0 });
     const run = runInstruction({ ...made.state, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: made.id }, t.ctx, []);
@@ -113,7 +113,12 @@ describe("The separate areas of stage 4", () => {
     const solo = spawn(alone.state, "901703", { zone: "engaged", seat: 0 });
     expect(runInstruction({ ...solo.state, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: solo.id }, alone.ctx, []).cards[solo.id]?.zone).toBe("engaged");
     const shared = { ...made.state, seats: [{ ...made.state.seats[0], joined: 1 }, made.state.seats[1]] as ScenarioState["seats"] };
-    expect(runInstruction({ ...shared, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: made.id }, t.ctx, []).cards[made.id]?.zone).toBe("engaged");
+    const together = runInstruction({ ...shared, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: made.id }, t.ctx, []);
+    expect(together.cards[made.id]?.zone).toBe("staging");
+    expect(areaOf(together, made.id)).toBe(1);
+    const common = table({ seats: 2 });
+    const unshared = spawn(common.state, "901703", { zone: "engaged", seat: 0 });
+    expect(runInstruction({ ...unshared.state, window: null }, { verb: "MoveToOtherPlayerArea" }, { seat: 0, sourceId: unshared.id }, common.ctx, []).cards[unshared.id]?.zone).toBe("staging");
   });
 
   it("04114:B:2 holds the stage at its quest points; at the beginning of the travel phase the first player to complete joins the other, and the second takes everyone to stage 5", () => {

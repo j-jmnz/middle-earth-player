@@ -27,9 +27,14 @@ export function namelessCards(state: ScenarioState, hostId: string): readonly st
   return (state.cards[hostId]?.attachments ?? []).filter((id) => isNamelessCard(state, id));
 }
 
-/** The printed cost of the cards attached to the enemy added up: a card with no printed cost counts 0. */
+/** Every card attached to the enemy, whoever attached it: the cards from a deck and any attachment a player put on it (Forest Snare). */
+export function allAttached(state: ScenarioState, hostId: string): readonly string[] {
+  return (state.cards[hostId]?.attachments ?? []).filter((id) => state.cards[id] != null);
+}
+
+/** The printed cost of all the cards attached to the enemy added up (the card says "all attached cards"): a card with no printed cost counts 0. */
 export function attachedCost(state: ScenarioState, hostId: string, cards: ReadonlyMap<string, PrintedCard>): number {
-  return namelessCards(state, hostId).reduce((sum, id) => sum + (printedOf(cards, state.cards[id]?.code ?? "").cost ?? 0), 0);
+  return allAttached(state, hostId).reduce((sum, id) => sum + (printedOf(cards, state.cards[id]?.code ?? "").cost ?? 0), 0);
 }
 
 function hostOf(state: ScenarioState, to: Verb<"AttachDeckTop">["to"], focus: Focus): string | null {

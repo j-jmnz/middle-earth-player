@@ -34,7 +34,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("StartRandomSeparateStage"), codes: z.array(z.string().min(1)).min(1), ...when }),
   // "Remove all other stage 4 quest cards from the game" (04113:B:1): every card of the quest deck with one of these codes leaves the game.
   z.strictObject({ verb: z.literal("RemoveUnusedStages"), codes: z.array(z.string().min(1)).min(1), ...when }),
-  // "that player chooses and adds it to a different player's staging area" (901703:A:2): the source enemy, engaged with a player, becomes a card of the staging area of another player (a player who is the head of another area; with two seats the other one). It stays engaged when there is no other area (one player, or stages not separate).
+  // "that player chooses and adds it to a different player's staging area" (901703:A:2): the source enemy, engaged with a player, becomes a card of the staging area of another player (a player who is the head of another area; with two seats the other one). Players who share an area (not separate, or joined) send it to that shared area as a staging card; with one player and no other area it stays engaged.
   z.strictObject({ verb: z.literal("MoveToOtherPlayerArea"), ...when }),
   // "In player order, each player moves 1 encounter card from this staging area to theirs" until none are left (142062:B:1): each living seat in turn
   // picks one card of the shared staging area (the first player's choice when a seat has several; the last one is taken without asking), until it holds

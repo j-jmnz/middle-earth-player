@@ -78,14 +78,16 @@ function moveToFirstStaging(state: ScenarioState, id: string | null): ScenarioSt
   return updateCard(moved, id, { controller: state.separate ? state.firstPlayer : null });
 }
 
-// MoveToOtherPlayerArea (901703:A:2): the engaged enemy goes to the staging area of the other player's area; it stays engaged when stages are not separate or no other area exists.
+// MoveToOtherPlayerArea (901703:A:2): the engaged enemy goes to another player's staging area as a staging card. Players who share an area (not separate, or joined) send it to that shared area; with one player, and no other area, it stays engaged.
 function moveToOtherPlayerArea(state: ScenarioState, id: string | null): ScenarioState {
   const card = id ? state.cards[id] : undefined;
-  if (!id || !card || card.zone !== "engaged" || card.controller == null || !state.separate) return state;
+  if (!id || !card || card.zone !== "engaged" || card.controller == null) return state;
   const own = headOf(state, card.controller);
-  const other = areaSeats(state).find((seat) => seat !== own);
-  if (other == null) return state;
-  return updateCard(moveCard(state, id, { zone: "staging", area: other }), id, { controller: other });
+  const other = state.separate ? areaSeats(state).find((seat) => seat !== own) : undefined;
+  if (other != null) return updateCard(moveCard(state, id, { zone: "staging", area: other }), id, { controller: other });
+  // No other area: another living player at the shared area is the one it is sent to, as a card of that staging area.
+  if (livingSeats(state).every((seat) => seat === card.controller)) return state;
+  return updateCard(moveCard(state, id, stagingDest(state, card.controller)), id, { controller: state.separate ? own : null });
 }
 
 // Fallen Into Evil, attached to a hero: the hero is an enemy in the first player's staging area, its player no longer controlling it.
