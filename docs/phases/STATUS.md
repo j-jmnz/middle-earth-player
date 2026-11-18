@@ -40,6 +40,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
+- `gate-won` is not committed: no seed in 500 wins The Redhorn Gate with the saved decklists. Until it exists `.maestro/scenarios/the-redhorn-gate/the-redhorn-gate.yaml` cannot run.
 - `frommoria-won` is not committed: no seed in 400 wins Flight from Moria with the saved decklists (heroes destroyed by round 3). Until it exists `.maestro/scenarios/flight-from-moria/flight-from-moria.yaml` cannot run.
 - `level-won` is not committed: no seed in 500 wins The Seventh Level with the saved decklists (their heroes are gone by round 3). Until it exists `.maestro/scenarios/the-seventh-level/the-seventh-level.yaml` cannot run.
 - `pit-won` is not committed: no seed in 500 wins Into the Pit with the saved decklists (their heroes are destroyed by round 3 or 4). Until it exists `.maestro/scenarios/into-the-pit/into-the-pit.yaml` cannot run.
@@ -294,7 +295,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 ### Rules and engine (Dwarrowdelf)
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
 - Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
-- Fanuidhol (04016) asks for each hero's resource at the end of the staging step, not when the quest total is counted; with two Blinding Blizzards (901307) the first in staging takes the progress, with no first-player choice between them. Agent recommendations (`docs/brief.md`, The Redhorn Gate).
+- With two Blinding Blizzards (901307) the first in staging takes the progress, with no first-player choice between them; Blinding Blizzard's progress readout ("3 / 5") does not warm near 5 (agent recommendation, `docs/brief.md`, The Redhorn Gate).
 - The Redhorn Gate readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Redhorn Gate). Not user-confirmed.
 - Flight from Moria readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Flight from Moria). Not user-confirmed.
 - Flight from Moria's banner beats (`src/play/words/scenarios/gundabad-beats.ts`) say a flipped stage flips "at the beginning of the quest phase" (Moria flips at the staging step) and a Nightmare bypass goes to "the bottom of the quest deck" (it is shuffled in).
