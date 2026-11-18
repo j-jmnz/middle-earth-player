@@ -5,6 +5,7 @@ import { EFFECTS } from "../../../effects/index.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 import { nightCard } from "../../../rules/families/erech/night.ts";
+import { readyBarred } from "../../../rules/core/holder-classes.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 
 import { quest, resolve, rowProblems, notWon, won, progressOn, zone, type Row } from "../../../../test/harness/card-spec.ts";
@@ -174,5 +175,22 @@ describe("50322:A:2 and 50323:A:3 Midnight, this effect cannot be canceled", () 
 
   it("50323:A:3 Murmurs of Dread can be canceled at Eventide and at Dusk, not at Midnight", () => {
     expect([offered("50323", "50308"), offered("50323", "50309"), offered("50323", "50310")]).toEqual([true, true, false]);
+  });
+});
+
+describe("50306:A:2 the Stone's cannot ready", () => {
+  it("50306:A:2 a character with less than 2 Willpower cannot be readied by a card effect while the Stone is active, one with 2 can", () => {
+    const made = table({ active: "50306", night: "50310", play: ["50304"] });
+    const state = settle(fireForced({ ...made.state, window: null }, { trigger: "beginningOfPhase", seat: null, phase: "Refresh" }, made.ctx, []), made.ctx, []);
+    expect(readyBarred(state, idOf(state, "50304"), made.ctx.cards)).toBe(true);
+    expect(readyBarred(state, made.hero, made.ctx.cards)).toBe(false);
+  });
+});
+
+describe("50325:A:1 Driven by Fear is unlimited on a hero", () => {
+  it("50325:A:1 with a copy already on the first hero, solo, the second copy joins it there", () => {
+    const done = play(ID, { line: "50325:A:1", layout: { staging: ["50325"], attached: [{ code: "50325", to: "dh1" }] }, act: resolve("50325", "whenRevealed"), expect: [] }, EFFECTS, false);
+    const copies = (done.run.state.cards[idOf(done.run.state, "dh1")]?.attachments ?? []).filter((id) => done.run.state.cards[id]?.code === "50325");
+    expect(copies).toHaveLength(2);
   });
 });

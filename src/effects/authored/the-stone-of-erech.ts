@@ -98,7 +98,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 50306 The Stone of Erech. Threat X: twice the number of players (the data row prints none). Immune to player card effects is the keyword. While it is the active location, characters (heroes and allies of every player) with less than 2 Willpower cannot ready.
   // Travel: each such character exhausts.
   { id: "50306:constant:1", cardCode: "50306", lines: ["50306:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { players: true, times: 2 }, until: "whileSourceInPlay", target: "self" }] },
-  { id: "50306:constant:2", cardCode: "50306", lines: ["50306:A:2"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "doesNotReady", amount: 1, until: "whileSourceInPlay", holders: A_CHARACTER(1) }] },
+  { id: "50306:constant:2", cardCode: "50306", lines: ["50306:A:2"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "whileSourceInPlay", holders: A_CHARACTER(1) }] },
   { id: "50306:travel:1", cardCode: "50306", lines: ["50306:A:3"], timing: "travel", instructions: [{ verb: "ExhaustEach", pick: A_CHARACTER(1) }] },
 
   // 50307 Tarlang's Neck. While it is the active location it gains a Forced effect: at the beginning of the encounter phase the players choose (the first player decides, as for stage 2B) to end the encounter phase at once, or the first player engages every enemy in the staging area.
