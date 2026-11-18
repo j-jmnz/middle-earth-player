@@ -48,7 +48,7 @@ Read the sections your task touches.
   - 497–500 Support (~90)
   - 501–516 Attribution (~410)
   - 517–520 License (~50)
-- `docs/architecture.md` — Architecture (~28.7K tok)
+- `docs/architecture.md` — Architecture (~28.8K tok)
   - 7–42 Stack (~1.3K)
   - 43–78 Processes (~690)
   - 79–162 Modules (~2.4K) ← 3
@@ -67,7 +67,7 @@ Read the sections your task touches.
   - 323–328 Images (~1.1K) ← 7
   - 329–383 Screens (~5.2K) ← 9
   - 384–395 Desktop (~1.4K) ← 5
-  - 396–405 Update check (~630) ← 7
+  - 396–405 Update check (~680) ← 7
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
@@ -182,7 +182,7 @@ Read the sections your task touches.
   - 374–385 Banner (~750) ← 5
   - 386–405 Screen reader (~3.0K) ← 19
   - 406–409 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~33.2K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~33.3K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
   - 35–45 Performance (~720) ← 4
@@ -198,7 +198,7 @@ Read the sections your task touches.
   - 236–250 Icons (~480) ← 7
   - 251–269 Card art (~750) ← 2
   - 270–285 Tablets (~630) ← 15
-  - 286–488 Screens (~19.3K)
+  - 286–488 Screens (~19.4K)
     - 290–295 Splash (~210) ← 3
     - 296–299 App icon (~80)
     - 300–315 Campaigns (campaign list) (~1.5K) ← 6
@@ -218,7 +218,7 @@ Read the sections your task touches.
     - 430–435 Card (~490) ← 2
     - 436–447 Collection (~530) ← 3
     - 448–451 Deck import (~120)
-    - 452–466 Settings (~1.5K) ← 15
+    - 452–466 Settings (~1.6K) ← 15
     - 467–472 Rules (~470) ← 1
     - 473–476 Rule (~220) ← 1
     - 477–484 Booklet (~540) ← 2
