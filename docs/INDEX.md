@@ -9,7 +9,7 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 Read whole.
 
 - `CLAUDE.md` — Claude Code (~3.0K tok)
-- `.claude/rules/agent-standards.md` — Agent standards (~220 tok)
+- `.claude/rules/agent-standards.md` — Agent standards (~350 tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~1.2K tok)
