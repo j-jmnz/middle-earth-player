@@ -37,14 +37,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     },
     // A:4: the players cannot win the game unless both Doors of Durin and The Watcher (04072, or 901502 when the Nightmare card took its place: twinCode, families/nightmare/guards.ts) are in the victory display. Defeating the last stage wins (rr.winning-the-game), so
     // the bar holds only that stage (04064, as Flight to the Ford's 906301:A:2 holds 141029): To the West-door is defeated as usual.
-    {
-      id: "901501:constant:2",
-      cardCode: "901501",
-      lines: ["901501:A:4"],
-      timing: "constant",
-      condition: { kind: "all", conditions: [{ kind: "inPlay", code: LAST_STAGE, is: true }, { kind: "any", conditions: [{ kind: "inVictory", code: DOORS, is: false }, { kind: "inVictory", code: WATCHER, is: false }] }] },
-      instructions: [{ verb: "Restrict", what: "advance" }],
-    },
+    // Two bars, one for each card: the last stage waits while Doors of Durin is not in the victory display, and while The Watcher is not (the code 04072 reads as the Nightmare Watcher 901502 once the recipe took the standard one out).
+    { id: "901501:constant:2", cardCode: "901501", lines: ["901501:A:4"], timing: "constant", condition: { kind: "all", conditions: [{ kind: "inPlay", code: LAST_STAGE, is: true }, { kind: "inVictory", code: DOORS, is: false }] }, instructions: [{ verb: "Restrict", what: "advance" }] },
+    { id: "901501:constant:3", cardCode: "901501", lines: ["901501:A:4"], timing: "constant", condition: { kind: "all", conditions: [{ kind: "inPlay", code: LAST_STAGE, is: true }, { kind: "inVictory", code: WATCHER, is: false }] }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
     // 901502 The Watcher. A:1: in the staging area it takes no damage from player card effects. A:2 is 04072:A:3.
     {
@@ -105,7 +100,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       timing: "forced",
       trigger: "attackResolved",
       subject: "self",
-      instructions: [DISCARD_TOP, { verb: "Pick", pick: { type: "character", control: "any", who: "firstPlayer", controlledBy: "actor" }, when: CHECK }, { verb: "AttachEnemyToPicked", returns: "discard", when: CHECK }],
+      instructions: [DISCARD_TOP, { verb: "Pick", pick: { type: "character", control: "any", who: "firstPlayer", controlledBy: "source" }, when: CHECK }, { verb: "AttachEnemyToPicked", returns: "discard", when: CHECK }],
     },
     { id: "901504:constant:1", cardCode: "901504", lines: ["901504:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Tentacle" }] },
     { id: "901504:forced:2", cardCode: "901504", lines: ["901504:A:1"], timing: "forced", trigger: "readied", subject: "host", condition: { kind: "all", conditions: [ATTACHED, HOST_IS("character")] }, instructions: [{ verb: "DamageCard", amount: 1, target: "host" }] },
