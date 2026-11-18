@@ -296,6 +296,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
 - Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
 - With two Blinding Blizzards (901307) the first in staging takes the progress, with no first-player choice between them; Blinding Blizzard's progress readout ("3 / 5") does not warm near 5 (agent recommendation, `docs/brief.md`, The Redhorn Gate).
+- Road to Rivendell readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Road to Rivendell). Not user-confirmed.
 - The Redhorn Gate readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Redhorn Gate). Not user-confirmed.
 - Flight from Moria readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Flight from Moria). Not user-confirmed.
 - Flight from Moria's banner beats (`src/play/words/scenarios/gundabad-beats.ts`) say a flipped stage flips "at the beginning of the quest phase" (Moria flips at the staging step) and a Nightmare bypass goes to "the bottom of the quest deck" (it is shuffled in).
