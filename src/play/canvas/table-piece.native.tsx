@@ -21,10 +21,11 @@ import { samePiece, type BodyProps, type PieceProps } from "./table-piece.ts";
  */
 export function drawBody(p: BodyProps, slot: CardSlot, dim: boolean) {
   const { image, name, fonts, backs, t, s } = p;
-  // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
+  // A pile, or the top of the deck the rules let the player play now (Gandalf): face up and picked like a hand card.
   if (slot.kind === "pile" || slot.zone === "deck") {
-    // A discard pile holding a card the seat may play from it (Elven-light) glows and wears the play mark; its list plays the card.
-    const playable = slot.kind === "pile" && p.tappable;
+    // A discard pile holding a card the seat may play from it (Elven-light) glows and wears the play mark; its list plays the card. A
+    // playable deck top glows and wears it too, so it reads apart from a faceup top that cannot be played now (142002:A:1).
+    const playable = p.tappable;
     const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} fan={p.fan} name={name} fonts={fonts} label playable={playable} backs={backs} t={t} s={s} />;
     return playable ? (
       <Group>

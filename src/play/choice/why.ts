@@ -44,6 +44,8 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
         return printed.type === "event" ? "It is played as a Response, when its moment comes." : "It cannot be played.";
       case "That card is not in hand":
         return "It is not in your hand.";
+      case "The top card of the deck was already played from this phase":
+        return "A card was already played from the top of your deck this phase. It can be again next phase.";
       case "That card cannot be played now":
         return "Its condition does not hold now.";
       case "That card has no legal target":
