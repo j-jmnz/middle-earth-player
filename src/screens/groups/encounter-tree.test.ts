@@ -7,7 +7,7 @@ import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
 import { collectionSets } from "../collection/sets.ts";
 import { groupDataOf } from "./cache.ts";
 import { campaignTree } from "./campaign-tree.ts";
-import { encounterList, searchEncounter, type EncounterProduct } from "./encounter-tree.ts";
+import { encounterList, productTitle, searchEncounter, type EncounterProduct } from "./encounter-tree.ts";
 import { row } from "./fixtures.ts";
 import { scenarioTree } from "./scenario-tree.ts";
 
@@ -16,6 +16,7 @@ const collection = [
   { id: "cycle", title: "A Cycle", packs: ["P1", "P2"] },
   { id: "campaign-box", title: "A Campaign Expansion", packs: ["CE"] },
 ];
+const cycles = collection.map((entry) => ({ ...entry, heading: "Cycles" }));
 const packs = [
   { code: "Core", name: "Core Set" },
   { code: "P1", name: "First Pack" },
@@ -54,6 +55,12 @@ describe("encounterList", () => {
     const hunt = list()[1]!.items.find((item) => item.kind === "row" && item.label === "The Hunt");
     expect(hunt).toMatchObject({ group: "set", detail: "First Pack · 1 card" });
   });
+
+  it("titles a cycle of several packs with the word Cycle, and keeps a one-pack product's title", () => {
+    expect(cycles.map(productTitle)).toEqual(["Core Set", "A Cycle Cycle", "A Campaign Expansion"]);
+    const products = encounterList(scenarioTree(rows, cycles, packs), campaignTree(rows, campaigns, cycles, packs, new Map()), cycles);
+    expect(products.map((product) => product.title)).toEqual(["Core Set", "A Cycle Cycle", "A Campaign Expansion"]);
+  });
 });
 
 describe("searchEncounter", () => {
@@ -80,6 +87,16 @@ describe("the catalog's Encounter cards list", () => {
     expect(keys.filter((key) => key.startsWith("set:")).length).toBe(data.scenario().byKey.size);
     expect(keys.filter((key) => key.startsWith("campaign:")).length).toBe(data.campaign().byKey.size);
     expect(products.at(-1)?.id).toBe("nightmare");
+  });
+
+  it("lists every cycle of the collection with its sets, titled as a cycle", () => {
+    const cycles = collectionSets().filter((entry) => entry.heading === "Cycles" && entry.packs.length > 1);
+    for (const cycle of cycles) {
+      const product = products.find((item) => item.id === cycle.id);
+      expect(product?.title, cycle.id).toBe(`${cycle.title} Cycle`);
+      expect(product?.items.some((item) => item.kind === "row" && item.group === "set"), cycle.id).toBe(true);
+    }
+    expect(products.find((item) => item.id === "the-hobbit")?.items.some((item) => item.kind === "row" && item.group === "set")).toBe(true);
   });
 
   it("files a campaign under the product that prints its cards", () => {

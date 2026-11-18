@@ -1,5 +1,5 @@
 // The Cards tab's Encounter cards view as data (docs/design-system.md, Card groups): one entry for each product of data/collection.json in its
-// order, the Nightmare decks last, each holding its encounter sets and then its campaigns' sections (campaign cards, Boons, Burdens, Treasures).
+// order (a cycle titled with the word Cycle), the Nightmare decks last, each holding its encounter sets and then its campaigns' sections (campaign cards, Boons, Burdens, Treasures).
 // A pack's one set is a row of its own; a pack of several sets is a heading over them, unless the product is that one pack. A campaign is filed
 // under the product that prints most of its cards. A search keeps the rows, headings and products whose words hold every word typed. Pure.
 import { cardsWord } from "./card-group";
@@ -28,6 +28,12 @@ export type EncounterProduct = {
 };
 
 type CollectionLike = { id: string; packs: readonly string[] };
+type CollectionEntry = CollectionLike & { title: string; heading?: string };
+
+/** A product's fold title: a cycle of several packs says so ("Dwarrowdelf Cycle"); a campaign expansion, a box or a pack keeps its own title. */
+export function productTitle(entry: Pick<CollectionEntry, "title" | "heading" | "packs">): string {
+  return entry.heading === "Cycles" && entry.packs.length > 1 ? `${entry.title} Cycle` : entry.title;
+}
 
 // The collection entry that prints most of a campaign's cards; the first listed wins a tie.
 function homeOf(campaign: CampaignNode, collection: readonly CollectionLike[]): string | null {
@@ -61,14 +67,14 @@ function campaignItems(campaigns: readonly CampaignNode[], productTitle: string)
 }
 
 /** Every product with a set or a campaign section, in the collection's order, then the Nightmare decks. */
-export function encounterList(scenario: ScenarioTree, campaign: CampaignTree, collection: readonly (CollectionLike & { title: string })[]): EncounterProduct[] {
+export function encounterList(scenario: ScenarioTree, campaign: CampaignTree, collection: readonly CollectionEntry[]): EncounterProduct[] {
   const homes = new Map<string, CampaignNode[]>();
   for (const node of campaign.campaigns) {
     const home = homeOf(node, collection);
     if (home) homes.set(home, [...(homes.get(home) ?? []), node]);
   }
   const products = new Map(scenario.products.map((product) => [product.id, product]));
-  const entries = [...collection.map((entry) => ({ id: entry.id, title: entry.title })), ...scenario.products.filter((product) => !collection.some((entry) => entry.id === product.id))];
+  const entries = [...collection.map((entry) => ({ id: entry.id, title: entry.title, shown: productTitle(entry) })), ...scenario.products.filter((product) => !collection.some((entry) => entry.id === product.id)).map((product) => ({ id: product.id, title: product.title, shown: product.title }))];
   return entries.flatMap((entry): EncounterProduct[] => {
     const product = products.get(entry.id);
     const packs = product?.packs ?? [];
@@ -83,7 +89,7 @@ export function encounterList(scenario: ScenarioTree, campaign: CampaignTree, co
     const count = packs.reduce((sum, pack) => sum + pack.sets.length, 0);
     const own = homes.get(entry.id) ?? [];
     const items = [...sets, ...campaignItems(own, entry.title)];
-    return items.length === 0 ? [] : [{ id: entry.id, title: product?.title ?? entry.title, summary: summaryOf(count, own.length > 0), items }];
+    return items.length === 0 ? [] : [{ id: entry.id, title: entry.shown, summary: summaryOf(count, own.length > 0), items }];
   });
 }
 
