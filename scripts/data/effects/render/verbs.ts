@@ -8,9 +8,10 @@ import { ANGMAR_TEMPLATES } from "./angmar.ts";
 import { ESCAPE_STAT_NOTES, ESCAPE_TEMPLATES } from "./escape.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES, guardianRestrict } from "./guardian.ts";
 import { SMAUG_SAMPLES, SMAUG_STAT_NOTES, SMAUG_TEMPLATES } from "./smaug.ts";
+import { ERECH_SAMPLES, ERECH_STAT_NOTES, ERECH_TEMPLATES } from "./erech.ts";
 
 export { ESCAPE_SAMPLES } from "./escape.ts";
-export { GUARDIAN_SAMPLES, SMAUG_SAMPLES };
+export { ERECH_SAMPLES, GUARDIAN_SAMPLES, SMAUG_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -68,6 +69,7 @@ const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(valu
 const STAT_NOTE: Readonly<Record<string, string>> = {
   ...ESCAPE_STAT_NOTES,
   ...SMAUG_STAT_NOTES,
+  ...ERECH_STAT_NOTES,
   questProgressCap: " (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count)",
   cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
   cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",
@@ -119,6 +121,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...ANGMAR_TEMPLATES,
   ...GUARDIAN_TEMPLATES,
   ...SMAUG_TEMPLATES,
+  ...ERECH_TEMPLATES,
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";

@@ -19,6 +19,7 @@ import { modifiedStat } from "../../core/keywords.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { encounterStart, encounterWorld, kept, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
 import { probeTable } from "../../../../scripts/card-smoke/encounter.ts";
+import { currentQuestHas } from "../quest/conditions.ts";
 import { nightCard } from "./night.ts";
 
 let world: EncounterWorld;
@@ -214,6 +215,34 @@ describe("50302:A:1 and 50304:A:1 Derufin", () => {
   });
 });
 
+describe("50303:B:2 no progress on the stage unless a player controls Derufin", () => {
+  // Stage 3 is the current quest; Tarlang's Neck is explored away so the progress goes to the stage.
+  function onStageThree(): ScenarioState {
+    const stage = spawn(table, "50303", { zone: "questStage" });
+    return syncConstants(moveCard(stage.state, table.activeLocation ?? "", { zone: "encounterDiscard" }), ctxOf());
+  }
+
+  it("places none while Derufin is attached to the Stone, and some once the first player controls him", () => {
+    const state = onStageThree();
+    const stage = state.questStage ?? "";
+    expect(state.cards[stage]?.code).toBe("50303");
+    expect(run(state, { verb: "PlaceQuestProgress", perPlayer: 3 }).cards[stage]?.progress).toBe(0);
+    const derufin = spawn(state, "50304", { zone: "play", seat: 0 });
+    const freed = syncConstants(derufin.state, ctxOf());
+    expect(run(freed, { verb: "PlaceQuestProgress", perPlayer: 3 }).cards[stage]?.progress).toBe(3);
+  });
+});
+
+describe("50303:B:1 Midnight. Battle", () => {
+  it("gives stage 3B the Battle keyword only while Midnight is in play", () => {
+    const stage = spawn(table, "50303", { zone: "questStage" }).state;
+    const at = (state: ScenarioState) => currentQuestHas(syncConstants(state, ctxOf()), "battle", ctxOf().cards);
+    expect(at(stage)).toBe(false);
+    expect(at(nightIs(stage, "50309"))).toBe(false);
+    expect(at(nightIs(stage, "50310"))).toBe(true);
+  });
+});
+
 describe("50324:A:1 PassHand", () => {
   const handOf = (state: ScenarioState, seat: number) => [...(state.seats[seat]?.hand ?? [])];
 
@@ -244,16 +273,8 @@ describe("50324:A:1 PassHand", () => {
 });
 
 describe("the table flags", () => {
-  const flag = (state: ScenarioState, stat: "noQuestProgress" | "skipPlanning" | "noCollect" | "cannotPlayEvents" | "losesIcons", target: string): ScenarioState =>
+  const flag = (state: ScenarioState, stat: "skipPlanning" | "noCollect" | "cannotPlayEvents" | "losesIcons", target: string): ScenarioState =>
     ({ ...state, modifiers: [...state.modifiers, { instanceId: target, sourceId: target, stat, amount: 1, until: "endOfRound" as const }] });
-
-  it("noQuestProgress: no progress of any kind goes on the quest card (50303:B:2)", () => {
-    const stage = table.questStage ?? "";
-    const barred = flag(table, "noQuestProgress", stage);
-    const placed = run(barred, { verb: "PlaceQuestProgress", perPlayer: 9 });
-    expect(placed.cards[stage]?.progress).toBe(0);
-    expect(run(table, { verb: "PlaceQuestProgress", perPlayer: 9 }).cards[stage]?.progress ?? 0).toBeGreaterThan(0);
-  });
 
   it("cannotPlayEvents: an event cannot be played, an ally can (50312:A:2)", () => {
     const cards = new Map(ctxOf().cards).set("q-event", definePrinted({ code: "q-event", name: "Event", type: "event" })).set("q-ally", definePrinted({ code: "q-ally", name: "Ally", type: "ally" }));

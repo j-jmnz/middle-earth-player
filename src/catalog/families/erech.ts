@@ -1,5 +1,5 @@
 // The erech family (The Stone of Erech, docs/brief.md, The Stone of Erech): the Night objectives (Eventide, Dusk, Midnight: one lies in play beside the quest, takes progress and gives way to the next), Derufin who is attached to the Stone and
-// joins the first player, the hand passed to the left, and the table flags the quest and the encounter cards set (no quest progress, no planning phase, no resource collection, no events, lost icons). src/rules/families/erech/ runs and reads them.
+// joins the first player, the hand passed to the left, and the table flags the quest and the encounter cards set (no planning phase, no resource collection, no events, lost icons). src/rules/families/erech/ runs and reads them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -24,8 +24,6 @@ const VERBS = [
 ] as const;
 
 const FLAGS = [
-  // On the current quest card: no progress of any kind is placed on it, from questing or from an effect ("Players cannot place progress on this stage unless they control Derufin", 50303:B:2). A location takes its share first as usual.
-  "noQuestProgress",
   // On the table, until the end of the round: the planning phase is skipped ("each player skips the next planning phase", 50302:B:1).
   "skipPlanning",
   // On the table, until the end of the round: no hero collects resources in the resource phase ("heroes do not collect resources during the resource phase this round", 50302:B:1); an effect that adds resources still works.

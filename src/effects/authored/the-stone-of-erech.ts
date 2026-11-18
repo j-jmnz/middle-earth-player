@@ -74,7 +74,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["50303:B:2"],
     timing: "constant",
     condition: { kind: "not", condition: { kind: "playersControl", code: "50304" } },
-    instructions: [{ verb: "ModifyStat", stat: "noQuestProgress", amount: 1, until: "whileSourceInPlay", target: "self" }],
+    instructions: [{ verb: "ModifyStat", stat: "noQuestProgress", amount: 1, until: "whileSourceInPlay", target: "table" }],
   },
   { id: "50303:triggered:1", cardCode: "50303", lines: ["50303:B:3"], timing: "triggered", trigger: "questDefeated", instructions: [{ verb: "WinGame" }] },
 
@@ -86,7 +86,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["50304:A:1"],
     timing: "forced",
     trigger: "traveled",
-    condition: { kind: "matches", card: "activeLocation", pick: { type: "location", control: "any", names: [STONE] } },
+    subject: { type: "location", control: "any", names: [STONE] },
     instructions: [{ verb: "FreeAttachedObjective", who: "firstPlayer" }],
   },
   NIGHT_STATS("50304", "50304:A:2", 2, DUSK, SELF_STAT("willpower", -1)),

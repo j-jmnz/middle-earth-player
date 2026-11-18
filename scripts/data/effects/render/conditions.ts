@@ -4,9 +4,11 @@ import { done, isObj, jsonOf, str, withArticle, type Ctx, type Obj } from "./kit
 import { renderPick } from "./picks.ts";
 import { ESCAPE_CONDITIONS } from "./escape.ts";
 import { GUARDIAN_CONDITIONS } from "./guardian.ts";
+import { ERECH_CONDITIONS } from "./erech.ts";
 
 export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
+export { ERECH_CONDITION_SAMPLES } from "./erech.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
   activeLocation: "is the active location",
@@ -32,6 +34,7 @@ type Template = (c: Obj, ctx: Ctx) => { text: string; read: readonly string[] } 
 export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_CONDITIONS,
   ...GUARDIAN_CONDITIONS,
+  ...ERECH_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
   subjectExplored: () => ({ text: "the card the event is about had enough progress to be explored", read: [] }),

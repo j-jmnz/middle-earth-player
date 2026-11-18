@@ -273,7 +273,7 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
   const amount = reduced ? reduceQuestProgress(state, absorbed) : absorbed;
   const stage = state.cards[stageId];
-  if (!stage || flagged(state, stageId, "noQuestProgress")) return state; // noQuestProgress: no progress of any kind on the card (50303:B:2, families/erech/)
+  if (!stage) return state;
   const advancing = points != null && canAdvance(state);
   const placed = advancing ? Math.min(amount, Math.max(0, points - stage.progress)) : amount;
   let next = state;
