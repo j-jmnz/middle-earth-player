@@ -179,7 +179,7 @@ Read the sections your task touches.
   - 350–359 Phase carousel (~680)
   - 360–365 Quest advance (~530) ← 1
   - 366–369 Undo (~150)
-  - 370–373 Haptics (~280)
+  - 370–373 Haptics (~280) ← 1
   - 374–385 Banner (~750) ← 5
   - 386–405 Screen reader (~3.0K) ← 19
   - 406–409 Android Back (~90)
@@ -220,7 +220,7 @@ Read the sections your task touches.
     - 446–451 Card (~490) ← 2
     - 452–463 Collection (~530) ← 3
     - 464–467 Deck import (~120)
-    - 468–482 Settings (~1.6K) ← 15
+    - 468–482 Settings (~1.6K) ← 16
     - 483–488 Rules (~470) ← 1
     - 489–492 Rule (~220) ← 1
     - 493–500 Booklet (~540) ← 2
@@ -307,6 +307,7 @@ Read when a task names the plan.
   - 155–166 After each scenario phase (~220)
   - 167–170 Order (~70)
   - 171–178 Verification (~100)
+- `docs/plans/sound-and-music.md` — Plan: sound effects and music (~2.2K tok)
 
 ## Handovers
 
