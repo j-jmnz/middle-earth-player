@@ -7,6 +7,7 @@ import * as digest from "../../campaign/digest.ts";
 import migrations from "../../../drizzle/migrations";
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
 import { fixtureSave, hasFixture, type FixtureName } from "../../campaign/fixtures.ts";
+import { staleChanges } from "../../campaign/changes.ts";
 import { CATALOG_VERSION } from "../../catalog/version.ts";
 import { readCheckpoint, readSave, savedAt, writeActive, writeCheckpoint, writeDealt, writeSave } from "../data/campaign-store.ts";
 import { ENGINE_VERSION } from "../../campaign/replay.ts";
@@ -41,8 +42,8 @@ describe("opening the table", () => {
     const old = { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1 } };
     writeSave(user, old);
     const before = savedAt(user).get("s1");
-    // No engine line is recorded for the version it missed, so the sheet shows its generic sentence only.
-    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null, changes: [] });
+    // The sheet lists the engine lines recorded for the version it missed that reach its scenario.
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null, changes: staleChanges({ ...old.active, world: null }, old.loadout!.scenarioId, null) });
     expect(readSave(user, "s1")).toEqual(old);
     expect(savedAt(user).get("s1")).toBe(before);
   });

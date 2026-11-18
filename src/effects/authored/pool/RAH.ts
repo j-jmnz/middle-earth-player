@@ -4,7 +4,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
   // 17028 Thurindir. The only side quests in data/cards are player side quests.
-  {"id":"17028:constant:1","cardCode":"17028","lines":["17028:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"player-side-quest"}},"until":"whileSourceInPlay"}]},
+  {"id":"17028:constant:1","cardCode":"17028","lines":["17028:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":{"count":{"type":"card","control":"any","from":"victory","sideQuest":true}},"until":"whileSourceInPlay"}]},
   // 17029 Kahliel's Tribesman
   {"id":"17029:action:1","cardCode":"17029","lines":["17029:A:1"],"timing":"action","cost":{"kind":"exhaustSelf"},"condition":{"kind":"canPick","pick":{"type":"character","control":"any","trait":"Harad","other":true}},"instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","trait":"Harad","other":true}},{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"endOfPhase","target":"picked"}]},
   // 17030 Steed of the North. data/cards spells the trait both "Dúnedain" and "Dunedain"; both are the one trait.

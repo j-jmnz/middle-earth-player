@@ -69,6 +69,7 @@ describe("effects render read fields, picks", () => {
     guardsTrait: "Clue",
     soleMostDamaged: true,
     attached: true,
+    sideQuest: true,
   };
   const SAMPLES: readonly Obj[] = [
     BIG,

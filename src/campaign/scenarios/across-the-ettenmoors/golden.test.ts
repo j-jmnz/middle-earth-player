@@ -32,6 +32,8 @@ describe("Across the Ettenmoors golden", () => {
         expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("10064");
         // The side quest rules hold: a pick that spans seats names the owner on each row.
         expect(state.sideQuests, golden.name).toBe(true);
+        // Lie Low, shuffled in by the quest card's Setup, asks whether progress was placed on it this round (10081:A:1): the game notes each placement from the start.
+        expect(state.progressNoted, golden.name).toBe(true);
         const staged = state.staging.map((id) => state.cards[id]);
         expect(staged.filter((card) => card?.code === "10072"), golden.name).toHaveLength(golden.seatCount);
         const place = staged.filter((card) => SAFE.includes(card?.code ?? ""));

@@ -104,6 +104,8 @@ export type EffectData = {
   // names (the enemy a character defends against).
   subject?: string;
   other?: string;
+  // The card the source was attached to when its own cost took it out of play ("Discard Cram to ready attached hero", 131011:A:2): "attached hero" still names it.
+  host?: string;
   // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.

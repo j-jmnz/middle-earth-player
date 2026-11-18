@@ -23,9 +23,17 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 27, scenarios: ["the-drowned-ruins", "a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "Command (Spirit) can put the campaign's own Spyglass from outside the game into play, on its Upgraded side when its boxes are marked, while no Spyglass is in play." },
   { version: 27, scenarios: ["the-passing-of-the-grey-company", "the-siege-of-gondor", "the-black-gate-opens"], note: "Raising each player's threat to search for Andúril happens after the starting threat level is set, so the threat floor no longer includes that raise." },
   { version: 28, scenarios: ["the-caves-of-nibin-dum"], note: "A quest stage that prints 0 quest points is no longer completed in the same quest phase that reveals it: its When Revealed effects resolve first." },
+  {
+    version: 29,
+    scenarios: ["across-the-ettenmoors", "deadmens-dike", "escape-from-mount-gram", "fire-in-the-night", "intruders-in-chetwood", "the-battle-of-carn-dum", "the-dread-realm", "the-treachery-of-rhudaur", "the-wastes-of-eriador", "the-weather-hills"],
+    note: "Cards that count the side quests in the victory display, like Legacy Blade, Thurindir, Thalion and Dagnir, count encounter side quests and player side quests alike.",
+  },
+  { version: 29, scenarios: ["across-the-ettenmoors"], note: "Lie Low lowers the enemies' engagement costs only in a round when no progress was placed on it." },
+  { version: 29, scenarios: ["across-the-ettenmoors", "intruders-in-chetwood", "the-wastes-of-eriador"], note: "Lost in the Wilderness returns the cards under it to their owners' hands when it is defeated, instead of discarding them." },
+  { version: 29, scenarios: "all", note: "Cram readies the hero it was attached to after it is discarded." },
 ];
 
-export const ENGINE_VERSION = 28;
+export const ENGINE_VERSION = 29;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

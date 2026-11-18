@@ -33,6 +33,8 @@ export const SIDE_CARDS: ReadonlyMap<string, PrintedCard> = new Map([
     quest("10086", "Send for Aid", "leadership", 1, 6),
     quest("16013", "The Storm Comes", "neutral", 0, 5),
     quest("17003", "Prepare for Battle", "leadership", 1, 6),
+    // An encounter side quest: a side quest too, for the cards that count the side quests in the victory display (mec108.side-quests).
+    definePrinted({ code: "wilds", name: "Wild Detour", type: "encounter-side-quest", questPoints: 4, victory: 1 }),
     quest("17036", "Explore Secret Ways", "lore", 1, 6, { victory: null }),
     quest("17059", "Keep Watch", "tactics", 1, 6),
     quest("17087", "Rally the West", "spirit", 1, 6),

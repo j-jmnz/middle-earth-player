@@ -29,6 +29,8 @@ export type AmountScope = {
   picked?: readonly string[];
   subject?: string | null;
   other?: string | null;
+  // The host the source lost to its own cost (EffectData.host): "attached hero" after "Discard Cram".
+  host?: string;
   x?: number;
   dealt?: number;
   excess?: number;
@@ -46,6 +48,7 @@ export function frameScope(state: ScenarioState, actor: number, sourceId: string
     ...(data.picked ? { picked: data.picked } : {}),
     ...(data.subject ? { subject: data.subject } : {}),
     ...(data.other ? { other: data.other } : {}),
+    ...(data.host ? { host: data.host } : {}),
     ...(data.x != null ? { x: data.x } : {}),
     ...(data.dealt != null ? { dealt: data.dealt } : {}),
     ...(data.excess != null ? { excess: data.excess } : {}),
@@ -60,7 +63,7 @@ export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope):
     case "self":
       return scope.sourceId;
     case "host":
-      return source?.host ?? null;
+      return source?.host ?? scope.host ?? null;
     case "picked":
       return scope.picked?.at(-1) || null;
     case "subject":

@@ -279,6 +279,12 @@ export function payUsage(
 
 // A Forced or triggered effect with a limit spends it when it resolves ("Limit once per game", 01130:A:4): the use is recorded as a
 // player's Response's is, and `limitSpent` keeps the effect from firing again (rules/windows/triggers.ts).
+/** The card the source was attached to before its cost was paid, when paying took it off ("Discard Cram to ready attached hero", 131011:A:2): the effect's "attached hero" still names it. */
+export function hostLostToCost(before: ScenarioState, paid: ScenarioState, sourceId: string): { host?: string } {
+  const host = before.cards[sourceId]?.host;
+  return host && paid.cards[sourceId]?.host !== host ? { host } : {};
+}
+
 export function noteForcedUse(state: ScenarioState, effect: Effect, sourceId: string, seat: number): ScenarioState {
   if (!effect.limit) return state;
   const rule = LIMITS[effect.limit];

@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
+import { EFFECTS } from "../../../effects/index.ts";
 import { doRefresh } from "../../engine/refresh.ts";
 import { updateCard } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
@@ -11,6 +12,8 @@ import { attach, damage, miscCtx } from "./fixture.ts";
 import { offered, passResponses, play, put, run, seat, send, trigger, triggers } from "../play/fixture.ts";
 
 const ctx = miscCtx(RECORDS);
+// Cram's records are the player pool's (src/effects/authored/pool/OHaUH.ts).
+const cramCtx = miscCtx([...RECORDS, ...EFFECTS.filter((effect) => effect.cardCode === "131011")]);
 
 describe("choose a player, then heal what that player controls", () => {
   it("Beorn's Hospitality heals all damage on each hero of the chosen player only (01068:A:1)", () => {
@@ -108,6 +111,16 @@ describe("choose one", () => {
     expect(state.window).toMatchObject({ kind: "choose", options: expect.arrayContaining(["discard", "keep"]) });
     state = send(state, { type: "Choose", optionId: "discard" }, ctx);
     expect(state.cards[wound.id]?.zone).not.toBe("attached");
+  });
+
+  it("Cram readies the hero it was attached to after its cost discards it (131011:A:2)", () => {
+    const table = seat(1, ["dwarf", "rohan"]);
+    const cram = put(table.state, "131011", "play");
+    const hero = table.heroes[0] ?? "";
+    let state = updateCard(attach(cram.state, cram.id, hero), hero, { exhausted: true });
+    state = trigger(state, cram.id, "131011:action:1", cramCtx);
+    expect(state.cards[cram.id]?.zone).toBe("discard");
+    expect(state.cards[hero]?.exhausted).toBe(false);
   });
 
   it("Miner of the Iron Hills discards a Condition attachment from play (01061:A:1)", () => {

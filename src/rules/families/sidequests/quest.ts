@@ -94,7 +94,8 @@ export function defeatSideQuest(state: ScenarioState, questId: string, ctx: Redu
   if (!quest) return state;
   // A card the side quest holds under it in play comes back to its players (Rescue Iârion, families/angmar/hold.ts).
   const into = flipsInto(ctx, quest.code);
-  const heard = noteHostDefeated(state, questId);
+  // An encounter side quest is no player's card: the seat that revealed it does not control it as it leaves play, so the player cards facedown under it stay there for its own effect (09051:A:2) instead of going to a discard pile.
+  const heard = noteHostDefeated(quest.zone !== "seatQuest" && quest.controller != null ? updateCard(state, questId, { controller: null }) : state, questId);
   let next = releaseHeldOnDefeat(into ? heard : releaseAttachments(heard, questId, ctx.cards, steps), questId);
   next = into ? flipDefeated(next, questId, into) : updateCard(addToVictory(next, questId, ctx), questId, { progress: 0, committed: false });
   next = queueEvent(next, { trigger: "questDefeated", seat: quest.controller, cardId: questId, subject: questId });
