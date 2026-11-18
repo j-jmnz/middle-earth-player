@@ -803,6 +803,16 @@
     },
     {
       "match": {
+        "code": "147015"
+      },
+      "set": {
+        "victory": null
+      },
+      "reason": "Hall of Beorn gives Wall of Trees the Victory 254, its code for X. The scan prints Threat X, quest points 4 and Victory X, where X equals the number of players, so the card has no number and its records read X.",
+      "source": "scan 147015.A, sha256 12e16baaf12ddaa467bbfe8c7db5190e04d9ba1606b03178e26a0e9a53ada011 (data/printed/standalone-scenarios.json)"
+    },
+    {
+      "match": {
         "code": "18029"
       },
       "set": {

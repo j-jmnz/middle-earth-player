@@ -420,9 +420,11 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const traited = set?.traits ? { ...pictured, traits: set.traits } : pictured;
     // A printed stat a source leaves out: Threat and engagement cost of a burden enemy (Hall of Beorn files its Threat icon as Willpower), and
     // the stats and Victory of a ship, which Hall of Beorn has no field for.
-    const printedStats = { ...traited, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health", "victory"]) };
+    const printedStats = { ...traited, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health"]), ...(set?.victory != null ? { victory: set.victory } : {}) };
     // A quest stage that prints no quest points, which Hall of Beorn fills with 0 (a stage with 0 would be completed as it is revealed): both sides carry none.
-    const stated = set?.questPoints !== undefined ? { ...printedStats, questPoints: set.questPoints, back: printedStats.back ? { ...printedStats.back, questPoints: set.questPoints } : printedStats.back } : printedStats;
+    // A Victory printed as X (Wall of Trees), which Hall of Beorn files as the number 254: the card carries none and its records read X.
+    const victorious = set?.victory === null ? { ...printedStats, victory: null } : printedStats;
+    const stated = set?.questPoints !== undefined ? { ...victorious, questPoints: set.questPoints, back: victorious.back ? { ...victorious.back, questPoints: set.questPoints } : victorious.back } : victorious;
     // A card type a source files wrongly: a ship-enemy that Hall of Beorn lists as an enemy (the scan prints SHIP-ENEMY).
     const typed = set?.type === "ship-enemy" ? { ...stated, type: set.type, typeName: "Ship-enemy" } : stated;
     // The stats of the Upgraded side, side B, which Hall of Beorn has no fields for either (dcce.scalable-upgradable).
