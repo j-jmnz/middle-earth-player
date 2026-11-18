@@ -104,7 +104,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DealSourceAsShadow":
       return dealSourceAsShadow(state, focus);
     case "AttachEnemyToPicked":
-      return attachEnemyToPicked(state, focus, ctx);
+      return attachEnemyToPicked(state, instruction, focus, ctx);
     case "DestroyHighestCostAlly":
       return destroyHighestCostAlly(state, instruction, focus, ctx, steps);
     case "DiscardOtherInPlay":

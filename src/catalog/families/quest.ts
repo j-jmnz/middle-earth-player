@@ -156,6 +156,9 @@ const FLAGS = [
   // discard it", 901307:A:2): the card stays in the staging area after its reveal (windows/frames.ts), takes the progress that would go on the current quest stage or on a location with the Snow trait, in play or in the staging area, from questing or an effect, up to 5, and is discarded
   // with the 5th; what it cannot take is placed as it would have gone without it (families/quest/blizzard.ts, read where progress is placed: rules/quest/quest.ts putOnStage, interpret/effect-verbs.ts placeProgress, south/locations.ts placeOnActive, attachments/quest.ts).
   "progressRedirect",
+  // On a location, from its own constant ("Progress tokens that would be placed on Doors of Durin are instead placed on the current quest card", 04065:A:1): what would be placed on it from a card effect goes on the main quest stage, and it is never explored
+  // (families/quest/doors.ts, read in interpret/effect-verbs.ts placeProgress; questing places none on a location with no quest points).
+  "progressToQuest",
   // Held by the table while the current stage holds it ("Snowdrifts" 04012:B:2: the stage is defeated while the characters are still committed, so Caradhras' -1 Willpower and stage 3B's discard at 0 reach them): the quest resolution keeps the commitments until its second pass
   // (rules/quest/quest.ts resolveQuest, stage-reveal.ts resolutionStep).
   "heldCommitted",

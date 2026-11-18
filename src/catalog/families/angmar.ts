@@ -110,7 +110,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("DealSourceAsShadow"), ...when }),
   // The source, an enemy that has left play (Wraith of Carn Dûm), attaches to the card the effect picked last and counts as an attachment: it has no enemy text while it lies there, and when its host leaves play it returns to the staging area as an enemy instead of being discarded with it ("attach it to a character in play ... If
   // the attached character leaves play, return Wraith of Carn Dûm to the staging area as an enemy", 101157:A:1). Discarded by another effect while attached it is simply discarded. Nothing happens with no card picked.
-  z.strictObject({ verb: z.literal("AttachEnemyToPicked"), ...when }),
+  // `to: other`: the card the answered event names as its other card ("attaches to the defending character", Writhing Tentacle 901503:A:1: the event is the attack's end and names its defender; nothing is attached when the attack was undefended or the character left play).
+  // `returns: discard`: a Tentacle attachment (The Watcher in the Water, 04073:A:1, 901503:A:1, 901504:A:1): it is no enemy while it lies there and goes to the encounter discard pile with the others when its host leaves play (`asAttachment: "discard"`).
+  z.strictObject({ verb: z.literal("AttachEnemyToPicked"), to: z.literal("other").optional(), returns: z.literal("discard").optional(), ...when }),
   // The ally with the highest printed cost among every player's allies in play (an X cost or no printed cost counts 0) is destroyed; the first player chooses among those that tie. It becomes the effect's last picked card and lies in its owner's discard pile; with no ally in play nothing is picked ("Destroy the highest cost ally
   // in play", 101162:A:2).
   z.strictObject({ verb: z.literal("DestroyHighestCostAlly"), ...when }),

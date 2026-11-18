@@ -110,6 +110,8 @@ const TRIGGERS = [
 ] as const;
 
 const FLAGS = [
+  // On an enemy: the damage a player card's effect would place on it is not placed ("While The Watcher is in the staging area, it cannot be damaged by player card effects", 901502:A:1). The damage of a character's attack, and the damage an encounter card's effect deals, are.
+  "noPlayerEffectDamage",
   // Damage assigned to the holder goes to the host of the modifier's source instead ("attached hero takes all damage assigned
   // to the chosen hero").
   "damageToSourceHost",

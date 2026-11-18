@@ -177,7 +177,8 @@ export const simpleVerbs = [
   // Setup: each player draws this many fewer cards in the starting hand (and in a mulligan redraw).
   z.strictObject({ verb: z.literal("ReduceOpeningHand"), amount: z.number().int().positive(), ...when }),
   // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles. With `each`, every matching card goes and the deck is shuffled once ("shuffle all copies of the \"Sacked!\" card from the discard pile back into the encounter deck", 02041:A:1).
-  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), ...when }),
+  // `who: firstPlayer`: the first player chooses the card ("The first player chooses X Tentacle enemies", rr.first-player; Rippling From Beneath 901508:A:2); the actor does otherwise.
+  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), who: z.literal("firstPlayer").optional(), ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it. `cost`: the search is a Travel cost the players must be able to pay, so it needs a card to find ("Travel: The first player searches ... for a Warg enemy", 10024:A:2; rr.travel); read by the angmar family. `to: "engaged"`: the enemy found is revealed and put into play engaged with the revealing player instead of staged ("reveal it, and put it into play engaged with you", 143065:A:2).
   // `deckOnly`: the encounter deck alone is searched, not its discard pile ("Search the encounter deck for 1 copy of Prison Cell", 10039:A:2).
   z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }),

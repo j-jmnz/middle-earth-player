@@ -3,6 +3,7 @@
 //
 // Encounter cards that player card effects look at and move: the top of the encounter deck, its discard pile, the staging
 // area, the active location.
+import { announceLooked } from "./looked.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -207,7 +208,9 @@ export function lookAtTop(state: ScenarioState, instruction: Extract<Instruction
   // Each card's frame goes on the stack above the effect, in the order of the deck: the first one found resolves first, so it is pushed last.
   const heard = [...acting].reverse().reduce((current, id) => fireForced(current, { trigger: "lookedAt", seat, cardId: id }, ctx, steps), noted);
   if (ids.length === 0) return heard;
-  return { ...heard, window: { kind: "look", seat, cardIds: ids }, activeSeat: seat, passed: [] };
+  // "After a player looks at one or more cards in the encounter deck" (901506:A:1): the cards are shown, then the deck's look is announced.
+  const looked = instruction.deck === "own" || instruction.deck === "picked" ? heard : announceLooked(heard, ctx, seat);
+  return { ...looked, window: { kind: "look", seat, cardIds: ids }, activeSeat: seat, passed: [] };
 }
 
 // How many of the top cards of the encounter deck are (or, with `not`, are not) of a type: the effect's X.

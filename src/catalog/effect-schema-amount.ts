@@ -46,6 +46,8 @@ export const amountExprSchema = z.strictObject({
   dealt: z.literal(true).optional(),
   // The total Threat of all cards in the staging area now, modifiers and the active location's effects read as they are (the staging step's total, rr.staging-area; "raises his threat by the total Threat of all cards in the staging area", 02047:A:1).
   stagingThreat: z.literal(true).optional(),
+  // The damage the player attack the effect answers (`enemyAttacked`) would deal its enemy: the attackers' total Attack less the enemy's Defense, 0 at the least ("deal the damage from the attack to 1 character", 04074:A:1). Read by the encounter family.
+  attackDamage: z.literal(true).optional(),
   // The damage an attack sent on past its defender (excessToShip), read by the effect the attack leaves for its end ("deal that much damage", 11055:A:2).
   excess: z.literal(true).optional(),
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the

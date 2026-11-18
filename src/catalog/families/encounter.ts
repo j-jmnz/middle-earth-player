@@ -15,6 +15,12 @@ const discardType = z.enum(["enemy", "location", "treachery", "objective", "enco
 const sphere = z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]);
 
 const VERBS = [
+  // The topmost enemy of the encounter discard pile (the last put there) that has this trait is revealed by the actor in full, as any reveal is: it leaves the pile and enters the staging area, its When Revealed and keywords resolve ("Reveal the topmost Tentacle enemy in the
+  // encounter discard pile to travel here", 901506:A:2). As a Travel cost it cannot be paid with no such enemy in the pile (rr.travel).
+  z.strictObject({ verb: z.literal("RevealFromDiscard"), type: z.literal("enemy"), trait: z.string().min(1), ...when }),
+  // Deals `amount` damage to each character, any player's, that has an attachment with this trait ("Deal 3 damage to each character with a Tentacle attachment", 901507:A:1). The effect's X becomes the number of characters that were damaged: damage a shield or a cap
+  // prevented all of, or that was canceled, leaves the character undamaged ("If no characters were damaged by this effect", a `not x` condition).
+  z.strictObject({ verb: z.literal("DamageEachWithAttachment"), amount: z.number().int().positive(), trait: z.string().min(1), ...when }),
   // Shows the actor the top `count` cards (1 by default) of the encounter deck, or of their own deck (`deck: "own"`), in a
   // look window they close with a pass. Nothing moves. The top card becomes the picked card ("that card", "the looked at
   // card"), and the effect remembers every card shown (for ArrangeEncounter and PickEncounter `from: "looked"`). An empty
@@ -163,9 +169,15 @@ const TRIGGERS = [
   // effect instructs a player to "look" at cards in the encounter deck and Ravenous Hawk is among those cards, that player must put Ravenous Hawk into play engaged with him", 900402:A:1). The card leaves the cards the effect looked at, so it does not count
   // for what the effect picks or discards among them.
   "lookedAt",
+  // About the seat: a card effect made a player look at cards of the encounter deck (a look at its top cards, a search of it), announced once the cards are shown; any card in play hears it ("After a player looks at one or more cards in the encounter deck",
+  // 901506:A:1). Announced only in a game with a card that hears it (families/encounter/looked.ts).
+  "lookedAtEncounterDeck",
 ] as const;
 
 const FLAGS = [
+  // On an enemy until the end of the phase, set by its Forced effect before an immediate attack it makes: its attack-resolved Forced effect attaches it to the character that defended ("makes an immediate attack, then attaches to the defending character", Writhing Tentacle 901503:A:1).
+  // The attack-resolved effect clears it; an undefended attack leaves nothing to attach to.
+  "attachesAfterAttack",
   // Held by the table: a card placed in the encounter discard pile is announced (`encounterDiscarded`).
   "noteEncounterDiscards",
   // Held by the table until the end of the phase: the staging step reveals this many fewer cards, to a minimum of 0

@@ -248,6 +248,8 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
   if (source === "player" && !playerCardEffectCanChoose(printed, state, id, sourcePrinted(state, cards, sourceId))) return state;
+  // "While The Watcher is in the staging area, it cannot be damaged by player card effects" (901502:A:1): the damage of a player card's effect is not placed; an attack's combat damage and an encounter card's are.
+  if (source === "player" && flagged(state, id, "noPlayerEffectDamage")) return state;
   // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
   if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
   // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.

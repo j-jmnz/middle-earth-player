@@ -1,5 +1,6 @@
 // Effect items that act on a picked or found card: ReturnToStaging, AttachSelf, the searches, ShuffleIntoDeck, DiscardRestricted, ReadyHero,
 // BarAttack, PlaceProgressOnLocation. The candidates are found, one is chosen (a player chooses only among different cards), and the verb applies.
+import { announceLooked } from "../families/encounter/looked.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 import { immuneToSource } from "../families/misc/guards.ts";
 import { characters } from "../combat/combat.ts";
@@ -140,11 +141,14 @@ export function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ct
     ids = found.slice(0, 1);
   } else if (picksOne(item.instruction)) {
     const distinct = distinctByCode(state, found);
-    const chooser = attachHostChooser(state, item.instruction, attachSeat(state, item.instruction, item.seat, frame.cardId) ?? item.seat);
+    const chooser = item.instruction.verb === "ShuffleIntoDeck" && item.instruction.who === "firstPlayer" ? state.firstPlayer : attachHostChooser(state, item.instruction, attachSeat(state, item.instruction, item.seat, frame.cardId) ?? item.seat);
     if (distinct.length > 1) return askTarget(state, { ...item, seat: chooser }, distinct);
     ids = found.slice(0, 1);
   }
-  return applyTargeted(state, item, ids, frame.cardId, ctx, steps);
+  const applied = applyTargeted(state, item, ids, frame.cardId, ctx, steps);
+  // A search of the encounter deck looks at its cards (901506:A:1, families/encounter/looked.ts).
+  const searched = (item.instruction.verb === "SearchMove" || item.instruction.verb === "SearchReveal") && state.encounterDeck.length > 0;
+  return searched ? announceLooked(applied, ctx, item.seat) : applied;
 }
 
 function applyTargeted(

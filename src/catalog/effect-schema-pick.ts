@@ -216,7 +216,8 @@ export const pickSchema = z.strictObject({
   // controls the source's host ("a character you control", on a Condition attached to a hero by an encounter card that no player controls,
   // 142087:A:2). `nonObjective`: not a card whose printed type is objective ("a non-objective attachment", 142052:A:2: the burden objectives that
   // count as attachments are left out).
-  controlledBy: z.enum(["picked", "host"]).optional(),
+  // `actor`: controlled by the seat the effect runs for (the defending player of an `attackResolved` Forced: "a character the defending player controls", 901504:A:1, with `who: firstPlayer` choosing). `attackers`: controlled by a player whose character took part in the player attack the effect answers ("1 character an attacking player controls", 04074:A:1).
+  controlledBy: z.enum(["picked", "host", "actor", "attackers"]).optional(),
   nonObjective: z.literal(true).optional(),
   // A card whose printed type is objective ("each hero and objective ally", 12081:A:2: Captain Sahír and Na'asiyah on their objective ally sides).
   objective: z.literal(true).optional(),
