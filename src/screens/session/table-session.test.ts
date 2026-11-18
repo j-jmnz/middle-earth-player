@@ -7,7 +7,7 @@ import * as digest from "../../campaign/digest.ts";
 import migrations from "../../../drizzle/migrations";
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
 import { fixtureSave, hasFixture, type FixtureName } from "../../campaign/fixtures.ts";
-import { staleChanges } from "../../campaign/changes.ts";
+import { ENGINE_CHANGES } from "../../campaign/changes.ts";
 import { CATALOG_VERSION } from "../../catalog/version.ts";
 import { readCheckpoint, readSave, savedAt, writeActive, writeCheckpoint, writeDealt, writeSave } from "../data/campaign-store.ts";
 import { ENGINE_VERSION } from "../../campaign/replay.ts";
@@ -42,8 +42,18 @@ describe("opening the table", () => {
     const old = { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1 } };
     writeSave(user, old);
     const before = savedAt(user).get("s1");
-    // The sheet lists the engine lines recorded for the version it missed that reach its scenario.
-    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null, changes: staleChanges({ ...old.active, world: null }, old.loadout!.scenarioId, null) });
+    // The sheet lists the lines of the missed version that reach the fixture's scenario: the "all" lines, and none scoped to other scenarios.
+    expect(old.loadout!.scenarioId).toBe("a-shadow-of-the-past");
+    const missed = ENGINE_CHANGES.filter((change) => change.version === ENGINE_VERSION);
+    const everywhere = missed.filter((change) => change.scenarios === "all").map((change) => change.note);
+    const elsewhere = missed.filter((change) => change.scenarios !== "all" && !change.scenarios.includes("a-shadow-of-the-past")).map((change) => change.note);
+    expect(everywhere.length).toBeGreaterThan(0);
+    expect(elsewhere.length).toBeGreaterThan(0);
+    const opened = openTable(catalog, user, "s1");
+    expect(opened).toMatchObject({ ok: false, reason: "stale", write: null });
+    if (opened.ok) throw new Error("fixture opened");
+    expect(opened.changes).toEqual(expect.arrayContaining(everywhere));
+    for (const note of elsewhere) expect(opened.changes).not.toContain(note);
     expect(readSave(user, "s1")).toEqual(old);
     expect(savedAt(user).get("s1")).toBe(before);
   });
