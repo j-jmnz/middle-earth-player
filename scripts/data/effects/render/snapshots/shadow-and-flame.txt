@@ -144,12 +144,12 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 04148:A:1 (front): When Revealed: Each player must discard 1 attachment he controls, if able.
   04148:whenRevealed:1: When revealed
     - for each player, first player first:
-      - choose attachment (you control)
+      - choose attachment (you control) that a player controls (not an encounter attachment)
       - discard the picked card
 
 04148:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, the defending player discards all attachments he controls.
   04148:shadow:1: Shadow
-    - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the acting player discards each attachment (you control)
+    - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the acting player discards each attachment (you control) that a player controls (not an encounter attachment)
 
 ## 04149 Leaping Flame
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -201,6 +201,8 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
   04152:whenRevealed:1: When revealed
     - attach this card to an enemy in play with the trait Balrog
   04152:constant:1: Constant
+    - this card counts as a Weapon attachment while it is attached
+  04152:constant:2: Constant
     - its host: stat attack 3, while this card is in play
 
 ## 04153 Many Thonged Whip
@@ -209,7 +211,9 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 04153:A:1 (front): When Revealed: Attach Many Thonged Whip to Durin's Bane as a Weapon attachment with the text: "Forced: When Durin's Bane attacks, the defending player must discard 1 card at random from his hand."
   04153:whenRevealed:1: When revealed
     - attach this card to an enemy in play with the trait Balrog
+  04153:constant:1: Constant
+    - this card counts as a Weapon attachment while it is attached
   04153:forced:1: Forced when this enemy attacks, before the defender is declared (heard about the host)
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 149 by template, 0 as JSON)
+(rendered pieces: 153 by template, 0 as JSON)
