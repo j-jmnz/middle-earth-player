@@ -136,7 +136,7 @@ Read the sections your task touches.
     - 1844–1866 The Battle of Lake-town (~4.0K) ← 36
     - 1867–1883 The Stone of Erech (~2.2K) ← 20
     - 1884–1918 The Old Forest (~4.1K) ← 10
-    - 1919–1950 Fog on the Barrow-downs (~4.1K) ← 1
+    - 1919–1950 Fog on the Barrow-downs (~4.1K) ← 2
   - 1951–1959 Nightmare (~410) ← 21
   - 1960–2000 Deckbuilding (~2.1K)
   - 2001–2080 Effects (~3.7K)
@@ -270,10 +270,10 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~16.0K tok)
+- `docs/phases/STATUS.md` — Phase status (~16.2K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–314 Open items (~14.7K)
+  - 22–315 Open items (~14.8K)
     - 24–26 Reviews (~90)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
@@ -284,8 +284,8 @@ STATUS.md, then the active phase file.
     - 251–275 Screens and code (~1.6K)
     - 276–295 Rules and engine (The Two Towers) (~1.4K)
     - 296–302 Rules and engine (Shadows of Mirkwood) (~380)
-    - 303–314 Rules and engine (Standalone scenarios) (~1.2K)
-  - 315–340 Standing decisions (~940)
+    - 303–315 Rules and engine (Standalone scenarios) (~1.4K)
+  - 316–341 Standing decisions (~940)
 
 ## Live plans
 
