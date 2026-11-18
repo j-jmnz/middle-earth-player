@@ -268,10 +268,10 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~15.6K tok)
+- `docs/phases/STATUS.md` — Phase status (~15.7K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–309 Open items (~14.2K)
+  - 22–310 Open items (~14.3K)
     - 24–26 Reviews (~70)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
@@ -282,8 +282,8 @@ STATUS.md, then the active phase file.
     - 249–273 Screens and code (~1.6K)
     - 274–293 Rules and engine (The Two Towers) (~1.4K)
     - 294–300 Rules and engine (Shadows of Mirkwood) (~380)
-    - 301–309 Rules and engine (Standalone scenarios) (~850)
-  - 310–335 Standing decisions (~940)
+    - 301–310 Rules and engine (Standalone scenarios) (~940)
+  - 311–336 Standing decisions (~940)
 
 ## Live plans
 
