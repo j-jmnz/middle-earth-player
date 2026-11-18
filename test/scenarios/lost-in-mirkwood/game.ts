@@ -87,7 +87,7 @@ export const LOSTMIRK_GOLDENS: readonly LostmirkGolden[] = [
   { name: "true solo, won, after Journey Up the Anduin (Turayn in the pool)", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "true solo, Easy, won, the guidance line", seatCount: 1, seed: 18, difficulty: "Easy", decks: "strong", outcome: "won", policy: { resolve: "last" } },
   { name: "two-handed, won, Melanwar joins the pool, a treasure discovered", seatCount: 2, seed: 16, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed, Easy, won, the guidance line", seatCount: 2, seed: 36, difficulty: "Easy", decks: "strong", outcome: "won", policy: { resolve: "last" } },
+  { name: "two-handed, Easy, won, the guidance line", seatCount: 2, seed: 193, difficulty: "Easy", decks: "strong", outcome: "won", policy: { resolve: "last" } },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, brittle, lost with every hero dead", seatCount: 1, seed: 3, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, weak, lost: the first player's threat takes Haldan out of play", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "Haldan left play" },
