@@ -1,0 +1,13 @@
+appId: com.middleearth.player
+tags:
+  - scenario
+---
+# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `dark-won` (scripts/e2e/dwarrowdelf/the-long-dark.ts): a real two-handed
+# standalone game of The Long Dark, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
+# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml); add this scenario's own assertions after the call.
+- runFlow:
+    file: ../../subflows/standalone-win.yaml
+    env:
+      FIXTURE: dark-won
+      SCENARIO_ID: the-long-dark
+# TODO: this scenario's own assertions on the outcome screen after the win (the score).
