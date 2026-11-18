@@ -1,4 +1,4 @@
-// Rules: dwd.nameless-enemies, rr.attachment-cards, rr.first-player (data/rules/entries.json); ledger lines 04125:A:1, 04125:A:2, 04126:A:1, 04123:A:2, 901704:A:1, 901705:A:1, 901706:A:1, 901708:A:2.
+// Rules: rr.attachment-cards, rr.first-player (data/rules/entries.json); ledger lines 04125:A:1, 04125:A:2, 04126:A:1, 04123:A:2, 901704:A:1, 901705:A:1, 901706:A:1, 901708:A:2.
 //
 // The player cards attached to a Nameless enemy. A card taken from the top of a deck lies faceup on the enemy as an attachment with no title and no game text (`CardInstance.nameless`, zone attached, host the enemy, owner the deck's seat, nobody controls it): its printed
 // cost, a hero, an event with an X cost or a card with no printed cost counting 0, is its only active part. It goes to its owner's discard pile when the enemy leaves play (families/play/zones.ts leaveWith).

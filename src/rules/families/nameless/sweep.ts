@@ -1,4 +1,4 @@
-// Rules: dwd.nameless-enemies, rr.hit-points, rr.discard-pile-and-victory-display (data/rules/entries.json); ledger lines 04125:A:2, 04126:A:2, 901704:A:2, 901705:A:2.
+// Rules: rr.hit-points, rr.discard-pile-and-victory-display (data/rules/entries.json); ledger lines 04125:A:2, 04126:A:2, 901704:A:2, 901705:A:2.
 //
 // The settle sweep of a game that attaches player cards to enemies: a Nameless enemy whose attached cards cost 0 in all has X = 0 hit points and is discarded (not destroyed: it was not dealt damage), and a card that lay on an enemy and has left it is a plain player card again.
 import type { PrintedCard } from "../../core/printed.ts";

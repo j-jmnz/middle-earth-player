@@ -1,4 +1,4 @@
-// Rules: rr.encounter-deck, rr.discard-pile-and-victory-display, rr.removed-from-game, rr.shuffle (data/rules/entries.json); ledger line 04113:B:1.
+// Rules: rr.encounter-deck, rr.discard-pile-and-victory-display, rr.removed-from-game (data/rules/entries.json); ledger line 04113:B:1.
 //
 // Washed Away!: "Shuffle all enemy and treachery cards in the encounter discard pile together with the Foundations of Stone encounter set. This deck becomes the new encounter deck. Remove all other encounter deck cards from the game." The cards of the old encounter deck and
 // the other cards of its discard pile leave the game; the discarded cards of the types named and the set-aside cards of the set (the Nightmare cards that bear its icon too) are the new deck, shuffled with the game's seed, facedown.

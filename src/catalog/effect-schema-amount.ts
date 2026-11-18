@@ -123,7 +123,9 @@ export const amountExprSchema = z.strictObject({
   damageOn: pickSchema.optional(),
   // The total printed cost of the allies in the staging area ("X is the total cost of all allies in the staging area", 145074:B:1; a card with no printed cost counts 0). Read by the pelennor family.
   stagedAlliesCost: z.literal(true).optional(),
-  // The total printed cost of the player cards attached to the source from the top of a deck (a card with no printed cost, a hero or an X cost, counts 0), or this number when none is attached ("X is the printed cost of all attached cards on this card. If there are no cards attached, X is 3", 04125:A:2; dwd.nameless-enemies). Read by the nameless family.
+  // The total printed cost of the player cards attached to the source from the top of a deck (a card with no printed cost, a hero or an X cost, counts 0), or this number when none is attached ("X is the printed cost of all attached cards on this card. If there are no cards attached, X is 3", 04125:A:2; rr.attachment-cards). Read by the nameless family.
+  // The players who share the acting player's staging area: every living player before stages are separate, those at his own area after ("if there is more than one player at this staging area", 901707:A:2; mec109.multiple-staging-areas). Read by the breaking family.
+  playersAtStage: z.literal(true).optional(),
   namelessCost: z.number().int().min(0).optional(),
   // The damage that destroys Minas Tirith: its hit points less its damage, plus what the active City Wall can still take first (mec113.minas-tirith, 145046:A:1); a number no damage reaches while Minas Tirith is not in play. Read by the pelennor family.
   minasTirithLeft: z.literal(true).optional(),

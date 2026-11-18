@@ -1,4 +1,4 @@
-// Rules: rr.reveal, rr.travel, rr.encounter-deck, dwd.nameless-enemies (data/rules/entries.json); ledger line 901706:A:2.
+// Rules: rr.reveal, rr.travel, rr.encounter-deck (data/rules/entries.json); ledger line 901706:A:2.
 //
 // Nest of Horrors' Travel: each player at the stage discards the top card of the encounter deck, then each Nameless enemy discarded that way is revealed.
 import type { Instruction } from "../../../catalog/boundary.ts";

@@ -1,4 +1,4 @@
-// Rules: rr.player-elimination, rr.draw, rr.printed, rr.the-word-choose (data/rules/entries.json); ledger lines 04124:A:1, 901703:A:1.
+// Rules: rr.player-elimination, rr.drawing-cards, rr.printed, rr.the-word-choose (data/rules/entries.json); ledger lines 04124:A:1, 901703:A:1.
 //
 // Lost and Alone shuffles a hero into its owner's deck (`ScenarioState.heroesInDeck`, written only by that verb) and the hero is put into play when it is drawn; the Giant Cave Centipede shuffles the hand card with the highest printed cost back.
 import type { Instruction } from "../../../catalog/boundary.ts";

@@ -78,7 +78,7 @@ export type Keywords = {
   pass: boolean;
   // Ambush (dwd.ambush): the enemy makes the players engagement checks against it when it enters play (families/encounter/ambush.ts).
   ambush: boolean;
-  // The enemy prints X for its Attack and its hit points (dwd.nameless-enemies): a record sets them (families/nameless).
+  // The enemy prints X for its Attack and its hit points (rr.attachment-cards): a record sets them (families/nameless).
   statsX: boolean;
 };
 

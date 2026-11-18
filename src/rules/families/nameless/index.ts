@@ -1,4 +1,4 @@
-// Rules: dwd.nameless-enemies, rr.attachment-cards, rr.reveal, rr.travel (data/rules/entries.json); ledger lines 04125:A:1, 04126:A:1, 04123:A:2, 901704:A:1, 901705:A:1, 901706:A:1, 901706:A:2, 901708:A:2.
+// Rules: rr.attachment-cards, rr.reveal, rr.travel (data/rules/entries.json); ledger lines 04125:A:1, 04126:A:1, 04123:A:2, 901704:A:1, 901705:A:1, 901706:A:1, 901706:A:2, 901708:A:2.
 // The verbs src/catalog/families/nameless.ts adds: the player cards attached to the Nameless enemies (attach.ts), the cost they add up to (amounts.ts, the settle sweep that discards an enemy whose attached cards cost 0, sweep.ts) and Nest of Horrors' travel (reveal.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 

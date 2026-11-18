@@ -1,12 +1,12 @@
 // The vocabulary the Nameless enemies of Foundations of Stone (Dwarrowdelf part 8) add to effect records: player cards attached to an enemy from the top of a deck, the printed cost they add up to, and Nest of Horrors' travel that reveals the Nameless enemies it
-// discards (dwd.nameless-enemies; ledger lines 04125:A:1, 04125:A:2, 04126:A:1, 04123:A:2, 901704:A:1, 901705:A:1, 901706:A:1, 901706:A:2, 901708:A:2). The amount `namelessCost` is in effect-schema-amount.ts; src/rules/families/nameless runs and reads them.
+// discards (rr.attachment-cards; ledger lines 04125:A:1, 04125:A:2, 04126:A:1, 04123:A:2, 901704:A:1, 901705:A:1, 901706:A:1, 901706:A:2, 901708:A:2). The amount `namelessCost` is in effect-schema-amount.ts; src/rules/families/nameless runs and reads them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 
 const VERBS = [
-  // "Attach the top 2 cards of that player's deck to it" (04125:A:1): the top `count` cards (1 by default) of a deck are attached faceup to an enemy as attachments with no title and no game text: the printed cost is their only active part (dwd.nameless-enemies), and each goes to its
+  // "Attach the top 2 cards of that player's deck to it" (04125:A:1): the top `count` cards (1 by default) of a deck are attached faceup to an enemy as attachments with no title and no game text: the printed cost is their only active part (rr.attachment-cards), and each goes to its
   // owner's discard pile when the enemy leaves play. `deck`: the acting player's (the player the event was about for a Forced effect, the defending player for a Shadow effect), or the first player's (of the staging area the enemy is in once stages are separate). `to`: the enemy the card
   // is attached to: the source (default), the last picked card, the attacking enemy, or the card the event was about. `untilCost`: cards are attached one after another until the printed cost of all the cards attached to the enemy adds up to this or more, or the deck is empty
   // ("until the total printed cost of all attached cards is 6 or higher", 901705:A:1). A deck with fewer cards attaches fewer. The cards attached together are one event for the cards that hear it (`attachedFromDeck`); `extra` attaches without announcing it (the additional card Nest of Horrors adds, 901706:A:1).

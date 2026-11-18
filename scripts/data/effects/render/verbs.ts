@@ -10,8 +10,9 @@ import { ATTACH_TEMPLATES } from "./attach.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES, guardianRestrict } from "./guardian.ts";
 import { AMBUSH_TEMPLATES } from "./ambush.ts";
 import { LONG_DARK_SAMPLES, LONG_DARK_TEMPLATES, longDarkRestrict } from "./long-dark.ts";
+import { STONE_SAMPLES, STONE_TEMPLATES } from "./stone.ts";
 export { ESCAPE_SAMPLES } from "./escape.ts";
-export { GUARDIAN_SAMPLES, LONG_DARK_SAMPLES };
+export { GUARDIAN_SAMPLES, LONG_DARK_SAMPLES, STONE_SAMPLES };
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
 
@@ -115,7 +116,7 @@ const FLIP_GOLLUM = {
 } as const;
 
 export const TEMPLATES: Readonly<Record<string, Template>> = {
-  ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES,
+  ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES,
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
@@ -401,7 +402,6 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   RemoveProgressAmong: (i, ctx) => ({ text: `the acting player removes ${amount(i.amount, ctx)} progress from among the quest cards in play, one token at a time from the card they choose (all of it when fewer are there)`, read: ["amount", "left"] }),
   RemoveProgressFromQuest: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from ${i.each === true ? "each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest)" : "the current quest card"} (all of it when it holds less)`, read: ["amount", "each"] }),
   PlaceProgressOnQuestCard: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on the picked quest card, directly (the active location does not take it)`, read: ["amount"] }),
-  ClaimObjective: () => ({ text: "this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)", read: [] }),
   DiscardEach: (i, ctx) => ({ text: `the acting player discards each ${pick(i.pick, ctx)}`, read: ["pick"] }),
   EachExhaustsOne: () => ({ text: "in player order, each player exhausts a ready character they control, choosing it (a player with none exhausts none)", read: ["seat"] }),
   PickEncounter: (i) => ({

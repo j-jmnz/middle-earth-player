@@ -26,6 +26,7 @@ import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts"
 import { branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
+import { threatFromOtherAreas } from "../families/breaking/threat.ts";
 import { rescueRandom } from "../families/captured/rescue.ts";
 import { oweDiscards } from "../families/breaking/progress.ts";
 import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
@@ -84,17 +85,8 @@ export function stagingThreatSources(state: ScenarioState, cards: Cards, seat?: 
     const instance = id ? view.cards[id] : undefined;
     if (instance && flagged(view, instance.id, "activeThreat") && !flagged(view, instance.id, "noThreatContribution")) sources.push({ id: instance.id, threat: modifiedStat(view, instance, "threat", cards), from: "active" });
   }
-  // A location in another player's staging area that contributes its Threat to every other area's total, once for each area ("Shivering River", 901707:A:1).
-  if (state.separate && seat != null) {
-    const head = headOf(state, seat);
-    state.seats.forEach((other, index) => {
-      if (index >= state.seatCount || index === head) return;
-      for (const id of other.staging) {
-        const instance = state.cards[id];
-        if (instance && flagged(state, id, "threatInOtherAreas") && !flagged(state, id, "noThreatContribution")) sources.push({ id, threat: modifiedStat(state, instance, "threat", cards), from: "elsewhere" });
-      }
-    });
-  }
+  // A location in another player's staging area that contributes its Threat to this area's total (Shivering River, 901707:A:1).
+  for (const found of threatFromOtherAreas(state, seat, cards)) sources.push({ ...found, from: "elsewhere" });
   const sum = sources.reduce((total, source) => total + source.threat, 0);
   return { sources, adjust: withStagingThreat(view, sum, cards) - sum };
 }

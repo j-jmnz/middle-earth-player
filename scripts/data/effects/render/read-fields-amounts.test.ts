@@ -12,6 +12,8 @@ describe("effects render read fields, amounts", () => {
     { stat: "attack", of: "host", printed: true, negative: true },
     { stat: "willpower", ofNamed: "A Card" },
     { players: true },
+    { namelessCost: 3 },
+    { playersAtStage: true },
     { victoryPoints: true },
     { stagingThreat: true },
     { highestThreat: true },

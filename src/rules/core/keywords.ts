@@ -361,8 +361,8 @@ export function defeatedDestination(
   // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives/claimed.ts).
   // A Captive destroyed under To Isengard! or an enemy goes to its owner's discard pile (families/captives).
   const usual: Destination =
-    // An ally in the staging area under nobody's control (Retreat from Osgiliath, 145074:B:2) is still its owner's: it goes to that discard pile.
-    !fromEncounterDeck(printed) && (instance.controller != null || ((instance.captive === true || instance.zone === "staging") && instance.owner != null))
+    // An ally in the staging area under nobody's control (Retreat from Osgiliath, 145074:B:2) and a player card lying on a Nameless enemy (families/nameless) are still their owner's: they go to that discard pile.
+    !fromEncounterDeck(printed) && (instance.controller != null || ((instance.captive === true || instance.zone === "staging" || instance.nameless === true) && instance.owner != null))
       ? { zone: "discard", seat: instance.owner ?? instance.controller ?? 0 }
       : printed.type === "quest"
         ? { zone: "setAside" }

@@ -37,6 +37,8 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.players === true) return { text: "the number of players", read: ["players"] };
   if (expr.remainingQuestPoints === "activeLocation") return { text: "the quest points the active location still needs (its quest points less its progress; 0 with no active location)", read: ["remainingQuestPoints"] };
   if (expr.victoryPoints === true) return { text: "the Victory points of the cards in the victory display added up (read live)", read: ["victoryPoints"] };
+  if (typeof expr.namelessCost === "number") return { text: `the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or ${expr.namelessCost} when none is attached`, read: ["namelessCost"] };
+  if (expr.playersAtStage === true) return { text: "the number of players at the acting player's staging area (every player before the areas are separate)", read: ["playersAtStage"] };
   if (expr.stagingThreat === true) return { text: "the total Threat of all cards in the staging area now", read: ["stagingThreat"] };
   if (typeof expr.pile === "string") return { text: `the number of cards left in the ${expr.pile === "harad" ? "Harad" : str(expr.pile)} deck`, read: ["pile"] };
   if (expr.highestThreat === true) return { text: "the highest threat among the living players", read: ["highestThreat"] };

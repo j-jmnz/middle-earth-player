@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11066:A:2 (front): Forced: When Raid Leader engages you, move 1 resource from each of your heroes' resource pools to Raid Leader.
   11066:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
-    - [json MoveResourceFromHeroes {"verb":"MoveResourceFromHeroes","to":"self"}]
+    - 1 resource moves from the pool of each hero the acting player controls that has one to this card
 
 ## 11067 Battle-Hardened
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 300 by template, 36 as JSON)
+(rendered pieces: 301 by template, 35 as JSON)
