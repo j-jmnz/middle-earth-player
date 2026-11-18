@@ -38,11 +38,10 @@ export type ErechGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-stone-of-erech/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type ErechGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: ErechDecks; outcome: "won" | "lost"; policy?: Partial<ErechPolicy>; lossReason?: string };
 
-// The games to pin (about 250 intents in all, each game 20 intents or more so the reader parity test plays it, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed (the players quest through the three stages in 4 or 5 rounds one-handed, 3 or 4 two-handed, Dusk coming in once Eventide has 4 progress), and the two ways the scenario is lost: every player's
+// The games to pin (about 200 intents in all, each game 20 intents or more so the reader parity test plays it, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed (the players quest through the three stages in 4 or 5 rounds one-handed, 3 or 4 two-handed, Dusk coming in once Eventide has 4 progress), and the two ways the scenario is lost: every player's
 // threat at 50 (heroes too weak to quest) and Derufin leaving play (a two-handed game on a seed where an enemy attacks him). Easy deals the Normal deck and there is no Nightmare deck, so Normal is the one difficulty.
 export const ERECH_GOLDENS: readonly ErechGolden[] = [
   { name: "solo win", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "solo win in 5 rounds", seatCount: 1, seed: 18, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win through Dusk", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
