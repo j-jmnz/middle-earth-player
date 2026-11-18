@@ -77,6 +77,8 @@ describe("the tokens on a previewed card", () => {
     expect(tokenLines({ damage: 2, progress: 0, resources: 1, exhausted: true, committed: false })).toEqual(["2 damage", "1 resource", "Exhausted"]);
     expect(tokenLines({ damage: 0, progress: 3, resources: 4, exhausted: false, committed: true })).toEqual(["3 progress", "4 resources", "Committed"]);
     expect(tokenLines({ damage: 0, progress: 0, resources: 0, exhausted: false, committed: false })).toEqual([]);
+    // 901307:A:2: Blinding Blizzard's progress is counted against its limit of 5.
+    expect(tokenLines({ damage: 0, progress: 3, resources: 0, exhausted: false, committed: false }, 5)).toEqual(["3 / 5 progress"]);
   });
 
   it("is on the previewed card", () => {

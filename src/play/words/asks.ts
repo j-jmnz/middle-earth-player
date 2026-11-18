@@ -147,6 +147,9 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   // An AssignDamage not yet split into steps holds all of its amount.
   if (a.instruction.verb === "AssignDamage") values.left = a.instruction.left ?? resolveAmount(a.game, a.instruction.amount, scope, a.ctx);
   values.host = hostId ? a.names.card(hostId) : "Its host";
+  // The card an Each or an earlier Pick of the record chose, for the question it opens ("Fanuidhol: spend 1 resource from {picked}'s pool", 04016:A:1).
+  const chosen = scope.picked?.findLast((id) => a.game.cards[id] != null);
+  if (chosen) values.picked = a.names.card(chosen);
   // The card that triggered the record (Barren Moorland's ally), named only where an entry says it.
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("subject"))) values.subject = scope.subject ? a.names.card(scope.subject) : "that card";
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("ringBearer"))) {

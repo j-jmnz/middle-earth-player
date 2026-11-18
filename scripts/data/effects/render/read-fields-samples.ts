@@ -191,7 +191,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   AttachSelf: [
     { verb: "AttachSelf", to: { kind: "hero", trait: "Warrior" } },
     { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } },
-    { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer", unlimited: true } },
+    { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer", unlimited: true }, announces: true },
     { verb: "AttachSelf", to: { kind: "character", trait: "Eagle", unlimited: true } },
     { verb: "AttachSelf", to: { kind: "character", name: "Wilyador" } },
   ],

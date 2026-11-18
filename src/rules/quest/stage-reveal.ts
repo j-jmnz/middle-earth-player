@@ -27,7 +27,7 @@ import { timeOnReveal } from "../families/angmar/time.ts";
 // its When Revealed effects pushed as frames. The second runs once those frames have popped, and ends
 // the phase. The phase does not end while a new stage is still resolving.
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (state.questResolved) return finish({ ...state, questResolved: false });
+  if (state.questResolved) return finish(clearCommitted({ ...state, questResolved: false }));
   // The quest total is about to be counted: the cards that charge for a committed Willpower ask now, once, after the window that follows the staging step (rr.step-3-4).
   const counted = announceQuestTotal(state, ctx, steps);
   if (counted) return counted;
