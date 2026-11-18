@@ -10,11 +10,16 @@ export function firstTreacheryNote(game: ScenarioState, cardId: string, name: st
   return flagged(game, cardId, "firstTreachery") ? `${name} is the first treachery revealed this round: its When Revealed effect cannot be canceled by player cards.` : null;
 }
 
-/** The side a stage of the quest deck shows when the quest arrives at it, told with the advance: side A until the beginning of the next quest phase. Null for a stage that arrives side B. */
-export function stageArrivalNote(game: ScenarioState, cardId: string): string | null {
+/** Whether a stage of the quest deck is flipped at the beginning of the staging step, its side B's When Revealed resolving then (Flight from Moria, dwd.creating-the-quest-deck: its record names `FlipCurrentQuest` with `resolve`), not at the beginning of the quest phase (Mount Gundabad). */
+export function flipsAtStaging(ctx: ReduceContext, code: string): boolean {
+  return effectsOf(ctx, code).some((effect) => effect.instructions.some((step) => step.verb === "FlipCurrentQuest" && step.resolve === true));
+}
+
+/** The side a stage of the quest deck shows when the quest arrives at it, told with the advance: side A until the beginning of the next quest phase (the next staging step where `atStaging`). Null for a stage that arrives side B. */
+export function stageArrivalNote(game: ScenarioState, cardId: string, atStaging: boolean): string | null {
   const stage = game.cards[cardId];
   if (!stage || stage.face !== "A" || !game.stages.some((item) => item.deck === true && item.code === stage.code)) return null;
-  return "It stays side A up until the quest phase begins; its side B text works from then.";
+  return atStaging ? "It stays side A up until the staging step of the quest phase begins; its side B text works from then." : "It stays side A up until the quest phase begins; its side B text works from then.";
 }
 
 // The most quest cards in the victory display that a condition allows, when it holds one.
@@ -33,17 +38,17 @@ export function mustBypassLead(ctx: ReduceContext, code: string): string | null 
 }
 
 /** The names a beat tells a stage by: its name with its reading, and the lead of a bypass the stage forces. */
-export type StageNames = { card: (cardId: string) => string; mustBypass?: (cardId: string) => string | null };
+export type StageNames = { card: (cardId: string) => string; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean };
 
 /**
- * The beat of a stage the intent flipped or left (emce.gundabad-quest-deck, emce.bypassing): flipped to side B at the beginning of the quest phase (after the advance that brought it, when one did), or bypassed or replaced (it leads: it is why the quest moved). The
+ * The beat of a stage the intent flipped or left (emce.gundabad-quest-deck, emce.bypassing, dwd.creating-the-quest-deck): flipped to side B at the beginning of the quest phase, or of the staging step in Flight from Moria (after the advance that brought it, when one did), or bypassed or replaced (it leads: it is why the quest moved). The
  * progress a stage loses is a line of its own (a step), so a bypass says it only when there was none. Null when neither happened.
  */
 export function stageBeats(before: ScenarioState, after: ScenarioState, names: StageNames): { rank: number; title: string; lines: readonly string[] } | null {
   const id = after.questStage;
   if (!id || !after.stages.some((item) => item.deck === true)) return null;
   if (before.cards[id]?.face === "A" && after.cards[id]?.face === "B" && before.questStage === id) {
-    return { rank: 2, title: `${names.card(id)} is flipped`, lines: ["The quest card shows side B at the beginning of the quest phase: its side B text works from now on."] };
+    return { rank: 2, title: `${names.card(id)} is flipped`, lines: [`The quest card shows side B at the beginning of the ${names.atStaging?.(id) ? "staging step" : "quest phase"}: its side B text works from now on.`] };
   }
   const left = after.stageLeft;
   if (left?.bypassed !== true || left.to !== id || before.questStage !== left.from || before.questStage === id) return null;
@@ -54,7 +59,8 @@ export function stageBeats(before: ScenarioState, after: ScenarioState, names: S
     return { rank: 0, title: `${names.card(id)} becomes the current quest`, lines: [`The stage that was current ${progress} and goes back into the quest deck, which is shuffled. It is not defeated, so it is not added to the victory display. The new stage is flipped over at once.`] };
   }
   const forced = names.mustBypass?.(left.from);
-  const goes = "goes to the bottom of the quest deck. It is not defeated, so it is not added to the victory display.";
+  // Flight from Moria's Nightmare setup card (901201:A:2) shuffles a bypassed stage into the quest deck in place of the bottom of it.
+  const goes = `${flagged(after, "table", "bypassShuffles") ? "is shuffled into the quest deck, which is shuffled" : "goes to the bottom of the quest deck"}. It is not defeated, so it is not added to the victory display.`;
   const text = forced ? `${forced} ${lost === 0 ? `It has no progress to lose and ${goes}` : `It ${goes}`}` : lost === 0 ? `It had no progress to lose and ${goes}` : `The stage ${goes}`;
   return { rank: 0, title: `${names.card(left.from)} is bypassed`, lines: [text] };
 }

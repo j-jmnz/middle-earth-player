@@ -14,7 +14,7 @@ import { printedOf } from "../../rules/core/printed.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 import { stageName } from "../../rules/families/wilderland/gundabad.ts";
 import { fateNames } from "../words/scenarios/fate-beats.ts";
-import { mustBypassLead } from "../words/scenarios/gundabad-beats.ts";
+import { flipsAtStaging, mustBypassLead } from "../words/scenarios/gundabad-beats.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "../store/store.ts";
 import { tableSettings, type TableSettings } from "../../ui/table-settings.ts";
 import { momentHoldMs, summaryHoldMs } from "../readouts/banner-time.ts";
@@ -63,15 +63,19 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
   const mustBypass = useCallback((cardId: string) => mustBypassLead(ctx, store.getState().game.cards[cardId]?.code ?? ""), [store, ctx]);
   // The lines of The Fate of Wilderland's banner: where the objective stands, the card an attack discards, the enemy that took no damage, the treachery that raises the staging area's Threat (words/scenarios/fate-beats.ts).
   const fate = useMemo(() => fateNames(ctx, names.card), [ctx, names]);
-  // Whether a card prints PASS, for the locate test's lines (dwd.locate-test).
-  const passes = useCallback((cardId: string) => printedOf(ctx.cards, store.getState().game.cards[cardId]?.code ?? "").keywords.pass === true, [store, ctx]);
   // After it, the state it made. Read once per moment.
   const said = useMemo((): Moment | null => {
     if (!shown) return null;
+    // A card's code is read from the shown state, not the store: a card keeps its instance for the whole game.
+    const codeOf = (cardId: string) => shown.after.cards[cardId]?.code ?? "";
+    // Whether a card prints PASS, for the locate test's lines (dwd.locate-test); whether a stage flips at the staging step (Flight from Moria) or at the beginning of the quest phase (Mount Gundabad).
+    const passes = (cardId: string) => printedOf(ctx.cards, codeOf(cardId)).keywords.pass === true;
+    const atStaging = (cardId: string) => flipsAtStaging(ctx, codeOf(cardId));
+    const set = { card: names.card, passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, atStaging, fate };
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
-    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after), momentOf(shown.after, shown.left, shown.steps, { card: names.card, passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, fate }));
-    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, fate });
-  }, [shown, names, passes, shadow, stage, revealed, stageNamed, mustBypass, fate]);
+    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after), momentOf(shown.after, shown.left, shown.steps, set));
+    return momentOf(shown.before, shown.after, shown.steps, set);
+  }, [shown, ctx, names, shadow, stage, revealed, stageNamed, mustBypass, fate]);
   // The round summary, once the round's own moment has had its say (outcome.ts, roundSummary).
   const summary = useMemo((): Moment | null => {
     if (shown?.kind !== "sent" || !shown.ended) return null;

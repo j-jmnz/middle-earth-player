@@ -35,7 +35,7 @@ export const BEAT_MS = 650;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { card: (cardId: string) => string; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; fate?: FateNames };
+type Names = { card: (cardId: string) => string; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -121,7 +121,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         if (!current) open(1, "The quest advances", "good");
         line(`The quest advances to ${stageNamed(step.cardId)}`);
         // A stage of Mount Gundabad's quest deck arrives side A up (emce.gundabad-quest-deck).
-        const arrival = stageArrivalNote(after, step.cardId);
+        const arrival = stageArrivalNote(after, step.cardId, names.atStaging?.(step.cardId) === true);
         if (arrival) line(arrival, null, [step.cardId]);
         // A stage whose When Revealed swaps the encounter sets (Change of Plans, 12040:B:1) reads its printed words as the beat: its flips, the set that leaves and the set shuffled in are in the log.
         if (steps.slice(index + 1).some((later) => later.kind === "removeSet")) {
@@ -279,7 +279,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   });
 
   // A stage of Mount Gundabad's quest deck flipped to side B at the beginning of the quest phase, or bypassed (emce.bypassing): no step of its own.
-  const stage = stageBeats(before, after, { card: stageNamed, ...(names.mustBypass ? { mustBypass: names.mustBypass } : {}) });
+  const stage = stageBeats(before, after, { card: stageNamed, ...(names.mustBypass ? { mustBypass: names.mustBypass } : {}), ...(names.atStaging ? { atStaging: names.atStaging } : {}) });
   if (stage) groups.push({ rank: stage.rank, title: stage.title, tone: "plain", lines: stage.lines.map((text) => ({ text, mark: null })) });
 
   // Where the objective of The Fate of Wilderland stands after progress moved on it, and the resources on the card that counts them.
