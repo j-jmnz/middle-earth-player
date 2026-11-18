@@ -63,7 +63,7 @@ import * as rivendell from "../scenarios/road-to-rivendell/game.ts";
 import * as water from "../scenarios/the-watcher-in-the-water/game.ts";
 import * as dark from "../scenarios/the-long-dark/game.ts";
 import * as stone from "../scenarios/foundations-of-stone/game.ts";
-// import * as flame from "../scenarios/shadow-and-flame/game.ts";
+import * as flame from "../scenarios/shadow-and-flame/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -153,5 +153,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-watcher-in-the-water", "The Watcher in the Water", water.WATER_GOLDENS, water.waterWorld, water.playGolden),
   entry("the-long-dark", "The Long Dark", dark.DARK_GOLDENS, dark.darkWorld, dark.playGolden),
   entry("foundations-of-stone", "Foundations of Stone", stone.STONE_GOLDENS, stone.stoneWorld, stone.playGolden),
-  // entry("shadow-and-flame", "Shadow and Flame", flame.FLAME_GOLDENS, flame.flameWorld, flame.playGolden),
+  entry("shadow-and-flame", "Shadow and Flame", flame.FLAME_GOLDENS, flame.flameWorld, flame.playGolden),
 ];

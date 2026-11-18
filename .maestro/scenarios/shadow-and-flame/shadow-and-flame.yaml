@@ -2,12 +2,12 @@ appId: com.middleearth.player
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `flame-won` (scripts/e2e/dwarrowdelf/shadow-and-flame.ts): a real two-handed
-# standalone game of Shadow and Flame, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `flame-won` (scripts/e2e/dwarrowdelf/shadow-and-flame.ts): a real two-handed
+# standalone game of Shadow and Flame (the One Deck and Defenders of Gondor lists, Easy), parked on its win: Durin's Bane discarded by Dark Pit's Action, the rail reads Victory. The fixture is OPEN: no seed in 100 wins with the saved decklists (docs/phases/STATUS.md, Fixtures and Maestro).
+# The steps are the shared subflow's (.maestro/subflows/standalone-win.yaml): the victory on the table, the outcome with its score, and the Scenarios tab, where the scenario's tile reads as won.
+# A cycle has no campaign: no Resolution, no XP and no next part, so the flow checks nothing more.
 - runFlow:
     file: ../../subflows/standalone-win.yaml
     env:
       FIXTURE: flame-won
       SCENARIO_ID: shadow-and-flame
-# TODO: this scenario's own assertions on the outcome screen after the win (the score).
