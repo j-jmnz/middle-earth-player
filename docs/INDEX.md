@@ -74,7 +74,7 @@ Read the sections your task touches.
   - 91–123 Stack (~1.2K)
   - 124–141 Performance and feel (~750)
   - 142–160 Repository layout (~500)
-  - 161–399 Domain (~10.4K)
+  - 161–400 Domain (~10.4K)
     - 163–251 Campaign (~2.2K) ← 1
     - 252–266 Mirkwood campaign cards and carry-over (~890)
     - 267–279 Standalone play (~990) ← 1
@@ -82,77 +82,77 @@ Read the sections your task touches.
     - 292–325 The engine plays the game (~2.2K) ← 4
     - 326–333 Engine steps (~180)
     - 334–362 Core round (~1.3K) ← 1
-    - 363–399 Keywords implemented once (~2.0K)
-  - 400–557 Fellowship of the Ring (~10.6K)
-    - 424–438 Scenario 1 resolution (~370)
-    - 439–452 A Knife in the Dark (~1.6K) ← 1
-    - 453–456 Hide tests (~130)
-    - 457–480 Flight to the Ford burden deck and life (~1.6K) ← 1
-    - 481–495 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
-    - 496–511 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
-    - 512–535 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
-    - 536–557 Seeded decks (~660)
-  - 558–657 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
-    - 576–589 Passage Through Mirkwood (~1.6K)
-    - 590–603 Journey Along the Anduin (~2.1K)
-    - 604–624 Escape from Dol Guldur (~2.7K)
-    - 625–639 The Oath (~2.4K)
-    - 640–657 The Caves of Nibin-Dûm (~2.4K)
-  - 658–716 Dream-chaser (~16.2K) ← 4
-  - 717–744 Ered Mithrin (~16.4K) ← 7
-  - 745–1305 Angmar Awakened (~69.4K) ← 6
-    - 768–802 Intruders in Chetwood (~3.5K)
-    - 803–833 The Weather Hills (~3.9K)
-    - 834–869 Deadmen's Dike (~4.5K)
-    - 870–900 The Weather Hills (~3.9K)
-    - 901–939 Deadmen's Dike (~5.8K)
-    - 940–976 The Wastes of Eriador (~4.8K)
-    - 977–1011 Escape from Mount Gram (~3.2K) ← 1
-    - 1012–1042 The Weather Hills (~3.9K)
-    - 1043–1081 Deadmen's Dike (~5.8K)
-    - 1082–1118 The Wastes of Eriador (~4.8K)
-    - 1119–1162 Escape from Mount Gram (~5.3K)
-    - 1163–1199 Across the Ettenmoors (~5.0K)
-    - 1200–1238 The Treachery of Rhudaur (~4.3K)
-    - 1239–1274 The Battle of Carn Dûm (~4.7K)
-    - 1275–1305 The Dread Realm (~4.2K)
-  - 1306–1443 The Two Towers (~16.4K) ← 20
-  - 1444–1679 The Return of the King (~28.2K) ← 22
-    - 1472–1497 The Passing of the Grey Company (~2.7K)
-    - 1498–1529 The Siege of Gondor (~4.1K)
-    - 1530–1575 The Battle of the Pelennor Fields (~5.8K)
-    - 1576–1613 The Tower of Cirith Ungol (~4.4K)
-    - 1614–1650 The Black Gate Opens (~4.4K) ← 2
-    - 1651–1679 Mount Doom (~4.3K)
-  - 1680–1818 Shadows of Mirkwood (~14.1K) ← 4
-    - 1688–1709 The Hunt for Gollum (~2.1K) ← 2
-    - 1710–1729 Conflict at the Carrock (~2.4K) ← 2
-    - 1730–1755 A Journey to Rhosgobel (~2.9K) ← 1
-    - 1756–1773 The Hills of Emyn Muil (~1.5K) ← 1
-    - 1774–1794 The Dead Marshes (~2.1K) ← 2
-    - 1795–1818 Return to Mirkwood (~2.3K) ← 4
-  - 1819–2102 Dwarrowdelf (~39.6K) ← 3
-    - 1830–1852 Into the Pit (~2.8K) ← 9
-    - 1853–1873 The Seventh Level (~3.0K) ← 5
-    - 1874–1907 Flight from Moria (~5.5K) ← 4
-    - 1908–1944 The Redhorn Gate (~5.4K) ← 4
-    - 1945–1975 Road to Rivendell (~4.1K) ← 3
-    - 1976–2011 The Watcher in the Water (~4.6K) ← 3
-    - 2012–2039 The Long Dark (~4.8K) ← 4
-    - 2040–2071 Foundations of Stone (~4.3K) ← 3
-    - 2072–2102 Shadow and Flame (~4.1K) ← 4
-  - 2103–2111 Nightmare (~410) ← 22
-  - 2112–2152 Deckbuilding (~2.1K)
-  - 2153–2232 Effects (~3.7K)
-    - 2155–2213 Three layers (~2.4K) ← 10
-    - 2214–2224 Player side quests, contracts and saga cards (~940)
-    - 2225–2228 Window stack (~100)
-    - 2229–2232 Coverage test (~270)
-  - 2233–2255 Data sources (~710) ← 2
-  - 2256–2274 Card images (~1.3K) ← 9
-  - 2275–2302 Persistence and shipping (~3.2K) ← 10
-  - 2303–2344 Screens (~5.1K) ← 2
-    - 2329–2344 Table screen (~1.8K) ← 3
+    - 363–400 Keywords implemented once (~2.1K)
+  - 401–558 Fellowship of the Ring (~10.6K)
+    - 425–439 Scenario 1 resolution (~370)
+    - 440–453 A Knife in the Dark (~1.6K) ← 1
+    - 454–457 Hide tests (~130)
+    - 458–481 Flight to the Ford burden deck and life (~1.6K) ← 1
+    - 482–496 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
+    - 497–512 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
+    - 513–536 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
+    - 537–558 Seeded decks (~660)
+  - 559–658 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
+    - 577–590 Passage Through Mirkwood (~1.6K)
+    - 591–604 Journey Along the Anduin (~2.1K)
+    - 605–625 Escape from Dol Guldur (~2.7K)
+    - 626–640 The Oath (~2.4K)
+    - 641–658 The Caves of Nibin-Dûm (~2.4K)
+  - 659–717 Dream-chaser (~16.2K) ← 4
+  - 718–745 Ered Mithrin (~16.4K) ← 7
+  - 746–1306 Angmar Awakened (~69.4K) ← 6
+    - 769–803 Intruders in Chetwood (~3.5K)
+    - 804–834 The Weather Hills (~3.9K)
+    - 835–870 Deadmen's Dike (~4.5K)
+    - 871–901 The Weather Hills (~3.9K)
+    - 902–940 Deadmen's Dike (~5.8K)
+    - 941–977 The Wastes of Eriador (~4.8K)
+    - 978–1012 Escape from Mount Gram (~3.2K) ← 1
+    - 1013–1043 The Weather Hills (~3.9K)
+    - 1044–1082 Deadmen's Dike (~5.8K)
+    - 1083–1119 The Wastes of Eriador (~4.8K)
+    - 1120–1163 Escape from Mount Gram (~5.3K)
+    - 1164–1200 Across the Ettenmoors (~5.0K)
+    - 1201–1239 The Treachery of Rhudaur (~4.3K)
+    - 1240–1275 The Battle of Carn Dûm (~4.7K)
+    - 1276–1306 The Dread Realm (~4.2K)
+  - 1307–1444 The Two Towers (~16.4K) ← 20
+  - 1445–1680 The Return of the King (~28.2K) ← 22
+    - 1473–1498 The Passing of the Grey Company (~2.7K)
+    - 1499–1530 The Siege of Gondor (~4.1K)
+    - 1531–1576 The Battle of the Pelennor Fields (~5.8K)
+    - 1577–1614 The Tower of Cirith Ungol (~4.4K)
+    - 1615–1651 The Black Gate Opens (~4.4K) ← 2
+    - 1652–1680 Mount Doom (~4.3K)
+  - 1681–1819 Shadows of Mirkwood (~14.1K) ← 4
+    - 1689–1710 The Hunt for Gollum (~2.1K) ← 2
+    - 1711–1730 Conflict at the Carrock (~2.4K) ← 2
+    - 1731–1756 A Journey to Rhosgobel (~2.9K) ← 1
+    - 1757–1774 The Hills of Emyn Muil (~1.5K) ← 1
+    - 1775–1795 The Dead Marshes (~2.1K) ← 2
+    - 1796–1819 Return to Mirkwood (~2.3K) ← 4
+  - 1820–2103 Dwarrowdelf (~39.6K) ← 3
+    - 1831–1853 Into the Pit (~2.8K) ← 9
+    - 1854–1874 The Seventh Level (~3.0K) ← 5
+    - 1875–1908 Flight from Moria (~5.5K) ← 4
+    - 1909–1945 The Redhorn Gate (~5.4K) ← 4
+    - 1946–1976 Road to Rivendell (~4.1K) ← 3
+    - 1977–2012 The Watcher in the Water (~4.6K) ← 3
+    - 2013–2040 The Long Dark (~4.8K) ← 4
+    - 2041–2072 Foundations of Stone (~4.3K) ← 3
+    - 2073–2103 Shadow and Flame (~4.1K) ← 4
+  - 2104–2112 Nightmare (~410) ← 22
+  - 2113–2153 Deckbuilding (~2.1K)
+  - 2154–2233 Effects (~3.7K)
+    - 2156–2214 Three layers (~2.4K) ← 10
+    - 2215–2225 Player side quests, contracts and saga cards (~940)
+    - 2226–2229 Window stack (~100)
+    - 2230–2233 Coverage test (~270)
+  - 2234–2256 Data sources (~710) ← 2
+  - 2257–2275 Card images (~1.3K) ← 9
+  - 2276–2303 Persistence and shipping (~3.2K) ← 10
+  - 2304–2345 Screens (~5.1K) ← 2
+    - 2330–2345 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~63.4K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
@@ -274,22 +274,22 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~16.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~16.6K tok)
   - 5–14 Rules (~380)
   - 15–20 Phases (~50)
-  - 21–330 Open items (~15.1K)
+  - 21–331 Open items (~15.2K)
     - 23–25 Reviews (~70)
     - 26–28 README (~90)
     - 29–33 Releases (~150)
     - 34–41 Desktop (~310)
-    - 42–91 Fixtures and Maestro (~2.8K)
-    - 92–130 Rules and engine (~1.6K)
-    - 131–251 Rules and engine (Angmar Awakened) (~5.3K)
-    - 252–276 Screens and code (~1.6K)
-    - 277–296 Rules and engine (The Two Towers) (~1.4K)
-    - 297–323 Rules and engine (Dwarrowdelf) (~1.6K)
-    - 324–330 Rules and engine (Shadows of Mirkwood) (~380)
-  - 331–356 Standing decisions (~940)
+    - 42–92 Fixtures and Maestro (~2.8K)
+    - 93–131 Rules and engine (~1.6K)
+    - 132–252 Rules and engine (Angmar Awakened) (~5.3K)
+    - 253–277 Screens and code (~1.6K)
+    - 278–297 Rules and engine (The Two Towers) (~1.4K)
+    - 298–324 Rules and engine (Dwarrowdelf) (~1.6K)
+    - 325–331 Rules and engine (Shadows of Mirkwood) (~380)
+  - 332–357 Standing decisions (~940)
 - `docs/phases/phase-62-dwarrowdelf.md` — Phase 62: The Dwarrowdelf cycle, standalone with Nightmare (~690 tok)
 
 ## Live plans
