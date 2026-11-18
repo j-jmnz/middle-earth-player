@@ -6,7 +6,8 @@ import { queueEvent } from "../../windows/queue.ts";
 
 /** The start of a game with a card that holds progress notes its code; every other game is left as it is. */
 export function markProgressHeld(state: ScenarioState, ctx: Pick<ReduceContext, "effects">): ScenarioState {
-  const codes = [...new Set(ctx.effects.filter((effect) => effect.trigger === "progressWouldBePlaced").map((effect) => effect.cardCode))];
+  const dealt = new Set(Object.values(state.cards).map((card) => card.code));
+  const codes = [...new Set(ctx.effects.filter((effect) => effect.trigger === "progressWouldBePlaced" && dealt.has(effect.cardCode)).map((effect) => effect.cardCode))];
   return codes.length === 0 ? state : { ...state, progressHeldBy: codes };
 }
 
