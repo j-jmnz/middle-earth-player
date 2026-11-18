@@ -119,7 +119,7 @@ describe("04073:A:1 Grasping Tentacle", () => {
     expect(run.state.cards[made.hero]?.exhausted).toBe(true);
   });
 
-  it("04073:A:1 is no enemy while it lies there: the Watcher may be optionally engaged again (04072:A:2)", () => {
+  it("04072:A:2 the Watcher may be optionally engaged again once the Tentacle engaged with a player lies as an attachment (04073:A:1)", () => {
     const { made, run, enemy } = attackIt("04073", ["04066", "f0", "f0"], { staging: ["04072"] });
     const watcher = idOf(run.state, "04072");
     expect(run.state.cards[enemy]?.zone).toBe("attached");
