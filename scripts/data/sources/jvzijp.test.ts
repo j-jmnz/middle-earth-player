@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { jvzijpFile, jvzijpPictures, namesMatch, parseDriveFolder } from "./jvzijp.ts";
+import { HttpError } from "./fetch.ts";
+import { isDriveRefusal, jvzijpFile, jvzijpPictures, namesMatch, NotAnImageError, onDriveRefusal, parseDriveFolder } from "./jvzijp.ts";
 
 const packs = [
   { code: "Core", name: "Core Set" },
@@ -62,5 +63,29 @@ describe("JvZijp's Drive", () => {
     expect(jvzijpFile(pictures, card("Appointed by Fate", [["RevCore", 134]]), "A", 23)?.id).toBe("page-23");
     expect(namesMatch("Stricken Dumb", "Sticken Dumb")).toBe(true);
     expect(namesMatch("Gandalf", "Galadriel")).toBe(false);
+  });
+});
+
+describe("onDriveRefusal", () => {
+  it("refuses a lower source for a pinned picture", () => {
+    expect(onDriveRefusal({ sha256: "aa" })).toBe("refuse");
+  });
+
+  it("lets a card with no pin fall back to the next source", () => {
+    expect(onDriveRefusal(undefined)).toBe("fallback");
+  });
+});
+
+describe("isDriveRefusal", () => {
+  it("reads the quota page, a 403, a 429, a 5xx and a timeout as a refusal", () => {
+    expect(isDriveRefusal(new NotAnImageError("not a JPEG or PNG"))).toBe(true);
+    for (const status of [403, 429, 500, 503]) expect(isDriveRefusal(new HttpError(`GET x answered ${status}`, status)), String(status)).toBe(true);
+    expect(isDriveRefusal(new Error("GET x timed out after 2 min", { cause: new DOMException("timed out", "TimeoutError") }))).toBe(true);
+  });
+
+  it("reads a missing file or a dropped connection as no refusal", () => {
+    expect(isDriveRefusal(new HttpError("GET x answered 404", 404))).toBe(false);
+    expect(isDriveRefusal(new Error("GET x failed", { cause: new Error("ECONNRESET") }))).toBe(false);
+    expect(isDriveRefusal("text")).toBe(false);
   });
 });

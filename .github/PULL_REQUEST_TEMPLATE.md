@@ -1,4 +1,4 @@
-<!-- Title: `<type>: <summary>` (fix, feat, refactor, style or repo), at most 72 characters. It becomes the squash commit on main (.claude/rules/commit-standards.md). -->
+<!-- Title: `<type>: <summary>` (fix, feat, refactor, style or repo), at most 72 characters, the summary an action that starts with an imperative verb and sums up the whole branch. It becomes the squash commit on main, and this description its body (.claude/rules/commit-standards.md). -->
 
 ## What and why
 

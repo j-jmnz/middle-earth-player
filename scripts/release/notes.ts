@@ -27,12 +27,14 @@ export type NotesInput = {
   testflightUrl?: string;
 };
 
-// The sections a player reads, in order; repo commits are counted, not listed.
-const SECTIONS: readonly { type: CommitType; title: string }[] = [
-  { type: "feat", title: "New" },
-  { type: "fix", title: "Fixes" },
-  { type: "style", title: "Look and feel" },
-  { type: "refactor", title: "Under the hood" },
+// The sections, in order, each listing every commit of its type (user request, 2026-11-17: no change is left out or only counted). Project
+// holds the repo commits and any subject from before the commit standards, which has no type.
+const SECTIONS: readonly { types: readonly (CommitType | undefined)[]; title: string }[] = [
+  { types: ["feat"], title: "New" },
+  { types: ["fix"], title: "Fixes" },
+  { types: ["style"], title: "Look and feel" },
+  { types: ["refactor"], title: "Under the hood" },
+  { types: ["repo", undefined], title: "Project (docs, tests, tooling, data refreshes)" },
 ];
 
 /** The link that adds the app to Obtainium, which then installs each release from the Releases page (README, Install). The
@@ -49,13 +51,10 @@ export function renderNotes(input: NotesInput): string {
   else if (input.previousTag && input.reach && input.reach.names.length > 0) warnings.push(`Open games of ${joinNames(input.reach.names)} may ask you to continue or restart; the campaign log is kept.`);
   if (!input.previousTag) out.push("The first release.", "");
   if (warnings.length > 0) out.push("## Before you update", "", ...warnings.map((line) => `- ${line}`), "");
-  for (const { type, title } of SECTIONS) {
-    const lines = input.changes.filter((change) => change.type === type).map((change) => `- ${change.summary}`);
+  for (const { types, title } of SECTIONS) {
+    const lines = input.changes.filter((change) => types.includes(change.type)).map((change) => `- ${change.summary}`);
     if (lines.length > 0) out.push(`## ${title}`, "", ...lines, "");
   }
-  // The first release lists only typed commits: the history before the commit standards has no types to sort.
-  const project = input.changes.filter((change) => change.type === "repo" || change.type === undefined).length;
-  if (input.previousTag && project > 0) out.push(`Plus ${project} project ${project === 1 ? "change" : "changes"} (docs, tests, tooling, data refreshes).`, "");
   out.push(
     "## Install",
     "",

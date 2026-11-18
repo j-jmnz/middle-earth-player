@@ -3,8 +3,6 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { scenarioCards } from "../../../src/catalog/scenario-data.ts";
-import { loadAnyScenario } from "../load-scenarios.ts";
 import { DATA_DIR } from "../paths.ts";
 import { MEC108_CHANGED, MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED } from "../printed/scope.ts";
 import { cardgameToolsFile, fallbackUrls, lettersOf, PDF_PAGES, productsOfPacks } from "./pictures.ts";
@@ -94,8 +92,9 @@ describe("pictures", () => {
   });
 
   // A card added to data/cards after the last `pnpm data sync pictures` has no picture pin, and the app bundles its small scan instead (the
-  // Dream-chaser cards did, user report 2026-10-31). Every card a built scenario deals has a side A picture, except the cards no source pictures.
-  it("pins a picture for every card a built scenario deals", () => {
+  // Dream-chaser cards did, user report 2026-10-31). Every card in data/cards, which the Cards tab lists (Player, Scenario, Campaign and the
+  // Messenger of the King heroes), has a side A picture, except the cards no source pictures (user decision, 2026-11-18).
+  it("pins a picture for every card in data/cards", () => {
     const { sources } = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string }[] } | undefined> };
     const pinned = new Set([...(sources.pictures?.files ?? []), ...(sources.nightmare?.files ?? [])].map((file) => /^pictures\/(\w+)\.A\./.exec(file.path)?.[1]).filter((code) => code != null));
     // The MEC108, MEC109, MEC112 and MEC113 printings whose wording differs keep their scan (MEC108_CHANGED, MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED). Navigation (11084) is a rules card of The Grey Havens that
@@ -106,14 +105,13 @@ describe("pictures", () => {
     const emce = ["120165", ...Array.from({ length: 39 }, (_, at) => String(12166 + at))];
     const unpictured = new Set([...MEC108_CHANGED, ...MEC109_CHANGED, ...MEC112_CHANGED, ...MEC113_CHANGED, "11084", ...emce]);
     const missing: string[] = [];
-    for (const id of readdirSync(path.join(DATA_DIR, "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {
-      const scenario = loadAnyScenario(id);
-      for (const code of new Set([...scenario.stages, ...scenarioCards(scenario).map((card) => card.code), ...(scenario.campaignCard ? [scenario.campaignCard] : []), ...scenario.campaignPlaced])) {
-        if (!pinned.has(code) && !unpictured.has(code)) missing.push(`${id} ${code}`);
+    for (const file of readdirSync(path.join(DATA_DIR, "cards")).filter((name) => name.endsWith(".json"))) {
+      for (const card of JSON.parse(readFileSync(path.join(DATA_DIR, "cards", file), "utf8")) as { code: string }[]) {
+        if (!pinned.has(card.code) && !unpictured.has(card.code)) missing.push(card.code);
       }
     }
     expect(missing, "Run pnpm data sync pictures").toEqual([]);
     const scanned = new Set((sources.scans?.files ?? []).map((file) => /^scans\/(\w+)\.A\./.exec(file.path)?.[1]).filter((code) => code != null));
-    expect(emce.filter((code) => !scanned.has(code)), "Run pnpm data sync scans").toEqual([]);
+    expect([...unpictured].filter((code) => !scanned.has(code) && !pinned.has(code)), "An unpictured card keeps its scan: run pnpm data sync scans").toEqual([]);
   });
 });

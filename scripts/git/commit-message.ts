@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { runScript, type Log } from "../log.ts";
 
 // Checks commit subjects against .claude/rules/commit-standards.md (Subject line): "<type>: <summary>", one of the
-// types below, at most 72 characters, no closing period. A message file and a range also have their bodies checked for a
+// types below, at most 72 characters, no closing period, the summary an action (its first word an imperative verb). A message file and a range also have their bodies checked for a
 // Claude Code session link, which the repository is public enough to keep out (commit-standards.md, Body).
 // Usage: pnpm commit:check "<subject>"... checks the subjects given; --range <base>..<head> checks every non-merge
 // commit in the range (CI checks a pull request's commits and its title, which becomes the squash commit's subject);
@@ -23,12 +23,34 @@ const AUTOSQUASH = /^(fixup|squash|amend)! /;
 // instead (commit-standards.md, Commit often). A summary about the game's checkpoint, which ends in no such marker, passes.
 const CHECKPOINT_MARKER = /(?:[,;:–—-]\s*|\(\s*)checkpoint\s*\)?$/i;
 
+// A first word that cannot start an action: an article, a pronoun or a determiner ("The table menu scrolls", "Each card shows").
+const NOT_A_VERB = new Set(["a", "an", "the", "this", "that", "these", "those", "each", "every", "all", "some", "any", "no", "both", "its", "it", "their", "they", "we", "i", "my", "our", "your", "you", "his", "her", "one", "there", "now"]);
+// Imperatives that end like a third-person verb, a past verb or a gerund, which the endings below would otherwise refuse.
+const ENDING_IMPERATIVES = new Set([
+  "bring", "string", "spring", "sing", "swing", "ring", "wing", "ping", "sting", "cling", "fling", "sling",
+  "embed", "feed", "seed", "shed", "need", "speed", "breed", "bleed", "proceed", "exceed", "succeed", "shred",
+  "alias", "canvas", "bias",
+]);
+
+/** Why a summary's first word does not start an action, or undefined: an article or pronoun, or a verb ending in -s, -ed or -ing ("Adds", "Added", "Adding"). */
+export function actionProblem(summary: string): string | undefined {
+  const first = (/^[A-Za-z']+/.exec(summary)?.[0] ?? "").toLowerCase();
+  if (first === "" || ENDING_IMPERATIVES.has(first)) return undefined;
+  if (NOT_A_VERB.has(first)) return `starts with "${first}"; start the summary with the action, an imperative verb ("Show", "Fix", "Add")`;
+  if (/[^s]s$/.test(first) && !/(us|is)$/.test(first)) return `starts with "${first}"; write the verb as an order ("Add", not "Adds"), or start with one`;
+  if (first.length > 4 && /ed$/.test(first)) return `starts with "${first}"; write the verb as an order ("Fix", not "Fixed")`;
+  if (first.length > 4 && /ing$/.test(first)) return `starts with "${first}"; write the verb as an order ("Show", not "Showing")`;
+  return undefined;
+}
+
 /** What is wrong with a commit subject, or undefined when it follows the standard. */
 export function subjectProblem(subject: string): string | undefined {
   if (!SUBJECT.test(subject)) return `"${subject}" does not start with "<type>: " (types: ${COMMIT_TYPES.join(", ")})`;
   if (subject.length > SUBJECT_MAX) return `"${subject}" is ${subject.length} characters; the limit is ${SUBJECT_MAX}`;
   if (subject.endsWith(".")) return `"${subject}" ends with a period`;
   if (CHECKPOINT_MARKER.test(subject)) return `"${subject}" ends with a checkpoint marker; say what the step did`;
+  const action = actionProblem(subject.slice(subject.indexOf(": ") + 2));
+  if (action) return `"${subject}" ${action}`;
   return undefined;
 }
 

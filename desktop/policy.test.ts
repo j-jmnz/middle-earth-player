@@ -64,8 +64,10 @@ describe("allowExternal", () => {
 });
 
 describe("allowPermission", () => {
-  it("denies every request", () => {
+  it("denies every request but writing text to the clipboard", () => {
     expect(allowPermission()).toBe(false);
+    for (const permission of ["clipboard-read", "media", "geolocation", "notifications", "fullscreen", "openExternal", "unknown"]) expect(allowPermission(permission)).toBe(false);
+    expect(allowPermission("clipboard-sanitized-write")).toBe(true);
   });
 });
 

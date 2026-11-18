@@ -121,6 +121,15 @@ describe("readerRows piles", () => {
     expect(discard && discard.kind === "pile" ? discard.label : "").toContain("a card playable now");
   });
 
+  it("names the top card of a deck the seat plays faceup (142002:A:1)", () => {
+    const state = find((game) => game.mode === "planning");
+    const top = state.seats[0]?.deck[0] ?? "";
+    const deck = (deps: ReaderRowsDeps) => section(readerRows(state, 0, deps), "piles").items.find((item) => item.kind === "pile" && item.id === "pile:deck");
+    const name = depsOf().nameOf(state.cards[top]?.code ?? "");
+    expect(deck(depsOf({ deckFaceUp: true }))).toMatchObject({ label: `Deck, ${state.seats[0]?.deck.length} cards, ${name} on top` });
+    expect(deck(depsOf())).toMatchObject({ label: `Deck, ${state.seats[0]?.deck.length} cards` });
+  });
+
   it("adds the victory display only once it holds a card", () => {
     const state = find((game) => game.mode === "planning");
     const none = section(readerRows(state, 0, depsOf()), "piles").items.map((item) => (item.kind === "pile" ? item.id : ""));

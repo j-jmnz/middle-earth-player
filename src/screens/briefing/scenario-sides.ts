@@ -1,4 +1,4 @@
-// The sides of a scenario's quest cards as the briefing's preview shows them (scenario-cards.tsx). Pure, so a test reads it.
+// The sides of a scenario's quest cards as the briefing's and the campaign setup's previews show them (scenario-cards.tsx, campaign-cards.tsx). Pure, so a test reads it.
 
 /** The quest cards in stage order, each on side A then side B, labelled "Stage 1A", "Stage 1B". */
 export function questSides(stages: readonly string[]): { code: string; side: "A" | "B"; label: string }[] {

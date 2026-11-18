@@ -1858,8 +1858,8 @@
   "outOfScope": [
     {
       "pack": "MotKA",
-      "reason": "RingsDB's (MotK) hero versions of unique allies are a deckbuilding stand-in, not printed cards: the Messenger of the King contract (22134) turns the ally itself into a hero in play, so these stay out of the card pool, and an import reads each as its ally.",
-      "source": "user decision, 2026-11-16"
+      "reason": "RingsDB's (MotK) hero versions of unique allies are a deckbuilding stand-in, not printed cards: the Messenger of the King contract (22134) turns the ally itself into a hero in play, so they are browse only: the Cards tab lists them, no deck or picker does, and an import reads each as its ally.",
+      "source": "user decision, 2026-11-16, browse only 2026-11-18"
     }
   ],
   "productCodes": [

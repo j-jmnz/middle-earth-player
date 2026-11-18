@@ -73,6 +73,7 @@ export default function CampaignSetup() {
     <BriefingScreen
       {...frame}
       scenarioId={data.scenarios[0] ?? null}
+      campaignSetup={{ id, scenarios: data.scenarios, campaignCards: data.campaignCards }}
       banner={<CampaignBanner eyebrow={`Campaign · ${words}`} name={name} />}
       bar={
         <View className="gap-2">

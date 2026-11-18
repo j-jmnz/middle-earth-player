@@ -7,7 +7,7 @@ import { OFFER_LINK_HINT, offerLinkLabel, offerTitle } from "../../ui/update/off
 /** What the menu needs of the table's navigation: the word the table's back control names the screen it leads to. */
 export type MenuNav = { backLabel: string; backAccessibilityLabel: string };
 
-export type MenuItemId = "update" | "leave" | "log" | "rules" | "booklet" | "setup" | "settings" | "resign";
+export type MenuItemId = "update" | "leave" | "log" | "rules" | "booklet" | "setup" | "settings" | "debug" | "resign";
 
 export type MenuItem = {
   id: MenuItemId;
@@ -24,9 +24,9 @@ export type MenuItem = {
 };
 
 /**
- * The menu's rows in order: what opens over the table (Log, Rules, Booklet, the scenario's Setup card, Table settings), Resign, then, apart at the foot, Leave the table
+ * The menu's rows in order: what opens over the table (Log, Rules, Booklet, the scenario's Setup card, Table settings), Copy game state, Resign, then, apart at the foot, Leave the table
  * with its door mark and no more words (user request, 2026-10-27); a screen reader still hears where it goes and that the game is saved.
- * `without` leaves out the rows a game has nothing behind: Booklet for a cycle's scenario, the Setup card where there is none. `update` is the version
+ * `without` leaves out the rows a game has nothing behind: Booklet for a cycle's scenario, the Setup card where there is none, Copy game state while Debug tools is off. `update` is the version
  * on offer (src/ui/update/offer.ts): its row heads the menu, since the table shows no update ribbon (docs/design-system-table.md, Table menu).
  */
 export function menuItems(nav: MenuNav, without?: readonly MenuItemId[], update?: string | null): readonly MenuItem[] {
@@ -51,6 +51,8 @@ export function menuItems(nav: MenuNav, without?: readonly MenuItemId[], update?
     // The scenario's campaign card, its Setup side, shown large (user request, 2026-11-01).
     { id: "setup", testID: "setup-card-open", label: "Setup card", accessibilityLabel: "Show the scenario's setup card", icon: null },
     { id: "settings", testID: "settings-open", label: "Table settings", accessibilityLabel: "Table settings", accessibilityHint: "Opens the table settings", icon: null },
+    // Debug tools (docs/design-system.md, Settings): the whole game as JSON on the clipboard, for a bug report. The table leaves the row out while the setting is off.
+    { id: "debug", testID: "debug-copy", label: "Copy game state", accessibilityLabel: "Copy the game state", accessibilityHint: "Copies the whole game as text, hidden cards included", icon: null },
     // Gives the scenario up: the game is lost and its outcome opens (the table asks first). Danger, like Leave the table.
     { id: "resign", testID: "resign-open", label: "Resign", accessibilityLabel: "Resign the scenario", accessibilityHint: "Ends the scenario as lost, after you confirm", icon: null, tone: "danger" },
     {

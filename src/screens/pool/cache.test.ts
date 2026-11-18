@@ -26,6 +26,19 @@ describe("the pool cache", () => {
     for (const code of pool.notApplied) expect(pool.byCode.has(code)).toBe(true);
   });
 
+  it("holds the Messenger of the King heroes apart from the deck-legal pool, sorted by name", () => {
+    const pool = poolOf(catalog);
+    expect(pool.motk.length).toBe(84);
+    expect(pool.motk.every((row) => !row.deckLegal && row.typeCode === "hero")).toBe(true);
+    expect(sortPool(pool.motk).map((row) => row.code)).toEqual(pool.motk.map((row) => row.code));
+    for (const row of pool.motk) expect(pool.byCode.has(row.code)).toBe(false);
+    // Each strip names its ally's pack, so two heroes of one name differ ("(MotK) Anborn", 9906114 and 99144004).
+    for (const row of pool.motk) expect(pool.motkNotes.get(row.code), row.code).not.toBe("Ally");
+    const anborn = pool.motk.filter((row) => row.name === "(MotK) Anborn").map((row) => pool.motkNotes.get(row.code));
+    expect(anborn).toHaveLength(2);
+    expect(new Set(anborn).size).toBe(2);
+  });
+
   it("gives another handle its own pool", () => {
     const other = drizzle(new Database(temporaryCatalog(), { readonly: true }));
     expect(poolOf(other)).not.toBe(poolOf(catalog));

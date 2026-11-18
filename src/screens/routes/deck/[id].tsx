@@ -27,6 +27,11 @@ import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
 import { Text } from "../../../ui/text";
 import { useTopInset } from "../../nav/use-top-inset";
+import { unownedCodes } from "../../../catalog/collection";
+import { collectionPacks } from "../../collection/sets";
+import { useNotOwned } from "../../collection/store";
+import { notOwnedNote, NOT_OWNED } from "../../collection/view";
+import { poolOf } from "../../pool/cache";
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
 // The deck's head in an expanded window, in Medium's points (docs/design-system.md, Deck builder); its cards take the rest.
@@ -96,6 +101,17 @@ export default function DeckEditor() {
   const codeKey = [...draft.heroes, ...draft.cards.map((card) => card.code), ...draft.side.map((card) => card.code)].join("\0");
   const faces = useMemo(() => deckFaces(catalog, codeKey.length === 0 ? [] : codeKey.split("\0")), [catalog, codeKey]);
   const lookup = useCallback<TitleLookup>((code) => faces.get(code), [faces]);
+  // The deck's cards outside the player's collection: named in the head, "Not owned" on each. A note only: the deck stays ready.
+  const notOwnedList = useNotOwned();
+  const unowned = useMemo(() => {
+    const byCode = poolOf(catalog).byCode;
+    const rows = codeKey.length === 0 ? [] : codeKey.split("\0").flatMap((code) => byCode.get(code) ?? []);
+    return unownedCodes(rows, collectionPacks(), new Set(notOwnedList));
+  }, [catalog, codeKey, notOwnedList]);
+  const notOwnedWords = useMemo(
+    () => notOwnedNote(codeKey.length === 0 ? [] : codeKey.split("\0").flatMap((code) => (unowned.has(code) ? [faces.get(code)?.name ?? code] : []))),
+    [codeKey, unowned, faces],
+  );
 
   // The deck's and the side deck's cards with what the catalog says of each, rebuilt only when the cards or the faces change (not for
   // each key of the name).
@@ -184,7 +200,7 @@ export default function DeckEditor() {
             onPress={() => router.push({ pathname: "/card/[code]", params: { code: hero.code } })}
             onLongPress={(source) => preview.open(hero.code, hero.name, source)}
             onRemove={() => announceDraftChange(removeDraftHero(hero.code, hero.name))}
-            loss={inactive.has(hero.code) ? notAppliedWords(hero.code, "hero") : null}
+            loss={unowned.has(hero.code) ? NOT_OWNED : inactive.has(hero.code) ? notAppliedWords(hero.code, "hero") : null}
           />
         </View>
       ))}
@@ -222,6 +238,8 @@ export default function DeckEditor() {
       notApplied={notApplied}
       droppedNote={draft.droppedNote ?? null}
       starterNote={isStarterDeck(draft.id) ? STARTER_NOTE : null}
+      notOwnedNote={notOwnedWords}
+      onEditCollection={() => router.push("/collection")}
       jumps={expanded ? [] : jumps}
       onJump={jumpTo}
       top={top}
@@ -258,6 +276,7 @@ export default function DeckEditor() {
             lookup={lookup}
             onPreview={preview.open}
             loss={inactive.has(card.code) ? notAppliedWords(card.code, card.typeCode) : null}
+            unowned={unowned.has(card.code)}
           />
         ))}
       </View>
@@ -275,7 +294,7 @@ export default function DeckEditor() {
       getItemType={(item) => item.kind}
       style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: 24 * s }}
-      extraData={{ cards: draft.cards, heroes: draft.heroes, side: draft.side, refused, cellWidth }}
+      extraData={{ cards: draft.cards, heroes: draft.heroes, side: draft.side, refused, cellWidth, unowned }}
       onViewableItemsChanged={onViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
       keyboardShouldPersistTaps="handled"

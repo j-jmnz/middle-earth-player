@@ -150,6 +150,7 @@ export function NavBar({
   title,
   subtitle,
   right,
+  wrap = false,
 }: {
   onBack: () => void;
   backTestID: string;
@@ -157,6 +158,8 @@ export function NavBar({
   title?: string;
   subtitle?: string;
   right?: ReactNode;
+  // A long title or subtitle takes a second line instead of being cut off (the card-group route: "The Treachery of Rhudaur Nightmare").
+  wrap?: boolean;
 }) {
   const s = useUiScale();
   return (
@@ -165,11 +168,11 @@ export function NavBar({
       <IconButton chevron testID={backTestID} label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`} onPress={onBack} />
       {title ? (
         <View className="flex-1 items-center">
-          <Text accessibilityRole="header" numberOfLines={1} className="font-display text-title text-bone">
+          <Text accessibilityRole="header" numberOfLines={wrap ? 2 : 1} className={wrap ? "text-center font-display text-title text-bone" : "font-display text-title text-bone"}>
             {title}
           </Text>
           {subtitle ? (
-            <Text numberOfLines={1} className="text-label text-muted">
+            <Text numberOfLines={wrap ? 2 : 1} className={wrap ? "text-center text-label text-muted" : "text-label text-muted"}>
               {subtitle}
             </Text>
           ) : null}

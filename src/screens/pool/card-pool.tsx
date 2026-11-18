@@ -13,10 +13,14 @@ import { useListPreview } from "./list-preview";
 import { notAppliedWords } from "../../play/cards/not-applied";
 import { usePalette } from "../kit/palette-hook";
 import { poolOf } from "./cache";
+import { cardsWord } from "../groups/card-group";
 import { addingView, browseView } from "./view";
 import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./cards";
 import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./grid";
-import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, typeRequestWords, type PoolFilter } from "./filter";
+import { activeFilterCount, applyTypeRequest, emptyPoolFilter, filterPool, MOTK_TYPE, motkFilter, packGroups, poolCountLine, typeRequestWords, type PoolFilter } from "./filter";
+import { unownedCodes } from "../../catalog/collection";
+import { collectionPacks, collectionSets } from "../collection/sets";
+import { useNotOwned } from "../collection/store";
 import { PoolFilterSheet, typeChoices } from "./filter-sheet";
 import { ToastView } from "../kit/toast-view";
 import { gutter } from "../../ui/size-class";
@@ -47,21 +51,17 @@ function onViewableItemsChanged({ viewableItems }: { viewableItems: { item?: Poo
   if (jobs.length > 0) enqueueImageDownloads(jobs);
 }
 
-// Night chips for the type, one tap from the search field. The filter sheet leaves the type to them.
+// Night chips for the type, one tap from the search field: only types, one picked at a time. The filter sheet leaves the type to them and
+// holds the switches (Applied only, My collection).
 function TypeChips({
   types,
   value,
   onChange,
-  applied,
-  onApplied,
   request,
 }: {
   types: { code: string; name: string }[];
   value: string | null;
   onChange: (next: string | null) => void;
-  // "Applied only": the cards whose every printed line the app applies (the filter's Active text, as a chip). Off by default.
-  applied: boolean;
-  onApplied: (next: boolean) => void;
   // A request from outside the pool: the row scrolls to the chip it chose.
   request: PoolTypeRequest | null;
 }) {
@@ -75,15 +75,6 @@ function TypeChips({
   const options = [{ code: null, name: "All" }, ...types];
   return (
     <ScrollView ref={row} horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">
-      {/* A switch, not a type: a chip with a check when on, before the type chips. */}
-      <ToggleChip
-        testID="pool-applied-only"
-        asSwitch
-        selected={applied}
-        label={applied ? "✓ Applied only" : "Applied only"}
-        accessibilityLabel="Applied only: cards whose text the app applies"
-        onPress={() => onApplied(!applied)}
-      />
       {options.map((option) => (
         <ToggleChip
           key={option.code ?? "all"}
@@ -145,6 +136,9 @@ function SphereToggles({ value, onChange }: { value: string | null; onChange: (n
 // asking for the same type again applies it again after the builder has changed the chips.
 export type PoolTypeRequest = { type: string | null };
 
+const MOTK_CHOICE = { code: MOTK_TYPE, name: "MotK heroes" };
+const NONE: ReadonlySet<string> = new Set();
+
 // The deck-legal player pool, searched and filtered in memory, as a grid of the card pictures or a list of rows. The Cards tab
 // browses it; the deck editor opens it with `adding` to put cards in the open draft: each card then has − and +. The body is the
 // search, the type chips, the grid or list and the filter sheet, with no Screen, bar, toast or preview of its own: `CardPool` below
@@ -198,8 +192,15 @@ export function CardPoolBody({
   const recycle = grid ? recyclePool(columns, listHeight, poolCellHeight(cellWidth, adding, scale)) : recyclePool(1, listHeight, LIST_ROW_HEIGHT * scale);
   // The sorted pool, its packs and the cards with a line the app does not apply: read once per catalog (pool/cache.ts), shared with the
   // Cards tab, the pool route, the deck editor's cards pane and the import screen.
-  const { rows, packs: packRows, notApplied: inactiveCodes, byCode } = poolOf(catalog);
-  const groups = useMemo(() => cycleGroups(packRows), [packRows]);
+  const { rows, packs: packRows, notApplied: inactiveCodes, byCode, motk: motkRows, motkNotes } = poolOf(catalog);
+  const groups = useMemo(() => packGroups(collectionSets(), packRows), [packRows]);
+  // The cards outside the player's collection (src/catalog/collection.ts): the My collection chip hides them, and with it off they
+  // say "Not owned". Empty, and the chip gone, while everything is owned.
+  const notOwnedList = useNotOwned();
+  const notOwned = useMemo(() => new Set(notOwnedList), [notOwnedList]);
+  const unowned = useMemo(() => unownedCodes(rows, collectionPacks(), notOwned), [rows, notOwned]);
+  // Keyed on the cards, not the saved packs: a pack switched off that holds no deck-legal card leaves everything owned.
+  const collectionSet = unowned.size > 0;
   const [search, setSearch] = useState("");
   // The field shows each keystroke at once; the list catches up when React has time, so typing never waits on the grid.
   const query = useDeferredValue(search);
@@ -217,11 +218,16 @@ export function CardPoolBody({
   }
   const [draftFilter, setDraftFilter] = useState<PoolFilter>(applied);
   const [open, setOpen] = useState(false);
+  // The Messenger of the King's heroes (browse only) are a chip of their own while browsing: picked, the pool lists them in place of the
+  // deck-legal cards, searched and narrowed by sphere and the sheet as those are, and each says on its strip which ally it stands for.
+  const motkOn = !adding && applied.typeCode === MOTK_TYPE;
   const visible = useMemo(
-    () => filterPool(rows, query, applied, groups, inactiveCodes),
-    [rows, query, applied, groups, inactiveCodes],
+    () => (motkOn ? filterPool(motkRows, query, motkFilter(applied), groups, NONE, NONE) : filterPool(rows, query, applied, groups, inactiveCodes, unowned)),
+    [motkOn, motkRows, rows, query, applied, groups, inactiveCodes, unowned],
   );
-  const types = useMemo(() => typeChoices(rows), [rows]);
+  const allyNotes = motkOn ? motkNotes : null;
+  const unownedShown = useMemo(() => (applied.owned || !collectionSet ? 0 : visible.filter((card) => unowned.has(card.code)).length), [applied.owned, collectionSet, visible, unowned]);
+  const types = useMemo(() => (!adding && motkRows.length > 0 ? [...typeChoices(rows), MOTK_CHOICE] : typeChoices(rows)), [adding, motkRows, rows]);
   const list = useRef<FlashListRef<PoolRowCard>>(null);
   useEffect(() => {
     if (!typeRequest) return;
@@ -230,14 +236,16 @@ export function CardPoolBody({
   }, [typeRequest, types]);
   // Other printings of a title share its copy limit: the deck's codes are named from the loaded rows.
   const lookup = useMemo<TitleLookup>(() => (code) => byCode.get(code), [byCode]);
-  const filters = activeFilterCount(applied);
+  // With the heroes picked, the badge counts only what narrows them.
+  const filters = activeFilterCount(motkOn ? motkFilter(applied) : applied);
   const openCard = useCallback((code: string) => (onOpen ? onOpen(code) : router.push({ pathname: "/card/[code]", params: { code } })), [router, onOpen]);
   const previewCard = onPreview;
   // One function while nothing it reads changes, so FlashList and the memoized cards skip the cards a render did not touch.
   const renderItem = useCallback(
     ({ item, index }: { item: PoolRowCard | undefined; index: number }) => {
       if (!item) return null;
-      const loss = inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null;
+      const loss = allyNotes ? (allyNotes.get(item.code) ?? null) : inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null;
+      const out = unowned.has(item.code);
       const count = draftCopyCount(draft, item.code, item.typeCode);
       const full = draftAddRefused(draft, item, lookup, target);
       const side = target === "side";
@@ -245,7 +253,7 @@ export function CardPoolBody({
       const offSide = side && (item.typeCode === "hero" || item.typeCode === "contract");
       const stepper = adding && !offSide;
       if (!grid) {
-        return <PoolCardRow item={item} adding={stepper} side={side} loss={loss} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
+        return <PoolCardRow item={item} adding={stepper} side={side} loss={loss} unowned={out} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
       }
       return (
         <PoolCardCell
@@ -255,6 +263,7 @@ export function CardPoolBody({
           adding={stepper}
           side={side}
           loss={loss}
+          unowned={out}
           count={count}
           full={full}
           lookup={lookup}
@@ -264,7 +273,7 @@ export function CardPoolBody({
         />
       );
     },
-    [grid, cellWidth, columns, scale, adding, inactiveCodes, draft, target, lookup, openCard, previewCard, selected],
+    [grid, cellWidth, columns, scale, adding, allyNotes, inactiveCodes, unowned, draft, target, lookup, openCard, previewCard, selected],
   );
 
   function openSheet(): void {
@@ -297,12 +306,10 @@ export function CardPoolBody({
         types={types}
         value={applied.typeCode}
         onChange={(typeCode) => setApplied({ ...applied, typeCode })}
-        applied={applied.activeText}
-        onApplied={(activeText) => setApplied({ ...applied, activeText })}
         request={typeRequest}
       />
       <View className="mt-1 flex-row items-center justify-between">
-        <Text testID="pool-shown" className="text-label text-muted">{`${visible.length} ${visible.length === 1 ? "card" : "cards"}`}</Text>
+        <Text testID="pool-shown" className="text-label text-muted">{motkOn ? `${cardsWord(visible.length)} · Browse only` : poolCountLine(visible.length, applied.owned, collectionSet, unownedShown)}</Text>
         <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact accessibilityLabel="Card view" />
       </View>
       <View
@@ -340,7 +347,7 @@ export function CardPoolBody({
           />
         ) : null}
       </View>
-      <PoolFilterSheet open={open} rows={rows} groups={groups} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
+      <PoolFilterSheet open={open} rows={rows} groups={groups} notOwned={draftFilter.owned && collectionSet ? notOwned : null} collection={collectionSet} heroes={motkOn} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
     </View>
   );
 }

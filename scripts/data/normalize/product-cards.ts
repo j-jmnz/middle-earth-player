@@ -83,6 +83,9 @@ export function addNightmareCards(hob: readonly HobCard[], byCode: Map<string, C
     const code = nightmareCode(deck, source.Number);
     if (byCode.has(code)) throw new Error(`Nightmare card ${code} (${source.Title}) is already built`);
     const merged = merge(code, source, source);
+    // The source gives a Nightmare side quest or ship enemy of the later decks no encounter set; the deck's own set ("Intruders in Chetwood Nightmare") is its
+    // Hall of Beorn card set. The setup card has none (it is the deck's one card of its own).
+    if (merged.type !== "nightmare" && merged.encounterSet == null) merged.encounterSet = deck.set;
     merged.printings = merged.printings.map((printing) => ({ ...printing, pack: NIGHTMARE_PACK }));
     byCode.set(code, merged);
   }

@@ -24,6 +24,8 @@ const pool = new Map<string, PoolFact>([
   ["01026", { name: "Steward of Gondor", typeCode: "attachment", deckLegal: false }],
   ["01014", { name: "Faramir", typeCode: "ally", deckLegal: true }],
   ["9901014", { name: "(MotK) Faramir", typeCode: "hero", deckLegal: false }],
+  ["131006", { name: "Bilbo's Ally", typeCode: "ally", deckLegal: true }],
+  ["99131006", { name: "(MotK) Bilbo's Ally", typeCode: "hero", deckLegal: false }],
   ["22134", { name: "Messenger of the King", typeCode: "contract", deckLegal: true }],
 ]);
 
@@ -128,6 +130,13 @@ describe("buildDecklist", () => {
     const built = buildDecklist(body!, pool);
     expect(built.heroes).toEqual(["141002"]);
     expect(built.cards).toEqual([{ code: "01014", count: 1 }, { code: "22134", count: 1 }, { code: "01073", count: 3 }]);
+    expect(built.droppedCodes).toEqual([]);
+  });
+
+  it("reads a Hobbit saga (MotK) hero, coded 99 and six digits, as its ally", () => {
+    const built = buildDecklist(readDecklistBody({ name: "Saga", heroes: { "141002": 1, "99131006": 1 }, slots: { "99131006": 1, "22134": 1 } })!, pool);
+    expect(built.heroes).toEqual(["141002"]);
+    expect(built.cards).toEqual([{ code: "131006", count: 1 }, { code: "22134", count: 1 }]);
     expect(built.droppedCodes).toEqual([]);
   });
 

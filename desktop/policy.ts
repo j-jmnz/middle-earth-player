@@ -53,7 +53,10 @@ export function allowExternal(url: string): boolean {
   return parsed.pathname === GITHUB_PROJECT || parsed.pathname.startsWith(`${GITHUB_PROJECT}/`);
 }
 
-/** Every permission request (camera, microphone, notifications, geolocation, clipboard read, ...) is denied: nothing in the app asks for one. */
-export function allowPermission(): boolean {
-  return false;
+/**
+ * Every permission request (camera, microphone, notifications, geolocation, clipboard read, ...) is denied but one: writing text to the clipboard, which
+ * the table's Copy game state does when the player taps it (src/screens/table/clipboard.ts). The app never reads the clipboard.
+ */
+export function allowPermission(permission?: string): boolean {
+  return permission === "clipboard-sanitized-write";
 }

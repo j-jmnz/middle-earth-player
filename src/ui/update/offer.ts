@@ -93,7 +93,7 @@ export const OFFER_LINK_HINT = "Opens the release page in your browser";
 /** What a screen reader hears for Get it, and for the table menu's row. */
 export const offerLinkLabel = (version: string) => `Get version ${version}`;
 export const CHECK_LABEL = "Check for new versions";
-export const CHECK_LINE = "Once a day, asks GitHub for the latest release. Nothing about you or your games is sent.";
+export const CHECK_LINE = "Once a day, asks GitHub for the latest release. Check now asks at once. Nothing about you or your games is sent.";
 
 /** The release date as Settings says it ("Released 15 November 2026"), or null without one. */
 export function releasedLine(publishedAt: string | null): string | null {
@@ -104,10 +104,27 @@ export function releasedLine(publishedAt: string | null): string | null {
   return `Released ${date.getUTCDate()} ${months[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
 }
 
-export type UpdateState = { stored: StoredUpdate; set: (stored: StoredUpdate) => void };
+/** Where Settings' Check now stands: not pressed, asking, answered (the stored row says what was found) or no usable answer. Not saved. */
+export type ManualCheck = "idle" | "checking" | "answered" | "failed";
 
-/** The app's one update store: hydrated from user.db and set after each answer or a closed ribbon (src/screens/update/check.ts writes it back). */
+export const CHECK_NOW_LABEL = "Check now";
+export const CHECK_NOW_HINT = "Asks GitHub for the latest release now";
+
+/** The line under Check now, or null before it is pressed; `offer` is the version it found, if any. A dev build says why it never asks. */
+export function manualLine(manual: ManualCheck, offer: string | null, checks: boolean): string | null {
+  if (!checks) return "This build is not a release, so it does not check.";
+  if (manual === "checking") return "Asking GitHub…";
+  if (manual === "failed") return "GitHub did not answer. Try again later.";
+  if (manual === "answered" && !offer) return "You have the latest version.";
+  return null;
+}
+
+export type UpdateState = { stored: StoredUpdate; manual: ManualCheck; set: (stored: StoredUpdate) => void; setManual: (manual: ManualCheck) => void };
+
+/** The app's one update store: hydrated from user.db and set after each answer or a closed ribbon (src/screens/update/check.ts writes `stored` back). */
 export const updateStore = createStore<UpdateState>()((set) => ({
   stored: EMPTY_UPDATE,
+  manual: "idle",
   set: (stored) => set({ stored }),
+  setManual: (manual) => set({ manual }),
 }));

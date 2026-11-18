@@ -74,8 +74,8 @@ app.on("web-contents-created", (_event, contents) => {
 function applySessionPolicy(): void {
   const ses = session.defaultSession;
   ses.webRequest.onBeforeRequest({ urls: ["<all_urls>"] }, (details, callback) => callback({ cancel: !allowRequest(details.url, dev) }));
-  ses.setPermissionRequestHandler((_contents, _permission, callback) => callback(allowPermission()));
-  ses.setPermissionCheckHandler(() => allowPermission());
+  ses.setPermissionRequestHandler((_contents, permission, callback) => callback(allowPermission(permission)));
+  ses.setPermissionCheckHandler((_contents, permission) => allowPermission(permission));
   ses.setDevicePermissionHandler(() => allowPermission());
   // The backup file (Settings) is a Blob download: the player picks where it goes, and the name the page gave is the one offered.
   ses.on("will-download", (_event, item) => {

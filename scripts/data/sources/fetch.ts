@@ -23,7 +23,7 @@ export function sha256(body: string | Uint8Array): string {
 const fetchLog = createLog("fetch");
 
 // A response that came back with an error status: its message is already the whole story.
-class HttpError extends Error {
+export class HttpError extends Error {
   readonly status: number;
   constructor(message: string, status: number) {
     super(message);
