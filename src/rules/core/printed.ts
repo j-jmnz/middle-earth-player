@@ -42,6 +42,8 @@ export type Keywords = {
   surge: boolean;
   hide: number | null;
   doomed: number | null;
+  // Regenerate X (dwd.regenerate): healed from the enemy itself after the first player token passes in the Refresh phase (families/encounter/regenerate.ts).
+  regenerate: number | null;
   peril: boolean;
   archery: number | null;
   immuneToPlayerCardEffects: boolean;
@@ -120,6 +122,7 @@ const EMPTY_KEYWORDS: Keywords = {
   surge: false,
   hide: null,
   doomed: null,
+  regenerate: null,
   peril: false,
   archery: null,
   immuneToPlayerCardEffects: false,
@@ -392,6 +395,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       surge: keywords.surge === true,
       hide: keywords.hide ?? null,
       doomed: keywords.doomed ?? null,
+      regenerate: keywords.regenerate ?? null,
       peril: keywords.peril === true,
       archery: keywords.archery ?? null,
       immuneToPlayerCardEffects: keywords.immune === true,

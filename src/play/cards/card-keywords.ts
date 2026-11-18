@@ -44,6 +44,7 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   shown("uncharted", isLostIsland(instance, ctx));
   shown("grapple", kw.grapple != null);
   shown("doomed", (kw.doomed ?? 0) > 0, kw.doomed ?? undefined);
+  shown("regenerate", (kw.regenerate ?? 0) > 0, kw.regenerate ?? undefined);
   shown("restricted", kw.restricted);
 
   if (heldAmount(game, cardId, "gainsSurge") > 0) add("surge", false);
