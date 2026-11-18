@@ -300,7 +300,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141074:constant:1: Constant
     - its host: stat engagementCost -10, while this card is in play
   141074:whenRevealed:1: When revealed
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"enemy","trait":"Nazgûl"}}]
+    - attach this card to an enemy in play with the trait Nazgûl
   141074:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
     - return its host to the staging area
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 223 by template, 35 as JSON)
+(rendered pieces: 224 by template, 34 as JSON)

@@ -181,7 +181,8 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), who: z.literal("firstPlayer").optional(), ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it. `cost`: the search is a Travel cost the players must be able to pay, so it needs a card to find ("Travel: The first player searches ... for a Warg enemy", 10024:A:2; rr.travel); read by the angmar family. `to: "engaged"`: the enemy found is revealed and put into play engaged with the revealing player instead of staged ("reveal it, and put it into play engaged with you", 143065:A:2).
   // `deckOnly`: the encounter deck alone is searched, not its discard pile ("Search the encounter deck for 1 copy of Prison Cell", 10039:A:2).
-  z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }),
+  // A Shadow effect with it runs in a frame, as its reveal waits for the card's When Revealed ("Search the encounter deck for a treachery card ... and reveal it", 901807:A:2).
+  verbFlags(z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }), { runsInFrame: true }),
   // Finds a card in the encounter deck or discard pile and puts it out without revealing it. With `each`, every card that
   // matches goes ("add each Nazgûl enemy found to the staging area", 141027:A:1) and nobody chooses.
   verbFlags(z.strictObject({

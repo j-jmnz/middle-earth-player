@@ -1,6 +1,7 @@
 // The pieces Foundations of Stone adds beside the families' own: the nameless family (src/catalog/families/nameless.ts), Washed Away!'s stage draw and deck swap, the Centipede's and Lost and Alone's moves, the ally discard and Drowned Treasury's claim. Templates for the verbs
 // and the samples read-fields.test.ts checks them with.
 import { cardRef } from "./amounts.ts";
+import { FLAME_SAMPLES, FLAME_TEMPLATES } from "./flame.ts";
 import { joinAnd, str, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 
@@ -9,7 +10,9 @@ type Made = { text: string; read: readonly string[] };
 const DECK: Readonly<Record<string, string>> = { actor: "the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect)", firstPlayer: "the first player's deck (of the staging area, once the areas are separate)" };
 const TO: Readonly<Record<string, string>> = { self: "this enemy", picked: "the picked enemy", attacker: "the attacking enemy", subject: "the enemy the event is about" };
 
+// Shadow and Flame's pieces (flame.ts) ride along.
 export const STONE_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Made>> = {
+  ...FLAME_TEMPLATES,
   AttachDeckTop: (i) => ({
     text: `${i.untilCost === undefined ? `attach the top ${i.count === undefined || i.count === 1 ? "card" : `${str(i.count)} cards`}` : `attach cards one after another until the printed cost of all the cards attached to ${TO[str(i.to ?? "self")] ?? str(i.to)} is ${str(i.untilCost)} or more (or the deck is empty), starting with the top card`} of ${DECK[str(i.deck ?? "actor")] ?? str(i.deck)} to ${TO[str(i.to ?? "self")] ?? str(i.to)}, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play)${i.extra === true ? "; the cards attached this way are not a new event for the Forced effects that hear one" : "; the cards attached together are one event"}`,
     read: ["deck", "to", "count", "untilCost", "extra"],
@@ -37,6 +40,7 @@ export const STONE_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Made
 };
 
 export const STONE_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
+  ...FLAME_SAMPLES,
   AttachDeckTop: [
     { verb: "AttachDeckTop", deck: "firstPlayer", to: "picked", count: 2 },
     { verb: "AttachDeckTop", deck: "firstPlayer", untilCost: 6 },

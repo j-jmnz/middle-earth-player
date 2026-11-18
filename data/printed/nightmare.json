@@ -5678,7 +5678,12 @@
     "When Durin's Bane would be dealt a shadow card, deal it from the Balrog deck instead of the encounter deck. Shadow cards dealt from the Balrog deck are discarded into a separate Balrog discard pile.",
     "At the beginning of each combat phase (or if the Balrog deck runs out of cards), shuffle the Balrog discard pile back into the Balrog deck."
    ],
-   "inert": [],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
    "misprints": [],
    "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null
@@ -5705,7 +5710,56 @@
     "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.",
     "Play Tip: This scenario contains 10 treachery cards with the Attack trait that have only a \"shadow\" effect, and no \"when revealed\" effect. These cards are never revealed from the encounter deck and are only ever dealt as shadow cards to Durin's Bane."
    ],
-   "inert": [],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "Play Tip: reminder that the Attack cards are only dealt as shadow cards to Durin's Bane. No game effect."
+    }
+   ],
    "misprints": [],
    "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null

@@ -1,7 +1,7 @@
 // The templates of the verbs that put an encounter card on a host or spend a resource from one card's pool: AttachSelf (the host it is offered to, and `announces`) and SpendResources with a `target` (04016:A:1). The other SpendResources lines (a hero chosen for each resource) stay JSON in their snapshots.
 import { cardRef, renderAmount } from "./amounts.ts";
 import { renderPick } from "./picks.ts";
-import { isObj, type Ctx, type Obj } from "./kit.ts";
+import { isObj, str, type Ctx, type Obj } from "./kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 
@@ -9,6 +9,7 @@ const attachSelfText = (i: Obj): Made | null => (isObj(i.to) && i.to.kind === "c
 
 export const ATTACH_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Made | null>> = {
   AttachSelf: (i) => {
+    if (isObj(i.to) && i.to.kind === "enemy") return { text: `attach this card to an enemy in play with the trait ${str(i.to.trait)}`, read: ["to"] };
     const made = attachSelfText(i);
     return made && i.announces === true ? { text: `${made.text} (the attachment is announced as it attaches: a Forced effect on an attachment hears it)`, read: [...made.read, "announces"] } : made;
   },
