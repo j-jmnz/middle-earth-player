@@ -14,7 +14,7 @@ import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { sharing } from "../breaking/areas.ts";
+import { isolatedAreas, sharing } from "../breaking/areas.ts";
 import { eventSeat, lastPickedSeat, namedCard, scheduleFor } from "./refs.ts";
 
 type ChangeControl = Extract<Instruction, { verb: "ChangeControl" }>;
@@ -79,8 +79,8 @@ export function takeFirstPlayer(state: ScenarioState, seat: number): ScenarioSta
 // Doomed: each player raises their threat from the doomed keyword (rr.doomed-x).
 export function doomed(state: ScenarioState, amount: number, steps: EngineStep[]): ScenarioState {
   let next = state;
-  // The players sharing the acting seat's staging area when areas are joined (families/captured/).
-  const seats = state.capture && state.separate && state.viewSeat != null ? sharing(state, state.viewSeat) : livingSeats(state);
+  // The players sharing the acting seat's staging area while the areas are isolated (a player card's Doomed; an encounter card's still hits every player, frames.ts).
+  const seats = isolatedAreas(state) && state.viewSeat != null ? sharing(state, state.viewSeat) : livingSeats(state);
   for (const seat of seats) next = raiseThreat(next, seat, amount, steps, ruleCause("rr.doomed-x"));
   return next;
 }

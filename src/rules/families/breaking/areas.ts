@@ -24,6 +24,12 @@ export function isSeparate(state: ScenarioState): boolean {
   return state.separate === true;
 }
 
+// Whether each area resolves as if only its players were in the game ("each player", "the first player", "in play" and a player card's Doomed read the area, mec108.create-staging-area): Escape from Mount Gram's areas always are (it has captured decks, `capture`),
+// and Fog on the Barrow-downs' once a player is trapped (`isolated`). Breaking of the Fellowship's areas are not.
+export function isolatedAreas(state: ScenarioState): boolean {
+  return state.separate === true && (state.capture != null || state.isolated === true);
+}
+
 // The seat whose area and stage the seat has: itself, or the player it joined (mec108.joining-another-player, families/captured/join.ts). A game that never joins returns the seat.
 export function headOf(state: ScenarioState, seat: number): number {
   return state.separate ? (state.seats[seat]?.joined ?? seat) : seat;
@@ -128,7 +134,7 @@ export function viewOf(state: ScenarioState, seat: number | undefined): Scenario
   // A card that is in every area is in this seat's too (mergeView leaves it out of the seat's own list).
   const everywhere = everyArea(state);
   // Mount Gram: "the first player" of an effect in an area is the area's own (the table's first player may be in another area).
-  const first = state.capture ? { firstPlayer: firstOfArea(state, head) } : {};
+  const first = isolatedAreas(state) ? { firstPlayer: firstOfArea(state, head) } : {};
   return { ...state, ...first, staging: everywhere.length > 0 ? [...owner.staging, ...everywhere] : owner.staging, questStage: owner.stage ?? null, activeLocation: owner.active ?? null, secondActiveLocation: null, viewSeat: head };
 }
 
@@ -173,7 +179,7 @@ export function mergeView(state: ScenarioState, asked: number | undefined, view:
   const added = [...now, ...elsewhere].filter((id) => !state.staging.includes(id));
   const { viewSeat: _seat, ...plain } = view;
   // The view's first player is the area's own (viewOf), unless the view passed the token on.
-  const first = state.capture && view.firstPlayer === firstOfArea(state, seat) ? { firstPlayer: state.firstPlayer } : {};
+  const first = isolatedAreas(state) && view.firstPlayer === firstOfArea(state, seat) ? { firstPlayer: state.firstPlayer } : {};
   const merged: ScenarioState = { ...plain, ...first, seats, questStage: state.questStage, staging: [...kept, ...added] };
   return mirrored({ ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") });
 }

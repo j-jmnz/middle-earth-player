@@ -17,7 +17,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { distinctTraitCount, flaggedTrait, lostTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
-import { headOf, inAreaOf } from "../families/breaking/areas.ts";
+import { headOf, inAreaOf, isolatedAreas } from "../families/breaking/areas.ts";
 import { victoryPointsOf } from "../core/printed-stat.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
 import { defendingAgainst } from "../families/angmar/combat.ts";
@@ -264,8 +264,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "enemyInPlay": {
       const trait = condition.trait;
-      // Mount Gram: while the staging areas are separate an enemy "in play" is one in the asking player's own area (mec108.create-staging-area).
-      const area = state.separate && state.capture ? headOf(state, scope.actor) : null;
+      // Isolated areas (isolatedAreas): an enemy "in play" is one in the asking player's own area (mec108.create-staging-area).
+      const area = isolatedAreas(state) ? headOf(state, scope.actor) : null;
       const found = Object.values(state.cards).some(
         (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
       );

@@ -313,6 +313,8 @@ export type ScenarioState = {
   // Stage 2B has created a staging area and a quest stage for each seat (`Seat.staging`, `Seat.stage`; families/breaking/areas.ts). Absent
   // in every other game and until then.
   separate?: true;
+  // The areas are isolated outside Escape from Mount Gram too: set while a player of Fog on the Barrow-downs is trapped at a stage of his own, so "each player", "the first player", "in play" and a player card's Doomed read the area (`isolatedAreas`, families/breaking/areas.ts). Dropped when the areas combine into one. Absent otherwise.
+  isolated?: true;
   // Only on a seat's view of the state (families/breaking/areas.ts viewOf): the seat it is the view of. mergeView drops it.
   viewSeat?: number;
   // The seats whose stage has dealt its archery this combat phase while stages are separate (machine.ts startCombat).
