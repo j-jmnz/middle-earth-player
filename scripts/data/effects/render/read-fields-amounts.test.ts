@@ -11,6 +11,8 @@ describe("effects render read fields, amounts", () => {
     { count: PICK, distinct: true, every: 2, times: 3, plus: 1, limit: 5 },
     { stat: "attack", of: "host", printed: true, negative: true },
     { stat: "willpower", ofNamed: "A Card" },
+    { stat: "hitPoints", ofNamed: "A Card", remaining: true },
+    { discardedMatching: PICK },
     { players: true },
     { namelessCost: 3 },
     { playersAtStage: true },

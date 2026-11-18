@@ -45,6 +45,8 @@ export function lineTimings(line: string): Set<string> {
     const inner = match[1] ? LABELS.get(match[1].toLowerCase()) : undefined;
     if (inner) allowed.add(inner);
   }
+  // "Forced: While Durin's Bane has no damage, Servant of Flame gets +2 Attack" (901807:A:1) is a constant effect that happens to carry the Forced label: it has no event to answer.
+  if (/^Forced:\s+While\b/i.test(line.trim())) allowed.add("constant");
   // A "(Counts as a ... attachment with the text: ...)" line also grants the attachment's own constant text, and so does an enemy that attaches itself "as a Tentacle attachment with the text: ..." (04073:A:1).
   if (/\bas an? (?:\w+ )?attachment/i.test(line)) allowed.add("constant");
   // "While in a player's hand, Lost in the Wild gains: "Cannot be discarded by player card effects. ..."" gives the card a constant ability of its own from the hand (18026:A:1).

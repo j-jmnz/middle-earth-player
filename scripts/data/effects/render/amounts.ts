@@ -30,9 +30,10 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
     return { text: `the number of ${expr.distinct === true ? "different " : ""}${pick(expr.count, ctx)}`, read };
   }
   if (typeof expr.stat === "string") {
-    take("stat", "of", "ofNamed", "printed");
+    take("stat", "of", "ofNamed", "printed", "remaining");
     const whose = typeof expr.ofNamed === "string" ? `"${expr.ofNamed}"` : cardRef(expr.of ?? "self");
-    return { text: `${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}`, read };
+    // `remaining` (hit points): what the card has left, its hit points less its damage and at least 0.
+    return { text: `${expr.remaining === true ? "remaining " : ""}${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}${expr.remaining === true ? " (its hit points less its damage, at least 0)" : ""}`, read };
   }
   if (expr.players === true) return { text: "the number of players", read: ["players"] };
   if (expr.remainingQuestPoints === "activeLocation") return { text: "the quest points the active location still needs (its quest points less its progress; 0 with no active location)", read: ["remainingQuestPoints"] };
@@ -50,6 +51,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.discarded === "cost") return { text: "the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0)", read: ["discarded"] };
   if (expr.discarded === "types") return { text: "the number of different card types among the cards this effect has discarded from decks, all the players' together", read: ["discarded"] };
   if (expr.discardedThreat === true) return { text: "the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)", read: ["discardedThreat"] };
+  if (isObj(expr.discardedMatching)) return { text: `the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are ${pick(expr.discardedMatching, ctx)}`, read: ["discardedMatching"] };
   if (expr.destroyedWillpower === true) return { text: "the Willpower the destroyed character had in play (last known)", read: ["destroyedWillpower"] };
   if (expr.x === true) return { text: "X", read: ["x"] };
   if (expr.stage === true) return { text: "the stage number of the quest", read: ["stage"] };
