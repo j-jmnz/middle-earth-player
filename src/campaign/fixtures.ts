@@ -62,6 +62,7 @@ import returnmirkwoodFixtures from "./fixtures/return-to-mirkwood.json";
 import osgiliathFixtures from "./fixtures/the-massing-at-osgiliath.json";
 import townFixtures from "./fixtures/the-battle-of-lake-town.json";
 import erechFixtures from "./fixtures/the-stone-of-erech.json";
+import forestFixtures from "./fixtures/the-old-forest.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -142,6 +143,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-massing-at-osgiliath": osgiliathFixtures,
   "the-battle-of-lake-town": townFixtures,
   "the-stone-of-erech": erechFixtures,
+  "the-old-forest": forestFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

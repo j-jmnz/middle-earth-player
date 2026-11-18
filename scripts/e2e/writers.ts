@@ -54,6 +54,7 @@ import { returnmirkwoodFixtures } from "./shadows-of-mirkwood/return-to-mirkwood
 import { osgiliathFixtures } from "./standalone-scenarios/the-massing-at-osgiliath.ts";
 import { townFixtures } from "./standalone-scenarios/the-battle-of-lake-town.ts";
 import { erechFixtures } from "./standalone-scenarios/the-stone-of-erech.ts";
+import { forestFixtures } from "./the-old-forest.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -117,4 +118,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-massing-at-osgiliath": () => osgiliathFixtures(),
   "the-battle-of-lake-town": () => townFixtures(),
   "the-stone-of-erech": () => erechFixtures(),
+  "the-old-forest": () => forestFixtures(),
 };
