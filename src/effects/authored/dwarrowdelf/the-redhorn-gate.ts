@@ -130,6 +130,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       ],
     },
 
+    // The commitments stay while Snowdrifts is the stage, until the quest resolution's second pass: the stage's defeat (B:2) and stage 3B's rule meet characters that are still committed (docs/brief.md, The Redhorn Gate).
+    { id: "04012:constant:1", cardCode: "04012", lines: ["04012:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "heldCommitted", amount: 1, until: "whileSourceInPlay", target: "table" }] },
+
     // 04013 The Mountains' Peaks (stage 3). B:1: every Snowstorm in the discard pile is shuffled back into the deck. B:2: while this stage is current a character whose Willpower is 0 is discarded from play, the state kept true by the settle sweep (families/play/sweep.ts).
     // B:3: the stage is not defeated while the victory display holds fewer than 5 victory points (progress goes on, faq.progress-without-advancing). B:4: defeating it wins.
     { id: "04013:whenRevealed:1", cardCode: "04013", lines: ["04013:B:1"], timing: "whenRevealed", instructions: [{ verb: "ShuffleEncounterDiscard", name: "Snowstorm" }] },
@@ -215,7 +218,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "ShuffleEncounterDiscard", type: "location", alsoVictory: true },
         { verb: "LowerThreat", amount: 11, who: "eachSeat", when: { kind: "not", condition: { kind: "returnedBelow", than: 2 } } },
-        { verb: "DiscardEach", pick: { type: "attachment", control: "any", names: [FREEZING_COLD] }, when: { kind: "not", condition: { kind: "returnedBelow", than: 2 } } },
+        { verb: "Each", pick: { type: "attachment", control: "any", names: [FREEZING_COLD] }, instructions: [{ verb: "Discard", target: { kind: "picked" } }], when: { kind: "not", condition: { kind: "returnedBelow", than: 2 } } },
       ],
     },
 
@@ -264,9 +267,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
               id: "remove",
               instructions: [
                 { verb: "RemoveAllProgress", pick: { type: "location", control: "any" } },
-                { verb: "RemoveAllProgress", target: "questStage" },
-                { verb: "RemoveAllProgress", pick: { type: "card", control: "any", cardType: "player-side-quest" } },
-                { verb: "RemoveAllProgress", pick: { type: "card", control: "any", cardType: "encounter-side-quest" } },
+                // The current quest stage, the encounter side quests in the staging area and the player side quests in the quest areas.
+                { verb: "RemoveAllProgress", pick: { type: "card", control: "any", questCard: true } },
                 { verb: "RemoveAllProgress", pick: { type: "card", control: "any", names: ["Blinding Blizzard"] } },
               ],
             },
@@ -289,7 +291,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 04023 Freezing Cold. When Revealed: the first player attaches it to a hero he controls. It counts as a Condition attachment: the hero gets -2 Willpower and cannot commit to the quest, and with more than 1 copy attached it is discarded from play.
-    { id: "04023:whenRevealed:1", cardCode: "04023", lines: ["04023:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer", unlimited: true } }] },
+    { id: "04023:whenRevealed:1", cardCode: "04023", lines: ["04023:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer", unlimited: true }, announces: true }] },
     {
       id: "04023:constant:1",
       cardCode: "04023",

@@ -1,7 +1,7 @@
 // Rules: rr.reveal, rr.staging, rr.travel, rr.victory, rr.first-player, rr.shadow-effects, rr.defending-player, dwd.caradhras, dwd.ally-objective-arwen, faq.lasting-effects, faq.progress-without-advancing (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, drew, exhausted, flag, frame, lost, offers, progressOn, quest, resolve, resourcesOn, respond, reveal, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, drew, exhausted, flag, lost, offers, progressOn, quest, resolve, resourcesOn, respond, reveal, stat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Redhorn Gate (dwarrowdelf part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The mechanics that need several steps (Arwen's control, Snowstorm's later commits,
@@ -52,6 +52,8 @@ const ROWS: readonly Row[] = [
 
   // 04015 Caradhras: -1 Willpower to every questing character while it is the active location; the players cannot travel to it.
   { line: "04015:A:1", name: "a questing character gets -1 Willpower while it is the active location", layout: { active: "04015", committed: ["dh1"] }, act: [], expect: [stat("dh1", "willpower", 1), stat("dh2", "willpower", 2)] },
+
+  { line: "04015:A:2", name: "the players cannot travel to it", layout: { phase: "Travel", staging: ["04015"] }, act: [], expect: offers("Travel", undefined, false) },
 
   // 04016 Fanuidhol: a hero's Willpower counts only if its controller spends 1 resource from its pool when the quest total is counted.
   { line: "04016:A:1", name: "a hero that pays spends 1 resource from its own pool and counts its Willpower", layout: { stage: "04011", active: "04016", heroResources: 2, committed: ["dh1", "dh2"] }, act: [announce("questTotalCounted"), answer("pay"), answer("keep")], expect: [resourcesOn("dh1", 1), resourcesOn("dh2", 2), committed("dh1")] },
@@ -105,6 +107,8 @@ const ROWS: readonly Row[] = [
 
   // 901304 Snow-Giant.
   { line: "901304:A:2", name: "after it engages you, you discard the ally you control with the highest Willpower", layout: { play: ["ally"], engaged: ["901304"] }, act: [announce("engaged", "901304")], expect: zone("ally", "discard") },
+
+  { line: "901304:A:2", name: "Arwen is the ally with the highest Willpower: discarding her loses the game", layout: { play: ["04014"], engaged: ["901304"] }, act: announce("engaged", "901304"), expect: lost },
 
   // 901305 Icy Cavern.
   { line: "901305:A:1", name: "its Threat is the number of Snow cards in the staging area, itself included", layout: { staging: ["901305", "04015", "04027", "f0"] }, act: [], expect: stat("901305", "threat", 3) },

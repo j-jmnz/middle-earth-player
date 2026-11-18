@@ -171,7 +171,8 @@ function applyTargeted(
       return data?.kind === "effect" ? patchTop(next, { data: { ...data, returned: data.returned + count } }) : next;
     }
     case "AttachSelf":
-      return first && sourceId ? attachSelf(state, sourceId, first, ctx) : state;
+      if (!first || !sourceId) return state;
+      return instruction.announces === true ? queueEvent(attachSelf(state, sourceId, first, ctx), { trigger: "attached", seat: item.seat, subject: sourceId, other: first }) : attachSelf(state, sourceId, first, ctx);
     case "SearchMove": {
       let next = state;
       for (const id of instruction.each ? ids : ids.slice(0, 1)) {

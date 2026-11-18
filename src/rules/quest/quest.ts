@@ -152,6 +152,8 @@ export function resolveQuest(
   stampAmount = false,
 ): ScenarioState {
   const started = steps.length;
+  // The commitments stay until the resolution's second pass when the table holds `heldCommitted` (Snowdrifts, 04012:B:2: the stage's defeat resolves while the characters are still committed).
+  const held = only == null && flagged(state, "table", "heldCommitted");
   const willpower = committedWillpower(state, cards, only);
   const threat = stagingThreat(state, cards, only);
   steps.push({ kind: "quest", willpower, threat, cause: ruleCause("rr.step-3-4") });
@@ -176,7 +178,7 @@ export function resolveQuest(
   }
   // A full stage whose progress an explored location's Forced effect may cancel advances once it has resolved (advanceFreed; families/wizardry/progress.ts).
   const ready = overflowWaits(next, steps, started, cards) ? next : withView(next, only, (view) => advanceReady(view, cards, steps, canAdvance, started));
-  return only == null ? clearCommitted(ready) : ready;
+  return only == null && !held ? clearCommitted(ready) : ready;
 }
 
 // A stage that is full and was held back advances as soon as it is allowed to; a 0-point one that arrived in this resolution first resolves its When Revealed.

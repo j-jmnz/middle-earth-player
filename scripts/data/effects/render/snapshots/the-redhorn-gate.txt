@@ -107,6 +107,8 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - the acting player finds one card with code 04015 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
     - then, if there is a location (any player controls) in the staging area only, named "Caradhras" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "Caradhras"
     - then, if there is a location (any player controls) in the staging area only, named "Caradhras" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+  04012:constant:1: Constant
+    - the table: stat heldCommitted 1, while this card is in play
 
 ## 04013 The Mountains' Peaks
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -190,7 +192,8 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the location cards of the encounter discard pile and the victory display (the cards that went back are counted as returned) into the encounter deck
     - then, if not (the running effect returned fewer than 2 cards (ReturnFromDiscard counts the cards it moved, only the treachery cards with `treacheries`; ShuffleEncounterDiscard `alsoVictory` the cards that went back into the deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): lower threat by 11 (each player)
-    - then, if not (the running effect returned fewer than 2 cards (ReturnFromDiscard counts the cards it moved, only the treachery cards with `treacheries`; ShuffleEncounterDiscard `alsoVictory` the cards that went back into the deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player discards each attachment (any player controls) named "Freezing Cold"
+    - then, if not (the running effect returned fewer than 2 cards (ReturnFromDiscard counts the cards it moved, only the treachery cards with `treacheries`; ShuffleEncounterDiscard `alsoVictory` the cards that went back into the deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (any player controls) named "Freezing Cold":
+      - discard the picked card
 
 ## 04019 Rocky Crags
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -224,10 +227,8 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - the first player chooses one of:
       * option "remove":
         - remove all the progress from each location (any player controls)
-        - remove all the progress from the current quest stage
-        - remove all the progress from each card (any player controls) of card type player-side-quest
-        - remove all the progress from each card (any player controls) of card type encounter-side-quest
-        - remove all the progress from each treachery (any player controls) named "Blinding Blizzard"
+        - remove all the progress from each card (any player controls) that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+        - remove all the progress from each card (any player controls) named "Blinding Blizzard"
       * option "reveal":
         - the first player reveals 2 encounter cards, one after the other, each in a staging of its own
 
@@ -253,7 +254,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04023:A:1 (front): When Revealed: The first player attaches this card to a hero he controls. Counts as a Condition attachment with the text: "Attached hero gets -2 Willpower and cannot commit to a quest. If attached hero has more than 1 copy of Freezing Cold attached, discard attached hero from play."
   04023:whenRevealed:1: When revealed
-    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card is discarded)
+    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card is discarded) (the attachment is announced as it attaches: a Forced effect on an attachment hears it)
   04023:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached

@@ -251,6 +251,8 @@ export const simpleVerbs = [
       // character of that title ("Attach to Wilyador", 900608:A:2). A character that carries a copy is not offered, unless `unlimited` (the card has no limit per character). With none to host it the card is discarded.
       z.strictObject({ kind: z.literal("character"), trait: z.string().min(1).optional(), name: z.string().min(1).optional(), unlimited: z.literal(true).optional() }),
     ]),
+    // The attachment is announced as it attaches (the `attached` trigger, as a played attachment is, rr.attachment-cards): "more than 1 copy" on a hero is read as the second one attaches (04023:A:1).
+    announces: z.literal(true).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("UncommitAll"), who: whoSchema, ...when }),
