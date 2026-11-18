@@ -11,9 +11,9 @@ Read whole.
 - `CLAUDE.md` — Claude Code (~2.9K tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~990 tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~1.2K tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
-- `.claude/rules/release-standards.md` — Release standards (~1.2K tok)
+- `.claude/rules/release-standards.md` — Release standards (~1.3K tok)
 
 ## Agents
 
