@@ -114,7 +114,7 @@ describe("pnpm scenario new", () => {
     expect(cli(id, "--dry-run").output).toContain(`src/effects/authored/return-of-the-king/${id}.ts`);
   });
 
-  // A scenario of a cycle (Shadows of Mirkwood) is standalone only: no campaign card, no campaign test, a standalone test, standalone fixtures and flows.
+  // A scenario of a cycle (Shadows of Mirkwood) is standalone only: no campaign card, no campaign test, a standalone test, and standalone fixtures.
   it.each(["the-hunt-for-gollum", "conflict-at-the-carrock"])("plans the standalone skeletons of the cycle scenario %s", (id) => {
     const view = without(id);
     const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
@@ -130,8 +130,6 @@ describe("pnpm scenario new", () => {
     expect(text("golden.test.ts")).toContain("standalone: true");
     expect(text(`shadows-of-mirkwood/${id}.ts`)).toContain("standaloneWonLost(");
     expect(text("standalone.test.ts")).toContain("it.todo(");
-    expect(text(`${id}.yaml`)).toContain("subflows/standalone-win.yaml");
-    expect(text(`${id}-loss.yaml`)).toContain("subflows/standalone-loss.yaml");
     const registry = plan?.edits.find((edit) => edit.file === "src/campaign/fixtures/registry.ts");
     expect(registry?.after).toContain(`scenarioId: "${id}", kind: "standalone"`);
     expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
@@ -170,8 +168,6 @@ describe("pnpm scenario new", () => {
       `src/campaign/scenarios/${id}/spec.test.ts`,
       `src/play/words/asks/${id}.ts`,
       `scripts/e2e/${id}.ts`,
-      `.maestro/scenarios/${id}/${id}.yaml`,
-      `.maestro/scenarios/${id}/${id}-loss.yaml`,
       `src/effects/authored/${id}.ts`,
       `src/campaign/fixtures/${id}.json`,
     ]);

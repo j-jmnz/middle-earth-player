@@ -32,7 +32,7 @@ export type UpanduinPolicy = {
 export const DEFAULT_POLICY: UpanduinPolicy = { choose: "first", resolve: "first", act: false };
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/journey-up-the-anduin.ts) play real decklists, so they turn card play on.
+// `options`: the auto-player's own policy for the answers this one does not give; the fixtures (scripts/e2e/journey-up-the-anduin.ts) play real decklists, so they turn card play on.
 export function upanduinIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: UpanduinPolicy = DEFAULT_POLICY, options: PolicyOptions = UPANDUIN_POLICY): PlayerIntent {
   // The Resolution's offer (Turayn joins the pool for a player, or the oath line): the first option is the ally, the last the line.
   if (state.window?.kind === "resolution") {

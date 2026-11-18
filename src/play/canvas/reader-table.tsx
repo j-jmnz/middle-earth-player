@@ -34,7 +34,7 @@ const OPEN_LIST = [{ name: "open", label: "Open the list" }];
 
 type ButtonProps = {
   id: string;
-  // The stable id a Maestro flow taps (.maestro/features/screen-reader.yaml): the card's place in its zone, or the pile's name; a card's own id changes from game to game.
+  // The stable id a test taps: the card's place in its zone, or the pile's name; a card's own id changes from game to game.
   testID: string;
   label: string;
   hint: string | null;

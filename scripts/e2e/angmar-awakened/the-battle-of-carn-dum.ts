@@ -1,4 +1,4 @@
-// The Maestro fixtures of The Battle of Carn Dûm (angmar-awakened part 8), written into src/campaign/fixtures/the-battle-of-carn-dum.json by scripts/e2e/fixtures.ts: real games of saved decklists (the One Deck and
+// The fixtures of The Battle of Carn Dûm (angmar-awakened part 8), written into src/campaign/fixtures/the-battle-of-carn-dum.json by scripts/e2e/fixtures.ts: real games of saved decklists (the One Deck and
 // Defenders of Gondor lists, `FIXTURE_DECKS` of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `dum-won` is the first seed that wins, parked on the win (the Resolution waits); `dum-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

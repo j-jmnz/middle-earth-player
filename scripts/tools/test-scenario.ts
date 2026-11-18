@@ -22,7 +22,7 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 // Parts, each its own vitest run (or the card smoke), so a failure names its part:
 //   tests      the test files that belong to the scenario: those whose path names it (its folder under src/campaign/scenarios/, src/play/scenarios/<id>-*.test.ts, ...)
 //              and those that import from test/scenarios/<id>/ or src/campaign/scenarios/<id>/ (a Temple table test named for the island, say)
-//   goldens    the registry-wide golden tests, filtered (-t) to the scenario's title in test/harness/golden-registry.ts: the Maestro fixtures (the
+//   goldens    the registry-wide golden tests, filtered (-t) to the scenario's title in test/harness/golden-registry.ts: the save fixtures (the
 //              causes and the replay of a scenario's goldens are in its own golden.test.ts, in tests). A scenario with no entry skips them, except
 //              a-shadow-of-the-past, whose goldens replay.test.ts and causes.test.ts read directly: those two run
 //              whole (in the tests part, as they import its scene)
@@ -81,7 +81,7 @@ export type Selection = {
   families: string[];
 };
 
-export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/checks/test-cost.test.ts", "scripts/checks/box-dealt.test.ts", "scripts/data/rules.test.ts", "scripts/checks/layout.test.ts", "scripts/checks/spec-coverage.test.ts", "scripts/docs/index.test.ts", "scripts/checks/maestro.test.ts"];
+export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/checks/test-cost.test.ts", "scripts/checks/box-dealt.test.ts", "scripts/data/rules.test.ts", "scripts/checks/layout.test.ts", "scripts/checks/spec-coverage.test.ts", "scripts/docs/index.test.ts"];
 export const READER_TEST = "src/play/reader-play.test.ts";
 const WORDS_ROOT = "src/play/words/";
 const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;

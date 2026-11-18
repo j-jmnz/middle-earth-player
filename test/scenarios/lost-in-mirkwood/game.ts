@@ -35,7 +35,7 @@ const OBJECTIVE_LOCATIONS: readonly string[] = ["18029", "18030", "18031", "1803
 const ESCAPE_LOCATIONS: readonly string[] = ["18030", "18032"];
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/lost-in-mirkwood.ts) play real decklists, so they turn card play on.
+// `options`: the auto-player's own policy for the answers this one does not give; the fixtures (scripts/e2e/lost-in-mirkwood.ts) play real decklists, so they turn card play on.
 export function lostmirkIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: LostmirkPolicy = DEFAULT_POLICY, options: PolicyOptions = LOSTMIRK_POLICY): PlayerIntent {
   // The Resolution's offer (Melanwar joins the pool for a player, or the guidance line): the first option is the ally, the last the line.
   if (state.window?.kind === "resolution") {

@@ -33,7 +33,7 @@ export const DEFAULT_POLICY: CarrockPolicy = { choose: "first", undefended: true
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
 // The players fight the Trolls. One hero of each seat quests (his Willpower is more than the staging area's Threat) until a Troll is engaged; then all stay ready. They engage Louis alone first (his Forced effect raises the threat after every Troll's attack) and the other Trolls once he is dead, take
 // every attack undefended (a Troll's damage is nothing to them; the Muck Adder, which discards a hero it damages, is defended when a hero can) and attack one Troll each, Louis first.
-// `options` are the auto-player's for everything else (the Maestro fixtures play real decklists with `play: true`).
+// `options` are the auto-player's for everything else (the fixtures play real decklists with `play: true`).
 export function carrockIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: CarrockPolicy = DEFAULT_POLICY, options: PolicyOptions = CARROCK_POLICY): PlayerIntent {
   const window = state.window;
   if (window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? window.options.at(-1) : window.options[0]) ?? "" };

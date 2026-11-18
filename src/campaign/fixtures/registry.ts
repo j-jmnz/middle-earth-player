@@ -1,4 +1,4 @@
-// The Maestro save fixtures, by scenario (docs/architecture.md, Tests). Adding a fixture name is a line here; a new scenario
+// The save fixtures, by scenario (docs/architecture.md, Tests). Adding a fixture name is a line here; a new scenario
 // adds its line, its JSON import in ../fixtures.ts (Metro needs static imports) and its writer in `e2e/writers.ts` in the scripts folder.
 // FixtureName, FIXTURE_NAMES and STORED in ../fixtures.ts, the e2e fixtures script and the per-scenario checks
 // in ../fixtures.test.ts all read it. `file` is the JSON file's name when it is not the scenario id.

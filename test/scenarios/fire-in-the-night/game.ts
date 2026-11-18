@@ -33,7 +33,7 @@ export type NightPolicy = {
   current: "side" | "main" | "alternate";
   // Whether a character defends: only the attack on Hrogar's Hill (19083:B:1) ("hill"), every attack ("all") or none. A defender is exhausted, so it cannot quest or attack; with nobody defending the attack falls on the character with the least damage.
   defend: "none" | "hill" | "all";
-  // The quest: the first character of a seat quests alone (the goldens' heroes have willpower far above the staging area's threat) or every character that can does (the Maestro fixtures' real decklists).
+  // The quest: the first character of a seat quests alone (the goldens' heroes have willpower far above the staging area's threat) or every character that can does (the fixtures' real decklists).
   quest: "alone" | "all";
   // Whether the players engage the enemies of the staging area, one at a time, and attack them.
   engage: boolean;
@@ -51,7 +51,7 @@ export const DEFAULT_POLICY: NightPolicy = { choose: "first", current: "side", d
 const damaged = (state: ScenarioState): boolean => Object.values(state.cards).some((card) => card.damage > 0 && (card.zone === "heroes" || card.zone === "play"));
 
 // The auto-player's answer (test/harness/auto-player.ts), except: the first player's current quest, a defender, an engagement, the attack, a Response, Beldis's Action and the Resolution's questions are answered as the policy says; a choice takes the first answer, or the last.
-// Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/fire-in-the-night.ts) play real decklists, so they turn card play on.
+// Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the fixtures (scripts/e2e/fire-in-the-night.ts) play real decklists, so they turn card play on.
 export function nightIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: NightPolicy = DEFAULT_POLICY, options: PolicyOptions = NIGHT_POLICY): PlayerIntent {
   if (state.window?.kind === "resolution") {
     const offered = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));

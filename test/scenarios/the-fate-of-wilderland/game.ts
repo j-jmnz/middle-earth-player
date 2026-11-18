@@ -92,7 +92,7 @@ function attackFrom(state: ScenarioState, ctx: ReduceContext, single: boolean): 
 const byDamage = (state: ScenarioState, ids: readonly string[]): string | undefined => [...ids].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the option the policy names (only among the options the reducer offered), the engagement, the attack (Urdug last), a defender and the Responses are answered as the policy says.
-// Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/the-fate-of-wilderland.ts) play real decklists, so they turn card play on.
+// Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the fixtures (scripts/e2e/the-fate-of-wilderland.ts) play real decklists, so they turn card play on.
 export function wilderlandIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: WilderlandPolicy = DEFAULT_POLICY, options: PolicyOptions = WILDERLAND_POLICY): PlayerIntent {
   const intents = legalIntents(state, ctx);
   if (state.window?.kind === "choose") {

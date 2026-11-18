@@ -1,4 +1,4 @@
-// The Maestro fixtures of Journey to the Cross-roads (the-two-towers part 5), written into src/campaign/fixtures/journey-to-the-cross-roads.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck in the first
+// The fixtures of Journey to the Cross-roads (the-two-towers part 5), written into src/campaign/fixtures/journey-to-the-cross-roads.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck in the first
 // seat, Defenders of Gondor in the second: FIXTURE_DECKS in scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `roads-won` is the first seed that wins, parked on the win (the Resolution waits); `roads-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

@@ -238,7 +238,7 @@ export async function ${logName}(): Promise<CampaignLog> {
   imports.push(dream ? `import { intentFor } from "${e2e}raid-on-the-grey-havens.ts";` : `import { nextIntent } from "${root}test/harness/auto-player.ts";`, `import { createLog } from "${scripts}log.ts";`, `import { ${dream ? "DREAM_CHASER, " : ""}firstSeed${withLog ? ", wonLog" : ""} } from "${e2e}seed-kit.ts";`);
   const campaignId = dream ? "DREAM_CHASER" : `"${facts.campaignId}"`;
   const answer = dream ? "intentFor" : "(state: ScenarioState, ctx: Parameters<typeof nextIntent>[1], memory: Set<string>) => nextIntent(state, ctx, { scout: \"\", prefer: \"\", protect: \"\", play: true, act: true }, memory)";
-  return `// The Maestro fixtures of ${facts.name} (${facts.campaignId} part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
+  return `// The save fixtures of ${facts.name} (${facts.campaignId} part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. \`${facts.short}-won\` is the first seed that wins, parked on the win (the Resolution waits); \`${facts.short}-lost\` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.${withLog ? "\n// The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it." : ""}
 // TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
@@ -263,42 +263,6 @@ ${withLog ? `  const log = await ${logName}();\n` : ""}  const find = (wanted: (
   const lost = find((state) => state.lost, "${facts.short}-lost");
   return { ...(won ? { "${facts.short}-won": won } : {}), ...(lost ? { "${facts.short}-lost": lost } : {}) };
 }
-`;
-}
-
-const TODO_FLOW = (kind: "win" | "loss", facts: Facts): string =>
-  `appId: com.middleearth.player
-tags:
-  - scenario
----
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture \`${facts.short}-${kind === "win" ? "won" : "lost"}\` (scripts/e2e/${facts.finderRel}.ts): a real two-handed
-# game of ${facts.name}, parked on its ${kind === "win" ? "win" : "loss"}. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-${kind}.yaml); add this scenario's own assertions after the call.
-`;
-
-/** .maestro/scenarios/<id>/<id>.yaml */
-export function winFlowFile(facts: Facts): string {
-  return `${TODO_FLOW("win", facts)}- runFlow:
-    file: ../../subflows/scenario-win.yaml
-    env:
-      FIXTURE: ${facts.short}-won
-      SCENARIO_ID: ${facts.id}
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
-`;
-}
-
-/** .maestro/scenarios/<id>/<id>-loss.yaml */
-export function lossFlowFile(facts: Facts): string {
-  return `${TODO_FLOW("loss", facts)}- runFlow:
-    file: ../../subflows/scenario-loss.yaml
-    env:
-      FIXTURE: ${facts.short}-lost
-      SCENARIO_ID: ${facts.id}
-# TODO: this scenario's own assertions on the log screen after the loss.
 `;
 }
 

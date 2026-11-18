@@ -15,7 +15,7 @@ pnpm web         # opens the app in a browser; narrow the window to phone width
 pnpm desktop dev # opens the app in the Electron desktop shell
 ```
 
-[docs/development.md](docs/development.md) covers phone builds, the Maestro flows and every `pnpm` command.
+[docs/development.md](docs/development.md) covers phone builds and every `pnpm` command.
 
 ## Before you start
 

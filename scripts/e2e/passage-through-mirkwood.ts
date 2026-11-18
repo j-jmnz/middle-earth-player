@@ -1,4 +1,4 @@
-// The Maestro fixtures of Passage Through Mirkwood (Mirkwood Paths part 1), written into src/campaign/fixtures/passage-through-mirkwood.json
+// The fixtures of Passage Through Mirkwood (Mirkwood Paths part 1), written into src/campaign/fixtures/passage-through-mirkwood.json
 // by scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json),
 // two-handed, Easy, from an empty Mirkwood Paths log, played by the auto-player, every intent one the reducer listed.
 // `mirkwood-won`: the first seed that wins, parked on the win (the Resolution asks nothing, so the table shows Victory and the

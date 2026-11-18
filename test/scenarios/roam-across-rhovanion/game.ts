@@ -33,9 +33,9 @@ export type RhovanionPolicy = {
   location: "first" | "last";
   // Harsh Weather (19045:A:1): exhaust a ready character or raise the player's threat. The goldens' heroes raise their threat by default, so the character that quests is not exhausted.
   weather: "exhaust" | "threat";
-  // The quest: the first character of a seat quests alone (the goldens' heroes have willpower far above the staging area's threat) or every character that can does (the Maestro fixtures' real decklists).
+  // The quest: the first character of a seat quests alone (the goldens' heroes have willpower far above the staging area's threat) or every character that can does (the fixtures' real decklists).
   quest: "alone" | "all";
-  // Whether a character defends: the goldens' heroes are numbers that shrug an attack off and stay ready to attack (nobody defends), the Maestro fixtures' real decklists defend as the auto-player does.
+  // Whether a character defends: the goldens' heroes are numbers that shrug an attack off and stay ready to attack (nobody defends), the fixtures' real decklists defend as the auto-player does.
   defend: boolean;
 };
 export const DEFAULT_POLICY: RhovanionPolicy = { choose: "first", trust: 9, location: "first", weather: "threat", quest: "alone", defend: false };
@@ -48,7 +48,7 @@ const guardsObjective = (state: ScenarioState, ctx: ReduceContext, id: string) =
 const priority = (state: ScenarioState, ctx: ReduceContext, id: string): number => (guardsObjective(state, ctx, id) ? 0 : isTiny(state, id) ? 2 : isUrdug(state, id) ? 3 : 1);
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the answer the policy says; the Resolution's questions are answered as the policy says; the players travel to a location that guards an objective, engage an enemy at a time and attack together in the order above.
-// Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/roam-across-rhovanion.ts) play real decklists, so they turn card play on.
+// Every intent is one the reducer listed. `options`: the auto-player's own policy for the answers this one does not give; the fixtures (scripts/e2e/roam-across-rhovanion.ts) play real decklists, so they turn card play on.
 export function rhovanionIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: RhovanionPolicy = DEFAULT_POLICY, options: PolicyOptions = RHOVANION_POLICY): PlayerIntent {
   if (state.window?.kind === "resolution") {
     const offered = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
