@@ -54,7 +54,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "04087:forced:1", cardCode: "04087", lines: ["04087:B:2"], timing: "forced", trigger: "questFailed", instructions: [{ verb: "TriggerLost", mode: "all" }] },
     copyLine("04013:B:4", "04087:B:3"),
 
-    // 04088 Durin's Greaves. A:1: the first player attaches it to a hero of any player (it is discarded to the encounter discard pile when the hero leaves play, rr.attachment-cards). A:2 (+1 Defense) is a template.
+    // 04088 Durin's Greaves. A:1: the first player attaches it to a hero of any player as an attachment: it is discarded to the encounter discard pile when the hero leaves play (rr.attachment-cards). A:2 (+1 Defense) is a template.
     { id: "04088:whenRevealed:1", cardCode: "04088", lines: ["04088:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "any" } }] },
 
     // 04089 Abandoned Mine. Lost: the two Goblin enemies most recently discarded come back to the staging area, not revealed. 04090 Dwarven Forge. Lost: each player in turn discards a card of his choice from his hand. 04091 Silent Caverns. Lost: every character of every player is exhausted.
