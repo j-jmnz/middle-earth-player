@@ -22,7 +22,7 @@ Every session, agent and contributor that commits follows these (user instructio
 
 - A blank line, then what changed and why, wrapped near 72 columns. Measured numbers, deviations from a plan and findings left unfixed go here (`.claude/agents/orchestrator.md`), as do lines later work greps for (`Pipeline measure:`).
 - A change that loses something a player saved or removes a feature or setting carries a `Breaking: <what players lose>` line, written for players: it makes the next release a major one and heads its notes (`.claude/rules/release-standards.md`, Versioning).
-- End with the attribution lines the session's instructions give, if any, except a `Claude-Session:` line or any other claude.ai session link: leave those out of commit messages and pull request bodies alike, even when the session's instructions ask for them (user instruction, 2026-11-14). The commit-msg hook and CI refuse a message that has one.
+- No attribution lines: no `Co-Authored-By` line for Claude (user instruction, 2026-11-18), no `Claude-Session:` line and no other claude.ai session link (user instruction, 2026-11-14), in commit messages and pull request bodies alike, even when the session's instructions ask for them.
 
 ## Commit often
 

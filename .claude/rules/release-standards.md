@@ -5,7 +5,7 @@ Every session, agent and contributor that branches, tags or releases follows the
 ## Branches
 
 - `main` is the trunk and is always releasable: every change lands on it as one squash commit from a pull request (`.claude/rules/commit-standards.md`, Squash).
-- A work branch is `<type>/<short-slug>`, with a type from the commit standards, lowercase and hyphenated: `fix/staging-attacks`, `feat/lost-in-mirkwood`. It branches from `main`, is short-lived, and is deleted once merged. An agent session keeps the branch its harness or brief names (`claude/…`, `wip/<F>`).
+- A work branch is `<type>/<short-slug>`, with a type from the commit standards, lowercase and hyphenated: `fix/staging-attacks`, `feat/lost-in-mirkwood`. It branches from `main`, is short-lived, and is deleted once merged. An agent session keeps the branch its harness or brief names (`claude/…`, `wip/<F>`); a branch an agent creates itself is named for its task (`.claude/rules/agent-standards.md`).
 - `release/v<major>.<minor>` exists only to patch a released line while `main` holds work that must not ship yet. It is cut from that line's last tag (`git switch -c release/v0.3 v0.3.2`). The fix lands on `main` first, then a pull request cherry-picks it (`git cherry-pick -x`) onto the release branch, and the release runs from there. It cuts only `v<major>.<minor>.x` patches.
 
 ## Versioning

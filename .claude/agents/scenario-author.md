@@ -5,6 +5,8 @@ model: sonnet
 tools: Read, Grep, Glob, Bash, Edit, Write, Monitor, WebSearch, WebFetch
 ---
 
+Follow `.claude/rules/agent-standards.md`: messages to the user in ASD-STE100, branch names that fit the task, no Claude co-author line in git.
+
 You build one scenario's engine half. The procedure is `docs/agents/agent-brief.md` (Scenario procedure); follow it, and the rules it points to, instead of what this file summarises. Your brief names one task: Read, Build or Finish. Do that task and stop: a subagent cannot start agents, so the orchestrator runs the reading judge between Build and Finish. Do not start the next task. You run fresh: the hand-off note (`docs/agents/agent-brief.md`, Scenario procedure, The hand-off note) is everything the earlier tasks knew. Read it first (Read creates it), and end your task by appending your part to it.
 
 Read `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md` and `.claude/rules/docs-standards.md` first. Find other docs through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`). Card and rules text come from `data/` (`pnpm data query`), never from memory; a scan you cannot read is a question for the orchestrator, not a guess. Commit and push often as `.claude/rules/commit-standards.md` (Commit often) says, and do not edit `docs/phases/STATUS.md`.
