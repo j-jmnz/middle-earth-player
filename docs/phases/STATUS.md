@@ -40,6 +40,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures and Maestro
+- `rivendell-won` is not committed: no seed in 500 wins Road to Rivendell with the saved decklists. Until it exists `.maestro/scenarios/road-to-rivendell/road-to-rivendell.yaml` cannot run.
 - `gate-won` is not committed: no seed in 500 wins The Redhorn Gate with the saved decklists. Until it exists `.maestro/scenarios/the-redhorn-gate/the-redhorn-gate.yaml` cannot run.
 - `frommoria-won` is not committed: no seed in 400 wins Flight from Moria with the saved decklists (heroes destroyed by round 3). Until it exists `.maestro/scenarios/flight-from-moria/flight-from-moria.yaml` cannot run.
 - `level-won` is not committed: no seed in 500 wins The Seventh Level with the saved decklists (their heroes are gone by round 3). Until it exists `.maestro/scenarios/the-seventh-level/the-seventh-level.yaml` cannot run.
