@@ -297,6 +297,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
 - Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
 - With two Blinding Blizzards (901307) the first in staging takes the progress, with no first-player choice between them; Blinding Blizzard's progress readout ("3 / 5") does not warm near 5 (agent recommendation, `docs/brief.md`, The Redhorn Gate).
+- The Long Dark readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Long Dark). Not user-confirmed.
 - The Watcher in the Water readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Watcher in the Water). Not user-confirmed.
 - Road to Rivendell readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Road to Rivendell). Not user-confirmed.
 - The Redhorn Gate readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Redhorn Gate). Not user-confirmed.
