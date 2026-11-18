@@ -1,84 +1,21 @@
 // Rules: mec108.create-staging-area, mec109.multiple-staging-areas, rr.player-elimination, rr.delayed-effects, rr.quest-advancement, rr.cancel, rr.lasting-effects, rr.effects, rr.forced (data/rules/entries.json);
-// ledger lines 148003:A:1, 148003:B:2, 148003:B:3, 148004:A:1, 148004:B:1, 148004:B:2, 148008:A:2, 148012:A:1, 148013:A:1, 148015:A:2, 148017:A:2.
-// The vocabulary Fog on the Barrow-downs adds (breaking, burden, quest, deck, misc, defense, sidequests and harad families), each on a table the layout kit builds from data/.
+// ledger lines 148003:B:2, 148003:B:3, 148004:B:1, 148004:B:2, 148014:A:1, 148016:A:1, 148017:A:2, 148018:A:2.
+// The breaking family's vocabulary for Fog on the Barrow-downs (RaiseThreatAtStage on a stage, allAtStage, CancelRevealed, the areas apart read as "each player"), the Delay until the travel phase and the stage flags, on the trapped scene
+// (test/scenarios/fog-on-the-barrow-downs/scene.ts). The other families' vocabulary is tested in their own folders.
 import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { eliminateSeat } from "../../core/eliminate.ts";
 import { printedOf } from "../../core/printed.ts";
-import { flagged, livingSeats, updateCard, withSeat, type ScenarioState } from "../../core/state.ts";
+import { flagged, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
-import { modifiedStat } from "../../core/keywords.ts";
 import { settle } from "../../engine/machine.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
-import { resolutionStep } from "../../quest/stage-reveal.ts";
-import { stagingThreat } from "../../quest/quest.ts";
-import { allyCard, idOf, resolveRecords, revealFromTop, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
-import { parkedStage, stageOf, stagingOf } from "./areas.ts";
-
-const SCENARIO = "fog-on-the-barrow-downs";
-const STAGE_3 = "148003";
-const STAGE_4 = "148004";
-const GREAT_BARROW = "148007";
-const table = (layout: Parameters<typeof tableFromLayout>[1] = {}) => tableFromLayout(SCENARIO, { stage: STAGE_3, phase: "Quest", ...layout });
-const focus = (seat: number, sourceId: string | null = null) => ({ seat, sourceId });
-const codeOf = (state: ScenarioState, id: string | null | undefined): string | undefined => (id ? state.cards[id]?.code : undefined);
-
-// Two players, seat 1 trapped by a Great Barrow it revealed: seat 0 at stage 3B, seat 1 at a stage 4A.
-function trapped(layout: Parameters<typeof tableFromLayout>[1] = {}) {
-  const t = table({ seats: 2, firstPlayer: 1, deck: ["148011"], staging: ["148009"], ...layout });
-  let state = spawn(t.state, STAGE_4, { zone: "questDeck" }).state;
-  state = spawn(state, STAGE_4, { zone: "questDeck" }).state;
-  const revealed = revealFromTop(state, t.ctx, GREAT_BARROW, []);
-  return { t, ...revealed };
-}
-
-describe("148004:A:1 End your quest phase, then keep as many allies as enemies are engaged", () => {
-  it("EndQuestPhase own: only the acting seat's reveals stop, its characters stop being committed and its quest is not resolved", () => {
-    const { t, state } = trapped();
-    const hero = state.seats[1].heroes[0] ?? "";
-    const staging = { ...updateCard(state, hero, { committed: true }), mode: "staging" as const, revealCursor: { seats: [1, 0], index: 1 } };
-    const ended = runInstruction(staging, { verb: "EndQuestPhase", own: true }, focus(1, stageOf(staging, 1)), t.ctx, []);
-    expect(ended.mode).toBe("staging");
-    expect(ended.questEnded).toEqual([1]);
-    expect(ended.cards[hero]?.committed).toBe(false);
-    // Seat 1 had made one of the reveals: the cursor now counts the seats left (seat 0) from none made.
-    expect(ended.revealCursor).toEqual({ seats: [0], index: 0 });
-    // Without separate areas it is the whole phase ending, as ever.
-    const shared = table({ seats: 2 });
-    const whole = runInstruction({ ...shared.state, mode: "staging", revealCursor: { seats: [0, 1], index: 1 } }, { verb: "EndQuestPhase", own: true }, focus(0), shared.ctx, []);
-    expect(whole.mode).toBe("resolution");
-    expect(whole.questEnded).toBeUndefined();
-  });
-
-  it("the resolution leaves the seat out: no quest step for it, and its threat does not rise", () => {
-    const { t, state } = trapped();
-    const ended = { ...state, mode: "resolution" as const, questEnded: [1], questResolved: false, window: null };
-    const steps: EngineStep[] = [];
-    const resolved = resolutionStep(ended, t.ctx, steps);
-    expect(steps.filter((step) => step.kind === "quest")).toHaveLength(1);
-    expect(resolved.seats[1].threat).toBe(state.seats[1].threat);
-    expect(resolved.questEnded).toBeUndefined();
-  });
-
-  it("148004:A:1 the player keeps exactly X allies, X the enemies engaged with him: he chooses which; fewer allies than X lose none", () => {
-    const t = table({ seats: 1, stage: STAGE_4, deck: ["148011"], engaged: ["148012", "148012"] });
-    for (const name of ["a1", "a2", "a3"]) t.cards.set(name, allyCard(name, 1));
-    let state = t.state;
-    for (const name of ["a1", "a2", "a3"]) state = spawn(state, name, { zone: "play", seat: 0 }).state;
-    const stage = idOf(state, STAGE_4);
-    // Two enemies engaged: keep 2 of the 3 allies; the first choice (a1) and the second (a2) are kept, a3 is discarded.
-    const run = resolveRecords(state, t.ctx, STAGE_4, "whenRevealed", stage);
-    const left = run.state.seats[0].play.map((id) => codeOf(run.state, id));
-    expect(left).toEqual(["a1", "a2"]);
-    expect(run.state.seats[0].discard.map((id) => codeOf(run.state, id))).toEqual(["a3"]);
-    // With one more ally than enemies, one is discarded; with no more allies than enemies, none.
-    const two = { ...state, seats: [{ ...state.seats[0], play: state.seats[0].play.slice(0, 2) }, state.seats[1]] as ScenarioState["seats"] };
-    expect(resolveRecords(two, t.ctx, STAGE_4, "whenRevealed", stage).state.seats[0].discard).toEqual([]);
-  });
-});
+import { idOf, resolveRecords, revealFromTop } from "../../../../test/harness/scene-kit.ts";
+import { codeOf, focus, fogTable as table, GREAT_BARROW, STAGE_3, trapped } from "../../../../test/scenarios/fog-on-the-barrow-downs/scene.ts";
+import { parkedStage, stagingOf } from "./areas.ts";
 
 describe("148003:B:2 and B:3 the shared stage", () => {
   it("148003:B:2 hears every elimination (playerEliminated) and raises the players at its stage by 10; one at another stage is not raised", () => {
@@ -177,71 +114,6 @@ describe("148004:B:1 a location revealed at stage 4B", () => {
   });
 });
 
-describe("148008:A:2 an ally facedown under Ancient Barrow", () => {
-  it("each player at its stage places an ally under it, which returns to its owner's hand when it is explored", () => {
-    const t = table({ seats: 1, staging: [] });
-    t.cards.set("a1", allyCard("a1", 1));
-    const state = spawn(t.state, "a1", { zone: "play", seat: 0 }).state;
-    const run = revealFromTop(state, t.ctx, "148008", []);
-    const barrow = run.id;
-    const ally = idOf(run.state, "a1");
-    expect(run.state.cards[ally]).toMatchObject({ zone: "under", host: barrow, owner: 0 });
-    // Its Threat is 1 plus the cards facedown under it.
-    expect(modifiedStat(run.state, run.state.cards[barrow]!, "threat", t.ctx.cards)).toBe(2);
-    const explored = runInstruction(run.state, { verb: "ReturnFacedownToHands" }, { seat: 0, sourceId: barrow }, t.ctx, []);
-    expect(explored.cards[ally]?.zone === "hand" || explored.cards[ally]?.zone === "under").toBe(true);
-  });
-});
-
-describe("the flags a Wight and Frozen by Fear set", () => {
-  it("148012:A:1 noCardDraw bars a card effect's draw and not the resource phase's", () => {
-    const t = table({ seats: 1, deckOf: ["ally", "ally"] });
-    const hold = { ...t.state, modifiers: [{ instanceId: "seat:0", sourceId: "x", stat: "noCardDraw" as const, amount: 1, until: "endOfRound" as const }] };
-    const drawn = runInstruction(hold, { verb: "Draw", amount: 1 }, focus(0, null), t.ctx, []);
-    expect(drawn.seats[0].hand).toHaveLength(0);
-    expect(flagged(hold, "seat:0", "noCardDraw")).toBe(true);
-  });
-
-  it("148013:A:1 noCardResources bars a card effect's resources on the hero and not the collection", () => {
-    const t = table({ seats: 1 });
-    const hero = t.state.seats[0].heroes[0] ?? "";
-    const hold = { ...t.state, modifiers: [{ instanceId: hero, sourceId: "x", stat: "noCardResources" as const, amount: 1, until: "endOfRound" as const }] };
-    const source = spawn(hold, "attachment", { zone: "staging" });
-    const gained = runInstruction(source.state, { verb: "AddResources", amount: 2, to: "picked" }, focus(0, source.id), t.ctx, []);
-    expect(gained.cards[hero]?.resources).toBe(t.state.cards[hero]?.resources);
-  });
-
-  it("148017:A:2 a seat held by cannotTriggerEffects triggers no Action or Response and plays no event", () => {
-    const t = table({ seats: 2, hand: [{ code: "event", seat: 1 }] });
-    const event = idOf(t.state, "event");
-    const frozen = { ...t.state, modifiers: [{ instanceId: "seat:1", sourceId: "x", stat: "cannotTriggerEffects" as const, amount: 1, until: "endOfRound" as const }] };
-    expect(flagged(frozen, "seat:1", "cannotTriggerEffects")).toBe(true);
-    expect(frozen.cards[event]?.zone).toBe("hand");
-    expect(withSeat).toBeDefined();
-  });
-});
-
-describe("148015:A:2 each Wight engaged with the revealer contributes its Threat", () => {
-  it("engagedThreatSeat with a Trait counts only the enemies with it, and only those of the seat's own area", () => {
-    const t = table({ seats: 2, engaged: [{ code: "148011", seat: 0 }, { code: "f3", seat: 0 }, { code: "148012", seat: 1 }] });
-    const base = stagingThreat(t.state, t.ctx.cards);
-    const held = { ...t.state, modifiers: [{ instanceId: "seat:0", sourceId: "x", stat: "engagedThreatSeat" as const, amount: 1, until: "endOfPhase" as const, trait: "Wight" }] };
-    const wight = printedOf(t.ctx.cards, "148011").threat ?? 0;
-    expect(stagingThreat(held, t.ctx.cards)).toBe(base + wight);
-  });
-});
-
-describe("148003:A:1 shuffling each copy of Great Barrow into the encounter deck", () => {
-  it("ShuffleSetAsideIntoEncounterDeck all puts every set-aside copy in, and without all only the first", () => {
-    const t = table({ seats: 1, setAside: [GREAT_BARROW, GREAT_BARROW, GREAT_BARROW] });
-    const one = runInstruction(t.state, { verb: "ShuffleSetAsideIntoEncounterDeck", code: GREAT_BARROW }, focus(0), t.ctx, []);
-    expect(one.setAside.filter((id) => codeOf(one, id) === GREAT_BARROW)).toHaveLength(2);
-    const all = runInstruction(t.state, { verb: "ShuffleSetAsideIntoEncounterDeck", code: GREAT_BARROW, all: true }, focus(0), t.ctx, []);
-    expect(all.setAside.filter((id) => codeOf(all, id) === GREAT_BARROW)).toHaveLength(0);
-    expect(all.encounterDeck.filter((id) => codeOf(all, id) === GREAT_BARROW)).toHaveLength(3);
-  });
-});
-
 describe("148018:A:2 Dreadful Song's end-of-round raise reads the hero's controller", () => {
   it("raises the threat of the player whose hero carries it by 1 for each Wight engaged with him, whoever holds the first player token", () => {
     const t = table({ seats: 2, firstPlayer: 0, engaged: [{ code: "148011", seat: 1 }, { code: "148012", seat: 1 }, { code: "148013", seat: 0 }] });
@@ -284,16 +156,5 @@ describe("areas apart: what an encounter card reads as 'each player', 'at this s
     const attacks = (seat: number) => resolveRecords({ ...state, firstPlayer: seat }, t.ctx, "148014", "whenRevealed").steps.filter((step) => step.kind === "attack").length;
     expect(attacks(0)).toBeGreaterThan(attacks(1));
     expect(attacks(1)).toBe(0);
-  });
-
-  it("148010:A:1 characters defend against a Wight with their Willpower, and against any other enemy with their Defense", () => {
-    const t = table({ seats: 1, staging: ["148010"], engaged: ["148011", "f3"] });
-    const settled = settle({ ...t.state, mode: "stopped", window: null }, t.ctx, []);
-    const hero = settled.seats[0].heroes[0] ?? "";
-    const card = settled.cards[hero]!;
-    const printed = printedOf(t.ctx.cards, card.code);
-    const against = (enemy: string) => ({ ...settled, pendingAttack: { enemyId: idOf(settled, enemy), seat: 0, defenderId: hero } }) as ScenarioState;
-    expect(modifiedStat(against("148011"), card, "defense", t.ctx.cards)).toBe(printed.willpower ?? 0);
-    expect(modifiedStat(against("f3"), card, "defense", t.ctx.cards)).toBe(printed.defense ?? 0);
   });
 });
