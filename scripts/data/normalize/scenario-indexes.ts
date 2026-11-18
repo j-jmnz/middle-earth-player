@@ -40,7 +40,7 @@ export function campaignsOf(
   return campaignDefs.map((def) => {
     const built = def.scenarios.filter((scenario) => scenarios.some((item) => item.id === scenario.id));
     // The titles Hall of Beorn lists under the cycle's later products, product by product in the def's order.
-    const later = def.kind === "cycle" ? (def.later ?? []).flatMap((product) => scenarioIndex.filter((entry) => entry.Product === product).map((entry) => entry.Title.replace(CAMPAIGN_SUFFIX, ""))) : [];
+    const later = def.kind === "cycle" ? (def.later ?? []).flatMap((product) => scenarioIndex.filter((entry) => entry.Product === product || entry.Title === product).map((entry) => entry.Title.replace(CAMPAIGN_SUFFIX, ""))) : [];
     const data: CampaignData = {
       id: def.id,
       name: def.name,

@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "c33bc3bb29bee638f382b1b402dc46ca24ffb7c0d48f091b14be0452b4062ded"
+        "value": "333d8f5eb4101f2397ac8e0c5ab7101debad827783ad500493f677f8e66a93da"
       },
-      "fetchedAt": "2026-11-18T01:58:56.339Z",
+      "fetchedAt": "2026-11-18T07:53:26.522Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -469,6 +469,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Stone-of-Erech",
           "sha256": "56add3eb8f0cdf28742510056e6ad809eb44b7cd014e13fb85c5b7a82807ad62",
           "bytes": 11011
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Old-Forest.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Old-Forest",
+          "sha256": "816b9ec6df3e64211799c6a381d1f77df35c2d6ed867662c802703173fd2f8bc",
+          "bytes": 14799
         }
       ]
     },

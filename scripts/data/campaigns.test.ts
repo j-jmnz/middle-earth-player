@@ -61,7 +61,9 @@ describe("data/campaigns/index.json", () => {
   });
 
   it("accounts for every official product Hall of Beorn lists: built, coming later, or a reprint the app plays from its revised box", () => {
-    const products = new Set(hobScenarioIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "raw", "hallofbeorn", "Scenarios.json"), "utf8"))).map((entry) => entry.Product));
+    const index = hobScenarioIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "raw", "hallofbeorn", "Scenarios.json"), "utf8")));
+    const products = new Set(index.map((entry) => entry.Product));
+    const titles = new Set(index.map((entry) => entry.Title));
     const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
     // The 2011 Core Set and the Two-Player Limited Edition Starter print the scenarios the Revised Core Set and The Dark of Mirkwood reprint.
     const reprinted = ["Core Set", "Two-Player Limited Edition Starter"];
@@ -77,7 +79,7 @@ describe("data/campaigns/index.json", () => {
     const unaccounted = [...products].filter((product) => !listed.has(product) && !reprinted.includes(product) && !fanMade.includes(product) && !standaloneToBuild.includes(product));
     expect(unaccounted).toEqual([]);
     // Each name above is a product Hall of Beorn lists, so a rename upstream fails here rather than hiding a product.
-    expect([...reprinted, ...fanMade, ...standaloneToBuild].filter((product) => !products.has(product))).toEqual([]);
+    expect([...reprinted, ...fanMade, ...standaloneToBuild].filter((product) => !products.has(product) && !titles.has(product))).toEqual([]);
     expect([...reprinted, ...fanMade, ...standaloneToBuild].filter((product) => listed.has(product))).toEqual([]);
   });
 

@@ -2,7 +2,7 @@
 import type { CampaignData, CampaignIndexEntry } from "../../../src/catalog/scenario-data.ts";
 import { PLAYABLE_SCENARIOS } from "../../../src/campaign/playable.ts";
 
-import { CAMPAIGNS, LORD_OF_THE_RINGS_SAGA, scenarioProductOf } from "../campaign-defs.ts";
+import { CAMPAIGNS, LORD_OF_THE_RINGS_SAGA, productListsScenario } from "../campaign-defs.ts";
 import type { Overrides } from "./cards.ts";
 import type { RawData } from "./load-raw.ts";
 
@@ -26,7 +26,7 @@ export function buildCampaignIndex(
     const def = CAMPAIGNS.find((item) => item.id === campaign.id);
     if (!def) throw new Error(`campaign index: ${campaign.id} has no definition in scripts/data/campaign-defs.ts`);
     // Every scenario Hall of Beorn lists under the campaign's products is built, and no other.
-    const listed = count(new Set(def.products.map(scenarioProductOf)));
+    const listed = raw.scenarioIndex.filter((entry) => def.products.some((name) => productListsScenario(name, entry))).length;
     if (listed !== campaign.scenarios.length) throw new Error(`campaign index: ${campaign.id} builds ${campaign.scenarios.length} scenarios, Hall of Beorn lists ${listed}`);
     for (const product of def.products) claimed.set(product, campaign.id);
     index.push({ id: campaign.id, name: campaign.name, scenarioCount: campaign.scenarios.length, playable: campaign.scenarios.some((id) => playable.includes(id)), kind: def.kind ?? "campaign", box: null, released: def.released });
