@@ -5,6 +5,7 @@
 // reader where it has one (hasKeyword, hasPhantom, indestructible, playerCardEffectCanChoose, heldAmount); this file only puts the answers in a list.
 import { cardArchery } from "../../rules/combat/combat.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
+import { hasSpectral } from "../../rules/families/attack/spectral.ts";
 import { hasPhantom } from "../../rules/families/grey-company/phantom.ts";
 import { hasKeyword, indestructible, playerCardEffectCanChoose, printedKeywordsBlank, toughnessOf } from "../../rules/core/keywords.ts";
 import { printedOf } from "../../rules/core/printed.ts";
@@ -71,6 +72,7 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   else shown("immune", kw.immuneToPlayerCardEffects);
   if (hasPhantom(game, cardId, ctx)) add("phantom", false);
   else if (kw.phantom && usable) add("phantom", true);
+  if (kw.spectral && usable) add("spectral", lostAll || !hasSpectral(game, cardId, ctx.cards));
 
   return (Object.keys(KEYWORD_RULES) as KeywordKey[]).flatMap((key) => found.get(key) ?? []);
 }

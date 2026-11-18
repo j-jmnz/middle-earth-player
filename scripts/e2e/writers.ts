@@ -53,7 +53,7 @@ import { deadmarshesFixtures } from "./shadows-of-mirkwood/the-dead-marshes.ts";
 import { returnmirkwoodFixtures } from "./shadows-of-mirkwood/return-to-mirkwood.ts";
 import { osgiliathFixtures } from "./standalone-scenarios/the-massing-at-osgiliath.ts";
 import { townFixtures } from "./standalone-scenarios/the-battle-of-lake-town.ts";
-import { erechFixtures } from "./the-stone-of-erech.ts";
+import { erechFixtures } from "./standalone-scenarios/the-stone-of-erech.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
