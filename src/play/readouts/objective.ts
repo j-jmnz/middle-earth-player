@@ -24,12 +24,13 @@ export function stagePoints(game: ScenarioState, stage: CardInstance, ctx: Reduc
 /**
  * The printed line that holds the quest stage back while a card says the players cannot advance ("Players cannot defeat this stage
  * while any Hill Troll cards are in play", 01126:B:2), or null when nothing holds it. Progress still goes on it past its quest points
- * meanwhile (faq.progress-without-advancing), and it advances once nothing holds it (rr.quest-advancement).
+ * meanwhile (faq.progress-without-advancing), and it advances once nothing holds it (rr.quest-advancement). A stage 4 of Foundations of Stone is held by its own Forced line ("join another player at the beginning of the travel phase",
+ * 04114:B:2): the stage is complete at its quest points and waits for the travel phase.
  */
 export function advanceHold(game: ScenarioState, ctx: ReduceContext, line: (id: string) => string | null): string | null {
   for (const rule of restricted(game, ctx, "advance")) {
     const code = game.cards[rule.sourceId]?.code;
-    const effect = (code == null ? [] : effectsOf(ctx, code)).find((item) => item.timing === "constant" && item.instructions.some((instruction) => instruction.verb === "Restrict" && instruction.what === "advance"));
+    const effect = (code == null ? [] : effectsOf(ctx, code)).find((item) => (item.timing === "constant" && item.instructions.some((instruction) => instruction.verb === "Restrict" && instruction.what === "advance")) || (item.timing === "forced" && item.instructions.some((instruction) => instruction.verb === "JoinAnotherPlayer" && instruction.holdsStage === true)));
     const text = effect?.lines[0] ? line(effect.lines[0]) : null;
     if (text) return text;
   }
