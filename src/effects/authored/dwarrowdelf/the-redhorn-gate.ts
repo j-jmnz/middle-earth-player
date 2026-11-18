@@ -111,7 +111,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "04012",
       lines: ["04012:B:1"],
       timing: "whenRevealed",
-      instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: SNOWSTORM }] }, { verb: "ShuffleSetAsideIntoEncounterDeck", code: SNOWSTORM }, { verb: "ShuffleEncounterDeck" }],
+      instructions: [
+        { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: SNOWSTORM }] },
+        { verb: "ShuffleSetAsideIntoEncounterDeck", code: SNOWSTORM },
+        { verb: "ShuffleEncounterDeck" },
+        // While Snowdrifts is the stage the characters stay committed through its defeat (B:2, docs/brief.md, The Redhorn Gate): the table's flag, read by the quest resolution (rules/quest/stage-reveal.ts).
+        { verb: "ModifyStat", stat: "heldCommitted", amount: 1, until: "whileSourceInPlay", target: "table" },
+      ],
     },
     {
       id: "04012:forced:1",
@@ -129,9 +135,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "MakeActive", when: { kind: "canPick", pick: CARADHRAS_IN_STAGING } },
       ],
     },
-
-    // The commitments stay while Snowdrifts is the stage, until the quest resolution's second pass: the stage's defeat (B:2) and stage 3B's rule meet characters that are still committed (docs/brief.md, The Redhorn Gate).
-    { id: "04012:constant:1", cardCode: "04012", lines: ["04012:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "heldCommitted", amount: 1, until: "whileSourceInPlay", target: "table" }] },
 
     // 04013 The Mountains' Peaks (stage 3). B:1: every Snowstorm in the discard pile is shuffled back into the deck. B:2: while this stage is current a character whose Willpower is 0 is discarded from play, the state kept true by the settle sweep (families/play/sweep.ts).
     // B:3: the stage is not defeated while the victory display holds fewer than 5 victory points (progress goes on, faq.progress-without-advancing). B:4: defeating it wins.

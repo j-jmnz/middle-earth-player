@@ -98,6 +98,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
       - one set-aside copy of the card with code 04022 is shuffled into the encounter deck (nothing with none set aside)
     - one set-aside copy of the card with code 04022 is shuffled into the encounter deck (nothing with none set aside)
     - shuffle the encounter deck
+    - the table: stat heldCommitted 1, while this card is in play
 
 04012:B:2 (back): Forced: After placing the 11th progress token on Snowdrifts, discard any active location. Caradhras becomes the active location.
   04012:forced:1: Forced on the event questCardDefeated (heard about this card)
@@ -107,8 +108,6 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - the acting player finds one card with code 04015 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
     - then, if there is a location (any player controls) in the staging area only, named "Caradhras" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "Caradhras"
     - then, if there is a location (any player controls) in the staging area only, named "Caradhras" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
-  04012:constant:1: Constant
-    - the table: stat heldCommitted 1, while this card is in play
 
 ## 04013 The Mountains' Peaks
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -312,4 +311,4 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     only if the event's other card is a enemy (any player controls) that is this card itself
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 195 by template, 0 as JSON)
+(rendered pieces: 194 by template, 0 as JSON)

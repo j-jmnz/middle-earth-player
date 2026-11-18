@@ -15,7 +15,7 @@ import { unflippedStage } from "../families/quest/order.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { restricted } from "../interpret/restrictions.ts";
-import { flagged, withMode, type ScenarioState } from "../core/state.ts";
+import { flagged, inPlay, updateCards, withMode, type ScenarioState } from "../core/state.ts";
 import { areaSeats, stageSeat } from "../families/breaking/areas.ts";
 import { payOwed } from "../families/breaking/progress.ts";
 import { fireForced } from "../windows/triggers.ts";
@@ -42,7 +42,7 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const canAdvance = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
   // Once stages are separate each seat resolves the quest of its own stage in player order, against its own staging area (mec109.multiple-staging-areas).
   const quested = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
-  const resolved = resolveSideQuests(quested, sides, ctx, steps);
+  const resolved = keepCommitted(resolveSideQuests(quested, sides, ctx, steps), state);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
   return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);
@@ -53,6 +53,13 @@ function announceQuestTotal(state: ScenarioState, ctx: ReduceContext, steps: Eng
   if (!heard(state, ctx, "questTotalCounted") || flagged(state, "table", "questTotalAnnounced")) return null;
   const marked: ScenarioState = { ...state, window: null, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questTotalAnnounced", amount: 1, until: "endOfPhase" }] };
   return fireForced(marked, { trigger: "questTotalCounted", seat: null }, ctx, steps);
+}
+
+// While the table holds `heldCommitted` (Snowdrifts, 04012:B:2) the characters stay committed through the stage's defeat, so Caradhras' -1 and stage 3B's zero-Willpower discard reach them: the resolution clears them, so they are committed again here (the second pass clears them).
+function keepCommitted(resolved: ScenarioState, before: ScenarioState): ScenarioState {
+  if (!flagged(before, "table", "heldCommitted")) return resolved;
+  const kept = Object.values(before.cards).filter((card) => card.committed && inPlay(resolved.cards[card.id]?.zone ?? "removed"));
+  return updateCards(resolved, kept.map((card) => [card.id, { committed: true }]));
 }
 
 // A card in the game answers a failed quest with an X amount (Urdug's Gambit, 19051:B:2): the event carries the shortfall for it.
