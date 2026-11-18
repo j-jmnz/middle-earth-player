@@ -23,7 +23,7 @@ import { defenseQuestResult } from "../words/scenarios/fortress.ts";
 import { defenseOutcome, stageHasDefense } from "./fortress.ts";
 import { companyProgressWords } from "./company.ts";
 import { erechQuestWords } from "./standalone-scenarios/erech.ts";
-import { downsHoldWords, downsQuestWords } from "./standalone-scenarios/barrow-downs.ts";
+import { downsHoldWords, downsQuestWords, downsRaise } from "./standalone-scenarios/barrow-downs.ts";
 import { forestHoldWords } from "./standalone-scenarios/old-forest.ts";
 import { lairProgressWords } from "./lair.ts";
 import { blackGateQuestEnd } from "./black-gate.ts";
@@ -200,7 +200,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // The Old Forest's stage 3B: progress that would fill it, and the card that holds the win.
     // Fog on the Barrow-downs' stage 3B: the progress it takes none of while a Great Barrow is in play, and the defeat it holds until every player is at it with Standing Stones in the victory display.
     const holds = forestHoldWords(game, ctx, willpower - threat) ?? downsHoldWords(game, ctx, willpower - threat);
-    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${holds ? `; ${holds}` : ""}${eliminationWords(game, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
+    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${holds ? `; ${holds}` : ""}${eliminationWords(game, ctx, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
   }
   return null;
 }
@@ -228,17 +228,22 @@ function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly s
 
 // A quest that would fail by `shortfall`, as the engine fails it on a copy (failQuest): a seat whose threat reaches 50 is
 // eliminated (rr.threat-elimination-level), and with no seat left the game is lost.
-function eliminationWords(game: ScenarioState, shortfall: number, only?: number): string {
+function eliminationWords(game: ScenarioState, ctx: ReduceContext, shortfall: number, only?: number): string {
   if (shortfall <= 0) return "";
   // The elimination level: 99 while the main quest is Dire (mec113.dire).
   const level = game.dire === true ? DIRE_THREAT : ELIMINATION_THREAT;
   const after = failQuest(game, shortfall, [], only == null ? undefined : [only]);
+  // Fog on the Barrow-downs' stage 3B hears an elimination: the players at it raise their threat by 10, which can end the game (148003:B:2).
+  const raise = downsRaise(game, ctx, after, level);
+  const raised = raise ? `; ${raise.text}${raise.ends ? `: ${lossWords("No seats remain")}` : ""}` : "";
   // Stages are separate: only the seat that quests raises its threat, so only it can be eliminated by this quest (mec109.multiple-staging-areas).
   if (only != null) {
     if (livingSeats(after).includes(only)) return "";
-    return livingSeats(game).length === 1 && after.lost && !game.lost ? `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}` : `; threat reaches ${level}: Player ${only + 1} is eliminated`;
+    if (livingSeats(game).length === 1 && after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}`;
+    return `; threat reaches ${level}: Player ${only + 1} is eliminated${raised}`;
   }
   if (after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}`;
   const out = livingSeats(game).filter((seat) => !livingSeats(after).includes(seat));
-  return out.length === 0 ? "" : `; threat reaches ${level}: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated`;
+  if (out.length === 0) return "";
+  return `; threat reaches ${level}: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated${raised}`;
 }

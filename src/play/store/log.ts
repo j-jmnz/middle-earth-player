@@ -128,7 +128,7 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "attack":
       return step.side === "enemy" ? `${names.card(step.enemyId)} attacks ${player(step.seat)}` : `${player(step.seat)} attacks ${names.card(step.enemyId)}`;
     case "cancel":
-      return `${names.card(step.cardId)} is canceled`;
+      return step.by ? `${names.card(step.by)}: ${names.card(step.cardId)} is canceled and discarded` : `${names.card(step.cardId)} is canceled`;
     // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
     case "grapple":
       return grappleLine(names.card(step.enemyId), names.card(step.locationId));

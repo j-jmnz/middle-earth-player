@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { eliminateSeat } from "../../../rules/core/eliminate.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { livingSeats, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { spawn } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { parkedStage, sharedStaging, stageOf, viewOf } from "../../../rules/families/breaking/areas.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
@@ -54,6 +55,16 @@ describe("148004:B:2 returning to stage 3B", () => {
     const barrows = Object.values(settled.cards).filter((card) => card.code === GREAT_BARROW);
     expect(barrows.filter((card) => card.zone === "victory")).toHaveLength(1);
     expect(barrows.every((card) => card.progress === 0)).toBe(true);
+  });
+});
+
+describe("148004:B:2 the Great Barrow that goes to the victory display", () => {
+  it("148004:B:2 with more than one in play, a player still in the game chooses, not the eliminated player", () => {
+    const { t, state } = trapped();
+    const two = spawn(state, GREAT_BARROW, { zone: "staging" }).state;
+    const steps: EngineStep[] = [];
+    const settled = settle(stopped(eliminateSeat({ ...two, firstPlayer: 0 }, 1, steps)), t.ctx, steps);
+    expect(settled.window).toMatchObject({ kind: "choose", seat: 0 });
   });
 });
 

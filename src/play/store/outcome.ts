@@ -15,8 +15,10 @@ import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
+import { raiseSource, returnLines, trapLine } from "../readouts/standalone-scenarios/barrow-downs.ts";
 import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scenarios/gundabad-beats.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
+import { BACK_TITLE, TRAPPED_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -103,9 +105,12 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         if (text) line(`Shadow, ${names.card(step.cardId)}: ${text}`, null, [step.cardId]);
         return;
       }
-      case "threat":
-        line(`${seatWord(after, step.seat)} ${step.amount >= 0 ? "+" : ""}${step.amount}`, "threat");
+      case "threat": {
+        // A threat raise stage 3B of Fog on the Barrow-downs made for an elimination says where it came from (148003:B:2).
+        const from = "line" in step.cause ? raiseSource(after, step.cause.line, names.card) : null;
+        line(`${seatWord(after, step.seat)} ${step.amount >= 0 ? "+" : ""}${step.amount}${from ? ` (${from})` : ""}`, "threat");
         return;
+      }
       case "progress":
         line(step.amount < 0 ? `${-step.amount} progress removed from ${stageNamed(step.targetId)}` : `${step.amount} progress on ${stageNamed(step.targetId)}`, "progress");
         return;
@@ -116,6 +121,13 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           line(`The Stormcaller advances to ${stormcallerStageWords(after, step.cardId)}: ${names.card(step.cardId)}`);
           const text = names.revealed?.(step.cardId);
           if (text) line(text, null, [step.cardId]);
+          return;
+        }
+        // A stage 4A a Great Barrow trapped a player at is a trap, not the quest's last stage (148007:A:2).
+        const trapped = trapLine(after, step.cardId, names.card);
+        if (trapped) {
+          open(1, TRAPPED_TITLE, "bad");
+          line(trapped, null, [step.cardId]);
           return;
         }
         if (!current) open(1, "The quest advances", "good");
@@ -244,6 +256,12 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against threat ${step.threat}`, "willpower");
         return;
+      // A revealed card a stage's own effect canceled (Trapped Inside a Barrow, 148004:B:1): which stage did it and what was discarded.
+      case "cancel":
+        if (!step.by) return;
+        if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
+        line(`${names.card(step.by)}: ${names.card(step.cardId)} is canceled and discarded`, null, [step.cardId]);
+        return;
       case "eliminate":
         open(0, `Player ${step.seat + 1} is eliminated`, "bad");
         return;
@@ -299,6 +317,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   } else if (after.activeLocation && after.activeLocation !== before.activeLocation && after.activeLocation !== before.secondActiveLocation && before.staging.includes(after.activeLocation)) {
     groups.push({ rank: 1, title: `Traveled to ${names.card(after.activeLocation)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
   }
+
+  // A player came back from stage 4B to stage 3B at the beginning of the travel phase (148004:B:2): no step of its own, so the beat reads the two states.
+  for (const text of returnLines(before, after, names.card)) groups.push({ rank: 1, title: BACK_TITLE, tone: "good", lines: [{ text, mark: null }] });
 
   const shown = groups.filter((group) => group.lines.length > 0 || group.title !== "");
   if (shown.length === 0) return null;

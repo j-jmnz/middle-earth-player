@@ -7,7 +7,7 @@
 // advanced already: the screen holds the moment so the stage is read before the round goes on, and the table answers nothing for
 // the player meanwhile (use-table-choice.ts). The table also opens on it (user request, 2026-10-29): the stage in play when the game is
 // loaded, so a new game shows its first quest card, usually the one whose Setup the game just ran, before the table. Pure, so a test reads it.
-import { isSeparate, parkedStage, stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
+import { isSeparate, parkedStage, stageOf, stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { stagePlace } from "../../rules/families/quest/branch.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import type { CardFace } from "../../rules/core/state.ts";
@@ -16,6 +16,8 @@ import { topFrame } from "../../rules/windows/windows.ts";
 
 import { stageDetail } from "./fortress.ts";
 import { advanceHold, questObjective, stagePoints } from "./objective.ts";
+import { isTrapStage, trapAdvance } from "./standalone-scenarios/barrow-downs.ts";
+import { questSeat } from "../store/selectors.ts";
 import { STAGE_LOSS } from "../words/scenarios/stormcaller.ts";
 import type { TableMoment } from "../store/store.ts";
 
@@ -56,10 +58,19 @@ export function askingStage(game: ScenarioState): string | null {
   return game.window != null && ASKING.has(game.window.kind) ? (topFrame(game)?.cardId ?? null) : null;
 }
 
+/**
+ * The stage the table opens on and an advance is told for: the shared stage; once the areas are isolated (Fog on the Barrow-downs, a player trapped) the acting seat's own stage, so a resumed game opens on it; none while a stage is parked (stage 3B with no player at it is no
+ * one's stage) and while Breaking of the Fellowship's stages are separate (each seat's is in `seatStages`).
+ */
+export function questStageOf(game: ScenarioState): string | null {
+  if (parkedStage(game) != null) return null;
+  if (game.separate === true && game.isolated === true) return stageOf(game, questSeat(game) ?? 0);
+  return game.questStage;
+}
+
 /** The view of a game. */
 export function questView(game: ScenarioState): QuestView {
-  // A parked stage (Fog on the Barrow-downs' stage 3B with no player at it) is no one's stage: the table opens on none and no advance tells it.
-  return { questStage: parkedStage(game) != null ? null : game.questStage, asking: askingStage(game), over: isOver(game), seatStages: stagesKey(game), callerStage: callerLastStage(game) };
+  return { questStage: questStageOf(game), asking: askingStage(game), over: isOver(game), seatStages: stagesKey(game), callerStage: callerLastStage(game) };
 }
 
 /**
@@ -121,13 +132,15 @@ export function advanceWords(
   const detail = (stage ? stageDetail(view, ctx, stage.code, points, hold, won) : [hold ?? won].filter((text) => text != null)).join(". ") || null;
   const who = seat != null && game.seatCount > 1 ? `Player ${seat + 1}` : null;
   const stageWords = place ? `Stage ${place.at} of ${place.of}` : null;
-  const eyebrow = who && stageWords ? `${who} · ${stageWords}` : (who ?? stageWords);
+  // A stage 4A a Great Barrow trapped a player at (Fog on the Barrow-downs) is no step toward the last stage: the overline says trapped and the detail says who stays at stage 3B and when he comes back.
+  const trap = trapAdvance(game, ctx, stageId);
+  const eyebrow = trap ? trap.eyebrow : who && stageWords ? `${who} · ${stageWords}` : (who ?? stageWords);
   const others = (also ?? []).flatMap((id) => {
     const code = game.cards[id]?.code;
     const other = stageSeat(game, id);
     return code == null ? [] : [`${other != null && game.seatCount > 1 ? `Player ${other + 1}` : "Another seat"} advanced to ${(nameOf ?? ((value: string) => value))(code)}`];
   });
-  return { eyebrow, title: name, detail, also: others };
+  return { eyebrow, title: name, detail: trap ? [trap.detail, detail].filter((text) => text != null).join(" ") : detail, also: others };
 }
 
 /**
@@ -144,7 +157,8 @@ export function advanceButton(
   resumed?: boolean,
 ): { label: string; hint: string } {
   if (isOpening(advance)) return game.round <= 1 && !resumed ? { label: "Begin", hint: "Begins the game at the table" } : { label: "Continue", hint: "Back to the table" };
-  if (advanceHold(game, ctx, line)) return { label: "Continue", hint: "Back to the table" };
+  // The stage is read as the seat that holds it sees it, as its words are (advanceWords): a hold on another seat's stage does not hold this one. A stage a player is trapped at only goes back to the table.
+  if (isTrapStage(game, advance.stageId) || advanceHold(viewOf(game, stageSeat(game, advance.stageId) ?? undefined), ctx, line)) return { label: "Continue", hint: "Back to the table" };
   return { label: "Progress", hint: "Back to the table" };
 }
 

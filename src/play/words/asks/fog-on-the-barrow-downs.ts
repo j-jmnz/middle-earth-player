@@ -17,14 +17,14 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 148004:B:2 (stage 4B defeated): he returns to stage 3B at the beginning of the travel phase and 1 progress goes on a Great Barrow there; a Great Barrow holds 1 quest point.
   "148004:forced:2 @0.1 Pick": {
     owned: true,
-    note: "Choose the Great Barrow at stage 3B that gets 1 progress. It has 1 quest point, so it is explored and goes to the victory display.",
+    note: "You are back at stage 3B. Choose the Great Barrow there that gets 1 progress. It has 1 quest point, so it is explored and goes to the victory display.",
     verb: "Place",
   },
 
-  // 148004:B:2 (the designer's ruling, Semi-official FAQ 3.181): stage 4B left play because its player was eliminated, so 1 Great Barrow in play goes to the victory display.
+  // 148004:B:2 (the designer's ruling, Semi-official FAQ 3.181): stage 4B left play because its player was eliminated, so 1 Great Barrow in play goes to the victory display. The eliminated player is not asked: the first player chooses.
   "148004:forced:3 @0 Pick": {
     owned: true,
-    note: "Trapped Inside a Barrow left play with its eliminated player. Choose a Great Barrow in any staging area to add to the victory display.",
+    note: "The player at Trapped Inside a Barrow was eliminated and it left play. As the first player, choose a Great Barrow in any staging area to add to the victory display.",
     verb: "Add",
   },
 
@@ -38,7 +38,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 148018:A:2 (Dreadful Song): attached to a questing hero the revealer controls with no Dreadful Song; the hero's Willpower is 0 and the player raises his threat at the end of the round.
   "148018:whenRevealed:1 @0 Pick": {
     owned: true,
-    note: "Dreadful Song: choose a questing hero you control without one. Its Willpower is reduced to 0, and you raise your threat at the end of the round for each Wight engaged with you.",
+    note: "Dreadful Song: choose a questing hero you control without one. Its Willpower is reduced to 0. At the end of the round raise your threat by 1 for each Wight engaged with you.",
     verb: "Attach",
   },
 

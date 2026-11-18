@@ -54,7 +54,7 @@ export type TopBarProps = {
   // On Nightmare: opens the setup card next to the quest deck (the Eye of Sauron after the dials). Absent on Easy and Normal.
   onNightmare?: (() => void) | null;
   // A tap on a scenario dial that names a card (`cardId`): shows that card large.
-  onDial?: ((cardId: string) => void) | null;
+  onDial?: ((cardId: string, extra?: readonly string[]) => void) | null;
   // A tap on a scenario dial that names a pile (`pile`): opens its list.
   onDialPile?: ((pile: string) => void) | null;
   rail: Rail;
@@ -188,7 +188,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit.value, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit" icon={null} limit={pursuit.limit} compact /> : null}
             {defense != null ? <ThreatRing threat={{ seat: 0, threat: defense.value, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${defense.name}`} testID="defense-tokens" icon={null} limit={defense.limit} limitWords={defenseLimitWords(defense.value, defense.limit, defense.stage)} goal compact /> : null}
             {(scenarioDials ?? NO_DIALS).map((dial) => (
-              <ThreatRing key={dial.id} {...dialProps(dial)} onPress={dial.cardId && onDial ? () => onDial(dial.cardId ?? "") : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : undefined} compact />
+              <ThreatRing key={dial.id} {...dialProps(dial)} onPress={dial.cardId && onDial ? () => onDial(dial.cardId ?? "", dial.extra) : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : undefined} compact />
             ))}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}

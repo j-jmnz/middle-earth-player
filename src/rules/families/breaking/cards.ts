@@ -23,7 +23,7 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
     case "RevealIfDiscarded":
       return state;
     case "CancelRevealed":
-      return cancelRevealed(state, focus);
+      return cancelRevealed(state, focus, steps);
     case "RaiseThreatAtStage":
       return raiseAtStage(state, instruction.amount, focus, ctx, steps);
     case "MoveToLeftArea":
@@ -47,12 +47,14 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
 }
 
 // CancelRevealed (148004:B:1): the reveal frame of the card the event is about is marked canceled and the card, in the staging area, goes to the encounter discard pile: the reveal is over (windows/frames.ts revealStep, a canceled reveal whose card left the staging area pops).
-function cancelRevealed(state: ScenarioState, focus: Focus): ScenarioState {
+function cancelRevealed(state: ScenarioState, focus: Focus, steps: EngineStep[]): ScenarioState {
   const id = refCard(state, "subject", frameScope(state, focus.seat, focus.sourceId));
   const at = id ? state.stack.findLastIndex((frame) => frame.cardId === id && frame.data.kind === "reveal") : -1;
   const frame = state.stack[at];
   if (!id || frame?.data.kind !== "reveal" || state.cards[id]?.zone !== "staging") return state;
   const discarded = updateCard(moveCard(state, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
+  // The card that canceled it is named in the step: the table says "Trapped Inside a Barrow: <location> is canceled and discarded".
+  steps.push({ kind: "cancel", cardId: id, ...(focus.sourceId ? { by: focus.sourceId } : {}) });
   return { ...discarded, stack: discarded.stack.map((entry, index) => (index === at && entry.data.kind === "reveal" ? { ...entry, data: { ...entry.data, canceled: true } } : entry)) };
 }
 

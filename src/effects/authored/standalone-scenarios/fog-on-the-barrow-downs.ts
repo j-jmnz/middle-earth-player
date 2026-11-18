@@ -17,8 +17,8 @@ const WIGHT = "Wight";
 const IN_STAGING = { kind: "sourceIn", zone: "staging" } as const;
 // A Great Barrow in play, in the staging area or active (the stage's own area once the areas are separate).
 const BARROW: PickSpec = { type: "location", control: "any", names: ["Great Barrow"] };
-// Any Great Barrow in play, in any staging area.
-const ANY_BARROW: PickSpec = { type: "location", control: "any", names: ["Great Barrow"], stagingArea: "any" };
+// Any Great Barrow in play, in any staging area. The player eliminated at stage 4B cannot choose: the first player (a player still in the game) names the Great Barrow that goes to the victory display (agent recommendation, docs/brief.md, Fog on the Barrow-downs).
+const ANY_BARROW: PickSpec = { type: "location", control: "any", names: ["Great Barrow"], stagingArea: "any", who: "firstPlayer" };
 // The Wights engaged with a player at the source's stage, and the players there.
 const WIGHT_AT_STAGE: PickSpec = { type: "enemy", control: "any", trait: WIGHT, atStage: true };
 const PLAYERS_AT_STAGE: PickSpec = { type: "player", control: "any", atStage: true };
