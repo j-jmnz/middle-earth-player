@@ -17,7 +17,7 @@ import { livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { manifest as catalog } from "../../../catalog/families/breaking.ts";
-import { areaOf, mergeView, viewOf } from "./areas.ts";
+import { areaOf, mergeView, sharing, viewOf } from "./areas.ts";
 import { noteSkippedStage, questCardDefeatedHeard } from "../quest/branch.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { runCards } from "./cards.ts";
@@ -175,4 +175,4 @@ function discardSharedStage(state: ScenarioState): ScenarioState {
   return next;
 }
 
-export const manifest: RulesFamily = { name: "breaking", verbs: ["RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "StartRandomSeparateStage", "RemoveUnusedStages", "MoveToOtherPlayerArea", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };
+export const manifest: RulesFamily = { name: "breaking", amount: (state, amount, scope) => (amount.playersAtStage ? sharing(state, scope.actor).length : null), verbs: ["RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "StartRandomSeparateStage", "RemoveUnusedStages", "MoveToOtherPlayerArea", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };

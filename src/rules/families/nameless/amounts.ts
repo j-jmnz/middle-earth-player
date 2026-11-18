@@ -1,4 +1,4 @@
-// Rules: dwd.nameless-enemies (data/rules/entries.json); ledger lines 04125:A:2, 04126:A:2, 901704:A:2, 901705:A:2.
+// Rules: rr.attachment-cards (data/rules/entries.json); ledger lines 04125:A:2, 04126:A:2, 901704:A:2, 901705:A:2.
 import type { Amount } from "../../../catalog/boundary.ts";
 
 import type { AmountScope } from "../../interpret/amounts.ts";

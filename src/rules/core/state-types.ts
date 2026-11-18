@@ -135,7 +135,7 @@ export type CardInstance = {
   keepsDamage?: true;
   // An enemy attached to a character as an attachment (Wraith of Carn Dûm, 101157:A:1): it has no enemy text while it lies there, hears no leaving of play, and returns to the staging area as an enemy when its host leaves play (families/angmar/reanimate/attached.ts).
   asAttachment?: true | "discard";
-  // A player card lying faceup on an enemy as an attachment with no title and no game text, taken from the top of a deck (Nameless Thing, dwd.nameless-enemies, families/nameless): its printed cost is its only active part. Set only by AttachDeckTop, and cleared once the card has left the enemy.
+  // A player card lying faceup on an enemy as an attachment with no title and no game text, taken from the top of a deck (Nameless Thing, families/nameless): its printed cost is its only active part. Set only by AttachDeckTop, and cleared once the card has left the enemy.
   nameless?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;

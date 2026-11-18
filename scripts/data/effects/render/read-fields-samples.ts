@@ -1,5 +1,5 @@
 import type { Obj } from "./kit.ts";
-import { ESCAPE_SAMPLES, GUARDIAN_SAMPLES, LONG_DARK_SAMPLES } from "./verbs.ts";
+import { ESCAPE_SAMPLES, GUARDIAN_SAMPLES, LONG_DARK_SAMPLES, STONE_SAMPLES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
@@ -7,6 +7,7 @@ export const HERO = { type: "hero", control: "you" };
 export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...ESCAPE_SAMPLES,
   ...LONG_DARK_SAMPLES,
+  ...STONE_SAMPLES,
   ...GUARDIAN_SAMPLES,
   ModifyStat: [
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: HERO, eachResource: true, doesNotStack: true },

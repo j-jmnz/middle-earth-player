@@ -13,6 +13,7 @@ import { countMatching, pickCandidates } from "./pick.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { guardsTitled } from "../families/objectives/pick.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
+import { joiningStages } from "../families/captured/join.ts";
 import { guardedSafeLocation } from "../families/angmar/safe.ts";
 import { flightDefenseBarred } from "../families/attack/flight.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
@@ -37,7 +38,7 @@ export function restricted(state: ScenarioState, ctx: ReduceContext, what: Restr
 }
 
 function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict["what"]): Restriction[] {
-  const found: Restriction[] = [];
+  const found: Restriction[] = what === "advance" ? joiningStages(state, ctx) : [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb !== "Restrict" || instruction.what !== what) continue;
     found.push({

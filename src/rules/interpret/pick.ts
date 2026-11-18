@@ -128,7 +128,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       if (instance.host == null || (instance.zone !== "play" && instance.zone !== "attached")) continue;
       // A boon guarded on an enemy is held for its owner, not an attachment any player controls (146069:B:1).
       if (instance.held === true) continue;
-      // A player card lying on a Nameless enemy is no attachment a player controls (dwd.nameless-enemies).
+      // A player card lying on a Nameless enemy is no attachment a player controls (rr.attachment-cards).
       if (instance.nameless === true) continue;
       // An encounter attachment (a Condition) has no controller: any player's filter sees it.
       if (instance.controller != null && !seats.includes(instance.controller)) continue;

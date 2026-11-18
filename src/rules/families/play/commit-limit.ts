@@ -1,4 +1,4 @@
-// Rules: rr.committing-characters, rr.cannot (data/rules/entries.json); ledger line 04118:B:2.
+// Rules: ltp.commit-characters, rr.cannot (data/rules/entries.json); ledger line 04118:B:2.
 //
 // "Each player cannot commit more allies to the quest than the number of heroes he is also committing": the table's flag `commitAlliesLimitByHeroes` counts the characters the seat has committed and the ones the intent adds, and refuses an intent that leaves it with more allies than heroes
 // (an ally needs a committed hero, a seat committing no hero commits no ally).
