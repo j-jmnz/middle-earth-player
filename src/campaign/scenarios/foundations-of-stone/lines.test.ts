@@ -11,15 +11,17 @@ import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import { reduce } from "../../../rules/engine/reduce.ts";
+import { reduce, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { drawMany } from "../../../rules/interpret/interpret.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { announceStageRevealed } from "../../../rules/families/nightmare/setup.ts";
 import { stagingThreat } from "../../../rules/quest/quest.ts";
+import { legalIntents } from "../../../rules/engine/legal.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
 import { attack, quest, type Row } from "../../../../test/harness/card-spec.ts";
-import { codesIn, finish, idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { codesIn, finish, idOf, resolveRecords, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "foundations-of-stone";
 const table = (layout: Layout) => tableFromLayout(SCENARIO, layout);
@@ -199,6 +201,41 @@ describe("Giant Cave Centipede, the Nightmare setup card, Shivering River", () =
     const allies = Object.values(run.state.cards).filter((card) => card.zone === "play" && ["a3", "a4"].includes(card.code));
     expect(allies.reduce((sum, card) => sum + (card.code === "a4" ? 4 : 3), 0)).toBeLessThanOrEqual(6);
     expect(Object.values(run.state.cards).filter((card) => card.code === "mt" && card.zone === "play")).toHaveLength(0);
+  });
+
+  it("04124:A:1 puts the shuffled hero into play, ready and with no tokens, when its owner draws it", () => {
+    const made = table({ deckOf: ["c1", "c1"] });
+    const run = resolveRecords(made.state, made.ctx, "04124", "whenRevealed", undefined, (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""));
+    const hero = run.state.heroesInDeck?.[0] ?? "";
+    expect(run.state.cards[hero]?.zone).toBe("deck");
+    let state: ScenarioState = { ...updateCard(run.state, hero, { damage: 2, resources: 1 }), window: null };
+    for (let guard = 0; guard < 3 && state.cards[hero]?.zone !== "heroes"; guard += 1) state = drawMany(state, 0, 1, [], { rule: "rr.drawing-cards" }, made.ctx);
+    expect(state.cards[hero]).toMatchObject({ zone: "heroes", exhausted: false, controller: 0 });
+    expect(state.seats[0].heroes).toContain(hero);
+  });
+
+  it("901701:A:2 resolves before Washed Away!'s When Revealed when the quest advances to stage 3B", () => {
+    const done = played({ nightmare: "901701", stage: "04112", progress: 10, deckOf: ["c1"] }, [quest("success")]);
+    // The frame that is popped first has resolved first (a pushed frame waits under the ones pushed after it).
+    const pushed = done.run.steps.flatMap((step, index) => (step.kind === "pop" ? [{ index, frame: step.frame, code: done.run.state.cards[step.cardId ?? ""]?.code }] : []));
+    const forced = pushed.find((item) => item.code === "901701" && item.frame === "forced");
+    const revealed = pushed.find((item) => item.code === "04113" && item.frame === "whenRevealed");
+    expect(forced, "the Nightmare Forced effect").toBeDefined();
+    expect(revealed, "Washed Away!'s When Revealed").toBeDefined();
+    expect(forced?.index).toBeLessThan(revealed?.index ?? 0);
+  });
+
+  it("04122:A:2 is used once each round in all: after one player uses the Refresh Action no player has it again", () => {
+    const made = table({ seats: 2, active: "04122", phase: "Refresh" });
+    // The action window of the refresh phase, after the characters are ready.
+    const refresh = start({ ...made.state, window: { kind: "pass" }, mode: "refresh" });
+    const mithril = idOf(refresh.state, "04122");
+    const offered = (state: ScenarioState) => legalIntents(state, made.ctx).filter((intent) => "cardId" in intent && intent.cardId === mithril);
+    const intent = offered(refresh.state)[0];
+    expect(intent, "the Action is offered").toBeDefined();
+    const used = finish(send(refresh, intent as PlayerIntent, made.ctx), made.ctx);
+    expect(used.state.cards[idOf(used.state, "dh1")]?.exhausted).toBe(true);
+    expect(offered(used.state)).toEqual([]);
   });
 
   it("901707:A:1 adds Shivering River's Threat to the total in every other staging area, and not twice to its own", () => {
