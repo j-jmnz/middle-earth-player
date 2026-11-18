@@ -1,5 +1,6 @@
 import { traitTokens } from "../../catalog/deck-save";
 import { matchCard, searchIndexOf, searchTerms, type SearchRow } from "./card-search";
+import { untagged } from "../groups/motk";
 import { sphereWord } from "../kit/sphere-mark";
 
 export type PoolPack = {
@@ -115,15 +116,10 @@ export function filterPool<T extends PoolCard & SearchRow>(
   return kept.map((entry) => entry.card);
 }
 
-// An alternate printing's tag ("(MotK) Aragorn", the Messenger of the King heroes) does not sort; the name does.
-function nameKey(name: string): string {
-  return name.replace(/^\([^)]*\)\s*/, "");
-}
-
 /** The pool in name order, a printing's leading tag ignored (the untagged printing first), then by code. Each key is worked out once. */
 export function sortPool<T extends { code: string; name: string }>(cards: readonly T[]): T[] {
   const keyed = cards.map((card) => {
-    const key = nameKey(card.name);
+    const key = untagged(card.name);
     return { card, key, tagged: key === card.name ? 0 : 1 };
   });
   keyed.sort((left, right) => left.key.localeCompare(right.key) || left.tagged - right.tagged || left.card.code.localeCompare(right.card.code));

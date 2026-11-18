@@ -1,6 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { ScanSide } from "../printed/scope.ts";
-import { fetchText } from "./fetch.ts";
+import { fetchText, HttpError } from "./fetch.ts";
 import { lettersOf } from "./names.ts";
 import type { Log } from "../../log.ts";
 
@@ -14,6 +14,28 @@ export const JVZIJP_FOLDER = "1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ";
 export const JVZIJP_SITE = `https://drive.google.com/drive/folders/${JVZIJP_FOLDER}`;
 
 export const driveFileUrl = (id: string): string => `https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`;
+
+/** A download that came back as a page (Drive's quota or sign-in page) and not an image. */
+export class NotAnImageError extends Error {}
+
+/**
+ * Whether a failed Drive download is a refusal and not a missing file: the quota page (not an image), a 403, a 429, a 5xx, or a
+ * timeout. Another status (a 404) means the file is not there, and the next source is tried.
+ */
+export function isDriveRefusal(error: unknown): boolean {
+  if (error instanceof NotAnImageError) return true;
+  if (error instanceof HttpError) return error.status === 403 || error.status === 429 || error.status >= 500;
+  return error instanceof Error && error.cause instanceof Error && error.cause.name === "TimeoutError";
+}
+
+/**
+ * What a sync does with a card whose Drive download was refused. A card that has a pin takes no lower source: a refusal that
+ * passes must not downgrade a picture, so the sync fails at its end with the pin unchanged. A card with no pin has nothing to
+ * lose and goes on to the next source.
+ */
+export function onDriveRefusal(pinned: { sha256: string } | undefined): "refuse" | "fallback" {
+  return pinned ? "refuse" : "fallback";
+}
 
 export type DriveFile = { path: string; id: string };
 

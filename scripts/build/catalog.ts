@@ -187,6 +187,7 @@ function cardRow(card: Card, knownPacks: ReadonlySet<string>, scans: { fronts: R
     victory: card.victory,
     engagement_cost: card.engagementCost,
     encounter_set: card.encounterSet,
+    stage: card.stage,
     campaign_kind: card.campaignKind,
     burden_set: card.burdenSet,
     back_type: card.backType,

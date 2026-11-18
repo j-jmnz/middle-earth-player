@@ -55,6 +55,8 @@ export const cards = sqliteTable("cards", {
   // The encounter set a card belongs to, and the campaign-card facts the engine reads (boon or burden, its burden set,
   // and the deck it joins when it is in the campaign pool).
   encounterSet: text("encounter_set"),
+  // A quest card's stage as printed on its side A ("1A", "3A"); null for any other card.
+  stage: text("stage"),
   campaignKind: text("campaign_kind"),
   burdenSet: text("burden_set"),
   backType: text("back_type"),
