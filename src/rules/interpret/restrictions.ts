@@ -19,7 +19,7 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true; engagedPlayer?: true };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -54,6 +54,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.unlessControls ? { unlessControls: instruction.unlessControls } : {}),
       ...(instruction.guardian ? { guardian: true as const } : {}),
       ...(instruction.exceptAlone ? { exceptAlone: true as const } : {}),
+      ...(instruction.engagedPlayer ? { engagedPlayer: true as const } : {}),
     });
   }
   return found;
@@ -238,6 +239,7 @@ export function seatBarred(state: ScenarioState, ctx: ReduceContext, seat: numbe
   return restricted(state, ctx, what).some(
     (rule) =>
       (rule.unlessControls != null && countMatching(state, rule.unlessControls, seat, rule.sourceId, ctx) === 0) ||
-      (rule.guardian === true && guardianSeat(state) === seat && !(rule.exceptAlone === true && livingSeats(state).length === 1)),
+      (rule.guardian === true && guardianSeat(state) === seat && !(rule.exceptAlone === true && livingSeats(state).length === 1)) ||
+      (rule.engagedPlayer === true && state.cards[rule.sourceId]?.zone === "engaged" && state.cards[rule.sourceId]?.controller === seat),
   );
 }

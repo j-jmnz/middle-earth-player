@@ -7,9 +7,9 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { engageEnemy } from "../../quest/quest.ts";
+import { engageEnemy, engageWith } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { livingSeats } from "../../core/state.ts";
+import { flagged, livingSeats } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { corsairHolds, endCorsairDeck, prepareCorsairDeck, refillCorsairDeck, revealCorsair, revealForAnyPlayer } from "./corsair.ts";
 import { prepareFleet } from "./fleet.ts";
@@ -52,8 +52,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       for (const seat of seats) next = revealCorsair(next, seat, count, ctx, steps);
       return next;
     }
-    case "EngageLastPlayer":
+    case "EngageLastPlayer": {
+      const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+      // An enemy engaged with another player moves to the last player, one already engaged with him stays (901603:A:2); one in the staging area engages him.
+      if (enemy?.zone === "engaged") return enemy.controller === lastPlayer(state) || flagged(state, enemy.id, "cannotBeEngaged") ? state : engageWith(state, lastPlayer(state), enemy.id, steps);
       return focus.sourceId ? engageEnemy(state, lastPlayer(state), focus.sourceId, steps) : state;
+    }
     case "Board":
       return boardNow(state, focus.sourceId, focus.seat, ctx, steps);
     case "SearchShips":

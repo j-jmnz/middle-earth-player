@@ -29,13 +29,11 @@ const VERBS = [
 const TRIGGERS = [
   // A Lost line's record: Lost effects are triggered only by card effects (TriggerLost), and every faceup card in play with such a record hears it (dwd.lost-effects). Not heard by a shadow card.
   "lost",
-  // About a location that holds `holdsProgress`: progress would be placed on it, the whole amount as one placement (the event's amount, the effect's X); the placement waits for the record, which places it with PlaceHeldProgress ("Forced: Before placing progress tokens on Twisting Passage", 04092:A:1).
+  // About a location whose Forced effect hears it (`progressHeldBy`, set at the start of the game): progress would be placed on it, by questing or by a card effect, the whole amount as one placement (the event's amount, the effect's X); the placement waits for the record, which places it with PlaceHeldProgress ("Forced: Before placing progress tokens on Twisting Passage", 04092:A:1).
   "progressWouldBePlaced",
 ] as const;
 
 const FLAGS = [
-  // On a location in play: progress that would be placed on it, by questing or by a card effect, is held back and announced as `progressWouldBePlaced` (04092:A:1).
-  "holdsProgress",
   // On an enemy until the end of the round: one of its attacks placed damage on a character ("unless it has dealt at least 1 damage this round", 04100:A:1), set by its Forced effect on `attackDamagedCharacter` and read by the condition `flag` with holder `self`.
   "dealtDamageThisRound",
 ] as const;

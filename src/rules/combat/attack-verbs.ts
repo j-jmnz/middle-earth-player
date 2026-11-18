@@ -16,6 +16,7 @@ import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
 import { moveCard } from "../core/zones.ts";
+import { queueEvent } from "../windows/queue.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 
 // Verbs that read or change the enemy attack in progress.
@@ -35,7 +36,8 @@ export function runAttackVerb(state: ScenarioState, instruction: Instruction, fo
       const next = seats[(at + 1) % seats.length];
       if (next == null || next === enemy.controller) return state;
       steps.push({ kind: "engage", seat: next, enemyId: focus.sourceId });
-      return moveCard(state, focus.sourceId, { zone: "engaged", seat: next });
+      const moved = moveCard(state, focus.sourceId, { zone: "engaged", seat: next });
+      return instruction.announces ? queueEvent(moved, { trigger: "engaged", seat: next, subject: focus.sourceId }) : moved;
     }
     default:
       return state;

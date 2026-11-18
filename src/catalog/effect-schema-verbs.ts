@@ -302,6 +302,8 @@ export const simpleVerbs = [
     // (rr.play-and-put-into-play). `exceptAlone`: unless he is the only player remaining in the game. Read by src/rules/interpret/restrictions.ts (seatBarred) and src/rules/families/guardian/.
     guardian: z.literal(true).optional(),
     exceptAlone: z.literal(true).optional(),
+    // With "draw" on an enemy: binds the player the source is engaged with, and only while it is ("While Sentinel of the Deep is engaged with a player, that player cannot draw cards from card effects", 901604:A:1).
+    engagedPlayer: z.literal(true).optional(),
     ...when,
   }),
   // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's
@@ -416,8 +418,8 @@ export const simpleVerbs = [
   // Constant on a hero: once per phase the actor may play the top card of their deck as if it were in their hand, and the
   // hero counts as having these resource icons while it pays for that card. The top card of the deck is faceup.
   z.strictObject({ verb: z.literal("PlayFromDeckTop"), icons: z.array(z.enum(["leadership", "tactics", "spirit", "lore"])).min(1), ...when }),
-  // The source enemy leaves the player it is engaged with and engages the next player.
-  verb("EngageNextPlayer"),
+  // The source enemy leaves the player it is engaged with and engages the next player. `announces`: the engagement is announced (`engaged`), as any engagement is, so the enemy's own "after ~ engages a player" Forced effect fires again (Goblin Sneak, 04098:A:1).
+  z.strictObject({ verb: z.literal("EngageNextPlayer"), announces: z.literal(true).optional(), ...when }),
   // The host of the source card, its resource pool, and every card attached to it pass to a seat.
   z.strictObject({ verb: z.literal("TransferHost"), who: whoSchema, ...when }),
   // The players win the scenario. The resolution choices follow.

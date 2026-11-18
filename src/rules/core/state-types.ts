@@ -384,6 +384,8 @@ export type ScenarioState = {
   sideQuests?: true;
   // The game has a card that asks whether progress was placed on a side quest this round ("if no progress was placed on Lie Low this round", 10081:A:1): the engine notes each placement as `progressPlacedHere` (families/angmar/progress.ts). Set at the start (markProgressNoted), absent in every other game.
   progressNoted?: true;
+  // The codes of the cards whose Forced effect hears `progressWouldBePlaced` (Twisting Passage, 04092:A:1): progress that would be placed on one of them in play waits for that effect (families/long-dark/hold.ts). Set at the start, absent in every other game.
+  progressHeldBy?: readonly string[];
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
