@@ -161,7 +161,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   LowerThreat: (i, ctx) => ({ text: `lower threat by ${amount(i.amount, ctx)} (${who(i.who)})`, read: ["amount", "who"] }),
   ReturnToStaging: (i, ctx) => {
     const found = isObj(i.target) ? i.target : null;
-    if (found?.kind === "engagedEnemies") return { text: `return ${found.pick === "choose" ? "one enemy" : "every enemy"}${typeof found.trait === "string" ? ` with the trait ${found.trait}` : ""} engaged with ${found.who === "actor" ? "the acting player" : "a player"}${found.pick === "choose" ? " (that player picks which)" : ""} to the staging area`, read: ["target"] };
+    if (found?.kind === "engagedEnemies") return { text: `return ${found.pick === "choose" ? "one enemy" : "every enemy"}${typeof found.trait === "string" ? ` with the trait ${found.trait}` : ""}${typeof found.keyword === "string" ? ` with the ${found.keyword} keyword` : ""} engaged with ${found.who === "actor" ? "the acting player" : "a player"}${found.pick === "choose" ? " (that player picks which)" : ""} to the staging area`, read: ["target"] };
     if (found?.kind === "self" && ctx.attacker === true) return { text: "return the attacking enemy (the card whose shadow this is the attacker of) to the staging area", read: ["target"] };
     return { text: `return ${target(i.target)} to the staging area`, read: ["target"] };
   },

@@ -23,7 +23,7 @@ export const ESCAPE_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Mad
   AddToX: (i, ctx) => ({ text: `the effect's X grows by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   MoveResources: (i, ctx) => ({ text: `move ${i.all === true ? "all the resource tokens" : `${amount(i.amount, ctx)} resource tokens`} from the card picked before the last to the last card picked`, read: ["amount", "all"] }),
   ReturnFromDiscard: (i, ctx) => ({
-    text: `return ${i.count == null ? "every" : `the topmost ${amount(i.count, ctx)}`} ${str(i.trait)} ${i.anyType === true ? "card(s)" : "enemies"} of the encounter discard pile to ${i.to === "deckTop" ? `the top of the encounter deck${i.order === "random" ? ", in a random order" : ""}, facedown (the cards ArrangeEncounter may reorder)` : "the staging area"} (they are not revealed: no When Revealed, no engagement; the number returned${i.treacheries === true ? ", the treachery cards only," : ""} is counted)`,
+    text: `return ${i.count == null ? "every" : `the topmost ${amount(i.count, ctx)}`} ${str(i.trait)} ${i.anyType === true ? "card(s)" : "enemies"} of the encounter discard pile to ${i.to === "deckTop" ? `the top of the encounter deck${i.order === "random" ? ", in a random order" : ""}, facedown (the cards ArrangeEncounter may reorder)` : "the staging area"} (they are not revealed: no When Revealed${i.to === "deckTop" ? ", no engagement" : "; one with the ambush keyword makes its engagement checks on entering the staging area"}; the number returned${i.treacheries === true ? ", the treachery cards only," : ""} is counted)`,
     read: ["trait", "count", "anyType", "to", "order", "treacheries"],
   }),
 };

@@ -78,7 +78,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   04043:constant:1: Constant
     only if this card is the active location
     - the first enemy revealed from the encounter deck each round gains ambush (counted from the round's start, whether or not this card is in play)
-  04043:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) that a card gave the ambush keyword (not one that prints it))
+  04043:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) that has the ambush keyword because a card gave it (the round's first enemy revealed, even one that prints Ambush))
     only if this card is the active location
     - the card the event is about (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
 
@@ -151,7 +151,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
     - repeat X times:
       - choose Orc enemy (any player controls) in the staging area only
       - engage the picked card
-    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): return every Orc enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): return every Orc enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
 
 ## 04049 Goblin Taskmaster
 (the scenario deals it into the encounter pile; the piles place it, no record does)

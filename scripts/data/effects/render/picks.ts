@@ -85,11 +85,11 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["guardedByTrait"], typeof pick.guardedByTrait === "string" ? `guarded by (attached to) a ${pick.guardedByTrait} enemy` : null);
   note(["notGuardedByTrait"], typeof pick.notGuardedByTrait === "string" ? `not guarded by (attached to) a ${pick.notGuardedByTrait} enemy` : null);
   note(["guardsTrait"], typeof pick.guardsTrait === "string" ? `attached as the guard of a ${pick.guardsTrait} objective` : null);
-  note(["controlled"], pick.controlled === true ? "that is claimed (attached to a character a player controls)" : null);
+  note(["controlled"], pick.controlled === true ? (pick.type === "ally" ? "that a player controls (not one a guard holds in the staging area)" : "that is claimed (attached to a character a player controls)") : null);
   note(["questCard"], pick.questCard === true ? "that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)" : null);
   note(["maxHitPointsLeft"], typeof pick.maxHitPointsLeft === "number" ? `with ${pick.maxHitPointsLeft} or fewer hit points remaining` : null);
   note(["determined"], pick.determined === true ? "that the Campaign Log marks determined" : null);
-  note(["keyword"], typeof pick.keyword === "string" ? (pick.keyword === "gainedAmbush" ? "that a card gave the ambush keyword (not one that prints it)" : `with the ${pick.keyword} keyword, printed or gained`) : null);
+  note(["keyword"], typeof pick.keyword === "string" ? (pick.keyword === "gainedAmbush" ? "that has the ambush keyword because a card gave it (the round's first enemy revealed, even one that prints Ambush)" : `with the ${pick.keyword} keyword, printed or gained`) : null);
   note(["safe"], pick.safe === true ? "with the safe keyword" : null);
   note(["isSource"], pick.isSource === true ? "that is this card itself" : null);
   note(["reanimated"], pick.reanimated === true ? "that is a Reanimated Dead" : null);
