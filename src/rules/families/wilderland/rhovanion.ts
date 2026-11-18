@@ -77,7 +77,9 @@ export function guardReturnedBy(state: ScenarioState, instruction: Verb<"GuardRe
   const where = guard ? state.cards[guard]?.zone : undefined;
   const returns = instruction.returns === "firstPlayer";
   if (!id || !guard || (where !== "staging" && !(returns && where === "activeLocation")) || guard === id) return state;
-  const guarded = guardWith(updateCard(moveCard(state, id, { zone: "staging" }), id, { controller: null, face: "up" }), guard, id);
+  // An ally keeps its owner (it goes to that discard pile if it is destroyed in the staging area, as defeatedDestination reads).
+  const kept = returns ? { owner: state.cards[id]?.owner ?? state.cards[id]?.controller ?? undefined } : {};
+  const guarded = guardWith(updateCard(moveCard(state, id, { zone: "staging" }), id, { controller: null, face: "up", ...kept }), guard, id);
   return returns ? { ...guarded, modifiers: [...guarded.modifiers, { instanceId: id, sourceId: guard, stat: "guardedAlly", amount: 1, until: "endOfGame" }] } : guarded;
 }
 
