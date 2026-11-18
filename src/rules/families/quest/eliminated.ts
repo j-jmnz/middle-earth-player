@@ -8,7 +8,8 @@ import type { ScenarioState } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { listens } from "../encounter/reveal.ts";
 
-// The steps this call of settle has already looked at, per step list.
+// The steps this call of settle has already looked at, per step list. The step list is the key because it is the one thing every settle of an intent shares and no state carries: a state is rebuilt at each step, while the list only grows within the reduce, so the count belongs to it
+// (a new reduce starts a new list and counts from none; a list the caller drops takes its count with it, as a WeakMap holds nothing for it).
 const SEEN = new WeakMap<object, number>();
 
 export function announceEliminated(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

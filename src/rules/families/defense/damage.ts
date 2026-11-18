@@ -84,6 +84,7 @@ export function undefendedExtras(state: ScenarioState, seat: number, cards: Card
 }
 
 // A character that uses its Willpower instead of its Defense (Against the Shadow, 06038), always or, with a `defendingAgainst` condition on the modifier, only while it defends against an enemy with the Trait ("when defending against Wight enemies", 148010:A:1).
+// modifiedStat takes the printed cards and no effect list (as keywords.ts reads the same condition for a Defense bonus), so the Trait is read from the enemy's printed traits and the traits the state grants it, not from a constant record that grants one.
 export function defenseFromWillpower(state: ScenarioState, instance: CardInstance, cards: ReadonlyMap<string, PrintedCard>): boolean {
   return state.modifiers.some(
     (modifier) =>

@@ -1253,11 +1253,10 @@
       },
       "set": {
         "keywords": {
-          "peril": true,
           "immune": true
         }
       },
-      "reason": "Great Barrow prints \"Peril. Immune to player card effects. The players cannot travel here.\"; Hall of Beorn lists no Immune keyword for it, so the engine would read no immunity.",
+      "reason": "Great Barrow prints \"Peril. Immune to player card effects. The players cannot travel here.\"; Hall of Beorn lists Peril but no Immune keyword for it, so the engine would read no immunity.",
       "source": "scan 148007.A (data/printed/standalone-scenarios.json)"
     },
     {
