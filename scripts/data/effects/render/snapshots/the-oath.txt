@@ -22,7 +22,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41002:B:2 (back): This stage cannot be defeated unless at least 1 copy of Goblin Trail is in the victory display.
   41002:constant:1: Constant
-    only if [json condition {"kind":"inVictory","code":"41014","is":false}]
+    only if the card with code 41014 is not in the victory display
     - the players cannot defeat this stage while this holds
 
 ## 41003 The Rearguard
@@ -317,4 +317,4 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:resolution:1: Resolution
     - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
 
-(rendered pieces: 186 by template, 5 as JSON)
+(rendered pieces: 187 by template, 4 as JSON)

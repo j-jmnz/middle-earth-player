@@ -22,7 +22,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
-    - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"tokens","code":"143033","min":8}}]
+    - then, if the card with code 143033 in play holds at least 8 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143076","when":{"kind":"inVictory","code":"143033","is":true}}]
 
 143033:A:3 (front): If there are 8 resource tokens here, add The Defense of Helm's Deep to the victory display and advance to stage 5A.
@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
-    - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"tokens","code":"143033","min":8}}]
+    - then, if the card with code 143033 in play holds at least 8 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143076","when":{"kind":"inVictory","code":"143033","is":true}}]
 
 ## 143034 Wild Hillman
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if there is no enemy in play (in the staging area or engaged)
     - the players win the game
 
-(rendered pieces: 178 by template, 14 as JSON)
+(rendered pieces: 182 by template, 12 as JSON)

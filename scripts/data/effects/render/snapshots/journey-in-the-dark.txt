@@ -345,7 +345,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   142087:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
-  142087:forced:2: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])
+  142087:forced:2: Forced on the event characterDestroyed (heard about character (any player controls) controlled by the player who controls this card's host)
     only if not (this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust its host
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if not (this card is in the staging area)
     - deal 1 damage to its host
 
-(rendered pieces: 197 by template, 11 as JSON)
+(rendered pieces: 198 by template, 10 as JSON)

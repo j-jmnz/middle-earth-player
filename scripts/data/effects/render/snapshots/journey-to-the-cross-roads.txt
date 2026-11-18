@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144014:action:1: Action
     only if it is the Planning phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSourceToVictory {"verb":"AddSourceToVictory"}]
+    - this card is added to the victory display (the players' own, the group's)
     - the acting player chooses (each option once) one of:
       * option "heal" (only if there is a damaged hero (any player controls) to choose):
         - choose damaged hero (any player controls)
@@ -299,4 +299,4 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
     - the players win the game
 
-(rendered pieces: 201 by template, 3 as JSON)
+(rendered pieces: 202 by template, 2 as JSON)

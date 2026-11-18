@@ -322,7 +322,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03064:B:2 (back): Players cannot advance to the next stage of the scenario unless Bridge of Khazad-dûm is in their victory display.
   03064:constant:1: Constant
-    only if [json condition {"kind":"inVictory","code":"03018","is":false}]
+    only if the card with code 03018 is not in the victory display
     - the players cannot defeat this stage while this holds
 
 ## 03065 Goblin Patrol
@@ -356,4 +356,4 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   03066:constant:2: Constant
     (no instructions)
 
-(rendered pieces: 225 by template, 4 as JSON)
+(rendered pieces: 226 by template, 3 as JSON)

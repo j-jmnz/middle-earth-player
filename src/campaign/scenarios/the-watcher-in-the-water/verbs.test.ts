@@ -3,15 +3,20 @@
 // The new verbs, flags and conditions of The Watcher in the Water, each on a table of the scene kit: the progress sent to the quest, the Travel costs, the discard check of the Tentacles and what follows it, the Tentacle attachments, Hideous Depths' look and Pulled Under.
 import { describe, expect, it } from "vitest";
 
-import { destroyCard, modifiedStat } from "../../../rules/core/keywords.ts";
+import { destroyCard, modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { placeProgress } from "../../../rules/interpret/effect-verbs.ts";
-import { travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
+import { crossBoundary } from "../../../rules/windows/triggers.ts";
+import { placeOnActive } from "../../../rules/families/south/locations.ts";
+import { placePlayerDamage } from "../../../rules/interpret/player-verbs.ts";
+import { restricted, travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
+import { doRefresh } from "../../../rules/engine/refresh.ts";
+import { settle } from "../../../rules/engine/machine.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { lookAtTop } from "../../../rules/families/encounter/moves.ts";
-import { finish, fightEnemy, idOf, idsOf, legalIntents, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
+import { finish, fightEnemy, idOf, legalIntents, opening, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-watcher-in-the-water";
 const table = (layout: Layout) => tableFromLayout(SCENARIO, layout);
@@ -297,3 +302,230 @@ describe("901508:A:2 Rippling From Beneath", () => {
     expect(done.state.encounterDeck.map((id) => done.state.cards[id]?.code)).toContain("04073");
   });
 });
+
+/** Plays an attack out: the first hero defends, choices take their first option and look windows close. */
+function playOut(run: Run, ctx: ReturnType<typeof table>["ctx"], defender: string): Run {
+  let current = run;
+  for (let guard = 0; guard < 40; guard += 1) {
+    const window = current.state.window;
+    if (window?.kind === "defense") current = send(current, { type: "DeclareDefender", defenderId: defender }, ctx);
+    else if (window?.kind === "choose") current = send(current, { type: "Choose", optionId: window.options[0] ?? "" }, ctx);
+    else if (window?.kind === "look") current = send(current, { type: "Pass" }, ctx);
+    else if (current.state.pendingAttack != null) {
+      const pass = legalIntents(current.state, ctx).find((intent) => intent.type === "Pass");
+      if (!pass) break;
+      current = send(current, pass as PlayerIntent, ctx);
+    } else break;
+  }
+  return current;
+}
+
+describe("901503:A:1 Writhing Tentacle", () => {
+  const engage = (deck: readonly string[], layout: Layout = {}) => {
+    const made = table({ phase: "Encounter", staging: ["901503"], deck, threat: [60, 20], ...layout });
+    const state = syncConstants(made.state, made.ctx);
+    const enemy = idOf(state, "901503");
+    const engaged = send(start(state), { type: "Engage", enemyId: enemy }, made.ctx);
+    return { made, enemy, run: playOut(engaged, made.ctx, made.hero) };
+  };
+
+  it("901503:A:1 attacks at once when it engages a player and attaches to the defending character after the attack, which then cannot commit to the quest", () => {
+    const { made, enemy, run } = engage(["04066", "f0", "f0", "f0"]);
+    const card = run.state.cards[enemy];
+    expect(card?.zone).toBe("attached");
+    expect(card?.host).toBe(made.hero);
+    expect(card?.asAttachment).toBe("discard");
+    expect(flagged(syncConstants(run.state, made.ctx), made.hero, "cannotQuest")).toBe(true);
+  });
+
+  it("901503:A:1 stays engaged as an enemy when the discarded card is no match", () => {
+    const { enemy, run } = engage(["f0", "f0", "f0", "f0"]);
+    expect(run.state.cards[enemy]?.zone).toBe("engaged");
+  });
+});
+
+describe("901504:A:1 Choking Tentacle", () => {
+  it("901504:A:1 attaches after its attack to a character the defending player controls, and the character takes 1 damage each time it readies", () => {
+    const fought = fightEnemy(table, "f0", "901504", { deck: ["f0", "04066", "f0", "f0"] });
+    const state = fought.run.state;
+    const enemy = idOf(state, "901504");
+    const card = state.cards[enemy];
+    expect(card?.zone).toBe("attached");
+    expect(card?.asAttachment).toBe("discard");
+    const host = card?.host ?? "";
+    expect(fought.made.state.seats[0]?.heroes).toContain(host);
+    // Each time the attached character readies it takes 1 damage.
+    const steps: EngineStep[] = [];
+    const tired = updateCard(state, host, { exhausted: true, damage: 0 });
+    const refreshed = settle(doRefresh({ ...tired, phase: "Refresh", window: null, pendingAttack: null }, fought.ctx, steps), fought.ctx, steps);
+    expect(refreshed.cards[host]?.exhausted).toBe(false);
+    expect(refreshed.cards[host]?.damage).toBe(1);
+  });
+
+  it("901504:A:1 stays an enemy when the discarded card is no match", () => {
+    const fought = fightEnemy(table, "f0", "901504", { deck: ["f0", "f0", "f0", "f0"] });
+    expect(fought.run.state.cards[idOf(fought.run.state, "901504")]?.zone).toBe("engaged");
+  });
+});
+
+/** The phase `ended` ends: its Forced effects and delayed effects resolve (choices take their first option). */
+function endPhase(state: ScenarioState, ctx: ReturnType<typeof table>["ctx"], ended: ScenarioState["phase"], next: ScenarioState["phase"]): Run {
+  const steps: EngineStep[] = [];
+  const crossed = crossBoundary({ ...state, phase: next, boundaryPhase: ended, window: null }, ctx, steps);
+  return finish({ state: settle(crossed, ctx, steps), steps }, ctx);
+}
+
+describe("04072:A:3 and 901502:A:2 The Watcher at the end of the combat phase", () => {
+  it("04072:A:3 each player in turn deals 3 damage to a character he controls while The Watcher is in the staging area", () => {
+    const made = table({ staging: ["04072"] });
+    const done = endPhase(made.state, made.ctx, "Combat", "Refresh");
+    const heroes = made.state.seats[0]?.heroes ?? [];
+    expect(heroes.reduce((sum, id) => sum + (done.state.cards[id]?.damage ?? 0), 0)).toBe(3);
+  });
+
+  it("04072:A:3 deals none while it is engaged", () => {
+    const made = table({ engaged: [{ code: "04072" }] });
+    const done = endPhase(made.state, made.ctx, "Combat", "Refresh");
+    expect((made.state.seats[0]?.heroes ?? []).reduce((sum, id) => sum + (done.state.cards[id]?.damage ?? 0), 0)).toBe(0);
+  });
+
+  it("901502:A:2 the Nightmare Watcher deals the same damage", () => {
+    const made = table({ nightmare: "901501", staging: ["901502"] });
+    const done = endPhase(made.state, made.ctx, "Combat", "Refresh");
+    expect((made.state.seats[0]?.heroes ?? []).reduce((sum, id) => sum + (done.state.cards[id]?.damage ?? 0), 0)).toBe(3);
+  });
+});
+
+describe("901502:A:1 The Watcher takes no damage from player card effects in the staging area", () => {
+  it("901502:A:1 a player card effect places none while it is in the staging area, an attack's damage and an encounter effect's are placed", () => {
+    const staged = table({ nightmare: "901501", staging: ["901502"] });
+    const watcher = idOf(staged.state, "901502");
+    expect(flagged(staged.state, watcher, "noPlayerEffectDamage")).toBe(true);
+    expect(placePlayerDamage(staged.state, 0, watcher, 2, staged.ctx, []).cards[watcher]?.damage).toBe(0);
+    expect(placeDamage(staged.state, watcher, 2, staged.cards, [], "framework", { rule: "rr.damage" }).cards[watcher]?.damage).toBe(2);
+    const engaged = table({ nightmare: "901501", engaged: [{ code: "901502" }] });
+    const there = idOf(engaged.state, "901502");
+    expect(placePlayerDamage(engaged.state, 0, there, 2, engaged.ctx, []).cards[there]?.damage).toBe(2);
+  });
+});
+
+describe("901501:A:2 to A:4 the Nightmare setup card", () => {
+  it("901501:A:2 The Watcher cannot be engaged while Doors of Durin is in play", () => {
+    const withDoors = table({ nightmare: "901501", staging: ["901502"], active: "04065" });
+    expect(flagged(withDoors.state, idOf(withDoors.state, "901502"), "cannotBeEngaged")).toBe(true);
+    const without = table({ nightmare: "901501", staging: ["901502"] });
+    expect(flagged(without.state, idOf(without.state, "901502"), "cannotBeEngaged")).toBe(false);
+  });
+
+  it("901501:A:3 a Tentacle enemy destroyed deals 1 damage to The Watcher in play", () => {
+    const { run } = attackIt("04075", ["f0", "f0", "f0"], { nightmare: "901501", staging: ["901502"], engaged: [{ code: "04075", damage: 2 }] });
+    expect(run.state.cards[idOf(run.state, "04075")]?.zone).not.toBe("engaged");
+    expect(run.state.cards[idOf(run.state, "901502")]?.damage).toBe(1);
+  });
+
+  it("901501:A:4 the stage cannot be defeated until Doors of Durin and The Watcher are both in the victory display", () => {
+    const none = table({ nightmare: "901501", stage: "04064", progress: 5, victory: ["04065"] });
+    expect(restricted(none.state, none.ctx, "advance")).toHaveLength(1);
+    const both = table({ nightmare: "901501", stage: "04064", progress: 5, victory: ["04065", "901502"] });
+    expect(restricted(both.state, both.ctx, "advance")).toHaveLength(0);
+  });
+});
+
+describe("04064:B:2 the stage's victory points", () => {
+  it("04064:B:2 cannot be defeated with fewer than 3 victory points, and can with 3 (Doors of Durin or The Watcher alone)", () => {
+    const few = table({ stage: "04064", progress: 5 });
+    expect(restricted(few.state, few.ctx, "advance")).toHaveLength(1);
+    const doors = table({ stage: "04064", progress: 5, victory: ["04065"] });
+    expect(restricted(doors.state, doors.ctx, "advance")).toHaveLength(0);
+    const watcher = table({ stage: "04064", progress: 5, victory: ["04072"] });
+    expect(restricted(watcher.state, watcher.ctx, "advance")).toHaveLength(0);
+  });
+});
+
+describe("040076:A:1 Wrapped!", () => {
+  const wrapped = () => {
+    const made = table({ phase: "Quest", deck: ["f0", "f0"] });
+    const steps: EngineStep[] = [];
+    const revealed = revealFromTop(made.state, made.ctx, "040076", steps);
+    return { made, id: revealed.id, run: finish({ state: revealed.state, steps }, made.ctx) };
+  };
+
+  it("040076:A:1 attaches to a hero of the first player, who cannot exhaust or ready", () => {
+    const { made, run, id } = wrapped();
+    const card = run.state.cards[id];
+    expect(made.state.seats[0]?.heroes).toContain(card?.host ?? "");
+    const synced = syncConstants(run.state, made.ctx);
+    expect(flagged(synced, card?.host ?? "", "cannotExhaust")).toBe(true);
+    expect(flagged(synced, card?.host ?? "", "cannotReady")).toBe(true);
+  });
+
+  it("040076:A:1 discards the hero from play at the end of the round", () => {
+    const { made, run, id } = wrapped();
+    const host = run.state.cards[id]?.host ?? "";
+    const done = endPhase(syncConstants(run.state, made.ctx), made.ctx, "End of round", "Planning");
+    expect(done.state.cards[host]?.zone).toBe("discard");
+  });
+
+  it("040076:A:1 its Combat Action exhausts a ready hero with no Tentacle attachment to discard it", () => {
+    const { made, run, id } = wrapped();
+    const synced = syncConstants({ ...run.state, ...opening("Combat") }, made.ctx);
+    const wrap = id;
+    const offered = legalIntents(synced, made.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === wrap);
+    expect(offered).toBeDefined();
+    const used = finish(send(start(synced), offered as PlayerIntent, made.ctx), made.ctx);
+    expect(used.state.cards[wrap]?.zone).toBe("encounterDiscard");
+    const free = (made.state.seats[0]?.heroes ?? []).filter((hero) => hero !== run.state.cards[wrap]?.host);
+    expect(free.some((hero) => used.state.cards[hero]?.exhausted)).toBe(true);
+  });
+});
+
+describe("04070:A:1 Ill Purpose", () => {
+  it("04070:A:1 every enemy in the staging area engages the player with the highest threat, then each player raises his threat by the staging area's Threat", () => {
+    const made = table({ seats: 2, staging: ["04070", "04073", "04074"], threat: [30, 20] });
+    const done = resolveRecords(made.state, made.ctx, "04070", "whenRevealed", idOf(made.state, "04070"));
+    expect(Object.values(done.state.cards).filter((card) => card.zone === "engaged" && card.controller === 0).map((card) => card.code).sort()).toEqual(["04073", "04074"]);
+    // Nothing is left in the staging area but the treachery itself: the Threat counted is that of what stayed.
+    expect(done.state.seats[0]?.threat).toBe(30);
+  });
+
+  it("04070:A:1 engages The Watcher too (it cannot only be optionally engaged), and the Nightmare Watcher stays while Doors of Durin is in play", () => {
+    const standard = table({ staging: ["04070", "04072"], threat: [30, 20] });
+    expect(resolveRecords(standard.state, standard.ctx, "04070", "whenRevealed", idOf(standard.state, "04070")).state.cards[idOf(standard.state, "04072")]?.zone).toBe("engaged");
+    const nightmare = table({ nightmare: "901501", staging: ["04070", "901502"], active: "04065", threat: [30, 20] });
+    expect(resolveRecords(nightmare.state, nightmare.ctx, "04070", "whenRevealed", idOf(nightmare.state, "04070")).state.cards[idOf(nightmare.state, "901502")]?.zone).toBe("staging");
+  });
+});
+
+describe("04067:A:1 and 04068:A:1 Perilous Swamp and Makeshift Passage", () => {
+  it("04067:A:1 takes 1 progress each round, the rest of the quest total going on the stage", () => {
+    const made = table({ stage: "04064", active: "04067" });
+    const swamp = idOf(made.state, "04067");
+    const done = placeOnActive(made.state, 3, made.cards, []);
+    expect(done.state.cards[swamp]?.progress).toBe(1);
+    expect(done.remaining).toBe(2);
+  });
+
+  it("04068:A:1 places 2 progress on the quest stage, not on the location, after the players travel there", () => {
+    const made = table({ stage: "04064", phase: "Travel", staging: ["04068"] });
+    const place = idOf(made.state, "04068");
+    const run = finish(send(start(made.state), { type: "Travel", locationId: place }, made.ctx), made.ctx);
+    expect(run.state.cards[run.state.questStage ?? ""]?.progress).toBe(2);
+    expect(run.state.cards[place]?.progress ?? 0).toBe(0);
+  });
+});
+
+describe("04070:A:2 Ill Purpose's Shadow", () => {
+  it("04070:A:2 gives +3 Attack to a Tentacle attacker and +1 to any other", () => {
+    const tentacle = shadowAttackStats("04075");
+    const plain = shadowAttackStats("f3");
+    expect(tentacle - 4).toBe(3);
+    expect(plain - 1).toBe(1);
+  });
+});
+
+/** The Attack the first attacker has while it attacks with Ill Purpose dealt to it as its shadow card. */
+function shadowAttackStats(enemy: string): number {
+  const fought = fightEnemy(table, "04070", enemy, {});
+  const attack = fought.run.steps.find((step) => step.kind === "strike" && step.side === "enemy");
+  return attack && "attack" in attack ? attack.attack : 0;
+}

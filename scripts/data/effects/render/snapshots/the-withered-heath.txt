@@ -384,10 +384,10 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19025:B:3 (back): This stage cannot be defeated while Cold-Drake is in play. When Cold-Drake is defeated, the players win the game.
   19025:constant:2: Constant
-    only if [json condition {"kind":"inVictory","code":"19011","is":false}]
+    only if the card with code 19011 is not in the victory display
     - the players cannot defeat this stage while this holds
   19025:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Cold-Drake")
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 300 by template, 39 as JSON)
+(rendered pieces: 301 by template, 38 as JSON)

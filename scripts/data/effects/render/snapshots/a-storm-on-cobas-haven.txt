@@ -206,7 +206,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12122:B:4 (back): If this stage is defeated, or if Raider Flagship is in the victory display, the players have broken through the Corsair fleet and win the game!
   12122:constant:3: Constant
-    only if [json condition {"kind":"inVictory","code":"12124","is":true}]
+    only if the card with code 12124 is in the victory display
     - the players win the game
 
 ## 12123 Dol Amroth Warship
@@ -444,4 +444,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus -4, while this card is in play
 
-(rendered pieces: 204 by template, 62 as JSON)
+(rendered pieces: 205 by template, 61 as JSON)

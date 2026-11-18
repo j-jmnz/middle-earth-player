@@ -31,7 +31,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141022:B:2 (back): The players cannot advance unless Bag End is in the victory display.
   141022:constant:1: Constant
-    only if [json condition {"kind":"inVictory","code":"141031","is":false}]
+    only if the card with code 141031 is not in the victory display
     - the players cannot defeat this stage while this holds
 
 ## 141023 A Shortcut to Mushrooms
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 222 by template, 36 as JSON)
+(rendered pieces: 223 by template, 35 as JSON)
