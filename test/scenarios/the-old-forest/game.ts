@@ -22,14 +22,14 @@ export const forestWorld = (decks: ForestDecks = "strong") => game.world(decks);
 export const forestStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty) => game.start(seatCount, seed, difficulty);
 
 export type ForestPolicy = {
-  // The option a Choose window with these answers takes: the first or the last.
-  choose: "first" | "last";
+  // The option a Choose window takes: the first.
+  choose: "first";
 };
 export const DEFAULT_POLICY: ForestPolicy = { choose: "first" };
 
-// The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-export function forestIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: ForestPolicy = DEFAULT_POLICY): PlayerIntent {
-  if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
+// The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option. Every intent is one the reducer listed.
+export function forestIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>): PlayerIntent {
+  if (state.window?.kind === "choose") return { type: "Choose", optionId: state.window.options[0] ?? "" };
   return nextIntent(state, ctx, FOREST_POLICY, memory, legalIntents(state, ctx));
 }
 
@@ -52,7 +52,6 @@ const game = standaloneGame<ForestDecks, ForestPolicy>({
   campaign: cycle,
   scenario: forest,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
   codes: [...forest.cards.map((card) => card.code)],
   intent: forestIntent,
   policy: DEFAULT_POLICY,

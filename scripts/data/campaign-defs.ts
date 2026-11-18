@@ -429,7 +429,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
       // DragnCards' deck Q99.04 has no Easy twin either.
       { id: "the-old-forest", product: "The Old Forest", deck: { normal: "Q99.04", easy: "Q99.04" } },
     ],
-    // The other products of the cycle, in release order (README.md, Roadmap): their scenario titles are the file's `later`.
+    // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
     later: ["Fog on the Barrow-downs", "2015", "2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
     saga: false,
     ledger: "standalone-scenarios",

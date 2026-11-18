@@ -153,7 +153,9 @@ function effectsOnCard(game: ScenarioState, ctx: ReduceContext, cardId: string):
     const lasting = behind.length > 0 && behind.every((modifier) => TEMPORARY.has(modifier.until));
     stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base, lasting });
   }
-  const flags = FLAGS.filter((entry) => flagged(game, cardId, entry.flag)).map((entry) => ({ ...entry, word: flagWord(entry.word, placedLimit(game, cardId, Number.POSITIVE_INFINITY)) }));
+  // A card engaged with each player is engaged, so "Cannot be engaged" would contradict it: its words say it (engagedWithAllWords).
+  const engagedWithAll = flagged(game, cardId, "engagedWithAll");
+  const flags = FLAGS.filter((entry) => flagged(game, cardId, entry.flag) && !(engagedWithAll && entry.flag === "cannotBeEngaged")).map((entry) => ({ ...entry, word: flagWord(entry.word, placedLimit(game, cardId, Number.POSITIVE_INFINITY)) }));
   return { stats, flags };
 }
 
@@ -221,6 +223,10 @@ function delayedWords(instruction: Instruction): string {
       return "is shuffled into its owner's deck";
     case "EngageAll":
       return "each enemy in staging engages the first player";
+    case "Discard":
+      return "is discarded";
+    case "ShuffleEncounterDiscard":
+      return "the encounter discard pile is shuffled into the encounter deck";
     // A hero Send for Help (Tactics) puts into play leaves the game at the end of the round (11212:A:2).
     case "MoveCard":
       return instruction.to === "removed" ? "is removed from the game" : "its effect resolves";

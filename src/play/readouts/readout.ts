@@ -23,6 +23,7 @@ import { defenseQuestResult } from "../words/scenarios/fortress.ts";
 import { defenseOutcome, stageHasDefense } from "./fortress.ts";
 import { companyProgressWords } from "./company.ts";
 import { erechQuestWords } from "./standalone-scenarios/erech.ts";
+import { forestHoldWords } from "./standalone-scenarios/old-forest.ts";
 import { lairProgressWords } from "./lair.ts";
 import { blackGateQuestEnd } from "./black-gate.ts";
 import { fortitudeNumbers } from "./fortitude.ts";
@@ -195,7 +196,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat) ?? erechQuestWords(game, ctx, willpower - threat);
     // The Siege's words carry their own "if nothing changes" ("4 progress if nothing changes: held while Great Corsair Ship is in play").
     const siege = siegeProgressWords(game, ctx, willpower - threat);
-    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${eliminationWords(game, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
+    // The Old Forest's stage 3B: progress that would fill it, and the card that holds the win.
+    const holds = forestHoldWords(game, ctx, willpower - threat);
+    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${holds ? `; ${holds}` : ""}${eliminationWords(game, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
   }
   return null;
 }

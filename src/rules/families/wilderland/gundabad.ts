@@ -18,6 +18,7 @@ import { askTarget } from "../../windows/choices.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
+import { backIntoQuestDeck } from "./random-stage.ts";
 import { arrivalFace } from "../quest/order.ts";
 import type { Focus } from "../index.ts";
 
@@ -64,9 +65,8 @@ function replaceCurrent(state: ScenarioState, nextId: string, how: { readonly fl
   const current = currentId ? state.cards[currentId] : undefined;
   if (!currentId || !current || currentId === nextId) return state;
   const before = steps.length;
-  if (current.progress > 0) steps.push({ kind: "progress", targetId: currentId, amount: -current.progress, cause: currentCause(steps, UNATTRIBUTED) });
-  let next = releaseAttachments(state, currentId, ctx.cards, steps);
-  next = updateCard(moveCard(next, currentId, { zone: "questDeck" }), currentId, { progress: 0, face: "A" });
+  const cause = currentCause(steps, UNATTRIBUTED);
+  let next = backIntoQuestDeck(releaseAttachments(state, currentId, ctx.cards, steps), currentId, cause, steps);
   next = moveCard(next, nextId, { zone: "questStage" });
   next = updateCard(next, nextId, { face: how.flipped ? "B" : arrivalFace(next, next.cards[nextId]?.code) });
   next = { ...next, stageLeft: { to: nextId, from: currentId, bypassed: true } };

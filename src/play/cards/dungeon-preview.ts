@@ -52,6 +52,8 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (captive) return captive;
   const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card);
   if (lost) return lost;
+  const everyone = engagedWithAllWords(game, card);
+  if (everyone) return everyone;
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
   // A treasure attached as a guarded objective (AttachRandomTreasure) is told like an objective: who guards it, or that it is free of encounters (emce.treasure).
   const kind = ctx.cards.get(card.code)?.type;
@@ -149,7 +151,8 @@ function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioStat
   }
   if (card.zone !== "staging" && card.zone !== "engaged") return null;
   const lines: string[] = [];
-  if (flagged(game, card.id, "engagedWithAll")) lines.push("Engaged with each player from the staging area. It attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat");
+  const all = engagedWithAllWords(game, card);
+  if (all) lines.push(all.replace(/\.$/, ""));
   const cap = heldAmount(game, card.id, "damageCap");
   // A cap that counts the Dragon Signs in the victory display (19025:B:1) says so; a fixed one (19023:B:2) does not.
   const stage = game.questStage ? game.cards[game.questStage]?.code : undefined;
@@ -158,6 +161,12 @@ function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioStat
   const ceiling = heldAmount(game, card.id, "damageCeiling");
   if (ceiling > 0) lines.push(`Never has more than ${ceiling} damage${flagged(game, card.id, "indestructible") ? ", and stays in play even then" : ""}`);
   return lines.length > 0 ? `${lines.join(". ")}.` : null;
+}
+
+// A card held engaged with each player (Cold-Drake under a Withered Heath stage, Old Man Willow, the Carn Dûm, Cirith Ungol and Fate of Wilderland cards): the words that say what the flag does.
+function engagedWithAllWords(game: ScenarioState, card: ScenarioState["cards"][string]): string | null {
+  if ((card.zone !== "staging" && card.zone !== "engaged") || !flagged(game, card.id, "engagedWithAll")) return null;
+  return "Engaged with each player from the staging area. It attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat.";
 }
 
 // "N of 4 Dragon Signs in the victory display; 4 discover a treasure." (12175:B:7): the signs of the game, and how many the Resolution's treasure takes, read from the record.

@@ -327,6 +327,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           onIsland={() => setReading({ kind: "island" })}
           onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
           onDial={onPreview}
+          onDialPile={onPile}
           rail={rail}
           stopAhead={stopAhead} carouselOpen={carouselOpen}
           narrow={narrow} areas={game.separate === true}

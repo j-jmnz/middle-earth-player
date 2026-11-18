@@ -1,4 +1,7 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
+import { ALWAYS } from "../conditions.ts";
+import { consideredEngaged } from "../considered-engaged.ts";
+import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Old Forest (standalone-scenarios cycle part 4, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) needs no record here.
 // Setup: the data's piles set Old Man Willow and Withywindle aside (147001:A:1's first sentence); the four stage 2s lie in the quest deck, a stage 2B returns to it when the quest goes on to a different one (AdvanceToRandomStage `different`).
@@ -12,38 +15,26 @@ const WILLOW: PickSpec = { type: "enemy", control: "any", staging: true, names: 
 const LOCATIONS_IN_VICTORY: PickSpec = { type: "location", control: "any", from: "victory" };
 const NON_OBJECTIVE_ATTACHMENT: PickSpec = { type: "attachment", control: "you", nonObjective: true };
 // X of the stage 2Bs: the Victory points in the victory display against the number of players times 5 (only locations score there, none of the dealt enemies prints Victory).
-const ENOUGH_VICTORY: Condition = { kind: "not", condition: { kind: "less", left: { victoryDisplay: true }, right: { players: true, times: 5 } } };
 const NOT_ENOUGH_VICTORY: Condition = { kind: "less", left: { victoryDisplay: true }, right: { players: true, times: 5 } };
+const ENOUGH_VICTORY: Condition = { kind: "not", condition: NOT_ENOUGH_VICTORY };
 const ENEMY_RAISES_AFTER_ATTACK: Instruction = { verb: "AfterAttack", instructions: [{ verb: "RaiseThreat", amount: 2, who: "eachSeat", when: { kind: "x", min: 1 } }] };
 
-// The four stage 2s print the same When Revealed and the same second Forced effect; each has its own first Forced effect.
-const stageTwo = (code: string, first: Effect): Effect[] => [
-  {
-    id: `${code}:whenRevealed:1`,
-    cardCode: code,
-    lines: [`${code}:A:1`],
-    timing: "whenRevealed",
-    instructions: [
-      { verb: "SearchMove", type: "location", to: "staging", when: { kind: "less", left: { count: { type: "location", control: "any", stagingOnly: true } }, right: { players: true } } },
-      { verb: "ShuffleEncounterDeck" },
-    ],
-  },
-  first,
-  {
-    id: `${code}:forced:2`,
-    cardCode: code,
-    lines: [`${code}:B:2`],
-    timing: "forced",
-    trigger: "questProgressPlaced",
-    instructions: [
-      // One X test, decided before the advance: the "Otherwise" branch comes first, so 3A's When Revealed (Swaying Without Wind returns a location from the victory display) cannot turn the test over.
-      { verb: "AdvanceToRandomStage", codes: [...STAGE_2], different: true, when: NOT_ENOUGH_VICTORY },
-      { verb: "AdvanceToStage", code: STAGE_3, when: ENOUGH_VICTORY },
-    ],
-  },
-];
+// The four stage 2s print the same When Revealed (147002's record is copied to the others) and the same second Forced effect; each has its own first Forced effect.
+// The second Forced effect names the four stage codes, so `copyLine` refuses it (a copy keeps the source's card code in a field): the factory writes it for each.
+const stageTwoAdvance = (code: string): Effect => ({
+  id: `${code}:forced:2`,
+  cardCode: code,
+  lines: [`${code}:B:2`],
+  timing: "forced",
+  trigger: "questProgressPlaced",
+  instructions: [
+    // One X test, decided before the advance: the "Otherwise" branch comes first, so 3A's When Revealed (Swaying Without Wind returns a location from the victory display) cannot turn the test over.
+    { verb: "AdvanceToRandomStage", codes: [...STAGE_2], different: true, when: NOT_ENOUGH_VICTORY },
+    { verb: "AdvanceToStage", code: STAGE_3, when: ENOUGH_VICTORY },
+  ],
+});
 
-export const AUTHORED_EFFECTS: readonly Effect[] = [
+export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 147001 Farewell to the Shire. Setup: each player in turn searches the encounter deck for a location of a different title and adds it to the staging area, then the deck is shuffled. Side B opens the game (stage 1A prints no quest points): each player draws 1 card and the quest advances to a random stage 2A.
   { id: "147001:setup:1", cardCode: "147001", lines: ["147001:A:1"], timing: "setup", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", type: "location", to: "staging", different: true }] }, { verb: "ShuffleEncounterDeck" }] },
   {
@@ -56,7 +47,20 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 147002 to 147005 The Living Forest. 2B first Forced effects: exhaust a hero each at the end of the planning phase; at the beginning of the round (the Resource phase's start) remove all progress from each location in play; at the end of the round discard a random location from the victory display;
   // the first player reveals 1 additional encounter card during the quest phase.
-  ...stageTwo("147002", {
+  {
+    id: "147002:whenRevealed:1",
+    cardCode: "147002",
+    lines: ["147002:A:1"],
+    timing: "whenRevealed",
+    instructions: [
+      { verb: "SearchMove", type: "location", to: "staging", when: { kind: "less", left: { count: { type: "location", control: "any", stagingOnly: true } }, right: { players: true } } },
+      { verb: "ShuffleEncounterDeck" },
+    ],
+  },
+  copyLine("147002:A:1", "147003:A:1"),
+  copyLine("147002:A:1", "147004:A:1"),
+  copyLine("147002:A:1", "147005:A:1"),
+  {
     id: "147002:forced:1",
     cardCode: "147002",
     lines: ["147002:B:1"],
@@ -64,8 +68,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "endOfPhase",
     condition: { kind: "phase", is: "Planning" },
     instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you", state: "ready" } }, { verb: "Exhaust", target: { kind: "picked" } }] }],
-  }),
-  ...stageTwo("147003", {
+  },
+  stageTwoAdvance("147002"),
+  {
     id: "147003:forced:1",
     cardCode: "147003",
     lines: ["147003:B:1"],
@@ -73,9 +78,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "beginningOfPhase",
     condition: { kind: "phase", is: "Resource" },
     instructions: [{ verb: "RemoveAllProgress", pick: { type: "location", control: "any" } }],
-  }),
-  ...stageTwo("147004", { id: "147004:forced:1", cardCode: "147004", lines: ["147004:B:1"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "DiscardRandomVictoryLocation" }] }),
-  ...stageTwo("147005", { id: "147005:forced:1", cardCode: "147005", lines: ["147005:B:1"], timing: "forced", trigger: "beginningOfPhase", condition: { kind: "phase", is: "Quest" }, instructions: [{ verb: "RevealMore", amount: 1 }] }),
+  },
+  stageTwoAdvance("147003"),
+  { id: "147004:forced:1", cardCode: "147004", lines: ["147004:B:1"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "DiscardRandomVictoryLocation" }] },
+  stageTwoAdvance("147004"),
+  { id: "147005:forced:1", cardCode: "147005", lines: ["147005:B:1"], timing: "forced", trigger: "beginningOfPhase", condition: { kind: "phase", is: "Quest" }, instructions: [{ verb: "RevealMore", amount: 1 }] },
+  stageTwoAdvance("147005"),
 
   // 147006 The Wicked Willow. Old Man Willow and Withywindle come from the set-aside pile to the staging area (added, not revealed), then the first player reveals one encounter card fewer than the players. Side B: Old Man Willow is held in the staging area, considered engaged with each player (it attacks each
   // in turn with a shadow card each, has no Threat in the staging area: rr.engaged) and any character may attack it; defeating the stage wins the game.
@@ -95,7 +103,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: STAGE_3,
     lines: ["147006:B:1"],
     timing: "constant",
-    instructions: (["cannotLeaveStaging", "engagedWithAll", "cannotBeEngaged", "noThreatContribution", "attackableByAny"] as const).map((stat) => ({ verb: "ModifyStat" as const, stat, amount: 1, until: "whileSourceInPlay" as const, holders: WILLOW })),
+    instructions: [{ verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: WILLOW }, ...consideredEngaged(WILLOW)],
   },
   { id: "147006:constant:2", cardCode: STAGE_3, lines: ["147006:B:2"], timing: "constant", instructions: [] },
 
@@ -235,13 +243,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "147022",
     lines: ["147022:A:1"],
     timing: "whenRevealed",
-    uncancelable: { kind: "count", pick: { type: "hero", control: "any" }, min: 0 },
+    uncancelable: ALWAYS,
     instructions: [
       { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } },
       { verb: "TakeRevealedCard", who: "picked", committed: true },
-      { verb: "Delay", until: "endOfRound", uncancelable: { kind: "count", pick: { type: "hero", control: "any" }, min: 0 }, instructions: [{ verb: "Discard", target: { kind: "self" }, counted: true }, { verb: "ShuffleEncounterDiscard", when: { kind: "not", condition: { kind: "noneDiscarded" } } }] },
+      { verb: "Delay", until: "endOfRound", uncancelable: ALWAYS, instructions: [{ verb: "Discard", target: { kind: "self" }, counted: true }, { verb: "ShuffleEncounterDiscard", when: { kind: "not", condition: { kind: "noneDiscarded" } } }] },
     ],
   },
-];
+]);
 
 export const AUTHORED_REPLACES: readonly string[] = [];

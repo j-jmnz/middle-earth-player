@@ -1,6 +1,6 @@
 // Rules: rr.quest-advancement, rr.quest-cards-quest-deck, rr.winning-the-game (data/rules/entries.json); ledger lines 19047:B:2, 19048:B:2, 19049:B:2, 19050:B:2.
 // Roam Across Rhovanion's quest order: the stages 2 are played in a random order, each once, then stage 3 (AdvanceToRandomStage).
-import { ruleCause } from "../../core/cause.ts";
+import { ruleCause, type Cause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -27,14 +27,21 @@ export function randomStageFrom(state: ScenarioState, currentCode: string): { st
 }
 
 /**
+ * A stage that leaves the quest for the quest deck without being won (a `different` random stage, 147002:B:2; a bypassed stage, emce.bypassing; a stage the quest deck's search replaces, 19124:A:1): its progress is removed (a progress step), side A is up again and it lies in the quest deck. The
+ * cards attached to it are released by the caller, before this.
+ */
+export function backIntoQuestDeck(state: ScenarioState, id: string, cause: Cause, steps: EngineStep[]): ScenarioState {
+  const progress = state.cards[id]?.progress ?? 0;
+  if (progress > 0) steps.push({ kind: "progress", targetId: id, amount: -progress, cause });
+  return updateCard(moveCard(state, id, { zone: "questDeck" }), id, { progress: 0, face: "A" });
+}
+
+/**
  * The defeated stage `id` (code `code`) leaves the quest: to the victory display when its quest does that, out of the game when the random stage `removes` it, back into the quest deck with no progress and side A up when the random stage is a `different` one (the stage 2 comes up again,
  * 147002:B:2), else to the set-aside pile.
  */
 export function leaveStage(state: ScenarioState, id: string, code: string, cards: ReadonlyMap<string, PrintedCard>, rolled: { remove: boolean; back: boolean } | null, steps: EngineStep[]): ScenarioState {
   const victory = stageToVictory(state, cards, code);
-  const next = moveCard(state, id, { zone: victory ? "victory" : rolled?.remove ? "removed" : rolled?.back ? "questDeck" : "setAside" });
-  if (victory || !rolled?.back) return next;
-  const progress = state.cards[id]?.progress ?? 0;
-  if (progress > 0) steps.push({ kind: "progress", targetId: id, amount: -progress, cause: ruleCause("rr.quest-advancement") });
-  return updateCard(next, id, { progress: 0, face: "A" });
+  if (!victory && rolled?.back) return backIntoQuestDeck(state, id, ruleCause("rr.quest-advancement"), steps);
+  return moveCard(state, id, { zone: victory ? "victory" : rolled?.remove ? "removed" : "setAside" });
 }

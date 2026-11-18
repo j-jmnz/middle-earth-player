@@ -194,9 +194,9 @@ export function runExtraVerb(
       return next;
     }
     case "Discard":
-      return discardTarget(state, instruction.target.kind, focus, ctx, steps, false, instruction.counted === true);
+      return discardTarget(state, instruction.target.kind, focus, ctx, steps, { counted: instruction.counted === true });
     case "Destroy":
-      return discardTarget(state, instruction.target.kind, focus, ctx, steps, true);
+      return discardTarget(state, instruction.target.kind, focus, ctx, steps, { destroy: true });
     case "UncommitAll": {
       const seat = seatFor(state, instruction.who, focus.seat);
       let next = state;
@@ -391,8 +391,7 @@ function discardTarget(
   focus: VerbFocus,
   ctx: ReduceContext,
   steps: EngineStep[],
-  destroy = false,
-  counted = false,
+  how: { readonly destroy?: boolean; readonly counted?: boolean },
 ): ScenarioState {
   const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" || kind === "other" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
@@ -400,14 +399,14 @@ function discardTarget(
   if (kind === "other" && !inPlay(state.cards[id]?.zone ?? "removed")) return state;
   // "Unique locations cannot be discarded from play by encounter card effects" (12193:B:1): the card holds the flag.
   if (flagged(state, id, "cannotBeDiscardedByEncounter") && isEncounterCardEffect(state, ctx.cards, focus.sourceId)) return state;
-  if (destroy) {
+  if (how.destroy === true) {
     const instance = state.cards[id];
     return instance && inPlay(instance.zone) ? destroyAndAnnounce(state, instance, printedOf(ctx.cards, instance.code), ctx.cards, steps) : state;
   }
   const before = state.cards[id];
   const next = destroyCard(state, id, ctx.cards, steps);
   // A `counted` discard of a card that left play counts for the effect's `noneDiscarded` ("Then" resolves only if the discard did, rr.then).
-  return counted && before && inPlay(before.zone) && !inPlay(next.cards[id]?.zone ?? "removed") ? countDiscarded(next, 1) : next;
+  return how.counted === true && before && inPlay(before.zone) && !inPlay(next.cards[id]?.zone ?? "removed") ? countDiscarded(next, 1) : next;
 }
 
 // The reveal frame of the source card counts each separate instance of surge it was given (rr.surge) for the rest of that reveal.

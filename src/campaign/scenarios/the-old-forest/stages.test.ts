@@ -6,7 +6,7 @@ import { finish, first, idOf, legalIntents, legalTargets, opening, resolveRecord
 import { victoryPointsOf } from "../../../rules/core/printed-stat.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
-import { phasePlaysBarred } from "../../../rules/families/wilderland/rounds.ts";
+import { playLimitBars } from "../../../rules/families/wilderland/rounds.ts";
 import { reduce, startScenario, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
 
@@ -91,6 +91,17 @@ describe("The Old Forest quest", () => {
     }
   });
 
+  it("147002:B:2 a successful quest that places no progress does not raise the Forced effect, though the display holds X", () => {
+    const made = table({ stage: "147002", phase: "Quest", victory: ["147013", "147016", "147014"], deck: ["f0", "f0", "f0"] });
+    // Nothing takes the progress (no active location, and the stage takes none): the quest succeeds with 0 placed.
+    const barred = { ...made.state, modifiers: [...made.state.modifiers, { instanceId: "table", sourceId: "table", stat: "noQuestProgress" as const, amount: 1, until: "endOfPhase" as const }] };
+    const done = drain(send(start(barred), { type: "Commit", cardIds: [made.hero, made.hero2] }, made.ctx), made.ctx);
+    expect(done.steps.some((step) => step.kind === "quest" && step.willpower > step.threat)).toBe(true);
+    expect(done.steps.some((step) => step.kind === "progress" && step.amount > 0)).toBe(false);
+    expect(done.state.cards[done.state.questStage ?? ""]?.code).toBe("147002");
+    expect(done.steps.filter((step) => step.kind === "advance")).toHaveLength(0);
+  });
+
   it("147002:B:2 a quest that does not succeed leaves the stage where it is", () => {
     const made = table({ stage: "147002", phase: "Quest", victory: ["147013", "147016", "147014"], staging: ["f3", "f3", "f3", "f3", "f3"], deck: ["f0", "f0", "f0"] });
     const done = drain(send(start(made.state), { type: "Commit", cardIds: [made.hero, made.hero2] }, made.ctx), made.ctx);
@@ -167,8 +178,8 @@ describe("LimitPlaysPerRound (147016:A:1)", () => {
     expect(played.cards[mine]?.zone).toBe("play");
     // The second seat has played nothing: its own card is not barred.
     const other = (played.seats[1]?.hand ?? [])[0] ?? "";
-    expect(phasePlaysBarred({ ...played, activeSeat: 1 }, other, t.ctx, {})).toBe(false);
-    expect(phasePlaysBarred({ ...played, activeSeat: 0 }, other, t.ctx, {})).toBe(true);
+    expect(playLimitBars({ ...played, activeSeat: 1 }, other, t.ctx, {})).toBe(false);
+    expect(playLimitBars({ ...played, activeSeat: 0 }, other, t.ctx, {})).toBe(true);
   });
 });
 

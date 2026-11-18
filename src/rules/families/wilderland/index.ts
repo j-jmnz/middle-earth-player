@@ -24,7 +24,7 @@ import { flipOver } from "./flip.ts";
 import { bypassStage, flipCurrentQuest, flipInPlace, searchQuestDeck } from "./gundabad.ts";
 import { attackedThisPhase, namedFlagHeld, removeProgressFrom, searchStageCard, stageDiscarded } from "./assault.ts";
 import { activateFromCaves, attachTreasuresToHost, stageRandomDiscarded } from "./gundabad-cards.ts";
-import { handPlayRefusal, handPlaysBarred, noteTreacheryReveal, phasePlayRefusal, phasePlaysBarred } from "./rounds.ts";
+import { handPlayRefusal, handPlaysBarred, noteTreacheryReveal, playLimitRefusal, playLimitBars } from "./rounds.ts";
 import { advanceToRandomStage, claimFreed, flipToEnemySide, guardReturnedBy, putTrust } from "./rhovanion.ts";
 import { addSourceToHandOfMost } from "./hand.ts";
 import { advanceToLetterStage, grantSurge, freeTreasures, searchGuardForTreasure, takeControlOfSetAside } from "./mirkwood.ts";
@@ -225,8 +225,8 @@ export const manifest: RulesFamily = {
   amount: wilderlandAmount,
   pick: wilderlandPickMatches,
   optionalEngage: optionalEngageBarred,
-  play: (state, id, ctx, how) => phasePlaysBarred(state, id, ctx, how) || handPlaysBarred(state, id, ctx, how),
-  playReason: (state, id, ctx) => phasePlayRefusal(state, id, ctx) ?? handPlayRefusal(state, id, ctx),
+  play: (state, id, ctx, how) => playLimitBars(state, id, ctx, how) || handPlaysBarred(state, id, ctx, how),
+  playReason: (state, id, ctx) => playLimitRefusal(state, id, ctx) ?? handPlayRefusal(state, id, ctx),
   revealed: noteTreacheryReveal,
   combat: NIGHT_COMBAT,
   travel: { unpayable: pileTravelUnpayable },

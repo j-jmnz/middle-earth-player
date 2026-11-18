@@ -1,5 +1,5 @@
 // Rules: rr.initiating-abilities-playing-cards, rr.play-and-put-into-play, rr.cancel, rr.reveal (data/rules/entries.json); ledger lines 19137:B:1, 19140:B:1, 00017:B:2.
-// What Mount Gundabad's stages say about a round or a phase: the first treachery revealed each round (its When Revealed effects cannot be canceled) and a limit on the cards a player plays in a phase. A game with no card that reads them does none of this work (`gameReads`).
+// What Mount Gundabad's stages say about a round or a phase: the first treachery revealed each round (its When Revealed effects cannot be canceled) and a limit on the cards a player plays in a phase or a round. A game with no card that reads them does none of this work (`gameReads`).
 import { gameReads } from "../../core/game-reads.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -37,12 +37,12 @@ function playLimit(state: ScenarioState, cardId: string, ctx: ReduceContext, how
 }
 
 /** Whether a LimitPlaysPerPhase or LimitPlaysPerRound in force bars the card from being played (families/wilderland/index.ts, the `play` hook). */
-export function phasePlaysBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, how: PlayHow): boolean {
+export function playLimitBars(state: ScenarioState, cardId: string, ctx: ReduceContext, how: PlayHow): boolean {
   return playLimit(state, cardId, ctx, how) != null;
 }
 
 /** The words for a refused play (the `playReason` hook): "Exploring Gundabad (play limit): each player can play only 1 card per phase. You have played 1 this planning phase." Null when no limit bars the card. */
-export function phasePlayRefusal(state: ScenarioState, cardId: string, ctx: ReduceContext): string | null {
+export function playLimitRefusal(state: ScenarioState, cardId: string, ctx: ReduceContext): string | null {
   const limit = playLimit(state, cardId, ctx, {});
   if (!limit) return null;
   const who = state.seatCount > 1 ? `Player ${state.activeSeat + 1} has` : "You have";

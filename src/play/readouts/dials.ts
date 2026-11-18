@@ -22,6 +22,8 @@ export type TableDial = {
   word?: string;
   // The card a tap on the dial shows large (the Night objective's, Derufin's): absent, the dial does nothing.
   cardId?: string;
+  // The pile a tap on the dial opens, as its list (the victory display's, on The Old Forest's stage 2): absent, the dial does nothing.
+  pile?: string;
 };
 
 /** The cards of a code that are in play (the staging area, the active location, a play area): what a scenario's dial reads its tokens from. */
@@ -43,7 +45,7 @@ export function dialProps(dial: TableDial) {
     warn: dial.warn,
     note: dial.note,
     word: dial.word,
-    hint: dial.cardId ? "Shows the card" : undefined,
+    hint: dial.cardId ? "Shows the card" : dial.pile ? "Shows the cards" : undefined,
   } as const;
 }
 
