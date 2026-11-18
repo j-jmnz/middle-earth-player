@@ -241,3 +241,18 @@ describe("148003:A:1 shuffling each copy of Great Barrow into the encounter deck
     expect(all.encounterDeck.filter((id) => codeOf(all, id) === GREAT_BARROW)).toHaveLength(3);
   });
 });
+
+describe("148018:A:2 Dreadful Song's end-of-round raise reads the hero's controller", () => {
+  it("raises the threat of the player whose hero carries it by 1 for each Wight engaged with him, whoever holds the first player token", () => {
+    const t = table({ seats: 2, firstPlayer: 0, engaged: [{ code: "148011", seat: 1 }, { code: "148012", seat: 1 }, { code: "148013", seat: 0 }] });
+    const hero = t.state.seats[1].heroes[0] ?? "";
+    const song = spawn(t.state, "148018", { zone: "attached" });
+    const attached = { ...updateCard(song.state, song.id, { host: hero, controller: 1 }), cards: song.state.cards };
+    const withHost = updateCard(attached, hero, { attachments: [song.id] });
+    const record = t.ctx.effects.find((effect) => effect.id === "148018:forced:1");
+    const pushed = pushCardEffects({ ...withHost, window: null }, "forced", song.id, 0, false, record ? [record] : [], t.ctx, []);
+    const done = settle({ ...pushed, mode: "stopped" }, t.ctx, []);
+    expect(done.seats[1].threat).toBe(t.state.seats[1].threat + 2);
+    expect(done.seats[0].threat).toBe(t.state.seats[0].threat);
+  });
+});

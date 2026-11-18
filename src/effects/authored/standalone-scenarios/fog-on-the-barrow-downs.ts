@@ -45,7 +45,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 148001 The House of Tom Bombadil. 1B skips the quest phase and places 1 progress on itself at the end of each round, advancing when it holds its quest points.
     { id: "148001:setup:1", cardCode: "148001", lines: ["148001:A:1"], timing: "setup", instructions: [{ verb: "ShuffleEncounterDeck" }] },
     { id: "148001:constant:1", cardCode: "148001", lines: ["148001:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "skipQuestPhase", amount: 1, until: "whileSourceInPlay", target: "table" }] },
-    { id: "148001:forced:1", cardCode: "148001", lines: ["148001:B:2"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "PlaceProgressOn", amount: 1, target: "self" }] },
+    { id: "148001:forced:1", cardCode: "148001", lines: ["148001:B:2"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "AddStageProgress", amount: 1 }] },
 
     // 148002 Across the Downs. 2A adds Hollow Circle and each player reveals 1 card; 2B raises every player's threat at the end of the refresh phase (nobody is apart yet) and cannot be defeated until Hollow Circle is in the victory display.
     {

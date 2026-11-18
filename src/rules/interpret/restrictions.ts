@@ -40,6 +40,8 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
   const found: Restriction[] = [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb !== "Restrict" || instruction.what !== what) continue;
+    // Once stages are separate "cannot defeat this stage" binds that stage only: another seat's stage does not hold this one back (148003:B:3 at stage 3B, 148004 at a trapped player's stage).
+    if (what === "advance" && state.separate && source.zone === "questStage" && source.id !== state.questStage) continue;
     found.push({
       sourceId: source.id,
       what,

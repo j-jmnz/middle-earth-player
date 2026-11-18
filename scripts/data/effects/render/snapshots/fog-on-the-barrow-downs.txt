@@ -13,7 +13,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148001:B:2 (back): Forced: At the end of the round, place 1 progress on this stage.
   148001:forced:1: Forced at the end of the round
-    - place 1 progress on this card
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 ## 148002 Across the Downs
 (the scenario deals it into the quest pile; the piles place it, no record does)
