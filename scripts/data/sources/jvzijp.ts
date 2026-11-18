@@ -15,6 +15,16 @@ export const JVZIJP_SITE = `https://drive.google.com/drive/folders/${JVZIJP_FOLD
 
 export const driveFileUrl = (id: string): string => `https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`;
 
+/**
+ * What a sync does with a card whose Drive download came back as a page (the quota page) instead of an image. A card that
+ * has a pin keeps it, with its cached file when that still hashes to the pin, and takes no lower source: a refusal that
+ * passes must not downgrade a picture. A card with no pin has nothing to lose and goes on to the next source.
+ */
+export function onDriveRefusal(pinned: { sha256: string } | undefined, cachedSha256: string | null): { action: "keep"; cached: boolean } | { action: "fallback" } {
+  if (!pinned) return { action: "fallback" };
+  return { action: "keep", cached: cachedSha256 === pinned.sha256 };
+}
+
 export type DriveFile = { path: string; id: string };
 
 type DriveEntry = { name: string; kind: "folder" | "file"; id: string };

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { jvzijpFile, jvzijpPictures, namesMatch, parseDriveFolder } from "./jvzijp.ts";
+import { jvzijpFile, jvzijpPictures, namesMatch, onDriveRefusal, parseDriveFolder } from "./jvzijp.ts";
 
 const packs = [
   { code: "Core", name: "Core Set" },
@@ -62,5 +62,17 @@ describe("JvZijp's Drive", () => {
     expect(jvzijpFile(pictures, card("Appointed by Fate", [["RevCore", 134]]), "A", 23)?.id).toBe("page-23");
     expect(namesMatch("Stricken Dumb", "Sticken Dumb")).toBe(true);
     expect(namesMatch("Gandalf", "Galadriel")).toBe(false);
+  });
+});
+
+describe("onDriveRefusal", () => {
+  it("keeps a pinned picture, with or without its cached file, and takes no lower source", () => {
+    expect(onDriveRefusal({ sha256: "aa" }, "aa")).toEqual({ action: "keep", cached: true });
+    expect(onDriveRefusal({ sha256: "aa" }, "bb")).toEqual({ action: "keep", cached: false });
+    expect(onDriveRefusal({ sha256: "aa" }, null)).toEqual({ action: "keep", cached: false });
+  });
+
+  it("lets a card with no pin fall back to the next source", () => {
+    expect(onDriveRefusal(undefined, null)).toEqual({ action: "fallback" });
   });
 });
