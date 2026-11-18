@@ -35,11 +35,21 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       instructions: [
         { verb: "CountsAs", cardType: "attachment", trait: "Tentacle" },
         { verb: "AttachesTo", host: { kind: "hero" }, limitPerHost: true },
+      ],
+    },
+    // "Attached hero cannot exhaust or ready": the host is a hero now.
+    {
+      id: "040076:constant:2",
+      cardCode: "040076",
+      lines: ["040076:A:1"],
+      timing: "constant",
+      condition: { kind: "all", conditions: [ATTACHED, HOST_IS("hero")] },
+      instructions: [
         { verb: "ModifyStat", stat: "cannotExhaust", amount: 1, until: "whileSourceInPlay", target: "host" },
         { verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "whileSourceInPlay", target: "host" },
       ],
     },
-    { id: "040076:triggered:1", cardCode: "040076", lines: ["040076:A:1"], timing: "triggered", trigger: "endOfRound", condition: ATTACHED, instructions: [{ verb: "Discard", target: { kind: "host" } }] },
+    { id: "040076:triggered:1", cardCode: "040076", lines: ["040076:A:1"], timing: "triggered", trigger: "endOfRound", condition: { kind: "all", conditions: [ATTACHED, HOST_IS("hero")] }, instructions: [{ verb: "Discard", target: { kind: "host" } }] },
     {
       id: "040076:action:1",
       cardCode: "040076",
@@ -147,7 +157,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       timing: "forced",
       trigger: "endOfPhase",
       condition: { kind: "all", conditions: [{ kind: "phase", is: "Combat" }, { kind: "sourceIn", zone: "staging" }] },
-      instructions: [{ verb: "AssignDamage", amount: 3, pick: { type: "character", control: "you" }, who: "eachSeat" }],
+      instructions: [{ verb: "AssignDamage", amount: 3, pick: { type: "character", control: "you" }, who: "eachSeat", single: true }],
     },
 
     // 04073 Grasping Tentacle. Forced: when it is attacked (the attackers are declared) the top card of the encounter deck is discarded; on a match it attaches to an attacking character the first player chooses as a Tentacle attachment and the attack is over (no damage

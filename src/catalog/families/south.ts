@@ -14,8 +14,8 @@ const VERBS = [
   // A location already active goes back to the staging area, unless a second active location slot is free (ExtraActiveLocation).
   z.strictObject({ verb: z.literal("MakeSetAsideActive"), code: z.string().min(1), ...when }),
   // Each player (`eachSeat`) assigns `amount` damage among the cards that match `pick` from their side, one damage at a time on the card
-  // they choose ("each player assigns X damage among characters he controls", 142029:A:2). `left` and `of` are engine use: the damage still to go, and the damage to assign in all.
-  verbFlags(z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), left: z.number().int().min(0).optional(), of: z.number().int().min(1).optional(), ...when }), { runsInFrame: true }),
+  // they choose ("each player assigns X damage among characters he controls", 142029:A:2). `single`: the player chooses one card and it takes all of the damage ("assigns 3 damage to 1 character he controls", 04072:A:3). `left` and `of` are engine use: the damage still to go, and the damage to assign in all.
+  verbFlags(z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), single: z.literal(true).optional(), left: z.number().int().min(0).optional(), of: z.number().int().min(1).optional(), ...when }), { runsInFrame: true }),
   // The actor discards each card that matches `pick` (from their side) to its owner's discard pile ("discard each ally he controls",
   // 142037:A:1).
   z.strictObject({ verb: z.literal("DiscardEach"), pick: pickSchema, ...when }),

@@ -61,7 +61,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       timing: "forced",
       trigger: "endOfPhase",
       condition: { kind: "all", conditions: [{ kind: "phase", is: "Combat" }, { kind: "sourceIn", zone: "staging" }] },
-      instructions: [{ verb: "AssignDamage", amount: 3, pick: { type: "character", control: "you" }, who: "eachSeat" }],
+      instructions: [{ verb: "AssignDamage", amount: 3, pick: { type: "character", control: "you" }, who: "eachSeat", single: true }],
     },
 
     // 901503 Writhing Tentacle. Forced: when it engages a player the top card is discarded; on a match it makes an immediate attack (a marker tells its attack-resolved Forced effect to attach it) and, once that attack resolves, attaches to the defending character if there
@@ -106,7 +106,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       instructions: [DISCARD_TOP, { verb: "Pick", pick: { type: "character", control: "any", who: "firstPlayer", controlledBy: "actor" }, when: CHECK }, { verb: "AttachEnemyToPicked", returns: "discard", when: CHECK }],
     },
     { id: "901504:constant:1", cardCode: "901504", lines: ["901504:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Tentacle" }] },
-    { id: "901504:forced:2", cardCode: "901504", lines: ["901504:A:1"], timing: "forced", trigger: "readied", subject: "host", condition: ATTACHED, instructions: [{ verb: "DamageCard", amount: 1, target: "host" }] },
+    { id: "901504:forced:2", cardCode: "901504", lines: ["901504:A:1"], timing: "forced", trigger: "readied", subject: "host", condition: { kind: "all", conditions: [ATTACHED, HOST_IS("character")] }, instructions: [{ verb: "DamageCard", amount: 1, target: "host" }] },
 
     // 901505 Banks of Sirannon. A:1: each Tentacle enemy in play, The Watcher included, gets +2 Defense for each copy in the staging area. A:2 (Shadow): for each point of damage the attack dealt, the defending player discards a random card from his hand.
     {

@@ -23,6 +23,7 @@ import { sharing } from "../families/breaking/areas.ts";
 import { guardianSeats, otherThanGuardian } from "../families/guardian/seats.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { holdsNow } from "./verbs.ts";
+import { releaseLooks } from "../families/encounter/looked.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
 import { dealOut } from "../families/breaking/deal.ts";
 import { moveCard } from "../core/zones.ts";
@@ -141,7 +142,7 @@ export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContex
   const data = frame.data;
   if (data.kind !== "effect") throw new Error(`Frame ${frame.frame} lost its effect data`);
   if (frame.step === 0) {
-    if (data.canceled) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
+    if (data.canceled) return reopen(releaseLooks(finishEvent(popFrame(state, steps), frame, data), data), data);
     // The "when revealed" effects of a card are about to resolve: a Response may cancel them first (rr.cancel). The only
     // such Response is A Test of Will, which cancels those "of a card that was just revealed from the encounter deck"
     // (01050:A:1); revealing from the encounter deck is staging (rr.staging), the `reveal` frame. A quest stage reached by
@@ -158,7 +159,7 @@ export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContex
     return beginEffect(state, frame, data, ctx);
   }
   const [item, ...rest] = data.queue;
-  if (data.canceled || !item) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
+  if (data.canceled || !item) return reopen(releaseLooks(finishEvent(popFrame(state, steps), frame, data), data), data);
   const advanced = patchTop(state, { data: { ...data, queue: rest } });
   return finishWhenDone(runItem(advanced, item, frame, data.returned, ctx, steps), frame.id);
 }

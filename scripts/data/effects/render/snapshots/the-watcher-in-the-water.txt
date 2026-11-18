@@ -10,10 +10,13 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Tentacle attachment while it is attached
     - this attachment may be attached to a hero (limit 1 of it per host)
+  040076:constant:2: Constant
+    only if all of: (this card is attached to a card) and (its host is a hero (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - its host: stat cannotExhaust 1, while this card is in play
     - its host: stat cannotReady 1, while this card is in play
   040076:triggered:1: Triggered (mandatory, not printed as Forced) at the end of the round
-    only if this card is attached to a card
+    only if all of: (this card is attached to a card) and (its host is a hero (any player controls))
     - discard its host
   040076:action:1: Action (any player may use it)
     only if all of: (it is the Combat phase) and (there is a ready hero (you control) that can exhaust (not held by a rule that stops it exhausting), with no Tentacle card attached to choose)
@@ -140,7 +143,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 04072:A:3 (front): If The Watcher is in the staging area at the end of the combat phase, each player must deal 3 damage to 1 character he controls.
   04072:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (this card is in the staging area)
-    - each player assigns 3 damage among the character (you control), one at a time
+    - each player assigns 3 damage to 1 of the character (you control), all of it
 
 ## 04073 Grasping Tentacle
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -180,4 +183,4 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this attack is considered undefended
 
-(rendered pieces: 120 by template, 0 as JSON)
+(rendered pieces: 128 by template, 0 as JSON)

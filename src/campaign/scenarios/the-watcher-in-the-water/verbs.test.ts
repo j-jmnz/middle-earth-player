@@ -3,6 +3,7 @@
 // The new verbs, flags and conditions of The Watcher in the Water, each on a table of the scene kit: the progress sent to the quest, the Travel costs, the discard check of the Tentacles and what follows it, the Tentacle attachments, Hideous Depths' look and Pulled Under.
 import { describe, expect, it } from "vitest";
 
+import type { Effect } from "../../../catalog/boundary.ts";
 import { placeDamage } from "../../../rules/core/keywords.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { placeProgress } from "../../../rules/interpret/effect-verbs.ts";
@@ -169,6 +170,27 @@ describe("901506:A:1 and A:2 Hideous Depths", () => {
     expect(lookAtTop(quiet.state, { verb: "LookAtTop", count: 2 }, 0, quiet.ctx, null, steps).pendingEvents?.length ?? 0).toBe(0);
   });
 
+  // "After a player looks at any cards ... shuffle": after is after the effect that looked has resolved (rr.forced), so an effect that looks and then acts on the deck acts on what it saw.
+  it("901506:A:1 the shuffle follows the whole effect: an effect that looks at the top card and then discards the top card discards the card it saw", () => {
+    const lookThenAct: Effect = {
+      id: "04066:whenRevealed:9",
+      cardCode: "04066",
+      lines: ["04066:A:1"],
+      timing: "whenRevealed",
+      instructions: [{ verb: "LookAtTop", count: 1 }, { verb: "MoveEncounterCard", card: "deckTop", to: "discard" }],
+    };
+    const deck = ["04073", "04074", "04075", "f0", "f3", "04068", "04069", "04070"];
+    for (const seed of [1, 2, 3, 4, 5, 6]) {
+      const made = table({ staging: ["04066", "901506"], deck, seed });
+      const ctx = { ...made.ctx, effects: [...made.ctx.effects, lookThenAct] };
+      const seen = made.state.encounterDeck[0] ?? "";
+      const done = resolveRecords(made.state, ctx, "04066", "whenRevealed", idOf(made.state, "04066"));
+      expect(done.state.cards[seen]?.zone, `seed ${seed}`).toBe("encounterDiscard");
+      // The look was announced and answered: the deck is shuffled (its 7 cards are all still there).
+      expect(done.state.encounterDeck).toHaveLength(deck.length - 1);
+    }
+  });
+
   it("901506:A:2 the cost reveals the topmost Tentacle enemy of the discard pile, and cannot be paid with none", () => {
     const none = table({ phase: "Travel", staging: ["901506"], discard: ["f0", "04066"] });
     expect(travelCostUnpayable(none.state, none.ctx, idOf(none.state, "901506"))).toBe(true);
@@ -200,10 +222,20 @@ describe("901508:A:2 Rippling From Beneath", () => {
 });
 
 /** The phase `ended` ends: its Forced effects and delayed effects resolve (choices take their first option). */
-function endPhase(state: ScenarioState, ctx: ReturnType<typeof table>["ctx"], ended: ScenarioState["phase"], next: ScenarioState["phase"]): Run {
+function endPhase(state: ScenarioState, ctx: ReturnType<typeof table>["ctx"], ended: ScenarioState["phase"], next: ScenarioState["phase"], pick?: (state: ScenarioState) => string): Run {
   const steps: EngineStep[] = [];
   const crossed = crossBoundary({ ...state, phase: next, boundaryPhase: ended, window: null }, ctx, steps);
-  return finish({ state: settle(crossed, ctx, steps), steps }, ctx);
+  return finish({ state: settle(crossed, ctx, steps), steps }, ctx, pick);
+}
+
+/** A chooser that takes the options in turn (the first, the second, the first ...), so a damage split among characters would show. */
+function alternating(): (state: ScenarioState) => string {
+  let count = 0;
+  return (state) => {
+    const options = state.window?.kind === "choose" ? state.window.options : [];
+    count += 1;
+    return options[(count - 1) % Math.max(1, options.length)] ?? "";
+  };
 }
 
 describe("04072:A:3 and 901502:A:2 The Watcher at the end of the combat phase", () => {
@@ -214,6 +246,15 @@ describe("04072:A:3 and 901502:A:2 The Watcher at the end of the combat phase", 
     expect(heroes.reduce((sum, id) => sum + (done.state.cards[id]?.damage ?? 0), 0)).toBe(3);
   });
 
+  it("04072:A:3 the 3 damage all go on the one character the player chooses (it cannot be split), each player's own", () => {
+    const made = table({ staging: ["04072"], seats: 2 });
+    const done = endPhase(made.state, made.ctx, "Combat", "Refresh", alternating());
+    for (const seat of [0, 1]) {
+      const heroes = made.state.seats[seat]?.heroes ?? [];
+      expect(heroes.map((id) => done.state.cards[id]?.damage ?? 0).sort(), `seat ${seat}`).toEqual([...heroes.map((_, at) => (at === 0 ? 3 : 0))].sort());
+    }
+  });
+
   it("04072:A:3 deals none while it is engaged", () => {
     const made = table({ engaged: [{ code: "04072" }] });
     const done = endPhase(made.state, made.ctx, "Combat", "Refresh");
@@ -222,8 +263,10 @@ describe("04072:A:3 and 901502:A:2 The Watcher at the end of the combat phase", 
 
   it("901502:A:2 the Nightmare Watcher deals the same damage", () => {
     const made = table({ nightmare: "901501", staging: ["901502"] });
-    const done = endPhase(made.state, made.ctx, "Combat", "Refresh");
-    expect((made.state.seats[0]?.heroes ?? []).reduce((sum, id) => sum + (done.state.cards[id]?.damage ?? 0), 0)).toBe(3);
+    const done = endPhase(made.state, made.ctx, "Combat", "Refresh", alternating());
+    const damage = (made.state.seats[0]?.heroes ?? []).map((id) => done.state.cards[id]?.damage ?? 0);
+    expect(damage.reduce((sum, value) => sum + value, 0)).toBe(3);
+    expect(Math.max(...damage)).toBe(3);
   });
 });
 
@@ -301,6 +344,32 @@ describe("040076:A:1 Wrapped!", () => {
     expect(used.state.cards[wrap]?.zone).toBe("encounterDiscard");
     const free = (made.state.seats[0]?.heroes ?? []).filter((hero) => hero !== run.state.cards[wrap]?.host);
     expect(free.some((hero) => used.state.cards[hero]?.exhausted)).toBe(true);
+  });
+});
+
+describe("040076:A:1 and 901504:A:1 the attachment's text reads its host as a hero (Wrapped!) or a character (Choking Tentacle)", () => {
+  it("040076:A:1 on a host that is no hero (an ally), it neither stops exhausting and readying nor is discarded with its host at the end of the round", () => {
+    const laid = table({ play: [{ code: "ally" }], attached: [{ code: "040076", to: "ally" }] });
+    const ally = idOf(laid.state, "ally");
+    // The layout lays an attachment in zone "play"; a Tentacle attachment lies in zone "attached" (the records' own check).
+    const made = { ...laid, state: updateCard(laid.state, idOf(laid.state, "040076"), { zone: "attached" }) };
+    const synced = syncConstants(made.state, made.ctx);
+    expect(flagged(synced, ally, "cannotExhaust")).toBe(false);
+    expect(flagged(synced, ally, "cannotReady")).toBe(false);
+    expect(endPhase(synced, made.ctx, "End of round", "Planning").state.cards[ally]?.zone).toBe("play");
+  });
+
+  it("901504:A:1 deals its 1 damage when the host readies only if the host is a character (not a location)", () => {
+    const readied = (host: string) => {
+      const laid = table({ nightmare: "901501", staging: ["04066"], attached: [{ code: "901504", to: host }] });
+      const made = { ...laid, state: updateCard(laid.state, idOf(laid.state, "901504"), { zone: "attached" }) };
+      const only = { ...made.ctx, effects: made.ctx.effects.filter((effect) => effect.id === "901504:forced:2") };
+      const hostId = idOf(made.state, host);
+      const run = resolveRecords(made.state, only, "901504", "forced", idOf(made.state, "901504"));
+      return run.state.cards[hostId]?.damage ?? 0;
+    };
+    expect(readied("dh1")).toBe(1);
+    expect(readied("04066")).toBe(0);
   });
 });
 

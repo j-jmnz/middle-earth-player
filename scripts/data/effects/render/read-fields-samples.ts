@@ -151,7 +151,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "SearchMove", to: "engaged" },
     { verb: "SearchMove", to: "stormcallerArea" },
   ],
-  AssignDamage: [{ verb: "AssignDamage", amount: 2, pick: HERO, who: "eachSeat", left: 1, of: 2 }],
+  AssignDamage: [{ verb: "AssignDamage", amount: 2, pick: HERO, who: "eachSeat", left: 1, of: 2 }, { verb: "AssignDamage", amount: 3, pick: HERO, who: "eachSeat", single: true }],
   ExhaustEach: [{ verb: "ExhaustEach", pick: HERO }],
   RemoveFromQuest: [{ verb: "RemoveFromQuest" }],
   AttachToQuest: [{ verb: "AttachToQuest" }],
