@@ -194,6 +194,16 @@
     },
     {
       "match": {
+        "code": "901807"
+      },
+      "set": {
+        "defense": 2
+      },
+      "reason": "Hall of Beorn gives Servant of Flame (Shadow and Flame Nightmare #7) Defense 32, a typing slip. The scan prints Engagement cost 12, Threat 3, Attack 3, Defense 2 and 5 hit points, and its Forced line adds +2 Defense.",
+      "source": "scan 901807.A, data/printed/nightmare.json"
+    },
+    {
+      "match": {
         "code": "110129"
       },
       "set": {
