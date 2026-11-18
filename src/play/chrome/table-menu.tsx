@@ -3,7 +3,7 @@
 // and the motion are the shared popover frame (popover-frame.tsx). A row closes the menu and then acts (the caller's onSelect).
 // Android Back closes it first (back.ts).
 import { useRef } from "react";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 
 import { GlassIconButton } from "../../ui/buttons.tsx";
 import { PopoverFrame, PopoverRow, type PressableRef } from "../../ui/popover-frame.tsx";
@@ -31,12 +31,14 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
 
 /**
  * The popover and the layer that closes it. Render it last among the table's panels so it sits over them. `top` and `right`
- * place it under the menu button, inside the safe-area insets.
+ * place it under the menu button, inside the safe-area insets; `bottom` is the room kept under it. A menu taller than the window
+ * between them scrolls inside its frame (a landscape phone with the update offer and Debug tools), so every row stays in reach.
  */
-export function TableMenu({ open, nav, without, update, top, right, onClose, onSelect }: { open: boolean; nav: MenuNav; without?: readonly MenuItemId[]; update?: string | null; top: number; right: number; onClose: () => void; onSelect: (id: MenuItemId) => void }) {
+export function TableMenu({ open, nav, without, update, top, right, bottom, onClose, onSelect }: { open: boolean; nav: MenuNav; without?: readonly MenuItemId[]; update?: string | null; top: number; right: number; bottom: number; onClose: () => void; onSelect: (id: MenuItemId) => void }) {
   // Focus moves to the first row when the menu opens, so a screen reader starts inside it.
   const first = useRef<PressableRef>(null);
   const s = useUiScale();
+  const { height } = useWindowDimensions();
   return (
     <PopoverFrame
       open={open}
@@ -47,6 +49,7 @@ export function TableMenu({ open, nav, without, update, top, right, onClose, onS
       closeLabel="Close the menu"
       focusRef={first}
       surface="notice"
+      maxHeight={height - top - bottom}
       onClose={onClose}
     >
       {menuItems(nav, without, update).map((item, index) => (
