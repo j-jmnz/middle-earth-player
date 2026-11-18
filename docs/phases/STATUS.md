@@ -22,7 +22,7 @@ No phase is open.
 ## Open items
 
 ### Reviews
-- Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, the card frames' ux fix, The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
+- Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, the card frames' ux fix, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech and The Old Forest. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
 
 ### README
 - The README showcase (`scripts/showcase/`): a first full capture run on a Mac or the showcase workflow, its contact sheet checked and failed flows fixed; then a Screens section, each shot a `<picture>` (Rivendell capture for GitHub's light theme, Ringwraiths otherwise) with the captions and alt text of `scripts/showcase/shots.ts`.

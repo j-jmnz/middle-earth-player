@@ -273,7 +273,7 @@ STATUS.md, then the active phase file.
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
   - 22–314 Open items (~14.7K)
-    - 24–26 Reviews (~80)
+    - 24–26 Reviews (~90)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
     - 35–42 Desktop (~310)
