@@ -59,6 +59,7 @@ import * as pit from "../scenarios/into-the-pit/game.ts";
 import * as level from "../scenarios/the-seventh-level/game.ts";
 import * as frommoria from "../scenarios/flight-from-moria/game.ts";
 import * as gate from "../scenarios/the-redhorn-gate/game.ts";
+// import * as rivendell from "../scenarios/road-to-rivendell/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -144,4 +145,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-seventh-level", "The Seventh Level", level.LEVEL_GOLDENS, level.levelWorld, level.playGolden),
   entry("flight-from-moria", "Flight from Moria", frommoria.FROMMORIA_GOLDENS, frommoria.frommoriaWorld, frommoria.playGolden),
   entry("the-redhorn-gate", "The Redhorn Gate", gate.GATE_GOLDENS, gate.gateWorld, gate.playGolden),
+  // entry("road-to-rivendell", "Road to Rivendell", rivendell.RIVENDELL_GOLDENS, rivendell.rivendellWorld, rivendell.playGolden),
 ];
