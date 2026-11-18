@@ -8,6 +8,7 @@ import { ANGMAR_TEMPLATES } from "./angmar.ts";
 import { ESCAPE_STAT_NOTES, ESCAPE_TEMPLATES } from "./escape.ts";
 import { ATTACH_TEMPLATES } from "./attach.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES, guardianRestrict } from "./guardian.ts";
+import { AMBUSH_TEMPLATES } from "./ambush.ts";
 
 export { ESCAPE_SAMPLES } from "./escape.ts";
 export { GUARDIAN_SAMPLES };
@@ -115,8 +116,7 @@ const FLIP_GOLLUM = {
 } as const;
 
 export const TEMPLATES: Readonly<Record<string, Template>> = {
-  ...ESCAPE_TEMPLATES,
-  ...ANGMAR_TEMPLATES,
+  ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES,
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
@@ -414,7 +414,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   }),
   DiscardUntilEnemies: (i) => i.cardType === "location"
     ? { text: `discard cards from the top of the encounter deck until ${str(i.perPlayer)} location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area`, read: ["perPlayer", "to", "cardType"] }
-    : ({ text: `discard from the top of the encounter deck until ${str(i.perPlayer)} ${typeof i.trait === "string" ? `${i.trait} ` : ""}enem${i.perPlayer === 1 ? "y" : "ies"} for each player${typeof i.less === "number" ? ` less ${i.less}` : ""} ${i.perPlayer === 1 ? "is" : "are"} discarded${i.to === "staging" ? "; add those enemies to the staging area" : ""}`, read: ["perPlayer", "to", "cardType", "trait", "less"] }),
+    : ({ text: `discard from the top of the encounter deck until ${str(i.perPlayer)} ${typeof i.trait === "string" ? `${i.trait} ` : ""}enem${i.perPlayer === 1 ? "y" : "ies"} for each player${typeof i.less === "number" ? ` less ${i.less}` : ""} ${i.perPlayer === 1 ? "is" : "are"} discarded${i.to === "staging" ? "; add those enemies to the staging area" : i.to === "reveal" ? "; reveal those enemies in full, in the order discarded" : ""}`, read: ["perPlayer", "to", "cardType", "trait", "less"] }),
   RevealEncounter: (i, ctx) => ({ text: i.times === undefined ? `${who(i.who ?? "actor")} reveals an encounter card` : `${who(i.who ?? "actor")} reveals ${amount(i.times, ctx)} encounter cards, one after the other, each in a staging of its own`, read: ["who", "times"] }),
   AdvanceStage: () => ({ text: "advance to the next quest stage", read: [] }),
   WinGame: () => ({ text: "the players win the game", read: [] }),

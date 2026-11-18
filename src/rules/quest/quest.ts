@@ -10,12 +10,12 @@ import { noteHostDefeated, withStagingThreat } from "../families/attachments/hol
 import { progressFirstLocations } from "../families/attachments/quest.ts";
 import { absorbFirst } from "../families/quest/blizzard.ts";
 import { passSorcery } from "../families/angmar/reanimate/stage.ts";
-import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import { hasQuestPoints, isLocationCard, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { CardInstance, Modifier, ScenarioState } from "../core/state.ts";
 import { flagged, livingSeats, updateCard, updateCards, withMode } from "../core/state.ts";
+import { checkEngages } from "./check.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
 import { placeQuestingProgress } from "../families/defense/damage.ts";
@@ -414,18 +414,12 @@ export function engageWith(state: ScenarioState, seat: number, enemyId: string, 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {
   // "Do not make engagement checks during the encounter phase" (01127:B:1): the table holds noEngagementChecks.
   if (flagged(state, "table", "noEngagementChecks")) return [];
-  // The threat the seat is treated as having (families/play/hooks.ts).
-  const threat = seatThreat(state, seat);
   const found: { id: string; cost: number }[] = [];
   // Engagement checks use only the seat's own staging area once stages are separate (mec109.multiple-staging-areas).
   for (const id of stagingEnemies(state, cards, seat)) {
     const instance = state.cards[id];
-    // An enemy that "does not make engagement checks" is passed over (it can still be engaged optionally).
-    if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks") || engagementBarred(state, id, seat, "checks")) continue;
-    // With what the enemy gets while checking against this player (Orc Disguise, families/costs/stats.ts).
-    const cost = checkCost(state, instance, seat, cards);
-    if (cost == null || cost > threat) continue;
-    found.push({ id, cost });
+    if (!instance || !checkEngages(state, id, seat, cards)) continue;
+    found.push({ id, cost: checkCost(state, instance, seat, cards) ?? 0 });
   }
   // Highest cost first: the check engages the enemy with the highest cost at or below threat (Learn to Play p14).
   found.sort((left, right) => right.cost - left.cost || left.id.localeCompare(right.id));

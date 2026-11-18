@@ -130,6 +130,20 @@ const VERBS = [
   // attachment is attached to a host the actor chooses, an event's Action resolves. Otherwise it goes to the bottom of
   // the deck. `embassy`: the player card of the Embassy from the Dark Tower's current pair (EmbassyNext), lying faceup in front of its owner, is played by its owner instead; when it cannot be played it goes to its owner's discard pile (146072:B:1).
   z.strictObject({ verb: z.literal("PlayRevealedFree"), embassy: z.literal(true).optional(), ...when }),
+  // Ambush (dwd.ambush; engine use, a frame the engine pushes when an enemy with the keyword was added to the staging area): each player in turn, the first player first, makes an engagement check against the source enemy alone (rr.engagement-check); the first player whose threat
+  // reaches its engagement cost engages it and the checks end, and an enemy nobody engages stays in the staging area. No effect while the table holds `ignoreAmbush` (Barren Hills, 04045:A:1).
+  z.strictObject({ verb: z.literal("AmbushChecks"), ...when }),
+  // "Each player discards the top card of the encounter deck, starting with the first player. Each player who discards an enemy with the ambush keyword must make an engagement check against that enemy" (901405:A:2; rr.running-out-of-cards): the actor discards the top card of
+  // the encounter deck (the discard pile is shuffled back when it is empty), and with `ambushCheck` makes one engagement check against it when it is an enemy with ambush: it leaves the discard pile and enters the actor's play area engaged when the actor's threat reaches its
+  // engagement cost, else it stays in the discard pile. Run for each player by ForEachPlayer.
+  z.strictObject({ verb: z.literal("DiscardTopEncounter"), ambushCheck: z.literal(true).optional(), ...when }),
+  // A constant marker on a location ("While Goblin Gate is the active location, the first enemy revealed from the encounter deck each round gains ambush", 04043:A:1; "While Concealed Woods is the active location, the first enemy with the ambush keyword revealed from the encounter deck each round
+  // gains surge", 901408:A:1): the first enemy (with `withKeyword`, the first one that has it, printed or gained) revealed from the encounter deck in a round of a game that deals a holder is noted for the round, whether or not the holder is in play then (Reading 11 of The Weather Hills, as
+  // FirstTraitSurge), and it gains `keyword` for the rest of the round when the marker's own condition holds. A gained ambush is a card flag (`gainsAmbush`); a gained surge is the reveal's own.
+  z.strictObject({ verb: z.literal("FirstEnemyGains"), keyword: z.enum(["ambush", "surge"]), withKeyword: z.literal("ambush").optional() }),
+  // Reveals the enemies in the encounter discard pile one after another, each in full (rr.reveal: keywords, When Revealed and the Responses to a reveal), ending in the staging area ("Reveal all enemies discarded by this effect", 901402:A:1). `ids` is engine use: the enemies still to reveal, kept while the
+  // one before is resolving.
+  verbFlags(z.strictObject({ verb: z.literal("RevealEnemies"), ids: z.array(z.string()).optional(), ...when }), { runsInFrame: true }),
 ] as const;
 
 const TRIGGERS = [
@@ -178,6 +192,15 @@ const FLAGS = [
   "cannotLeaveStaging",
   // On a card in play until the end of the round: it entered play this round ("if Hunting Warg entered play this round", 900403:A:1), set by a Forced effect that hears `encounterEnteredPlay` and read by the condition `flag` with holder `self`.
   "enteredThisRound",
+  // On an enemy until the end of the round: a card gave it the ambush keyword (`FirstEnemyGains`, Goblin Gate 04043:A:1), read as the keyword by hasKeyword.
+  "gainsAmbush",
+  // Held by the table while its source is the active location: the ambush keyword has no effect, printed or gained ("ignore ambush", Barren Hills 04045:A:1).
+  "ignoreAmbush",
+  // On a seat, while its source is in play: the seat counts this much more Threat in every engagement check, and only there ("considered to have +20 threat for the purposes of engagement checks only", Vicious Trackers 901406:A:2; rr.engagement-check). Optional engagement does not read it.
+  "engagementThreat",
+  // Held by the table until the end of the round: a first enemy was noted for a FirstEnemyGains marker, with any keyword (`enemyRevealed`) or with the ambush keyword (`ambushEnemyRevealed`).
+  "enemyRevealed",
+  "ambushEnemyRevealed",
 ] as const;
 
 export const manifest = { name: "encounter", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

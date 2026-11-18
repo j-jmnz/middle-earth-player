@@ -72,6 +72,8 @@ export type Keywords = {
   phantom: boolean;
   // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
   dire: boolean;
+  // Ambush (dwd.ambush): the enemy makes the players engagement checks against it when it enters play (families/encounter/ambush.ts).
+  ambush: boolean;
 };
 
 // A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
@@ -140,6 +142,7 @@ const EMPTY_KEYWORDS: Keywords = {
   grapple: null,
   phantom: false,
   dire: false,
+  ambush: false,
 };
 
 // The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable), or a location's side B that prints a Threat.

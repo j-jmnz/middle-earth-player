@@ -9,6 +9,7 @@ export type KeywordResult = { keywords: PrintedKeywords; unknown: string[] };
 
 export const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   surge: "surge",
+  ambush: "ambush",
   peril: "peril",
   indestructible: "indestructible",
   permanent: "permanent",

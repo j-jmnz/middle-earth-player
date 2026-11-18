@@ -106,8 +106,8 @@ export const pickSchema = z.strictObject({
   notTraits: z.array(z.string().min(1)).min(1).optional(),
   // A card with one of these titles ("a hero or Gandalf" is two picks; "Elladan or Elrohir" is one with two names).
   names: z.array(z.string().min(1)).min(1).optional(),
-  // A card that has this keyword, printed or gained (sentinel, ranged).
-  keyword: z.enum(["sentinel", "ranged", "restricted", "doomed", "surge"]).optional(),
+  // A card that has this keyword, printed or gained (sentinel, ranged). `gainedAmbush`: an enemy a card gave ambush to (Goblin Gate, 04043:A:1), not one that prints it.
+  keyword: z.enum(["sentinel", "ranged", "restricted", "doomed", "surge", "ambush", "gainedAmbush"]).optional(),
   state: z.enum(["ready", "exhausted"]).optional(),
   // A card with damage on it (`false`: one with none).
   damaged: z.boolean().optional(),

@@ -1,4 +1,4 @@
-// Rules: rr.keywords, rr.blank, rr.sentinel, rr.ranged, rr.surge, mec109.indestructible, mec109.toughness, mec109.archery, mec113.phantom (data/rules/entries.json).
+// Rules: rr.keywords, rr.blank, rr.sentinel, rr.ranged, rr.surge, dwd.ambush, mec109.indestructible, mec109.toughness, mec109.archery, mec113.phantom (data/rules/entries.json).
 //
 // A card's keywords as they stand now, for the table's card preview: the printed ones, the ones a card effect gives (Sentinel, Ranged, Surge,
 // Toughness, Archery, Immune, Phantom), and the printed ones an effect or a blank text box takes away. Every reading goes through the engine's own
@@ -48,6 +48,9 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
 
   if (heldAmount(game, cardId, "gainsSurge") > 0) add("surge", false);
   else shown("surge", kw.surge);
+  // Ambush: printed, or given by a card (Goblin Gate, 04043:A:1).
+  if (hasKeyword(game, cardId, "gainedAmbush", ctx.cards)) add("ambush", false);
+  else shown("ambush", kw.ambush);
 
   // Sentinel and Ranged: the engine's reader says whether the card has it now; one the card prints and does not have now is struck through.
   for (const key of ["sentinel", "ranged"] as const) {

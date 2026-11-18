@@ -455,9 +455,12 @@ export function destroyCard(
 
 // A keyword a card prints or has gained: a flag modifier of the same name ("Attached hero gains sentinel", rr.sentinel,
 // rr.ranged).
-export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel" | "ranged" | "restricted" | "doomed" | "surge", cards: ReadonlyMap<string, PrintedCard>): boolean {
+export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel" | "ranged" | "restricted" | "doomed" | "surge" | "ambush" | "gainedAmbush", cards: ReadonlyMap<string, PrintedCard>): boolean {
   const instance = state.cards[id];
   if (!instance) return false;
+  // Ambush a card gave the enemy (`gainsAmbush`, dwd.ambush; Goblin Gate 04043:A:1), in addition to a printed one.
+  if (keyword === "gainedAmbush") return flagged(state, id, "gainsAmbush");
+  if (keyword === "ambush" && flagged(state, id, "gainsAmbush")) return true;
   const printed = printedOf(cards, instance.code);
   const blank = printedKeywordsBlank(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
