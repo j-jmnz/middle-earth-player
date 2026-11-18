@@ -58,6 +58,7 @@ import { gateFixtures } from "./dwarrowdelf/the-redhorn-gate.ts";
 import { rivendellFixtures } from "./dwarrowdelf/road-to-rivendell.ts";
 import { waterFixtures } from "./dwarrowdelf/the-watcher-in-the-water.ts";
 import { darkFixtures } from "./dwarrowdelf/the-long-dark.ts";
+import { stoneFixtures } from "./dwarrowdelf/foundations-of-stone.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -125,4 +126,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "road-to-rivendell": () => rivendellFixtures(),
   "the-watcher-in-the-water": () => waterFixtures(),
   "the-long-dark": () => darkFixtures(),
+  "foundations-of-stone": () => stoneFixtures(),
 };
