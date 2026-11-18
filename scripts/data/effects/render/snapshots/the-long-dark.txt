@@ -1,0 +1,212 @@
+Scenario piles that place cards with no record (quest: 04086 Journey in the Black Pit; quest: 04087 Continuing Eastward; attachedChosen: 03041 Cave Torch)
+
+## 04086 Journey in the Black Pit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04086:A:1 (front): Setup: The first player attaches Cave Torch to a hero of his choice.
+  04086:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - a copy of the card with code 03041 is set aside, out of play
+    - choose hero (any player controls) chosen by the first player [also {"attachable":"03041"}]
+    - the set-aside copy of the card with code 03041 is attached to the last picked hero; if it would leave play it is removed from the game
+    - shuffle the encounter deck
+
+04086:B:1 (back): When Revealed: Discard cards from the top of the encounter deck until you discard X locations, where X is one less than the number of players in the game (minimum of 1). Add those locations to the staging area, and shuffle the other discarded cards back into the encounter deck.
+  04086:whenRevealed:1: When revealed
+    - discard cards from the top of the encounter deck until 1 location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area [also {"less":1,"atLeast":1,"returnOthers":true}]
+
+04086:B:2 (back): Each location gets +1 Threat. If the players quest unsuccessfully, trigger all "Lost:" effects in play.
+  04086:constant:1: Constant
+    - each location (any player controls): stat threat 1, while this card is in play
+  04086:forced:1: Forced after the players quest unsuccessfully
+    - [json TriggerLost {"verb":"TriggerLost","mode":"all"}]
+
+## 04087 Continuing Eastward
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04087:B:1 (back): When Revealed: The first player makes a locate test. If this test is failed, reveal cards from the encounter deck equal to the number of players in the game and add them to the staging area. Then, trigger all "Lost:" effects in play.
+  04087:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json LocateTest {"verb":"LocateTest","who":"firstPlayer"}]
+    - repeat the number of players times:
+      - if [json condition {"kind":"lastLocateFailed"}]: the first player reveals an encounter card
+    - [json TriggerLost {"verb":"TriggerLost","mode":"all","when":{"kind":"lastLocateFailed"}}]
+
+04087:B:2 (back): If the players quest unsuccessfully, trigger all "Lost:" effects in play.
+  04087:forced:1: Forced after the players quest unsuccessfully
+    - [json TriggerLost {"verb":"TriggerLost","mode":"all"}]
+
+04087:B:3 (back): If the players defeat this stage, they have won the game.
+  04087:constant:1: Constant
+    (no instructions)
+
+## 04088 Durin's Greaves
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04088:A:1 (front): When Revealed: The first player attaches Durin's Greaves to a hero of his choice as an attachment.
+  04088:whenRevealed:1: When revealed
+    - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
+
+04088:A:2 (front): Attached hero gets +1 Defense.
+  04088:constant:1: Constant
+    - its host: stat defense 1, while this card is in play
+
+## 04089 Abandoned Mine
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04089:A:1 (front): Lost: Return the top 2 Goblin enemies in the encounter discard pile to the staging area, if able.
+  04089:forced:1: Forced on the event lost
+    - return the topmost 2 Goblin enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
+
+04089:A:2: PASS.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+## 04090 Dwarven Forge
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04090:A:1 (front): Lost: Each player must choose and discard 1 card from his hand.
+  04090:forced:1: Forced on the event lost
+    - for each player, first player first:
+      - discard 1 cards from hand
+
+04090:A:2: PASS.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+## 04091 Silent Caverns
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04091:A:1 (front): Lost: Exhaust all characters.
+  04091:forced:1: Forced on the event lost
+    - exhaust each character (any player controls)
+
+04091:A:2: PASS.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+## 04092 Twisting Passage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04092:A:1 (front): Forced: Before placing progress tokens on Twisting Passage, the first player must make a locate test. If this test is failed, do not place any progress tokens on Twisting Passage and trigger all "Lost:" effects in play.
+  04092:forced:1: Forced on the event progressWouldBePlaced
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json LocateTest {"verb":"LocateTest","who":"firstPlayer"}]
+    - [json PlaceHeldProgress {"verb":"PlaceHeldProgress","when":{"kind":"lastLocatePassed"}}]
+    - [json TriggerLost {"verb":"TriggerLost","mode":"all","when":{"kind":"lastLocateFailed"}}]
+
+04092:A:2: PASS.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+## 04093 Fatigue
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04093:A:1 (front): When Revealed: Each player must exhaust 1 character he controls, if able. Then, if any player controls no unexhausted characters, Fatigue gains surge.
+  04093:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - in player order, each player exhausts a ready character they control, choosing it (a player with none exhausts none)
+    - then, if [json condition {"kind":"playerWithoutReady"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+04093:A:2 (shadow): Shadow: The defending player must exhaust 1 character he controls, if able.
+  04093:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 04094 Foul Air
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04094:A:1 (front): When Revealed: The first player makes a locate test. If this test is failed, deal 2 damage to all characters and trigger all "Lost:" effects in play.
+  04094:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json LocateTest {"verb":"LocateTest","who":"firstPlayer"}]
+    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each character (any player controls)
+    - [json TriggerLost {"verb":"TriggerLost","mode":"all","when":{"kind":"lastLocateFailed"}}]
+
+04094:A:2: PASS.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+## 04095 Gathering Ground
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04095:A:1 (front): When Revealed: Attach this card to a location in the staging area with the highest combined threat and remaining quest points. (Counts as a Condition attachment with the text: "Each enemy revealed from the encounter deck gains surge.")
+  04095:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) in the staging area only, chosen by the first player [also {"highestThreatPlusRemaining":true}]
+    - this card attaches to the picked card (any number of copies may be attached to one card)
+  04095:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  04095:constant:2: Constant
+    only if this card is attached to a card
+    - [json EnemiesGainSurge {"verb":"EnemiesGainSurge"}]
+
+04095:A:2: PASS.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+## 04096 Vast and Intricate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04096:A:1 (front): When Revealed: The first player makes a locate test. If this test is failed, raise each player's threat by 7, remove all progress tokens from play, and trigger all "Lost:" effects in play.
+  04096:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json LocateTest {"verb":"LocateTest","who":"firstPlayer"}]
+    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 7 (each player)
+    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
+    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): remove all the progress from each location (any player controls) with progress on it
+    - then, if [json condition {"kind":"lastLocateFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): remove all the progress from each card (any player controls) that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - [json TriggerLost {"verb":"TriggerLost","mode":"all","when":{"kind":"lastLocateFailed"}}]
+
+## 04097 Cave Spider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04097:A:1 (front): When Revealed: The first player draws 1 card. Then, that player must choose and discard 4 cards from his hand, if able.
+  04097:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player draws 1 card(s)
+    - the rest of the effect is carried out by the first player
+    - discard 4 cards from hand
+
+04097:A:2 (front): Forced: After Cave Spider engages a player, that player must choose and discard 1 card from his hand, if able.
+  04097:forced:1: Forced after an enemy engages a player (heard about this card)
+    - discard 1 cards from hand
+
+## 04098 Goblin Sneak
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04098:A:1 (front): Forced: After Goblin Sneak engages a player, discard the top card of the encounter deck. If it is a treachery card, Goblin Sneak engages the next player, if able.
+  04098:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy engages the next player [also {"announces":true}]
+
+04098:A:2 (shadow): Shadow: Add Goblin Sneak to the staging area.
+  04098:shadow:1: Shadow
+    - this card goes to the staging area (it is not revealed)
+
+## 04099 Goblin Warlord
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04099:A:1 (front): Lost: Each player must choose and discard 1 ally he controls from play, if able.
+  04099:forced:1: Forced on the event lost
+    - for each player, first player first:
+      - choose ally (you control)
+      - discard the picked card
+
+04099:A:2 (shadow): Shadow: Trigger all "Lost:" effects in play.
+  04099:shadow:1: Shadow
+    - [json TriggerLost {"verb":"TriggerLost","mode":"all"}]
+
+## 04100 Rock Adder
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04100:A:1 (front): Rock Adder cannot be attacked unless it has dealt at least 1 damage this round.
+  04100:constant:1: Constant
+    only if this card does not hold the flag dealtDamageThisRound
+    - this card: stat cannotBeAttacked 1, while this card is in play
+  04100:forced:1: Forced on the event attackDamagedCharacter (heard about this card)
+    - this card: stat dealtDamageThisRound 1, until the end of the round
+
+04100:A:2 (shadow): Shadow: If this attack is undefended, the defending player must discard 1 character he controls from play.
+  04100:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attack has no defender: choose character (you control)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+(rendered pieces: 82 by template, 24 as JSON)
