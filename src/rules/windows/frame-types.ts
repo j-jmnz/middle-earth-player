@@ -280,6 +280,8 @@ export type PendingAttack = {
   toStage?: boolean;
   // The damage beyond the remaining hit points of the defending character goes on the main quest card (19083:B:1, 19080:A:3).
   excessToStage?: boolean;
+  // The damage beyond the remaining hit points of the defending character goes on the card in play with this title (901407:A:2, ExcessToCard).
+  excessToCard?: string;
   // Shadow cards that are enemies and say "attacks the defending player" (Wolf Rider, 01081:A:2): each attacks once this attack has ended
   // (families/defense/shadow-attack.ts).
   shadowAttackers?: readonly string[];

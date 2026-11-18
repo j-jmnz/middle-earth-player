@@ -191,7 +191,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12122:A:1 (front): When Revealed: The players make engagement checks against each enemy in the staging area. Raider Flagship gets -50 engagement cost during these engagement checks.
   12122:whenRevealed:1: When revealed
-    - [json MakeEngagementChecks {"verb":"MakeEngagementChecks","lower":{"name":"Raider Flagship","amount":50}}]
+    - the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none (the enemy titled Raider Flagship checks with 50 less engagement cost)
 
 12122:B:1: Sailing.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -444,4 +444,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus -4, while this card is in play
 
-(rendered pieces: 203 by template, 63 as JSON)
+(rendered pieces: 204 by template, 62 as JSON)

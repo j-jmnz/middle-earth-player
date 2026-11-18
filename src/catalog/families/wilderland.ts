@@ -187,7 +187,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ClaimWhenFree"), host: z.string().min(1).optional() }),
   // "The first player loses control of Urdug, then attach Urdug to a location in the staging area as a guarded objective" (19044:A:1): the card in play with this code goes back to the staging area, controlled by no one, guarded by the last picked card (a location in the staging area). Nothing happens when no such card is
   // in play or nothing is picked.
-  z.strictObject({ verb: z.literal("GuardReturnedBy"), code, ...when }),
+  // `returns: "firstPlayer"` (an ally, "attaches her to Goblin Gate", 901402:B:1): the guard may be the active location too, and once nothing guards the card (the guard left play) it rejoins the first player's play area, as the ControlledBy constant it holds says (the flag `guardedAlly`,
+  // read by the play family's sweep). Its damage, tokens and attachments stay on it, and it stays in play.
+  z.strictObject({ verb: z.literal("GuardReturnedBy"), code, returns: z.literal("firstPlayer").optional(), ...when }),
   // Resolution: "Each player chooses a location in the staging area and adds a copy of it to the campaign pool. Players must choose different locations, if able" (12184:B:4): each player in turn, the first player first, chooses a location (by title) in the staging area that no earlier player chose, unless
   // every title is taken; a copy of each joins the Campaign Pool's encounter cards (never more than one collection holds). A burden location (Abandoned Ruin) is not offered: it joins the pool as a burden. Run by the Resolution (rules/setup/resolution.ts).
   z.strictObject({ verb: z.literal("ChooseStagedLocationForPool"), ...when }),

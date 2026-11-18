@@ -397,6 +397,8 @@ export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({
     kind: z.literal("engagedEnemies"),
     trait: z.string().min(1).optional(),
+    // Only the enemies with the ambush keyword, printed or gained ("Return each engaged enemy with the ambush keyword to the staging area", 901409:A:1).
+    keyword: z.literal("ambush").optional(),
     who: z.enum(["actor", "each"]),
     pick: z.enum(["all", "choose"]),
   }),

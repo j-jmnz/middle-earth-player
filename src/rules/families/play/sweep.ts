@@ -19,6 +19,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { giveControl } from "./control.ts";
+import { freeOfEncounters } from "../objectives/free.ts";
 import { lastPlayer } from "../sea/players.ts";
 
 type Codes = { swept: ReadonlySet<string>; hero: ReadonlySet<string>; returning: ReadonlySet<string> };
@@ -127,9 +128,14 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
       const id = instruction.card === "host" ? source.host : source.id;
       const holder = instruction.who === "lastPlayer" ? lastPlayer(next) : next.firstPlayer;
       const held = id ? next.cards[id] : undefined;
+      // An ally a guard held in the staging area (Arwen under Goblin Gate, 901402:B:1, `guardedAlly`) rejoins the first player's play area once nothing guards her: nobody controls her until then.
+      if (id && held?.zone === "staging" && flagged(next, id, "guardedAlly")) {
+        if (!freeOfEncounters(next, id)) continue;
+        next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up" });
+        next = { ...next, modifiers: next.modifiers.filter((modifier) => !(modifier.instanceId === id && modifier.stat === "guardedAlly")) };
       // An objective ally in the staging area joins the first player's play area, faceup and ready, and stays with that player when the first player token moves on: "joins the first player" is one change of
       // control, not a rule that follows the token (Grimbeorn the Old, 02037:A:2; docs/brief.md, Conflict at the Carrock).
-      if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
+      } else if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
       else if (id && (instruction.intoPlay !== true || instruction.follows === true) && held?.controller !== holder) next = giveControl(next, id, holder);
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {
       next = destroyCard(next, source.id, ctx.cards, steps);

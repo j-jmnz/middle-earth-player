@@ -89,6 +89,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["questCard"], pick.questCard === true ? "that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)" : null);
   note(["maxHitPointsLeft"], typeof pick.maxHitPointsLeft === "number" ? `with ${pick.maxHitPointsLeft} or fewer hit points remaining` : null);
   note(["determined"], pick.determined === true ? "that the Campaign Log marks determined" : null);
+  note(["keyword"], typeof pick.keyword === "string" ? (pick.keyword === "gainedAmbush" ? "that a card gave the ambush keyword (not one that prints it)" : `with the ${pick.keyword} keyword, printed or gained`) : null);
   note(["safe"], pick.safe === true ? "with the safe keyword" : null);
   note(["isSource"], pick.isSource === true ? "that is this card itself" : null);
   note(["reanimated"], pick.reanimated === true ? "that is a Reanimated Dead" : null);

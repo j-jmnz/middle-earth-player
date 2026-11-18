@@ -40,6 +40,7 @@ describe("effects render read fields, picks", () => {
     exceptSphere: "lore",
     who: "firstPlayer",
     engagedEnemies: true,
+    keyword: "ambush",
     hasShadow: true,
     copyInDiscard: true,
     controlled: true,

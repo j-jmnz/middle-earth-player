@@ -30,6 +30,9 @@ const VERBS = [
   }),
   // Discards a shadow card dealt to the enemy (`target`, the picked one by default): a facedown one if it has any. With `all`, each shadow card dealt to it ("discard each shadow card from that enemy", 10192:A:1).
   z.strictObject({ verb: z.literal("DiscardShadowOf"), target: cardRefSchema.optional(), all: z.literal(true).optional(), ...when }),
+  // The damage this attack deals beyond the remaining hit points of the character it damages must be assigned to the card in play with this title, wherever it lies, instead of staying lost: "Excess damage dealt by this attack must be assigned to Arwen Undómiel" (901407:A:2; rr.damage). An undefended attack has
+  // no excess. A Shadow effect: it is read as the damage is dealt, in families/defense/excess.ts.
+  z.strictObject({ verb: z.literal("ExcessToCard"), name: z.string().min(1), ...when }),
   // Deals the enemy (`target`) one more shadow card from the encounter deck ("deal the attacking enemy another shadow card"):
   // during its attack it resolves after the ones it has.
   z.strictObject({ verb: z.literal("DealShadowTo"), target: cardRefSchema, ...when }),

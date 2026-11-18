@@ -19,6 +19,7 @@ import { familyAttached } from "./family-hooks.ts";
 import { controlledShips, defendingShip } from "../families/sea/campaign.ts";
 import { discardRestricted } from "../families/objectives/claimed.ts";
 import { printedOf } from "../core/printed.ts";
+import { hasKeyword } from "../core/keywords.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { Frame, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
@@ -56,7 +57,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       return seats
         .flatMap((seat) => state.seats[seat]?.engaged ?? [])
         .filter((id) => hasEnemyType(state, id, ctx))
-        .filter((id) => !target.trait || hasTrait(state, id, target.trait, ctx));
+        .filter((id) => !target.trait || hasTrait(state, id, target.trait, ctx))
+        .filter((id) => !target.keyword || hasKeyword(state, id, target.keyword, ctx.cards));
     }
     case "AttachSelf": {
       const code = sourceId ? state.cards[sourceId]?.code : undefined;
@@ -194,6 +196,8 @@ function applyTargeted(
         next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each || facedown) next = updateCard(next, id, { face: turnedUp(next, id) });
         // A card found out of play enters play: the cards that hear a search put a card into play hear it (Quiet the Spirits, 10109:A:1); `encounterEnteredPlay` is left to the other ways in.
+        // An enemy with the ambush keyword found in the encounter deck or discard pile is added to the staging area from outside play, so it makes its ambush checks (dwd.ambush): only it is announced as added.
+        if (!wasInPlay && instruction.to === "staging" && hasKeyword(next, id, "ambush", ctx.cards)) next = queueEvent(next, { trigger: "addedToStaging", seat: item.seat, cardId: id });
         if (!wasInPlay && listens(next, ctx, "searchedIntoPlay")) next = queueEvent(next, { trigger: "searchedIntoPlay", seat: item.seat, subject: id });
       }
       // A `different` search tells the next one which titles are taken.
