@@ -35,7 +35,7 @@ export const BEAT_MS = 650;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; fate?: FateNames };
+type Names = { card: (cardId: string) => string; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; fate?: FateNames };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -239,7 +239,12 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       case "locateTest":
         open(1, step.success ? "Locate test passed" : "Locate test failed", step.success ? "good" : "bad");
-        line(`${plural(step.handIds.length, "card")} discarded from the hand, ${plural(step.dealtIds.length, "encounter card")} discarded`);
+        // Each try: the hand card and the encounter card it discarded, and whether that card prints PASS (dwd.locate-test).
+        step.dealtIds.forEach((dealt, at) => {
+          const held = step.handIds[at];
+          line(`${held ? `${names.card(held)} discarded, ` : ""}${names.card(dealt)} ${names.passes?.(dealt) ? "has PASS" : "has no PASS"}`, null, held ? [held, dealt] : [dealt]);
+        });
+        if (step.dealtIds.length === 0) line("No card discarded");
         return;
       case "hideTest":
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");

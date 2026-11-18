@@ -8,6 +8,7 @@ import type { Amount, Condition, Instruction, PickSpec } from "../../catalog/bou
 import type { Cause } from "../../rules/core/cause.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { embassyPairNow } from "../readouts/black-gate.ts";
+import { printedOf } from "../../rules/core/printed.ts";
 import { ringBearerId } from "../../rules/families/burden/deck.ts";
 import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { holds } from "../../rules/interpret/conditions.ts";
@@ -94,7 +95,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "picked", "host", "subject", "ringBearer", "pair", "left", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {})]);
+  const known = new Set(["card", "owner", "picked", "host", "subject", "ringBearer", "pair", "left", "dealt", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {})]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -146,6 +147,11 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   const hostId = a.source ? a.game.cards[a.source]?.host : undefined;
   // An AssignDamage not yet split into steps holds all of its amount.
   if (a.instruction.verb === "AssignDamage") values.left = a.instruction.left ?? resolveAmount(a.game, a.instruction.amount, scope, a.ctx);
+  // The encounter cards a locate test has discarded so far, each with whether it prints PASS (dwd.locate-test), named only where an entry says them.
+  if (a.instruction.verb === "LocateTest" && templatesOf(entry).some((template) => placeholdersOf(template).includes("dealt"))) {
+    const dealt = (a.instruction.dealtIds ?? []).map((id) => `${a.names.card(id)}${printedOf(a.ctx.cards, a.game.cards[id]?.code ?? "").keywords.pass === true ? " (PASS)" : " (no PASS)"}`);
+    values.dealt = dealt.length > 0 ? dealt.join(", ") : "none yet";
+  }
   values.host = hostId ? a.names.card(hostId) : "Its host";
   // The card an Each or an earlier Pick of the record chose, for the question it opens ("Fanuidhol: spend 1 resource from {picked}'s pool", 04016:A:1).
   const chosen = scope.picked?.findLast((id) => a.game.cards[id] != null);
