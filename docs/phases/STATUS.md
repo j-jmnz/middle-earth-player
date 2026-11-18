@@ -44,6 +44,7 @@ No phase is open.
 - `town-won` is not committed: no seed in 100 wins The Battle of Lake-town with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-lake-town/the-battle-of-lake-town.yaml` cannot run.
 - `osgiliath-won` is not committed: no seed in 1200 wins The Massing at Osgiliath with the saved decklists (their heroes fall by round 2 to 4). Until it exists `.maestro/scenarios/the-massing-at-osgiliath/the-massing-at-osgiliath.yaml` cannot run.
 - `erech-won` is not committed: no seed in 500 wins The Stone of Erech with the saved decklists. Until it exists `.maestro/scenarios/the-stone-of-erech/the-stone-of-erech.yaml` cannot run.
+- `forest-won` is not committed: no seed in 100 wins The Old Forest with the saved decklists. Until it exists `.maestro/scenarios/the-old-forest/the-old-forest.yaml` cannot run.
 - `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50). Until it exists `.maestro/scenarios/conflict-at-the-carrock/conflict-at-the-carrock.yaml` cannot run.
 - `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists. Until it exists `.maestro/scenarios/return-to-mirkwood/return-to-mirkwood.yaml` cannot run.
 - `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.
