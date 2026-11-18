@@ -20,6 +20,8 @@ export type TableDial = {
   note?: string;
   // The disc says this word in place of the number (the Day and Night dial: "Day"); the number only tells the dial that it changed.
   word?: string;
+  // The card a tap on the dial shows large (the Night objective's, Derufin's): absent, the dial does nothing.
+  cardId?: string;
 };
 
 /** The cards of a code that are in play (the staging area, the active location, a play area): what a scenario's dial reads its tokens from. */
@@ -41,6 +43,7 @@ export function dialProps(dial: TableDial) {
     warn: dial.warn,
     note: dial.note,
     word: dial.word,
+    hint: dial.cardId ? "Shows the card" : undefined,
   } as const;
 }
 

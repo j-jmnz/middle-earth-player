@@ -19,3 +19,6 @@ export const derufinHeldWords = (owner: number | null): string => `${owner == nu
 
 /** The warning on the last stage while no player controls him. */
 export const derufinStageWords = (): string => "No progress can be placed on this stage while no player controls Derufin.";
+
+/** The quest readout on stage 3B while no player controls Derufin: what the active location takes, and that the stage takes none. */
+export const erechProgressWords = (onLocation: number): string => (onLocation > 0 ? `${onLocation} progress on the active location; none on the stage while no player controls Derufin` : "No progress on the stage while no player controls Derufin");
