@@ -2,7 +2,7 @@
 // order, every card its encounter sets deal under their type's heading with the copies the scenario file deals in Normal and Easy Mode, and,
 // where a Nightmare deck is printed for it, the deck's setup card and its cards (user decision, 2026-11-18). The campaign setup opens it for
 // each scenario. Pure: the rows come from groups/cache.ts and the scenario from its data file.
-import { groupCard, SCENARIO_TYPES, typeGroups, type EasyCopies, type GroupRow, type TypeGroup } from "./group-types";
+import { groupCard, placementCopies, SCENARIO_TYPES, setsCount, typeGroups, type GroupRow, type TypeGroup } from "./group-types";
 
 /** What a scenario file says that this reads (`AnyScenarioData`). */
 export type ScenarioLike = {
@@ -29,12 +29,7 @@ function rowsOf(codes: readonly string[], byCode: ReadonlyMap<string, GroupRow>)
 export function scenarioCards(scenario: ScenarioLike, byCode: ReadonlyMap<string, GroupRow>): ScenarioCards {
   const stages = new Set(scenario.stages);
   // A card placed in several piles counts each placement's copies.
-  const counts = new Map<string, EasyCopies>();
-  for (const card of scenario.cards) {
-    if (stages.has(card.code)) continue;
-    const found = counts.get(card.code) ?? { normal: 0, easy: 0 };
-    counts.set(card.code, { normal: found.normal + card.normal, easy: found.easy + card.easy });
-  }
+  const counts = placementCopies(scenario.cards, stages);
   const dealt = [...counts].flatMap(([code, copies]): GroupRow[] => {
     const row = byCode.get(code);
     return row && copies.normal > 0 ? [{ ...row, quantity: copies.normal }] : [];
@@ -54,5 +49,5 @@ export function scenarioCards(scenario: ScenarioLike, byCode: ReadonlyMap<string
     ...(setup.length > 0 ? [{ id: "nightmare-setup", title: "Nightmare setup", cards: setup.map((row) => groupCard(row)) }] : []),
     ...(added.length > 0 ? [{ id: "nightmare-cards", title: "Nightmare cards", cards: typeGroups(added, SCENARIO_TYPES).flatMap((group) => group.cards) }] : []),
   ];
-  return { groups, count: scenario.encounterSets.reduce((sum, set) => sum + set.count, 0) };
+  return { groups, count: setsCount(scenario.encounterSets) };
 }

@@ -51,7 +51,7 @@ export function EncounterList({
       {searching ? null : <FoldAllBar folds={folds} ids={ids} noun="product" />}
       {shown.length === 0 ? (
         <BodyText testID="cards-encounter-empty" tone="muted" className="mt-6">
-          No sets match.
+          Nothing matches.
         </BodyText>
       ) : null}
       <View style={{ gap: 6 * s }}>
@@ -59,7 +59,7 @@ export function EncounterList({
           const id = productFoldId(product.id);
           const folded = searching ? false : folds.folded(id, true);
           return (
-            <FoldSection key={product.id} id={id} title={product.title} summary={product.summary} folded={folded} onFold={(next) => folds.setFolded(id, next, true)}>
+            <FoldSection key={product.id} id={id} title={product.title} summary={product.summary} folded={folded} onFold={(next) => (searching ? undefined : folds.setFolded(id, next, true))}>
               {folded
                 ? null
                 : product.items.map((item) =>

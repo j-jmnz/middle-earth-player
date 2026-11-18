@@ -1,8 +1,8 @@
 // The cards the Cards tab's Encounter cards view lists, read from catalog.db once per database handle: every card that is not a deck-legal
-// player card (encounter and quest cards, the Nightmare decks, campaign cards, boons, burdens, treasures, the Messenger of the King's heroes),
+// player card (encounter and quest cards, the Nightmare decks, campaign cards, boons, burdens, treasures; the Messenger of the King's heroes are read but listed by the pool),
 // with only the columns a row or a grid cell reads, and the trees built from them on first use. The catalog is read-only while the app
 // runs, so an entry never goes stale; a WeakMap frees it with the handle (the same rule as pool/cache.ts).
-import { asc, eq, inArray } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { campaigns, cards, packs } from "../../catalog/schema";
@@ -10,8 +10,7 @@ import { collectionSets } from "../collection/sets";
 import { printedScenarioName } from "../../campaign/printed-name";
 import { campaignIds, campaignOf, scenarioOf } from "../data/campaign-data";
 import { campaignTree, type CampaignTree } from "./campaign-tree";
-import type { EasyCopies, GroupRow } from "./group-types";
-import { motkAllyCode, motkHeroes, MOTK_PACK, type MotkHero } from "./motk";
+import { placementCopies, type EasyCopies, type GroupRow } from "./group-types";
 import { scenarioCards, type ScenarioCards } from "./scenario-group";
 import { scenarioTree, type ScenarioTree } from "./scenario-tree";
 
@@ -57,11 +56,7 @@ export function scenarioFacts(): ScenarioFacts {
       const scenario = scenarioOf(scenarioId);
       if (!scenario) continue;
       for (const code of scenario.campaignPlaced) if (!givenBy.has(code)) givenBy.set(code, printedScenarioName(scenario.name));
-      const counts = new Map<string, EasyCopies>();
-      for (const placement of scenario.cards) {
-        const found = counts.get(placement.code) ?? { normal: 0, easy: 0 };
-        counts.set(placement.code, { normal: found.normal + placement.normal, easy: found.easy + placement.easy });
-      }
+      const counts = placementCopies(scenario.cards);
       for (const [code, found] of counts) {
         const known = easy.get(code);
         if (!known) easy.set(code, found);
@@ -77,12 +72,11 @@ export type GroupData = {
   rows: readonly GroupRow[];
   scenario: () => ScenarioTree;
   campaign: () => CampaignTree;
-  motk: () => readonly MotkHero[];
-  /** One scenario's cards by its id (scenario-group.ts), with its printed name and number; null for an id no scenario file has. */
+  /** One scenario's cards by its id (scenario-group.ts), with its printed name; null for an id no scenario file has. */
   scenarioCards: (id: string) => ScenarioGroup | null;
 };
 
-export type ScenarioGroup = { name: string; number: number; cards: ScenarioCards };
+export type ScenarioGroup = { name: string; cards: ScenarioCards };
 
 const groups = new WeakMap<object, GroupData>();
 
@@ -90,25 +84,12 @@ function build<TRun>(catalog: Db<TRun>): GroupData {
   const rows = readGroupRows(catalog);
   let scenario: ScenarioTree | null = null;
   let campaign: CampaignTree | null = null;
-  let motk: readonly MotkHero[] | null = null;
   let packRows: { code: string; name: string }[] | null = null;
   let byCode: ReadonlyMap<string, GroupRow> | null = null;
   const scenarios = new Map<string, ScenarioGroup | null>();
   let scenarioFactsRead: ScenarioFacts | null = null;
   const facts = () => (scenarioFactsRead ??= scenarioFacts());
   const packList = () => (packRows ??= catalog.select({ code: packs.code, name: packs.name }).from(packs).all());
-  // The pack each hero's ally is printed in, by the ally's code (two allies of one name differ by it).
-  const allyPacks = () => {
-    const codes = rows.filter((row) => row.packCode === MOTK_PACK).flatMap((row) => motkAllyCode(row.code) ?? []);
-    const names = new Map(packList().map((pack) => [pack.code, pack.name]));
-    const found = codes.length === 0 ? [] : catalog.select({ code: cards.code, packCode: cards.packCode }).from(cards).where(inArray(cards.code, codes)).all();
-    return new Map(
-      found.flatMap((ally): [string, string][] => {
-        const name = names.get(ally.packCode);
-        return name ? [[ally.code, name]] : [];
-      }),
-    );
-  };
   const data: GroupData = {
     rows,
     scenario: () => (scenario ??= scenarioTree(rows, collectionSets(), packList(), facts().easy)),
@@ -120,12 +101,11 @@ function build<TRun>(catalog: Db<TRun>): GroupData {
         packList(),
         facts().givenBy,
       )),
-    motk: () => (motk ??= motkHeroes(rows, allyPacks())),
     scenarioCards: (id) => {
       if (!scenarios.has(id)) {
         const scenario = scenarioOf(id);
         byCode ??= new Map(rows.map((row) => [row.code, row]));
-        scenarios.set(id, scenario ? { name: printedScenarioName(scenario.name), number: scenario.number, cards: scenarioCards(scenario, byCode) } : null);
+        scenarios.set(id, scenario ? { name: printedScenarioName(scenario.name), cards: scenarioCards(scenario, byCode) } : null);
       }
       return scenarios.get(id) ?? null;
     },

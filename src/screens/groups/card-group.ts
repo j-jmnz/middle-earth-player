@@ -50,7 +50,7 @@ export function cardGroupOf(source: GroupSource, kind: GroupKind, id: string): C
   if (kind === "scenario") {
     const found = source.scenarioCards(id);
     if (!found) return null;
-    return { kind, id, title: found.name, count: found.cards.count, subtitle: `Scenario ${found.number} · ${cardsWord(found.cards.count)}`, spoiler: true, groups: found.cards.groups };
+    return { kind, id, title: found.name, count: found.cards.count, subtitle: cardsWord(found.cards.count), spoiler: true, groups: found.cards.groups };
   }
   return null;
 }

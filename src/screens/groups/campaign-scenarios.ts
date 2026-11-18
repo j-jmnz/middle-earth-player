@@ -1,15 +1,15 @@
-// The rows that open a campaign's scenarios as card groups (scenario-group.ts): the campaign setup's Later scenarios list and the path's Cards
-// screen (docs/design-system.md, Campaign setup). Each says the scenario's place in the book and what its encounter deck holds in Normal. Pure.
+// The rows that open a campaign's scenarios as card groups (scenario-group.ts): the campaign's cards screen, which the campaign setup's
+// Later scenarios row and the path's Campaign cards button open (docs/design-system.md, Campaign setup). Each says the scenario's place in the book and what its encounter deck holds in Normal. Pure.
 import { printedScenarioName } from "../../campaign/printed-name";
 import { scenarioOf } from "../data/campaign-data";
 import { cardsWord } from "./card-group";
+import { setsCount } from "./group-types";
 
 export type ScenarioRow = { id: string; number: number; name: string; detail: string };
 
 /** "3 sets · 36 cards": the booklet's sets and their Normal counts, as the briefing counts them. */
 export function encounterWords(sets: readonly { count: number }[]): string {
-  const cards = sets.reduce((sum, set) => sum + set.count, 0);
-  return `${sets.length} ${sets.length === 1 ? "set" : "sets"} · ${cardsWord(cards)}`;
+  return `${sets.length} ${sets.length === 1 ? "set" : "sets"} · ${cardsWord(setsCount(sets))}`;
 }
 
 /** "Stages 1 to 3", "Stage 1". */

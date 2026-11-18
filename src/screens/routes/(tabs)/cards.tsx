@@ -46,7 +46,7 @@ export default function Cards() {
         <PillButton label="Collection" testID="collection-open" accessibilityHint="Choose the cycles and packs you own" onPress={() => router.push("/collection")} />
       </HubHeader>
       <View className="mb-1 mt-2">
-        <Segmented options={CARDS_VIEWS} value={view} onChange={choose} testIDPrefix="cards-view" stretch accessibilityLabel="Cards" />
+        <Segmented options={CARDS_VIEWS} value={view} onChange={choose} testIDPrefix="cards-view" testIDs={{ "Player cards": "cards-view-player", "Encounter cards": "cards-view-encounter" }} stretch accessibilityLabel="Cards" />
       </View>
     </>
   );

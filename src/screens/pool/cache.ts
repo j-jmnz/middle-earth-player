@@ -8,7 +8,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { deckPacks } from "../../catalog/collection";
 import { cards, packs } from "../../catalog/schema";
 import { notAppliedCodes } from "../../play/cards/not-applied";
-import { MOTK_PACK } from "../groups/motk";
+import { allyNote, MOTK_PACK, motkAllyCode } from "../groups/motk";
 
 import { sortPool } from "./filter";
 
@@ -60,6 +60,8 @@ export type PoolData = {
   notApplied: ReadonlySet<string>;
   /** The Messenger of the King's heroes, in name order: browse only, never added to a deck. */
   motk: readonly PoolEntry[];
+  /** Each hero's strip: the ally it stands for and that ally's pack ("Ally · The Hunt for Gollum"), which tells two heroes of one name apart. */
+  motkNotes: ReadonlyMap<string, string>;
 };
 
 const pools = new WeakMap<object, PoolData>();
@@ -67,9 +69,19 @@ const pools = new WeakMap<object, PoolData>();
 export function readPool<TRun>(catalog: Db<TRun>): PoolData {
   const rows = sortPool(selectPool(catalog));
   const held = deckPacks(rows);
+  const byCode = new Map(rows.map((row) => [row.code, row]));
+  const motk = sortPool(selectMotk(catalog));
+  // An ally is deck-legal, so its pack is read from the pool's own rows.
+  const packNames = new Map(catalog.select({ code: packs.code, name: packs.name }).from(packs).all().map((pack) => [pack.code, pack.name]));
+  const motkNotes = new Map(
+    motk.map((hero) => {
+      const ally = byCode.get(motkAllyCode(hero.code) ?? "");
+      return [hero.code, allyNote(ally ? packNames.get(ally.packCode) : undefined)] as const;
+    }),
+  );
   return {
     rows,
-    byCode: new Map(rows.map((row) => [row.code, row])),
+    byCode,
     packs: catalog
       .select(packColumns)
       .from(packs)
@@ -77,7 +89,8 @@ export function readPool<TRun>(catalog: Db<TRun>): PoolData {
       .all()
       .filter((pack) => held.has(pack.code)),
     notApplied: notAppliedCodes(rows.map((row) => [row.code, row.errata ?? row.text] as const)),
-    motk: sortPool(selectMotk(catalog)),
+    motk,
+    motkNotes,
   };
 }
 

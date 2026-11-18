@@ -31,6 +31,8 @@ export type CampaignNode = {
 
 export type CampaignTree = {
   campaigns: readonly CampaignNode[];
+  /** A campaign by its id. */
+  byId: ReadonlyMap<string, CampaignNode>;
   byKey: ReadonlyMap<string, { campaign: CampaignNode; section: CampaignSection }>;
 };
 
@@ -104,5 +106,5 @@ export function campaignTree(rows: readonly GroupRow[], campaigns: readonly Camp
   }
   const byKey = new Map<string, { campaign: CampaignNode; section: CampaignSection }>();
   for (const campaign of nodes) for (const section of campaign.sections) byKey.set(section.key, { campaign, section });
-  return { campaigns: nodes, byKey };
+  return { campaigns: nodes, byId: new Map(nodes.map((node) => [node.id, node])), byKey };
 }

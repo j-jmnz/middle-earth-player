@@ -13,13 +13,11 @@ import { useListPreview } from "./list-preview";
 import { notAppliedWords } from "../../play/cards/not-applied";
 import { usePalette } from "../kit/palette-hook";
 import { poolOf } from "./cache";
-import { groupDataOf } from "../groups/cache";
 import { cardsWord } from "../groups/card-group";
-import type { MotkHero } from "../groups/motk";
 import { addingView, browseView } from "./view";
 import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./cards";
 import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./grid";
-import { activeFilterCount, applyTypeRequest, emptyPoolFilter, filterPool, packGroups, poolCountLine, typeRequestWords, type PoolFilter } from "./filter";
+import { activeFilterCount, applyTypeRequest, emptyPoolFilter, filterPool, MOTK_TYPE, motkFilter, packGroups, poolCountLine, typeRequestWords, type PoolFilter } from "./filter";
 import { unownedCodes } from "../../catalog/collection";
 import { collectionPacks, collectionSets } from "../collection/sets";
 import { useNotOwned } from "../collection/store";
@@ -138,20 +136,8 @@ function SphereToggles({ value, onChange }: { value: string | null; onChange: (n
 // asking for the same type again applies it again after the builder has changed the chips.
 export type PoolTypeRequest = { type: string | null };
 
-// The Messenger of the King heroes' chip: not a printed type, so its code cannot meet one.
-const MOTK_TYPE = "motk-heroes";
 const MOTK_CHOICE = { code: MOTK_TYPE, name: "MotK heroes" };
 const NONE: ReadonlySet<string> = new Set();
-
-// The heroes are filtered as the pool is, but the chip is their type, nothing is owned or not applied: they are never played.
-function motkFilter(filter: PoolFilter): PoolFilter {
-  return { ...filter, typeCode: null, activeText: false, owned: false };
-}
-
-// Each hero's strip: the ally it stands for and that ally's pack ("Ally · The Hunt for Gollum"), which tells two heroes of one name apart.
-function motkNotes(heroes: readonly MotkHero[]): ReadonlyMap<string, string> {
-  return new Map(heroes.flatMap((hero): [string, string][] => (hero.card.note ? [[hero.card.code, hero.card.note]] : [])));
-}
 
 // The deck-legal player pool, searched and filtered in memory, as a grid of the card pictures or a list of rows. The Cards tab
 // browses it; the deck editor opens it with `adding` to put cards in the open draft: each card then has − and +. The body is the
@@ -206,7 +192,7 @@ export function CardPoolBody({
   const recycle = grid ? recyclePool(columns, listHeight, poolCellHeight(cellWidth, adding, scale)) : recyclePool(1, listHeight, LIST_ROW_HEIGHT * scale);
   // The sorted pool, its packs and the cards with a line the app does not apply: read once per catalog (pool/cache.ts), shared with the
   // Cards tab, the pool route, the deck editor's cards pane and the import screen.
-  const { rows, packs: packRows, notApplied: inactiveCodes, byCode, motk: motkRows } = poolOf(catalog);
+  const { rows, packs: packRows, notApplied: inactiveCodes, byCode, motk: motkRows, motkNotes } = poolOf(catalog);
   const groups = useMemo(() => packGroups(collectionSets(), packRows), [packRows]);
   // The cards outside the player's collection (src/catalog/collection.ts): the My collection chip hides them, and with it off they
   // say "Not owned". Empty, and the chip gone, while everything is owned.
@@ -239,7 +225,7 @@ export function CardPoolBody({
     () => (motkOn ? filterPool(motkRows, query, motkFilter(applied), groups, NONE, NONE) : filterPool(rows, query, applied, groups, inactiveCodes, unowned)),
     [motkOn, motkRows, rows, query, applied, groups, inactiveCodes, unowned],
   );
-  const allyNotes = useMemo(() => (motkOn ? motkNotes(groupDataOf(catalog).motk()) : null), [motkOn, catalog]);
+  const allyNotes = motkOn ? motkNotes : null;
   const unownedShown = useMemo(() => (applied.owned || !collectionSet ? 0 : visible.filter((card) => unowned.has(card.code)).length), [applied.owned, collectionSet, visible, unowned]);
   const types = useMemo(() => (!adding && motkRows.length > 0 ? [...typeChoices(rows), MOTK_CHOICE] : typeChoices(rows)), [adding, motkRows, rows]);
   const list = useRef<FlashListRef<PoolRowCard>>(null);
@@ -250,7 +236,8 @@ export function CardPoolBody({
   }, [typeRequest, types]);
   // Other printings of a title share its copy limit: the deck's codes are named from the loaded rows.
   const lookup = useMemo<TitleLookup>(() => (code) => byCode.get(code), [byCode]);
-  const filters = activeFilterCount(applied);
+  // With the heroes picked, the badge counts only what narrows them.
+  const filters = activeFilterCount(motkOn ? motkFilter(applied) : applied);
   const openCard = useCallback((code: string) => (onOpen ? onOpen(code) : router.push({ pathname: "/card/[code]", params: { code } })), [router, onOpen]);
   const previewCard = onPreview;
   // One function while nothing it reads changes, so FlashList and the memoized cards skip the cards a render did not touch.
