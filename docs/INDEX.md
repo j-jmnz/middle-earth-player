@@ -135,7 +135,7 @@ Read the sections your task touches.
     - 1820–1843 The Massing at Osgiliath (~2.5K) ← 1
     - 1844–1866 The Battle of Lake-town (~4.0K) ← 36
     - 1867–1883 The Stone of Erech (~2.2K) ← 20
-    - 1884–1917 The Old Forest (~3.8K) ← 1
+    - 1884–1917 The Old Forest (~3.8K) ← 2
   - 1918–1926 Nightmare (~410) ← 21
   - 1927–1967 Deckbuilding (~2.1K)
   - 1968–2047 Effects (~3.7K)
@@ -269,10 +269,10 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~15.7K tok)
+- `docs/phases/STATUS.md` — Phase status (~15.9K tok)
   - 5–14 Rules (~380)
   - 15–21 Phases (~20)
-  - 22–311 Open items (~14.3K)
+  - 22–312 Open items (~14.5K)
     - 24–26 Reviews (~80)
     - 27–29 README (~90)
     - 30–34 Releases (~150)
@@ -283,8 +283,8 @@ STATUS.md, then the active phase file.
     - 250–274 Screens and code (~1.6K)
     - 275–294 Rules and engine (The Two Towers) (~1.4K)
     - 295–301 Rules and engine (Shadows of Mirkwood) (~380)
-    - 302–311 Rules and engine (Standalone scenarios) (~930)
-  - 312–337 Standing decisions (~940)
+    - 302–312 Rules and engine (Standalone scenarios) (~1.1K)
+  - 313–338 Standing decisions (~940)
 
 ## Live plans
 
