@@ -90,6 +90,8 @@ export const printedKeywordsSchema = z.strictObject({
   eyeIcons: z.number().int().positive().optional(),
   // Not a keyword either: the location prints X for its quest points (`quest` stays null), and a constant record sets them (Hills of Wilderland, Underground Lake): the engine lets it take progress and be explored.
   questPointsX: z.boolean().optional(),
+  // Also a printed mark: the enemy prints X for its Attack and its hit points (the Nameless things, dwd.nameless-enemies): their numbers stay null, a record sets them, and the engine reads the hit points as 0 until it does.
+  statsX: z.boolean().optional(),
 });
 
 export const ringsDbPackSchema = z

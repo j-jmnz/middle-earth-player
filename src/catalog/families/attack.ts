@@ -73,6 +73,8 @@ const FLAGS = [
   "eagleOrRangedOnly",
   // On an enemy, until the modifier ends: a character with the Ranged keyword cannot be declared as an attacker against it ("cannot be attacked by characters with the ranged keyword until the end of the phase", 900606:A:2).
   "cannotBeAttackedByRanged",
+  // On an enemy: only characters with the Ranged keyword, printed or gained, can attack or defend against it ("Only characters with ranged can attack or defend against Moria Bats", 04127:A:1); with none able its attack is undefended.
+  "onlyRangedCombat",
 ] as const;
 
 export const manifest = { name: "attack", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

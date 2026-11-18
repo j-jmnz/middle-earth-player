@@ -58,6 +58,8 @@ export function releaseGuarded(state: ScenarioState, id: string): ScenarioState 
 export function textBlank(state: ScenarioState, id: string, cards: ReadonlyMap<string, PrintedCard>): boolean {
   const instance = state.cards[id];
   if (instance?.prisoner === true) return true;
+  // A player card lying on a Nameless enemy has no title and no game text (dwd.nameless-enemies).
+  if (instance?.nameless === true && instance.zone === "attached") return true;
   for (const modifier of state.modifiers) {
     if (modifier.stat !== "blankText" || modifier.amount <= 0 || !modifierActive(state, modifier)) continue;
     if (modifier.instanceId === id || (instance != null && cards != null && (modifier.instanceId === CHARACTERS_CLASS || modifier.instanceId === DAMAGED_CHARACTERS_CLASS) && heldBy(modifier, instance, printedOf(cards, instance.code)))) return true;

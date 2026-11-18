@@ -36,7 +36,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "GuardObjective":
       return guardObjective(state, instruction, focus, ctx, steps);
     case "ClaimObjective":
-      return claimObjective(state, focus, ctx, steps);
+      return claimObjective(state, instruction, focus, ctx, steps);
     case "AttachGuard":
       return attachGuard(state, instruction, focus, ctx);
     // A constant kept by the settle sweep (control.ts): it does nothing when run.
@@ -72,8 +72,8 @@ export function guardedByType(state: ScenarioState, objectiveId: string, types: 
 }
 
 // ClaimObjective: the source objective leaves the staging area (or the hero it is attached to) for the last picked hero, controlled by that hero's controller; an objective ally a player controls (Amarthiúl, 10110:A:1) may be the host as well.
-function claimObjective(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = focus.sourceId;
+function claimObjective(state: ScenarioState, instruction: Extract<Instruction, { verb: "ClaimObjective" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = instruction.card ? refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)) : focus.sourceId;
   const objective = id ? state.cards[id] : undefined;
   const heroId = lastPicked(state);
   const hero = heroId ? state.cards[heroId] : undefined;

@@ -27,7 +27,7 @@ export function victorySaid(kind: string | null, points: number): string {
 }
 
 // Where a card that adds to the staging threat stands, when that is not the staging area itself.
-const FROM_WORDS = { staging: null, engaged: "Engaged", active: "Active location" } as const;
+const FROM_WORDS = { staging: null, engaged: "Engaged", active: "Active location", elsewhere: "In another area" } as const;
 
 /** The staging threat list's line: the type, where the card stands when not in staging, then the Threat it adds, "Enemy · 3 Threat". */
 export function threatSourceWords(kind: string | null, threat: number, from: keyof typeof FROM_WORDS): string {

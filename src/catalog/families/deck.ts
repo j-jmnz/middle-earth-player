@@ -40,6 +40,12 @@ const VERBS = [
   // The actor's hand (but the source card) is shuffled into their deck. The effect's X becomes how many cards that was ("Count
   // the number of cards in your hand and shuffle your hand into your deck. Then, draw an equal number of cards").
   z.strictObject({ verb: z.literal("ShuffleHandIntoDeck"), ...when }),
+  // "Shuffles the card in his hand with the highest printed cost back into his deck" (901703:A:1): the actor's hand card with the highest printed cost (a card with no printed cost or an X cost counting 0) goes into the deck, which is shuffled; the actor chooses among cards tied for
+  // the highest. An empty hand does nothing.
+  z.strictObject({ verb: z.literal("ShuffleHighestCostIntoDeck"), ...when }),
+  // "Each player chooses and shuffles a hero he controls into his deck. When he draws that hero, he puts it into play" (04124:A:1): the last picked hero leaves play (it is not destroyed; its attachments are discarded) and is shuffled into its owner's deck, where it is marked; when the owner
+  // draws it, it is put into play at once among his heroes, ready, with no damage or resources (families/deck/hero.ts). A seat with no hero in play and one in its deck is not eliminated (rr.player-elimination).
+  z.strictObject({ verb: z.literal("ShuffleHeroIntoDeck"), ...when }),
   // Every card in the actor's discard pile leaves the game ("remove all cards in that player's discard pile from the game", 900908:A:1; sotm.removed-from-game): a hero among them goes with the rest, and the cards are announced to nothing.
   z.strictObject({ verb: z.literal("RemoveDiscardFromGame"), ...when }),
   // The top `amount` cards of the actor's deck (shuffled first with `shuffle`) go to their discard pile, each announced as
