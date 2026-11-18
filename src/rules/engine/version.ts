@@ -31,9 +31,11 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 29, scenarios: ["across-the-ettenmoors"], note: "Lie Low lowers the enemies' engagement costs only in a round when no progress was placed on it." },
   { version: 29, scenarios: ["across-the-ettenmoors", "intruders-in-chetwood", "the-wastes-of-eriador"], note: "Lost in the Wilderness returns the cards under it to their owners' hands when it is defeated, instead of discarding them." },
   { version: 29, scenarios: "all", note: "Cram readies the hero it was attached to after it is discarded." },
+  { version: 30, scenarios: ["mount-gundabad"], note: "Dagnir and the other cards that count quest cards in the victory display count player side quests too." },
+  { version: 30, scenarios: "all", note: "A card that attaches to a quest card in play, like The Long Defeat, can attach to a side quest." },
 ];
 
-export const ENGINE_VERSION = 29;
+export const ENGINE_VERSION = 30;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

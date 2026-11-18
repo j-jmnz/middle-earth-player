@@ -337,6 +337,11 @@ export function fromEncounterDeck(printed: PrintedCard): boolean {
   return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure" || printed.type === "player-side-quest" || printed.type === "contract");
 }
 
+// A quest card (mec108.side-quests: "Side quests are a new type of quest card"): a quest stage, an encounter side quest or a player side quest.
+export function isQuestCardType(type: CardType): boolean {
+  return type === "quest" || type === "encounter-side-quest" || type === "player-side-quest";
+}
+
 // A treasure is a player card ("Treasure is a new type of player card", emce.treasure).
 export function isPlayerType(printed: PrintedCard): boolean {
   return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract" || printed.type === "treasure";

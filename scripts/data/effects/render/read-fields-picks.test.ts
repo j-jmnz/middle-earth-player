@@ -42,6 +42,7 @@ describe("effects render read fields, picks", () => {
     copyInDiscard: true,
     controlled: true,
     questCard: true,
+    questCardType: true,
     maxHitPointsLeft: 2,
     looked: true,
     lowestAttack: true,
