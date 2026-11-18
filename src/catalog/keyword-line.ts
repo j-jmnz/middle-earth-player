@@ -23,6 +23,8 @@ export const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   uncharted: "uncharted",
   phantom: "phantom",
   dire: "dire",
+  // PASS (dwd.locate-test): a card that prints it passes a locate test it is discarded for (src/rules/families/long-dark/).
+  pass: "pass",
 };
 
 export const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {

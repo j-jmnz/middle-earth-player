@@ -23,6 +23,8 @@ export type EngineStep =
   | { kind: "escapeCommit"; cardId: string }
   // `seat`: the player who made the test, null for a party test (every player commits to it). `stat`: what the committed characters counted, left out for Willpower.
   | { kind: "escapeTest"; seat: number | null; dealtIds: readonly string[]; committed: number; escape: number; success: boolean; stat?: "attack" | "defense" }
+  // The locate test (dwd.locate-test): `handIds` the cards the tester discarded from his hand, `dealtIds` the encounter cards each discarded, in order; the last one passed it when `success`.
+  | { kind: "locateTest"; seat: number; handIds: readonly string[]; dealtIds: readonly string[]; success: boolean }
   | { kind: "fortitudeTest"; seat: number; discardedIds: readonly string[]; willpower: number; eyes: number; success: boolean }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   // `stormcaller`: the Stormcaller's quest stage advanced (dcce.stormcallers-area-stages), not the players' quest.

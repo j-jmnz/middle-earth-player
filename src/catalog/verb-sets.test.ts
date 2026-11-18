@@ -7,7 +7,7 @@ const sorted = (verbs: ReadonlySet<string>) => [...verbs].sort();
 
 describe("verb flags", () => {
   it("mark exactly the verbs a Shadow effect runs in a frame for", () => {
-    expect(sorted(verbsRunningInFrame())).toEqual(["AssignDamage", "Choose", "DiscardBottom", "DiscardFromDeck", "EngageOrGrapple", "Each", "EscapeTest", "ForEachPlayer", "ImmediateAttack", "Pick", "Repeat", "ResolveGrapple", "ResolveWhenRevealed", "ResolveWhenRevealedOf", "RevealEncounter", "RevealEnemies", "RevealTopEnemies", "SearchMove"].sort());
+    expect(sorted(verbsRunningInFrame())).toEqual(["AssignDamage", "Choose", "DiscardBottom", "DiscardFromDeck", "EngageOrGrapple", "Each", "EscapeTest", "ForEachPlayer", "ImmediateAttack", "LocateTest", "Pick", "Repeat", "ResolveGrapple", "ResolveWhenRevealed", "ResolveWhenRevealedOf", "RevealEncounter", "RevealEnemies", "RevealTopEnemies", "SearchMove", "TriggerLost"].sort());
   });
 
   it("mark exactly the verbs that make a quest card's Setup run", () => {

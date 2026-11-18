@@ -237,6 +237,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         open(1, escapeResultTitle(step.success, step.seat, after.seatCount > 1), step.success ? "good" : "bad");
         line(escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape), step.stat ?? "willpower");
         return;
+      case "locateTest":
+        open(1, step.success ? "Locate test passed" : "Locate test failed", step.success ? "good" : "bad");
+        line(`${plural(step.handIds.length, "card")} discarded from the hand, ${plural(step.dealtIds.length, "encounter card")} discarded`);
+        return;
       case "hideTest":
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against threat ${step.threat}`, "willpower");

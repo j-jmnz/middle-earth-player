@@ -81,6 +81,8 @@ export const printedKeywordsSchema = z.strictObject({
   phantom: z.boolean().optional(),
   // Dire on a quest card (mec113.dire): while the main quest has it, each player's elimination level is 99, non-boon player card effects lower a player's threat by at most 1 each round and Valour triggers at 80 threat (src/rules/families/black-gate/dire.ts).
   dire: z.boolean().optional(),
+  // PASS on a card (dwd.locate-test): the card passes a locate test it is discarded for, and the Goblin Stalker reads it on a shadow card dealt to it (src/rules/families/long-dark/).
+  pass: z.boolean().optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
   sailingSuccess: z.number().int().positive().optional(),

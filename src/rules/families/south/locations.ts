@@ -14,6 +14,7 @@ import { flagged, heldAmount, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { exploring } from "../island/map.ts";
 import { redirectProgress } from "../quest/blizzard.ts";
+import { holdPlacement, holdsProgress } from "../long-dark/hold.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 export type Slot = "activeLocation" | "secondActiveLocation";
@@ -114,6 +115,8 @@ export function placeOnActive(state: ScenarioState, amount: number, cards: Cards
     const location = id ? next.cards[id] : undefined;
     if (!id || !location) break;
     const wanted = Math.min(remaining, progressRoom(next, id, cards));
+    // All of the quest phase's progress waits for the location's Forced effect, the quest's share too: a failed test places none anywhere (Twisting Passage, 04092:A:1, families/long-dark/hold.ts).
+    if (holdsProgress(next, id)) return { state: holdPlacement(next, id, remaining), remaining: 0 };
     // A Blinding Blizzard takes the progress a Snow location would (901307:A:2): the location's whole share is spent, so the quest gets no more of the tokens.
     const redirected = redirectProgress(next, id, wanted, cards, steps);
     const placed = redirected.remaining;

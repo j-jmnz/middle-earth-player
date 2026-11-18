@@ -129,6 +129,8 @@ export type EffectData = {
   fortitude?: "failed" | "passed";
   // The last escape test this effect made (EscapeTest; the `lastEscapeFailed` and `lastEscapePassed` conditions, families/escape/conditions.ts).
   escape?: "failed" | "passed";
+  // The last locate test this effect made (LocateTest; the `lastLocateFailed` and `lastLocatePassed` conditions, families/long-dark/conditions.ts).
+  locate?: "failed" | "passed";
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action

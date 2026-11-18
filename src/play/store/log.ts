@@ -115,6 +115,8 @@ function words(step: EngineStep, names: LogNames): string | null {
       return `${names.card(step.cardId)} commits to the escape test`;
     case "escapeTest":
       return `${escapeResultTitle(step.success, step.seat, true)}: ${escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape)}`;
+    case "locateTest":
+      return `${step.success ? "Locate test passed" : "Locate test failed"}: ${plural(step.handIds.length, "card")} discarded from the hand, ${plural(step.dealtIds.length, "encounter card")} discarded`;
     case "fortitudeTest":
       return `Fortitude test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`;
     case "hideTest":
