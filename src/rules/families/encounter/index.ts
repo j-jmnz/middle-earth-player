@@ -26,6 +26,9 @@ import { ambushChecks, discardTopEncounter, revealEnemies } from "./ambush.ts";
 import { noteFirstEnemy } from "./first-enemy.ts";
 import { exploreFull } from "./explore.ts";
 import { searchCollection } from "./collection.ts";
+import { attackDamageAmount, discardCondition } from "./discard-check.ts";
+import { damageEachWithAttachment } from "./damage-attached.ts";
+import { revealFromDiscard, topmostInDiscard } from "./reveal-discard.ts";
 import { returnFromDiscard } from "./returned.ts";
 import { queueFront } from "../play/refs.ts";
 import { freeSlot } from "../south/locations.ts";
@@ -72,6 +75,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return instruction.alsoVictory === true ? shuffleDiscardAndVictoryIn(state, ctx, instruction.trait, instruction.type, instruction.name) : shuffleDiscardIn(state, ctx, instruction.trait, instruction.type, instruction.name);
     case "DiscardUntil":
       return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait);
+    case "DamageEachWithAttachment":
+      return damageEachWithAttachment(state, instruction, focus, ctx, steps);
+    case "RevealFromDiscard":
+      return revealFromDiscard(state, instruction, focus, ctx, steps);
     case "AmbushChecks":
       return ambushChecks(state, focus.sourceId, ctx, steps);
     case "DiscardTopEncounter":
@@ -147,4 +154,4 @@ export function addTableModifier(state: ScenarioState, modifier: Omit<Modifier, 
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", ...modifier }] };
 }
 
-export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains"], run, revealed: noteFirstEnemy, settle: { sweep: exploreFull } };
+export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains", "RevealFromDiscard", "DamageEachWithAttachment"], run, revealed: noteFirstEnemy, condition: discardCondition, amount: (state, found, scope, ctx) => attackDamageAmount(state, found, scope, ctx), travel: { unpayable: (state, instruction, ctx) => instruction.verb === "RevealFromDiscard" && topmostInDiscard(state, instruction.trait, ctx) == null }, settle: { sweep: exploreFull } };

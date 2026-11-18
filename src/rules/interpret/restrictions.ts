@@ -158,7 +158,9 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       // "Exhaust a Ship objective to travel here" (12128:A:2): the card to exhaust is picked, so the cost cannot be paid without one.
       if (instruction.verb === "Exhaust" && instruction.target?.kind === "picked") {
         const pick = instructions.find((other) => other.verb === "Pick");
-        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
+        // "The first player must exhaust 2 characters to travel here" (04066:A:1): one ready card for each exhaust of the cost.
+        const needed = instructions.filter((other) => other.verb === "Exhaust" && other.target?.kind === "picked").length;
+        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length < needed;
       }
       // "The first player must discard 1 event card from his hand to travel here" (02088:A:1): the card discarded is picked, so the cost cannot be paid without one.
       if (instruction.verb === "DiscardPicked") {

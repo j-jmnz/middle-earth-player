@@ -109,7 +109,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   if (familial !== null) return familial;
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
-    case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives":
+    case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives": case "discardedHasShadowOrTentacle": case "firstLetterMatches":
     case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "setAsideHas":
       return false;
     case "hideFailed":
@@ -264,7 +264,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       // Mount Gram: while the staging areas are separate an enemy "in play" is one in the asking player's own area (mec108.create-staging-area).
       const area = state.separate && state.capture ? headOf(state, scope.actor) : null;
       const found = Object.values(state.cards).some(
-        (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
+        (card) =>
+          inPlay(card.zone) && card.asAttachment == null && printedOf(ctx.cards, card.code).type === "enemy" && (condition.other !== true || card.id !== scope.sourceId) && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
       );
       return found === condition.is;
     }

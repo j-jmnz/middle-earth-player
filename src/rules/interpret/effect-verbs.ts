@@ -1,6 +1,7 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { redirectProgress } from "../families/quest/blizzard.ts";
+import { progressToQuest, sendsProgressToQuest } from "../families/quest/doors.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "../quest/explore.ts";
@@ -116,6 +117,8 @@ export function progressPlacer(state: ScenarioState, ctx: ReduceContext, seat: n
 export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number): ScenarioState {
   const location = state.cards[id];
   if (!location) return state;
+  // "Progress that would be placed on Doors of Durin is instead placed on the current quest card" (04065:A:1, families/quest/doors.ts).
+  if (sendsProgressToQuest(state, id)) return progressToQuest(state, amount, ctx, steps);
   const points = questPointsOf(state, location, ctx.cards);
   // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south/locations.ts).
   const wanted = Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards));

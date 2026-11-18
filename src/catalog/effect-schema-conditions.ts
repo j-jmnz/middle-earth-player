@@ -202,7 +202,14 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The current quest card has progress on it (141026:B:2: removing progress is an effect that changes the game, rr.effects).
   z.strictObject({ kind: z.literal("questProgress") }),
   // An enemy (with this trait, if one is named) is in play (`is`) or none is (141027:B:1).
-  z.strictObject({ kind: z.literal("enemyInPlay"), trait: z.string().min(1).optional(), is: z.boolean() }),
+  // `other`: not the source card itself ("While there is another Tentacle enemy in play", 04072:A:2). An enemy lying on a character as an attachment is no enemy in play (families/angmar/reanimate/attached.ts).
+  z.strictObject({ kind: z.literal("enemyInPlay"), trait: z.string().min(1).optional(), other: z.literal(true).optional(), is: z.boolean() }),
+  // The card the running effect's last DiscardEncounterTop (MoveEncounterCard `deckTop` to `discard`) put in the encounter discard pile has a shadow effect (a printed Shadow line: a `shadow` record) or is a Tentacle enemy
+  // ("If that card has a shadow effect or is a Tentacle enemy", 04073:A:1, 04074:A:1, 04075:A:1, 901503:A:1, 901504:A:1). False when nothing was discarded. Read by the encounter family (src/rules/families/encounter/discard-check.ts).
+  z.strictObject({ kind: z.literal("discardedHasShadowOrTentacle") }),
+  // The title of the encounter card the effect discarded last starts with the same letter as the title of a card an earlier pick of the effect chose (the player cards discarded from the hands), case and accents aside ("If the first letter of the
+  // encounter card's title matches that of one of the discarded player cards", 04065:A:2). False when nothing was discarded. Read by the encounter family.
+  z.strictObject({ kind: z.literal("firstLetterMatches") }),
   // How many cards match the filter, from the actor's side, is at least `min` and at most `max` ("while you control at least
   // 5 Dwarf characters", "if there is at least 1 Gondor hero in play", "while you have no cards in your hand").
   z.strictObject({ kind: z.literal("count"), pick: pickSchema, min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
