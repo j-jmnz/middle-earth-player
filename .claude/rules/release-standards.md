@@ -25,7 +25,7 @@ Every session, agent and contributor that branches, tags or releases follows the
 
 ## Release notes
 
-- The notes are written by `scripts/release/notes.ts` from the commit subjects since the last tag: `feat` under New, `fix` under Fixes, `style` under Look and feel, `refactor` under Under the hood, `Breaking:` lines under Before you update, `repo` counted. So a pull request title is a line of the notes: write it for a player.
+- The notes are written by `scripts/release/notes.ts` from the commit subjects since the last tag: `feat` under New, `fix` under Fixes, `style` under Look and feel, `refactor` under Under the hood, `repo` (and any untyped subject from before the standards) under Project, `Breaking:` lines under Before you update. Every commit is listed; none is only counted or left out (user request, 2026-11-17). So a pull request title is a line of the notes: write it for a player, as an action (`.claude/rules/commit-standards.md`, Subject line).
 - Do not write the notes by hand. Edit a published release only to add a short note above the generated text.
 
 ## Who releases

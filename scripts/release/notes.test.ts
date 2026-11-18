@@ -22,17 +22,21 @@ const base: NotesInput = {
 };
 
 describe("release notes (.claude/rules/release-standards.md, Release notes)", () => {
-  it("lists player-facing commits by section, counts repo commits and links the comparison", () => {
+  it("lists every commit by section, repo commits under Project, and links the comparison", () => {
     const notes = renderNotes(base);
     expect(notes).toContain("## Before you update\n\n- Saves made in 0.3 lose their open scenario\n");
     expect(notes).toContain("## New\n\n- Lost in Mirkwood is playable (#40)\n");
     expect(notes).toContain("## Fixes\n\n- Staging attackers make their additional attacks (#41)\n");
     expect(notes).toContain("## Look and feel\n\n- The quest card shows its stage number (#42)\n");
     expect(notes).not.toContain("Under the hood");
-    expect(notes).not.toContain("Refresh the card data");
-    expect(notes).toContain("Plus 2 project changes");
+    expect(notes).toContain("## Project (docs, tests, tooling, data refreshes)\n\n- Refresh the card data (#43)\n- Tidy the brief (#44)\n");
+    expect(notes).not.toContain("Plus ");
     expect(notes).toContain("https://github.com/j-jmnz/middle-earth-player/compare/v0.3.2...v0.4.0");
     expect(notes.indexOf("Before you update")).toBeLessThan(notes.indexOf("## New"));
+  });
+
+  it("lists a subject from before the commit standards under Project", () => {
+    expect(renderNotes({ ...base, changes: [parseCommit("Add open-source community files", "")] })).toContain("## Project (docs, tests, tooling, data refreshes)\n\n- Add open-source community files\n");
   });
 
   it("says the Windows installer is unsigned unless the plan found the certificate", () => {
@@ -49,11 +53,10 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(renderNotes({ ...base, changes: [], reach: { all: false, names: [] } })).not.toContain("Before you update");
   });
 
-  it("adds the APK's checksums, and marks the first release without a project count or comparison", () => {
+  it("adds the APK's checksums, and marks the first release without a comparison", () => {
     const apk = { name: "middle-earth-player-v0.1.0.apk", sha256: "ab12", certificateSha256: "cd34" };
     const notes = renderNotes({ ...base, tag: "v0.1.0", previousTag: undefined, reach: undefined, apk });
     expect(notes.startsWith("The first release.\n")).toBe(true);
-    expect(notes).not.toContain("Plus ");
     expect(notes).not.toContain("compare/");
     expect(notes).toContain("`middle-earth-player-v0.1.0.apk` SHA-256: `ab12`");
     expect(notes).toContain("Signing certificate SHA-256: `cd34`");
