@@ -19,6 +19,16 @@ export function withFolded(sections: Sections, id: string, folded: boolean, defa
   return folded === defaultFolded ? rest : { ...rest, [id]: folded };
 }
 
+/** The map with every one of `ids` set to `folded` (Collapse all and Expand all), each dropped where that is its default. */
+export function withAllFolded(sections: Sections, ids: readonly { id: string; defaultFolded: boolean }[], folded: boolean): Sections {
+  return ids.reduce((map, { id, defaultFolded }) => withFolded(map, id, folded, defaultFolded), sections);
+}
+
+/** What the screen's fold-all control offers: Collapse all while any of its sections is open, else Expand all. */
+export function foldAllOffer(folded: readonly boolean[]): { label: "Collapse all" | "Expand all"; folds: boolean } {
+  return folded.some((one) => !one) ? { label: "Collapse all", folds: true } : { label: "Expand all", folds: false };
+}
+
 /** What a folded header says about its count to a screen reader and in words ("3 hidden"). */
 export function foldWords(title: string, folded: boolean, count: number | string | null): string {
   return `${title}${count == null ? "" : `, ${count}`}${folded ? ", folded" : ""}`;

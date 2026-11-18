@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import migrations from "../../../drizzle/migrations";
 import { DEFAULT_SETTINGS, tableSettings } from "../../ui/table-settings";
 import { CHECK_INTERVAL_MS, EMPTY_UPDATE, LATEST_RELEASE_URL, updateStore } from "../../ui/update/offer";
-import { afterAnswer, dismissUpdate, readStoredUpdate, startUpdateChecks, writeStoredUpdate, type UpdateFetch } from "./check.ts";
+import { afterAnswer, checkNow, dismissUpdate, readStoredUpdate, startUpdateChecks, writeStoredUpdate, type UpdateFetch } from "./check.ts";
 
 vi.mock("react-native", () => ({ AppState: { addEventListener: () => ({ remove: () => undefined }) } }));
 
@@ -38,6 +38,7 @@ afterEach(() => {
   vi.useRealTimers();
   tableSettings.getState().hydrate(DEFAULT_SETTINGS);
   updateStore.getState().set(EMPTY_UPDATE);
+  updateStore.getState().setManual("idle");
 });
 
 describe("the update check", () => {
@@ -135,6 +136,40 @@ describe("the update check", () => {
     expect(signals[1].aborted).toBe(false);
     stop();
     expect(signals[1].aborted).toBe(true);
+  });
+
+  it("asks at once on Check now, past the daily wait and the switch, and says how it went", async () => {
+    const user = openUser();
+    writeStoredUpdate(user, { checkedAt: NOW - 1000, latest: null, dismissed: null });
+    tableSettings.getState().update({ checkUpdates: false });
+    let status: number | null = 200;
+    const calls: string[] = [];
+    const fetcher: UpdateFetch = (url) => {
+      calls.push(url);
+      if (status == null) return Promise.reject(new TypeError("Network request failed"));
+      return Promise.resolve({ status, json: () => Promise.resolve({ tag_name: "v0.5.0" }) });
+    };
+    const stop = startUpdateChecks(user, { current: "0.4.2", fetch: fetcher, now: () => NOW, onActive: () => () => undefined, warn: () => undefined });
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(calls).toHaveLength(0);
+    checkNow();
+    expect(updateStore.getState().manual).toBe("checking");
+    await vi.advanceTimersByTimeAsync(0);
+    expect(calls).toHaveLength(1);
+    expect(updateStore.getState().manual).toBe("answered");
+    expect(readStoredUpdate(user).latest?.version).toBe("0.5.0");
+    status = null;
+    checkNow();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(updateStore.getState().manual).toBe("failed");
+    status = 403;
+    checkNow();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(updateStore.getState().manual).toBe("failed");
+    expect(updateStore.getState().stored.latest?.version).toBe("0.5.0");
+    stop();
+    checkNow();
+    expect(calls).toHaveLength(3);
   });
 
   it("keeps the closed version in user.db", () => {

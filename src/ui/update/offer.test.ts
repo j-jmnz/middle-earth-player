@@ -8,6 +8,7 @@ import {
   checksFor,
   isNewer,
   LATEST_RELEASE_URL,
+  manualLine,
   offerOf,
   parseLatestRelease,
   parseStoredUpdate,
@@ -102,5 +103,16 @@ describe("the offer and the ribbon", () => {
     expect(releasedLine("2026-11-15T23:30:00Z")).toBe("Released 15 November 2026");
     expect(releasedLine(null)).toBeNull();
     expect(releasedLine("not a date")).toBeNull();
+  });
+});
+
+describe("Check now's line", () => {
+  it("says nothing before it is pressed, then asking, the latest, no answer, or nothing while the offer shows", () => {
+    expect(manualLine("idle", null, true)).toBeNull();
+    expect(manualLine("checking", null, true)).toBe("Asking GitHub…");
+    expect(manualLine("answered", null, true)).toBe("You have the latest version.");
+    expect(manualLine("answered", "0.5.0", true)).toBeNull();
+    expect(manualLine("failed", null, true)).toMatch(/did not answer/);
+    expect(manualLine("idle", null, false)).toMatch(/not a release/);
   });
 });

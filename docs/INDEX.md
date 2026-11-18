@@ -11,9 +11,9 @@ Read whole.
 - `CLAUDE.md` — Claude Code (~2.9K tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~990 tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~1.2K tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
-- `.claude/rules/release-standards.md` — Release standards (~1.2K tok)
+- `.claude/rules/release-standards.md` — Release standards (~1.3K tok)
 
 ## Agents
 
@@ -48,7 +48,7 @@ Read the sections your task touches.
   - 497–500 Support (~90)
   - 501–516 Attribution (~410)
   - 517–520 License (~50)
-- `docs/architecture.md` — Architecture (~28.7K tok)
+- `docs/architecture.md` — Architecture (~28.8K tok)
   - 7–42 Stack (~1.3K)
   - 43–78 Processes (~690)
   - 79–162 Modules (~2.4K) ← 3
@@ -67,11 +67,11 @@ Read the sections your task touches.
   - 323–328 Images (~1.1K) ← 7
   - 329–383 Screens (~5.2K) ← 9
   - 384–395 Desktop (~1.4K) ← 5
-  - 396–405 Update check (~630) ← 7
+  - 396–405 Update check (~680) ← 7
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~216.4K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~216.5K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
@@ -144,14 +144,14 @@ Read the sections your task touches.
     - 1940–1943 Window stack (~100)
     - 1944–1947 Coverage test (~270)
   - 1948–1970 Data sources (~700) ← 2
-  - 1971–1989 Card images (~1.3K) ← 9
+  - 1971–1989 Card images (~1.4K) ← 9
   - 1990–2017 Persistence and shipping (~3.2K) ← 10
   - 2018–2059 Screens (~5.1K) ← 2
     - 2044–2059 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~60.2K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~60.3K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
-  - 24–27 Table menu (~800) ← 8
+  - 24–27 Table menu (~860) ← 8
   - 28–35 Quest scale (~830) ← 2
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
@@ -182,7 +182,7 @@ Read the sections your task touches.
   - 374–385 Banner (~750) ← 5
   - 386–405 Screen reader (~3.0K) ← 19
   - 406–409 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~33.2K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~33.4K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
   - 35–45 Performance (~720) ← 4
@@ -198,32 +198,32 @@ Read the sections your task touches.
   - 236–250 Icons (~480) ← 7
   - 251–269 Card art (~750) ← 2
   - 270–285 Tablets (~630) ← 15
-  - 286–488 Screens (~19.3K)
+  - 286–490 Screens (~19.5K)
     - 290–295 Splash (~210) ← 3
     - 296–299 App icon (~80)
     - 300–315 Campaigns (campaign list) (~1.5K) ← 6
-    - 316–329 Scenarios (~1000) ← 1
-    - 330–341 History (~1.4K) ← 4
-    - 342–359 Briefing (~2.0K) ← 6
-    - 360–363 Campaign setup (~1.0K) ← 3
-    - 364–369 Campaign path (~890) ← 4
-    - 370–373 Campaign log (~840) ← 1
-    - 374–377 Spend XP (~610) ← 1
-    - 378–381 Table — landscape (~30) ← 1
-    - 382–385 Table opens stale (~750) ← 4
-    - 386–399 Resolution and standalone outcome (~1.9K) ← 2
-    - 400–409 Decks (~920) ← 2
-    - 410–419 Deck builder (deck editor) (~1.1K) ← 3
-    - 420–429 Card pool (the Cards tab) (~1.1K) ← 3
-    - 430–435 Card (~490) ← 2
-    - 436–447 Collection (~530) ← 3
-    - 448–451 Deck import (~120)
-    - 452–466 Settings (~1.5K) ← 15
-    - 467–472 Rules (~470) ← 1
-    - 473–476 Rule (~220) ← 1
-    - 477–484 Booklet (~540) ← 2
-    - 485–488 Database (~110)
-  - 489–508 States (~620)
+    - 316–331 Scenarios (~1.1K) ← 1
+    - 332–343 History (~1.4K) ← 4
+    - 344–361 Briefing (~2.0K) ← 6
+    - 362–365 Campaign setup (~1.0K) ← 3
+    - 366–371 Campaign path (~890) ← 4
+    - 372–375 Campaign log (~840) ← 1
+    - 376–379 Spend XP (~610) ← 1
+    - 380–383 Table — landscape (~30) ← 1
+    - 384–387 Table opens stale (~750) ← 4
+    - 388–401 Resolution and standalone outcome (~1.9K) ← 2
+    - 402–411 Decks (~920) ← 2
+    - 412–421 Deck builder (deck editor) (~1.1K) ← 3
+    - 422–431 Card pool (the Cards tab) (~1.1K) ← 3
+    - 432–437 Card (~490) ← 2
+    - 438–449 Collection (~530) ← 3
+    - 450–453 Deck import (~120)
+    - 454–468 Settings (~1.6K) ← 15
+    - 469–474 Rules (~470) ← 1
+    - 475–478 Rule (~220) ← 1
+    - 479–486 Booklet (~540) ← 2
+    - 487–490 Database (~110)
+  - 491–510 States (~620)
 - `docs/development.md` — Development (~2.8K tok)
 - `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1

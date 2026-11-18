@@ -491,7 +491,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
-      <UpdateTableMenu open={menuOpen} nav={nav} without={menuWithout} state={{ store, nameOf, intents }} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <UpdateTableMenu open={menuOpen} nav={nav} without={menuWithout} state={{ store, nameOf, intents }} top={barBottom} right={insets.right + 8 * s} bottom={insets.bottom + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable, result: choice.readout?.result, refusal }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );

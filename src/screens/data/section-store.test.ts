@@ -4,8 +4,8 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
 import migrations from "../../../drizzle/migrations";
-import { foldWords, isFolded, parseSections, withFolded } from "../kit/fold-state";
-import { readSections, writeSection } from "./section-store";
+import { foldAllOffer, foldWords, isFolded, parseSections, withFolded } from "../kit/fold-state";
+import { readSections, writeSection, writeSections } from "./section-store";
 
 function openUser() {
   const sqlite = new Database(":memory:");
@@ -31,6 +31,20 @@ describe("fold state", () => {
     expect(isFolded(back, "others", false)).toBe(true);
     expect(isFolded(back, "archived", true)).toBe(false);
     expect(isFolded(back, "start", false)).toBe(false);
+  });
+
+  it("folds and opens several sections in one write, keeping the others (Collapse all, Expand all)", () => {
+    const { user } = openUser();
+    writeSection(user, "other-games", true, false);
+    const ids = [{ id: "box-core", defaultFolded: false }, { id: "scenarios-coming", defaultFolded: false }];
+    expect(writeSections(user, ids, true)).toEqual({ "other-games": true, "box-core": true, "scenarios-coming": true });
+    expect(writeSections(user, ids, false)).toEqual({ "other-games": true });
+    expect(readSections(user)).toEqual({ "other-games": true });
+  });
+
+  it("offers Collapse all while any section is open, else Expand all", () => {
+    expect(foldAllOffer([false, true])).toEqual({ label: "Collapse all", folds: true });
+    expect(foldAllOffer([true, true])).toEqual({ label: "Expand all", folds: false });
   });
 
   it("drops a section set back to its default", () => {

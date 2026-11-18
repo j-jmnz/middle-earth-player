@@ -12,15 +12,21 @@ import { useUiScale } from "../../ui/ui-scale";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { Chevron } from "./chrome-marks";
 import { useDatabases } from "../data/databases";
-import { foldWords, isFolded, type Sections } from "./fold-state";
+import { foldWords, isFolded, withAllFolded, type Sections } from "./fold-state";
 import { plural } from "../history/words";
 import { usePalette } from "./palette-hook";
-import { readSections, writeSection } from "../data/section-store";
+import { readSections, writeSection, writeSections } from "../data/section-store";
 import { Text } from "../../ui/text";
 import { announce } from "../../ui/announce";
 
-/** The screen's fold state: `folded` reads a section (its default when the viewer never changed it), `setFolded` changes and stores it. */
-export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => boolean; setFolded: (id: string, folded: boolean, defaultFolded?: boolean) => void } {
+export type FoldIds = readonly { id: string; defaultFolded: boolean }[];
+
+/** The screen's fold state: `folded` reads a section (its default when the viewer never changed it), `setFolded` changes and stores it, `setAll` sets several at once. */
+export function useFolds(): {
+  folded: (id: string, defaultFolded?: boolean) => boolean;
+  setFolded: (id: string, folded: boolean, defaultFolded?: boolean) => void;
+  setAll: (ids: FoldIds, folded: boolean) => void;
+} {
   const { user } = useDatabases();
   const [sections, setSections] = useState<Sections>(() => readSections(user));
   const folded = useCallback((id: string, defaultFolded = false) => isFolded(sections, id, defaultFolded), [sections]);
@@ -35,8 +41,18 @@ export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => b
     },
     [user],
   );
-  // One object while neither function changes, so a caller can depend on it (or on `setFolded`, which only a new user changes).
-  return useMemo(() => ({ folded, setFolded }), [folded, setFolded]);
+  const setAll = useCallback(
+    (ids: FoldIds, next: boolean) => {
+      try {
+        setSections(writeSections(user, ids, next));
+      } catch {
+        setSections((current) => withAllFolded(current, ids, next));
+      }
+    },
+    [user],
+  );
+  // One object while no function changes, so a caller can depend on it (or on `setFolded`, which only a new user changes).
+  return useMemo(() => ({ folded, setFolded, setAll }), [folded, setFolded, setAll]);
 }
 
 /** A foldable section. The header's testID is `section-<id>` (`testID` overrides it) and the body's is `section-<id>-body`. */
