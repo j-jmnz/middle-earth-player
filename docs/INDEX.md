@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~247.2K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~247.5K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -131,14 +131,14 @@ Read the sections your task touches.
     - 1756–1773 The Hills of Emyn Muil (~1.5K) ← 1
     - 1774–1794 The Dead Marshes (~2.1K) ← 2
     - 1795–1818 Return to Mirkwood (~2.3K) ← 4
-  - 1819–2039 Dwarrowdelf (~30.9K) ← 3
+  - 1819–2039 Dwarrowdelf (~31.2K) ← 3
     - 1830–1852 Into the Pit (~2.8K) ← 9
     - 1853–1873 The Seventh Level (~3.0K) ← 5
     - 1874–1907 Flight from Moria (~5.5K) ← 4
     - 1908–1944 The Redhorn Gate (~5.4K) ← 4
     - 1945–1975 Road to Rivendell (~4.1K) ← 3
     - 1976–2011 The Watcher in the Water (~4.6K) ← 3
-    - 2012–2039 The Long Dark (~4.5K) ← 4
+    - 2012–2039 The Long Dark (~4.8K) ← 4
   - 2040–2048 Nightmare (~410) ← 22
   - 2049–2089 Deckbuilding (~2.1K)
   - 2090–2169 Effects (~3.7K)
@@ -151,7 +151,7 @@ Read the sections your task touches.
   - 2212–2239 Persistence and shipping (~3.2K) ← 10
   - 2240–2281 Screens (~5.1K) ← 2
     - 2266–2281 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~61.9K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~62.3K tok)
   - 5–8 Overview (~170) ← 1
   - 9–23 Top bar (~3.2K) ← 5
   - 24–27 Table menu (~570) ← 4
@@ -159,32 +159,32 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–115 Cards (~23.5K) ← 29
-  - 116–121 The Sailing test (~690) ← 5
-  - 122–135 The Island Map (~1.8K) ← 8
-  - 136–139 Tokens and effects (~360)
-  - 140–154 Piles (~2.0K) ← 7
-  - 155–160 Marks of the open moment (~400) ← 1
-  - 161–231 Motion (~3.3K) ← 7
-  - 232–257 Spotlight (~2.6K) ← 33
-  - 258–263 Gestures (~620) ← 4
-  - 264–267 Hold, slide and release (~940)
-  - 268–279 Pointer and keys (~1.0K) ← 5
-  - 280–285 Peeking at the other seat (~610) ← 1
-  - 286–305 Command column (~2.6K) ← 11
-  - 306–311 Two taps (~620) ← 9
-  - 312–315 One answer, one tap (~240)
-  - 316–319 Stops and Always use (~250)
-  - 320–323 Guide (~120)
-  - 324–340 Choice tray (~5.6K) ← 63
-  - 341–355 Reading panels (~1.6K) ← 5
-  - 356–365 Phase carousel (~680)
-  - 366–371 Quest advance (~530) ← 1
-  - 372–375 Undo (~150)
-  - 376–379 Haptics (~280)
-  - 380–391 Banner (~750) ← 5
-  - 392–411 Screen reader (~3.0K) ← 19
-  - 412–415 Android Back (~90)
+  - 59–116 Cards (~23.9K) ← 30
+  - 117–122 The Sailing test (~690) ← 5
+  - 123–136 The Island Map (~1.8K) ← 8
+  - 137–140 Tokens and effects (~360)
+  - 141–155 Piles (~2.0K) ← 7
+  - 156–161 Marks of the open moment (~400) ← 1
+  - 162–232 Motion (~3.3K) ← 7
+  - 233–258 Spotlight (~2.6K) ← 33
+  - 259–264 Gestures (~620) ← 4
+  - 265–268 Hold, slide and release (~940)
+  - 269–280 Pointer and keys (~1.0K) ← 5
+  - 281–286 Peeking at the other seat (~610) ← 1
+  - 287–306 Command column (~2.6K) ← 11
+  - 307–312 Two taps (~620) ← 9
+  - 313–316 One answer, one tap (~240)
+  - 317–320 Stops and Always use (~250)
+  - 321–324 Guide (~120)
+  - 325–341 Choice tray (~5.6K) ← 63
+  - 342–356 Reading panels (~1.6K) ← 5
+  - 357–366 Phase carousel (~680)
+  - 367–372 Quest advance (~530) ← 1
+  - 373–376 Undo (~150)
+  - 377–380 Haptics (~280)
+  - 381–392 Banner (~750) ← 5
+  - 393–412 Screen reader (~3.0K) ← 19
+  - 413–416 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~32.3K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~680) ← 1
@@ -272,10 +272,10 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~16.1K tok)
+- `docs/phases/STATUS.md` — Phase status (~16.2K tok)
   - 5–14 Rules (~380)
   - 15–20 Phases (~50)
-  - 21–323 Open items (~14.7K)
+  - 21–324 Open items (~14.8K)
     - 23–25 Reviews (~70)
     - 26–28 README (~90)
     - 29–33 Releases (~150)
@@ -285,9 +285,9 @@ STATUS.md, then the active phase file.
     - 130–250 Rules and engine (Angmar Awakened) (~5.3K)
     - 251–275 Screens and code (~1.6K)
     - 276–295 Rules and engine (The Two Towers) (~1.4K)
-    - 296–316 Rules and engine (Dwarrowdelf) (~1.2K)
-    - 317–323 Rules and engine (Shadows of Mirkwood) (~380)
-  - 324–349 Standing decisions (~940)
+    - 296–317 Rules and engine (Dwarrowdelf) (~1.3K)
+    - 318–324 Rules and engine (Shadows of Mirkwood) (~380)
+  - 325–350 Standing decisions (~940)
 - `docs/phases/phase-62-dwarrowdelf.md` — Phase 62: The Dwarrowdelf cycle, standalone with Nightmare (~690 tok)
 
 ## Live plans
@@ -333,7 +333,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (34); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (5); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Return of the King (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight from Moria (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, The Seventh Level (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Flight from Moria (2); brief.md, Into the Pit (2); brief.md, Return to Mirkwood (2); brief.md, Road to Rivendell (2); brief.md, The Dead Marshes (2); brief.md, The Long Dark (2); brief.md, The Redhorn Gate (2); brief.md, The Seventh Level (2); brief.md, The Watcher in the Water (2); agents/agent-brief.md, Scenario procedure (1); brief.md, A Journey to Rhosgobel (1); brief.md, Angmar Awakened (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Conflict at the Carrock (1); brief.md, Nightmare (1); brief.md, The Hills of Emyn Muil (1); brief.md, The Hunt for Gollum (1)
-- `src/play`: design-system-table.md, Choice tray (56); design-system-table.md, Spotlight (29); design-system-table.md, Cards (28); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); design-system-table.md, Pointer and keys (4); design-system-table.md, Top bar (4); design-system-table.md, Two taps (4); brief.md, Table screen (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
+- `src/play`: design-system-table.md, Choice tray (56); design-system-table.md, Cards (29); design-system-table.md, Spotlight (29); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); design-system-table.md, Pointer and keys (4); design-system-table.md, Top bar (4); design-system-table.md, Two taps (4); brief.md, Table screen (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
 - `src/rules`: brief.md, Into the Pit (6); brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); brief.md, Angmar Awakened (2); brief.md, Return to Mirkwood (2); architecture.md, State (1); brief.md, Conflict at the Carrock (1); brief.md, Escape from Mount Gram (1); brief.md, The Black Gate Opens (1); brief.md, The Long Dark (1); brief.md, The Redhorn Gate (1); brief.md, The Return of the King (1); brief.md, The Seventh Level (1)
 - `src/screens`: design-system.md, Tablets (10); brief.md, Persistence and shipping (6); design-system.md, Briefing (6); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); design-system.md, Settings (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); architecture.md, Desktop (2); architecture.md, Update check (2); brief.md, Screens (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); design-system.md, Update ribbon (2); .claude/rules/code-standards.md, Saving (1); architecture.md, Images (1); architecture.md, Persistence (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Dwarrowdelf (1); brief.md, Nightmare (1); brief.md, Shadows of Mirkwood (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
 - `src/ui`: design-system-table.md, Screen reader (4); design-system.md, Settings (4); design-system.md, Type (4); design-system-table.md, Two taps (3); design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); architecture.md, Update check (1); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Standards (1); design-system.md, Surfaces (1); design-system.md, Update ribbon (1)
