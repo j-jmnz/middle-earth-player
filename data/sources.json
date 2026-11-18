@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "333d8f5eb4101f2397ac8e0c5ab7101debad827783ad500493f677f8e66a93da"
+        "value": "8aabc8490d8989996f3aeb868517ca7da1cb7362fa6051e62fd7623e78d219ca"
       },
-      "fetchedAt": "2026-11-18T07:53:26.522Z",
+      "fetchedAt": "2026-11-18T12:28:43.616Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -475,6 +475,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Old-Forest",
           "sha256": "816b9ec6df3e64211799c6a381d1f77df35c2d6ed867662c802703173fd2f8bc",
           "bytes": 14799
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Fog-on-the-Barrow-downs.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs",
+          "sha256": "11469da3529bb0f7d60ab6de7bf5b3b34a4be1e4a77f117e66cf47474b3b0546",
+          "bytes": 11639
         }
       ]
     },
