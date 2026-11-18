@@ -22,6 +22,8 @@ import { runEncounterItem } from "./items.ts";
 import { countTop, discardUntil, effectData, encounterCard, lookAtTop, moveEncounter, pushPicked, shuffleDiscardAndVictoryIn, shuffleDiscardIn, shuffleVictoryIn, travelThere } from "./moves.ts";
 import { answeredRaise } from "./reveal.ts";
 import { revealTopEnemies } from "./top-enemies.ts";
+import { ambushChecks, discardTopEncounter, revealEnemies } from "./ambush.ts";
+import { noteFirstEnemy } from "./first-enemy.ts";
 import { searchCollection } from "./collection.ts";
 import { returnFromDiscard } from "./returned.ts";
 import { queueFront } from "../play/refs.ts";
@@ -69,6 +71,15 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return instruction.alsoVictory === true ? shuffleDiscardAndVictoryIn(state, ctx, instruction.trait, instruction.type, instruction.name) : shuffleDiscardIn(state, ctx, instruction.trait, instruction.type, instruction.name);
     case "DiscardUntil":
       return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait);
+    case "AmbushChecks":
+      return ambushChecks(state, focus.sourceId, ctx, steps);
+    case "DiscardTopEncounter":
+      return discardTopEncounter(state, instruction, focus, ctx, steps);
+    case "RevealEnemies":
+      return revealEnemies(state, instruction, focus, ctx, steps);
+    case "FirstEnemyGains":
+      // A marker: noteFirstEnemy reads the constant record as an enemy is revealed.
+      return state;
     case "ResolveWhenRevealed": {
       const id = refCard(state, instruction.card ?? "picked", frameScope(state, focus.seat, focus.sourceId));
       const code = id ? state.cards[id]?.code : undefined;
@@ -135,4 +146,4 @@ export function addTableModifier(state: ScenarioState, modifier: Omit<Modifier, 
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", ...modifier }] };
 }
 
-export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand"], run };
+export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains"], run, revealed: noteFirstEnemy };

@@ -8,6 +8,7 @@ import type { GameEvent, ScenarioState } from "../core/state.ts";
 import { fireForced } from "./triggers.ts";
 import { pushFrame } from "./windows.ts";
 import { board } from "../families/sea/boarding.ts";
+import { pushAmbush } from "../families/encounter/ambush.ts";
 
 // Whether an event may be announced now. A Response is used immediately after its triggering condition has occurred and
 // resolved (rr.response), so an event is announced over any window the framework opened since (an action window, an
@@ -61,15 +62,17 @@ export function drainEvents(state: ScenarioState, ctx: ReduceContext, steps: Eng
   // The Forced effects go on top of the response frame, the first event's last, so they resolve in the order of the events.
   const announce = (from: ScenarioState): ScenarioState =>
     [event, ...together].reverse().reduce((current, each) => fireForced(current, each, ctx, steps), offerResponses(from, event, ctx, steps, together));
+  // An enemy with the ambush keyword added to the staging area makes its checks once what hears it enter has resolved: their frame goes down first (families/encounter/ambush.ts).
+  const ambush = (from: ScenarioState): ScenarioState => [event, ...together].reduce((current, each) => pushAmbush(current, each, ctx, steps), from);
   const window = cleared.window;
-  if (!window) return announce(cleared);
+  if (!window) return announce(ambush(cleared));
   const before = steps.length;
   const marker = pushFrame(
     { ...cleared, window: null },
     { frame: "event", cardId: null, seat: cleared.activeSeat, peril: false, data: { kind: "resume", window, seat: cleared.activeSeat, passed: cleared.passed } },
     steps,
   );
-  const next = announce(marker);
+  const next = announce(ambush(marker));
   if (next.stack.length > marker.stack.length) return next;
   // Nobody hears it: the window stays as it was.
   steps.length = before;

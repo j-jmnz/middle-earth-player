@@ -44,6 +44,8 @@ const optionalInt = z.number().int().nullish();
 export const printedKeywordsSchema = z.strictObject({
   hide: z.number().int().positive().optional(),
   surge: z.boolean().optional(),
+  // Ambush (dwd.ambush): an enemy entering play makes each player, the first player first, an engagement check against it alone (src/rules/families/encounter/ambush.ts).
+  ambush: z.boolean().optional(),
   doomed: z.number().int().positive().optional(),
   peril: z.boolean().optional(),
   archery: z.number().int().positive().optional(),
