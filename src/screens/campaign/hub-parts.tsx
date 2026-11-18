@@ -274,7 +274,11 @@ export function CatalogTile({
   );
 }
 
-/** What is not playable yet, as tiles that wrap (two to a row at phone width, so a name never breaks inside a word): faint, a locked ring, not pressable and read as one label. */
+/**
+ * What is not playable yet, as tiles that wrap (two to a row at phone width, so a name never breaks inside a word): faint, a locked ring,
+ * not pressable and read as one label. Each tile starts from a 46% basis, not `flex-1`: in a wrapping row the native layout measures a
+ * tile's words at its basis, and a basis of 0 puts one word on each line and makes the tile many times too tall.
+ */
 export function LockedTiles({ tiles, testID }: { tiles: readonly { id: string; name: string; caption: string }[]; testID?: string }) {
   const t = useTableTokens();
   return (
@@ -285,8 +289,8 @@ export function LockedTiles({ tiles, testID }: { tiles: readonly { id: string; n
           testID={`locked-${tile.id}`}
           accessible
           accessibilityLabel={`${tile.name}, ${tile.caption}`}
-          className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-item px-4 py-4"
-          style={{ ...rowSurface(false, t), opacity: 0.78 }}
+          className="min-h-32 justify-end gap-1 rounded-item px-4 py-4"
+          style={{ flexBasis: "46%", flexGrow: 1, ...rowSurface(false, t), opacity: 0.78 }}
         >
           <RingMark size={14} state="locked" />
           <Text className="mt-2 font-display text-heading text-faint">{tile.name}</Text>
