@@ -61,7 +61,7 @@ import * as frommoria from "../scenarios/flight-from-moria/game.ts";
 import * as gate from "../scenarios/the-redhorn-gate/game.ts";
 import * as rivendell from "../scenarios/road-to-rivendell/game.ts";
 import * as water from "../scenarios/the-watcher-in-the-water/game.ts";
-// import * as dark from "../scenarios/the-long-dark/game.ts";
+import * as dark from "../scenarios/the-long-dark/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -149,5 +149,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-redhorn-gate", "The Redhorn Gate", gate.GATE_GOLDENS, gate.gateWorld, gate.playGolden),
   entry("road-to-rivendell", "Road to Rivendell", rivendell.RIVENDELL_GOLDENS, rivendell.rivendellWorld, rivendell.playGolden),
   entry("the-watcher-in-the-water", "The Watcher in the Water", water.WATER_GOLDENS, water.waterWorld, water.playGolden),
-  // entry("the-long-dark", "The Long Dark", dark.DARK_GOLDENS, dark.darkWorld, dark.playGolden),
+  entry("the-long-dark", "The Long Dark", dark.DARK_GOLDENS, dark.darkWorld, dark.playGolden),
 ];
