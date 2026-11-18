@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
+import { deckTopFaceUp } from "../../rules/player/deck-play.ts";
 import { updateCard, withMode } from "../../rules/core/state.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { spawn } from "../../rules/core/zones.ts";
@@ -171,7 +172,19 @@ describe("Gandalf, the hero (142002:A:1)", () => {
     // The next card is not offered again this phase.
     const next = run.state.seats[0]?.deck[0] ?? "";
     expect(legalIntents(run.state, tab.ctx)).not.toContainEqual({ type: "PlayCard", cardId: next });
-    expect(refusal(run.state, { type: "PlayCard", cardId: next, payments: [] }, tab.ctx)).toBe("That card is not in hand");
+    expect(refusal(run.state, { type: "PlayCard", cardId: next, payments: [] }, tab.ctx)).toBe("The top card of the deck was already played from this phase");
+    // A card under the top is out of the hand as ever.
+    expect(refusal(run.state, { type: "PlayCard", cardId: run.state.seats[0]?.deck[1] ?? "", payments: [] }, tab.ctx)).toBe("That card is not in hand");
+  });
+
+  it("keeps the top card of the deck faceup while he is in play, whether or not it can be played", () => {
+    const tab = scene();
+    expect(deckTopFaceUp(tab.state, 0, tab.ctx)).toBe(true);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: tab.state.seats[0]?.deck[0] ?? "", payments: [{ heroId: idsOf(tab, GANDALF_HERO), amount: 4 }] }, tab.ctx);
+    // The permission is spent this phase; the new top card still lies faceup.
+    expect(legalIntents(run.state, tab.ctx)).not.toContainEqual({ type: "PlayCard", cardId: run.state.seats[0]?.deck[0] });
+    expect(deckTopFaceUp(run.state, 0, tab.ctx)).toBe(true);
+    expect(deckTopFaceUp(table({ heroes: [{ code: SAM, seat: 0 }], playerDeck: [{ code: BOROMIR, seat: 0 }] }).state, 0, tab.ctx)).toBe(false);
   });
 
   it("the permission is back in the next phase", () => {

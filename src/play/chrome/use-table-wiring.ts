@@ -28,7 +28,7 @@ export function useTableWiring({ store, ctx, game, setReading, setPreview }: { s
   const success = useCallback((code: string) => successOf(ctx.cards, code), [ctx]);
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), [setPreview]);
   // A discard pile or the victory display opens its list; a fold stack says which row it folds (row-fold.ts): its list opens on a tap or a long press; a deck with an encounter card attached to it (Iron Shackles,
-  // 01105:A:1) opens that card, whose preview says what it does.
+  // 01105:A:1) opens that card, whose preview says what it does; a deck the seat plays with its top card faceup (Gandalf, 142002:A:1) opens that card.
   const onPile = useCallback(
     (id: string) => {
       if (id === "staging" || id === "engaged") return setReading({ kind: "row", row: id });
@@ -37,8 +37,11 @@ export function useTableWiring({ store, ctx, game, setReading, setPreview }: { s
       // The Grotto deck's top card is free to read: a tap or a long press opens its preview, which shows the Grotto side it lies on and never the Underwater side behind it (dcce.grotto-deck).
       const grotto = id === "grottoDeck" ? grottoTop(now) : undefined;
       if (grotto) return setPreview({ id: grotto, extra: [] });
-      const shackles = id === "deck" ? now.seats[shownSeat(now, viewedSeat)]?.deckAttached?.[0] : undefined;
-      if (shackles) setPreview({ id: shackles, extra: [] });
+      const seat = shownSeat(now, viewedSeat);
+      const shackles = id === "deck" ? now.seats[seat]?.deckAttached?.[0] : undefined;
+      if (shackles) return setPreview({ id: shackles, extra: [] });
+      const faceUp = id === "deck" && store.getState().faceUpDecks.includes(seat) ? now.seats[seat]?.deck[0] : undefined;
+      if (faceUp) setPreview({ id: faceUp, extra: [] });
     },
     [store, setReading, setPreview],
   );

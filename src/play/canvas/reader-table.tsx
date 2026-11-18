@@ -149,7 +149,8 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   useLayoutEffect(() => {
     store.getState().setRowFolds({ staging: [], engaged: [] });
   }, [store]);
-  const rows = readerRows(game, seat, { facts, cards: readerSeed.cards, nameOf, playable: highlight.tappable, discover });
+  const deckFaceUp = useStore(store, (state) => state.faceUpDecks.includes(seat));
+  const rows = readerRows(game, seat, { facts, cards: readerSeed.cards, nameOf, playable: highlight.tappable, discover, deckFaceUp });
   const deps: CardSpeechDeps = { nameOf, inactive, facts, info, highlight, cards: readerSeed.cards, sheet: readerSeed.sheet, peeking };
   return (
     <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingTop: 12 * s + banner, paddingBottom: 12 * s + bottomInset }}>

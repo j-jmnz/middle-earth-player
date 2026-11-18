@@ -118,8 +118,10 @@ export type LayoutOptions = {
   attacker?: string | null;
   // A fight the player has picked and not confirmed: those characters are drawn beside that enemy already.
   preview?: { enemyId: string; ids: readonly string[]; kind: FightKind } | null;
-  // The top card of the deck when the rules let the player play it (Gandalf, 142002): face up on the deck, and a card.
+  // The top card of the deck when the rules let the player play it now (Gandalf, 142002): face up on the deck, and a card picked up like a hand card.
   deckTop?: CardInstance | null;
+  // The top card of a deck the seat plays with faceup but cannot play now (142002:A:1): drawn face up, and the deck stays a pile, whose tap opens the card.
+  deckShown?: CardInstance | null;
   // The cards a Sailing test looked at, top of the deck first, with the success symbols each prints: laid in a strip over staging (look-strip.ts).
   look?: readonly { card: CardInstance; success: number }[];
   // The strip leaves the staging band to the cards that stand there (Discover's Loot objective and Hazard, which the banner rings above the veil): it lies in the engagement and play bands only (emce.discover).
@@ -190,8 +192,8 @@ export function handCardSize(card: { w: number; h: number }, width: number, coun
 // The narrowest hand card, in Medium's points.
 const HAND_FLOOR = 36;
 
-function pileSlot(view: PileView, rect: Rect, deckTop: CardInstance | null | undefined): CardSlot {
-  const top = view.pile === "deck" ? (deckTop ?? null) : view.top;
+function pileSlot(view: PileView, rect: Rect, deckTop: CardInstance | null | undefined, deckShown?: CardInstance | null): CardSlot {
+  const top = view.pile === "deck" ? (deckTop ?? deckShown ?? null) : view.top;
   const base: CardSlot = {
     ...rect,
     id: `pile:${view.pile}`,
@@ -353,7 +355,7 @@ export function tableLayout(
   // covers it; a tap on the deck opens it (table/view.tsx).
   const held = piles.deck.attached ?? [];
   held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y - (held.length - at) * peek, w: deck.w, h: deck.h })));
-  for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
+  for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop, options.deckShown));
   for (const id of [...SECOND_DECKS, ...SECOND_DISCARDS, "victory"] as const) {
     const view = piles[id];
     const rect = pileRects[id];

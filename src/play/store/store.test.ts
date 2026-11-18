@@ -4,9 +4,12 @@ import { expectOk } from "../../rules/core/test-fixture.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 import { withThreat } from "../../rules/core/state.ts";
+import { deckPlayHero, markDeckPlay } from "../../rules/player/deck-play.ts";
 import { moveCard } from "../../rules/core/zones.ts";
 import { nextIntent } from "../../../test/harness/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../../test/scenarios/a-shadow-of-the-past/game.ts";
+import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { buildTable } from "../../../test/harness/scene.ts";
 
 import { cardSize, HAND_SHOW, handCardSize, tableLayout } from "../layout/layout.ts";
 import { hitSlot } from "../layout/hits.ts";
@@ -277,5 +280,23 @@ describe("motion", () => {
     expect(ghost && ghost.slot.x + ghost.slot.w / 2 + ghost.dx).toBeCloseTo(next.piles.discard.x + next.piles.discard.w / 2);
     // The first draw of a table moves nothing.
     expect([...motionsBetween(null, next, () => null).motions.values()].every(still)).toBe(true);
+  });
+});
+
+// Rules: rr.initiating-abilities-playing-cards. Gandalf (142002:A:1): "Play with the top card of your deck faceup", playable now or not.
+describe("a deck played with its top card faceup", () => {
+  it("stays face up as a pile, not a card to pick up, once the phase's play from it is spent", async () => {
+    const base = await starterBase();
+    // Two seats, Gandalf on the second: the store names that seat only.
+    const tab = buildTable(base, { ring: "none", start: "planning", seats: 2, heroes: [{ code: "141002", seat: 0 }, { code: "142002", seat: 1 }], playerDeck: [{ code: "142004", seat: 1 }, { code: "01028", seat: 1 }] });
+    const permission = deckPlayHero(tab.state, 1, tab.ctx);
+    if (!permission) throw new Error("Gandalf is not in play");
+    const spent = markDeckPlay(tab.state, permission);
+    const state = createTableStore({ ctx: tab.ctx, game: spent }).getState();
+    const top = spent.seats[1]?.deck[0] ?? "";
+    expect(state.faceUpDecks).toEqual([1]);
+    expect(state.draggable).not.toContain(top);
+    const deck = tableLayout(560, 330, views(spent), piles(spent), { deckShown: spent.cards[top] }).slots.find((slot) => slot.zone === "deck");
+    expect(deck).toMatchObject({ id: "pile:deck", kind: "pile", code: spent.cards[top]?.code, faceDown: false });
   });
 });

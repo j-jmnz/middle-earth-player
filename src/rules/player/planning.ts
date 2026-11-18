@@ -8,7 +8,7 @@ import { discardsLocked } from "../families/angmar/lock.ts";
 import { announceEventAction } from "../families/deck/pressure.ts";
 import { playLimit, playLimitReason } from "../families/dungeon/limit.ts";
 import { effectCause, ruleCause } from "../core/cause.ts";
-import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
+import { deckPlayHero, deckTopFaceUp, markDeckPlay, playableFromDeck } from "./deck-play.ts";
 import { holds } from "../interpret/conditions.ts";
 import { familyPlayRefusal } from "../interpret/family-hooks.ts";
 import { effectsOf } from "../windows/listen.ts";
@@ -210,6 +210,9 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   const instance = state.cards[cardId];
   const fromDeck = instance?.zone === "deck" && playableFromDeck(state, cardId, state.activeSeat, ctx);
   const fromDiscard = instance?.zone === "discard" && !discardsLocked(state) && (discardPlay(ctx, instance.code).allowed || discardGranted(state, state.activeSeat, ctx).includes(instance.id));
+  // The faceup top card of the deck whose once-per-phase play is spent (142002:A:1) says so, not that it is out of the hand.
+  const spentTop = instance?.zone === "deck" && !fromDeck && state.seats[state.activeSeat]?.deck[0] === cardId && deckTopFaceUp(state, state.activeSeat, ctx);
+  if (spentTop && instance.controller === state.activeSeat) return "The top card of the deck was already played from this phase";
   if (!instance || (instance.zone !== "hand" && !fromDeck && !fromDiscard) || instance.controller !== state.activeSeat) return "That card is not in hand";
   if (instance.zone === "hand" && discardPlay(ctx, instance.code).only) return "That card can only be played from the discard pile";
   // "Play only if ..." (a play restriction, rr.initiating-abilities-playing-cards).
