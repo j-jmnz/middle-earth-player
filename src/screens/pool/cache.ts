@@ -8,6 +8,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { deckPacks } from "../../catalog/collection";
 import { cards, packs } from "../../catalog/schema";
 import { notAppliedCodes } from "../../play/cards/not-applied";
+import { MOTK_PACK } from "../groups/motk";
 
 import { sortPool } from "./filter";
 
@@ -40,6 +41,11 @@ function selectPool<TRun>(catalog: Db<TRun>) {
   return catalog.select(columns).from(cards).where(eq(cards.deckLegal, true)).all();
 }
 
+// The Messenger of the King's heroes: browse only, so never in the deck-legal rows; the Cards tab shows them under their own type chip.
+function selectMotk<TRun>(catalog: Db<TRun>) {
+  return catalog.select(columns).from(cards).where(eq(cards.packCode, MOTK_PACK)).all();
+}
+
 export type PoolEntry = ReturnType<typeof selectPool>[number];
 
 export type PoolPackRow = { code: string; name: string; position: number; cyclePosition: number };
@@ -52,6 +58,8 @@ export type PoolData = {
   packs: readonly PoolPackRow[];
   /** The codes with a printed line the app does not apply. */
   notApplied: ReadonlySet<string>;
+  /** The Messenger of the King's heroes, in name order: browse only, never added to a deck. */
+  motk: readonly PoolEntry[];
 };
 
 const pools = new WeakMap<object, PoolData>();
@@ -69,6 +77,7 @@ export function readPool<TRun>(catalog: Db<TRun>): PoolData {
       .all()
       .filter((pack) => held.has(pack.code)),
     notApplied: notAppliedCodes(rows.map((row) => [row.code, row.errata ?? row.text] as const)),
+    motk: sortPool(selectMotk(catalog)),
   };
 }
 

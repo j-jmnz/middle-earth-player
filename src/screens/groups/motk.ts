@@ -1,5 +1,5 @@
-// The Messenger of the King's heroes (pack MotKA): RingsDB's browse-only stand-ins for the allies the contract turns into heroes, as one group
-// of the Cards tab. Each is tied to its ally's code (99 and the ally's code). Pure.
+// The Messenger of the King's heroes (pack MotKA): RingsDB's browse-only stand-ins for the allies the contract turns into heroes, listed under
+// their own type chip in the Cards tab's Player cards view. Each is tied to its ally's code (99 and the ally's code). Pure.
 import { groupCard, type GroupCard, type GroupRow } from "./group-types";
 
 export const MOTK_PACK = "MotKA";
@@ -22,7 +22,7 @@ export function untagged(name: string): string {
   return name.replace(/^\([^)]*\)\s*/, "");
 }
 
-/** The line under a hero in the grid: the ally's pack, which tells two heroes of one name apart ("Ally · The Hunt for Gollum"). */
+/** The strip on a hero in the pool: the ally's pack, which tells two heroes of one name apart ("Ally · The Hunt for Gollum"). */
 export function allyNote(packName: string | undefined): string {
   return packName ? `Ally · ${packName}` : "Ally";
 }

@@ -5,8 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
 import { groupDataOf, scenarioFacts } from "./cache.ts";
-import { cardGroupOf, MOTK_GROUP_ID } from "./card-group.ts";
-import { MOTK_NOTE } from "./motk.ts";
+import { cardGroupOf } from "./card-group.ts";
 import { isCampaignRow } from "./campaign-tree.ts";
 import type { TypeGroup } from "./group-types.ts";
 import { isScenarioRow } from "./scenario-tree.ts";
@@ -75,16 +74,13 @@ describe("the group cache", () => {
     expect(new Set(anborn).size).toBe(2);
   });
 
-  it("resolves a set, a campaign section and the heroes by the route's kind and id", () => {
+  it("resolves a set and a campaign section by the route's kind and id", () => {
     const trees = { scenario: data.scenario(), campaign: data.campaign() };
     const set = [...trees.scenario.byKey.keys()][0]!;
     expect(cardGroupOf(data, "set", set)?.spoiler).toBe(true);
     const section = [...trees.campaign.byKey.keys()][0]!;
     expect(cardGroupOf(data, "campaign", section)?.groups.length).toBeGreaterThan(0);
-    expect(cardGroupOf(data, "motk", MOTK_GROUP_ID)).toMatchObject({ spoiler: false, title: "Messenger of the King heroes", subtitle: `84 cards · ${MOTK_NOTE}` });
-    expect(cardGroupOf(data, "motk", MOTK_GROUP_ID)).toBe(cardGroupOf(data, "motk", MOTK_GROUP_ID));
     expect(cardGroupOf(data, "set", "nowhere~Nothing")).toBeNull();
-    expect(cardGroupOf(data, "motk", "other")).toBeNull();
   });
 
   it("names the scenario that gives Turayn", () => {

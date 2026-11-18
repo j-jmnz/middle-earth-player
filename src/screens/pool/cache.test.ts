@@ -26,6 +26,14 @@ describe("the pool cache", () => {
     for (const code of pool.notApplied) expect(pool.byCode.has(code)).toBe(true);
   });
 
+  it("holds the Messenger of the King heroes apart from the deck-legal pool, sorted by name", () => {
+    const pool = poolOf(catalog);
+    expect(pool.motk.length).toBe(84);
+    expect(pool.motk.every((row) => !row.deckLegal && row.typeCode === "hero")).toBe(true);
+    expect(sortPool(pool.motk).map((row) => row.code)).toEqual(pool.motk.map((row) => row.code));
+    for (const row of pool.motk) expect(pool.byCode.has(row.code)).toBe(false);
+  });
+
   it("gives another handle its own pool", () => {
     const other = drizzle(new Database(temporaryCatalog(), { readonly: true }));
     expect(poolOf(other)).not.toBe(poolOf(catalog));

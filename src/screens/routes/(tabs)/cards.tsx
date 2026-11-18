@@ -7,7 +7,6 @@ import { CardPool, CardPoolBody } from "../../pool/card-pool";
 import { cardsWord } from "../../groups/card-group";
 import { CardGroupBody, useCardGroup } from "../../groups/group-body";
 import { CampaignList } from "../../groups/campaign-list";
-import { MotkRow } from "../../groups/motk-row";
 import { ScenarioList } from "../../groups/scenario-list";
 import { CARDS_VIEWS, viewOf, viewWrites, type CardsView } from "../../groups/view";
 import { BodyText, HubHeader, PillButton, Screen, Segmented } from "../../kit/chrome";
@@ -48,7 +47,6 @@ export default function Cards() {
       <View className="mb-1 mt-2">
         <Segmented options={CARDS_VIEWS} value={view} onChange={choose} testIDPrefix="cards-view" stretch accessibilityLabel="Cards" />
       </View>
-      {view === "Player" ? <MotkRow /> : null}
     </>
   );
   const expanded = size === "expanded";
