@@ -5,6 +5,7 @@ import { resolveAmount } from "./amounts.ts";
 
 import { characters } from "../combat/combat.ts";
 import { hasTrait } from "./conditions.ts";
+import { sideOf } from "../families/breaking/areas.ts";
 import { constantInstructions } from "./constant-records.ts";
 import { attachedCount } from "../families/sidequests/contract.ts";
 import { areaOf } from "../families/stormcaller/zone.ts";
@@ -24,7 +25,7 @@ function cardsInPlay(state: ScenarioState): CardInstance[] {
 
 // Hobbit heroes the source's controller has.
 function hobbitHeroes(state: ScenarioState, source: CardInstance, ctx: ReduceContext): number {
-  const seat = source.controller ?? state.firstPlayer;
+  const seat = sideOf(state, source) ?? state.firstPlayer;
   return (state.seats[seat]?.heroes ?? []).filter((id) => hasTrait(state, id, "Hobbit", ctx)).length;
 }
 
@@ -66,7 +67,7 @@ function holdersOf(state: ScenarioState, source: CardInstance, target: string | 
       return livingSeats(state).map((seat) => `seat:${seat}`);
     // The source controller's seat ("You draw 1 additional card during the resource phase").
     case "actorSeat":
-      return [`seat:${source.controller ?? state.firstPlayer}`];
+      return [`seat:${sideOf(state, source) ?? state.firstPlayer}`];
     default:
       return [source.id];
   }
@@ -75,7 +76,7 @@ function holdersOf(state: ScenarioState, source: CardInstance, target: string | 
 // The holders a constant names by filter, from its controller's side ("Each Outlands character you control"). A player card's
 // constant does not reach a card immune to player card effects (mec109.immune-to-player-card-effects).
 function matching(state: ScenarioState, source: CardInstance, filter: PickSpec, ctx: ReduceContext): string[] {
-  return pickCandidates(state, filter, source.controller ?? state.firstPlayer, [], source.id, ctx);
+  return pickCandidates(state, filter, sideOf(state, source) ?? state.firstPlayer, [], source.id, ctx);
 }
 
 // A constant set ("Reduce attached hero's Willpower, Attack, and Defense to 0", 141055:A:2) is a set modifier (rr.modifiers).
@@ -97,7 +98,7 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
     if (instruction.verb === "SetStat") found.push(...setRecord(state, source, effect.id, instruction, ctx));
     if (instruction.verb !== "ModifyStat") continue;
     // "for each Hobbit hero you control", "for each enemy engaged with you" are counted here, each time the records are rebuilt.
-    const seat = source.controller ?? state.firstPlayer;
+    const seat = sideOf(state, source) ?? state.firstPlayer;
     const base = resolveAmount(state, instruction.amount, { actor: seat, sourceId: source.id }, ctx);
     const read = instruction.per === "hobbitHero" ? base * hobbitHeroes(state, source, ctx) : base;
     const amount = instruction.subtract ? -read : read;

@@ -255,7 +255,7 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return instruction.reveal ? `reveal the top card of ${deck} and ${where}` : `${instruction.to === "engaged" ? "put" : "add"} the top card of ${deck} ${instruction.to === "engaged" ? "into play engaged with you" : "to the staging area"}`;
     }
     case "PlaceFacedownUnder":
-      return `place ${instruction.target === "self" ? "the attacking enemy" : "it"} facedown under ${names.code(instruction.code)}${instruction.afterAttack ? " after this attack" : ""}`;
+      return `place ${instruction.target === "self" ? "the attacking enemy" : "it"} facedown under ${instruction.code != null ? names.code(instruction.code) : "this card"}${instruction.afterAttack ? " after this attack" : ""}`;
     case "ShuffleEncounterDeck":
       return null;
     // The quest family's verbs (src/catalog/families/quest.ts).

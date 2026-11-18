@@ -13,7 +13,7 @@ import { livingSeats, updateCard } from "../../core/state.ts";
 import { raiseFor } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { areaOf, stagingDest } from "./areas.ts";
+import { areaOf, sharing, stageSeat, stagingDest } from "./areas.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { ringBearerId } from "../burden/deck.ts";
 
@@ -22,6 +22,8 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
   switch (instruction.verb) {
     case "RevealIfDiscarded":
       return state;
+    case "CancelRevealed":
+      return cancelRevealed(state, focus);
     case "RaiseThreatAtStage":
       return raiseAtStage(state, instruction.amount, focus, ctx, steps);
     case "MoveToLeftArea":
@@ -44,10 +46,21 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
   }
 }
 
-// "Each player at this stage raises his threat" (142077:A:1): the seat whose staging area holds the source; every living seat with one staging area.
+// CancelRevealed (148004:B:1): the reveal frame of the card the event is about is marked canceled and the card, in the staging area, goes to the encounter discard pile: the reveal is over (windows/frames.ts revealStep, a canceled reveal whose card left the staging area pops).
+function cancelRevealed(state: ScenarioState, focus: Focus): ScenarioState {
+  const id = refCard(state, "subject", frameScope(state, focus.seat, focus.sourceId));
+  const at = id ? state.stack.findLastIndex((frame) => frame.cardId === id && frame.data.kind === "reveal") : -1;
+  const frame = state.stack[at];
+  if (!id || frame?.data.kind !== "reveal" || state.cards[id]?.zone !== "staging") return state;
+  const discarded = updateCard(moveCard(state, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
+  return { ...discarded, stack: discarded.stack.map((entry, index) => (index === at && entry.data.kind === "reveal" ? { ...entry, data: { ...entry.data, canceled: true } } : entry)) };
+}
+
+// "Each player at this stage raises his threat" (142077:A:1): the seat whose staging area holds the source; every living seat with one staging area. A stage as the source (148003:B:2): the players that share its area, none while no player is at it.
 function raiseAtStage(state: ScenarioState, amount: number, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const owner = focus.sourceId ? areaOf(state, focus.sourceId) : null;
-  const seats = state.separate ? (owner == null ? [] : [owner]) : livingSeats(state);
+  const atStage = focus.sourceId && owner == null ? stageSeat(state, focus.sourceId) : null;
+  const seats = state.separate ? (owner != null ? [owner] : atStage != null ? sharing(state, atStage) : []) : livingSeats(state);
   let next = state;
   for (const seat of seats) {
     if (state.seats[seat]?.eliminated) continue;

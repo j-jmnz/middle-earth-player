@@ -332,6 +332,9 @@ export type ScenarioState = {
   // The seats that have had their travel opportunity this round while stages are separate: each seat in player order may travel to a location of its own
   // staging area (machine.ts, travel.ts).
   travelDone?: readonly number[];
+  // The seats whose own quest phase ended this round while stages are separate ("End your quest phase (do not resolve the quest)", 148004:A:1): no more cards are revealed for them and their quest is not resolved
+  // (quest/stage-reveal.ts resolveSeparate, which drops the list once every other seat has resolved). Absent otherwise.
+  questEnded?: readonly number[];
   // Progress a stage 3B turned into cards to discard from the encounter deck, until the progress step is over (families/breaking/progress.ts).
   progressOwed?: readonly { seat: number; amount: number }[];
   stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: { codes: readonly string[]; otherwise?: string; remove?: true; different?: true }; deck?: true }[];

@@ -49,7 +49,7 @@ export function modifiedStat(
   against?: string,
 ): number {
   // "Use their Willpower instead of Defense" (06038).
-  if (stat === "defense" && defenseFromWillpower(state, instance.id)) return modifiedStat(state, instance, "willpower", cards, against);
+  if (stat === "defense" && defenseFromWillpower(state, instance, cards)) return modifiedStat(state, instance, "willpower", cards, against);
   // "During the encounter phase, treat each enemy's engagement cost as if it were 0" (41005:B:1).
   if (stat === "engagementCost" && state.phase === "Encounter" && flagged(state, "table", "engagementCostZero")) return 0;
   const printed = printedOf(cards, instance.code);

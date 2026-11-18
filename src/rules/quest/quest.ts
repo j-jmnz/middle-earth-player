@@ -26,6 +26,7 @@ import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts"
 import { branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
+import { engagedContributors } from "./engaged-threat.ts";
 import { rescueRandom } from "../families/captured/rescue.ts";
 import { oweDiscards } from "../families/breaking/progress.ts";
 import { arrivalFace, orderedNext } from "../families/quest/order.ts";
@@ -70,16 +71,7 @@ export function stagingThreatSources(state: ScenarioState, cards: Cards, seat?: 
   // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1; "While engaged with a player, Faithless Desecrator
   // contributes its Threat", 12075:A:1). Only the games with ships (`sea`) or an Uncharted deck (`uncharted`) have such a card, so no other game reads the engaged enemies here.
   // `engagedThreatSeat` on a seat ("each enemy engaged with you adds its Threat ... until the end of the round", 143065:A:2) is read live: an enemy that engages that seat later counts too (rr.lasting-effects).
-  const hasEngagedContributors = view.sea || view.uncharted || view.modifiers.some((modifier) => modifier.stat === "engagedThreat" || modifier.stat === "engagedThreatSeat");
-  if (hasEngagedContributors) {
-    view.seats.forEach((seat, index) => {
-      const whole = flagged(view, `seat:${index}`, "engagedThreatSeat");
-      for (const id of seat.engaged) {
-        const instance = view.cards[id];
-        if (instance && (whole || flagged(view, id, "engagedThreat")) && !flagged(view, id, "noThreatContribution")) sources.push({ id, threat: modifiedStat(view, instance, "threat", cards), from: "engaged" });
-      }
-    });
-  }
+  sources.push(...engagedContributors(view, cards));
   // An active location that contributes its Threat to the staging area's ("While Flooded Ruins is the active location, it contributes its Threat", 11072:A:1).
   for (const id of [view.activeLocation, view.secondActiveLocation]) {
     const instance = id ? view.cards[id] : undefined;
@@ -297,7 +289,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     if (!currentId) return { ...next, stageCleared: true };
     const current = next.cards[currentId];
     if (!current) return { ...next, stageCleared: true };
-    // A defeated stage that waits for the first player to choose the next one (LookAtStages), or a final stage that holds the win (`holdsWin`, 02106:B:1) and waits for its own Forced effect, stays where it is.
+    // A defeated stage that waits for the first player to choose the next one (LookAtStages), or a final stage that holds the win (`holdsWin`, 02106:B:1, 148003:B:3: no stage follows it, though the quest's order lists one) and waits for its own Forced effect, stays where it is.
     if (next.stageChoice === "due" || next.stageHeld === currentId) return next;
     // Defeating a stage when the Stormcaller is at its stage means the players have caught up to it and win (families/stormcaller/values.ts, 12013:B:3).
     if (caughtUp(next, current.code)) return clearStage(next);
@@ -313,7 +305,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     const rolled = ordered || branched ? null : randomStageFrom(next, current.code);
     if (rolled) next = rolled.state;
     const nextId = ordered ? ordered.id : rolled ? rolled.id : (() => {
-      const nextCode = branched ? branched.code : index < 0 ? undefined : next.stages[index + 1]?.code;
+      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : next.stages[index + 1]?.code;
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();
     if (!nextId) return flagged(next, currentId, "holdsWin") ? holdStage(next, currentId) : clearStage(next);

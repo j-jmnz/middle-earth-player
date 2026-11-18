@@ -3,6 +3,7 @@ import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
 import { DIRE_ELIMINATION_LEVEL } from "../families/black-gate/dire.ts";
 import { discardArea } from "../families/breaking/areas.ts";
+import { discardIsolated } from "../families/breaking/barrow.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { gameReads } from "./game-reads.ts";
@@ -73,7 +74,8 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
   }
   // Stages that are separate: the stage of an eliminated seat is discarded with the encounter cards at it (mec109.multiple-staging-areas). The
   // enemies that were engaged with it returned to its staging area above.
-  if (next.separate) for (let index = 0; index < next.seatCount; index += 1) if (next.seats[index]?.eliminated) next = discardArea(next, index);
+  // Fog on the Barrow-downs' areas (`isolated`): the stage that stays in play is parked and a trapped player's stage goes back to the quest deck (families/breaking/barrow.ts).
+  if (next.separate) for (let index = 0; index < next.seatCount; index += 1) if (next.seats[index]?.eliminated) next = next.isolated ? discardIsolated(next, index) : discardArea(next, index);
   if (heir != null && heir !== next.firstPlayer) next = { ...next, firstPlayer: heir };
   return next;
 }

@@ -53,10 +53,13 @@ const failureAmountRead = (state: ScenarioState, ctx: ReduceContext): boolean =>
 function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean): ScenarioState {
   let next = state;
   for (const seat of areaSeats(state)) {
+    // A seat whose own quest phase ended resolves nothing (EndQuestPhase `own`, 148004:A:1).
+    if ((state.questEnded ?? []).includes(seat)) continue;
     next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat, failureAmountRead(state, ctx));
     if (next.stageCleared || next.lost) break;
   }
-  return clearCommitted(next);
+  const { questEnded: _ended, ...rest } = next;
+  return clearCommitted(rest);
 }
 
 // After progress was placed on the quest (from `steps[before]` on): each stage the quest advanced to has its When Revealed

@@ -56,6 +56,16 @@ const VERBS = [
   // The source (default) or the last picked enemy, in a staging area or engaged, moves to the first player's staging area ("move 1 enemy engaged with you to
   // the first player's staging area", 142080:A:2; "move attacking enemy to the first player's staging area", 142080:A:3). With one staging area it goes to it.
   z.strictObject({ verb: z.literal("MoveToFirstStaging"), target: z.enum(["self", "picked"]).optional(), ...when }),
+  // The acting seat leaves the stage the players share (stage 3B) for a stage and a staging area of its own: the quest deck's card with this printed code (stage 4A, one copy for each player) becomes its stage, side B up, and its When Revealed effects resolve for
+  // the seat ("remove each character you control from the quest and create your own staging area. Then advance to a separate stage 4A by yourself", 148007:A:2; mec108.create-staging-area). The other players keep the shared stage and its staging area, the source card
+  // with them; from here each area resolves as if only its players were in the game (`ScenarioState.isolated`), and a stage no player is at stays in play, parked. Nothing happens when the seat is not at the shared stage or no copy is left in the quest deck.
+  z.strictObject({ verb: z.literal("SplitToOwnStage"), code: z.string().min(1), ...when }),
+  // The acting seat's own stage (stage 4B) goes back to the quest deck with no progress and the seat is at the stage with this printed code again (3B): its enemies, locations and active location join that stage's staging area (engaged enemies stay engaged), and the seat joins the players there or
+  // takes the stage when none is ("advance to stage 3B at the beginning of the travel phase (combining staging areas with stage 3B)", 148004:B:2). Once every living player shares one area the areas are the shared one again.
+  z.strictObject({ verb: z.literal("ReturnToSharedStage"), code: z.string().min(1), ...when }),
+  // The card the event is about (a location just revealed, `locationRevealed`) has its effects canceled and goes to the encounter discard pile instead of staying in the staging area; the reveal is over, no card is revealed in its place ("cancel its effects and discard it", 148004:B:1).
+  // Nothing happens when the card is not the one being revealed.
+  z.strictObject({ verb: z.literal("CancelRevealed"), ...when }),
   // Fallen Into Evil (142083:A:1), attached to a non-Fellowship hero: the hero moves to the first player's staging area as an enemy (its Threat is its Willpower, its
   // engagement cost its threat cost) and leaves its player's control. It is the same card with the code `<code>~enemy` (src/rules/core/printed.ts); its game text is
   // blank while it is one.
@@ -79,6 +89,9 @@ const TRIGGERS = [
   // so that stage's Forced effect resolves for that seat ("Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging
   // area is less than 4, reveal 1 encounter card", 142063:A:1 to 142066:A:1).
   "stageDiscarded",
+  // About a location a seat just revealed, in the staging area, before any of its effects resolve and before the Responses to its reveal are offered; the event's seat is the seat that revealed it ("Forced: When a location is revealed at this stage", 148004:B:1).
+  // A Forced effect heard here resolves first; when it cancels the reveal (CancelRevealed) no Response is offered.
+  "locationRevealed",
 ] as const;
 
 const FLAGS = [
@@ -105,6 +118,8 @@ const FLAGS = [
   // On "table", while a card holds it: the encounter phase is skipped, with its optional engagements and engagement checks ("Skip the encounter phase",
   // 142061:B:1; rules/engine/machine.ts). The combat phase still follows.
   "skipEncounter",
+  // On a stage: it stays in play, with its staging area, when the player at it is eliminated (parked until a player is at it again), not discarded with the player's area ("Forced: After a player is eliminated (at any stage)", 148003:B:2; rules/families/breaking/barrow.ts).
+  "staysInPlay",
 ] as const;
 
 export const manifest = { name: "breaking", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

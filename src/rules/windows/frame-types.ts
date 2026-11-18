@@ -32,7 +32,7 @@ export type Modifier = {
   liveScouts?: true;
   // A `revealDoomed` modifier's amount while this stage is current, read when each card is revealed (RevealedGainDoomed `instead`, families/angmar/weather.ts).
   stageAmount?: { stage: number; amount: number };
-  // The Trait a `traitGained` modifier gives its holder ("gain a Trait of your choice", 11195:A:5).
+  // The Trait a `traitGained` modifier gives its holder ("gain a Trait of your choice", 11195:A:5), or the Trait an `engagedThreatSeat` modifier narrows its enemies to (quest/engaged-threat.ts).
   trait?: string;
 };
 
@@ -219,7 +219,8 @@ export type DelayedEffect = {
   // resolves otherwise. `questFailed`: the same, when they quest unsuccessfully (900307:A:1).
   // `endOfAttack`: the end of the player attack in progress (families/attack/flow.ts).
   // `startOfGame`: run once the opening hands are settled (misc family).
-  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "questFailed" | "endOfAttack" | "startOfGame";
+  // `beginningOfTravel`: run when the next travel phase begins (windows/triggers.ts crossBoundary).
+  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "questFailed" | "endOfAttack" | "startOfGame" | "beginningOfTravel";
   sourceId: string | null;
   seat: number;
   // The phase the effect was scheduled in. An end-of-phase effect fires when that phase ends.

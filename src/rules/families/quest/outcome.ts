@@ -25,7 +25,8 @@ export function questOutcome(state: ScenarioState, ctx: ReduceContext): QuestOut
   const committed = livingSeats(state).flatMap((seat) => [...(state.seats[seat]?.heroes ?? []), ...(state.seats[seat]?.play ?? [])].filter((id) => state.cards[id]?.committed === true));
   if (state.separate) {
     const bySeat: Record<number, Result> = {};
-    for (const seat of livingSeats(state)) bySeat[seat] = resultOf(committedWillpower(state, ctx.cards, seat), stagingThreat(state, ctx.cards, seat));
+    // A seat whose quest phase ended resolves no quest (EndQuestPhase `own`), so it is neither a success nor a failure.
+    for (const seat of livingSeats(state)) if (!(state.questEnded ?? []).includes(seat)) bySeat[seat] = resultOf(committedWillpower(state, ctx.cards, seat), stagingThreat(state, ctx.cards, seat));
     const results = Object.values(bySeat);
     const result = results.length > 0 && results.every((each) => each === "success") ? "success" : results.length > 0 && results.every((each) => each === "failure") ? "failure" : "tie";
     return { committed, result, bySeat };

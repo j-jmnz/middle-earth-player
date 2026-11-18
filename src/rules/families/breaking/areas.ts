@@ -61,6 +61,15 @@ export function areaHeadOf(state: ScenarioState, id: string): number | null {
   return card.zone === "engaged" && card.controller != null ? headOf(state, card.controller) : null;
 }
 
+// The seat a card's constants and records read as "you" and "the first player": its controller (the first player with none), or, while the areas are isolated, the first player of the area it lies in (a staging card's controller is whoever revealed it, not whoever is there now).
+// Null for a staging card or an active location in no area while a stage is parked: no player is at it, so its constants hold for nobody. (Escape from Mount Gram's cards in every area have no area either, and keep their controller.)
+export function sideOf(state: ScenarioState, card: CardInstance): number | null {
+  if (!isolatedAreas(state)) return card.controller ?? state.firstPlayer;
+  const head = areaHeadOf(state, card.id);
+  if (head != null) return firstOfArea(state, head);
+  return parkedStage(state) != null && (card.zone === "staging" || card.zone === "activeLocation") ? null : (card.controller ?? state.firstPlayer);
+}
+
 // The living seats that own an area (not a seat that joined another): the seats a phase resolves for once stages are separate. A game with no joined seat returns every living seat.
 export function areaSeats(state: ScenarioState): number[] {
   return state.separate ? livingSeats(state).filter((index) => headOf(state, index) === index) : livingSeats(state);
@@ -87,7 +96,8 @@ export function inAreaOf(state: ScenarioState, card: CardInstance, seat: number)
   if (!state.separate) return true;
   if (card.zone === "engaged") return card.controller != null && headOf(state, card.controller) === seat;
   const area = areaOf(state, card.id);
-  return area == null || headOf(state, area) === seat;
+  // A staging card in no seat's list is in no area while its stage is parked, and in every area before stage 2B deals it out.
+  return area == null ? parkedStage(state) == null : headOf(state, area) === seat;
 }
 
 // The seat whose staging area holds the card, or null when it is in no area (the shared staging area, or not in staging).
@@ -102,6 +112,11 @@ export function sharedStaging(state: ScenarioState): readonly string[] {
   if (!state.separate) return state.staging;
   const owned = new Set(state.seats.flatMap((seat) => seat.staging));
   return state.staging.filter((id) => !owned.has(id));
+}
+
+// The stage no player is at while the areas are isolated (Fog on the Barrow-downs, stage 3B when every player is trapped): the stage in play with no seat, held in `ScenarioState.questStage`. Null otherwise.
+export function parkedStage(state: ScenarioState): string | null {
+  return state.separate === true && state.isolated === true ? state.questStage : null;
 }
 
 // The seat's quest stage, or the shared one when stages are not separate.
@@ -153,7 +168,7 @@ export function activeFor(state: ScenarioState, seat: number, all = false): stri
 }
 
 // The shared slots mirror the seats' active locations (see the header).
-function mirrored(state: ScenarioState): ScenarioState {
+export function mirrorActive(state: ScenarioState): ScenarioState {
   const first = state.seats[0].active ?? null;
   const second = state.seats[1].active ?? null;
   return state.activeLocation === first && state.secondActiveLocation === second ? state : { ...state, activeLocation: first, secondActiveLocation: second };
@@ -181,7 +196,7 @@ export function mergeView(state: ScenarioState, asked: number | undefined, view:
   // The view's first player is the area's own (viewOf), unless the view passed the token on.
   const first = isolatedAreas(state) && view.firstPlayer === firstOfArea(state, seat) ? { firstPlayer: state.firstPlayer } : {};
   const merged: ScenarioState = { ...plain, ...first, seats, questStage: state.questStage, staging: [...kept, ...added] };
-  return mirrored({ ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") });
+  return mirrorActive({ ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") });
 }
 
 // Runs `act` on the seat's view and writes the result back.
@@ -225,5 +240,5 @@ function passArea(state: ScenarioState, seat: number, heir: number): ScenarioSta
     if (index !== heir && other?.joined === seat) next = withSeat(next, index, { ...other, joined: heir });
   }
   const { stage: _stage, active: _active, ...left } = next.seats[seat] ?? owner;
-  return mirrored(withSeat(next, seat, { ...left, staging: [] }));
+  return mirrorActive(withSeat(next, seat, { ...left, staging: [] }));
 }

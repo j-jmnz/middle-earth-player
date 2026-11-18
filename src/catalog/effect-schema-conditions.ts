@@ -313,6 +313,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),
+  // Every living player is at the source stage, sharing its staging area, or not (`is: false`): "unless each player in the game is at this stage" (148003:B:3). With one shared staging area it holds; false for a stage no player is at. Read by the breaking family.
+  z.strictObject({ kind: z.literal("allAtStage"), is: z.boolean() }),
   // The current quest, read by the angmar family: `side` a side quest is the current quest ("If the current quest is a side quest", 09047:A:1), `self` the source is the side quest that is the current quest ("While Orc Rearguard is the current quest", 09023:A:2),
   // `other` there is a quest card besides the current one that may be chosen to be the current quest (09049:A:2: the main quest card, or an encounter side quest in the staging area).
   z.strictObject({ kind: z.literal("currentQuest"), is: z.enum(["side", "self", "other"]) }),

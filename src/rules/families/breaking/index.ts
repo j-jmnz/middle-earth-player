@@ -18,6 +18,8 @@ import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { manifest as catalog } from "../../../catalog/families/breaking.ts";
 import { areaOf, mergeView, viewOf } from "./areas.ts";
+import { returnToSharedStage, splitOff } from "./barrow.ts";
+import { allAtStageHolds, eventFrozen } from "./conditions.ts";
 import { noteSkippedStage, questCardDefeatedHeard } from "../quest/branch.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { runCards } from "./cards.ts";
@@ -41,6 +43,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return startSeparateStage(state, instruction.code, focus.seat, instruction.reveal === true ? { ctx, steps } : undefined);
     case "AdvanceToStage":
       return advanceToStage(state, instruction.code, ctx, steps);
+    case "SplitToOwnStage":
+      return splitToOwnStage(state, instruction.code, focus.seat, ctx, steps);
+    case "ReturnToSharedStage":
+      return returnToSharedStage(state, instruction.code, focus.seat);
     case "DealOutStaging":
       return state;
     case "MovePickedToOwnStaging":
@@ -79,6 +85,15 @@ export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceCo
   // Only a game with a card that hears "after a quest card is defeated" keeps the stage it left (Lost in Mirkwood's letters), so every other game's state stays as it was.
   if (currentId && questCardDefeatedHeard(next, ctx)) next = noteSkippedStage(next, nextId, currentId);
   return afterProgress(next, before, ctx, steps);
+}
+
+// SplitToOwnStage (148007:A:2): families/breaking/barrow.ts leaves the shared stage; the stage 4A copy is revealed for the seat as an advanced stage is.
+function splitToOwnStage(state: ScenarioState, code: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const split = splitOff(state, code, seat);
+  if (!split) return state;
+  const before = steps.length;
+  steps.push({ kind: "advance", cardId: split.stageId });
+  return afterProgress(split.state, before, ctx, steps);
 }
 
 // RemoveRingBearer (142062:A:1): the Ring-bearer, and each card attached to it, leave the game. The cards go to the removed zone directly: The One Ring
@@ -152,4 +167,4 @@ function discardSharedStage(state: ScenarioState): ScenarioState {
   return next;
 }
 
-export const manifest: RulesFamily = { name: "breaking", verbs: ["RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };
+export const manifest: RulesFamily = { name: "breaking", condition: (state, found, scope) => allAtStageHolds(state, found, scope.sourceId), play: (state, cardId, ctx, how) => how.putting !== true && eventFrozen(state, cardId, how.seat, ctx.cards), playReason: (state, cardId, ctx) => (eventFrozen(state, cardId, undefined, ctx.cards) ? "Players cannot trigger Action or Response effects until the end of the round" : null), verbs: ["SplitToOwnStage", "ReturnToSharedStage", "CancelRevealed", "RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };

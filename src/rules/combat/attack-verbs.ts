@@ -149,7 +149,7 @@ export function modifyStat(
   for (const id of targets) {
     if (trait != null && !id.startsWith("seat:") && !isTraitedEnemies(id) && !isTraitedStaging(id) && !isTraitedLocations(id) && !hasTrait(next, id, trait, ctx)) continue;
     if (id === "table") next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId, stat: instruction.stat, amount, until: instruction.until }] };
-    else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
+    else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until, ...(trait != null && instruction.stat === "engagedThreatSeat" ? { trait } : {}) }] };
     else next = isClassHolder(id)
       ? addClassModifier(next, id, sourceId, instruction.stat, amount, instruction.until)
       : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);

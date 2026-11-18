@@ -114,11 +114,14 @@ const TRIGGERS = [
   // with a `subject` filter of any card hears it ("After a quest card is defeated", 01135:A:3); a Forced effect with `subject: "self"`
   // is the card's own ("When you defeat this stage", 01120:B:1). The winning stage is not announced: the game is over.
   "questCardDefeated",
+  // About the seat: it was eliminated, by its threat, with no heroes left or by a card ("Forced: After a player is eliminated (at any stage)", 148003:B:2). Every elimination is announced, the last player's too while the game goes on; `eventSeat: "you"` is the eliminated player's own stage.
+  "playerEliminated",
 ] as const;
 
 const FLAGS = [
   // On a final quest stage that holds the win ("Forced: After this stage is defeated ... If this final Escape test is passed, the players ... won the game", 02106:B:1, 02106:B:2): defeating it does not win the game. The stage stays the current quest card, defeated, `questCardDefeated` is announced
-  // to its own Forced effects, and the game is won only by what they do (`WinGame`) or the quest is reset (`ReturnToStage`). Read by rules/quest/quest.ts (advanceStage).
+  // to its own Forced effects, and the game is won only by what they do (`WinGame`) or the quest is reset (`ReturnToStage`). Read by rules/quest/quest.ts (advanceStage). A stage with the flag has no stage after it in the quest's order: Fog on the Barrow-downs' 3B wins (`WinGame`) and 4B is left by
+  // its own Forced effect (148003:B:3, 148004:B:2).
   "holdsWin",
   // On "table": no character may be committed to the quest ("Do not commit characters to the quest", 143078:B:1; rules/engine/legal.ts committers).
   "cannotCommit",

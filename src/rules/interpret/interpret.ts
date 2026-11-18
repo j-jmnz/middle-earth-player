@@ -179,7 +179,7 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 // `byPlayerCard`: a player card's effect draws them, which a card that hears the draw can ask (143059:A:1). `framework`: the framework draws them (the opening hand, the resource phase's draw), which a rule about drawing "through card effects" does not
 // bar (900404:A:1).
 export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false, byPlayerCard = false, framework = false): ScenarioState {
-  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0 || (!framework && seatBarred(state, ctx, seat, "draw"))) return state;
+  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0 || (!framework && (seatBarred(state, ctx, seat, "draw") || (state.modifiers.length > 0 && flagged(state, `seat:${seat}`, "noCardDraw"))))) return state;
   const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback, bottom));
   return announceEnteredHand(state, announceDraw(state, drawn, seat, ctx, byPlayerCard), seat, ctx);
 }

@@ -18,7 +18,7 @@ import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "../interpret/verbs.ts";
 import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
-import { announceEntered, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
+import { announceEntered, listens, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { engageWith } from "../quest/quest.ts";
 import { sharing, stagingDest } from "../families/breaking/areas.ts";
@@ -160,6 +160,11 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // "After an enemy is added to the staging area" hears the card arrive.
       if (!engages) next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
       next = patchTop(next, { step: 1 });
+      // A Forced effect on the reveal of a location (148004:B:1) resolves before the Responses to the reveal are offered; one that cancels the reveal leaves none to offer.
+      if (printed.type === "location" && listens(next, ctx, "locationRevealed")) {
+        const forced = fireForced(next, { trigger: "locationRevealed", seat, cardId: id }, ctx, steps);
+        if (forced !== next) return forced;
+      }
       // A card just revealed from the encounter deck: a Response may cancel its effects before any of them resolves.
       return frame.data.fromDeck ? offerResponses(next, { trigger: "encounterRevealed", seat, subject: id }, ctx, steps) : next;
     }

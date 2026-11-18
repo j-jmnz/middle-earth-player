@@ -66,8 +66,11 @@ function openOf(codes: Iterable<string>): string[] {
 // The Campaign Setup of a Dream-chaser campaign card whose box prints no Setup line (The Thing in the Depths, 11194): the cards to set aside are the scenario's Campaign Setup rule (dcce.campaign-setup-*), and the
 // record cites the card's "You are playing Campaign Mode." marker line, which has no other game effect.
 // The Black Gate Opens' campaign card (146074) holds the flag endsInDefeat for the whole scenario by a constant record that cites its Resolution line: the scenario has no win, and its last player's elimination runs that Resolution (user decision, 2026-11-12).
+// Fog on the Barrow-downs' stage 4B prints only Forced lines, so the flag holdsWin (its defeat does not win the game, the Forced line sends the player back to stage 3B) is a constant record citing the Forced line that says what the defeat does.
 const isCampaignMarker = (effect: { cardCode: string; timing: string }, line: string): boolean =>
-  (effect.cardCode === "11194" && effect.timing === "campaignSetup" && line === "You are playing Campaign Mode.") || (effect.cardCode === "146074" && effect.timing === "constant" && line.startsWith("Resolution:"));
+  (effect.cardCode === "11194" && effect.timing === "campaignSetup" && line === "You are playing Campaign Mode.") ||
+  (effect.cardCode === "146074" && effect.timing === "constant" && line.startsWith("Resolution:")) ||
+  (effect.cardCode === "148004" && effect.timing === "constant" && line.startsWith("Forced: After this stage is defeated"));
 
 describe("effect coverage", () => {
   for (const code of [...dealt].sort()) {
