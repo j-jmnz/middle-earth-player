@@ -32,6 +32,7 @@ import { exploring } from "../families/island/map.ts";
 import { islandMayTravel, islandReach } from "../families/island/travel.ts";
 import { freeSlot, mustTravel } from "../families/south/locations.ts";
 import { viewOf } from "../families/breaking/areas.ts";
+import { commitLimitReason } from "../families/play/commit-limit.ts";
 import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "../families/sea/sailing-legal.ts";
 import { printedOf } from "../core/printed.ts";
 
@@ -284,6 +285,8 @@ function commitReason(
   for (const id of intent.cardIds) {
     if (!legal.has(id)) return "That character cannot commit";
   }
+  const limit = commitLimitReason(state, state.activeSeat, intent.cardIds, ctx.cards);
+  if (limit) return limit;
   return intent.sideQuestId ? sideQuestReason(state, intent.sideQuestId) : null;
 }
 

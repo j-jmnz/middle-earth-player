@@ -98,6 +98,8 @@ const VERBS = [
   // Brambles and Thorns this round", 900704:A:1). When damage is dealt (the card's damage grew: a shield or cap that prevented it all leaves it undealt) the card is marked for the round by that title (the flag `damagedByTitle`), so each copy that resolves
   // afterwards finds it marked. Read by nightmare/damage-once.ts.
   z.strictObject({ verb: z.literal("DamageOncePerRound"), amount: z.number().int().positive(), target: cardRefSchema.optional(), ...when }),
+  // "Each player must also discard allies he controls until the total printed cost of allies he controls is 6 or less" (901701:A:2): the actor chooses and discards one ally he controls at a time (a card with no printed cost counting 0) until the allies he controls cost `cost` or less in all.
+  z.strictObject({ verb: z.literal("DiscardAlliesToCost"), cost: z.number().int().min(0), ...when }),
 ] as const;
 
 const TRIGGERS = [

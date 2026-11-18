@@ -13,7 +13,7 @@ import { livingSeats, updateCard } from "../../core/state.ts";
 import { raiseFor } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { areaOf, stagingDest } from "./areas.ts";
+import { areaOf, areaSeats, headOf, stagingDest } from "./areas.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { ringBearerId } from "../burden/deck.ts";
 
@@ -28,6 +28,8 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
       return moveToLeft(state, focus.sourceId);
     case "MoveToFirstStaging":
       return moveToFirstStaging(state, instruction.target === "picked" ? lastPicked(state) : focus.sourceId);
+    case "MoveToOtherPlayerArea":
+      return moveToOtherPlayerArea(state, focus.sourceId);
     case "FallIntoEvil":
       return fallIntoEvil(state, focus.sourceId, steps);
     case "ReturnFallenHero":
@@ -74,6 +76,16 @@ function moveToFirstStaging(state: ScenarioState, id: string | null): ScenarioSt
   if (!id || !card || (card.zone !== "staging" && card.zone !== "engaged")) return state;
   const moved = moveCard(state, id, stagingDest(state, state.firstPlayer));
   return updateCard(moved, id, { controller: state.separate ? state.firstPlayer : null });
+}
+
+// MoveToOtherPlayerArea (901703:A:2): the engaged enemy goes to the staging area of the other player's area; it stays engaged when stages are not separate or no other area exists.
+function moveToOtherPlayerArea(state: ScenarioState, id: string | null): ScenarioState {
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card || card.zone !== "engaged" || card.controller == null || !state.separate) return state;
+  const own = headOf(state, card.controller);
+  const other = areaSeats(state).find((seat) => seat !== own);
+  if (other == null) return state;
+  return updateCard(moveCard(state, id, { zone: "staging", area: other }), id, { controller: other });
 }
 
 // Fallen Into Evil, attached to a hero: the hero is an enemy in the first player's staging area, its player no longer controlling it.

@@ -27,6 +27,7 @@ import { drawCards } from "../families/dungeon/deck.ts";
 import { withView } from "../families/breaking/areas.ts";
 import { isBreakingVerb } from "../families/breaking/index.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
+import { heroDrawn } from "../families/deck/hero.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
 import { playerSource } from "../families/quest/threat.ts";
 import { queueHeard } from "../families/quest/events.ts";
@@ -183,7 +184,8 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false, byPlayerCard = false, framework = false): ScenarioState {
   if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0 || (!framework && seatBarred(state, ctx, seat, "draw"))) return state;
   const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback, bottom));
-  return announceEnteredHand(state, announceDraw(state, drawn, seat, ctx, byPlayerCard), seat, ctx);
+  // A hero a card shuffled into the deck is put into play as it is drawn (families/deck/hero.ts).
+  return heroDrawn(announceEnteredHand(state, announceDraw(state, drawn, seat, ctx, byPlayerCard), seat, ctx), seat);
 }
 
 function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause, bottom: boolean): ScenarioState {

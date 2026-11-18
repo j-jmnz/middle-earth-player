@@ -53,7 +53,7 @@ type Gate = (state: ScenarioState) => boolean;
 
 // One card's part of the total Threat in the staging area: where it stands (in staging, engaged but contributing, or the active location
 // that contributes) and the Threat it adds now.
-export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" };
+export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" | "elsewhere" };
 
 // The cards that make up the total Threat in the staging area, and what the table's held effects add to or take from their sum
 // (withStagingThreat; the total never falls below 0). A card that "does not contribute its Threat" is left out.
@@ -83,6 +83,17 @@ export function stagingThreatSources(state: ScenarioState, cards: Cards, seat?: 
   for (const id of [view.activeLocation, view.secondActiveLocation]) {
     const instance = id ? view.cards[id] : undefined;
     if (instance && flagged(view, instance.id, "activeThreat") && !flagged(view, instance.id, "noThreatContribution")) sources.push({ id: instance.id, threat: modifiedStat(view, instance, "threat", cards), from: "active" });
+  }
+  // A location in another player's staging area that contributes its Threat to every other area's total, once for each area ("Shivering River", 901707:A:1).
+  if (state.separate && seat != null) {
+    const head = headOf(state, seat);
+    state.seats.forEach((other, index) => {
+      if (index >= state.seatCount || index === head) return;
+      for (const id of other.staging) {
+        const instance = state.cards[id];
+        if (instance && flagged(state, id, "threatInOtherAreas") && !flagged(state, id, "noThreatContribution")) sources.push({ id, threat: modifiedStat(state, instance, "threat", cards), from: "elsewhere" });
+      }
+    });
   }
   const sum = sources.reduce((total, source) => total + source.threat, 0);
   return { sources, adjust: withStagingThreat(view, sum, cards) - sum };

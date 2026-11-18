@@ -15,6 +15,9 @@ const discardType = z.enum(["enemy", "location", "treachery", "objective", "enco
 const sphere = z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]);
 
 const VERBS = [
+  // "Shuffle all enemy and treachery cards in the encounter discard pile together with the Foundations of Stone encounter set. This deck becomes the new encounter deck. Remove all other encounter deck cards from the game" (04113:B:1): the encounter deck and the other cards of its discard pile
+  // leave the game; the discarded cards of the `keep` types and the set-aside cards of the encounter set `set` (and the Nightmare cards bearing its icon) are shuffled into the new encounter deck, facedown.
+  z.strictObject({ verb: z.literal("ReplaceEncounterDeck"), set: z.string().min(1), keep: z.array(z.enum(["enemy", "treachery", "location"])).min(1), ...when }),
   // The topmost enemy of the encounter discard pile (the last put there) that has this trait is revealed by the actor in full, as any reveal is: it leaves the pile and enters the staging area, its When Revealed and keywords resolve ("Reveal the topmost Tentacle enemy in the
   // encounter discard pile to travel here", 901506:A:2). As a Travel cost it cannot be paid with no such enemy in the pile (rr.travel).
   z.strictObject({ verb: z.literal("RevealFromDiscard"), type: z.literal("enemy"), trait: z.string().min(1), ...when }),
