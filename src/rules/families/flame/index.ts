@@ -10,7 +10,7 @@ import { namedInPlay } from "../misc/amounts.ts";
 import { refCard } from "../../interpret/amounts.ts";
 import type { Focus } from "../index.ts";
 import { formBalrogDeck, shuffleBalrogDiscard } from "./balrog.ts";
-import { cancelEventEffects, committedThisRound, discardNamedFromPlay, remainingHitPoints } from "./bane.ts";
+import { cancelEventEffects, committedThisRound, discardNamedFromPlay, moveDamageUnpayable, remainingHitPoints } from "./bane.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -31,6 +31,7 @@ export const manifest: RulesFamily = {
   name: "flame",
   verbs: ["FormBalrogDeck", "ShuffleBalrogDiscard", "DiscardNamedFromPlay", "CancelEventEffects"],
   run,
+  travel: { unpayable: (state, instruction, ctx) => moveDamageUnpayable(state, instruction, ctx) },
   condition: (state, condition, _scope, ctx) => committedThisRound(state, condition, ctx),
   amount: (state, amount, scope, ctx) => (amount.stat === "hitPoints" && amount.remaining === true ? remainingHitPoints(state, amount.ofNamed ? namedInPlay(state, amount.ofNamed, ctx) : refCard(state, amount.of ?? "self", scope), ctx) : null),
 };
