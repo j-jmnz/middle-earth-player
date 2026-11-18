@@ -27,6 +27,7 @@ import { attachTo, moveCard, spawn } from "../core/zones.ts";
 import { stampRoutes } from "../families/sea/routes.ts";
 import { markSideQuests } from "../families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../families/angmar/progress.ts";
+import { markProgressHeld } from "../families/long-dark/hold.ts";
 import { markCapture } from "../families/captured/entry.ts";
 import { markEnemyDamage } from "../families/encounter/patrol.ts";
 import { markSeatedRows } from "../families/encounter/seated.ts";
@@ -137,6 +138,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   // A game that deals encounter side quests in its encounter deck reads the side quest rules (families/wilderland/night-quest.ts).
   state = markSideQuests(state, ctx.cards);
   state = markProgressNoted(state, ctx);
+  state = markProgressHeld(state, ctx);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   state = markCapture(state, ctx);
   state = markEnemyDamage(state, ctx);

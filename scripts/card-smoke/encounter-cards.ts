@@ -113,9 +113,9 @@ function travel(base: ScenarioState, ctx: ReduceContext, code: string, steps: En
   const legal = legalIntents(at, ctx);
   const target = legalTargets(at, { type: "Travel" }, ctx).find((id) => id === placed.id);
   if (!legal.some((intent) => intent.type === "Travel") || target == null) return { state: at, note: "not offered as a travel target on this table" };
-  const traveled = drive(at, ctx, steps, (state) => state.cards[target]?.zone !== "staging" && state.stack.length === 0 && state.window?.kind !== "choose", { type: "Travel", locationId: target });
-  // A location explored on arrival (no quest points) or sent away by its own Travel text has left the staging area too.
-  if (traveled.cards[target]?.zone === "staging") throw new Error("The location is still in the staging area after Travel");
+  const traveled = drive(at, ctx, steps, (state) => (state.cards[target]?.zone !== "staging" || state.phase !== "Travel") && state.stack.length === 0 && state.window?.kind !== "choose", { type: "Travel", locationId: target });
+  // A location explored on arrival (no quest points) or sent away by its own Travel text has left the staging area too. One whose Travel test was failed stays there, the players' travel used and the Travel phase over (EndTravel, 901605:A:1).
+  if (traveled.cards[target]?.zone === "staging" && traveled.phase === "Travel") throw new Error("The location is still in the staging area after Travel");
   return { state: traveled, note: null };
 }
 
