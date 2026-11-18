@@ -34,7 +34,7 @@ export const DEFAULT_POLICY: RhosgobelPolicy = { choose: "first", quest: "all", 
 
 // The players look for Athelas and claim it. Every character quests (a hero that is ready in the planning phase claims an Athelas that nothing guards: the auto-player's Actions); each seat engages every enemy it may, one at a time, and every ready character
 // attacks the first enemy any can reach together (Wilyador, an Eagle, is the one who may attack a Mirkwood Flock or Black Forest Bats); a defender takes every attack he can. Radagast's Request is used while Wilyador can afford its damage, and its look reveals Athelas
-// when it is among the top 3 cards. `options` are the auto-player's for everything else (the Maestro fixtures play real decklists with `play: true`).
+// when it is among the top 3 cards. `options` are the auto-player's for everything else (the fixtures play real decklists with `play: true`).
 export function rhosgobelIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: RhosgobelPolicy = DEFAULT_POLICY, options: PolicyOptions = RHOSGOBEL_POLICY): PlayerIntent {
   const window = state.window;
   if (window?.kind === "choose") {

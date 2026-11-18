@@ -1,4 +1,4 @@
-// The Maestro fixtures of Helm's Deep (the-two-towers part 2), written into src/campaign/fixtures/helms-deep.json by scripts/e2e/fixtures.ts: real games of saved decklists (the One Deck and the
+// The fixtures of Helm's Deep (the-two-towers part 2), written into src/campaign/fixtures/helms-deep.json by scripts/e2e/fixtures.ts: real games of saved decklists (the One Deck and the
 // Defenders of Gondor lists of data/decks/prebuilt.json, `FIXTURE_DECKS`), two-handed, Easy, so each is a real save. `deep-won` is the first seed that wins, parked on the win (the Resolution waits); `deep-lost` the first
 // that loses, parked on the loss; `deep-showcase` the first that reaches a full table (`atBoard`) for the README. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

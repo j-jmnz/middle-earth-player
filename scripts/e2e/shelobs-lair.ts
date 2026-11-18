@@ -1,4 +1,4 @@
-// The Maestro fixtures of Shelob's Lair (the-two-towers part 6), written into src/campaign/fixtures/shelobs-lair.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the
+// The fixtures of Shelob's Lair (the-two-towers part 6), written into src/campaign/fixtures/shelobs-lair.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the
 // Defenders of Gondor lists of data/decks/prebuilt.json, `FIXTURE_DECKS`), two-handed, Easy, so each is a real save. `lair-won` is the first seed that wins, parked on the win (the Resolution waits); `lair-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

@@ -20,7 +20,7 @@ import { finishStandalone, resumeStandalone, standaloneBriefing } from "./standa
 import { reduce } from "../rules/engine/reduce.ts";
 import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 
-// The Maestro fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
+// The fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
 // loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won
 // game writes. When this fails, run scripts/e2e/fixtures.ts again. `won` and `knife-lost` are open (docs/phases/STATUS.md):
 // no legal win of the two starter decks has been found, so the tests that need them are skipped until they are committed.
@@ -53,7 +53,7 @@ function earlierParts(name: FixtureName): readonly string[] {
   return order.slice(0, Math.max(0, order.indexOf(loadout.scenarioId)));
 }
 
-describe("Maestro fixtures", () => {
+describe("Save fixtures", () => {
   it("are loadouts a briefing deals, from the fixture's log", () => {
     for (const name of COMMITTED) {
       const { loadout, seatCount, log } = fixture(name);
@@ -96,7 +96,7 @@ describe("Maestro fixtures", () => {
     expect(resolutionView(state, world).kind).toBe("settled");
     save = finish(save, world, state);
     expect(found.log).toEqual(save.log);
-    // The answers the scenario-1 Maestro flow gives: Gandalf's Delay and Gildor Inglorion.
+    // The answers the scenario-1 fixture gives: Gandalf's Delay and Gildor Inglorion.
     expect(found.log.campaignPool.map((card) => card.code)).toEqual(["141078", "141077"]);
     expect(found.log.completed).toEqual(["a-shadow-of-the-past"]);
     expect(found.loadout.scenarioId).toBe("a-knife-in-the-dark");

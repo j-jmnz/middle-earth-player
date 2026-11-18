@@ -1,4 +1,4 @@
-// The Maestro fixtures of Journey Along the Anduin (Mirkwood Paths part 2), written into src/campaign/fixtures/journey-along-the-anduin.json by
+// The fixtures of Journey Along the Anduin (Mirkwood Paths part 2), written into src/campaign/fixtures/journey-along-the-anduin.json by
 // scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed,
 // Easy, from the log the `mirkwood-won` game (scripts/e2e/passage-through-mirkwood.ts) writes when it is confirmed (Passage Through Mirkwood's earned pool reaches
 // this scenario through the Campaign Setup Checklist), played by the auto-player, every intent one the reducer listed.

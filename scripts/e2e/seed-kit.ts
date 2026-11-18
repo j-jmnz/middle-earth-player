@@ -149,7 +149,7 @@ export function playStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>,
   return { loadout, ...playOut(resumed.state, contextOf(world), spec.limit ?? 8000, spec.answer, spec.stop) };
 }
 
-/** The Maestro fixtures of a cycle scenario: the first seed whose two-handed standalone game wins (`<prefix>-won`) and the first whose game loses (`<prefix>-lost`), each parked on its end; one not found is left out. */
+/** The fixtures of a cycle scenario: the first seed whose two-handed standalone game wins (`<prefix>-won`) and the first whose game loses (`<prefix>-lost`), each parked on its end; one not found is left out. */
 export function standaloneWonLost<P extends string>(say: Log, prefix: P, spec: StandaloneSeedSpec<2>, seedsVar: string): Partial<Record<`${P}-won` | `${P}-lost`, StandaloneSeedFixture<2>>> {
   const won = firstStandaloneSeed(say, spec, seedsVar, (state) => state.stageCleared && !state.lost, `${prefix}-won`);
   const lost = firstStandaloneSeed(say, spec, seedsVar, (state) => state.lost, `${prefix}-lost`);

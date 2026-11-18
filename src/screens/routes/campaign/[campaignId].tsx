@@ -58,7 +58,7 @@ export default function CampaignSetup() {
   const continued = continues.find((choice) => choice.saveId === continuing) ?? null;
   // A continued save takes the finished save's seat count: its log is per seat, and the count is chosen once.
   const seatsNow = continued ? continued.seatCount : seats;
-  // The Fellowship's testIDs are the ones the Maestro flows use (`seats-1`, `start-fellowship`); every other campaign is `seats-<id>-<n>` and `start-<id>`.
+  // The Fellowship's testIDs are the ones the showcase flows use (`seats-1`, `start-fellowship`); every other campaign is `seats-<id>-<n>` and `start-<id>`.
   const fellowship = id === FELLOWSHIP_ID;
   const seatId = (n: 1 | 2) => (fellowship ? `seats-${n}` : `seats-${id}-${n}`);
 

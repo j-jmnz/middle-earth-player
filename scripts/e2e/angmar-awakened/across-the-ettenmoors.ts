@@ -1,4 +1,4 @@
-// The Maestro fixtures of Across the Ettenmoors (angmar-awakened part 6), written into src/campaign/fixtures/across-the-ettenmoors.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
+// The fixtures of Across the Ettenmoors (angmar-awakened part 6), written into src/campaign/fixtures/across-the-ettenmoors.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `ettenmoors-won` is the first seed that wins, parked on the win (the Resolution waits); `ettenmoors-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

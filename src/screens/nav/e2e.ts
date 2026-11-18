@@ -1,5 +1,5 @@
-// The e2e-test build (eas.json) sets EXPO_PUBLIC_E2E_SEED; Expo inlines EXPO_PUBLIC_ variables at build time. With it, a deal
-// uses that fixed seed so a Maestro flow deals the same game every run, and the fixture route writes fixture saves. Every
+// A build made with EXPO_PUBLIC_E2E_SEED=1 (the README showcase build) sets it; Expo inlines EXPO_PUBLIC_ variables at build time. With it, a deal
+// uses that fixed seed so a scripted run deals the same game every run, and the fixture route writes fixture saves. Every
 // build ships the fixture route; without the variable it is inert and writes nothing.
 function e2eSeed(): number | null {
   const fixed = Number(process.env.EXPO_PUBLIC_E2E_SEED);

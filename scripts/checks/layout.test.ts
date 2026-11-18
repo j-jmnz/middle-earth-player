@@ -39,7 +39,7 @@ describe("repository layout", () => {
   });
 
   it("names every scenario folder by a scenario id in data/scenarios", () => {
-    const strays = ["src/campaign/scenarios", "test/scenarios", ".maestro/scenarios"].flatMap((dir) => folders(dir).filter((name) => !scenarioIds.has(name)).map((name) => `${dir}/${name}`));
+    const strays = ["src/campaign/scenarios", "test/scenarios"].flatMap((dir) => folders(dir).filter((name) => !scenarioIds.has(name)).map((name) => `${dir}/${name}`));
     expect(strays).toEqual([]);
   });
 });

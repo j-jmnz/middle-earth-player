@@ -12,7 +12,7 @@ Use `docs/INDEX.md` to find the sections the diff touches (its last part maps ea
 
 The gate (`pnpm test`, `pnpm lint`, `pnpm typecheck`) has run before you are called; do not run the full suite again. To check a claim, run the tests that reach it: `pnpm vitest run <file>`, or `pnpm vitest related <files the diff changed> --run`. `pnpm lint` and `pnpm typecheck` take seconds.
 
-Phone and tablet checks are not tracked (user instruction, 2026-11-06): a missing one is not a finding, and a phone-check note in a doc is a finding. A Maestro flow the phase file names must be present. `maestro test` runs after the last phase. An unrun flow is not a block before then.
+Phone and tablet checks are not tracked (user instruction, 2026-11-06): a missing one is not a finding, and a phone-check note in a doc is a finding.
 
 ## What you judge
 
@@ -50,7 +50,7 @@ Search the surrounding module before you accept a new helper, type, or branch. R
 - A record is checked against the card bugs reviews find (`docs/agents/effect-authoring.md`, Readings the review catches); a finding of a kind that list does not name gets a line there in the fix pass.
 - A sentence written by hand on several cards belongs in a template, and a line printed the same as another card's takes that card's records with `copyLine` (`docs/agents/effect-authoring.md`, Templates and copied lines).
 - A test that plays a golden game outside its scenario's golden test, a scenario game that plays an earlier part's goldens, a golden added beyond the paths the others cover, or a scenario's entry in `OVER_BUDGET` (`scripts/tools/test-scenario.ts`) raised without the user's say (`.claude/rules/code-standards.md`, Test cost).
-- A scenario's test, game, seed finder or Maestro flow that repeats what the shared kit holds (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`, `scripts/e2e/seed-kit.ts`, `.maestro/subflows/`) is a copy; so is a scenario scene that imports another scenario's scene.
+- A scenario's test, game, seed finder that repeats what the shared kit holds (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`, `scripts/e2e/seed-kit.ts`) is a copy; so is a scenario scene that imports another scenario's scene.
 
 Do not demand a shared abstraction for two lines that happen to look similar and mean different things. Name the behavior that is actually repeated.
 
@@ -82,7 +82,7 @@ Report these when they appear in the change. Do not spend the review on formatti
 
 - No `any`. No empty `catch`. A rejected intent returns a reason.
 - No commented-out code and no unused exports left behind "for later."
-- A behavior change has a Vitest or a Maestro flow in the same change, matching what the phase exit requires.
+- A behavior change has a Vitest test in the same change, matching what the phase exit requires.
 - A new dependency that `docs/brief.md` does not pin is a block.
 
 ## How to report

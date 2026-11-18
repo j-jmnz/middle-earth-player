@@ -59,7 +59,7 @@ import * as returnmirkwood from "../scenarios/return-to-mirkwood/game.ts";
 import type { PlayedGame } from "./game-kit.ts";
 
 // Every scenario's golden games (the `*_GOLDENS` of its test/scenarios/<id>/game.ts), in campaign order and then the cycle's pack order. The reader check
-// (src/play/reader-play/games.ts) plays them, `pnpm test scenario` filters the Maestro fixtures by an entry's title and
+// (src/play/reader-play/games.ts) plays them, `pnpm test scenario` filters the fixtures by an entry's title and
 // `pnpm scenario new` reads the previous part's names here. Each scenario's golden.test.ts plays, pins, cause-checks and replays its
 // goldens (test/harness/golden-suite.ts). A Shadow of the Past's goldens are the filler-hero games and the starter decks
 // (test/scenarios/a-shadow-of-the-past/game.ts); src/campaign/causes.test.ts and replay.test.ts read them directly.

@@ -1,4 +1,4 @@
-// The Maestro fixtures of The Road to Isengard (the-two-towers part 3), written into src/campaign/fixtures/the-road-to-isengard.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
+// The fixtures of The Road to Isengard (the-two-towers part 3), written into src/campaign/fixtures/the-road-to-isengard.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `isengard-won` is the first seed that wins, parked on the win (the Resolution waits); `isengard-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.

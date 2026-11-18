@@ -29,7 +29,7 @@ export const DEFAULT_POLICY: MuilPolicy = { choose: "first" };
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
 // The players clear the Emyn Muil locations: every character quests, so the progress lands on the active location and the quest card; each seat engages every enemy it may, one at a time, and the ready characters attack the first enemy any can reach
 // together, so the Orcs do not pile up in the staging area (the Orc Horse Thieves' Attack grows with the locations there); a defender takes every attack he can; the travel phase goes to the first location offered. `options` are the auto-player's for everything
-// else (the Maestro fixtures play real decklists with `play: true`).
+// else (the fixtures play real decklists with `play: true`).
 export function muilIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: MuilPolicy = DEFAULT_POLICY, options: PolicyOptions = MUIL_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
   const engage = engageOneEach(state, ctx, 8);

@@ -1,5 +1,5 @@
 // The table's top bar pieces: the threat rings, and the mark beside a log line (the phase rail is phase-rail.tsx). These are React Native
-// text with testIDs, so Maestro can read them; card pictures stay on the canvas (docs/design-system-table.md). Phase
+// text with testIDs, so tests can read them; card pictures stay on the canvas (docs/design-system-table.md). Phase
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
 import { useEffect, useMemo, useRef, useState } from "react";
