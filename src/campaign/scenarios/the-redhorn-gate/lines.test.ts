@@ -69,7 +69,9 @@ describe("04013 The Mountains' Peaks", () => {
   it("04013:B:2 discards the characters that Caradhras' -1 brings to 0 as Snowdrifts becomes stage 3B, Freezing Cold's -2 as well", () => {
     const made = table({ stage: "04012", progress: 9, staging: ["04015"], play: ["ally"], deck: ["f0"] });
     const ally = idOf(made.state, "ally");
-    const run0: Run = send(start(made.state), { type: "Commit", cardIds: [made.hero, made.hero2, ally] }, made.ctx);
+    // Snowdrifts' When Revealed has resolved (it holds the commitments through the stage's defeat); the round then goes on in the quest phase.
+    const revealed = resolveRecords(made.state, made.ctx, "04012", "whenRevealed", idOf(made.state, "04012"));
+    const run0: Run = send(start({ ...revealed.state, ...opening("Quest") }), { type: "Commit", cardIds: [made.hero, made.hero2, ally] }, made.ctx);
     let run = send(run0, { type: "Pass" }, made.ctx);
     for (let guard = 0; guard < 20 && run.state.questStage != null && run.state.cards[run.state.questStage]?.code === "04012" && !run.state.lost; guard += 1) {
       const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass");
