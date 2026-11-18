@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–429 Tests (~2.3K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~225.1K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~226.4K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
@@ -131,22 +131,23 @@ Read the sections your task touches.
     - 1753–1770 The Hills of Emyn Muil (~1.5K) ← 1
     - 1771–1791 The Dead Marshes (~2.1K) ← 2
     - 1792–1815 Return to Mirkwood (~2.3K) ← 4
-  - 1816–1883 Standalone scenarios (~9.0K) ← 1
+  - 1816–1893 Standalone scenarios (~10.3K) ← 1
     - 1820–1843 The Massing at Osgiliath (~2.5K) ← 1
     - 1844–1866 The Battle of Lake-town (~4.0K) ← 36
     - 1867–1883 The Stone of Erech (~2.2K) ← 20
-  - 1884–1892 Nightmare (~410) ← 21
-  - 1893–1933 Deckbuilding (~2.1K)
-  - 1934–2013 Effects (~3.7K)
-    - 1936–1994 Three layers (~2.4K) ← 10
-    - 1995–2005 Player side quests, contracts and saga cards (~940)
-    - 2006–2009 Window stack (~100)
-    - 2010–2013 Coverage test (~270)
-  - 2014–2036 Data sources (~730) ← 3
-  - 2037–2055 Card images (~1.3K) ← 9
-  - 2056–2083 Persistence and shipping (~3.2K) ← 10
-  - 2084–2125 Screens (~5.1K) ← 2
-    - 2110–2125 Table screen (~1.8K) ← 3
+    - 1884–1893 The Old Forest (~1.3K) ← 1
+  - 1894–1902 Nightmare (~410) ← 21
+  - 1903–1943 Deckbuilding (~2.1K)
+  - 1944–2023 Effects (~3.7K)
+    - 1946–2004 Three layers (~2.4K) ← 10
+    - 2005–2015 Player side quests, contracts and saga cards (~940)
+    - 2016–2019 Window stack (~100)
+    - 2020–2023 Coverage test (~270)
+  - 2024–2046 Data sources (~730) ← 3
+  - 2047–2065 Card images (~1.3K) ← 9
+  - 2066–2093 Persistence and shipping (~3.2K) ← 10
+  - 2094–2135 Screens (~5.1K) ← 2
+    - 2120–2135 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~60.6K tok)
   - 5–8 Overview (~170) ← 1
   - 9–25 Top bar (~3.6K) ← 5
@@ -316,7 +317,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); releasing.md, Jobs (1)
+- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, The Old Forest (1); releasing.md, Jobs (1)
 - `scripts/data`: brief.md, Nightmare (5); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
