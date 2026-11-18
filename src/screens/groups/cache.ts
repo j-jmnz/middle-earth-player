@@ -11,7 +11,7 @@ import { printedScenarioName } from "../../campaign/printed-name";
 import { campaignIds, campaignOf, scenarioOf } from "../data/campaign-data";
 import { campaignTree, type CampaignTree } from "./campaign-tree";
 import type { GroupTrees } from "./card-group";
-import type { GroupRow } from "./group-types";
+import type { EasyCopies, GroupRow } from "./group-types";
 import { motkHeroes, type MotkHero } from "./motk";
 import { scenarioTree, type ScenarioTree } from "./scenario-tree";
 
@@ -27,7 +27,6 @@ const columns = {
   position: cards.position,
   encounterSet: cards.encounterSet,
   quantity: cards.quantity,
-  easyQuantity: cards.easyQuantity,
   campaignKind: cards.campaignKind,
   burdenSet: cards.burdenSet,
   campaignId: cards.campaignId,
@@ -39,17 +38,37 @@ export function readGroupRows<TRun>(catalog: Db<TRun>): readonly GroupRow[] {
   return catalog.select(columns).from(cards).where(eq(cards.deckLegal, false)).orderBy(asc(cards.code)).all();
 }
 
-/** The scenario that gives each boon and burden: the scenario whose campaign card places the card (`campaignPlaced`), by card code. */
-export function givenByScenario(): ReadonlyMap<string, string> {
-  const map = new Map<string, string>();
+export type ScenarioFacts = {
+  /** The scenario that gives each boon and burden: the scenario whose campaign card places the card (`campaignPlaced`), by card code. */
+  givenBy: ReadonlyMap<string, string>;
+  /** The copies each card deals in Normal and in Easy Mode, from the scenario files; a card two scenarios count differently is left out. */
+  easy: ReadonlyMap<string, EasyCopies>;
+};
+
+/** What the built scenarios' files say of the cards: where a boon or burden comes from, and the Easy Mode counts (the catalog has neither). */
+export function scenarioFacts(): ScenarioFacts {
+  const givenBy = new Map<string, string>();
+  const easy = new Map<string, EasyCopies>();
+  const conflicting = new Set<string>();
   for (const id of campaignIds()) {
     for (const scenarioId of campaignOf(id)?.scenarios ?? []) {
       const scenario = scenarioOf(scenarioId);
       if (!scenario) continue;
-      for (const code of scenario.campaignPlaced) if (!map.has(code)) map.set(code, printedScenarioName(scenario.name));
+      for (const code of scenario.campaignPlaced) if (!givenBy.has(code)) givenBy.set(code, printedScenarioName(scenario.name));
+      const counts = new Map<string, EasyCopies>();
+      for (const placement of scenario.cards) {
+        const found = counts.get(placement.code) ?? { normal: 0, easy: 0 };
+        counts.set(placement.code, { normal: found.normal + placement.normal, easy: found.easy + placement.easy });
+      }
+      for (const [code, found] of counts) {
+        const known = easy.get(code);
+        if (!known) easy.set(code, found);
+        else if (known.normal !== found.normal || known.easy !== found.easy) conflicting.add(code);
+      }
     }
   }
-  return map;
+  for (const code of conflicting) easy.delete(code);
+  return { givenBy, easy };
 }
 
 export type GroupData = {
@@ -68,17 +87,19 @@ function build<TRun>(catalog: Db<TRun>): GroupData {
   let campaign: CampaignTree | null = null;
   let motk: readonly MotkHero[] | null = null;
   let packRows: { code: string; name: string }[] | null = null;
+  let scenarioFactsRead: ScenarioFacts | null = null;
+  const facts = () => (scenarioFactsRead ??= scenarioFacts());
   const packList = () => (packRows ??= catalog.select({ code: packs.code, name: packs.name }).from(packs).all());
   const data: GroupData = {
     rows,
-    scenario: () => (scenario ??= scenarioTree(rows, collectionSets(), packList())),
+    scenario: () => (scenario ??= scenarioTree(rows, collectionSets(), packList(), facts().easy)),
     campaign: () =>
       (campaign ??= campaignTree(
         rows,
         catalog.select({ id: campaigns.id, name: campaigns.name, kind: campaigns.kind, position: campaigns.position }).from(campaigns).all(),
         collectionSets(),
         packList(),
-        givenByScenario(),
+        facts().givenBy,
       )),
     motk: () => (motk ??= motkHeroes(rows)),
     trees: () => ({ scenario: data.scenario(), campaign: data.campaign(), motk: data.motk() }),

@@ -59,7 +59,8 @@ export const GroupCell = memo(function GroupCell({
               </View>
             )}
             {badge ? (
-              <View className="absolute bottom-1 left-1 right-1 rounded-control px-1 py-0.5" style={{ backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+              // The button's name already says the copies, so the badge's words are hidden from a reader (a name must start with the visible words).
+              <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" className="absolute bottom-1 left-1 right-1 rounded-control px-1 py-0.5" style={{ backgroundColor: withAlphaHex(palette.night, 0.82) }}>
                 <Text testID={`group-badge-${card.code}`} className="text-center text-micro text-moon" numberOfLines={1}>
                   {badge}
                 </Text>

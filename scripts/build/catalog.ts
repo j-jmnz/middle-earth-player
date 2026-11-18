@@ -178,7 +178,6 @@ function cardRow(card: Card, knownPacks: ReadonlySet<string>, scans: { fronts: R
     cost: card.cost,
     deck_limit: card.deckLimit,
     quantity: card.quantity,
-    easy_quantity: card.easyQuantity,
     threat: card.threat,
     willpower: card.willpower,
     attack: card.attack,

@@ -17,7 +17,7 @@ const packs = [
 describe("scenarioTree", () => {
   const rows = [
     row({ code: "1", name: "Stage 1", typeCode: "quest", packCode: "P1", encounterSet: "Wilderlands" }),
-    row({ code: "2", name: "Wolf", typeCode: "enemy", packCode: "P1", encounterSet: "Wilderlands", quantity: 3, easyQuantity: 1 }),
+    row({ code: "2", name: "Wolf", typeCode: "enemy", packCode: "P1", encounterSet: "Wilderlands", quantity: 3 }),
     row({ code: "3", name: "Hill", typeCode: "location", packCode: "P1", encounterSet: "Wilderlands", quantity: 2 }),
     row({ code: "20", name: "Bat", typeCode: "enemy", packCode: "P1", encounterSet: "Cave Dwellers", quantity: 1 }),
     row({ code: "30", name: "Rat", typeCode: "enemy", packCode: "P2", encounterSet: "Wilderlands", quantity: 2 }),
@@ -29,7 +29,7 @@ describe("scenarioTree", () => {
     row({ code: "900101", name: "Wolf Nightmare", typeCode: "nightmare", packCode: "Nightmare", packCodes: [] }),
     row({ code: "900102", name: "Nasty Wolf", typeCode: "enemy", packCode: "Nightmare", packCodes: [], encounterSet: "Wolf Nightmare", quantity: 2 }),
   ];
-  const tree = scenarioTree(rows, collection, packs);
+  const tree = scenarioTree(rows, collection, packs, new Map([["2", { normal: 3, easy: 1 }]]));
 
   it("lists the collection's products in order, each pack with an encounter card, and the Nightmare decks last", () => {
     expect(tree.products.map((product) => product.id)).toEqual(["cycle", "nightmare"]);

@@ -77,7 +77,7 @@ export function campaignTree(rows: readonly GroupRow[], campaigns: readonly Camp
       for (const pack of split) {
         const these = pack == null ? ofKind : ofKind.filter((row) => row.packCode === pack);
         const specs = kind === "boons" || kind === "burdens" ? [...PLAYER_TYPES, ...SCENARIO_TYPES] : SCENARIO_TYPES;
-        const groups = typeGroups(these, specs, note);
+        const groups = typeGroups(these, specs, { note });
         sections.push({
           key: pack == null ? `${campaign.id}~${kind}` : `${campaign.id}~${kind}~${pack}`,
           kind,

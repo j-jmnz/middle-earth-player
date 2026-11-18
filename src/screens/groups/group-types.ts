@@ -12,7 +12,6 @@ export type GroupRow = {
   position: number;
   encounterSet: string | null;
   quantity: number;
-  easyQuantity: number | null;
   campaignKind: string | null;
   burdenSet: string | null;
   campaignId: string | null;
@@ -34,12 +33,25 @@ export type GroupCard = {
 
 export type TypeGroup = { id: string; title: string; cards: readonly GroupCard[] };
 
+/** What a scenario file says of a card: the copies it deals in Normal and in Easy Mode, summed over its placements. */
+export type EasyCopies = { normal: number; easy: number };
+
+/** What decorates a card: its note, and the scenario files' Easy counts by code. The catalog's own `EasyModeQuantity` is not used: it reads 0 for a card Easy keeps whole. */
+export type Decorate = { note?: (row: GroupRow) => string | undefined; easy?: ReadonlyMap<string, EasyCopies> };
+
 // The types whose copies the Easy Mode sheet thins out: the encounter deck's. A quest card, a setup card and a campaign card are not.
 const EASY_TYPES: ReadonlySet<string> = new Set(["enemy", "location", "treachery", "objective", "encounter-side-quest", "ship-enemy", "ship-objective"]);
 
-export function groupCard(row: GroupRow, note?: string): GroupCard {
-  const easy = EASY_TYPES.has(row.typeCode) && row.campaignKind == null && row.easyQuantity != null && row.easyQuantity !== row.quantity ? row.easyQuantity : null;
-  return { code: row.code, name: row.name, typeCode: row.typeCode, imagesrc: row.imagesrc, copies: row.quantity, easy, ...(note ? { note } : {}) };
+// The Easy copies, where a scenario file deals every copy of the card in Normal (so its counts are the card's) and Easy Mode keeps fewer.
+function easyOf(row: GroupRow, counts: ReadonlyMap<string, EasyCopies> | undefined): number | null {
+  const found = counts?.get(row.code);
+  if (!found || !EASY_TYPES.has(row.typeCode) || row.campaignKind != null) return null;
+  return found.normal === row.quantity && found.easy < found.normal ? found.easy : null;
+}
+
+export function groupCard(row: GroupRow, decorate: Decorate = {}): GroupCard {
+  const note = decorate.note?.(row);
+  return { code: row.code, name: row.name, typeCode: row.typeCode, imagesrc: row.imagesrc, copies: row.quantity, easy: easyOf(row, decorate.easy), ...(note ? { note } : {}) };
 }
 
 /** The badge on a card: "×3", "×3 · Easy ×1", "×2 · Not in Easy"; null for a single copy that Easy keeps. */
@@ -85,10 +97,10 @@ function otherTitle(row: { typeName: string }): string {
 }
 
 /** The rows' cards under `specs`' headings in that order (a heading with no card is left out), each heading's cards in print order; a type no spec names gets its own heading after them. */
-export function typeGroups(rows: readonly GroupRow[], specs: readonly TypeSpec[], note?: (row: GroupRow) => string | undefined): TypeGroup[] {
+export function typeGroups(rows: readonly GroupRow[], specs: readonly TypeSpec[], decorate: Decorate = {}): TypeGroup[] {
   const sorted = [...rows].sort((left, right) => left.position - right.position || left.code.localeCompare(right.code));
   const named = new Set(specs.flatMap((spec) => spec.types));
-  const make = (id: string, title: string, members: readonly GroupRow[]): TypeGroup[] => (members.length === 0 ? [] : [{ id, title, cards: members.map((row) => groupCard(row, note?.(row)))}]);
+  const make = (id: string, title: string, members: readonly GroupRow[]): TypeGroup[] => (members.length === 0 ? [] : [{ id, title, cards: members.map((row) => groupCard(row, decorate)) }]);
   const known = specs.flatMap((spec) => make(spec.id, spec.title, sorted.filter((row) => spec.types.includes(row.typeCode))));
   const extra = [...new Set(sorted.filter((row) => !named.has(row.typeCode)).map((row) => row.typeCode))].flatMap((type) => {
     const members = sorted.filter((row) => row.typeCode === type);

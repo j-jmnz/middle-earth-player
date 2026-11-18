@@ -14,12 +14,20 @@ describe("the copy badge", () => {
     expect(copyWords({ copies: 1, easy: null })).toBeNull();
   });
 
-  it("keeps Easy for the encounter deck's types and only where it differs", () => {
-    expect(groupCard(row({ code: "1", name: "A", typeCode: "enemy", quantity: 3, easyQuantity: 1 })).easy).toBe(1);
-    expect(groupCard(row({ code: "2", name: "B", typeCode: "enemy", quantity: 3, easyQuantity: 3 })).easy).toBeNull();
-    // A quest card's Easy count is not a copy count.
-    expect(groupCard(row({ code: "3", name: "C", typeCode: "quest", quantity: 1, easyQuantity: 0 })).easy).toBeNull();
-    expect(groupCard(row({ code: "4", name: "D", typeCode: "enemy", quantity: 3, easyQuantity: null })).easy).toBeNull();
+  it("keeps Easy for the encounter deck's types, from the scenario counts, only where it differs and covers every copy", () => {
+    const easy = new Map([
+      ["1", { normal: 3, easy: 1 }],
+      ["2", { normal: 3, easy: 3 }],
+      ["3", { normal: 1, easy: 0 }],
+      ["5", { normal: 2, easy: 1 }],
+    ]);
+    expect(groupCard(row({ code: "1", name: "A", typeCode: "enemy", quantity: 3 }), { easy }).easy).toBe(1);
+    expect(groupCard(row({ code: "2", name: "B", typeCode: "enemy", quantity: 3 }), { easy }).easy).toBeNull();
+    // A quest card's count is not a copy to remove, and a card the scenarios do not count whole says nothing.
+    expect(groupCard(row({ code: "3", name: "C", typeCode: "quest", quantity: 1 }), { easy }).easy).toBeNull();
+    expect(groupCard(row({ code: "4", name: "D", typeCode: "enemy", quantity: 3 }), { easy }).easy).toBeNull();
+    expect(groupCard(row({ code: "5", name: "E", typeCode: "enemy", quantity: 4 }), { easy }).easy).toBeNull();
+    expect(groupCard(row({ code: "3", name: "C", typeCode: "enemy", quantity: 1 }), { easy }).easy).toBe(0);
   });
 });
 

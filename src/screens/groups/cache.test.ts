@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
-import { groupDataOf, givenByScenario } from "./cache.ts";
+import { groupDataOf, scenarioFacts } from "./cache.ts";
 import { cardGroupOf, MOTK_GROUP_ID } from "./card-group.ts";
 import { isCampaignRow } from "./campaign-tree.ts";
 import { isScenarioRow } from "./scenario-tree.ts";
@@ -51,14 +51,18 @@ describe("the group cache", () => {
   });
 
   it("names the scenario that gives Turayn", () => {
-    expect(givenByScenario().get("12166")).toBe("Journey Up the Anduin");
+    expect(scenarioFacts().givenBy.get("12166")).toBe("Journey Up the Anduin");
     const section = data.campaign().byKey.get("ered-mithrin~boons")!.section;
     expect(section.groups.flatMap((group) => group.cards).find((card) => card.code === "12166")?.note).toBe("From Journey Up the Anduin");
   });
 
-  it("keeps Easy copies on the Core set's encounter cards", () => {
-    const wilderlands = [...data.scenario().byKey.values()].find(({ set }) => set.name === "Wilderlands")!;
-    const easy = wilderlands.set.groups.flatMap((group) => group.cards).filter((card) => card.easy != null);
-    expect(easy.length).toBeGreaterThan(0);
+  it("shows Easy copies from the scenario files, only where Easy Mode keeps fewer", () => {
+    const cards = new Map([...data.scenario().byKey.values()].flatMap(({ set }) => set.groups.flatMap((group) => group.cards)).map((card) => [card.code, card]));
+    // Forest Spider (4 copies, all kept), Dol Guldur Beastmaster (2, one kept), Hummerhorns (1, none kept) in Passage Through Mirkwood.
+    expect(cards.get("01096")).toMatchObject({ copies: 4, easy: null });
+    expect(cards.get("01091")).toMatchObject({ copies: 2, easy: 1 });
+    expect(cards.get("01075")).toMatchObject({ copies: 1, easy: 0 });
+    // A quest card is no copy to remove.
+    expect(cards.get("01119")?.easy).toBeNull();
   });
 });

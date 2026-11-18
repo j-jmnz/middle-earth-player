@@ -146,7 +146,7 @@ Read the sections your task touches.
   - 1948–1970 Data sources (~700) ← 2
   - 1971–1989 Card images (~1.4K) ← 9
   - 1990–2017 Persistence and shipping (~3.2K) ← 10
-  - 2018–2060 Screens (~5.4K) ← 2
+  - 2018–2060 Screens (~5.5K) ← 2
     - 2045–2060 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~60.3K tok)
   - 5–8 Overview (~170) ← 1

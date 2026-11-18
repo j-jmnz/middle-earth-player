@@ -44,8 +44,6 @@ export const cards = sqliteTable("cards", {
   cost: text("cost"),
   deckLimit: integer("deck_limit"),
   quantity: integer("quantity").notNull(),
-  // The copies an encounter card keeps in Easy Mode (the Cards tab's Scenario view shows "×3 · Easy ×1" where it differs); null for a card with no Easy count.
-  easyQuantity: integer("easy_quantity"),
   threat: integer("threat"),
   willpower: integer("willpower"),
   attack: integer("attack"),
