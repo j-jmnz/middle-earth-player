@@ -11,12 +11,12 @@ Both commands open the same form: a title, the type and the report text. The typ
 
 1. Creates the issue in `GITHUB_REPO` (`discord/wrangler.toml`) with the label.
 2. Adds the report's attachments as links, the reporter's Discord name, a link to the Discord message or thread, and your name.
-3. Replies to the report (or posts in the thread) with the issue link.
+3. Starts a thread on the report message, named for the issue (`#42 Gandalf costs 5`), and posts the issue link in it. For `/issue`, it posts the link in the thread that you ran it in.
 4. Tells you, in a message only you see, that it created the issue or why it could not.
 
 ## Issue updates
 
-After that, the bot posts each change of the issue beside the report: as a reply to the report message, or as a message in the thread.
+After that, the bot posts each change of the issue in the same thread. If the thread is archived, the post opens it again. When the bot cannot start a thread (the report message is already inside a thread or a forum post, or the bot has no Create Public Threads permission), it replies to the report message.
 
 | GitHub event | Message in Discord |
 | --- | --- |
@@ -135,10 +135,10 @@ Discord answers with the two commands as JSON. Run the same command again after 
 Open this link with your application ID in it, select the server and select **Authorize**:
 
 ```
-https://discord.com/oauth2/authorize?client_id=<your application id>&scope=bot+applications.commands&permissions=274877975552
+https://discord.com/oauth2/authorize?client_id=<your application id>&scope=bot+applications.commands&permissions=309237713920
 ```
 
-The permissions number gives the bot View Channels, Send Messages, Send Messages in Threads and Read Message History, and nothing more. If a bug channel limits who can see it, give the bot's role access to that channel too.
+The permissions number gives the bot View Channels, Send Messages, Send Messages in Threads, Create Public Threads and Read Message History, and nothing more. If you added the bot with an earlier link that did not have Create Public Threads, open the new link again and select **Authorize**, or give the bot's role that permission in **Server Settings → Roles**. If a bug channel limits who can see it, give the bot's role access to that channel too.
 
 ### Choose who can use it
 
@@ -160,7 +160,8 @@ The commands are for members with the **Manage Messages** permission (`default_m
 - **"GitHub answered 401" or "403".** The GitHub token expired or has no Issues write permission for this repository.
 - **"GitHub answered 422".** The title is not valid, or a label is missing: the repository must have the labels `bug`, `rules` and `accessibility`.
 - **No issue update in Discord.** On GitHub, open **Settings → Webhooks**, select the webhook and read **Recent Deliveries**. `401` means that `GITHUB_WEBHOOK_SECRET` and the webhook's secret are different. `500` shows the error: for example, the bot cannot post in that channel. `Nothing to post.` means that the bot did not make that issue, the marker line was deleted, or the event is not one in Issue updates. You can send a failed delivery again with **Redeliver**.
-- **"I could not post the link in the channel".** The bot has no Send Messages permission (or Send Messages in Threads) in that channel. The issue was still created.
+- **"I could not post the link beside the report".** The bot has no Send Messages permission (or Send Messages in Threads) in that channel. The issue was still created.
+- **The bot replies to the message instead of starting a thread.** The bot has no Create Public Threads permission in that channel, or the message is already in a thread.
 
 ## Change it
 

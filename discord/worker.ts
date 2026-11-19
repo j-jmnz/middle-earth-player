@@ -76,17 +76,17 @@ async function fileIssue(env: Env, interaction: Interaction, source: SourceRef, 
     const filedBy = interaction.member ? nameOf(interaction.member.user) : "a moderator";
     const issue = await createIssue(env, values, issueBody(values, report, filedBy, source));
     const link = `Created issue [#${issue.number}](<${issue.url}>): ${values.title}`;
-    const posted = await postLink(env, source, link);
-    await editReply(env, interaction.token, posted ? `${link}. I posted the link in the channel.` : `${link}. I could not post the link in the channel.`);
+    const posted = await postLink(env, source, link, `#${issue.number} ${values.title}`);
+    await editReply(env, interaction.token, posted ? `${link}. I posted the link beside the report.` : `${link}. I could not post the link beside the report.`);
   } catch (error) {
     await editReply(env, interaction.token, `I could not create the issue. ${error instanceof Error ? error.message : String(error)}`.slice(0, 2000));
   }
 }
 
 // The issue link beside the report. A channel the bot cannot post in still keeps the issue.
-async function postLink(env: Env, source: SourceRef, content: string): Promise<boolean> {
+async function postLink(env: Env, source: SourceRef, content: string, threadName: string): Promise<boolean> {
   try {
-    await postAt(env, source, content);
+    await postAt(env, source, content, threadName);
     return true;
   } catch {
     return false;

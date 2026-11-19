@@ -51,16 +51,26 @@ describe("issue updates", () => {
     expect(response.status).toBe(401);
   });
 
-  it("replies to the report message when its issue is closed as fixed", async () => {
-    const calls = stubFetch({ "POST discord.com/channels/200/messages": {} });
+  it("posts in the thread on the report message when its issue is closed as fixed", async () => {
+    const calls = stubFetch({ "GET discord.com/channels/300": { id: "300" }, "POST discord.com/channels/300/messages": {} });
     const response = await run(await delivery("issues", { action: "closed", issue: { ...fromMessage, state_reason: "completed" } }));
     expect(response.status).toBe(200);
-    expect(calls).toHaveLength(1);
-    expect(calls[0]!.body).toMatchObject({
+    expect(calls.map((call) => `${call.method} ${new URL(call.url).pathname}`)).toEqual(["GET /api/v10/channels/300", "POST /api/v10/channels/300/messages"]);
+    expect(calls[1]!.body).toEqual({
       content: "Issue [#42](<https://github.com/owner/repo/issues/42>) (Gandalf costs 5) is fixed. The fix comes in the next release.",
-      message_reference: { message_id: "300" },
       allowed_mentions: { parse: [] },
     });
+  });
+
+  it("replies to the report message when the bot may not start a thread on it", async () => {
+    const calls = stubFetch({
+      "POST discord.com/channels/200/messages/300/threads": new Response("Missing Permissions", { status: 403 }),
+      "POST discord.com/channels/200/messages": {},
+    });
+    await run(await delivery("issues", { action: "reopened", issue: fromMessage }));
+    const threadAsked = calls.find((call) => call.url.endsWith("/threads"))!;
+    expect(threadAsked.body).toEqual({ name: "#42 Gandalf costs 5", auto_archive_duration: 10080 });
+    expect(calls.at(-1)!.body).toMatchObject({ content: expect.stringContaining("is open again"), message_reference: { message_id: "300" } });
   });
 
   it("posts in the thread when a person comments, quoting the comment", async () => {
@@ -84,7 +94,8 @@ describe("issue updates", () => {
     const calls = stubFetch({
       "GET api.github.com/repos/owner/repo/issues/42": fromMessage,
       "GET api.github.com/repos/owner/repo/issues/7": { ...fromThread, number: 7, body: "Not from Discord" },
-      "POST discord.com/channels/200/messages": {},
+      "GET discord.com/channels/300": { id: "300" },
+      "POST discord.com/channels/300/messages": {},
     });
     const release = { tag_name: "v0.4.0", html_url: "https://github.com/owner/repo/releases/v0.4.0", body: "- Fix Gandalf's cost (closes #42, #7)\n- Other (see #9)", prerelease: false, draft: false };
     await run(await delivery("release", { action: "published", release }));
@@ -94,7 +105,7 @@ describe("issue updates", () => {
   });
 
   it("answers 500 when Discord refuses the post, so GitHub can send it again", async () => {
-    stubFetch({ "POST discord.com/channels/200/messages": new Response("Missing Permissions", { status: 403 }) });
+    stubFetch({ "GET discord.com/channels/300": { id: "300" }, "POST discord.com/channels/300/messages": new Response("Missing Permissions", { status: 403 }) });
     const response = await run(await delivery("issues", { action: "reopened", issue: fromMessage }));
     expect(response.status).toBe(500);
   });
