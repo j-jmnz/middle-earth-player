@@ -34,6 +34,16 @@ Discord attachment links expire after about a day. To keep a screenshot, open th
 
 The issue is public. The reporter's Discord display name and text go into it. Say this in the bug channel's rules.
 
+## Release announcements
+
+When the release workflow publishes a release, the bot posts an announcement to the releases channel: one embed titled "Middle-Earth Player v0.4.0 is out!" that links to the release page. The bot builds it from the release notes:
+
+- It keeps the sections that players read: **Before you update**, **New**, **Fixes** and **Look and feel**, each with at most 12 lines and "…and N more on GitHub" for the rest.
+- It counts **Under the hood** and **Project** in one line ("Plus 3 behind-the-scenes changes…").
+- It drops issue numbers, install steps and checksums, and ends with a short **How to update** part. The release page keeps all of it.
+
+A prerelease is not announced. If you set a role, the announcement mentions it, so players who want a ping can take that role. `discord/release.ts` builds the announcement, and `discord/release.test.ts` tests it against notes that `scripts/release/notes.ts` writes.
+
 ## How it works
 
 Discord sends each command to the Worker's URL (the Interactions Endpoint URL). The Worker checks Discord's Ed25519 signature (`discord/verify.ts`), reads the report through the Discord API as the bot (`discord/source.ts`), answers with the form, and on submit creates the issue through the GitHub API (`discord/issue.ts`). `discord/worker.ts` routes the interactions. GitHub's webhook calls the Worker at `/github`; `discord/github.ts` checks GitHub's signature and posts the issue updates. The Worker needs no server that runs all the time and no database. `discord/commands.json` holds the two command definitions that you register with Discord. `discord/worker.test.ts` and `discord/github.test.ts` test the bot with `pnpm vitest run discord`.
@@ -117,6 +127,17 @@ This step turns on Issue updates.
    - **Which events**: **Let me select individual events**. Select **Issues**, **Issue comments** and **Releases**, and clear **Pushes**.
 4. Select **Add webhook**. GitHub sends a test delivery. Under **Recent Deliveries**, it must show a green tick and the answer `Nothing to post.`
 
+### Set the releases channel
+
+This step turns on Release announcements.
+
+1. In Discord, open **User Settings → Advanced** and turn on **Developer Mode**.
+2. Right-click the releases channel and select **Copy Channel ID**.
+3. In the `discord` folder, run `npx wrangler secret put RELEASES_CHANNEL_ID` and paste the ID.
+4. To ping a role with each announcement (optional), open **Server Settings → Roles**, right-click the role, select **Copy Role ID**, and run `npx wrangler secret put RELEASES_ROLE_ID` with it. Make sure that the role is mentionable, or that the bot has **Mention @everyone, @here, and All Roles** in that channel.
+5. Give the bot **View Channel**, **Send Messages** and **Embed Links** in the releases channel. If the channel is an announcement channel that only some roles can post in, add the bot to those roles or give it the permissions in the channel's settings.
+6. If a GitHub webhook already posts releases to that channel, remove it (**Server Settings → Integrations → Webhooks**), or the channel gets two posts for each release.
+
 ### Register the commands
 
 Run this in the `discord` folder. `read -s` keeps the token out of your shell history. This is the bash form; in zsh (the macOS default) the first line is `read -s "BOT_TOKEN?Bot token: "; echo`:
@@ -137,10 +158,10 @@ Discord answers with the two commands as JSON. Run the same command again after 
 Open this link with your application ID in it, select the server and select **Authorize**:
 
 ```
-https://discord.com/oauth2/authorize?client_id=<your application id>&scope=bot+applications.commands&permissions=309237713920
+https://discord.com/oauth2/authorize?client_id=<your application id>&scope=bot+applications.commands&permissions=309237730304
 ```
 
-The permissions number gives the bot View Channels, Send Messages, Send Messages in Threads, Create Public Threads and Read Message History, and nothing more. If you added the bot with an earlier link that did not have Create Public Threads, open the new link again and select **Authorize**, or give the bot's role that permission in **Server Settings → Roles**. If a bug channel limits who can see it, give the bot's role access to that channel too.
+The permissions number gives the bot View Channels, Send Messages, Send Messages in Threads, Create Public Threads, Embed Links and Read Message History, and nothing more. If you added the bot with an earlier link that did not have Create Public Threads, open the new link again and select **Authorize**, or give the bot's role that permission in **Server Settings → Roles**. If a bug channel limits who can see it, give the bot's role access to that channel too.
 
 ### Choose who can use it
 
@@ -163,6 +184,7 @@ The commands are for members with the **Manage Messages** permission (`default_m
 - **"GitHub didn't accept the title or a label".** The title is not valid, or a label is missing: the repository must have the labels `bug`, `rules` and `accessibility`.
 - **"Something went wrong on my side" or another GitHub error.** Run `npx wrangler tail` and try again: the log has the full error.
 - **No issue update in Discord.** On GitHub, open **Settings → Webhooks**, select the webhook and read **Recent Deliveries**. `401` means that `GITHUB_WEBHOOK_SECRET` and the webhook's secret are different. `500` shows the error: for example, the bot cannot post in that channel. `Nothing to post.` means that the bot did not make that issue, the marker line was deleted, or the event is not one in Issue updates. You can send a failed delivery again with **Redeliver**.
+- **No release announcement.** The `RELEASES_CHANNEL_ID` secret is not set or names another channel, the bot cannot post or embed links in that channel, or the release is a prerelease. The release delivery in **Recent Deliveries** says "Announced the release…" when the bot posted it, and shows the error when it failed. If you send a failed release delivery again, the reports that already got their release post get it a second time.
 - **"I couldn't post in that channel".** The bot has no Send Messages permission (or Send Messages in Threads) in that channel. The issue was still created.
 - **The bot replies to the message instead of starting a thread.** The bot has no Create Public Threads permission in that channel, or the message is already in a thread.
 

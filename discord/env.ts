@@ -7,6 +7,10 @@ export interface Env {
   GITHUB_TOKEN: string;
   /** The secret the repository's webhook signs its deliveries with. */
   GITHUB_WEBHOOK_SECRET: string;
+  /** The channel that gets the release announcements; unset, no announcement is posted. */
+  RELEASES_CHANNEL_ID?: string;
+  /** A role the announcement mentions, for players who want a ping; unset, it pings no one. */
+  RELEASES_ROLE_ID?: string;
   /** `owner/name` of the repository the issues go to. */
   GITHUB_REPO: string;
 }

@@ -3,6 +3,7 @@
 // (sourceMarker), so the update goes beside the report: closed, reopened, a new comment, and the release that ships
 // the fix, after which the bot stops following the issue (docs/discord-issues.md, Issue updates).
 import { github, type Env } from "./env.ts";
+import { announceRelease, type Release } from "./release.ts";
 import { postAt, retiredBody, sourceInBody } from "./source.ts";
 import { bytesOfHex } from "./verify.ts";
 
@@ -19,7 +20,7 @@ interface Delivery {
   action?: string;
   issue?: Issue;
   comment?: { body: string; html_url: string; user: { login: string; type: string } };
-  release?: { tag_name: string; html_url: string; body?: string | null; prerelease: boolean; draft: boolean };
+  release?: Release;
   sender?: { login: string };
 }
 
@@ -96,8 +97,10 @@ export async function handleGitHub(request: Request, env: Env): Promise<Response
   const delivery = JSON.parse(body) as Delivery;
   try {
     if (event === "release" && delivery.action === "published" && delivery.release) {
+      // The announcement first: it is what most players read. A failure in either still answers 500.
+      const announced = await announceRelease(env, delivery.release);
       await postRelease(env, delivery.release);
-      return new Response("Posted the release.");
+      return new Response(announced ? "Announced the release and posted it to its reports." : "Posted the release to its reports.");
     }
     const message = issueMessage(event, delivery);
     const source = sourceInBody(delivery.issue?.body);
