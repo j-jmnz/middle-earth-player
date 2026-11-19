@@ -71,7 +71,7 @@ Read the sections your task touches.
     - 309–314 Opening a game (~350)
     - 315–321 Continue, Restart and the checkpoint (~380)
   - 322–327 Images (~1.1K) ← 7
-  - 328–383 Screens (~5.3K) ← 9
+  - 328–383 Screens (~5.4K) ← 9
   - 384–395 Desktop (~1.4K) ← 5
   - 396–405 Update check (~680) ← 7
   - 406–411 Catalog build (~410)
@@ -238,9 +238,9 @@ Read the sections your task touches.
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
   - 82–132 Commands (~2.0K) ← 4
-- `docs/releasing.md` — Releasing (~4.4K tok)
+- `docs/releasing.md` — Releasing (~4.5K tok)
   - 5–19 Start a release (~290) ← 1
-  - 20–35 Jobs (~1.8K) ← 4
+  - 20–35 Jobs (~1.9K) ← 4
   - 36–60 Caches (~760)
   - 61–95 Signing (~980) ← 2
     - 65–68 Desktop signing (optional) (~220) ← 1

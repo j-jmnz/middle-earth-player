@@ -296,7 +296,9 @@ jobs:
 
   ios:
     needs: [plan]
-    runs-on: macos-latest
+    # The Xcode 27 image: an app built with an SDK older than iOS 27.1 runs letterboxed on a folding iPhone's inner screen,
+    # in a compatibility window that also ignores the table's landscape lock. macos-latest has only Xcode 26.
+    runs-on: xcode-27
     timeout-minutes: 180
     permissions:
       contents: read
@@ -308,6 +310,7 @@ jobs:
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       SIGNED: ${{ needs.plan.outputs.ios_signed }}
       IPA_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
+      MIN_IOS_SDK: "27.1"
     outputs:
       caches: ${{ steps.caches.outputs.keys }}
     steps:
@@ -402,6 +405,11 @@ jobs:
           # The sideloading IPA: the app in Payload/, zipped.
           mkdir -p "$RUNNER_TEMP/out" "$RUNNER_TEMP/ipa/Payload"
           cp -R "$archive"/Products/Applications/*.app "$RUNNER_TEMP/ipa/Payload/"
+          # The SDK the app was built with: below iOS 27.1, iOS shows it letterboxed on a folding iPhone's inner screen.
+          sdk=$(/usr/libexec/PlistBuddy -c "Print :DTSDKName" "$RUNNER_TEMP"/ipa/Payload/*.app/Info.plist)
+          echo "Built with $sdk"
+          lowest=$(printf '%s\n%s\n' "${sdk#iphoneos}" "$MIN_IOS_SDK" | sort -V | head -1)
+          if [ "$lowest" != "$MIN_IOS_SDK" ]; then echo "::error::Built with $sdk; the release needs the iOS $MIN_IOS_SDK SDK or later"; exit 1; fi
           (cd "$RUNNER_TEMP/ipa" && zip -qry "$RUNNER_TEMP/out/$IPA_NAME" Payload)
           size=$(stat -f %z "$RUNNER_TEMP/out/$IPA_NAME")
           echo "$IPA_NAME: $((size / 1048576)) MB"
