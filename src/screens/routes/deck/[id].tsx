@@ -245,6 +245,7 @@ export default function DeckEditor() {
       top={top}
       side={expanded ? { paddingLeft: 0, paddingRight: 0 } : side}
       wide={size !== "compact"}
+      onPreview={preview.open}
     />
   );
 
