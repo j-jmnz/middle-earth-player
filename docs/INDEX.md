@@ -8,12 +8,12 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~3.1K tok)
+- `CLAUDE.md` — Claude Code (~3.2K tok)
   - 7–26 Data (~1.3K)
-  - 27–45 Commands (~1.1K)
-  - 46–49 Agents (~180)
-  - 50–53 Skills (~80)
-  - 54–57 Cloud sessions (~60)
+  - 27–46 Commands (~1.2K)
+  - 47–50 Agents (~180)
+  - 51–54 Skills (~80)
+  - 55–58 Cloud sessions (~60)
 - `.claude/rules/agent-standards.md` — Agent standards (~350 tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 7–41 Stack (~1.2K)
   - 42–77 Processes (~690)
   - 78–161 Modules (~2.4K) ← 3
-    - 126–161 Repository map (~980) ← 1
+    - 126–161 Repository map (~990) ← 1
   - 162–187 State (~1.1K) ← 9
   - 188–209 Play loop (~250)
   - 210–235 Engine (~5.9K)
@@ -231,12 +231,13 @@ Read the sections your task touches.
     - 493–500 Booklet (~540) ← 2
     - 501–504 Database (~110)
   - 505–524 States (~620)
-- `docs/development.md` — Development (~3.4K tok)
+- `docs/development.md` — Development (~4.0K tok)
   - 5–14 In a browser (~170)
   - 15–32 Checking a screen in a browser (~670) ← 3
-  - 33–40 On a desktop (~210) ← 1
-  - 41–61 On a phone (~350)
-  - 62–111 Commands (~1.9K) ← 4
+  - 33–49 Reading a game as text (~520) ← 3
+  - 50–57 On a desktop (~210) ← 1
+  - 58–78 On a phone (~350)
+  - 79–129 Commands (~2.0K) ← 4
 - `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1
   - 20–35 Jobs (~1.8K) ← 4
@@ -337,6 +338,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
+- `scripts/game`: development.md, Reading a game as text (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
 - `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/showcase`: design-system.md, Color (1)
@@ -349,4 +351,5 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/screens`: design-system.md, Tablets (10); design-system.md, Card groups (the Cards tab's Encounter cards view) (9); design-system.md, Campaign setup (8); design-system.md, Briefing (7); brief.md, Persistence and shipping (6); design-system.md, Campaigns (campaign list) (6); design-system.md, Settings (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system-table.md, Table menu (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Collection (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); architecture.md, Desktop (2); architecture.md, Update check (2); brief.md, Screens (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); design-system.md, Update ribbon (2); .claude/rules/code-standards.md, Saving (1); architecture.md, Images (1); architecture.md, Persistence (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Shadows of Mirkwood (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system-table.md, Two taps (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
 - `src/ui`: design-system-table.md, Screen reader (4); design-system.md, Settings (4); design-system.md, Type (4); design-system-table.md, Two taps (3); design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); architecture.md, Update check (1); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Standards (1); design-system.md, Surfaces (1); design-system.md, Update ribbon (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)
+- `test/harness`: development.md, Reading a game as text (1)
 - `test/scenarios`: .claude/rules/code-standards.md, Test cost (6)

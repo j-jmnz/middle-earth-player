@@ -80,6 +80,7 @@
     "effects": "node scripts/cli.ts effects",
     "scenario": "node scripts/cli.ts scenario",
     "doc": "node scripts/cli.ts doc",
+    "game": "node scripts/cli.ts game",
     "browser": "node scripts/cli.ts browser",
     "desktop": "node scripts/cli.ts desktop",
     "release": "node scripts/cli.ts release",
