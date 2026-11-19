@@ -244,6 +244,11 @@
             "target": "./desktop",
             "from": "./src",
             "message": "desktop/ (the Electron shell) imports nothing from src/: it runs outside the app's bundle."
+          },
+          {
+            "target": "./discord",
+            "from": "./src",
+            "message": "discord/ (the Discord issue bot) imports nothing from src/: it runs as a Cloudflare Worker."
           }
         ]
       }
