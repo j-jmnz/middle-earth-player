@@ -157,7 +157,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–109 Cards (~21.6K) ← 27
+  - 59–109 Cards (~21.7K) ← 27
   - 110–115 The Sailing test (~690) ← 5
   - 116–129 The Island Map (~1.8K) ← 8
   - 130–133 Tokens and effects (~360)
