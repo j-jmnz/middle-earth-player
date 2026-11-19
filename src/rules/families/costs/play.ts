@@ -172,7 +172,9 @@ function playableNow(state: ScenarioState, seat: number, cardId: string, terms: 
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
   if (cardRules(state, cardId, "PlayOnlyIf", ctx).some((rule) => !holds(state, rule.condition, scope, ctx))) return false;
   if (extraCostReason(state, cardId, seat, ctx)) return false;
-  if (!terms.noMatch && !hasResourceMatch(state, seat, printed.sphere, ctx, cardId)) return false;
+  // A card played at no cost is not paid for, so it needs no resource match (rr.resource-match covers a card that is paid
+  // for, a 0-cost one included; docs/brief.md, Core round). An event still checks its own play reason above.
+  if (!terms.noMatch && !terms.free && !hasResourceMatch(state, seat, printed.sphere, ctx, cardId)) return false;
   const hostId = terms.onSelf ? sourceId : null;
   if (terms.onSelf && (!sourceId || !attachmentHostIds(state, seat, card.code, ctx).includes(sourceId))) return false;
   const cost = termsCost(state, cardId, seat, terms, hostId, ctx);

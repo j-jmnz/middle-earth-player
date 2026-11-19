@@ -18,6 +18,7 @@ import { noteEvent } from "./pay.ts";
 
 const thranduil = card("19056", "hero", "leadership", null, { threat: 12 });
 const silvan = card("silvan", "ally", "lore", 2, { traits: ["Silvan"] });
+const archer = card("archer", "ally", "tactics", 3, { traits: ["Silvan"] });
 const wiglaf = card("19027", "ally", "leadership", 2, { traits: ["Dale"] });
 const lamp = card("lamp", "attachment", "leadership", 2, { traits: ["Item"] });
 const host = card("22036", "event", "lore", 3);
@@ -39,7 +40,7 @@ const eagle = card("eagle", "ally", "lore", 2, { traits: ["Creature"] });
 const frodo = card("21002", "hero", "spirit", null, { threat: 7, isUnique: true });
 const sam = card("sam", "hero", "leadership", null, { threat: 8, isUnique: true });
 
-const CARDS = [thranduil, silvan, wiglaf, lamp, host, guardian, filler, houses, healer, mark, signal, runeMaster, belts, linhir, presence, steward, quick, strength, radagast, eagle, frodo, sam];
+const CARDS = [thranduil, silvan, archer, wiglaf, lamp, host, guardian, filler, houses, healer, mark, signal, runeMaster, belts, linhir, presence, steward, quick, strength, radagast, eagle, frodo, sam];
 const QUICK: Effect = { id: "quick:action:1", cardCode: "quick", lines: ["quick:A:1"], timing: "action", instructions: [] };
 
 function combat(state: ScenarioState): ScenarioState {
@@ -75,6 +76,15 @@ describe("a card an effect plays from the hand (PlayFromHand)", () => {
     expect(again.cards[elves.id]).toMatchObject({ zone: "play", damage: 0, exhausted: false });
     expect(Object.values(again.cards).filter((entry) => entry.code === "silvan" && entry.zone === "play").length).toBe(2);
     expect(again.cards[ids[0]?.[1] ?? ""]?.resources).toBe(0);
+  });
+
+  it("Host of Galadhrim plays a Silvan ally again at no cost when no hero has its sphere", () => {
+    const { state, ids, ctx } = table(RECORDS, CARDS, [["lead", "lore"]]);
+    const off = put(state, "archer", "play");
+    const event = put(off.state, "22036", "hand");
+    const again = expectOk(reduce(event.state, { type: "PlayCard", cardId: event.id, payments: [{ heroId: ids[0]?.[1] ?? "", amount: 3 }] }, ctx)).state;
+    expect(again.cards[off.id]?.zone).toBe("play");
+    expect(again.seats[0].hand).not.toContain(off.id);
   });
 });
 
