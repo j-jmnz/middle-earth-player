@@ -39,8 +39,11 @@ export type App = {
    * the page it opened before: the app's database is one OPFS file, and a second tab waits on it forever.
    */
   open: (route: string, options?: { wait?: string; settle?: number }) => Promise<Page>;
-  /** Writes a fixture save through the e2e route and returns the route it landed on (`/path/save-e2e-<name>`, or a standalone game's table). */
-  seed: (fixture: string) => Promise<string>;
+  /**
+   * Writes a fixture save through the e2e route and returns the route it landed on (`/path/save-e2e-<name>`, or a standalone game's table). `at` keeps
+   * the fixture's first intents only: the moment `pnpm game show <name> --at <n>` prints.
+   */
+  seed: (fixture: string, at?: number) => Promise<string>;
   /**
    * Taps an element: a bare word is a testID, anything with `=` or a leading `[`, `#` or `.` is a Playwright selector (`text=Settings`), and `x,y` is a
    * point in CSS pixels (a card on the table's canvas). A target that is not there fails after 5 s, naming the testIDs that are.
@@ -129,12 +132,12 @@ export async function openApp(options: AppOptions): Promise<App> {
     return page;
   };
 
-  const seed = async (fixture: string): Promise<string> => {
+  const seed = async (fixture: string, at?: number): Promise<string> => {
     if (current && !current.isClosed()) await current.close();
     const page = await context.newPage();
     watch(page);
     try {
-      await page.goto(new URL(`/e2e/${fixture}`, options.base).toString());
+      await page.goto(new URL(`/e2e/${fixture}${at === undefined ? "" : `?at=${at}`}`, options.base).toString());
       // The route replaces itself with the save's path, or a standalone game's table; it stays put on a name with no committed fixture.
       await page.waitForURL((url) => !url.pathname.startsWith("/e2e/"), { timeout: TIMEOUT });
       return new URL(page.url()).pathname;

@@ -4,7 +4,8 @@
 // a real game of saved deck cards that the reducer replays; `knife-lost` starts
 // from the log scenario 1's `won` game writes (src/campaign/fixtures.ts). A scenario of a cycle (Shadows of Mirkwood) has no campaign: its fixture is
 // one open standalone game, written to the standalone games and opened on its table.
-// Outside the e2e-test build (EXPO_PUBLIC_E2E_SEED, eas.json) this route writes nothing.
+// `?at=<n>` keeps only the fixture's first n intents, so the table opens on that moment of the game (`pnpm browser shot --fixture <name> --at <n>`, the
+// moment `pnpm game show <name> --at <n>` prints). Outside the e2e-test build (EXPO_PUBLIC_E2E_SEED, eas.json) this route writes nothing.
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
 
@@ -14,13 +15,14 @@ import { BodyText, NavBar, Screen } from "../../kit/chrome";
 import { restoreSave, writeSave } from "../../data/campaign-store";
 import { useDatabases } from "../../data/databases";
 import { restoreStandalone, writeStandaloneDealt } from "../../data/standalone-store";
-import { e2eBuild } from "../../nav/e2e";
+import { e2eAt, e2eBuild } from "../../nav/e2e";
 import { goBack } from "../../nav/go-back";
 import { routeCode } from "../../nav/route-code";
 
 export default function E2eFixture() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ fixture: string }>();
+  const params = useLocalSearchParams<{ fixture: string; at?: string }>();
+  const at = e2eAt(params.at);
   const name = routeCode(params.fixture);
   const { user } = useDatabases();
   const known = name != null && isFixtureName(name) && hasFixture(name);
@@ -31,16 +33,16 @@ export default function E2eFixture() {
     if (!allowed || !saveId || !name || !isFixtureName(name)) return;
     if (fixtureKindOf(name) === "standalone") {
       const gameId = `standalone-e2e-${name}`;
-      writeStandaloneDealt(user, fixtureStandalone(name, gameId, CATALOG_VERSION));
+      writeStandaloneDealt(user, fixtureStandalone(name, gameId, CATALOG_VERSION, at));
       restoreStandalone(user, gameId);
       router.replace({ pathname: "/standalone/table/[gameId]", params: { gameId } });
       return;
     }
-    writeSave(user, fixtureSave(name, saveId, CATALOG_VERSION));
+    writeSave(user, fixtureSave(name, saveId, CATALOG_VERSION, at));
     // A fixture save archived by an earlier run is written again; it must also be back on the list.
     restoreSave(user, saveId);
     router.replace({ pathname: "/path/[saveId]", params: { saveId } });
-  }, [allowed, saveId, name, user, router]);
+  }, [allowed, saveId, name, at, user, router]);
 
   return (
     <Screen testID="e2e-fixture" scene="calm">

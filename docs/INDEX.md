@@ -10,7 +10,7 @@ Read whole.
 
 - `CLAUDE.md` — Claude Code (~3.2K tok)
   - 7–26 Data (~1.3K)
-  - 27–46 Commands (~1.2K)
+  - 27–46 Commands (~1.3K)
   - 47–50 Agents (~180)
   - 51–54 Skills (~80)
   - 55–58 Cloud sessions (~60)
@@ -233,7 +233,7 @@ Read the sections your task touches.
   - 505–524 States (~620)
 - `docs/development.md` — Development (~4.0K tok)
   - 5–14 In a browser (~170)
-  - 15–32 Checking a screen in a browser (~670) ← 3
+  - 15–32 Checking a screen in a browser (~700) ← 3
   - 33–49 Reading a game as text (~520) ← 3
   - 50–57 On a desktop (~210) ← 1
   - 58–78 On a phone (~350)

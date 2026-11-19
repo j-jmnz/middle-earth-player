@@ -8,6 +8,8 @@ export type ShotArgs = {
   /** The routes to open, in order. `{save}` in one is the fixture's save id. None: the fixture's landing route, or `/`. */
   routes: string[];
   fixture: string | null;
+  /** `--at <n>`: the fixture's first n intents only. */
+  at: number | undefined;
   wait: string | null;
   /** Tapped in order on every route, each followed by a shot. */
   taps: string[];
@@ -25,13 +27,19 @@ export type ShotArgs = {
   reuse: boolean;
 };
 
-const VALUED = new Set(["--fixture", "--wait", "--tap", "--size", "--settle", "--base", "--out"]);
+const VALUED = new Set(["--fixture", "--at", "--wait", "--tap", "--size", "--settle", "--base", "--out"]);
 const BARE = new Set(["--dark", "--both", "--landscape", "--full-page", "--ids", "--text", "--net", "--fresh", "--reuse", "--verbose", "--quiet"]);
 
 function sizeOf(value: string): Size {
   const match = /^(\d+)x(\d+)$/.exec(value);
   if (!match) throw new Error(`--size takes <width>x<height>, not ${value}`);
   return { width: Number(match[1]), height: Number(match[2]) };
+}
+
+function atOf(value: string | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  if (!/^\d+$/.test(value)) throw new Error(`--at takes a count of intents, not ${value}`);
+  return Number(value);
 }
 
 export function parseShotArgs(args: readonly string[], root: string): ShotArgs {
@@ -48,6 +56,7 @@ export function parseShotArgs(args: readonly string[], root: string): ShotArgs {
   return {
     routes,
     fixture: flagValue(args, "--fixture") ?? null,
+    at: atOf(flagValue(args, "--at")),
     wait: flagValue(args, "--wait") ?? null,
     taps: flagValues(args, "--tap"),
     schemes,

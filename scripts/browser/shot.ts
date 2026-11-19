@@ -4,6 +4,7 @@
 //
 //   pnpm browser shot /settings /decks --dark                   # two screens in the dark theme
 //   pnpm browser shot --fixture duo /table/{save} --landscape   # a fixture save (src/campaign/fixtures/registry.ts) on its table
+//   pnpm browser shot --fixture mirkwood-lost --at 40 /table/{save} --landscape   # the moment `pnpm game show mirkwood-lost --at 40` prints
 //   pnpm browser shot /settings --tap text=Theme --ids          # tap, shoot again, list the testIDs left to tap
 //   pnpm browser shot /rules --base http://localhost:8081       # a running `pnpm web` (Metro) in place of the export
 //
@@ -71,7 +72,7 @@ async function main(log: Log): Promise<void> {
       const app = await openApp({ base, scheme, size: args.size, network: args.network, out: args.out });
       try {
         // A fixture is written once per context: each scheme's context has its own storage.
-        const landed = args.fixture ? await app.seed(args.fixture) : null;
+        const landed = args.fixture ? await app.seed(args.fixture, args.at) : null;
         const suffix = args.schemes.length > 1 ? `-${scheme}` : "";
         failures += await shoot(log, app, args, routesOf(args, landed), suffix);
       } finally {
