@@ -57,26 +57,26 @@ Read the sections your task touches.
 - `docs/architecture.md` — Architecture (~28.6K tok)
   - 7–41 Stack (~1.2K)
   - 42–77 Processes (~690)
-  - 78–161 Modules (~2.4K) ← 3
-    - 126–161 Repository map (~990) ← 1
-  - 162–187 State (~1.1K) ← 10
-  - 188–209 Play loop (~250)
-  - 210–235 Engine (~5.9K)
-    - 224–235 Mechanic families (~5.0K) ← 5
-  - 236–241 Effects (~600) ← 5
-  - 242–274 Scenario definition (~800)
-  - 275–321 Persistence (~3.4K) ← 2
-    - 298–301 Open games across an update (~50)
-    - 302–308 Open game rows (~660)
-    - 309–314 Opening a game (~350)
-    - 315–321 Continue, Restart and the checkpoint (~380)
-  - 322–327 Images (~1.1K) ← 7
-  - 328–383 Screens (~5.4K) ← 9
-  - 384–395 Desktop (~1.4K) ← 5
-  - 396–405 Update check (~680) ← 7
-  - 406–411 Catalog build (~410)
-  - 412–428 Tests (~1.9K) ← 5
-  - 429–444 Performance (~1.2K) ← 4
+  - 78–162 Modules (~2.4K) ← 3
+    - 126–162 Repository map (~1.0K) ← 1
+  - 163–188 State (~1.1K) ← 10
+  - 189–210 Play loop (~250)
+  - 211–236 Engine (~5.9K)
+    - 225–236 Mechanic families (~5.0K) ← 5
+  - 237–242 Effects (~600) ← 5
+  - 243–275 Scenario definition (~800)
+  - 276–322 Persistence (~3.4K) ← 2
+    - 299–302 Open games across an update (~50)
+    - 303–309 Open game rows (~660)
+    - 310–315 Opening a game (~350)
+    - 316–322 Continue, Restart and the checkpoint (~380)
+  - 323–328 Images (~1.1K) ← 7
+  - 329–384 Screens (~5.4K) ← 9
+  - 385–396 Desktop (~1.4K) ← 5
+  - 397–406 Update check (~680) ← 7
+  - 407–412 Catalog build (~410)
+  - 413–429 Tests (~1.9K) ← 5
+  - 430–445 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~276.9K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
@@ -254,6 +254,7 @@ Read the sections your task touches.
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
   - 82–133 Commands (~2.0K) ← 4
+- `docs/discord-issues.md` — Discord issue bot (~2.1K tok)
 - `docs/releasing.md` — Releasing (~5.2K tok)
   - 5–20 Start a release (~340) ← 1
   - 21–36 Jobs (~2.0K) ← 4

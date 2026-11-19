@@ -1,0 +1,116 @@
+// The Discord issue bot: a Cloudflare Worker that Discord calls at its Interactions Endpoint URL. A moderator runs
+// /issue in a thread, or Apps > Create GitHub issue on a message; the bot answers with a form filled from the report,
+// and on submit it creates the issue in GITHUB_REPO and links it in the channel (docs/discord-issues.md).
+import { discord, editReply, type Context, type Env } from "./env.ts";
+import { createIssue, issueBody, issueForm, readForm } from "./issue.ts";
+import { loadReport, nameOf, sourceFromId, sourceToId, type SourceRef } from "./source.ts";
+import { verifyDiscordRequest } from "./verify.ts";
+
+// Interaction and response types (https://discord.com/developers/docs/interactions/receiving-and-responding).
+const PING = 1;
+const APPLICATION_COMMAND = 2;
+const MODAL_SUBMIT = 5;
+const PONG = 1;
+const CHANNEL_MESSAGE = 4;
+const DEFERRED_CHANNEL_MESSAGE = 5;
+const MODAL = 9;
+const EPHEMERAL = 64;
+// A slash command's type, and the message command's.
+const CHAT_INPUT = 1;
+const MESSAGE_COMMAND = 3;
+// Channel types of a thread: announcement, public and private.
+const THREADS = new Set([10, 11, 12]);
+
+interface Interaction {
+  type: number;
+  token: string;
+  guild_id?: string;
+  channel?: { id: string; type: number };
+  member?: { user: { id: string; username: string; global_name?: string | null } };
+  data?: {
+    type?: number;
+    name?: string;
+    target_id?: string;
+    custom_id?: string;
+    options?: { name: string; value: unknown }[];
+    components?: Parameters<typeof readForm>[0];
+  };
+}
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+}
+
+/** A reply only the moderator sees. */
+function note(content: string): Response {
+  return json({ type: CHANNEL_MESSAGE, data: { content, flags: EPHEMERAL, allowed_mentions: { parse: [] } } });
+}
+
+// The command's source: the message it was run on, or the thread it was run in.
+function sourceOf(interaction: Interaction): SourceRef | null {
+  const { data, channel } = interaction;
+  if (data?.type === MESSAGE_COMMAND && data.target_id && channel) return { kind: "message", channelId: channel.id, messageId: data.target_id };
+  if (data?.type === CHAT_INPUT && channel && THREADS.has(channel.type)) {
+    const replies = data.options?.find((option) => option.name === "replies")?.value === true;
+    return { kind: "thread", threadId: channel.id, replies };
+  }
+  return null;
+}
+
+// The command opens the form. It must answer within three seconds, so it reads the report once and does no more.
+async function openForm(env: Env, interaction: Interaction): Promise<Response> {
+  const source = sourceOf(interaction);
+  if (!source || !interaction.guild_id) return note("Use `/issue` inside a thread or a forum post. To use one message, right-click it and select **Apps → Create GitHub issue**.");
+  const report = await loadReport(env, interaction.guild_id, source);
+  if (!report) return note("I cannot read that report. Make sure that I can see this channel and that the Message Content intent is on.");
+  return json({ type: MODAL, data: issueForm(sourceToId(source), report) });
+}
+
+// After the deferred answer: read the report again for its attachments, create the issue, link it where the report is,
+// and tell the moderator. A failure is told to the moderator only.
+async function fileIssue(env: Env, interaction: Interaction, source: SourceRef, values: NonNullable<ReturnType<typeof readForm>>): Promise<void> {
+  try {
+    const report = await loadReport(env, interaction.guild_id!, source);
+    const filedBy = interaction.member ? nameOf(interaction.member.user) : "a moderator";
+    const issue = await createIssue(env, values, issueBody(values, report, filedBy));
+    const link = `Created issue [#${issue.number}](<${issue.url}>): ${values.title}`;
+    const posted = await postLink(env, source, link);
+    await editReply(env, interaction.token, posted ? `${link}. I posted the link in the channel.` : `${link}. I could not post the link in the channel.`);
+  } catch (error) {
+    await editReply(env, interaction.token, `I could not create the issue. ${error instanceof Error ? error.message : String(error)}`.slice(0, 2000));
+  }
+}
+
+// The issue link as a reply to the report message, or as a message in the thread.
+async function postLink(env: Env, source: SourceRef, content: string): Promise<boolean> {
+  const channelId = source.kind === "message" ? source.channelId : source.threadId;
+  const reference = source.kind === "message" ? { message_reference: { message_id: source.messageId, fail_if_not_exists: false } } : {};
+  try {
+    await discord(env, "POST", `/channels/${channelId}/messages`, { content, ...reference, allowed_mentions: { parse: [] } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function submitForm(env: Env, interaction: Interaction, context: Context): Response {
+  const source = sourceFromId(interaction.data?.custom_id ?? "");
+  const values = readForm(interaction.data?.components ?? []);
+  if (!source || !values || !interaction.guild_id) return note("The form is not complete. Run the command again.");
+  context.waitUntil(fileIssue(env, interaction, source, values));
+  return json({ type: DEFERRED_CHANNEL_MESSAGE, data: { flags: EPHEMERAL } });
+}
+
+export default {
+  async fetch(request: Request, env: Env, context: Context): Promise<Response> {
+    if (request.method !== "POST") return new Response("The Discord issue bot answers Discord interactions only.", { status: 405 });
+    const body = await request.text();
+    const signed = await verifyDiscordRequest(env.DISCORD_PUBLIC_KEY, request.headers.get("x-signature-ed25519"), request.headers.get("x-signature-timestamp"), body);
+    if (!signed) return new Response("Bad request signature.", { status: 401 });
+    const interaction = JSON.parse(body) as Interaction;
+    if (interaction.type === PING) return json({ type: PONG });
+    if (interaction.type === APPLICATION_COMMAND) return openForm(env, interaction);
+    if (interaction.type === MODAL_SUBMIT) return submitForm(env, interaction, context);
+    return new Response("Unknown interaction type.", { status: 400 });
+  },
+};

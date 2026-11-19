@@ -1,0 +1,25 @@
+[
+  {
+    "name": "issue",
+    "type": 1,
+    "description": "Create a GitHub issue from this thread's bug report",
+    "options": [
+      {
+        "name": "replies",
+        "description": "Put the thread's replies in the issue as well",
+        "type": 5,
+        "required": false
+      }
+    ],
+    "default_member_permissions": "8192",
+    "contexts": [0],
+    "integration_types": [0]
+  },
+  {
+    "name": "Create GitHub issue",
+    "type": 3,
+    "default_member_permissions": "8192",
+    "contexts": [0],
+    "integration_types": [0]
+  }
+]
