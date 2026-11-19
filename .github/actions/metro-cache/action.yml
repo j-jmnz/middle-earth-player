@@ -1,0 +1,51 @@
+name: Restore the Metro cache
+description: Restores the Metro transforms an earlier release build of this platform used and points @expo/metro-config at them (docs/releasing.md, Caches). The job saves the output folder under `key` after its bundle, when `hit` is not true.
+
+inputs:
+  platform:
+    description: android, ios or web; each keeps its own transforms.
+    required: true
+
+outputs:
+  key:
+    description: The key to save under, which the cleanup job keeps.
+    value: ${{ steps.key.outputs.key }}
+  path:
+    description: The folder Metro writes the transforms this build used to, which the job saves.
+    value: ${{ steps.key.outputs.path }}
+  hit:
+    description: true when this commit's entry was restored, so there is nothing new to save.
+    value: ${{ steps.restore.outputs.cache-hit }}
+
+runs:
+  using: composite
+  steps:
+    # Under the runner's temp folder: the cache action refuses a path with `..`, and a job's env cannot read the runner context.
+    - id: key
+      shell: bash
+      run: |
+        {
+          echo "prefix=metro-${{ inputs.platform }}-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-"
+          echo "key=metro-${{ inputs.platform }}-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-$GITHUB_SHA"
+          echo "path=$RUNNER_TEMP/metro"
+        } >> "$GITHUB_OUTPUT"
+        {
+          echo "EXPO_METRO_CACHE_RESTORE_DIR=$RUNNER_TEMP/metro-restored"
+          echo "EXPO_METRO_CACHE_OUTPUT_DIR=$RUNNER_TEMP/metro"
+        } >> "$GITHUB_ENV"
+    - id: restore
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.key.outputs.path }}
+        key: ${{ steps.key.outputs.key }}
+        restore-keys: |
+          ${{ steps.key.outputs.prefix }}
+          metro-${{ inputs.platform }}-
+    # Metro reads the restored transforms and writes the ones this build uses to its output folder, which the job saves under
+    # this commit, so the next release starts from them.
+    - name: Move the restored transforms aside
+      shell: bash
+      run: |
+        rm -rf "$EXPO_METRO_CACHE_RESTORE_DIR"
+        if [ -d "$EXPO_METRO_CACHE_OUTPUT_DIR" ]; then mv "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"; fi
+        mkdir -p "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"
