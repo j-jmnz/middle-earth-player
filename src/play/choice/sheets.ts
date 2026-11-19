@@ -66,6 +66,17 @@ function lineOf(effect: Effect | undefined, names: SheetNames): string | null {
   return id ? names.line(id) : null;
 }
 
+/**
+ * The row of a card whose Action or Response can be used: an attachment says which card it lies on ("Unexpected Courage ·
+ * on Aragorn"), so two copies on two heroes read apart. A hero or an ally is named alone.
+ */
+function triggerLabel(game: ScenarioState, names: SheetNames, id: string): string {
+  // A card under a location also names a host; only a card in the host's attachments is attached to it.
+  const host = game.cards[id]?.host;
+  const label = cardLabel(game, names, id);
+  return host != null && game.cards[host]?.attachments.includes(id) === true ? `${label} \u00b7 on ${names.card(host)}` : label;
+}
+
 export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): TriggerOption[] {
   const options: TriggerOption[] = [];
   for (const intent of legal) {
@@ -76,7 +87,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
     const caution = framsburgActionCaution(game, effect);
     options.push({
       id: `${intent.cardId}|${intent.effectId}`,
-      label: cardLabel(game, names, intent.cardId),
+      label: triggerLabel(game, names, intent.cardId),
       code: pictureKey(card),
       effectId: intent.effectId,
       cardId: intent.cardId,
