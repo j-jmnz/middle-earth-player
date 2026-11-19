@@ -132,6 +132,8 @@ export type CardInstance = {
   // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideInPlay with keepDamage.
   keepsDamage?: true;
   // An enemy attached to a character as an attachment (Wraith of Carn Dûm, 101157:A:1): it has no enemy text while it lies there, hears no leaving of play, and returns to the staging area as an enemy when its host leaves play (families/angmar/reanimate/attached.ts).
+  // A card of the Investigation deck a look window has shown (families/investigation/look.ts): the Investigation List marks its name as checked off. The card stays facedown; nothing but the list reads it.
+  seen?: true;
   asAttachment?: true | "discard";
   // A player card lying faceup on an enemy as an attachment with no title and no game text, taken from the top of a deck (Nameless Thing, families/nameless): its printed cost is its only active part. Set only by AttachDeckTop, and cleared once the card has left the enemy.
   nameless?: true;

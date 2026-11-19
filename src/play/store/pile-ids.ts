@@ -6,7 +6,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 // discard pile while it deals that (emce.evil-creatures-deck), or one deck alone: the Uncharted deck (dcce.uncharted-deck), the Grotto deck (dcce.grotto-deck) or the Caves deck
 // (emce.caves-deck), the Balrog deck and its discard pile in Shadow and Flame Nightmare (the setup card's lines 901801:A:2 to A:4), or the Harad deck lying under The Cross-roads (mec112.setup-journey-to-the-cross-roads). The victory display is a pile too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
-export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "balrogDeck" | "balrogDiscard" | "cavesDeck" | "haradDeck" | "angmarOrcDeck" | "smaugDeck" | "smaugDiscard";
+export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "balrogDeck" | "balrogDiscard" | "cavesDeck" | "haradDeck" | "angmarOrcDeck" | "investigationDeck" | "smaugDeck" | "smaugDiscard";
 export type VictoryPileId = "victory";
 export type PileId = BasePileId | SecondPileId | VictoryPileId;
 
@@ -19,6 +19,7 @@ const GROTTO_PILES: readonly SecondPileId[] = ["grottoDeck"];
 const CAVES_PILES: readonly SecondPileId[] = ["cavesDeck"];
 const HARAD_PILES: readonly SecondPileId[] = ["haradDeck"];
 const ANGMAR_PILES: readonly SecondPileId[] = ["angmarOrcDeck"];
+const INVESTIGATION_PILES: readonly SecondPileId[] = ["investigationDeck"];
 const SMAUG_PILES: readonly SecondPileId[] = ["smaugDeck", "smaugDiscard"];
 const NONE_PILES: readonly SecondPileId[] = [];
 
@@ -38,6 +39,7 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   cavesDeck: "Caves deck",
   haradDeck: "Harad deck",
   angmarOrcDeck: "Orc deck",
+  investigationDeck: "Investigation deck",
   smaugDeck: "Smaug deck",
   smaugDiscard: "Smaug discard pile",
   victory: "Victory display",
@@ -52,6 +54,7 @@ export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "unchart
   if (game.uncharted !== undefined) return UNCHARTED_PILES;
   if (game.piles?.haradDeck !== undefined) return HARAD_PILES;
   if (game.piles?.angmarOrcDeck !== undefined) return ANGMAR_PILES;
+  if (game.piles?.investigationDeck !== undefined) return INVESTIGATION_PILES;
   if (game.piles?.smaugDeck !== undefined) return SMAUG_PILES;
   return game.piles?.cavesDeck !== undefined ? CAVES_PILES : NONE_PILES;
 }

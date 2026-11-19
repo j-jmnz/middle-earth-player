@@ -9,7 +9,7 @@ import { hasTrait } from "../../interpret/conditions.ts";
 import { textBlank } from "../attachments/hold.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { heldAmount } from "../../core/state.ts";
+import { heldAmount, updateCards } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { ignoresKeyword } from "../wilderland/markers.ts";
@@ -52,7 +52,9 @@ function noteLooked(state: ScenarioState, ids: readonly string[]): ScenarioState
 
 /** The window that shows the cards to the seat. */
 function showing(state: ScenarioState, seat: number, ids: readonly string[]): ScenarioState {
-  return ids.length === 0 ? state : { ...state, window: { kind: "look", seat, cardIds: ids }, activeSeat: seat, passed: [] };
+  if (ids.length === 0) return state;
+  const marked = updateCards(state, ids.map((id) => [id, { seen: true }] as const));
+  return { ...marked, window: { kind: "look", seat, cardIds: ids }, activeSeat: seat, passed: [] };
 }
 
 /**
