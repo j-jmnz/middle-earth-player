@@ -231,6 +231,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "campaign" ||
     zone === "nightmare" ||
     zone === "modeCard" ||
+    zone === "nightObjective" ||
     zone === "captive" || zone === "grappled"
   );
 }

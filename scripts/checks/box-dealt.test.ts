@@ -13,6 +13,10 @@ const EXCEPTIONS: Readonly<Record<string, string>> = {
   "146080": "Epic Multiplayer Mode, the double-sided setup card of the last two scenarios played together (mec113.epic-multiplayer-mode); epic multiplayer mode is not built.",
   "146081": "The Eye of Sauron (The Black Gate Opens side), an epic multiplayer mode objective that the Epic Multiplayer Mode card's Setup places (mec113.epic-multiplayer-mode); epic multiplayer mode is not built.",
   "146082": "The Eye of Sauron (Mount Doom side), an epic multiplayer mode objective that the Epic Multiplayer Mode card's Setup places (mec113.epic-multiplayer-mode); epic multiplayer mode is not built.",
+  "147023": "The Old Forest's campaign card (The Lord of the Rings Part 1.1): Campaign Mode only; the Standalone scenarios cycle has no campaign log, so the standalone game deals no campaign card (docs/brief.md, The Old Forest).",
+  "147024": "Old Bogey-stories, the boon the Old Forest campaign card attaches and its Resolution earns: Campaign Mode only, never dealt by the standalone game (docs/brief.md, The Old Forest).",
+  "148020": "Fog on the Barrow-downs's campaign card (The Lord of the Rings Part 1.2): Campaign Mode only; the Standalone scenarios cycle has no campaign log, so the standalone game deals no campaign card (docs/brief.md, Fog on the Barrow-downs).",
+  "148021": "Ho! Tom Bombadil!, the boon the Fog campaign card's Resolution earns: a player card of Campaign Mode, never dealt by the standalone game (docs/brief.md, Fog on the Barrow-downs).",
   "142091": "The One Ring as printed in The Road Darkens (TRD 91): the app deals 141085 (TBR 85, TFotR 166), the same card, attached through the campaign card's setup.",
 };
 

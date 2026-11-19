@@ -39,6 +39,8 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (typeof expr.pile === "string") return { text: `the number of cards left in the ${expr.pile === "harad" ? "Harad" : str(expr.pile)} deck`, read: ["pile"] };
   if (expr.highestThreat === true) return { text: "the highest threat among the living players", read: ["highestThreat"] };
   if (typeof expr.playersAtThreat === "number") return { text: `the number of living players with a threat of ${expr.playersAtThreat} or higher`, read: ["playersAtThreat"] };
+  if (expr.lakeTownDamage === true) return { text: "the damage on Lake-town", read: ["lakeTownDamage"] };
+  if (expr.victoryDisplay === true) return { text: "the Victory points in the victory display", read: ["victoryDisplay"] };
   if (expr.pursuit === true) return { text: "the pursuit value", read: ["pursuit"] };
   if (expr.questCards === true) return { text: "the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1)", read: ["questCards"] };
   if (expr.shadowCardsInPlay === true) return { text: "the number of shadow cards dealt to the enemies in play (in the staging area and engaged)", read: ["shadowCardsInPlay"] };

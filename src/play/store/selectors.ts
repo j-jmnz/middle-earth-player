@@ -14,7 +14,7 @@ import { capturedByHost } from "../../rules/families/captured/pile.ts";
 import { grappledWith } from "../../rules/families/grapple/values.ts";
 import { prisonersOfSeat } from "../../rules/families/prisoner/index.ts";
 import { declaredDefenders } from "../../rules/families/defense/defenders.ts";
-import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../../rules/families/breaking/areas.ts";
+import { activeOf, areaOf, isSeparate, parkedStage, sharedStaging, stageOf, stagingOf } from "../../rules/families/breaking/areas.ts";
 
 import { threatRows } from "./foresight.ts";
 import { isDiscardPile, opensList, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId } from "./pile-ids.ts";
@@ -136,6 +136,8 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
 function areaOrShared(game: ScenarioState, seat: number): readonly string[] {
   const own = stagingOf(game, seat);
   if (!isSeparate(game)) return own;
+  // The staging cards of a parked stage (Fog on the Barrow-downs, stage 3B with no player at it) are in no player's area: the table draws them in none, and a dial and the stage's preview name them (readouts/standalone-scenarios/barrow-downs.ts).
+  if (parkedStage(game) != null) return own;
   const shared = sharedStaging(game);
   return shared.length > 0 ? [...own, ...shared] : own;
 }
@@ -277,6 +279,8 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "cavesDeck":
     case "haradDeck":
     case "angmarOrcDeck":
+    case "smaugDeck":
+    case "smaugDiscard":
       return game.piles?.[pile] ?? NONE;
     case "victory":
       return game.victory;
@@ -417,7 +421,8 @@ export function onTableFor(game: ScenarioState, seat: number, folded?: ReadonlyS
       // Once stages are separate the table draws the seat's own area, stage and active location: a card of another seat's is not on it.
       case "staging": {
         const area = areaOf(game, cardId);
-        return area == null || area === seat;
+        // A card of a parked stage's staging area is in no area: it is not on the table the seat sees.
+        return area == null ? parkedStage(game) == null : area === seat;
       }
       case "activeLocation":
       case "secondActiveLocation":

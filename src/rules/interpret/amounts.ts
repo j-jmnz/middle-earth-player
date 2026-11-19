@@ -13,6 +13,7 @@ import { printedOf } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import { activeOf } from "../families/breaking/areas.ts";
+import { lakeTownId, smaugInPlay } from "../families/smaug/cards.ts";
 import { stageNumber } from "../families/caves/progress.ts";
 import { topFrame } from "../windows/windows.ts";
 import { shadowCards } from "../core/zones.ts";
@@ -93,6 +94,11 @@ export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope):
       return state.encounterDiscard.at(-1) ?? null;
     case "questStage":
       return state.questStage ?? null;
+    // The Battle of Lake-town: the Smaug in play (in the staging area or engaged) and the Lake-town objective (families/smaug/cards.ts).
+    case "smaug":
+      return smaugInPlay(state);
+    case "lakeTown":
+      return lakeTownId(state);
   }
 }
 

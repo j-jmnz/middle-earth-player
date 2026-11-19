@@ -1,0 +1,254 @@
+Scenario piles that place cards with no record (quest: 00016 Beyond Expectations; quest: 00017 Through the Ruins; quest: 00018 Anduin Crossing; quest: 00019 Race to Minas Tirith; staging: 00002 Snaga Scouts; staging: 00003 Wolves from Mordor; staging: 00004 Wainriders; setAside: 00001 The Witch-king)
+
+## 00001 The Witch-king
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+00001:A:1 (front): Players cannot play attachments on The Witch-king.
+  00001:constant:1: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+00001:A:2 (front): While The Witch-king is in the staging area, each character gets -1 Willpower.
+  00001:constant:2: Constant
+    only if this card is in the staging area
+    - each character (any player controls): stat willpower -1, while this card is in play
+
+00001:A:3 (front): Forced: After The Witch-king attacks, he returns to the staging area unless the defending player raises his threat by 3.
+  00001:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 3 (the player the event is about)
+      * option "staging":
+        - return this card to the staging area
+
+## 00002 Snaga Scouts
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+00002:A:1 (front): Forced: At the beginning of the encounter phase, all copies of Snaga Scouts engage the player with the lowest threat. (The first player chooses in case of a tie.)
+  00002:forced:1: Forced when a phase begins
+    only if it is the Encounter phase
+    - every copy of this enemy, in the staging area or engaged with a player, engages the player with the lowest threat (the first player chooses among tied players)
+
+## 00003 Wolves from Mordor
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+00003:A:1 (front): Forced: After Wolves from Mordor attack and destroy a character, shuffle Wolves from Mordor into the encounter deck.
+  00003:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    - this card is shuffled into the encounter deck
+
+00003:A:2 (shadow): Shadow: Deal 2 damage to the defending character.
+  00003:shadow:1: Shadow
+    - deal 2 damage to the defender
+
+## 00004 Wainriders
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+00004:A:1 (front): Each damage dealt by Wainriders raises the defending player's threat by 1.
+  00004:constant:1: Constant
+    - this card: stat damageToThreat 1, while this card is in play
+
+## 00005 Wainrider Captain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00005:A:1 (front): When Revealed: Move the top Scout enemy from the encounter discard pile to the staging area. (Top 2 Scout enemies instead if the players have crossed the Anduin.)
+  00005:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the players are on stage 4): return the topmost 1 Scout enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+    - then, if the players are on stage 4 (checked when this step runs, after the steps above; not tied to whether they did anything): return the topmost 2 Scout enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+
+00005:A:2 (shadow): Shadow: If this attack is undefended, attacking enemy gets +2 Attack if it is a Scout.
+  00005:shadow:1: Shadow
+    - if all of: (the attack has no defender) and (the attacking enemy is a Scout enemy (any player controls)): the attacking enemy: stat attack 2, until the end of the attack
+
+## 00006 Uruk Vanguard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00006:A:1 (front): If the players have crossed the Anduin, Uruk Vanguard gets +3 Attack.
+  00006:constant:1: Constant
+    only if the players are on stage 4
+    - this card: stat attack 3, while this card is in play
+
+00006:A:2 (shadow): Shadow: attacking enemy gets +1 Attack. (+2 Attack instead if players have crossed the Anduin).
+  00006:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the players are on stage 4): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the players are on stage 4 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 00007 Captured Watchtower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00007:A:1 (front): If the players have crossed the Anduin, Captured Watchtower gets +3 Threat.
+  00007:constant:1: Constant
+    only if the players are on stage 4
+    - this card: stat threat 3, while this card is in play
+
+00007:A:2 (shadow): Shadow: Remove all defending characters from combat. This attack is considered undefended.
+  00007:shadow:1: Shadow
+    - this attack is considered undefended
+
+## 00008 Emyn Arnen Overlook
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00008:A:1 (front): The first Scout enemy revealed from the encounter deck each round gains surge and doomed 2.
+  00008:constant:1: Constant
+    - the first Scout enemy card revealed each round gains surge and doomed 2
+
+## 00009 Morgulduin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00009:A:1 (front): While Morgulduin is the active Location, it gains: 'Forced: When a character commits to a Quest, deal 1 damage to that character.'
+  00009:forced:1: Forced after a card is committed to the quest (heard about character (any player controls))
+    only if this card is the active location
+    - deal 1 damage to the card the event is about
+
+00009:A:2 (shadow): Shadow: If the players have not yet crossed the Anduin, return any current active location to the staging area. Morgulduin becomes the active location.
+  00009:shadow:1: Shadow
+    - if not (the players are on stage 4): this card becomes the active location
+
+## 00010 Pelennor Fields
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00010:A:1 (front): If the players have crossed the Anduin, Pelennor Fields gains: 'When faced with the option to travel, the players must either travel to Pelennor Fields or raise each player's threat by 3.'
+  00010:constant:1: Constant
+    only if all of: (the players are on stage 4) and (this card is in the staging area)
+    - when the players are faced with the option to travel, declining to travel or traveling to a location with another title raises each player's threat by 3 (traveling to a location with this title costs nothing; copies are charged once)
+
+## 00011 Ruins of Osgiliath
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00011:A:1 (front): If the players have not crossed the Anduin, Ruins of Osgiliath gets +3 Threat.
+  00011:constant:1: Constant
+    only if not (the players are on stage 4)
+    - this card: stat threat 3, while this card is in play
+
+## 00012 Cut Off
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00012:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+00012:A:2 (front): When Revealed: Each player must discard all ally cards from his hand, if able.
+  00012:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player discards each card (you control) in hand, of card type ally
+
+00012:A:3 (shadow): Shadow: Defending player must discard 1 ally card from his hand or attacking enemy gets +3 Attack. (2 allies instead if this attack is undefended.)
+  00012:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "discard" (only if all of: (the attack has a defender) and (the number of card (you control) in hand, of card type ally is at least 1)):
+        - choose card (you control) in hand, of card type ally
+        - discard the picked card
+      * option "discardTwo" (only if all of: (the attack has no defender) and (the number of card (you control) in hand, of card type ally is at least 2)):
+        - choose card (you control) in hand, of card type ally
+        - discard the picked card
+        - choose card (you control) in hand, of card type ally, other than the cards this effect already picked
+        - discard the picked card
+      * option "attack":
+        - the attacking enemy: stat attack 3, until the end of the attack
+
+## 00013 Dark Pursuit
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00013:A:1 (front): When Revealed: Raise the total Threat of the staging area by 1 for each Scout enemy in play. If there are no Scout enemies in play, Dark Pursuit gains surge.
+  00013:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the total Threat in the staging area is raised, live, by 1 for each Scout enemy in play until the end of the phase
+    - then, if the number of Scout enemy (any player controls) or in the staging area is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 00014 Massing at Osgiliath
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00014:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+00014:A:2 (front): When Revealed: Until the end of the phase, each card revealed by the encounter deck gains doomed 1. (Doomed 3 instead if the players have crossed the Anduin.)
+  00014:whenRevealed:1: When revealed
+    - until the end of the phase, each card revealed gains doomed 1 (doomed 3 while the current stage is stage 4), recalculated as each is revealed
+
+## 00015 Ranger of Ithilien
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+00015:A:1 (front): When Revealed: The first player takes control of Ranger of Ithilien, exhausted and committed to the quest. Then, Ranger of Ithilien gains surge.
+  00015:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
+    - exhaust this card
+    - then, if it is the Quest phase (checked when this step runs, after the steps above; not tied to whether they did anything): this card is committed to the quest (it counts as committing, so a "when a character commits" effect hears it)
+    - this card gains surge (one more encounter card is revealed when it has been resolved)
+
+00015:A:2 (shadow): Shadow: Deal 2 damage to attacking enemy. The defending player may exhaust a character he controls to take control of Ranger of Ithilien.
+  00015:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - deal 2 damage to the attacking enemy
+    - the acting player chooses one of:
+      * option "take" (only if there is a ready character (you control) to choose):
+        - choose ready character (you control)
+        - exhaust the picked card
+        - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
+      * option "decline":
+
+## 00016 Beyond Expectations
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+00016:A:1 (front): Setup: Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area. Remove The Witch-king from the encounter deck and set him aside, out of play. Shuffle any unused Scout cards back into the encounter deck.
+  00016:setup:1: Setup
+    (no instructions)
+
+00016:B:1 (back): Players cannot travel to West Bank locations.
+  00016:constant:1: Constant
+    - the players cannot travel to locations with the trait West Bank while this holds
+
+## 00017 Through the Ruins
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+00017:B:1 (back): Players cannot travel to West Bank locations.
+  00017:constant:1: Constant
+    - the players cannot travel to locations with the trait West Bank while this holds
+
+00017:B:2 (back): Each player cannot play or put into play more than 1 card from his hand each round.
+  00017:constant:2: Constant
+    - each player cannot play or put into play more than 1 card from his hand each round (events included; cards from the deck or the discard pile do not count)
+
+## 00018 Anduin Crossing
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+00018:B:1 (back): Progress tokens from card effects cannot be placed on this quest card or the active location.
+  00018:constant:1: Constant
+    - this card: stat noEffectProgress 1, while this card is in play
+
+00018:B:2 (back): Players cannot travel to East Bank or West Bank locations.
+  00018:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the players cannot travel to locations with the trait East Bank while this holds
+    - the players cannot travel to locations with the trait West Bank while this holds
+
+00018:B:3 (back): In order to commit characters to the quest, a player must first choose a hero or 1 Ranger of Ithilien card he controls. Discard each chosen card from play.
+  00018:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "hero" (only if there is a hero (you control) to choose):
+          - choose hero (you control)
+          - discard the picked card
+        * option "ranger" (only if there is a ally (you control) named "Ranger of Ithilien" to choose):
+          - choose ally (you control) named "Ranger of Ithilien"
+          - discard the picked card
+        * option "none":
+          - ownCharacters: stat cannotQuest 1, until the end of the phase
+
+## 00019 Race to Minas Tirith
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+00019:B:1 (back): When Revealed: Add The Witch-king to the staging area.
+  00019:whenRevealed:1: When revealed
+    - the set-aside card with code 00001 joins the staging area (not revealed)
+
+00019:B:2 (back): Players have now crossed the Anduin. Players cannot travel to East Bank locations.
+  00019:constant:1: Constant
+    - the players cannot travel to locations with the trait East Bank while this holds
+
+00019:B:3 (back): If the players defeat this stage, they have won the game.
+  00019:constant:2: Constant
+    (no instructions)
+
+(rendered pieces: 155 by template, 0 as JSON)

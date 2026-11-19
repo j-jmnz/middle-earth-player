@@ -11,10 +11,11 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { defendingAgainst } from "../angmar/combat.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -82,9 +83,17 @@ export function undefendedExtras(state: ScenarioState, seat: number, cards: Card
   return found;
 }
 
-// A character that uses its Willpower instead of its Defense (Against the Shadow, 06038).
-export function defenseFromWillpower(state: ScenarioState, id: string): boolean {
-  return flagged(state, id, "defenseFromWillpower");
+// A character that uses its Willpower instead of its Defense (Against the Shadow, 06038), always or, with a `defendingAgainst` condition on the modifier, only while it defends against an enemy with the Trait ("when defending against Wight enemies", 148010:A:1).
+// modifiedStat takes the printed cards and no effect list (as keywords.ts reads the same condition for a Defense bonus), so the Trait is read from the enemy's printed traits and the traits the state grants it, not from a constant record that grants one.
+export function defenseFromWillpower(state: ScenarioState, instance: CardInstance, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  return state.modifiers.some(
+    (modifier) =>
+      modifier.stat === "defenseFromWillpower" &&
+      modifier.instanceId === instance.id &&
+      modifier.amount > 0 &&
+      modifierActive(state, modifier) &&
+      (modifier.when?.kind !== "defendingAgainst" || defendingAgainst(state, instance, modifier.when.trait, { effects: [], cards })),
+  );
 }
 
 // Progress from questing successfully (rr.step-3-4): the active location takes what it needs first, and while an enemy holds

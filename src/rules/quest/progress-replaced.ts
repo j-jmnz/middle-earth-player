@@ -6,11 +6,12 @@ import { rescueRandom } from "../families/captured/rescue.ts";
 import { queueEvent } from "../windows/queue.ts";
 
 // The flags of a quest stage that replace the progress placed on it, tried in this order: the removal of damage from locations in play (families/aflame.ts, 11037:B:1), progress the players place on a location in the staging area instead (families/island.ts, 12067:B:2) and,
-// for progress from questing successfully only (a player card's is placed as usual), damage among the enemies in play (families/pelennor, 145076:B:1).
+// for progress from questing successfully only (a player card's is placed as usual), damage among the enemies in play (families/pelennor, 145076:B:1) and the healing of Lake-town (families/smaug/stage.ts, 50202:B:2).
 const PROGRESS_REPLACED: readonly { flag: Modifier["stat"]; questingOnly: boolean }[] = [
   { flag: "progressHeals", questingOnly: false },
   { flag: "progressToStaging", questingOnly: false },
   { flag: "progressAsDamage", questingOnly: true },
+  { flag: "progressHealsLakeTown", questingOnly: true },
 ];
 
 // What is left of `remaining` once the stage's flags have taken their share; the caller has checked that no side quest takes the progress instead (mec108.side-quests-in-play).

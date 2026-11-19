@@ -1,0 +1,418 @@
+Scenario piles that place cards with no record (quest: 50301 The Disappearance; quest: 50302 Terror of the Dead; quest: 50303 The Shadow Host; activeLocation: 50307 Tarlang's Neck; setAside: 50304 Derufin; setAside: 50305 The Lord of the Dead; setAside: 50306 The Stone of Erech; setAside: 50308 Eventide; setAside: 50309 Dusk; setAside: 50310 Midnight)
+
+## 50301 The Disappearance
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50301:A:1 (front): Setup: Make Tarlang's Neck the active location. Set Derufin, The Lord of the Dead, The Stone of Erech, and the 3 Night objectives aside, out of play. Shuffle the encounter deck. Place Eventide into play, next to the current quest.
+  50301:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - the set aside card with code 50308 (a Night objective: Eventide, Dusk or Midnight) comes into play beside the current quest, with no progress; only one Night objective lies there at a time
+
+50301:B:1 (back): When Revealed: Reveal 1 encounter card per player, adding them to the staging area.
+  50301:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+50301:B:2 (back): Players cannot defeat this stage while Tarlang's Neck is in play.
+  50301:constant:1: Constant
+    only if the card with code 50307 is in play
+    - the players cannot defeat this stage while this holds
+
+## 50302 Terror of the Dead
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50302:A:1 (front): When Revealed: Add The Stone of Erech to the staging area and attach Derufin to it.
+  50302:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 50306 joins the staging area (it is not revealed)
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"50304","to":"The Stone of Erech","uncontrolled":true}]
+
+50302:B:1 (back): Forced: At the beginning of each round, the players must choose: each player skips the next planning phase, or heroes do not collect resources during the resource phase this round.
+  50302:forced:1: Forced when a phase begins
+    only if it is the Beginning of round phase
+    - the first player chooses one of:
+      * option "skipPlanning":
+        - the table: stat skipPlanning (the planning phase is skipped: no window opens) 1, until the end of the round
+      * option "noCollect":
+        - the table: stat noCollect (no hero collects resources in the resource phase; an effect that adds resources still works) 1, until the end of the round
+
+## 50303 The Shadow Host
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50303:A:1 (front): When Revealed: Starting with the first player, each player searches the encounter deck and discard pile for 1 Oathbreaker enemy, reveals it, and adds it to the staging area. Add the Lord of the Dead to the staging area.
+  50303:whenRevealed:1: When revealed (record also names 50303:A:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player searches the encounter deck and discard pile for a Oathbreaker enemy, reveals it and adds it to the staging area
+    - one set-aside card with code 50305 joins the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+50303:A:2 (front): Shuffle the encounter deck.
+  50303:whenRevealed:1: When revealed (record also names 50303:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player searches the encounter deck and discard pile for a Oathbreaker enemy, reveals it and adds it to the staging area
+    - one set-aside card with code 50305 joins the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+50303:B:1 (back): Midnight. Battle (Characters use their Attack instead of Willpower when questing.)
+  50303:constant:1: Constant
+    only if the Night objective in play is Midnight
+    - this card: stat battle 1, while this card is in play
+
+50303:B:2 (back): Players cannot place progress on this stage unless they control Derufin.
+  50303:constant:2: Constant
+    only if not (a player controls the card with code 50304)
+    - the table: stat noQuestProgress 1, while this card is in play
+
+50303:B:3 (back): If the players defeat this stage, they have escaped the Blackroot Vale with Derufin and won the game.
+  50303:triggered:1: Triggered (mandatory, not printed as Forced) on the event questDefeated
+    - the players win the game
+
+## 50304 Derufin
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50304:A:1 (front): Forced: After the players travel to The Stone of Erech, the first player gains control of Derufin.
+  50304:forced:1: Forced after the players travel (heard about location (any player controls) named "The Stone of Erech")
+    - this card, an objective ally attached to another card, leaves it and joins the first player's play area, ready, controlled by him
+
+50304:A:2 (front): Dusk. Derufin gets -1 Willpower
+  50304:constant:2: Constant
+    only if the Night objective in play is Dusk
+    - this card: stat willpower -1, while this card is in play
+
+50304:A:3 (front): Midnight. Derufin gets -2 Willpower
+  50304:constant:3: Constant
+    only if the Night objective in play is Midnight
+    - this card: stat willpower -2, while this card is in play
+
+50304:A:4 (front): If Derufin leaves play, the players lose the game.
+  50304:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 50305 The Lord of the Dead
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50305:A:1 (front): Spectral. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  50305:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+50305:A:2 (front): While you are engaged with The Lord of the Dead, treat all printed text boxes on characters you control as if they were blank (except for Traits.)
+  50305:constant:2: Constant
+    only if this card is engaged with the player
+    - engagedSeatCharacters: stat blankText (its text box is blank) 1, while this card is in play
+
+## 50306 The Stone of Erech
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50306:A:1 (front): Immune to player card effects. X is twice the number of players in the game.
+  (the keyword part is owned by the card's keywords; the records cover: X is twice the number of players in the game.)
+  50306:constant:1: Constant
+    - this card: stat threat the number of players x 2, while this card is in play
+
+50306:A:2 (front): While The Stone of Erech is that active location, characters with less than 2 Willpower cannot ready.
+  50306:constant:2: Constant
+    only if this card is the active location
+    - each character (any player controls) [also {"maxWillpower":1}]: stat cannotReady 1, while this card is in play
+
+50306:A:3 (front): Travel: Exhaust each character with less than 2 Willpower.
+  50306:travel:1: Travel
+    - exhaust each character (any player controls) [also {"maxWillpower":1}]
+
+## 50307 Tarlang's Neck
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+50307:A:1 (front): While Tarlang's Neck is the active location, it gains, 'Forced: At the beginning of the encounter phase, the players must either immediately end the encounter phase, or the first player must engage all enemies in the staging area.'
+  50307:forced:1: Forced when a phase begins
+    only if all of: (it is the Encounter phase) and (this card is the active location)
+    - the first player chooses one of:
+      * option "endPhase":
+        - the phase in progress ends once this effect has finished (what is left of it is skipped: in the quest phase the characters stay exhausted and uncommitted and the quest is not resolved; in the combat phase no attack is made); its end-of-phase Forced effects resolve as it ends
+      * option "engageAll":
+        - the first player engages every enemy in the staging area
+
+## 50308 Eventide
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50308:A:1 (front): Forced: At the end of the round, place 1 progress on Eventide.
+  50308:forced:1: Forced at the end of the round
+    - place 1 progress on this card
+
+50308:A:2 (front): If there are 4 or more progress on Eventide, add it to the victory display and put Dusk into play.
+  50308:constant:1: Constant
+    - a passive check, made whenever the game settles: with 4 or more progress on this Night objective it goes to the victory display with its progress and the set aside card with code 50309 comes into play beside the quest with none
+
+## 50309 Dusk
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50309:A:1 (front): Forced: At the end of the round, place 1 progress on Dusk.
+  50309:forced:1: Forced at the end of the round
+    - place 1 progress on this card
+
+50309:A:2 (front): If there are 4 or more progress on Dusk, add it to the victory display and put Midnight into play.
+  50309:constant:1: Constant
+    - a passive check, made whenever the game settles: with 4 or more progress on this Night objective it goes to the victory display with its progress and the set aside card with code 50310 comes into play beside the quest with none
+
+## 50310 Midnight
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50310:A:1 (front): Forced: At the end of the round, place 1 progress on Midnight. Then, raise each player's threat by the number of progress on Midnight.
+  50310:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 progress on this card
+    - raise threat by progress of this card (each player)
+
+## 50311 Relic from the Dark Years
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50311:A:1 (front): Midnight. Action: Claim this objective and attach it to a hero you control. Counts as an Artifact attachment with the text: 'When attached hero attacks an Oathbreaker, that enemy loses the Spectral keyword until the end of the phase.'
+  50311:action:1: Action (any player may use it)
+    only if all of: (the Night objective in play is Midnight) and (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+  50311:constant:1: Constant
+    - this card counts as a Artifact attachment while it is attached
+  50311:forced:1: Forced after a character is declared as an attacker (heard about the host)
+    only if all of: (its host is a hero (any player controls)) and (the event's other card is a Oathbreaker enemy (any player controls))
+    - the event's other card: stat losesSpectral 1, until the end of the phase
+
+## 50312 Shadow-man
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50312:A:1: Spectral.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50312:A:2 (front): When Revealed: Players cannot play events until the end of the round.
+  50312:whenRevealed:1: When revealed
+    - the table: stat cannotPlayEvents (no player can play an event) 1, until the end of the round
+
+50312:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead).
+  50312:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the Night objective in play is Dusk or Midnight): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the Night objective in play is Dusk (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if the Night objective in play is Midnight (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 50313 Restless Dead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50313:A:1: Spectral.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50313:A:2 (front): When Revealed: Return the topmost Undead enemy in the encounter discard pile to the staging area.
+  50313:whenRevealed:1: When revealed
+    - return the topmost 1 Undead enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+
+## 50314 Whisperer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50314:A:1: Spectral.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50314:A:2 (front): Dusk. Whisperer gets +1 Threat.
+  50314:constant:2: Constant
+    only if the Night objective in play is Dusk
+    - this card: stat threat 1, while this card is in play
+
+50314:A:3 (front): Midnight. Whisperer gets +2 Threat and gains doomed 2.
+  50314:constant:3: Constant
+    only if the Night objective in play is Midnight
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat 2, while this card is in play
+    - this card: stat gainsDoomed (the Doomed X it gains as it is revealed, each player raising their threat by it) 2, while this card is in play
+
+## 50315 Shadow Host Captain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50315:A:1: Spectral.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50315:A:2 (front): Dusk. Shadow Host Captain gets +1 Attack and +1 Defense.
+  50315:constant:2: Constant
+    only if the Night objective in play is Dusk
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack 1, while this card is in play
+    - this card: stat defense 1, while this card is in play
+
+50315:A:3 (front): Midnight. Shadow Host Captain gets +2 Attack and +2 Defense.
+  50315:constant:3: Constant
+    only if the Night objective in play is Midnight
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack 2, while this card is in play
+    - this card: stat defense 2, while this card is in play
+
+## 50316 Regretful Shade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50316:A:1: Spectral. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50316:A:2 (shadow): Shadow: Deal attacking enemy 1 additional shadow card (Dusk. 2 additional cards instead. Midnight. 3 additional cards instead).
+  50316:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - then, if the Night objective in play is Dusk or Midnight (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - then, if the Night objective in play is Midnight (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 50317 Banks of Morthond
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50317:A:1 (front): While Banks of Morthond is the active location, each location in the staging area gets -1 Threat.
+  50317:constant:1: Constant
+    only if this card is the active location
+    - each location (any player controls) in the staging area only: stat threat -1, while this card is in play
+
+50317:A:2 (shadow): Shadow: If this attack destroys a character, add 1 progress to the current Night objective.
+  50317:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): place 1 progress on the Night objective in play (nothing with none); a Night objective at its limit then gives way to the next
+
+## 50318 Vale of Shadows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50318:A:1 (front): When Revealed: Make Vale of Shadows the active location. If another location is currently active, return it to the staging area.
+  50318:whenRevealed:1: When revealed
+    - this card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+
+50318:A:2 (front): Dusk. Vale of Shadows gets +2 quest points.
+  50318:constant:2: Constant
+    only if the Night objective in play is Dusk
+    - this card: stat questPoints 2, while this card is in play
+
+50318:A:3 (front): Midnight. Vale of Shadows gets +4 quest points.
+  50318:constant:3: Constant
+    only if the Night objective in play is Midnight
+    - this card: stat questPoints 4, while this card is in play
+
+## 50319 Blackroot Graves
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50319:A:1 (front): Forced: When Blackroot Graves is explored, return the topmost Undead enemy in the encounter discard pile to play, engaged with the first player.
+  50319:forced:1: Forced on the event locationExplored (heard about this card)
+    - return the topmost 1 Undead enemies of the encounter discard pile into play engaged with the first player (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+
+50319:A:2 (shadow): Shadow: If defending character has 0 Willpower, deal 2 damage to that character.
+  50319:shadow:1: Shadow
+    - if the defender is a character (any player controls) [also {"maxWillpower":0}]: deal 2 damage to the defender
+
+## 50320 Shadow of Dwimorberg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50320:A:1 (front): Dusk. Shadow of Dwimorberg gets +2 Threat.
+  50320:constant:1: Constant
+    only if the Night objective in play is Dusk
+    - this card: stat threat 2, while this card is in play
+
+50320:A:2 (front): Midnight. Shadow of Dwimorberg gets +4 Threat.
+  50320:constant:2: Constant
+    only if the Night objective in play is Midnight
+    - this card: stat threat 4, while this card is in play
+
+## 50321 Haunted Valley
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50321:A:1 (front): While this location is in the staging area, all ready heroes lose all Lore, Leadership, Spirit and Tactics icons.
+  50321:constant:1: Constant
+    only if this card is in the staging area
+    - each ready hero (any player controls): stat losesIcons (the hero has none of its Lore, Leadership, Spirit and Tactics icons, printed or gained) 1, while this card is in play
+
+50321:A:2 (front): Planning Action: Exhaust a hero. Any player may trigger this action.
+  50321:action:1: Action (any player may use it)
+    only if all of: (it is the Planning phase) and (there is a ready hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+
+## 50322 Midnight Throng
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50322:A:1 (front): When Revealed: Starting with the first player, each player must search the encounter deck and discard pile for an Undead enemy, reveal it, and add it to the staging area. Shuffle the encounter deck.
+  50322:whenRevealed:1: When revealed (cannot be canceled while the Night objective in play is Midnight) (record also names 50322:A:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player searches the encounter deck and discard pile for a Undead enemy, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+50322:A:2 (front): Midnight. This effect cannot be canceled.
+  50322:whenRevealed:1: When revealed (cannot be canceled while the Night objective in play is Midnight) (record also names 50322:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player searches the encounter deck and discard pile for a Undead enemy, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+50322:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead).
+  50322:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the Night objective in play is Dusk or Midnight): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the Night objective in play is Dusk (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if the Night objective in play is Midnight (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 50323 Murmurs of Dread
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50323:A:1 (front): When Revealed: All characters get -1 Willpower until the end of the round.
+  50323:whenRevealed:1: When revealed (cannot be canceled while the Night objective in play is Midnight) (record also names 50323:A:3)
+    - every character in play, now and entering later: stat willpower -1, until the end of the round
+
+50323:A:2 (shadow): Shadow: Dusk/Midnight. Attacking enemy makes an additional attack after this one.
+  50323:shadow:1: Shadow
+    - if the Night objective in play is Dusk or Midnight: the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+50323:A:3 (front): Midnight. This effect cannot be canceled.
+  50323:whenRevealed:1: When revealed (cannot be canceled while the Night objective in play is Midnight) (record also names 50323:A:1)
+    - every character in play, now and entering later: stat willpower -1, until the end of the round
+
+## 50324 Groping Horror
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50324:A:1 (front): When Revealed: The first player must choose: skip the next travel phase, or each player must pass his hand to the player on his left (discard your hand instead if you are the only player in the game).
+  50324:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "skipTravel":
+        - [json SkipTravelPhase {"verb":"SkipTravelPhase"}]
+      * option "passHands":
+        - every player passes his whole hand to the player on his left (the next seat in player order) at once; the only player discards his hand instead
+
+50324:A:2 (front): Midnight. Groping Horror gains surge.
+  50324:constant:2: Constant
+    only if the Night objective in play is Midnight
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
+
+## 50325 Driven by Fear
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50325:A:1 (front): When Revealed: The first player attaches Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attached character's text box as if it was blank (except for Traits.)'
+  50325:whenRevealed:1: When revealed
+    - attach this card to a hero the first player controls (any number of copies may be attached to one hero) (the first player chooses it; with none this card is discarded)
+  50325:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  50325:constant:2: Constant
+    only if its host is a hero (any player controls)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
+    - its host: stat blankText (its text box is blank) 1, while this card is in play
+
+## 50326 The Dead Ride Behind
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50326:A:1 (front): When Revealed: Deal 1 damage to each character with less than 2 Willpower (Dusk. less than 3 Willpower instead. Midnight. less than 4 Willpower instead).
+  50326:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the Night objective in play is Dusk or Midnight): deal 1 damage to each character (any player controls) [also {"maxWillpower":1}]
+    - then, if the Night objective in play is Dusk (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to each character (any player controls) [also {"maxWillpower":2}]
+    - then, if the Night objective in play is Midnight (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to each character (any player controls) [also {"maxWillpower":3}]
+
+## 50327 The Gloaming
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50327:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50327:A:2 (front): When Revealed: Add 1 progress to the current Night objective.
+  50327:whenRevealed:1: When revealed
+    - place 1 progress on the Night objective in play (nothing with none); a Night objective at its limit then gives way to the next
+
+(rendered pieces: 227 by template, 8 as JSON)

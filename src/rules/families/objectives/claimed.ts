@@ -21,6 +21,8 @@ export function claimedDestination(state: ScenarioState, card: CardInstance | un
 
 // Moves the card to `otherwise`, or back to the staging area faceup when it is a claimed objective.
 export function sendAway(state: ScenarioState, id: string, otherwise: Destination): ScenarioState {
+  const discarded = discardedDetached(state, id);
+  if (discarded) return discarded;
   if (!returnsToStaging(state, state.cards[id])) return moveCard(state, id, otherwise);
   return updateCard(moveCard(state, id, { zone: "staging" }), id, { face: "up" });
 }
@@ -37,4 +39,10 @@ export function returnedToDeck(state: ScenarioState, id: string): ScenarioState 
   if (!state.cards[id]?.claimed || !flagged(state, id, "returnsToEncounterDeck")) return null;
   const moved = updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
   return { ...moved, encounterDeck: [id, ...moved.encounterDeck.filter((entry) => entry !== id)] };
+}
+
+// A claimed objective that says it is discarded when it is detached (the flag `discardedWhenDetached`, "If detached, discard The Old Thrush", 50208:A:2) goes to the encounter discard pile faceup, controlled by nobody; null for any other card.
+export function discardedDetached(state: ScenarioState, id: string): ScenarioState | null {
+  if (!state.cards[id]?.claimed || !flagged(state, id, "discardedWhenDetached")) return null;
+  return updateCard(moveCard(state, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
 }

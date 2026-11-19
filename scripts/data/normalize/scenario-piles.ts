@@ -73,6 +73,8 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
     case "encounterDeck2":
       return stepExists("secondDeck", "buildDeck", "setSetsAside") && setAsideBySet;
     // Angmar Awakened's Orc deck: built by the Weather Hills' Setup step.
+    case "smaugDeck":
+      return stepExists("buildSmaugDeck");
     case "angmarOrcDeck":
       return stepExists("buildOrcDeck");
     // Ered Mithrin's decks: built by their Setup step, or (the two Lost in Mirkwood sets) set aside by set name.

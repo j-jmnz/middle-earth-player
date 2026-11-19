@@ -320,7 +320,8 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
   }
   // No Response is open: a When Revealed effect that cancels itself ("spend 1 Fellowship resource and exhaust The One Ring to cancel this effect", 144055:A:2) is the one running on top (rr.cancel).
   const running = state.stack.at(-1);
-  if (running?.frame === "whenRevealed" && running.data.kind === "effect") return patchTop(state, { data: { ...running.data, canceled: true } });
+  // A Shadow effect that any player may cancel by discarding a hero (50209:A:2, 50210:A:2) is the one running on top too.
+  if ((running?.frame === "whenRevealed" || running?.frame === "shadow") && running.data.kind === "effect") return patchTop(state, { data: { ...running.data, canceled: true } });
   return state;
 }
 

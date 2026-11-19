@@ -36,7 +36,8 @@ export type EngineStep =
   // of the card it hits (0 for the hero an undefended attack hits, `undefended`). The damage placed is the `damage` step
   // after it.
   | { kind: "strike"; side: "enemy" | "player"; enemyId: string; targetId: string; attack: number; defense: number; undefended: boolean; cause: Cause }
-  | { kind: "cancel"; cardId: string }
+  // `by`: the card whose effect canceled a revealed card (Trapped Inside a Barrow, 148004:B:1); absent when a player canceled an effect.
+  | { kind: "cancel"; cardId: string; by?: string }
   // An enemy attached itself facedown to a location in the staging area (dcce.grapple): the enemy is not named, it is facedown now.
   | { kind: "grapple"; enemyId: string; locationId: string }
   // A grappled enemy came out from under its location, faceup, into the staging area (dcce.grapple): named, it was seen faceup when it was revealed.

@@ -21,6 +21,7 @@ export const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   sailing: "sailing",
   uncharted: "uncharted",
   phantom: "phantom",
+  spectral: "spectral",
   dire: "dire",
 };
 
@@ -32,6 +33,7 @@ export const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
   secrecy: "secrecy",
   boarding: "boarding",
   aflame: "aflame",
+  burn: "burn",
 };
 
 // Hall of Beorn lists one keyword per entry, with the trailing period: "Hide 2.", "Surge.".

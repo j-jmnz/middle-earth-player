@@ -19,7 +19,7 @@ import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
-import { areaHeadOf, firstOfArea } from "../families/breaking/areas.ts";
+import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
 import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
 // Costs and limits on an Action or a Response. A cost is paid when the effect is triggered, before
@@ -27,8 +27,8 @@ import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
 export function controllerSeat(state: ScenarioState, source: CardInstance): number {
   if (source.controller != null) return source.controller;
-  // Mount Gram: the first player of the card's own staging area answers for an encounter card while the areas are separate (mec108.create-staging-area).
-  const head = state.capture ? areaHeadOf(state, source.id) : null;
+  // Isolated areas: the first player of the card's own staging area answers for an encounter card while the areas are separate (mec108.create-staging-area).
+  const head = isolatedAreas(state) ? areaHeadOf(state, source.id) : null;
   return head == null ? state.firstPlayer : firstOfArea(state, head);
 }
 

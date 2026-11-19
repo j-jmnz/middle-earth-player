@@ -25,4 +25,17 @@ describe("DiscardRandomVictoryLocation (900709:A:1)", () => {
     const seen = new Set(Array.from({ length: 12 }, (_, seed) => discard(seed + 1).discarded[0]));
     expect(seen.size).toBeGreaterThan(1);
   });
+
+  it("147007:A:2 without a Trait any location of the victory display may go, never another card, and the effect's X is the Victory points it scored there", () => {
+    const run = (seed: number) => {
+      const made = tableFromLayout("the-old-forest", { seed, victory: ["147013", "147014", "147012"] });
+      const state = runInstruction(made.state, { verb: "DiscardRandomVictoryLocation" }, { seat: 0, sourceId: null }, made.ctx, []);
+      return state.encounterDiscard.map((id) => state.cards[id]?.code);
+    };
+    const seen = new Set(Array.from({ length: 16 }, (_, seed) => run(seed + 1)[0]));
+    expect(seen.size).toBeGreaterThan(1);
+    for (const code of seen) expect(["147013", "147014", "147012"]).toContain(code);
+    const empty = tableFromLayout("the-old-forest", { victory: [] });
+    expect(runInstruction(empty.state, { verb: "DiscardRandomVictoryLocation" }, { seat: 0, sourceId: null }, empty.ctx, []).encounterDiscard).toEqual([]);
+  });
 });

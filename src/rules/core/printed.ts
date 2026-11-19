@@ -66,10 +66,14 @@ export type Keywords = {
   uncharted: boolean;
   // Aflame X (dcce.aflame): the damage on a location that destroys it, null when the card prints none.
   aflame: number | null;
+  // Burn X (The Battle of Lake-town): the burn damage a location adds to the pool "resolve all burn damage" deals, null when the card prints none.
+  burn: number | null;
   // Grapple (dcce.grapple): the location in the staging area the enemy attaches to, facedown, when it is revealed; null when the card prints none.
   grapple: "highestThreat" | "lowestThreat" | "highestQuestPoints" | "lowestQuestPoints" | null;
   // Phantom (mec113.phantom): the damage the enemy's attack would deal becomes a threat raise for the defending player (families/grey-company/).
   phantom: boolean;
+  // Spectral (docs/brief.md, The Stone of Erech): characters attacking the enemy use their Willpower instead of their Attack (families/attack/spectral.ts).
+  spectral: boolean;
   // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
   dire: boolean;
 };
@@ -137,8 +141,10 @@ const EMPTY_KEYWORDS: Keywords = {
   eyeIcons: null,
   uncharted: false,
   aflame: null,
+  burn: null,
   grapple: null,
   phantom: false,
+  spectral: false,
   dire: false,
 };
 
@@ -423,8 +429,10 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       eyeIcons: keywords.eyeIcons ?? null,
       uncharted: keywords.uncharted === true,
       aflame: keywords.aflame ?? null,
+      burn: keywords.burn ?? null,
       grapple: keywords.grapple ?? null,
       phantom: keywords.phantom === true,
+      spectral: keywords.spectral === true,
       dire: keywords.dire === true,
     },
   });

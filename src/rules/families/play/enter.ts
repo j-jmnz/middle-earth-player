@@ -23,6 +23,7 @@ import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { putAttachmentIntoPlay } from "../attachments/play.ts";
 import { playBlocked } from "../sidequests/contract.ts";
+import { noteHandPlay } from "../wilderland/rounds.ts";
 import type { Focus } from "../index.ts";
 import { lastPickedSeat, markPicked, namedCard, queueFront, scheduleFor } from "./refs.ts";
 
@@ -63,7 +64,10 @@ export function enterPlay(state: ScenarioState, id: string, seat: number, terms:
   if (!card || !canEnter(state, id, ctx, terms.ignoreUnique === true) || state.seats[seat]?.eliminated) return state;
   const owner = card.owner ?? card.controller ?? seat;
   const printed = printedOf(ctx.cards, card.code);
+  // A card put into play from the hand counts toward a per-round limit on cards from the hand (LimitHandPlaysPerRound, 00017:B:2).
+  const fromHand = card.zone === "hand" ? (card.controller ?? owner) : null;
   let next = moveCard(state, id, { zone: printed.type === "hero" ? "heroes" : "play", seat });
+  if (fromHand != null) next = noteHandPlay(next, ctx, fromHand, id);
   next = updateCard(next, id, { exhausted: terms.exhausted === true || entersExhausted(ctx, card.code), committed: terms.committed === true, owner: owner !== seat ? owner : undefined, ...(terms.then === "removeFromGame" ? { temporary: true as const } : {}) });
   if (terms.damage) {
     next = updateCard(next, id, { damage: terms.damage });
@@ -95,7 +99,10 @@ export function putIntoPlay(state: ScenarioState, instruction: PutIntoPlay, focu
   const id = namedCard(state, instruction.card ?? "self", focus);
   const card = id ? state.cards[id] : undefined;
   // An attachment goes on a host, guarded first when it has Guarded (X) (families/attachments/play.ts).
-  if (id && card && printedOf(ctx.cards, card.code).type === "attachment") return putAttachmentIntoPlay(state, instruction, id, focus, ctx, steps);
+  if (id && card && printedOf(ctx.cards, card.code).type === "attachment") {
+    const placed = putAttachmentIntoPlay(state, instruction, id, focus, ctx, steps);
+    return card.zone === "hand" && placed.cards[id] != null && inPlay(placed.cards[id]?.zone ?? "removed") ? noteHandPlay(placed, ctx, card.controller ?? card.owner ?? focus.seat, id) : placed;
+  }
   if (!id || !card || !canEnter(state, id, ctx, instruction.ignoreUnique === true)) return state;
   let seat: number | null = focus.seat;
   if (instruction.who === "owner") seat = card.owner ?? card.controller ?? focus.seat;

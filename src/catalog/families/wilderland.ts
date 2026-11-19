@@ -175,7 +175,9 @@ const VERBS = [
   // Roam Across Rhovanion (part 5, campaign card 12184; ledger lines 12184:A:2, 12184:B:1, 12184:B:3, 12184:B:4, 19036:A:1, 19037:A:1, 19044:A:1, 19047:B:2, 19048:B:2, 19051:A:1).
   // "Advance to a random stage 2A, if able. Otherwise, advance to stage 3A" (19047:B:2, 19048:B:2, 19049:B:2, 19050:B:2): the quest card names the stages it proceeds to, each played once in a random order (the game's seed): one of `codes` still in the quest deck, else `otherwise`; with `remove` the stage defeated
   // is removed from the game. The scenario definition copies it onto the stage (`stages[i].randomNext`) and the quest takes it when the stage is defeated, so run on a stage that was defeated it does nothing; run on the stage the quest is at (19047:B:2's Forced effect) it advances the quest at once.
-  z.strictObject({ verb: z.literal("AdvanceToRandomStage"), codes: z.array(code).min(2), otherwise: code.optional(), remove: z.literal(true).optional() }),
+  z.strictObject({ verb: z.literal("AdvanceToRandomStage"), codes: z.array(code).min(2), otherwise: code.optional(), remove: z.literal(true).optional(), different: z.literal(true).optional(), ...when }),
+  // With `different` ("advance to a different random stage 2A", 147002:B:2): the stage is never the one the quest is at, and that stage, when it is one of `codes`, goes back into the quest deck with its progress and attachments discarded (it can come up again later),
+  // instead of leaving the game or the deck's order; the stage it arrives at resolves its When Revealed. A stage that is not among `codes` (stage 1, 147001:B:1) leaves as an advanced stage does.
   // "The first player loses control of both Urdug and Tiny, flips them to their enemy sides, and adds them to the staging area. (Remove any damage that was on them.)" (19051:A:1): the card in play with this code becomes the card `into`, faceup and ready in the staging area, controlled by no one,
   // with no damage; it keeps its resource tokens and its attachments. Nothing happens when no such card is in play.
   z.strictObject({ verb: z.literal("FlipToEnemySide"), code, into: code, ...when }),
@@ -240,6 +242,13 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachTreasuresToHost"), ...when }),
   // A constant of a card in play: "Each player cannot play more than 1 card each phase" (19140:B:1). A player who has played `max` cards in the phase (the plays state.played records) may play no more; a card put into play is not played.
   z.strictObject({ verb: z.literal("LimitPlaysPerPhase"), max: z.number().int().min(1) }),
+
+  // A constant of a card in play: "Each player cannot play more than 1 card each round" (147016:A:1). Each player's own count of cards played this round (the plays state.played records, any phase); a card put into play is not played and does not count, unlike LimitHandPlaysPerRound.
+  z.strictObject({ verb: z.literal("LimitPlaysPerRound"), max: z.number().int().min(1) }),
+  // A constant of a card in play: "Each player cannot play or put into play more than 1 card from his hand each round" (00017:B:2). Every card a player plays from the hand (allies, attachments and events) and every card an effect puts into play
+  // from his hand counts, each player's own; a card played or put into play from the deck, the discard pile or out of play does not. The count (`handPlays`, a table modifier for the seat until the end of the round) is kept only in a game
+  // with such a card.
+  z.strictObject({ verb: z.literal("LimitHandPlaysPerRound"), max: z.number().int().min(1) }),
   // The Fate of Wilderland (part 9, campaign card 12195; ledger lines 12195:A:2, 19155 to 19170).
   // Campaign Setup: "Each player may search their deck for a boon or treasure card and add it to their hand" (12195:A:2). Each player in turn may take a boon or a treasure card of their deck (a pool card the checklist is about to shuffle into it is in the deck already) into their
   // starting hand, or decline; every player is asked, unlike the search for a boon ally. Dealt by the checklist (campaign/checklist.ts), so it changes nothing here.
@@ -260,6 +269,8 @@ const TRIGGERS = [
   "discovered",
 ] as const;
 const FLAGS = [
+  // On the table, for a seat, until the end of the round: one card played or put into play from its hand (LimitHandPlaysPerRound, 00017:B:2); engine use, one modifier for each card.
+  "handPlays",
   // On a character: the next damage it would be dealt cancels this many points of it, and the flag is spent ("The next time that character would be dealt damage this round, cancel 1 of that damage", 12166:A:2). Set with a ModifyStat that lasts
   // until the end of the round or the phase; src/rules/families/wilderland/shield.ts takes it as damage is placed.
   "damageShield",

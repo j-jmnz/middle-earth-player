@@ -13,7 +13,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("CommitToQuest"), target: cardRefSchema.optional(), stat: z.literal("attack").optional(), ...when }),
   // The location (the picked card by default) becomes the active location; any other active location returns to the staging
   // area. This is not traveling: no Travel cost or Travel effect, no `traveled` event (131013:A:2, 19034:A:1).
-  z.strictObject({ verb: z.literal("MakeActive"), target: cardRefSchema.optional(), ...when }),
+  z.strictObject({ verb: z.literal("MakeActive"), target: cardRefSchema.optional(), random: z.literal(true).optional(), ...when }),
+  // With `random` ("randomly choose a location in the staging area and switch it with the active location", 147020:A:2): the location is chosen from the staging area with the game's seed, not named; the old active location returns to the staging area keeping its tokens,
+  // and the new one hears that it became active. Nothing happens with no location in the staging area. The record's `when` holds the rest ("If there is a non-unique active location").
   // Moves progress tokens to the last picked location, from the source card, the current quest card or the card picked before
   // the last: `amount` (at most what is there), or `all`. With `choose` the actor chooses how many, from 1 to `amount` (or to
   // all of them). Progress placed on a location can explore it (04008:A:1, 12037:A:2, 17034:A:2).
@@ -87,6 +89,9 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // About the table, once: the quest resolved successfully and placed progress on the active location, on a card that takes it first or on the stage ("After placing progress as the result of questing successfully", 147002:B:2). Not about one placement: a quest that fills a location
+  // and goes on to the stage still raises it once.
+  "questProgressPlaced",
   // About each character committed to the quest when it resolved: the quest succeeded ("After ~ quests successfully"), or it
   // resolved at all ("After resolving a quest to which ~ was committed").
   "questedSuccessfully",
@@ -109,14 +114,20 @@ const TRIGGERS = [
   // with a `subject` filter of any card hears it ("After a quest card is defeated", 01135:A:3); a Forced effect with `subject: "self"`
   // is the card's own ("When you defeat this stage", 01120:B:1). The winning stage is not announced: the game is over.
   "questCardDefeated",
+  // About the seat: it was eliminated, by its threat, with no heroes left or by a card ("Forced: After a player is eliminated (at any stage)", 148003:B:2). Every elimination is announced, the last player's too while the game goes on; `eventSeat: "you"` is the eliminated player's own stage.
+  "playerEliminated",
 ] as const;
 
 const FLAGS = [
   // On a final quest stage that holds the win ("Forced: After this stage is defeated ... If this final Escape test is passed, the players ... won the game", 02106:B:1, 02106:B:2): defeating it does not win the game. The stage stays the current quest card, defeated, `questCardDefeated` is announced
-  // to its own Forced effects, and the game is won only by what they do (`WinGame`) or the quest is reset (`ReturnToStage`). Read by rules/quest/quest.ts (advanceStage).
+  // to its own Forced effects, and the game is won only by what they do (`WinGame`) or the quest is reset (`ReturnToStage`). Read by rules/quest/quest.ts (advanceStage). A stage with the flag has no stage after it in the quest's order: Fog on the Barrow-downs' 3B wins (`WinGame`) and 4B is left by
+  // its own Forced effect (148003:B:3, 148004:B:2).
   "holdsWin",
   // On "table": no character may be committed to the quest ("Do not commit characters to the quest", 143078:B:1; rules/engine/legal.ts committers).
   "cannotCommit",
+  // On the current quest stage: progress from card effects cannot be placed on the stage or on an active location ("Progress tokens from card effects cannot be placed on this quest card or the active location", 00018:B:1). Questing's own progress is
+  // not a card effect. Read by rules/families/quest/effect-progress.ts, where an effect places progress (families/quest/effect-progress.ts placeEffectProgress, interpret/effect-verbs.ts placeProgress, families/quest/quest-card.ts).
+  "noEffectProgress",
   // On a seat: it does not raise threat from questing unsuccessfully; a player card effect that reduces its threat reduces it by
   // at most 1 (22054:A:1); it may optionally engage this many additional enemies (09002:A:2), and the optional engagements it
   // made this phase (engine use).

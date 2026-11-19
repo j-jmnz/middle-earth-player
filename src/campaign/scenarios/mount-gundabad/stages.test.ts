@@ -6,7 +6,7 @@ import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { playReason } from "../../../rules/player/planning.ts";
-import { phasePlaysBarred } from "../../../rules/families/wilderland/rounds.ts";
+import { playLimitBars } from "../../../rules/families/wilderland/rounds.ts";
 import { CODES, STAGE_TWOS, codesIn, finish, gundabad, gundabadTable, idOf, legalIntents, loadGundabadWorld, resolveRecords, send, start, type GundabadWorld } from "../../../../test/scenarios/mount-gundabad/scene.ts";
 
 let world: GundabadWorld;
@@ -345,9 +345,9 @@ describe("19140 Exploring Gundabad (Foreboding Darkness)", () => {
     const played = finish(send(start(t.state), { type: "PlayCard", cardId: idOf(t.state, "filler"), payments: [] }, t.ctx), t.ctx);
     const otherSeat = Object.values(played.state.cards).find((card) => card.code === "c0" && card.zone === "hand" && card.controller === 1);
     expect(otherSeat).toBeDefined();
-    expect(phasePlaysBarred({ ...played.state, activeSeat: 1 }, otherSeat?.id ?? "", t.ctx, {})).toBe(false);
-    expect(phasePlaysBarred({ ...played.state, activeSeat: 0 }, otherSeat?.id ?? "", t.ctx, {})).toBe(true);
-    expect(phasePlaysBarred({ ...played.state, activeSeat: 0 }, otherSeat?.id ?? "", t.ctx, { putting: true })).toBe(false);
+    expect(playLimitBars({ ...played.state, activeSeat: 1 }, otherSeat?.id ?? "", t.ctx, {})).toBe(false);
+    expect(playLimitBars({ ...played.state, activeSeat: 0 }, otherSeat?.id ?? "", t.ctx, {})).toBe(true);
+    expect(playLimitBars({ ...played.state, activeSeat: 0 }, otherSeat?.id ?? "", t.ctx, { putting: true })).toBe(false);
   });
 
   it("19140:B:2 Forced: when this stage is defeated the first player looks at the top 2 stages, puts 1 on the bottom and the quest advances to the top stage", () => {

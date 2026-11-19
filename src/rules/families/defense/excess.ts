@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.hit-points, rr.step-6-4-3, mec113.phantom (data/rules/entries.json); ledger lines 01082:A:1, 41030:A:2, 19080:A:3, 19083:B:1.
+// Rules: rr.damage, rr.hit-points, rr.step-6-4-3, rr.defending-player, mec113.phantom (data/rules/entries.json); ledger lines 01082:A:1, 41030:A:2, 19080:A:3, 19083:B:1, 00004:A:1.
 //
 // Hill Troll's excess combat damage. An enemy that holds `excessToThreat` (a constant on itself) sends the damage its attack deals
 // beyond the remaining hit points of the character it damages to its controller's threat: "Excess combat damage dealt by Hill Troll
@@ -11,7 +11,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage, raiseThreat } from "../../core/keywords.ts";
 import { effectsOf } from "../../windows/listen.ts";
-import { effectCause, ruleCause } from "../../core/cause.ts";
+import { effectCause, ruleCause, type Cause } from "../../core/cause.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay } from "../../core/state.ts";
@@ -22,6 +22,7 @@ import { cancelPhantomDamage } from "../grey-company/phantom.ts";
 import { noteHurt } from "../angmar/damage.ts";
 import { noteWillpower } from "../angmar/last-known.ts";
 import { removeProgressFromEachQuest } from "../angmar/excess.ts";
+import { lakeTownId } from "../smaug/cards.ts";
 import { damageGoesTo } from "./damage.ts";
 
 // The damage this attack has dealt so far, kept on the attack only while a shadow effect waits to read it after the attack ("Raise your threat by 1
@@ -44,6 +45,19 @@ function noteExcess(state: ScenarioState, excess: number): ScenarioState {
 function noteHitPointsOn(state: ScenarioState, id: string, hitPoints: number): ScenarioState {
   const attack = state.pendingAttack;
   return attack ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, hitPointsOn: { ...attack.defense?.hitPointsOn, [id]: hitPoints } } } } : state;
+}
+
+// The cause an enemy's flag effect names: the record of the enemy's card that holds the flag, else the damage rule.
+function flagCause(ctx: ReduceContext, code: string, flag: string): Cause {
+  const record = effectsOf(ctx, code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
+  return record ? effectCause(record) : ruleCause("rr.damage");
+}
+
+// The damage an attack landed raises the defending player's threat (damageToThreat): the player the attack is against, or the enemy's controller outside an attack.
+function damageRaisesThreat(state: ScenarioState, before: ScenarioState, enemyId: string, landed: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
+  const seat = before.pendingAttack?.seat ?? before.cards[enemyId]?.controller;
+  if (seat == null) return state;
+  return raiseThreat(state, seat, landed, steps, flagCause(ctx, before.cards[enemyId]?.code ?? "", "damageToThreat"));
 }
 
 // The enemy's combat damage `raw` is placed on `assigned`; the excess goes to threat when the enemy says so. Every place an enemy
@@ -70,6 +84,8 @@ export function combatDamage(
   const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);
   const landed = steps.slice(logged).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
   const placed = noteHurt(noteLanded(noteWillpower(damaged, state, targetId, ctx), landed), targetId, state.cards[targetId]?.damage ?? 0, landed, ctx);
+  // "Each damage dealt by Wainriders raises the defending player's threat by 1" (00004:A:1): the damage that landed, whatever the character's hit points, raises the threat of the player the attack is against (rr.defending-player).
+  const raised = landed > 0 && flagged(state, enemyId, "damageToThreat") ? damageRaisesThreat(placed, state, enemyId, landed, steps, ctx) : placed;
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   const toShip = flagged(state, enemyId, "excessToShip");
@@ -77,23 +93,24 @@ export function combatDamage(
   const toStage = state.pendingAttack?.excessToStage === true && state.questStage != null && state.questStage !== targetId;
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play.
   const toEachQuest = flagged(state, enemyId, "excessToEachQuest");
+  // Smaug the Magnificent's excess damage "must be assigned to Lake-town" (50206:A:2), and the excess of his attack against Lake-town (50211:A:1): the damage beyond the defender's remaining hit points goes on Lake-town (families/smaug/attack.ts).
+  const lake = lakeTownId(state);
+  const toLake = (flagged(state, enemyId, "excessToLakeTown") || state.pendingAttack?.excessToLakeTown === true) && lake != null && lake !== targetId;
   // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
   const reads = gameReads(state, ctx, '"excessOf"');
-  if (!toThreat && !toQuest && !toShip && !reads && !toStage && !toEachQuest) return placed;
+  if (!toThreat && !toQuest && !toShip && !reads && !toStage && !toEachQuest && !toLake) return raised;
   const enemy = state.cards[enemyId];
   const target = state.cards[targetId];
-  if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
-  if (!isCharacterType(printedOf(ctx.cards, target.code))) return placed;
+  if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return raised;
+  if (!isCharacterType(printedOf(ctx.cards, target.code))) return raised;
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
-  if (excess <= 0) return placed;
+  if (excess <= 0) return raised;
   // The cause an excess effect names: the record of the enemy that holds the flag, else the rule.
-  const causeOf = (flag: string) => {
-    const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
-    return record ? effectCause(record) : ruleCause("rr.damage");
-  };
+  const causeOf = (flag: string) => flagCause(ctx, enemy.code, flag);
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play; the enemy's other excess flags still apply.
-  const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(placed, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : placed;
+  const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(raised, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : raised;
+  if (toLake && lake != null) return noteHitPointsOn(placeDamage(eachQuest, lake, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   if (toStage && state.questStage) return noteHitPointsOn(placeDamage(eachQuest, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(eachQuest, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.

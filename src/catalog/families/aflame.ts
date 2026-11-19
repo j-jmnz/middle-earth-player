@@ -19,6 +19,9 @@ const VERBS = [
   // "Captain Sahír engages the first player" (11076:A:1): the source enemy, in the staging area, engages the first player. (EngageLastPlayer is the sea family's: dcce.last-player.)
   // With `moves`, an enemy already engaged with another player moves to the first player too ("Tunneling Nameless Thing engages the first player", 900702:A:1).
   z.strictObject({ verb: z.literal("EngageFirstPlayer"), moves: z.literal(true).optional(), ...when }),
+  // "All copies of Snaga Scouts engage the player with the lowest threat. (The first player chooses in case of a tie.)" (00002:A:1): every copy of the source's title in the staging area or engaged with a player,
+  // whoever it is engaged with, engages the living seat with the lowest threat; among tied seats the first player chooses once for all the copies. Copies already all engaged with a lowest-threat seat stay.
+  z.strictObject({ verb: z.literal("EngageLowestThreat"), ...when }),
   // Resolution: "Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool" (11182:B:2). One entry for each copy with one of these codes that a seat chose at the Setup
   // (ScenarioState.chosenAtSetup), earned for that seat wherever the copy is now (in a hand, in the victory display, in a discard pile).
   z.strictObject({ verb: z.literal("EarnDealt"), codes: z.array(z.string().min(1)).min(1), ...when }),

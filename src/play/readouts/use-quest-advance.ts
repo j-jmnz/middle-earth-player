@@ -7,7 +7,7 @@ import { useStore } from "zustand";
 
 import { isOver } from "../../rules/engine/undo.ts";
 
-import { advancedTo, askingStage, callerLastStage, stagesKey, closeLatch, nextLatch, openAdvance, openingLatch, type QuestAdvance, type QuestView } from "./quest-advance.ts";
+import { advancedTo, askingStage, callerLastStage, stagesKey, closeLatch, nextLatch, openAdvance, openingLatch, questStageOf, type QuestAdvance, type QuestView } from "./quest-advance.ts";
 import type { TableStore } from "../store/store.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 
@@ -24,7 +24,7 @@ export type QuestAdvanceState = {
 export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const moment = useStore(store, (state) => state.moment);
   // What the screen reads of the game, one value at a time: a state that changes none of them does not render this hook's caller.
-  const questStage = useStore(store, (state) => state.game.questStage);
+  const questStage = useStore(store, (state) => questStageOf(state.game));
   const asking = useStore(store, (state) => askingStage(state.game));
   const over = useStore(store, (state) => isOver(state.game));
   // The stages the seats are on once stages are separate: an advance of any seat's stage holds the screen.

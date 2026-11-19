@@ -1,0 +1,147 @@
+{
+  "id": "the-massing-at-osgiliath",
+  "name": "The Massing at Osgiliath",
+  "number": 1,
+  "stages": [
+    "00016",
+    "00017",
+    "00018",
+    "00019"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Massing at Osgiliath",
+      "count": 28
+    }
+  ],
+  "cards": [
+    {
+      "code": "00005",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "00006",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "00007",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "00008",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "00009",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "00010",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "00011",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "00012",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "00013",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "00014",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "00015",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "00016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "00017",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "00018",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "00019",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "00002",
+      "normal": 4,
+      "easy": 4,
+      "pile": "staging",
+      "perPlayer": 1
+    },
+    {
+      "code": "00003",
+      "normal": 4,
+      "easy": 4,
+      "pile": "staging",
+      "perPlayer": 1
+    },
+    {
+      "code": "00004",
+      "normal": 4,
+      "easy": 4,
+      "pile": "staging",
+      "perPlayer": 1
+    },
+    {
+      "code": "00001",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q99.01",
+    "dragnEasy": "Q99.01",
+    "hobSlug": "The-Massing-at-Osgiliath"
+  }
+}

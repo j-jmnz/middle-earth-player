@@ -38,6 +38,8 @@ export type TravelHooks = {
   readonly cost?: (state: ScenarioState, ctx: ReduceContext, locationId: string | null) => TravelCharge | null;
   readonly forced?: (state: ScenarioState, ctx: ReduceContext) => readonly string[];
   readonly unpayable?: (state: ScenarioState, instruction: Instruction, ctx: ReduceContext, locationId: string) => boolean;
+  /** Whether the players may travel to this location although both active slots are taken or the one slot is: it becomes the second active location (Fisherman's Dock, 50223:A:2). Asked only when no slot is free. */
+  readonly second?: (state: ScenarioState, locationId: string) => boolean;
 };
 
 /** Whether a family bars playing a card, or putting it into play (`putting`), from the hand or by an effect: true bars it. Asked after the core's own bars. */

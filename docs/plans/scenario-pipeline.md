@@ -128,7 +128,7 @@ Sections A to D and F are built (E waits for a new campaign or pack). What each 
   - A record that no golden reaches is found only by the reviewer. The fix pass then writes card tests for it.
   - The player-card smoke runs only player cards; the encounter smoke (`scripts/card-smoke/encounter.ts`, Faster feedback while authoring) plays each encounter card's When Revealed, Shadow, Travel and Setup before a golden does.
   - The box-wide check (`scripts/checks/box-dealt.test.ts`) finds a scenario's undealt card; the golden finds the rest.
-- **Fixtures.** With real decks the seed finder finds a loss but no win, so the won fixture is missing (`docs/phases/STATUS.md`, Fixtures and Maestro).
+- **Fixtures.** With real decks the seed finder finds a loss but no win, so the won fixture is missing (`docs/phases/STATUS.md`, Fixtures).
 - **Review and fix.** The one fix pass is the largest single task of the phase. Its findings fall into classes the author can check before the review:
   - card readings (`docs/agents/effect-authoring.md`, Readings the review catches);
   - records with no test and no golden that reaches them;

@@ -1,0 +1,346 @@
+Scenario piles that place cards with no record (quest: 50201 Terror from the Mountain; quest: 50202 Fire and Water; quest: 50203 The Dragon's Wrath; staging: 50207 Lake-town; smaugDeck: 50204 Smaug the Mighty; smaugDeck: 50205 Smaug the Terrible; smaugDeck: 50206 Smaug the Magnificent)
+
+## 50201 Terror from the Mountain
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50201:A:1 (front): Setup: Shuffle all copies of Smaug into a separate Smaug deck. Search the encounter deck for Lake-town and add it to the staging area. Shuffle the encounter deck. Then, reveal 1 card from the encounter deck per player, and add it to the staging area.
+  50201:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the smaug deck
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+50201:B:1 (back): Smaug cannot have more than 6 damage on him.
+  50201:constant:1: Constant
+    - each Dragon enemy (any player controls) or in the staging area: stat damageCeiling 6, while this card is in play
+
+50201:B:2 (back): When Revealed: Deal 1 damage to Lake-town for each player in the game.
+  50201:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - place 1 damage token(s) on the card in play with code 50207 (placed, not dealt: nothing cancels or reduces them)
+
+## 50202 Fire and Water
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50202:B:1 (back): Smaug cannot have more than 12 damage on him.
+  50202:constant:1: Constant
+    - each Dragon enemy (any player controls) or in the staging area: stat damageCeiling 12, while this card is in play
+
+50202:B:2 (back): When the players quest successfully, any number of progress tokens that would be placed on this quest may instead be discarded to remove the same amount of damage from Lake-town.
+  50202:constant:2: Constant
+    - this card: stat progressHealsLakeTown (progress that questing would place on this stage is not placed; the stage's record hears it and may discard it to remove damage from Lake-town) 1, while this card is in play
+  50202:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+    - the first player chooses how many of the replaced progress tokens (the event's X) to discard, at most the damage on Lake-town: that much damage comes off Lake-town and the rest of the progress is placed on the quest card
+
+## 50203 The Dragon's Wrath
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50203:B:1 (back): Forced: During the quest phase, reveal 1 additional card from the encounter deck
+  50203:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - reveal 1 additional encounter card(s) in the staging step this phase
+
+50203:B:2 (back): Refresh Action: Reset the quest deck to stage 2B.
+  50203:action:1: Action
+    only if it is the Refresh phase
+    - the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
+
+50203:B:3 (back): The players must defeat Smaug to defeat this stage. When Smaug is defeated, compare the number of damage tokens on Lake-town with the number of victory points in the victory display. If the players have more victory points, they have won the game. Otherwise, Lake-town has burned and the players have lost.
+  50203:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about Dragon enemy (any player controls) or in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the damage on Lake-town is less than the Victory points in the victory display: the players win the game
+    - then, if not (the damage on Lake-town is less than the Victory points in the victory display) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Smaug was defeated, but the victory display holds no more Victory points than the damage on Lake-town)
+
+## 50204 Smaug the Mighty
+(the scenario deals it into the smaugDeck pile; the piles place it, no record does)
+
+50204:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50204:A:2 (front): When Revealed: Smaug the Mighty makes an immediate attack against each player (deal and resolve a shadow card for each attack).
+  50204:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - this card attacks the acting player now, from the staging area (or engaged)
+
+## 50205 Smaug the Terrible
+(the scenario deals it into the smaugDeck pile; the piles place it, no record does)
+
+50205:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50205:A:2 (front): When Revealed: Resolve all burn damage from all locations in play.
+  50205:whenRevealed:1: When revealed
+    - resolve all burn damage: the Burn of every location in play (staging area or active, the Burn 1 West Pier gives each included) is a pool; each player in turn from the first player may exhaust ready characters he controls and assign any of the pool to each, up to its remaining hit points, and the rest goes on Lake-town
+
+## 50206 Smaug the Magnificent
+(the scenario deals it into the smaugDeck pile; the piles place it, no record does)
+
+50206:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50206:A:2 (front): Excess damage from attacks by Smaug the Magnificent must be assigned to Lake-town.
+  50206:constant:1: Constant
+    - this card: stat excessToLakeTown (the damage of its attacks beyond the remaining hit points of the defending character goes on Lake-town) 1, while this card is in play
+
+50206:A:3 (front): When Revealed: Move 3 damage from Smaug the Magnificent to Lake-town.
+  50206:whenRevealed:1: When revealed
+    - up to 3 damage on this card moves to lakeTown (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
+
+## 50207 Lake-town
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+50207:A:1 (front): If Lake-town has 50 or more damage on it, Lake-town has completely burned and the players have lost the game.
+  50207:constant:1: Constant
+    - this card: stat loseAtDamage 50, while this card is in play
+
+## 50208 The Old Thrush
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50208:A:1 (front): Guarded.
+  50208:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+
+50208:A:2 (front): Action: Exhaust a hero to claim this objective and attach it to that hero when it is free of encounters. (Counts as an attachment with the text: "If detached, discard The Old Thrush. Response: After attached hero exhausts to attack Smaug, discard X cards from hand to reduce Smaug's Defense by X.")
+  50208:action:1: Action (any player may use it)
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+  50208:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as an attachment while it is attached
+    - this card: stat discardedWhenDetached 1, while this card is in play
+  50208:response:1: Response after a character is declared as an attacker (heard about the host)
+    only if the event's other card is a Dragon enemy (any player controls) or in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player chooses X, from 1 to the number of card (you control) in hand
+    - discard X cards from hand
+    - the event's other card: stat defense minus (X), until the end of the attack
+
+## 50209 Close to the Flame
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50209:A:1 (front): When Revealed: Deal 1 damage to each character in play.
+  50209:whenRevealed:1: When revealed
+    - deal 1 damage to each character (any player controls)
+
+50209:A:2 (shadow): Shadow: Deal 1 damage to each character in play. Any player may discard a hero to cancel this effect.
+  50209:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if there is a hero (you control) to choose):
+          - choose hero (you control)
+          - discard the picked card
+          - the effect being resolved is canceled: nothing after this resolves
+        * option "keep":
+    - deal 1 damage to each character (any player controls)
+
+## 50210 Scorching Blast
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50210:A:1 (front): When Revealed: Resolve all burn damage from all locations in play.
+  50210:whenRevealed:1: When revealed
+    - resolve all burn damage: the Burn of every location in play (staging area or active, the Burn 1 West Pier gives each included) is a pool; each player in turn from the first player may exhaust ready characters he controls and assign any of the pool to each, up to its remaining hit points, and the rest goes on Lake-town
+
+50210:A:2 (shadow): Shadow: Resolve this card's "When Revealed" effect. Any player may discard a hero to cancel this effect.
+  50210:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if there is a hero (you control) to choose):
+          - choose hero (you control)
+          - discard the picked card
+          - the effect being resolved is canceled: nothing after this resolves
+        * option "keep":
+    - resolve all burn damage: the Burn of every location in play (staging area or active, the Burn 1 West Pier gives each included) is a pool; each player in turn from the first player may exhaust ready characters he controls and assign any of the pool to each, up to its remaining hit points, and the rest goes on Lake-town
+
+## 50211 Town-Baiting
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50211:A:1 (front): When Revealed: Smaug makes an attack against Lake-town. The last player may declare a defender against this attack. Excess damage from this attack must be placed on Lake-town. This effect cannot be canceled.
+  50211:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    - the Smaug in play (in the staging area or engaged) attacks the last player now, dealt a shadow card; the last player may declare a defender, undefended damage and the damage beyond a defender's hit points go on Lake-town (nothing with no Smaug in play)
+
+## 50212 Dire Magnificence
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50212:A:1 (front): When Revealed: Each player must choose and discard 1 ally he controls, if able. Deal 2 damage to Lake-town for each player that cannot.
+  50212:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if there is a ally (you control) to choose):
+          - choose ally (you control)
+          - discard the picked card
+        * option "cannot" (only if not (there is a ally (you control) to choose)):
+          - place 2 damage token(s) on the card in play with code 50207 (placed, not dealt: nothing cancels or reduces them)
+
+50212:A:2 (shadow): Shadow: If this attack destroys a character, Smaug engages the next player and makes an immediate attack against that player.
+  50212:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (another player is still in the game): the attacking enemy engages the next player
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (another player is still in the game) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
+
+## 50213 Catching Fire
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50213:A:1 (front): When Revealed: Choose and shuffle 1 Pier location from the victory display back into the encounter deck. If no location was shuffled into the encounter deck by this effect, Catching Fire gains surge.
+  50213:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "shuffle" (only if there is a Pier location (any player controls) in the victory display to choose):
+        - choose Pier location (any player controls) in the victory display
+        - the picked card is shuffled into the encounter deck
+      * option "none" (only if not (there is a Pier location (any player controls) in the victory display to choose)):
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
+
+50213:A:2 (shadow): Shadow: Defending character gets -2 Defense.
+  50213:shadow:1: Shadow
+    - the defender: stat defense -2, until the end of the attack
+
+## 50214 Reckless in His Rage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50214:A:1 (front): When Revealed: If Smaug is in play, he gets +2 Threat, +2 Attack, -2 Defense and gains the text: "Allies cannot be declared as defenders." This effect lasts until the end of the round.
+  50214:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is Dragon enemy in play (in the staging area or engaged): choose Dragon enemy (any player controls) or in the staging area
+    - then, if there is Dragon enemy in play (in the staging area or engaged) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat threat 2, until the end of the round
+    - then, if there is Dragon enemy in play (in the staging area or engaged) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat attack 2, until the end of the round
+    - then, if there is Dragon enemy in play (in the staging area or engaged) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat defense -2, until the end of the round
+    - then, if there is Dragon enemy in play (in the staging area or engaged) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat alliesCannotDefend (allies cannot be declared as defenders against it) 1, until the end of the round
+
+50214:A:2 (shadow): Shadow: If this attack destroys a character, resolve all burn damage on locations in play.
+  50214:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): resolve all burn damage: the Burn of every location in play (staging area or active, the Burn 1 West Pier gives each included) is a pool; each player in turn from the first player may exhaust ready characters he controls and assign any of the pool to each, up to its remaining hit points, and the rest goes on Lake-town
+
+## 50215 West Pier
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50215:A:1 (front): Each location in play gains Burn 1.
+  50215:constant:1: Constant
+    - this card: stat locationsGainBurn (each location in play, this card included, gains Burn 1 for the burn damage that is resolved) 1, while this card is in play
+
+## 50216 The Master's Manor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50216:A:1: Burn 3.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50216:A:2 (front): When Revealed: Move all damage from Smaug to Lake-town.
+  50216:whenRevealed:1: When revealed
+    - all the damage on smaug moves to lakeTown (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
+
+50216:A:3 (shadow): Shadow: If this attack destroys a character, defending player discards his hand.
+  50216:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player discards all the cards in their hand
+
+## 50217 South Pier
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50217:A:1: Burn 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50217:A:2 (front): When faced with the option to travel, players cannot travel to other locations.
+  50217:constant:1: Constant
+    - the players cannot travel to any location but this one while this card is in play (a Travel Action is not traveling)
+
+## 50218 North Pier
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50218:A:1: Burn 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50218:A:2 (front): Smaug cannot be damaged.
+  50218:constant:1: Constant
+    - each Dragon enemy (any player controls) or in the staging area: stat cannotTakeDamage 1, while this card is in play
+
+## 50219 Merchant's District
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50219:A:1: Burn 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50219:A:2 (front): Travel Action: Deal 2 damage per player to Lake-town to add this location to the victory display.
+  50219:action:1: Action
+    only if it is the Travel phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - place 2 damage token(s) on the card in play with code 50207 (placed, not dealt: nothing cancels or reduces them)
+    - [json AddSourceToVictory {"verb":"AddSourceToVictory"}]
+
+50219:A:3 (shadow): Shadow: Deal 1 damage on Lake-town. (4 damage instead if undefended.)
+  50219:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attack has a defender: place 1 damage token(s) on the card in play with code 50207 (placed, not dealt: nothing cancels or reduces them)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): place 4 damage token(s) on the card in play with code 50207 (placed, not dealt: nothing cancels or reduces them)
+
+## 50220 East Pier
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50220:A:1: Burn 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50220:A:2 (front): "When Revealed" effects cannot be canceled.
+  50220:constant:1: Constant
+    - while this card is in play (under its condition), the When Revealed effects of cards cannot be canceled
+
+## 50221 Great House
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50221:A:1: Burn 3.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50221:A:2 (front): When Revealed: Resolve all burn damage from all locations in play.
+  50221:whenRevealed:1: When revealed
+    - resolve all burn damage: the Burn of every location in play (staging area or active, the Burn 1 West Pier gives each included) is a pool; each player in turn from the first player may exhaust ready characters he controls and assign any of the pool to each, up to its remaining hit points, and the rest goes on Lake-town
+
+## 50222 Great Bridge
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50222:A:1: Burn 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50222:A:2 (front): When Revealed: Discard X cards from each player's deck. X is the amount of damage on Lake-town. (If no cards are discarded by this effect, Great Bridge gains surge.)
+  50222:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the top the damage on Lake-town card(s) of the acting player's deck go to their discard pile
+    - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 50223 Fisherman's Dock
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50223:A:1: Burn 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50223:A:2 (front): Travel: If there is 1 active location, exhaust a hero to travel here. (There are now 2 active locations.)
+  50223:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of location (any player controls) that is the active location is at least 1: choose ready hero (you control)
+    - then, if the number of location (any player controls) that is the active location is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+
+50223:A:3 (shadow): Shadow: Add this location to the staging area.
+  50223:shadow:1: Shadow
+    - this card goes to the staging area (it is not revealed)
+
+## 50224 Esgaroth Wharf
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50224:A:1: Burn 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50224:A:2 (front): All locations are immune to player card effects.
+  50224:constant:1: Constant
+    - each location (any player controls) or in the staging area: stat immuneToPlayerCards 1, while this card is in play
+
+50224:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack. Then, it makes an additional attack after this one.
+  50224:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 2, until the end of the attack
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+(rendered pieces: 208 by template, 1 as JSON)

@@ -7,7 +7,7 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 import { cardKeywords } from "./card-keywords.ts";
 import { cardTextParagraphs, type TextRun } from "./card-text.ts";
 import { sideText } from "./ledger.ts";
-import { KEYWORD_RULES, pickRule, TIMING_RULES, timingOf, type TimingKey } from "./keyword-rules.ts";
+import { KEYWORD_RULES, LOCAL_RULE, pickRule, TIMING_RULES, timingOf, type TimingKey } from "./keyword-rules.ts";
 
 /** One chip in the card preview: the word as it reads on the chip, the rule span it opens, and how it is drawn. */
 export type PreviewKeyword = { word: string; ruleId: string; lost?: boolean; timing?: boolean };
@@ -46,7 +46,8 @@ export function timingKeys(text: string | null | undefined): TimingKey[] {
 export function previewKeywords(game: ScenarioState, ctx: ReduceContext, cardId: string, text: string | null | undefined, ruleDoc: string | null): PreviewKeyword[] {
   const out: PreviewKeyword[] = [];
   for (const keyword of cardKeywords(game, ctx, cardId)) {
-    const ruleId = pickRule(KEYWORD_RULES[keyword.key].rules, ruleDoc);
+    const own = KEYWORD_RULES[keyword.key];
+    const ruleId = pickRule(own.rules, ruleDoc) ?? (own.text ? `${LOCAL_RULE}${keyword.key}` : null);
     if (ruleId) out.push({ word: keyword.word, ruleId, ...(keyword.lost ? { lost: true } : {}) });
   }
   const code = game.cards[cardId]?.code;

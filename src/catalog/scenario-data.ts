@@ -19,7 +19,8 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // The Two Towers' second encounter decks (mec112.setup-journey-to-the-cross-roads, mec112.setup-shelobs-lair): `haradDeck` (the Men of Harad set, shuffled and
 // placed facedown under The Cross-roads) and `greatSpiderDeck` (The Great Spider set, set aside). Neither is part of the encounter deck.
 // Angmar Awakened's Orc deck (mec108.orc-deck): `angmarOrcDeck`, the Angmar Orcs enemies and Concealed Orc-camp The Weather Hills' Setup takes out of the encounter deck.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
+// The Battle of Lake-town's Smaug deck (docs/brief.md, The Battle of Lake-town): `smaugDeck`, the nine Smaug cards its Setup shuffles into a separate deck, with a discard pile of its own.
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -138,6 +139,8 @@ export const campaignDataSchema = z.strictObject({
   scenarios: z.array(z.string().min(1)),
   // "cycle": scenarios that belong to no campaign (Shadows of Mirkwood), played standalone only. Absent in a campaign's file.
   kind: z.literal("cycle").optional(),
+  // A cycle built a scenario at a time: the titles of the ones it lists that are not built yet, in release order. The Scenarios tab shows each under Coming later.
+  later: z.array(z.string().min(1)).optional(),
   // The campaign card of each scenario, by scenario id. Its Setup and Resolution lines are effect records. A cycle's file omits it (read as empty).
   campaignCards: z.record(z.string(), z.string().min(1)).default({}),
   // The booklet the campaign opens (src/screens/booklets/books.ts): the Fellowship's MEC109, the Learn to Play for Mirkwood
@@ -298,7 +301,7 @@ export function corsairCodes(data: AnyScenarioData, difficulty: Difficulty = "No
 }
 
 // The decks of Ered Mithrin a scenario deals, copy by copy (emce.caves-deck, emce.evil-creatures-deck): each of these piles at the difficulty played, by pile. A pile the scenario does not deal is left out.
-export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
+export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"] as const;
 export function dealtPiles(data: AnyScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
   const piles: Partial<Record<(typeof DEAL_PILES)[number], string[]>> = {};
   for (const card of placementsAt(data, difficulty)) {
@@ -384,12 +387,12 @@ export function campaignScenario<T extends AnyScenarioData>(data: T): T {
 // A stage that names CatchUpWins (12013:B:3) carries the Stormcaller's stage number that makes its defeat a win as its `catchUp`.
 // A stage that names AdvanceToRandomStage (19048:B:2) carries the stages it proceeds to, in a random order, as its `randomNext`.
 // A stage that names FlipAtQuestPhase (19135:A:2) is a stage of a quest deck (`deck`): it is not flipped when revealed.
-export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true }; deck?: true } {
+export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true; different?: true }; deck?: true } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
   const random = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceToRandomStage");
-  const randomNext = random?.verb === "AdvanceToRandomStage" ? { codes: random.codes, ...(random.otherwise != null ? { otherwise: random.otherwise } : {}), ...(random.remove ? { remove: true as const } : {}) } : undefined;
+  const randomNext = random?.verb === "AdvanceToRandomStage" ? { codes: random.codes, ...(random.otherwise != null ? { otherwise: random.otherwise } : {}), ...(random.remove ? { remove: true as const } : {}), ...(random.different ? { different: true as const } : {}) } : undefined;
   const deck = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).some((instruction) => instruction.verb === "FlipAtQuestPhase");
   return { code, ...(randomNext ? { randomNext } : {}), ...(deck ? { deck: true as const } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
 }

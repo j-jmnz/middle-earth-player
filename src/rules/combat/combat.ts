@@ -25,6 +25,7 @@ import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
 import { countsDefense, struck } from "../families/attack/strike.ts";
+import { attackStatAgainst } from "../families/attack/spectral.ts";
 import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 
@@ -378,9 +379,11 @@ export function strikeEnemy(
 // The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.
 export function attackStrength(state: ScenarioState, attackerIds: readonly string[], enemyId: string, cards: Cards): number {
   let attack = 0;
+  // Against a Spectral enemy a character's Willpower is its attack strength (families/attack/spectral.ts).
+  const stat = attackStatAgainst(state, enemyId, cards);
   for (const attackerId of attackerIds) {
     const attacker = state.cards[attackerId];
-    if (attacker) attack += modifiedStat(state, attacker, "attack", cards, enemyId);
+    if (attacker) attack += modifiedStat(state, attacker, stat, cards, enemyId);
   }
   return attack;
 }

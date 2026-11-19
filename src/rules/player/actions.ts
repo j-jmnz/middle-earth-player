@@ -32,6 +32,8 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   if (textBlank(state, instance.id, ctx.cards)) return undefined;
   // A character that cannot trigger its effect cannot use its Actions (Sacked!, 02048:A:1).
   if (flagged(state, instance.id, "cannotTriggerEffects")) return undefined;
+  // A player held by a lasting effect ("players cannot trigger Action or Response effects", 148017:A:2) uses no Action, a shared card's included.
+  if (state.modifiers.length > 0 && flagged(state, `seat:${state.activeSeat}`, "cannotTriggerEffects")) return undefined;
   const effect = effectsOfCard(state, ctx, instance).find((entry) => entry.id === effectId && entry.timing === "action");
   // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
   // The campaign card next to the quest deck belongs to no player either, and its Action is any player's (11197:A:3, "Travel Action").

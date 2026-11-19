@@ -8,10 +8,13 @@ import { ruleDoc } from "./ledger.ts";
 
 export type KeywordKey =
   | "surge" | "peril" | "indestructible" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
-  | "phantom" | "dire" | "hide" | "doomed" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple";
+  | "phantom" | "dire" | "spectral" | "hide" | "doomed" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn";
 
-/** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. */
-export type RuleWord = { word: string; rules: readonly string[] };
+/** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. `text`: a keyword no rules span defines (Burn X) says its definition itself, with the source it comes from. */
+export type RuleWord = { word: string; rules: readonly string[]; text?: { paragraphs: readonly string[]; source: string } };
+
+/** The id of a chip whose rule is a keyword's own `text` (`local:burn`), not a span of data/rules. */
+export const LOCAL_RULE = "local:";
 
 // In the order a card's keywords are listed (the engine's EMPTY_KEYWORDS order).
 export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
@@ -35,6 +38,28 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
   uncharted: { word: "Uncharted", rules: ["dcce.uncharted"] },
   aflame: { word: "Aflame", rules: ["dcce.aflame"] },
   grapple: { word: "Grapple", rules: ["dcce.grapple"] },
+  // Burn X (The Battle of Lake-town): printed on no rules span; the Quest Companion defines it (docs/brief.md, The Battle of Lake-town, Burn X).
+  burn: {
+    word: "Burn",
+    rules: [],
+    text: {
+      paragraphs: [
+        "Burn X: when a card says to resolve all burn damage, add up the Burn X of every location in play, in the staging area or active. Each player in turn, from the first player, may exhaust any number of ready characters he controls and assign any amount of that damage to them, each up to its remaining hit points. The damage nobody takes is placed on Lake-town.",
+      ],
+      source: "Quest Companion (community source)",
+    },
+  },
+  // Spectral (The Stone of Erech): from RulesPal's transcription of the scenario's rulesheet, which data/rules does not hold (docs/brief.md, The Stone of Erech, Spectral).
+  spectral: {
+    word: "Spectral",
+    rules: [],
+    text: {
+      paragraphs: [
+        "Spectral: characters attacking a Spectral enemy must use their Willpower instead of their Attack to determine their attack strength. The enemy's Defense is still subtracted. Damage that is not an attack (a card effect) is not changed.",
+      ],
+      source: "RulesPal transcription (community source)",
+    },
+  },
   phantom: { word: "Phantom", rules: ["mec113.phantom"] },
   dire: { word: "Dire", rules: ["mec113.dire"] },
 };

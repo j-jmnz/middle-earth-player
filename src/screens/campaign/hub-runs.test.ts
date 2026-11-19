@@ -109,6 +109,12 @@ describe("comingLater", () => {
     expect(tiles[0]?.caption).toBe("Cycle \u00b7 3 scenarios \u00b7 Coming soon");
   });
 
+  it("lists a cycle's scenarios not built yet after its built ones, numbered on in its box's order", () => {
+    const cycle: Box[] = [{ id: "cyc", name: "Cycle Box", campaignId: "cyc", scenarios: ["built"], later: ["Next One", "After That"] }];
+    const tiles = comingLater(cycle, [row("cyc", true, "cycle")], (id) => id === "built", (id) => id);
+    expect(tiles.map((tile) => [tile.name, tile.caption])).toEqual([["Next One", "Coming soon · Cycle Box · 2"], ["After That", "Coming soon · Cycle Box · 3"]]);
+  });
+
   it("gives a locked campaign whose box is listed one tile named by the box, not a tile for each scenario", () => {
     const listed: Box[] = [{ id: "awake", name: "Awakened Campaign Expansion", campaignId: "awake", scenarios: ["x", "y", "z"] }];
     const tiles = comingLater(listed, [row("awake", false, "campaign", null), row("one", true)], () => false, (id) => `Scenario ${id}`);

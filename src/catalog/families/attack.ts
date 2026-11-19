@@ -70,6 +70,8 @@ const FLAGS = [
   "eagleOrRangedOnly",
   // On an enemy, until the modifier ends: a character with the Ranged keyword cannot be declared as an attacker against it ("cannot be attacked by characters with the ranged keyword until the end of the phase", 900606:A:2).
   "cannotBeAttackedByRanged",
+  // On an enemy, until the modifier ends: it loses the Spectral keyword ("that enemy loses the Spectral keyword until the end of the phase", 50311:A:1; docs/brief.md, The Stone of Erech): characters attacking it use their Attack again.
+  "losesSpectral",
 ] as const;
 
 export const manifest = { name: "attack", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -13,7 +13,8 @@ import { isPlayerCardEffect, playerCardEffectCanChoose, sourcePrinted } from "..
 import { immuneToSource } from "../misc/guards.ts";
 import { activeLocations, progressRoom } from "../south/locations.ts";
 import { currentSideQuest } from "../wilderland/night-quest.ts";
-import { placeOnMainQuest, placeQuestProgress } from "../../quest/quest.ts";
+import { placeOnMainQuest } from "../../quest/quest.ts";
+import { placeEffectProgress } from "../quest/effect-progress.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
@@ -42,7 +43,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       if (!(instruction.main && currentSideQuest(state) != null) && immuneBuffer(state, focus.sourceId, ctx)) return state;
       const before = steps.length;
       const gate = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
-      const placed = instruction.main ? placeOnMainQuest(state, amount, ctx.cards, steps, gate) : placeQuestProgress(state, amount, ctx.cards, steps, gate);
+      const placed = instruction.main ? placeOnMainQuest(state, amount, ctx.cards, steps, gate) : placeEffectProgress(state, amount, ctx.cards, steps, gate);
       return afterProgress(placed, before, ctx, steps);
     }
     case "ExcessDamageTo": {

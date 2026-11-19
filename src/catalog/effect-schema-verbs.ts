@@ -216,7 +216,8 @@ export const simpleVerbs = [
     inPlay: z.literal(true).optional(),
     ...when,
   }),
-  z.strictObject({ verb: z.literal("Discard"), target: targetSchema, ...when }),
+  // `counted`: the running effect counts a card this discards out of play for its `noneDiscarded` condition ("discard Tom Bombadil. Then, shuffle ...", 147022:A:1: the part after "then" resolves only if the discard did, rr.then).
+  z.strictObject({ verb: z.literal("Discard"), target: targetSchema, counted: z.literal(true).optional(), ...when }),
   // The card is destroyed (rr.destroy), not discarded: a hero or ally lies in its owner's discard pile and the table hears it was destroyed ("Destroy all heroes with the card 'Sacked!' attached", 02049:A:1).
   z.strictObject({ verb: z.literal("Destroy"), target: targetSchema, ...when }),
   z.strictObject({
@@ -234,7 +235,9 @@ export const simpleVerbs = [
         // "Attach to a Warrior hero." (143015:A:2): only a hero with this printed trait (rr.attachment-cards: a play restriction is checked as the attachment enters play).
         trait: z.string().min(1).optional(),
         // "Attach it to a hero with 1 or more Willpower" (900806:A:1): only a hero whose current Willpower is at least this.
-        minWillpower: z.number().int().min(1).optional() }),
+        minWillpower: z.number().int().min(1).optional(),
+        // The card has no limit per hero ("Driven by Fear", 50325:A:1: a second copy may go on the same hero): a hero that carries a copy is offered too.
+        unlimited: z.literal(true).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),
@@ -286,6 +289,8 @@ export const simpleVerbs = [
     // With "defend": only the allies whose printed hit points are fewer than the source's cannot defend ("Allies with fewer printed hit points than Uruk-hai
     // Captain cannot defend against Uruk-hai Captain", 142069:A:2).
     belowSourceHitPoints: z.boolean().optional(),
+    // With "travel" on a card that is not the location: the players cannot travel to any location but the source ("players cannot travel to other locations", 50217:A:2).
+    exceptSelf: z.boolean().optional(),
     // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
     // draws, not card effects). The pick is read from each player's side.
     unlessControls: pickSchema.optional(),
@@ -306,8 +311,8 @@ export const simpleVerbs = [
     ...when,
   }),
   // Constant on an encounter card attached by its own text: it counts as an attachment with this trait while attached
-  // ("Counts as a Condition attachment", 141043:A:2, 141055:A:2), so "a Condition attachment" finds it (01061:A:1).
-  z.strictObject({ verb: z.literal("CountsAs"), cardType: z.literal("attachment"), trait: z.string().min(1), ...when }),
+  // ("Counts as a Condition attachment", 141043:A:2, 141055:A:2), so "a Condition attachment" finds it (01061:A:1); with no trait it counts as an attachment only ("Counts as an attachment", 50208:A:2).
+  z.strictObject({ verb: z.literal("CountsAs"), cardType: z.literal("attachment"), trait: z.string().min(1).optional(), ...when }),
   // Deals damage to each ally in play, only those with willpower at most `maxWillpower` when it is named (a value below 0
   // counts as 0, rr.modifiers) ("Deal 2 damage to each ally with 0 Willpower", 141071:A:1).
   z.strictObject({
