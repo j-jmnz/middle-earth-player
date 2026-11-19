@@ -187,6 +187,18 @@ describe("ShuffleSelfIntoInvestigation (50728:A:1)", () => {
   });
 });
 
+describe("ShuffleSelfIntoInvestigation after a destroying attack (50728:A:2)", () => {
+  it("leaves the shadow card where it is and queues the shuffle for the end of the attack, for a character destroyed", () => {
+    const shadow = spawn(built(), "mist", { zone: "encounterDiscard" });
+    const attacked: ScenarioState = { ...shadow.state, pendingAttack: { enemyId: "e", seat: 0 } as NonNullable<ScenarioState["pendingAttack"]> };
+    const queued = runInstruction(attacked, { verb: "ShuffleSelfIntoInvestigation", ifDestroyed: true }, { seat: 0, sourceId: shadow.id }, ctxOf([]), []);
+    expect(pileOf(queued, "investigationDeck")).toHaveLength(5);
+    expect(queued.pendingAttack?.after).toEqual([{ verb: "ShuffleSelfIntoInvestigation", card: shadow.id, when: { kind: "x", min: 1 } }]);
+    const later = runInstruction(queued, { verb: "ShuffleSelfIntoInvestigation", card: shadow.id }, { seat: 0, sourceId: "e" }, ctxOf([]), []);
+    expect(later.cards[shadow.id]).toMatchObject({ zone: "investigationDeck", face: "down" });
+  });
+});
+
 describe("the accusation (50702:B:2)", () => {
   /** The hidden pair of the state, as codes. */
   const pairOf = (state: ScenarioState) => state.setAside.map((id) => state.cards[id]?.code ?? "");

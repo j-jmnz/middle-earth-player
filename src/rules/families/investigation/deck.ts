@@ -1,6 +1,8 @@
 // Rules: docs/brief.md (Murder at the Prancing Pony, readings 1, 7 and 12), rr.in-play-and-out-of-play; ledger lines 50701:A:1, 50702:B:1, 50728:A:1, 50728:A:2. The Investigation deck (core/piles.ts, the named pile `investigation`): built by the Setup, a card removed from it unseen, a card shuffled into it.
 // Hidden information: no EngineStep and no log line names a card of the deck or the Suspect and Hideout set aside facedown, so these functions push no step. Only a look window (look.ts) shows cards.
 import type { Instruction } from "../../../catalog/boundary.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
 
 import { pileOf, shufflePile } from "../../core/piles.ts";
 import { shuffleIds } from "../../core/seed.ts";
@@ -50,8 +52,15 @@ export function removeRandomInvestigation(state: ScenarioState): ScenarioState {
 }
 
 /** ShuffleSelfIntoInvestigation: the source card (a revealed treachery in the staging area, or a shadow card) joins the deck facedown, and the deck is shuffled. */
-export function shuffleSelfIntoInvestigation(state: ScenarioState, focus: Focus): ScenarioState {
-  const id = focus.sourceId;
+export function shuffleSelfIntoInvestigation(state: ScenarioState, instruction: Extract<Instruction, { verb: "ShuffleSelfIntoInvestigation" }>, focus: Focus, steps: EngineStep[]): ScenarioState {
+  const attack = state.pendingAttack;
+  // A shadow card that shuffles itself in only if the attack destroys a character: the shuffle waits for the end of the attack, as AfterAttack does (the source is then the attacking enemy, so the card is named).
+  if (instruction.ifDestroyed && instruction.card == null) {
+    if (!attack || !focus.sourceId) return state;
+    const later: Instruction = { verb: "ShuffleSelfIntoInvestigation", card: focus.sourceId, when: { kind: "x", min: 1 } };
+    return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), later], afterCause: currentCause(steps, UNATTRIBUTED) } };
+  }
+  const id = instruction.card ?? focus.sourceId;
   if (!id || !state.cards[id]) return state;
   return shufflePile(updateCard(moveCard(state, id, { zone: DECK }), id, { face: "down", controller: null }), DECK);
 }

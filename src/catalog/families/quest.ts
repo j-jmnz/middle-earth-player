@@ -98,6 +98,8 @@ const TRIGGERS = [
   // About the table, once: the quest resolved successfully and placed progress on the active location, on a card that takes it first or on the stage ("After placing progress as the result of questing successfully", 147002:B:2). Not about one placement: a quest that fills a location
   // and goes on to the stage still raises it once.
   "questProgressPlaced",
+  // About the table, once: the quest resolved successfully and placed progress on the current stage itself, not only on a location ("After the players place progress on this stage from questing successfully", 50702:B:2).
+  "questProgressPlacedOnStage",
   // About each character committed to the quest when it resolved: the quest succeeded ("After ~ quests successfully"), or it
   // resolved at all ("After resolving a quest to which ~ was committed").
   "questedSuccessfully",

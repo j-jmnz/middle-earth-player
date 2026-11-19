@@ -22,7 +22,8 @@ const VERBS = [
   // "Choose 1 random card from the Investigation deck and remove it from the game (without looking at it)" (50702:B:1): the game's seed picks; the card is removed unseen and unnamed. An empty deck changes nothing.
   z.strictObject({ verb: z.literal("RemoveRandomInvestigation"), ...when }),
   // "Shuffle ~ into the Investigation deck" (50728:A:1, 50728:A:2): the source card, from the staging area or as a shadow card, joins the deck facedown and the deck is shuffled.
-  z.strictObject({ verb: z.literal("ShuffleSelfIntoInvestigation"), ...when }),
+  // `ifDestroyed`: a shadow card's "If this attack destroys a character, ... shuffle ~ into the Investigation deck" (50728:A:2): while the attack is in progress the shuffle is left for its end, and is made only when the attack destroyed a character. `card` is set by the engine when it leaves the shuffle for the end of the attack (the source then is the attacking enemy); a record does not write it.
+  z.strictObject({ verb: z.literal("ShuffleSelfIntoInvestigation"), ifDestroyed: z.literal(true).optional(), card: z.string().min(1).optional(), ...when }),
   // "The first player names 1 Suspect and 1 Hideout" (50702:B:2): the actor chooses one of the cards with these `codes` by its title (any of them, a card in play too); the choice is kept for MakeAccusation. `kind` says which of the two is named.
   z.strictObject({ verb: z.literal("NameInvestigation"), kind: z.enum(["suspect", "hideout"]), codes: z.array(code).min(2), ...when }),
   // "Reveal the facedown out-of-play Suspect and Hideout and add them to the staging area. If either is not the one named, search the Investigation deck for each card just named that is not in play, add it to the staging area, and raise each player's threat by 3" (the insert, 50702:B:2).

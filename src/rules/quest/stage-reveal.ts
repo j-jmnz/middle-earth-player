@@ -44,7 +44,8 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
   // Progress placed anywhere in this resolution (the active location, a location that takes it first, the stage), for the trigger the table hears once.
   const placed = steps.slice(before).some((step) => step.kind === "progress" && step.amount > 0);
-  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), { ...outcome, placed }, ctx, steps);
+  const placedOnStage = steps.slice(before).some((step) => step.kind === "progress" && step.amount > 0 && step.targetId === state.questStage);
+  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), { ...outcome, placed, placedOnStage }, ctx, steps);
 }
 
 // "Forced: when the quest total is counted" (04016:A:1, Fanuidhol): fired once a phase, only in a game with a card that hears it (the marker is the table's `questTotalAnnounced`).

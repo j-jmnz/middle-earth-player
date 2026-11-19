@@ -4,6 +4,7 @@ import { joinAnd, str, type Ctx, type Obj } from "./kit.ts";
 type Made = { text: string; read: readonly string[] };
 
 const codes = (value: unknown): string => joinAnd((Array.isArray(value) ? value : []).map(str));
+const orList = (parts: readonly string[]): string => (parts.length <= 1 ? (parts[0] ?? "") : `${parts.slice(0, -1).join(", ")} or ${parts[parts.length - 1]}`);
 
 export const INVESTIGATION_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>> = {
   HideSuspectAndHideout: (i) => ({
@@ -20,13 +21,13 @@ export const INVESTIGATION_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>>
     read: ["from", "count"],
   }),
   RemoveRandomInvestigation: () => ({ text: "a random card of the Investigation deck, chosen with the game's seed, is removed from the game without being looked at (no step names it)", read: [] }),
-  ShuffleSelfIntoInvestigation: () => ({ text: "this card is shuffled into the Investigation deck, facedown", read: [] }),
+  ShuffleSelfIntoInvestigation: (i) => ({ text: i.ifDestroyed === true ? "once the attack ends, if it destroyed a character, this shadow card is shuffled into the Investigation deck, facedown" : "this card is shuffled into the Investigation deck, facedown", read: ["ifDestroyed", "card"] }),
   NameInvestigation: (i) => ({ text: `the acting player names one ${str(i.kind)} (a Suspect or a Hideout), by title, of the cards with codes ${codes(i.codes)} (a card in play too)`, read: ["kind", "codes"] }),
   MakeAccusation: (i) => ({
     text: `the facedown out-of-play Suspect and Hideout (the set-aside cards among ${codes(i.suspects)} and ${codes(i.hideouts)}) are turned faceup and added to the staging area; for each name that is not one of them, the Investigation deck is searched for that card and it is added to the staging area unless it is in play; X is 1 if either name was wrong, else 0`,
     read: ["suspects", "hideouts"],
   }),
-  AddLookedToStaging: (i) => ({ text: `the top card of the Investigation deck (the card the keyword just showed) is added to the staging area faceup if it has the Trait ${joinAnd((Array.isArray(i.traits) ? i.traits : []).map(str))}`, read: ["traits"] }),
+  AddLookedToStaging: (i) => ({ text: `the top card of the Investigation deck (the card the keyword just showed) is added to the staging area faceup if it has one of the Traits ${orList((Array.isArray(i.traits) ? i.traits : []).map(str))}`, read: ["traits"] }),
 };
 
 // The plain words a stat flag of the scenario adds after its name.
@@ -36,7 +37,7 @@ export const INVESTIGATION_STAT_NOTES: Readonly<Record<string, string>> = {
 
 export const INVESTIGATION_CONDITIONS: Readonly<Record<string, (c: Obj, ctx: Ctx) => Made>> = {
   investigateIgnored: () => ({ text: "a card in play says to ignore the Investigate keyword", read: [] }),
-  investigationTop: (c) => ({ text: `the top card of the Investigation deck (the card the keyword just showed) has the Trait ${joinAnd((Array.isArray(c.traits) ? c.traits : []).map(str))}`, read: ["traits"] }),
+  investigationTop: (c) => ({ text: `the top card of the Investigation deck (the card the keyword just showed) has one of the Traits ${orList((Array.isArray(c.traits) ? c.traits : []).map(str))}`, read: ["traits"] }),
 };
 
 export const INVESTIGATION_CONDITION_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {

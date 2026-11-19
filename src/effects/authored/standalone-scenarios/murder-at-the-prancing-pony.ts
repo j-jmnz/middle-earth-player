@@ -31,9 +31,11 @@ const SUSPECTS: string[] = [TODD, SUSIE, JAKE, JOHNNY, ORC_EYES];
 const HIDEOUTS: string[] = [BILL_FERNY_HOUSE, STADDLE, COMBE, ARCHET, CHETWOOD_CAMP];
 
 // An enemy pick that is not `staging` sees only the enemies engaged with a player (rules/interpret/pick.ts), so each of these reads the staging area too.
+// The running attack destroyed a character (AfterAttack reads the number destroyed as X).
+const DESTROYED_A_CHARACTER = { kind: "x", min: 1 } as const;
 const SUSPECT_ENEMY: PickSpec = { type: "enemy", control: "any", trait: "Suspect", staging: true };
 const BRIGAND_ENEMY: PickSpec = { type: "enemy", control: "any", trait: "Brigand", staging: true };
-const HIDEOUT_IN_PLAY: PickSpec = { type: "location", control: "any", trait: "Hideout" };
+const HIDEOUT_IN_PLAY: PickSpec = { type: "location", control: "any", trait: "Hideout", staging: true };
 const IN_VICTORY: Condition = { kind: "sourceIn", zone: "victory" };
 const KEYWORD_RESOLVES: Condition = { kind: "not", condition: { kind: "investigateIgnored" } };
 // "Investigate X" is a Forced effect of the location once it is explored as the active location (reading 3).
@@ -86,7 +88,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: STAGE_2,
     lines: ["50702:B:2"],
     timing: "forced",
-    trigger: "questProgressPlaced",
+    trigger: "questProgressPlacedOnStage",
     instructions: [
       {
         verb: "Choose",
@@ -115,7 +117,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: STAGE_3,
     lines: ["50703:A:1"],
     timing: "whenRevealed",
-    instructions: [EACH_PLAYER([{ verb: "SearchMove", trait: "Brigand", type: "enemy", to: "staging", when: { kind: "otherPlayer" } }]), { verb: "ShuffleEncounterDeck" }],
+    instructions: [EACH_PLAYER([{ verb: "SearchMove", trait: "Brigand", type: "enemy", to: "staging", when: { kind: "not", condition: { kind: "firstPlayer" } } }]), { verb: "ShuffleEncounterDeck" }],
   },
   { id: "50703:constant:1", cardCode: STAGE_3, lines: ["50703:B:1"], timing: "constant", instructions: [{ verb: "IgnoreKeyword", keywords: ["investigate"] }] },
   {
@@ -285,7 +287,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       },
     ],
   },
-  // 50722 Bree-land Informant: after it attacks, with a shadow card of no shadow effect, the defending player raises threat by 1, spends 1 resource to look at the bottom card of the Investigation deck, and it is discarded (reading 14).
+  // 50722 Bree-land Informant: after it attacks, with a shadow card of no shadow effect, the defending player raises threat by 1 and spends 1 resource to look at the bottom card of the Investigation deck; then it is discarded only when the look and the spend resolved, so a player with no resource keeps it in play (reading 14, rr.then).
   {
     id: "50722:response:1",
     cardCode: INFORMANT,
@@ -297,8 +299,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       { verb: "RaiseThreat", amount: 1 },
       { verb: "LookAtInvestigation", from: "bottom", when: { kind: "resources", min: 1 } },
+      { verb: "Discard", target: { kind: "self" }, when: { kind: "resources", min: 1 } },
       { verb: "SpendResources", amount: 1 },
-      { verb: "Discard", target: { kind: "self" } },
     ],
   },
   // 50723 Lawless Ruffian: +2 Attack while engaged with a player with threat 35 or higher; Shadow: an additional attack against you.
@@ -351,7 +353,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         who: "actor",
         options: [
           { id: "threat", instructions: [{ verb: "RaiseThreat", amount: 2 }] },
-          { id: "return", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ReturnToStaging", target: { kind: "attacker" } }] }] },
+          { id: "return", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] }] },
         ],
       },
     ],
@@ -413,8 +415,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         verb: "Choose",
         who: "actor",
         options: [
-          { id: "threat", instructions: [{ verb: "RaiseThreat", amount: 2 }] },
-          { id: "shuffle", instructions: [{ verb: "ShuffleSelfIntoInvestigation" }] },
+          { id: "threat", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "RaiseThreat", amount: 2, when: DESTROYED_A_CHARACTER }] }] },
+          { id: "shuffle", instructions: [{ verb: "ShuffleSelfIntoInvestigation", ifDestroyed: true }] },
         ],
       },
     ],

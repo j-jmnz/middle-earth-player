@@ -27,7 +27,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RemoveRandomInvestigation":
       return removeRandomInvestigation(state);
     case "ShuffleSelfIntoInvestigation":
-      return shuffleSelfIntoInvestigation(state, focus);
+      return shuffleSelfIntoInvestigation(state, instruction, focus, steps);
     case "NameInvestigation":
       return nameInvestigation(state, instruction, focus, steps);
     case "MakeAccusation":
