@@ -92,6 +92,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
   release: {
     plan: { steps: [{ script: "release/plan.ts" }], about: "prints the next tag and its notes (--dry-run)" },
     source: { steps: [{ script: "release/sideload-source.ts" }], about: "writes a release's SideStore and AltStore source" },
+    installs: { steps: [{ script: "release/installs.ts" }], about: "writes the README's installs badge from a dump of the releases (--releases, --out)" },
   },
 };
 

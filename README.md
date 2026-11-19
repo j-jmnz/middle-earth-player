@@ -27,6 +27,7 @@
   </p>
   <p>
     <a href="https://github.com/j-jmnz/middle-earth-player/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?color=3E5A48&label=release"></a>
+    <a href="https://github.com/j-jmnz/middle-earth-player/releases"><img alt="Total installs" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fj-jmnz%2Fmiddle-earth-player%2Fstats%2Finstalls.json"></a>
     <a href="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/j-jmnz/middle-earth-player/actions/workflows/test.yml/badge.svg?branch=main"></a>
     <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3E5A48"></a>
     <a href="https://www.bestpractices.dev/projects/16744"><img alt="OpenSSF Best Practices" src="https://www.bestpractices.dev/projects/16744/badge"></a>
