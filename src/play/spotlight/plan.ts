@@ -10,6 +10,7 @@ import { slotRotation } from "../motion/motion.ts";
 import { SPOT } from "./shape.ts";
 import type { ClashShape } from "./beats.ts";
 import { spotlightSpan } from "./beats.ts";
+import { gaugeOf, type Gauge } from "./gauge.ts";
 import { stageOf, type Stage, type StageArea } from "./stage.ts";
 
 /** A card in the spotlight: its picture's code, the rectangle it stands in on the table (upright) and the turn it is drawn with. */
@@ -33,6 +34,8 @@ export type ClashPlan = {
   // attacks before this one on the same target (all the engine's numbers).
   before: number;
   after: number;
+  // The gauge of shields and hearts in the middle of the stage (spotlight/gauge.ts), laid out once with the stage.
+  gauge: Gauge;
 };
 
 export type SpotlightPlan = {
@@ -88,6 +91,7 @@ export function buildPlan(input: PlanInput): SpotlightPlan {
   };
   const isEnemy = (id: string) => prev.staging.includes(id) || prev.seats.some((seat) => seat.engaged.includes(id));
   const entries: Omit<ClashPlan, "shape" | "seed">[] = [];
+  const scale = input.scale ?? 1;
   // The damage each target took from the attacks before this one, so two attacks on one target count up in turn.
   const taken = new Map<string, number>();
   for (const clash of input.clashes) {
@@ -100,6 +104,7 @@ export function buildPlan(input: PlanInput): SpotlightPlan {
     const enemy = clash.attackers[0] ?? "";
     const turned = clash.shadow ? spot(clash.shadow, layouts.some((layout) => layout.slots.some((slot) => slot.id === clash.shadow)) ? clash.shadow : enemy) : null;
     const shown = everyone.slice(0, SPOT.fan);
+    const stage = stageOf(area, card, everyone.length, turned != null, scale);
     entries.push({
       clash,
       enemyAttack: isEnemy(enemy) && clash.attackers.length === 1,
@@ -107,12 +112,13 @@ export function buildPlan(input: PlanInput): SpotlightPlan {
       more: Math.max(0, everyone.length - shown.length),
       target,
       shadow: turned,
-      stage: stageOf(area, card, everyone.length, turned != null, input.scale ?? 1),
+      stage,
       before,
       after: before + clash.damage,
+      gauge: gaugeOf(stage.gauge, { attack: clash.attack, defense: clash.defense, hitPoints: clash.hitPoints, undefended: clash.undefended, before, damage: clash.damage }, scale),
     });
   }
-  const clashes: ClashPlan[] = entries.map((entry, index) => ({ ...entry, seed: input.seq * 31 + index, shape: { damage: entry.clash.damage, destroyed: entry.clash.destroyed, shadow: entry.shadow != null, first: index === 0, last: index === entries.length - 1 } }));
+  const clashes: ClashPlan[] = entries.map((entry, index) => ({ ...entry, seed: input.seq * 31 + index, shape: { damage: entry.clash.damage, destroyed: entry.clash.destroyed, shadow: entry.shadow != null, first: index === 0, last: index === entries.length - 1, steps: entry.gauge.steps } }));
   const codes = [...new Set(clashes.flatMap((plan) => [...plan.attackers, plan.target, ...(plan.shadow ? [plan.shadow] : [])].map((entry) => entry.code)))];
   return { seq: input.seq, clashes, codes, span: spotlightSpan(clashes.length), canvas, area };
 }

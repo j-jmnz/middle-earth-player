@@ -10,16 +10,17 @@ const E: Emitters = {
   blocked: false,
   converge: { x: 300, y: 180, size: 234 },
   hit: { x: 420, y: 180, size: 234, dir: -0.3 },
+  ember: null,
   ash: { x: 520, y: 180, size: 234, w: 168 },
   rim: [0.83, 0.33, 0.22],
 };
-const OFF: Times = { convergeT: -1, sparkT: -1, ashT: -1, dark: 1 };
+const OFF: Times = { convergeT: -1, sparkT: -1, emberT: -1, ashT: -1, dark: 1 };
 
 describe("the atlas draws", () => {
   it("are the draws the particles allow, each as large as its kinds need", () => {
     expect(ATLAS_SLOTS.length).toBe(ATLAS_DRAWS);
     expect(Math.max(...Object.values(PARTICLE_DRAW)) + 1).toBe(ATLAS_DRAWS);
-    expect(ATLAS_SLOTS).toEqual([PARTICLE_COUNT.converge, Math.max(PARTICLE_COUNT.spark, PARTICLE_COUNT.deflect), PARTICLE_COUNT.ash]);
+    expect(ATLAS_SLOTS).toEqual([Math.max(PARTICLE_COUNT.converge, PARTICLE_COUNT.ember), Math.max(PARTICLE_COUNT.spark, PARTICLE_COUNT.deflect), PARTICLE_COUNT.ash]);
     expect(ATLAS_CELL).toEqual([0, 1, 0]);
     // Every draw is light added to the picture.
     expect(ATLAS_BLEND).toEqual(["plus", "plus", "plus"]);
@@ -32,7 +33,7 @@ describe("spriteAt", () => {
   });
 
   it("puts the center of the sprite's cell at the particle's point, whatever its turn", () => {
-    const times: Times = { convergeT: 200, sparkT: 120, ashT: 300, dark: 1 };
+    const times: Times = { convergeT: 200, sparkT: 120, emberT: -1, ashT: 300, dark: 1 };
     let seen = 0;
     for (let draw = 0; draw < ATLAS_DRAWS; draw += 1) {
       for (let i = 0; i < (ATLAS_SLOTS[draw] ?? 0); i += 1) {
@@ -55,6 +56,24 @@ describe("spriteAt", () => {
     expect(seen).toBeGreaterThan(20);
   });
 
+  it("draws the sparks of the gauge's lit hearts in the glow's slots once the first token lands, not faded by the dark", () => {
+    const ember = { x: 600, y: 300, size: 234, xs: [580, 610, 640], gap: 90 };
+    const e: Emitters = { ...E, ember };
+    expect(drawLive(0, { ...OFF, emberT: 50 }, E)).toBe(false);
+    expect(drawLive(0, { ...OFF, emberT: 50 }, e)).toBe(true);
+    let seen = 0;
+    for (let i = 0; i < (ATLAS_SLOTS[0] ?? 0); i += 1) {
+      const slot = spriteAt(0, i, { ...OFF, emberT: 250, dark: 0.5 }, e);
+      const p = particleAt("ember", i, 250, e.seed, ember, e.burnMs);
+      expect(slot.a).toBeCloseTo(p.alpha, 12);
+      if (slot.a > 0) seen += 1;
+    }
+    // Three hearts, three sparks each, the third heart's still to come at 250 ms in part.
+    expect(seen).toBeGreaterThan(3);
+    expect(seen).toBeLessThanOrEqual(9);
+    expect(drawLive(0, { ...OFF, emberT: 100000 }, e)).toBe(false);
+  });
+
   it("reads deflection, not sparks, when the attack was blocked, in silver", () => {
     const sparks = spriteAt(1, 2, { ...OFF, sparkT: 80 }, E);
     const blocked = spriteAt(1, 2, { ...OFF, sparkT: 80 }, { ...E, blocked: true });
@@ -64,7 +83,7 @@ describe("spriteAt", () => {
   });
 
   it("fades the glow with the dark and leaves the sparks and the ash alone", () => {
-    const times: Times = { convergeT: 200, sparkT: 120, ashT: 300, dark: 1 };
+    const times: Times = { convergeT: 200, sparkT: 120, emberT: -1, ashT: 300, dark: 1 };
     const half: Times = { ...times, dark: 0.5 };
     let seen = 0;
     for (const draw of [0]) {
@@ -94,7 +113,7 @@ describe("spriteAt", () => {
   });
 
   it("is deterministic for a seed", () => {
-    const times: Times = { convergeT: 100, sparkT: 60, ashT: 200, dark: 1 };
+    const times: Times = { convergeT: 100, sparkT: 60, emberT: -1, ashT: 200, dark: 1 };
     expect(spriteAt(0, 5, times, E)).toEqual(spriteAt(0, 5, times, E));
     expect(spriteAt(0, 5, times, E)).not.toEqual(spriteAt(0, 5, times, { ...E, seed: 42 }));
   });

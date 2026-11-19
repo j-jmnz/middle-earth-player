@@ -21,7 +21,7 @@ beforeAll(async () => {
 // The first attack of the seeded game.
 function attack(seed: number, keep: number, wanted: (reduced: Reduced) => boolean): Reduced {
   const start = expectOk(reduce(startScenario(starterStart(DECK, seed), ctx), { type: "Keep" }, ctx)).state;
-  const found = playUntil(ctx, start, keep, (reduced) => clashesOf(reduced.prev, reduced.next, reduced.steps).length > 0 && wanted(reduced));
+  const found = playUntil(ctx, start, keep, (reduced) => clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards).length > 0 && wanted(reduced));
   if (!found) throw new Error(`Seed ${seed} never reached that attack`);
   return found;
 }
@@ -29,7 +29,7 @@ function attack(seed: number, keep: number, wanted: (reduced: Reduced) => boolea
 describe("the gate", () => {
   it("opens for a moment with attacks and not for one without", () => {
     const reduced = attack(2, 1, () => true);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     expect(openGate(4, clashes)).toEqual({ seq: 4, clashes, ended: null, leaving: false, before: null, after: null });
     expect(openGate(5, [])).toMatchObject({ seq: 5, ended: "done", leaving: true });
     expect(NO_SPOTLIGHT.ended).toBe("done");
@@ -37,7 +37,7 @@ describe("the gate", () => {
 
   it("holds the table while attacks play, on a canvas, at a scale above 0 only", () => {
     const reduced = attack(2, 1, () => true);
-    const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps));
+    const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards));
     expect(spotlightHolds(gate, 1, true)).toBe(true);
     expect(spotlightHolds(gate, 0.6, true)).toBe(true);
     // Reduced motion plays none, and the web has no canvas to play it on: the banner carries the attack.
@@ -48,7 +48,7 @@ describe("the gate", () => {
 
   it("ends once, by the run or by a tap, and only for its own moment", () => {
     const reduced = attack(2, 1, () => true);
-    const gate = openGate(3, clashesOf(reduced.prev, reduced.next, reduced.steps));
+    const gate = openGate(3, clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards));
     expect(endGate(gate, "done", 2)).toBe(gate);
     const skipped = endGate(gate, "skipped");
     expect(skipped).toMatchObject({ ended: "skipped", leaving: true });
@@ -58,7 +58,7 @@ describe("the gate", () => {
 
   it("is open until it ends, whatever the scale: what Android Back skips first", () => {
     const reduced = attack(2, 1, () => true);
-    const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps));
+    const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards));
     expect(spotlightOpen(gate)).toBe(true);
     expect(spotlightOpen(endGate(gate, "skipped"))).toBe(false);
     expect(spotlightOpen(NO_SPOTLIGHT)).toBe(false);
@@ -67,7 +67,7 @@ describe("the gate", () => {
 
   it("marks the gate as leaving once the last attack begins to go back", () => {
     const reduced = attack(2, 1, () => true);
-    const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps));
+    const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards));
     const leaving = leaveGate(gate);
     expect(leaving.leaving).toBe(true);
     expect(spotlightHolds(leaving, 1, true)).toBe(true);
@@ -82,7 +82,7 @@ describe("the store's gate", () => {
     expect(store.getState().spotlight.clashes).toEqual([]);
     expect(store.getState().dispatch(reduced.intent)).toBe(true);
     const gate = store.getState().spotlight;
-    expect(gate.clashes).toEqual(clashesOf(reduced.prev, reduced.next, reduced.steps));
+    expect(gate.clashes).toEqual(clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards));
     expect(gate).toMatchObject({ seq: store.getState().moment?.seq, ended: null });
     store.getState().leaveSpotlight();
     expect(store.getState().spotlight.leaving).toBe(true);
@@ -129,7 +129,7 @@ describe("the store's gate", () => {
 describe("nextGate", () => {
   it("leaves an open gate be for a moment with no attacks, and opens a new one otherwise", () => {
     const reduced = attack(2, 1, () => true);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     const open = openGate(1, clashes, reduced.prev, reduced.next);
     expect(nextGate(open, 2, [], reduced.next, reduced.next)).toBe(open);
     // Once it ended, a quiet moment closes it as before.

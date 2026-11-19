@@ -172,7 +172,7 @@ export function createTableStore(input: TableInput): TableStore {
         shown: shows ? moment : get().shown,
         // The attacks this moment resolved play on the canvas before its banner; a pass that shows nothing, or a moment with no attacks
         // while the last one's still wait to play, leaves the last gate be (gate.ts, nextGate).
-        spotlight: shows ? nextGate(get().spotlight, moment.seq, clashesOf(before, result.state, result.steps), before, result.state) : get().spotlight,
+        spotlight: shows ? nextGate(get().spotlight, moment.seq, clashesOf(before, result.state, result.steps, ctx.cards), before, result.state) : get().spotlight,
       });
       input.onCommit?.(intent, result.state);
       return true;

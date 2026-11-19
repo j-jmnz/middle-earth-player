@@ -17,17 +17,43 @@ export const SPOT = {
   shadowGap: 20,
   // The group keeps this much (pt) beyond the safe insets in all: 32 across the width, not at each side.
   margin: 32,
-  // The stat medallions' radius (pt), straddling each card's foot.
-  medal: 26,
-  // The sizes of the words (pt, Medium's): the damage number, the stamps, the note chip, and the stamps' turn in degrees.
-  numberSize: 64,
-  stampSize: 34,
+  // The attack value under the attackers: its number and its icon (pt).
+  attackSize: 30,
+  attackIcon: 22,
+  // The gauge (spotlight/gauge.ts): each glyph takes `gaugeStep` pt at most and is at most `gaugeGlyph` pt. Under `gaugeMinStep` the hearts, then the shields, become one glyph and a count,
+  // which keeps `gaugeCount` pt for its words. The gap between the shields and the hearts, and the undefended mark's place, are shares
+  // of a step. Past `gaugeShields` shields or `gaugeHearts` hearts the row is a count at once.
+  gaugeStep: 30,
+  gaugeGlyph: 24,
+  gaugeMinStep: 14,
+  gaugeCount: 60,
+  gaugeSep: 0.7,
+  gaugeMark: 1.2,
+  gaugeShields: 6,
+  gaugeHearts: 12,
+  // The middle of the stage (spotlight/stage.ts, focus) is over the gap between the front attacker and the target; the gauge stands
+  // this share of a card's height under it, and may take this many card widths. During the count it grows by `gaugeFocus` and the
+  // cards dim under a night veil of `focusVeil`. At most `gaugeAbsorbed` marks say how much of the attack a card effect took away.
+  gaugeDrop: 0.29,
+  gaugeRoom: 1.6,
+  gaugeFocus: 0.3,
+  focusVeil: 0.45,
+  gaugeAbsorbed: 4,
+  // The sizes of the words (pt, Medium's): the matchup line's numbers and words, the result, and the note; the room kept under the
+  // attack value at the cards' feet to the bottom safe inset.
+  matchupSize: 30,
+  matchupWord: 22,
+  resultSize: 40,
   noteSize: 15,
-  stampTurn: -8,
-  // The note chip: its height, the room under it to the bottom safe inset, and the room kept between it and a medallion (pt).
+  footRoom: 24,
+  // The note at the top: its height, the room above it to the top safe inset, and the room kept between it and the cards (pt); and
+  // the room kept between the caption and the bottom safe inset.
   noteHeight: 30,
   noteRoom: 8,
   noteClear: 8,
+  // The sparks a lost heart gives off: at most `embers` in all, at most `emberPer` for each heart.
+  embers: 9,
+  emberPer: 3,
   // The damage token art is this share of a card's height; its place in the target's corner is this far (pt) from the edges.
   token: 0.17,
   tokenInset: 2,
@@ -39,9 +65,7 @@ export const SPOT = {
   knockBlocked: 0.4,
   // The attacker tilts this many degrees away while it draws back.
   tilt: 5,
-  // The defense medallion bounces to this scale when the attack is blocked; the damage number pops to this.
+  // The shields that held bounce to this scale when the attack is blocked; the result pops to this.
   bounce: 1.25,
-  numberPeak: 1.4,
-  // The number floats up this share of a card's height while it shows.
-  numberRise: 0.08,
+  resultPeak: 1.3,
 } as const;

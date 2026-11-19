@@ -40,6 +40,11 @@ export function tickLand(): void {
   quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Segment_Tick) : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)));
 }
 
+/** A damage token of the combat spotlight landed in its target's corner and lit a heart of the gauge: the lightest tick, one per token. */
+export function tickToken(): void {
+  quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Segment_Frequent_Tick) : Haptics.selectionAsync()));
+}
+
 /** The strike of the combat spotlight met its target: a medium impact at the hit stop, at most one per strike. */
 export function tickImpact(): void {
   quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Long_Press) : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)));

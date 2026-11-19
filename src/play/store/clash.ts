@@ -7,7 +7,9 @@
 // Archery, damage from a card effect, an attack that was canceled and an attack that placed no damage step (a card said the
 // target takes none, or the damage went to the Ring-bearer's life) have no `strike` followed by its `damage`, and so no clash:
 // the banner covers them.
+import type { PrintedCard } from "../../rules/core/printed.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
+import { modifiedStat } from "../../rules/core/keywords.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { shadowCards } from "../../rules/core/zones.ts";
 
@@ -19,8 +21,9 @@ import { shadowCards } from "../../rules/core/zones.ts";
  * - `damage`: the combat damage the engine placed on the target, after toughness. 0 is a blocked attack.
  * - `destroyed`: the attack destroyed the target.
  * - `shadow`: the shadow card the attack turned face up, or null.
+ * - `hitPoints`: the target's hit points as the strike found it (its modified stat in `prev`), for the spotlight's gauge.
  */
-export type Clash = { attackers: string[]; target: string; attack: number; defense: number; damage: number; destroyed: boolean; shadow: string | null; undefended: boolean };
+export type Clash = { attackers: string[]; target: string; attack: number; defense: number; damage: number; destroyed: boolean; shadow: string | null; undefended: boolean; hitPoints: number };
 
 // A strike ends where the next attack or strike of the same reduce begins.
 function endOf(steps: readonly EngineStep[], from: number): number {
@@ -53,10 +56,11 @@ function shadowOf(prev: ScenarioState, next: ScenarioState, enemyId: string): st
 }
 
 /**
- * The attacks the intent resolved, in order. `prev` is the state it was sent in, `next` the state it left, `steps` the engine's.
- * Each `strike` that is followed by the damage step of its target is one clash; a state with two attacks has two.
+ * The attacks the intent resolved, in order. `prev` is the state it was sent in, `next` the state it left, `steps` the engine's,
+ * `cards` the printed cards (for the target's hit points). Each `strike` that is followed by the damage step of its target is one
+ * clash; a state with two attacks has two.
  */
-export function clashesOf(prev: ScenarioState, next: ScenarioState, steps: readonly EngineStep[]): Clash[] {
+export function clashesOf(prev: ScenarioState, next: ScenarioState, steps: readonly EngineStep[], cards: ReadonlyMap<string, PrintedCard>): Clash[] {
   const out: Clash[] = [];
   steps.forEach((step, index) => {
     if (step.kind !== "strike") return;
@@ -69,6 +73,7 @@ export function clashesOf(prev: ScenarioState, next: ScenarioState, steps: reado
     if (damage?.kind !== "damage") return;
     const attackers = step.side === "enemy" ? [step.enemyId] : attackersOf(prev, steps, index, step.enemyId);
     if (attackers.length === 0) return;
+    const target = prev.cards[step.targetId] ?? next.cards[step.targetId];
     out.push({
       attackers,
       target: step.targetId,
@@ -78,6 +83,7 @@ export function clashesOf(prev: ScenarioState, next: ScenarioState, steps: reado
       destroyed: range.some((later) => later.kind === "destroy" && later.targetId === step.targetId),
       shadow: step.side === "enemy" ? shadowOf(prev, next, step.enemyId) : null,
       undefended: step.undefended,
+      hitPoints: target ? modifiedStat(prev.cards[step.targetId] ? prev : next, target, "hitPoints", cards) : 0,
     });
   });
   return out;
