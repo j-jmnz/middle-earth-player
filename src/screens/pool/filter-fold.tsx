@@ -64,28 +64,43 @@ export function useFilterFold(enabled: boolean, shown: unknown): FilterFoldState
 }
 
 /**
- * The filters over the top of the list, which starts under them by their height: folding fades them and lifts them 16 pt over
- * `filtersFold` and `filtersUnfold` (reduced motion snaps), and the list's size never changes, so a fold renders nothing under it. A
- * night shade behind them, solid under the rows and falling to nothing below them, hides the cards that scroll under them; it shows
- * only once the list has left its top. It runs as far past the screen's inset as the type chips' row does, so the row reaches the
- * edges. Folded, the filters are hidden from a screen reader and take no touch; a keyboard's focus landing in them shows them.
+ * The filters over the top of the list, which starts under them by their height, so a fold changes no layout and renders nothing
+ * under it. Folding lifts them 24 pt and fades them, over `filtersFold` and `filtersUnfold` (reduced motion snaps), clipped at the
+ * list's top, so they slide away under the search row. A night shade behind them, solid under the rows and falling to nothing below
+ * them, hides the cards that scroll under them; it shows once the list has left its top. It rises with the rows and stops 16 pt under
+ * the search row, so folded the cards still pass under a short band and never touch the search. It runs as far past the screen's inset
+ * as the type chips' row does, so the row reaches the edges. Folded, the filters are hidden from a screen reader and take no touch; a
+ * keyboard's focus landing in them shows them.
  */
 export function FilterFold({ fold, children }: { fold: FilterFoldState; children: ReactNode }) {
   const palette = usePalette();
   const s = useUiScale();
   const { progress } = useOpenMotion(!fold.folded, MOTION.filtersUnfold, MOTION.filtersFold);
-  const lift = 16 * s;
+  const lift = 24 * s;
   const fall = 24 * s;
+  const band = 16 * s;
   const scrolled = fold.scrolled;
-  const rows = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: -lift * (1 - progress.get()) }] }));
-  const shade = useAnimatedStyle(() => ({ opacity: progress.get() * Math.min(1, scrolled.get() / fall) }));
+  // How far the shade rises when folded: all of its solid part but the band.
+  const rise = Math.max(0, fold.height - band);
+  const rows = useAnimatedStyle(() => {
+    const p = progress.get();
+    // The words fade a little ahead of the lift, so they are gone before they reach the search row.
+    return { opacity: p * p, transform: [{ translateY: -lift * (1 - p) }] };
+  });
+  const shade = useAnimatedStyle(() => ({ opacity: Math.min(1, scrolled.get() / fall), transform: [{ translateY: -rise * (1 - progress.get()) }] }));
   const height = fold.height + fall;
   const solid = Math.round((fold.height / height) * 100);
   const night = withAlphaHex(palette.night, 0.94);
   const clear = withAlphaHex(palette.night, 0);
   return (
-    // NativeWind does not style a Reanimated view: the place and the bleed are the plain view around them, the inset the view inside.
-    <View className="absolute -left-6 -right-6 top-0" style={{ zIndex: 1 }} pointerEvents={fold.folded ? "none" : "box-none"} onFocus={fold.folded ? fold.reveal : undefined}>
+    // NativeWind does not style a Reanimated view: the place, the bleed and the clip are the plain view around them, the inset the view
+    // inside.
+    <View
+      className="absolute -left-6 -right-6 top-0 overflow-hidden"
+      style={{ zIndex: 1, height }}
+      pointerEvents={fold.folded ? "none" : "box-none"}
+      onFocus={fold.folded ? fold.reveal : undefined}
+    >
       <Animated.View
         pointerEvents="none"
         style={[{ position: "absolute", left: 0, right: 0, top: 0, height, backgroundImage: `linear-gradient(180deg, ${night} ${solid}%, ${clear} 100%)` }, shade]}

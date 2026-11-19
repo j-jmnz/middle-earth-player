@@ -236,7 +236,7 @@ Read the sections your task touches.
     - 390–403 Resolution and standalone outcome (~1.9K) ← 2
     - 404–413 Decks (~920) ← 2
     - 414–423 Deck builder (deck editor) (~1.1K) ← 3
-    - 424–435 Card pool (the Cards tab) (~1.5K) ← 5
+    - 424–435 Card pool (the Cards tab) (~1.6K) ← 5
     - 436–447 Card groups (the Cards tab's Encounter cards view) (~1.3K) ← 9
     - 448–453 Card (~490) ← 2
     - 454–465 Collection (~530) ← 3

@@ -217,7 +217,7 @@ The table moves like a game, not a form, and never holds the player up: every to
 | `threatBadgeIn` / `threatBadgeOut` | 160 ms / 400 ms | default |
 | `meterFill` | 220 ms | ease out cubic |
 | `toastIn` / `toastOut` | 160 ms / 120 ms | default |
-| `filtersFold` / `filtersUnfold` (the Cards tab's filters) | 180 ms / 200 ms | ease out cubic |
+| `filtersFold` / `filtersUnfold` (the Cards tab's filters) | 320 ms / 300 ms | ease in-out sine |
 
 The scrub's shapes are in `SHAPE`: `scrubScale` 1.5, `scrubLiftScale` 1.55, `scrubLiftRise` 0.25 of the card's height (its foot's rise), `scrubNight` 0.35, `peekVeil` 0.3, and the fan's `fanStep` 0.07 rad, `fanMax` 0.45 rad and `fanRadius` 3 card heights. A spring is named by its damping ratio and the time it takes to settle; the canvas evaluates the same damped oscillator Reanimated integrates, so a state has one clock. Timers that are not motion stay outside the scale: the top bar's 400 ms measure fallback, the dock's second-tap window, the banner's 650 ms beats and 4.5 s hold, the 350 ms settle after a new moment (it starts again when a spotlight on it ends or is skipped), and the 150 ms the sweep waits to see whether the table passes the phase.
 
