@@ -10,7 +10,8 @@ on:
   workflow_call:
 
 # Read-only token: pull requests from forks run with no write access. Actions are pinned to a commit, not a
-# movable tag; Dependabot (.github/dependabot.yml) proposes the updates.
+# movable tag; Dependabot (.github/dependabot.yml) proposes the updates. Every job that installs uses .github/actions/install,
+# whose pnpm store falls back to the newest entry of an older lockfile, so a dependency bump downloads only what changed.
 permissions:
   contents: read
 
@@ -25,14 +26,10 @@ concurrency:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/install
       - run: pnpm data check
       - run: pnpm lint
       - run: pnpm typecheck
@@ -41,18 +38,14 @@ jobs:
   # the same tests a local `pnpm test` does; together they are the whole suite.
   shard:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/install
       - run: pnpm test --shard=${{ matrix.shard }}/4
 
   # The release plan as the release workflow's plan job runs it: straight after checkout, with no dependencies installed,
@@ -60,6 +53,7 @@ jobs:
   # when only repo commits came in since the last tag.
   release-plan:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -76,6 +70,7 @@ jobs:
     if: always()
     needs: [checks, shard, release-plan]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checks, every shard and the release plan passed
         env:
@@ -85,15 +80,14 @@ jobs:
   # The web build audited with axe-core in Chromium (docs/development.md, Commands). Its own job, so `test` stays as fast.
   a11y-web:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/install
+      # The browser only: the runner image has Chrome's libraries, and Playwright's own dependency install then only adds fonts, from a mirror slow enough
+      # to take five minutes. The script installs them when a library is missing.
+      - run: pnpm exec playwright install chromium
+      - run: .github/scripts/linux-browser-deps.sh "$(node -e 'console.log(require("playwright").chromium.executablePath())')"
       - run: pnpm test a11y
 
   # The desktop app launched through Playwright's Electron driver under xvfb (docs/development.md, Commands): isolation, the drawn table, a save dialog for the backup, no request
@@ -103,21 +97,16 @@ jobs:
   desktop-smoke:
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       ELECTRON_SKIP_BINARY_DOWNLOAD: ""
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/install
       # pnpm's side-effects cache can restore electron without running its postinstall (a store filled by a job that skipped the binary), so the binary is fetched explicitly; a no-op when it is there.
       - run: node node_modules/electron/install.js
-      # The system libraries Chromium (and so Electron) needs, and xvfb for the display.
-      - run: pnpm exec playwright install-deps chromium
-      - run: sudo apt-get install -y xvfb
+      # The system libraries Chromium (and so Electron) needs, and xvfb for the display, only when the runner image lacks them.
+      - run: .github/scripts/linux-browser-deps.sh node_modules/electron/dist/electron
       - run: pnpm desktop smoke
 
   # The Android and iOS bundles of a pull request with desktop work against main's (docs/architecture.md, Screens): each exported with --no-bytecode, and the job fails
@@ -126,16 +115,12 @@ jobs:
   phone-bundle:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/install
       - run: pnpm assets catalog
       - run: pnpm test phone-bundle --if-desktop-work
 
@@ -143,6 +128,7 @@ jobs:
   commits:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

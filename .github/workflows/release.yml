@@ -37,6 +37,7 @@ jobs:
     # Off when the run only adds the desktop app to a release, so every build, the checks and publish are skipped with it.
     if: ${{ inputs.add_desktop_from_run == '' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       tag: ${{ steps.plan.outputs.tag }}
       version: ${{ steps.plan.outputs.version }}
@@ -138,7 +139,7 @@ jobs:
       APP_VERSION: ${{ needs.plan.outputs.version }}
       APK_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.apk
     outputs:
-      caches: ${{ steps.caches.outputs.keys }}
+      caches: ${{ steps.caches.outputs.keys }} ${{ steps.metro.outputs.key }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
@@ -170,7 +171,7 @@ jobs:
         with:
           cache-disabled: true
       # The build caches (docs/releasing.md, Caches). ccache keeps the compiled C++ of every native module, Gradle's home
-      # keeps the dependencies and its build cache the outputs of the cacheable tasks, and Metro keeps its transforms.
+      # keeps the dependencies, and Metro keeps its transforms.
       - id: caches
         name: Point the build caches at the runner
         env:
@@ -178,12 +179,10 @@ jobs:
         run: |
           # Every key this job saves under, named once here; the cleanup job keeps these and deletes what they replace.
           lock="${{ hashFiles('pnpm-lock.yaml') }}"
-          metro="metro-android-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-$GITHUB_SHA"
           {
             echo "ccache=ccache-android-$lock"
             echo "gradle=gradle-modules-$lock"
-            echo "metro=$metro"
-            echo "keys=$PNPM_KEY ccache-android-$lock gradle-modules-$lock $metro"
+            echo "keys=$PNPM_KEY ccache-android-$lock gradle-modules-$lock"
           } >> "$GITHUB_OUTPUT"
           {
             echo "CCACHE_DIR=$RUNNER_TEMP/ccache"
@@ -195,8 +194,6 @@ jobs:
             echo "CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime,include_file_ctime"
             echo "CMAKE_C_COMPILER_LAUNCHER=ccache"
             echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache"
-            echo "EXPO_METRO_CACHE_RESTORE_DIR=$RUNNER_TEMP/metro-restored"
-            echo "EXPO_METRO_CACHE_OUTPUT_DIR=$RUNNER_TEMP/metro"
           } >> "$GITHUB_ENV"
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -212,25 +209,14 @@ jobs:
             ~/.gradle/wrapper/dists
           key: ${{ steps.caches.outputs.gradle }}
           restore-keys: gradle-modules-
-      # Metro reads the restored transforms and writes the ones this build used to its output directory, which is saved
-      # under this commit, so the next release starts from them.
       - id: metro
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: ./.github/actions/metro-cache
         with:
-          path: ${{ runner.temp }}/metro
-          key: ${{ steps.caches.outputs.metro }}
-          restore-keys: |
-            metro-android-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-
-            metro-android-
-      - name: Move the restored transforms aside
-        run: |
-          rm -rf "$EXPO_METRO_CACHE_RESTORE_DIR"
-          if [ -d "$EXPO_METRO_CACHE_OUTPUT_DIR" ]; then mv "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"; fi
-          mkdir -p "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"
+          platform: android
       - name: Wait for the assets
         env:
           GH_TOKEN: ${{ github.token }}
-        run: .github/scripts/wait-for-assets.sh
+        run: .github/scripts/wait-for-artifact.sh assets assets
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: assets
@@ -294,11 +280,11 @@ jobs:
           path: ${{ runner.temp }}/out/
           retention-days: 14
           compression-level: 0
-      - if: steps.metro.outputs.cache-hit != 'true'
+      - if: steps.metro.outputs.hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ runner.temp }}/metro
-          key: ${{ steps.caches.outputs.metro }}
+          path: ${{ steps.metro.outputs.path }}
+          key: ${{ steps.metro.outputs.key }}
 
   ios:
     needs: [plan]
@@ -318,7 +304,7 @@ jobs:
       IPA_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
       MIN_IOS_SDK: "27.1"
     outputs:
-      caches: ${{ steps.caches.outputs.keys }}
+      caches: ${{ steps.caches.outputs.keys }} ${{ steps.metro.outputs.key }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
@@ -334,20 +320,14 @@ jobs:
         env:
           PNPM_KEY: ${{ steps.install.outputs.key }}
         run: |
-          {
-            echo "EXPO_METRO_CACHE_RESTORE_DIR=$RUNNER_TEMP/metro-restored"
-            echo "EXPO_METRO_CACHE_OUTPUT_DIR=$RUNNER_TEMP/metro"
-          } >> "$GITHUB_ENV"
           xcode=$(xcodebuild -version | tr -s ' \n' '-' | sed 's/-$//')
           # Every key this job saves under, named once here; the cleanup job keeps these and deletes what they replace.
           lock="${{ hashFiles('pnpm-lock.yaml') }}"
-          metro="metro-ios-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-$GITHUB_SHA"
           {
             echo "xcode=$xcode"
             echo "cas=xcode-cas-$xcode-$lock"
             echo "pods=pods-$lock"
-            echo "metro=$metro"
-            echo "keys=$PNPM_KEY xcode-cas-$xcode-$lock pods-$lock $metro"
+            echo "keys=$PNPM_KEY xcode-cas-$xcode-$lock pods-$lock"
           } >> "$GITHUB_OUTPUT"
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -362,24 +342,15 @@ jobs:
           key: ${{ steps.caches.outputs.pods }}
           restore-keys: pods-
       - id: metro
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: ./.github/actions/metro-cache
         with:
-          path: ${{ runner.temp }}/metro
-          key: ${{ steps.caches.outputs.metro }}
-          restore-keys: |
-            metro-ios-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-
-            metro-ios-
-      - name: Move the restored transforms aside
-        run: |
-          rm -rf "$EXPO_METRO_CACHE_RESTORE_DIR"
-          if [ -d "$EXPO_METRO_CACHE_OUTPUT_DIR" ]; then mv "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"; fi
-          mkdir -p "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"
+          platform: ios
       - name: Generate the native project
         run: pnpm exec expo prebuild --platform ios
       - name: Wait for the assets
         env:
           GH_TOKEN: ${{ github.token }}
-        run: .github/scripts/wait-for-assets.sh
+        run: .github/scripts/wait-for-artifact.sh assets assets
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: assets
@@ -445,11 +416,11 @@ jobs:
           path: ${{ runner.temp }}/out/
           retention-days: 14
           compression-level: 0
-      - if: steps.metro.outputs.cache-hit != 'true'
+      - if: steps.metro.outputs.hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ runner.temp }}/metro
-          key: ${{ steps.caches.outputs.metro }}
+          path: ${{ steps.metro.outputs.path }}
+          key: ${{ steps.metro.outputs.key }}
       - if: env.SIGNED == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -460,6 +431,7 @@ jobs:
 
   # The web export every desktop installer carries, built once: it is the same on every OS (docs/releasing.md, Jobs). Like the native builds it starts
   # beside the assets job and waits for them; CanvasKit's wasm and pdf.js are copied from node_modules, so only the pictures, booklets and catalog come from the artifact.
+  # Its Metro cache is under the runner's temp folder like the native builds' (.github/actions/metro-cache).
   web:
     needs: [plan]
     runs-on: ubuntu-latest
@@ -471,39 +443,20 @@ jobs:
       ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
       # The desktop build stamps its version from this, as app.config.js does for the phone builds.
       APP_VERSION: ${{ needs.plan.outputs.version }}
-      EXPO_METRO_CACHE_RESTORE_DIR: ${{ github.workspace }}/../metro-web-restored
-      EXPO_METRO_CACHE_OUTPUT_DIR: ${{ github.workspace }}/../metro-web
     outputs:
-      caches: ${{ steps.caches.outputs.keys }}
+      caches: ${{ steps.install.outputs.key }} ${{ steps.metro.outputs.key }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: install
         uses: ./.github/actions/install
-      - id: caches
-        name: Name the Metro cache
-        env:
-          PNPM_KEY: ${{ steps.install.outputs.key }}
-        run: |
-          metro="metro-web-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-$GITHUB_SHA"
-          echo "metro=$metro" >> "$GITHUB_OUTPUT"
-          echo "keys=$PNPM_KEY $metro" >> "$GITHUB_OUTPUT"
       - id: metro
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: ./.github/actions/metro-cache
         with:
-          path: ${{ github.workspace }}/../metro-web
-          key: ${{ steps.caches.outputs.metro }}
-          restore-keys: |
-            metro-web-${{ hashFiles('pnpm-lock.yaml', 'babel.config.js', 'metro.config.js') }}-
-            metro-web-
-      - name: Move the restored transforms aside
-        run: |
-          rm -rf "$EXPO_METRO_CACHE_RESTORE_DIR"
-          if [ -d "$EXPO_METRO_CACHE_OUTPUT_DIR" ]; then mv "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"; fi
-          mkdir -p "$EXPO_METRO_CACHE_OUTPUT_DIR" "$EXPO_METRO_CACHE_RESTORE_DIR"
+          platform: web
       - name: Wait for the assets
         env:
           GH_TOKEN: ${{ github.token }}
-        run: .github/scripts/wait-for-assets.sh
+        run: .github/scripts/wait-for-artifact.sh assets assets
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: assets
@@ -521,16 +474,17 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
-      - if: steps.metro.outputs.cache-hit != 'true'
+      - if: steps.metro.outputs.hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ github.workspace }}/../metro-web
-          key: ${{ steps.caches.outputs.metro }}
+          path: ${{ steps.metro.outputs.path }}
+          key: ${{ steps.metro.outputs.key }}
 
   # One installer set per OS, packed from the same export and launched once before it is kept (docs/releasing.md, Jobs). Electron is downloaded here and
-  # nowhere else, so its downloads are cached by the lockfile.
+  # nowhere else, so its downloads are cached by the lockfile. Like the native builds with the assets, each leg starts beside the web job and waits for its
+  # export only before it packs, so the install, the Electron binary and the runner's queue (macOS runners are the scarcest) do not add to the release's time.
   desktop:
-    needs: [plan, web]
+    needs: [plan]
     strategy:
       fail-fast: false
       matrix:
@@ -539,7 +493,10 @@ jobs:
           - { os: macos, runner: macos-latest }
           - { os: windows, runner: windows-latest }
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         shell: bash
@@ -547,6 +504,10 @@ jobs:
       APP_VERSION: ${{ needs.plan.outputs.version }}
       TAG: ${{ needs.plan.outputs.tag }}
     steps:
+      # Git for Windows checks text out with CRLF, which changes hashFiles('pnpm-lock.yaml'): the Windows cache keys would not
+      # be the lockfile hash the cleanup job keeps, so their stale entries were never deleted.
+      - if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # electron_config_cache is read by Electron's install and passed to electron-builder by `pnpm desktop pack` (its Electron zips); ELECTRON_BUILDER_CACHE holds its tools.
       - name: Point the Electron downloads at the runner
@@ -564,11 +525,14 @@ jobs:
       # pnpm's side-effects cache can restore electron without running its postinstall (a store filled by a job that skipped the binary), so the binary is fetched explicitly; a no-op when it is there.
       - name: Fetch the Electron binary
         run: node node_modules/electron/install.js
-      # The system libraries Electron needs and xvfb for the display (the smoke script runs itself under xvfb-run).
+      # The system libraries Electron needs and xvfb for the display (the smoke script runs itself under xvfb-run), only when the image lacks them.
       - if: runner.os == 'Linux'
-        run: |
-          pnpm exec playwright install-deps chromium
-          sudo apt-get install -y -q xvfb
+        run: .github/scripts/linux-browser-deps.sh node_modules/electron/dist/electron
+      # The web job's own timeout.
+      - name: Wait for the web export
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/wait-for-artifact.sh web-dist web 5400
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: web-dist
@@ -608,6 +572,7 @@ jobs:
     # Runs after a failed build too, so the caches of the legs that finished are still tidied; not when nothing was built.
     if: ${{ !cancelled() && inputs.add_desktop_from_run == '' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       actions: write
@@ -632,6 +597,7 @@ jobs:
     needs: [plan, checks, assets, android, ios, desktop]
     if: ${{ !cancelled() && !inputs.dry_run && needs.plan.result == 'success' && needs.checks.result == 'success' && needs.assets.result == 'success' && needs.android.result == 'success' && needs.ios.result == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
     outputs:
@@ -777,6 +743,7 @@ jobs:
   add-desktop:
     if: ${{ inputs.add_desktop_from_run != '' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
       actions: read

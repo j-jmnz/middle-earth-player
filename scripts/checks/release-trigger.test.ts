@@ -66,7 +66,7 @@ describe("release.yml desktop jobs", () => {
 
   it("has the web export, the three-OS desktop build and a publish that waits for it", () => {
     expect([...all.keys()]).toEqual(expect.arrayContaining(["plan", "checks", "assets", "android", "ios", "web", "desktop", "cleanup", "publish"]));
-    expect(all.get("desktop")).toMatch(/needs: \[plan, web\]/);
+    expect(all.get("desktop")).toMatch(/needs: \[plan\]/);
     for (const os of ["ubuntu-latest", "macos-latest", "windows-latest"]) expect(all.get("desktop")).toContain(os);
     expect(all.get("publish")).toMatch(/needs: \[[^\]]*\bdesktop\b/);
     expect(all.get("cleanup")).toMatch(/needs: \[[^\]]*\bdesktop\b/);
@@ -106,8 +106,56 @@ describe("release.yml desktop jobs", () => {
   });
 
   it("starts the web export beside the assets job and waits for it, as the native builds do", () => {
-    for (const job of ["web", "android", "ios"]) expect(all.get(job), job).toContain(".github/scripts/wait-for-assets.sh");
+    for (const job of ["web", "android", "ios"]) expect(all.get(job), job).toContain(".github/scripts/wait-for-artifact.sh assets assets");
     expect(all.get("web")).toMatch(/needs: \[plan\]/);
+  });
+
+  // The desktop legs install and fetch Electron while the web job exports, and wait for web-dist only before they pack.
+  it("starts the desktop legs beside the web export and waits for it before the download", () => {
+    const desktop = all.get("desktop") ?? "";
+    const wait = desktop.indexOf(".github/scripts/wait-for-artifact.sh web-dist web");
+    expect(wait).toBeGreaterThan(desktop.indexOf("uses: ./.github/actions/install"));
+    expect(wait).toBeLessThan(desktop.indexOf("name: web-dist"));
+    expect(desktop).toContain("actions: read");
+  });
+
+  // docs/releasing.md, Caches: one action names, restores and places each Metro cache, under the runner's temp folder (the
+  // cache action refuses a path with `..`, so the web job's cache was never saved), and the job saves what it names.
+  it("keeps each build's Metro cache through the metro-cache action", () => {
+    for (const job of ["android", "ios", "web"]) {
+      const body = all.get(job) ?? "";
+      expect(body, job).toContain("uses: ./.github/actions/metro-cache");
+      expect(body, job).toContain("path: ${{ steps.metro.outputs.path }}");
+      expect(body, job).toContain("key: ${{ steps.metro.outputs.key }}");
+      expect(body, job).toMatch(/caches: .*\$\{\{ steps\.metro\.outputs\.key \}\}/);
+      expect(body, job).not.toContain("EXPO_METRO_CACHE");
+    }
+  });
+
+  // A job that hangs must not hold the one-release-at-a-time queue for GitHub's six-hour default.
+  it("gives every job a timeout", () => {
+    for (const file of ["release.yml", "test.yml"]) {
+      for (const [name, body] of jobs(path.join(GITHUB, file))) {
+        if (/^ {4}uses: /m.test(body)) continue;
+        expect(body, `${file} ${name}`).toMatch(/^ {4}timeout-minutes: \d+$/m);
+      }
+    }
+  });
+
+  // hashFiles reads the checked-out lockfile: with CRLF on Windows its keys missed the cleanup job's list of keys to keep.
+  it("checks Windows out with LF line ends before the desktop leg names its caches", () => {
+    const desktop = all.get("desktop") ?? "";
+    expect(desktop.indexOf("core.autocrlf false")).toBeGreaterThan(-1);
+    expect(desktop.indexOf("core.autocrlf false")).toBeLessThan(desktop.indexOf("uses: actions/checkout"));
+  });
+
+  // The runner image has Chrome's libraries and xvfb; playwright install-deps then only adds fonts, for minutes.
+  it("installs the Linux browser libraries only when they are missing", () => {
+    const checks = jobs(path.join(GITHUB, "test.yml"));
+    for (const [name, body] of [["desktop", all.get("desktop")], ["desktop-smoke", checks.get("desktop-smoke")], ["a11y-web", checks.get("a11y-web")]] as const) {
+      expect(body, name).toContain(".github/scripts/linux-browser-deps.sh");
+      expect(body, name).not.toMatch(/playwright install-deps|--with-deps/);
+    }
   });
 
   it("downloads Electron's binary in the desktop job only", () => {
