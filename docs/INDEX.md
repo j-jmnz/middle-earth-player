@@ -37,23 +37,23 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` (~8.0K tok)
-  - 57–94 Features (~550)
-    - 80–94 Themes (~190)
-  - 95–113 What you can play (~280)
-  - 114–121 Private by design (~170)
-  - 122–127 Accessibility (~120)
-  - 128–225 Install (~1.7K)
-  - 226–451 FAQ (~2.2K)
-    - 230–316 At the table (~960)
-    - 317–367 Settings worth knowing (~460)
-    - 368–400 Decks and cards (~240)
-    - 401–451 Campaigns, saves and updates (~530)
-  - 452–486 Roadmap (~1.2K)
-  - 487–497 Get involved (~210)
-  - 498–501 Support (~90)
-  - 502–517 Attribution (~410)
-  - 518–521 License (~50)
+- `README.md` (~8.1K tok)
+  - 58–95 Features (~550)
+    - 81–95 Themes (~190)
+  - 96–114 What you can play (~280)
+  - 115–122 Private by design (~170)
+  - 123–128 Accessibility (~120)
+  - 129–226 Install (~1.7K)
+  - 227–452 FAQ (~2.2K)
+    - 231–317 At the table (~960)
+    - 318–368 Settings worth knowing (~460)
+    - 369–401 Decks and cards (~240)
+    - 402–452 Campaigns, saves and updates (~530)
+  - 453–487 Roadmap (~1.2K)
+  - 488–498 Get involved (~210)
+  - 499–502 Support (~90)
+  - 503–518 Attribution (~410)
+  - 519–522 License (~50)
 - `docs/architecture.md` — Architecture (~28.6K tok)
   - 7–41 Stack (~1.2K)
   - 42–77 Processes (~690)
@@ -243,17 +243,18 @@ Read the sections your task touches.
   - 33–52 Reading a game as text (~760) ← 4
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
-  - 82–132 Commands (~2.0K) ← 4
-- `docs/releasing.md` — Releasing (~4.5K tok)
+  - 82–133 Commands (~2.0K) ← 4
+- `docs/releasing.md` — Releasing (~4.7K tok)
   - 5–19 Start a release (~290) ← 1
   - 20–35 Jobs (~1.9K) ← 4
-  - 36–60 Caches (~760)
-  - 61–95 Signing (~980) ← 2
-    - 65–68 Desktop signing (optional) (~220) ← 1
-    - 69–82 Android key (~250) ← 1
-    - 83–95 TestFlight (optional) (~420) ← 1
-  - 96–99 Installing (~90)
-  - 100–110 Troubleshooting (~390)
+  - 36–39 Installs count (~180) ← 2
+  - 40–64 Caches (~760)
+  - 65–99 Signing (~980) ← 2
+    - 69–72 Desktop signing (optional) (~220) ← 1
+    - 73–86 Android key (~250) ← 1
+    - 87–99 TestFlight (optional) (~420) ← 1
+  - 100–103 Installing (~90)
+  - 104–114 Troubleshooting (~390)
 
 ## Agent procedures
 
@@ -347,7 +348,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/game`: development.md, Reading a game as text (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
-- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
+- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Installs count (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/showcase`: design-system.md, Color (1)
 - `scripts/tools`: .claude/rules/code-standards.md, Test cost (4); agents/agent-brief.md, Scenario procedure (4); architecture.md, Modules (1); design-system-table.md, Choice tray (1); development.md, Commands (1)
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (32); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (5); brief.md, The Battle of Lake-town (3); brief.md, The Old Forest (3); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); brief.md, Fog on the Barrow-downs (2); brief.md, The Stone of Erech (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)

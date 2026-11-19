@@ -689,6 +689,12 @@ jobs:
           if [ "$GITHUB_REF_NAME" != main ]; then latest=false; fi
           gh release create "$TAG" "${assets[@]}" "$RUNNER_TEMP/out/source.json" \
             --target "$GITHUB_SHA" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --latest="$latest"
+      # The README's installs badge (docs/releasing.md, Installs count). A failure here must not fail a release that is already out.
+      - name: Update the installs count
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/publish-installs.sh
       # The TestFlight job reads the same notes; the tag now exists, so it cannot plan them again.
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

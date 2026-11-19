@@ -1,0 +1,33 @@
+name: installs
+
+# Refreshes the README's installs badge between releases: the downloads of every release's installers, written to the `stats`
+# branch by the same script release.yml's publish job runs after each release (docs/releasing.md, Installs count). Start it
+# from the Actions tab or with `gh workflow run installs.yml --ref main`.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Two runs would race to force-push the same branch.
+concurrency:
+  group: installs
+  cancel-in-progress: true
+
+jobs:
+  count:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - name: Update the installs count
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/publish-installs.sh
