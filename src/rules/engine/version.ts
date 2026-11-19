@@ -44,6 +44,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 30, scenarios: "all", note: "Delay the Enemy, Send for Aid and Gather Information let each player decline, as their text says \"may\"." },
   { version: 30, scenarios: ["escape-from-mount-gram"], note: "Loot the Dungeons, which the campaign card adds at the start, is now in every player's staging area, so it counts as a quest card and takes progress." },
   { version: 30, scenarios: ["breaking-of-the-fellowship"], note: "When the players have separate staging areas, a Trap played into the staging area goes into your own area and attaches only to an enemy that enters that area." },
+  { version: 30, scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship", "raid-on-the-grey-havens", "the-thing-in-the-depths", "journey-up-the-anduin", "the-kings-quest", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland", "the-weather-hills", "the-wastes-of-eriador", "escape-from-mount-gram", "the-road-to-isengard", "journey-to-the-cross-roads", "shelobs-lair", "the-passing-of-the-grey-company", "the-battle-of-the-pelennor-fields", "the-tower-of-cirith-ungol", "the-black-gate-opens", "mount-doom", "conflict-at-the-carrock"], note: "Legolas, Blade of Gondolin and The Steadfast place no progress while the active location is immune to player card effects: not on the location and not on the quest." },
 ];
 
 export const ENGINE_VERSION = 30;
