@@ -2,10 +2,8 @@
 // dcce.ship-objectives, rr.winning-the-game, rr.victory, rr.guarded, ltp.campaign-setup-checklist (data/rules/entries.json).
 import { expect, it } from "vitest";
 
-import { expectOk } from "../../../rules/core/test-fixture.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
+import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import type { PlayerIntent } from "../../../rules/core/intents.ts";
-import type { StartScenario } from "../../../rules/setup/setup.ts";
 import { HAVEN_GOLDENS, UPGRADED_CODES, afterRuins, blessingChoices, playGolden, havenWorld, type HavenDecks, type HavenGolden } from "../../../../test/scenarios/a-storm-on-cobas-haven/game.ts";
 import { CODES, campaign, haven } from "../../../../test/scenarios/a-storm-on-cobas-haven/scene.ts";
 import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
@@ -24,12 +22,14 @@ const of = (state: ScenarioState, wanted: string) => Object.values(state.cards).
 // The Círdan's Blessing the golden's players took ("skip" refuses it).
 const chosenCards = (golden: HavenGolden): string[] => (golden.choices ?? blessingChoices()).filter((item) => item !== "skip");
 
-// What a replay of a golden shows besides its final state: the moments the records act in, so the suite can say which of them the goldens reach.
+// What a golden shows besides its final state: the moments the records act in, so the suite can say which of them the goldens reach.
+// Read from the states the one play kept (playGolden, trail), not from a second play.
 type Seen = Set<string>;
-function replay(game: { start: StartScenario; intents: readonly PlayerIntent[] }, ctx: ReduceContext): Seen {
+function replay(game: { kept: ScenarioState; intents: readonly PlayerIntent[]; trail?: readonly ScenarioState[] }): Seen {
   const seen: Seen = new Set();
-  let state = startScenario(game.start, ctx);
-  state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
+  const trail = game.trail;
+  if (!trail) throw new Error("the golden was played without its trail (playGolden, trail)");
+  let state = game.kept;
   const scan = (now: ScenarioState): void => {
     for (const card of Object.values(now.cards)) {
       if (TOWERS.includes(card.code) && card.zone === "staging" && card.claimed) seen.add("a tower freed and controlled by the players");
@@ -41,8 +41,8 @@ function replay(game: { start: StartScenario; intents: readonly PlayerIntent[] }
     }
     if ((now.extraPhases?.length ?? 0) > 0 || now.extraResume) seen.add("an added phase");
   };
-  for (const intent of game.intents) {
-    state = expectOk(reduce(state, intent, ctx)).state;
+  for (const [at, intent] of game.intents.entries()) {
+    state = trail[at] ?? state;
     scan(state);
     if (intent.type === "Trigger") seen.add(`Trigger ${intent.effectId}`);
     if (intent.type === "Travel") seen.add(`Travel ${code(state, intent.locationId)}`);
@@ -109,7 +109,7 @@ goldenSuite<HavenGolden, HavenDecks>({
 
     it("reaches the moments the records act in: a tower freed and controlled, a guarded objective, Taking on Water, Belfalas Islet holding a Ship enemy, Gavin's Action, Send for Help (a hero out of the collection, an added phase) and the Flagship in the victory display", () => {
       const reached = new Set<string>();
-      for (const golden of HAVEN_GOLDENS) for (const item of replay(game(golden), world(golden).ctx)) reached.add(item);
+      for (const golden of HAVEN_GOLDENS) for (const item of replay(game(golden))) reached.add(item);
       for (const wanted of [
         "a tower freed and controlled by the players",
         "an objective guarded by a Ship enemy",
