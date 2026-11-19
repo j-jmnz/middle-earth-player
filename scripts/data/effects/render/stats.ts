@@ -4,6 +4,7 @@ import { ERECH_STAT_NOTES } from "./erech.ts";
 import { ESCAPE_STAT_NOTES } from "./escape.ts";
 import { FOG_STAT_NOTES } from "./fog.ts";
 import { RUINS_STAT_NOTES } from "./ruins.ts";
+import { INVESTIGATION_STAT_NOTES } from "./investigation.ts";
 import { guardianRestrict } from "./guardian.ts";
 import { isObj, str, type Ctx, type Obj } from "./kit.ts";
 import { longDarkRestrict } from "./long-dark.ts";
@@ -48,6 +49,7 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   ...ERECH_STAT_NOTES,
   ...FOG_STAT_NOTES,
   ...RUINS_STAT_NOTES,
+  ...INVESTIGATION_STAT_NOTES,
   questProgressCap: " (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count)",
   cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
   cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",

@@ -6,12 +6,14 @@ import { ESCAPE_CONDITIONS } from "./escape.ts";
 import { GUARDIAN_CONDITIONS } from "./guardian.ts";
 import { ERECH_CONDITIONS } from "./erech.ts";
 import { FOG_CONDITIONS } from "./fog.ts";
+import { INVESTIGATION_CONDITIONS } from "./investigation.ts";
 import { LONG_DARK_CONDITIONS } from "./long-dark.ts";
 
 export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
 export { ERECH_CONDITION_SAMPLES } from "./erech.ts";
 export { FOG_CONDITION_SAMPLES } from "./fog.ts";
+export { INVESTIGATION_CONDITION_SAMPLES } from "./investigation.ts";
 export { LONG_DARK_CONDITION_SAMPLES } from "./long-dark.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
@@ -40,6 +42,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...GUARDIAN_CONDITIONS,
   ...ERECH_CONDITIONS,
   ...FOG_CONDITIONS,
+  ...INVESTIGATION_CONDITIONS,
   ...LONG_DARK_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),

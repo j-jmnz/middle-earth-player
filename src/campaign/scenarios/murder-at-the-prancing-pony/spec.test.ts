@@ -1,12 +1,67 @@
-// Rules: TODO name the rule ids the rows exercise (data/rules/entries.json).
+// Rules: rr.forced, rr.travel, rr.search, rr.immune, rr.cannot, rr.engaged, rr.in-play-and-out-of-play, rr.victory, rr.quest-advancement, rr.keywords, faq.additional-attacks (data/rules/entries.json); docs/brief.md (Murder at the Prancing Pony).
 import { describe, it } from "vitest";
 
-import { cardSpecs, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, flag, handCount, quest, resolve, respond, reveal, offers, stat, stagingThreat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Murder at the Prancing Pony (standalone-scenarios part 7): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
-// TODO: the rows; the todo below stands in until there is one.
-const ROWS: readonly Row[] = [];
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the seeded hiding of the Suspect and
+// Hideout, the table-wide stats) are tests in lines.test.ts, each titled with its line id.
+const F0 = ["f0", "f0", "f0", "f0", "f0", "f0"];
+const TAKEN_ONLY = { investigationDeck: ["50714"] } as const;
+const DECK3 = { investigationDeck: ["f0", "f0", "f0"] } as const;
+const BEGINNING_OF = (phase: "Quest" | "Encounter") => ({ seat: null, phase }) as const;
+
+const ROWS: readonly Row[] = [
+  // 50702 Running out of Time.
+  { line: "50702:A:1", name: "When Revealed: the discard pile is shuffled into the deck and cards are discarded until a location is; it goes to the staging area", layout: { stage: "50702", side: "A", discard: ["f3"], deck: ["f0", "50716", "f0"] }, act: resolve("50702", "whenRevealed"), expect: [zone("50716", "staging")] },
+  { line: "50702:B:1", name: "Forced: after the players quest unsuccessfully a random card of the Investigation deck is removed from the game", layout: { stage: "50702", phase: "Quest", staging: ["f3", "f3"], piles: DECK3 }, act: quest("fail"), expect: [count("f0", "investigationDeck", 2), count("f0", "removed", 1)] },
+  { line: "50702:B:2", name: "Forced: the first player may reveal an encounter card and remain at the stage", layout: { stage: "50702", phase: "Quest", deck: F0 }, act: [announce("questProgressPlaced"), answer("reveal")], expect: [zone("50702", "questStage"), count("f0", "staging", 1)] },
+  { line: "50702:B:2", name: "or make the accusation, which turns the hidden pair up and advances to stage 3A", layout: { stage: "50702", phase: "Quest", setAside: ["50709", "50704"], piles: { investigationDeck: ["50710", "50705", "50714"] } }, act: [announce("questProgressPlaced"), answer("accuse"), answer("50709"), answer("50704")], expect: [zone("50709", "staging"), zone("50704", "staging"), zone("50703", "questStage"), threat(28)] },
+  { line: "50702:B:2", name: "a wrong name adds the card named from the Investigation deck to the staging area and raises each player's threat by 3", layout: { stage: "50702", phase: "Quest", setAside: ["50709", "50704"], piles: { investigationDeck: ["50710", "50705", "50714"] } }, act: [announce("questProgressPlaced"), answer("accuse"), answer("50710"), answer("50704")], expect: [zone("50710", "staging"), zone("50709", "staging"), threat(31), count("50705", "investigationDeck", 1)] },
+
+  // 50703 Apprehending the Killer.
+  { line: "50703:A:1", name: "When Revealed: each player besides the first searches for a Brigand enemy and adds it to the staging area", layout: { stage: "50703", side: "A", seats: 2, deck: ["f0", "50723", "f0"] }, act: resolve("50703", "whenRevealed"), expect: [zone("50723", "staging")] },
+  { line: "50703:B:1", name: "the Investigate keyword is ignored when the active location is explored", layout: { stage: "50703", active: "50716", staging: ["50709"], piles: TAKEN_ONLY, deck: ["f0"], discard: ["f3"] }, act: announce("activeExplored", "50716"), expect: [zone("50714", "investigationDeck")] },
+  { line: "50703:B:2", name: "Forced: at the beginning of the encounter phase each Suspect in play engages the first player", layout: { stage: "50703", phase: "Encounter", staging: ["50709"] }, act: announce("beginningOfPhase", undefined, BEGINNING_OF("Encounter")), expect: [zone("50709", "engaged")] },
+  { line: "50703:B:3", name: "with a Hideout in play the Suspects cannot take damage", layout: { stage: "50703", staging: ["50709", "50706"] }, act: [], expect: [flag("50709", "cannotTakeDamage")] },
+  { line: "50703:B:3", name: "with no Suspect in play the players win the game", layout: { stage: "50703", phase: "Encounter", staging: ["f0"] }, act: announce("beginningOfPhase", undefined, BEGINNING_OF("Encounter")), expect: [won] },
+
+  // 50704 to 50708 the Hideouts in the victory display.
+  { line: "50704:A:2", name: "in the victory display each Suspect is immune to player card effects and the shadow cards dealt to it are immune", layout: { staging: ["50709"], victory: ["50704"] }, act: [], expect: [flag("50709", "immuneToPlayerCards"), flag("50709", "shadowsImmune")] },
+  { line: "50704:A:3", name: "Travel: Bill Ferny is searched for in the victory display and added to the staging area", layout: { phase: "Travel", staging: ["50704"], victory: ["50721"], deck: ["f0"] }, act: travel("50704"), expect: [zone("50721", "staging")] },
+  { line: "50705:A:2", name: "in the victory display each Suspect can be attacked only by the player engaged with it", layout: { staging: ["50709"], victory: ["50705"] }, act: [], expect: [flag("50709", "attackOnlyByEngaged")] },
+  { line: "50706:A:2", name: "in the victory display each Suspect that engages a player makes an immediate attack", layout: { engaged: ["50709"], victory: ["50706"], deck: ["f0", "f0"] }, act: announce("engaged", "50709", { seat: 0 }), expect: [window("defense")] },
+  { line: "50707:A:2", name: "in the victory display each Suspect cannot take more than 5 damage each round", layout: { staging: ["50709"], victory: ["50707"] }, act: [], expect: [stat("50709", "damageCap", 5)] },
+  { line: "50708:A:2", name: "in the victory display each Suspect gets +1 Threat, +1 Attack and +1 Defense", layout: { staging: ["50709"], victory: ["50708"] }, act: [], expect: [stat("50709", "threat", 3), stat("50709", "attack", 8), stat("50709", "defense", 3)] },
+
+  // 50709 to 50713 the Suspects.
+  { line: "50709:A:2", name: "excess combat damage becomes a threat raise", layout: { engaged: ["50709"], deck: ["f0", "f0"] }, act: attack("50709", { undefended: false }), expect: [flag("50709", "excessToThreat")] },
+  { line: "50710:A:2", name: "Threat X: the number of Brigand enemies in play", layout: { staging: ["50710", "50723", "50724"] }, act: [], expect: [stat("50710", "threat", 3)] },
+  { line: "50710:A:3", name: "with another Brigand in play Susie the Spider cannot take damage", layout: { staging: ["50710", "50723"] }, act: [], expect: [flag("50710", "cannotTakeDamage")] },
+  { line: "50712:A:2", name: "Forced: when Johnny Goblin-fingers attacks the defending player discards a random card and raises their threat by its cost", layout: { engaged: ["50712"], hand: ["filler"], deck: ["f0", "f0"] }, act: announce("attacks", "50712", { seat: 0 }), expect: [handCount(0)] },
+  { line: "50714:A:1", name: "Forced: looked at in the Investigation deck, Taken by Surprise puts the first enemy discarded engaged with the first player and is removed from the game", layout: { piles: { investigationDeck: ["50714"] }, deck: ["f0"], discard: ["f3"] }, act: announce("lookedAtInvestigationDeck", "50714"), expect: [zone("50714", "removed"), count("f3", "engaged", 1)] },
+
+  // 50715 to 50720 the locations.
+  { line: "50715:A:1", name: "Forced: when explored the first player either draws 2 cards each", layout: { stage: "50701", active: "50715", seats: 2, deckOf: ["filler", "filler", "filler", "filler"] }, act: [announce("locationExplored", "50715"), answer("draw")], expect: [handCount(2), handCount(2, 1)] },
+  { line: "50716:A:1", name: "Investigate 2: the first player looks at the top 2 cards of the Investigation deck", layout: { stage: "50701", active: "50716", piles: TAKEN_ONLY, deck: ["f0"], discard: ["f3"] }, act: announce("activeExplored", "50716"), expect: [zone("50714", "removed")] },
+    { line: "50716:A:3", name: "Travel: each player raises their threat by 1 (and by 1 more at the end of the round)", layout: { phase: "Travel", staging: ["50716"], threat: [30, 30], deck: F0 }, act: travel("50716"), expect: [threat(32)] },
+  { line: "50717:A:2", name: "enemies in the staging area cannot take damage", layout: { phase: "Travel", staging: ["50717", "f3"] }, act: [], expect: [flag("f3", "cannotTakeDamage")] },
+  { line: "50717:A:3", name: "Travel: the discard pile is shuffled in and cards are discarded until an enemy is; it is added to the staging area", layout: { phase: "Travel", staging: ["50717"], discard: ["f3"], deck: ["f0", "f0"] }, act: travel("50717"), expect: [zone("f0", "staging")] },
+  { line: "50718:A:3", name: "Travel: each player spends 1 resource", layout: { phase: "Travel", staging: ["50718"], heroResources: 0 }, act: [], expect: offers("Travel", undefined, false) },
+  { line: "50719:A:2", name: "Forced: the first player either looks at 2 additional cards or reduces each player's threat by 3", layout: { stage: "50701", active: "50719", threat: [30, 30], piles: DECK3 }, act: [announce("activeExplored", "50719"), answer("reduce")], expect: [threat(27)] },
+  { line: "50720:A:3", name: "Travel: each player discards 1 random card from their hand", layout: { phase: "Travel", staging: ["50720"], hand: ["filler", "filler"] }, act: travel("50720"), expect: [handCount(1)] },
+  { line: "50720:A:2", name: "Response: after the keyword resolves with a Suspect on top the location goes to the victory display and the card to the staging area", layout: { stage: "50701", active: "50720", piles: { investigationDeck: ["50709"] } }, act: [announce("activeExplored", "50720"), respond("50720")], expect: [zone("50720", "victory"), zone("50709", "staging")] },
+
+  // 50721 Bill Ferny, 50722 Bree-land Informant, 50723 to 50729 the other encounter cards.
+  { line: "50721:A:1", name: "Bill Ferny cannot be optionally engaged", layout: { staging: ["50721"] }, act: [], expect: [flag("50721", "cannotBeOptionallyEngaged")] },
+  { line: "50721:A:2", name: "the first treachery revealed each round gains doomed 1", layout: { staging: ["50721"], deck: ["50729", "f0"] }, act: reveal("50729"), expect: [threat(30)] },
+  { line: "50723:A:1", name: "while engaged with a player with threat 35 or higher Lawless Ruffian gets +2 Attack", layout: { engaged: ["50723"], threat: [36, 30] }, act: [], expect: [stat("50723", "attack", 5)] },
+  { line: "50724:A:1", name: "When Revealed: either each player raises their threat by 2", layout: { staging: ["f0"], deck: ["f0"] }, act: [resolve("50724", "whenRevealed"), answer("threat")], expect: [threat(30)] },
+  { line: "50726:A:2", name: "When Revealed: Hired Muscle attaches to a Brigand enemy, which returns to the staging area", layout: { engaged: ["50723"], deck: F0 }, act: reveal("50726"), expect: [zone("50723", "staging"), count("50726", "attached", 1)] },
+  { line: "50727:A:1", name: "When Revealed: the top X cards of the encounter deck are discarded and their Threat added to the staging total", layout: { stage: "50701", active: "50717", deck: ["f3", "f3", "f3", "f3", "f3"] }, act: resolve("50727", "whenRevealed"), expect: [stagingThreat(12)] },
+  { line: "50728:A:1", name: "When Revealed: either each player raises threat by 2 or it is shuffled into the Investigation deck", layout: { piles: DECK3, deck: ["f0"] }, act: [reveal("50728"), answer("shuffle")], expect: [count("50728", "investigationDeck", 1)] },
+  { line: "50729:A:1", name: "When Revealed: each player raises their threat by 1 more than the Investigate value of the active location", layout: { stage: "50701", active: "50717", deck: ["f0"] }, act: reveal("50729"), expect: [threat(32)] },
+];
 
 if (ROWS.length > 0) cardSpecs("murder-at-the-prancing-pony", ROWS);
 else describe("murder-at-the-prancing-pony card specs", () => it.todo("a row for each record whose behaviour needs a game moment"));

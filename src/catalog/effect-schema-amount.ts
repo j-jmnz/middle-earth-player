@@ -13,7 +13,7 @@ import { pickSchema } from "./effect-schema-pick.ts";
 export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage", "smaug", "lakeTown"]);
 
 // The decks beside the encounter deck a record names (emce.caves-deck, emce.evil-creatures-deck, mec112.setup-journey-to-the-cross-roads; src/rules/core/piles.ts NAMED_PILES): the one list `pile` of a wilderland verb, the amount `pile` and the condition `pileHas` share.
-export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug"]);
+export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug", "investigation"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").
@@ -84,6 +84,8 @@ export const amountExprSchema = z.strictObject({
   firstPlayerTens: z.literal(true).optional(),
   // The Discover value of the active location: its Discover X (a number, or the amount its record reads) with the adjustment a Response made, 0 when it has none ("the Discover value of the active location", 19095:A:3; emce.discover). Read by the wilderland family.
   discoverValue: z.literal(true).optional(),
+  // The Investigate value of the active location: its Investigate X (a number, or the amount its record reads) with the cards its flag adds not counted, 0 when it has none or no location is active ("1 more than the Investigate value of the active location", 50727:A:1; the keyword being ignored does not change it). Read by the investigation family.
+  investigateValue: z.literal(true).optional(),
   // How many of the cards the running effect discarded from the top of the encounter deck (DiscardEncounterTop) match the pick, still in the discard pile ("for each enemy discarded this way", 12185:A:2). Read by the wilderland family.
   discardedMatching: pickSchema.optional(),
   // The printed cost of the card the source guards: the player cards under it, and the card it is attached to as a guard ("X is that card's cost", 18050:A:1). Read by the wilderland family.

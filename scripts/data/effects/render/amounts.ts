@@ -52,6 +52,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.discardPileMaxCost === true) return { text: "the highest printed cost among the cards in the acting player's discard pile (0 for none, a hero or an X cost)", read: ["discardPileMaxCost"] };
   if (expr.discarded === "cost") return { text: "the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0)", read: ["discarded"] };
   if (expr.discarded === "types") return { text: "the number of different card types among the cards this effect has discarded from decks, all the players' together", read: ["discarded"] };
+  if (expr.investigateValue === true) return { text: "the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed)", read: ["investigateValue"] };
   if (expr.discardedThreat === true) return { text: "the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)", read: ["discardedThreat"] };
   if (isObj(expr.discardedMatching)) return { text: `the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are ${pick(expr.discardedMatching, ctx)}`, read: ["discardedMatching"] };
   if (expr.destroyedWillpower === true) return { text: "the Willpower the destroyed character had in play (last known)", read: ["destroyedWillpower"] };

@@ -55,7 +55,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("Deep") }),
   // Constant on a card in play, usually the campaign card or the quest stage: "Ignore the deep keyword" / "Ignore the deep and discover keywords" (12187:A, 12195:A, 18080:B, 19023:B; emce.deep, emce.discover). While the card is in play the keywords
   // are not resolved: the scenario-level switch. It does nothing when run.
-  z.strictObject({ verb: z.literal("IgnoreKeyword"), keywords: z.array(z.enum(["deep", "discover"])).min(1) }),
+  z.strictObject({ verb: z.literal("IgnoreKeyword"), keywords: z.array(z.enum(["deep", "discover", "investigate"])).min(1) }),
   // Forced on a location, trigger becameActive with subject self: the Discover X keyword (emce.discover; 19102:A, 19104:A, 19105:A). The first player looks at the top X cards of the encounter deck (the discard pile is shuffled into it when it holds fewer),
   // attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile. Ignored while a card in play ignores the keyword.
   // `afterTravel` is engine use: the keyword the travel step held back to resolve once the Responses to the travel are done (families/wilderland/discover.ts, so a Response such as Crypt Key's, 19094:A:3, comes before it).
@@ -148,8 +148,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("VictoryWhenFree") }),
   // A constant marker, in play under the record's own condition: "While Mountain Pass is in the staging area, the 'when revealed' effects of Weather treachery cards cannot be canceled" (19015:A:1). A Response that cancels the When Revealed effects of an encounter card
   // with the trait is not offered while the marker's source is in play and its record holds (rr.cancel, families/wilderland/heath.ts). With `cardType` the effects of treachery cards ("The 'when revealed' effects of treachery cards cannot be canceled", 19048:B:1). It does nothing when run.
-  // With `firstRevealedEachRound`, only the first treachery revealed each round ("The 'when revealed' effects of the first treachery revealed each round cannot be canceled", 19137:B:1).
-  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1).optional(), cardType: z.literal("treachery").optional(), firstRevealedEachRound: z.literal(true).optional() }),
+  // With `firstRevealedEachRound`, only the first treachery revealed each round ("The 'when revealed' effects of the first treachery revealed each round cannot be canceled", 19137:B:1). With `doomed` (and `firstRevealedEachRound`) that treachery also gains Doomed X as it is revealed, on top of its printed Doomed ("The first treachery revealed each round gains doomed 1 and its effects cannot be canceled", 50721:A:2).
+  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1).optional(), cardType: z.literal("treachery").optional(), firstRevealedEachRound: z.literal(true).optional(), doomed: z.number().int().positive().optional() }),
   // "Look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest" (19022:B:1, 19024:B:1): after LookAtTop and a PickEncounter of one looked card, the other looked cards that are still on top go to the encounter discard pile faceup; the picked card is then the top card, and the
   // RevealEncounter after it reveals it. The discard comes first, a deliberate order as Discover's (emce.discover): a Surge on the revealed card reveals the next card of the deck, not one of the looked ones.
   z.strictObject({ verb: z.literal("DiscardOtherLooked"), ...when }),

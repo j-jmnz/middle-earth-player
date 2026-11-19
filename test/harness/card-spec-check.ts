@@ -112,6 +112,11 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
           if (held?.zone !== "captive" || held.host !== host) problems.push(`${item.code} is ${held?.zone === "captive" ? `held by ${state.cards[held.host ?? ""]?.code ?? "nothing"}` : `in ${held?.zone ?? "no zone"}`}, not held by ${item.host}`);
           break;
         }
+        case "window": {
+          const got = state.window?.kind === item.kind;
+          if (got !== item.value) problems.push(`the open window is ${state.window?.kind ?? "none"}, ${item.value ? "not" : "which is"} ${item.kind}`);
+          break;
+        }
         case "deckCount":
           if (state.encounterDeck.length !== item.value) problems.push(`the encounter deck holds ${state.encounterDeck.length} cards, not ${item.value}`);
           break;

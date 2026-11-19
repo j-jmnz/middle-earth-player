@@ -16,9 +16,10 @@ import { SMAUG_SAMPLES, SMAUG_TEMPLATES } from "./smaug.ts";
 import { ERECH_SAMPLES, ERECH_TEMPLATES } from "./erech.ts";
 import { FOG_SAMPLES, FOG_TEMPLATES } from "./fog.ts";
 import { RUINS_SAMPLES, RUINS_TEMPLATES } from "./ruins.ts";
+import { INVESTIGATION_SAMPLES, INVESTIGATION_TEMPLATES } from "./investigation.ts";
 
 export { ESCAPE_SAMPLES } from "./escape.ts";
-export { ERECH_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES };
+export { ERECH_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -73,7 +74,7 @@ const FLIP_GOLLUM = {
 export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES, ...STAT_TEMPLATES,
-  ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES,
+  ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES, ...INVESTIGATION_TEMPLATES,
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),
   // The mount-doom family (src/catalog/families/mount-doom.ts).
   FortitudeTest: (i, ctx) => {
@@ -91,7 +92,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   RemoveProgressFrom: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from ${i.target ? cardRef(i.target) : `"${str(i.named)}"`}`, read: ["amount", "named", "target"] }),
   DealShadow: (i) => ({ text: i.additional === true ? "the attacking enemy is dealt an additional shadow card, which resolves beside the one it has" : "the attacking enemy is dealt a shadow card", read: ["additional"] }),
   CannotPlay: (i, ctx) => ({ text: `${i.anyPlayer === true ? "no player" : "its controller"} can play, or put into play, a ${pick(i.pick, ctx)}`, read: ["pick", "anyPlayer"] }),
-  UncancelableWhenRevealed: (i) => ({ text: `while this card is in play (under its condition), the When Revealed effects of ${typeof i.trait === "string" ? `${i.trait} cards` : i.cardType === "treachery" ? "treachery cards" : i.firstRevealedEachRound === true ? "the first treachery revealed each round" : "cards"} cannot be canceled`, read: ["trait", "cardType", "firstRevealedEachRound"] }),
+  UncancelableWhenRevealed: (i) => ({ text: `while this card is in play (under its condition), the When Revealed effects of ${typeof i.trait === "string" ? `${i.trait} cards` : i.cardType === "treachery" ? "treachery cards" : i.firstRevealedEachRound === true ? "the first treachery revealed each round" : "cards"} cannot be canceled${i.doomed != null ? `, and that treachery gains doomed ${str(i.doomed)} as it is revealed` : ""}`, read: ["trait", "cardType", "firstRevealedEachRound", "doomed"] }),
   DamageOncePerRound: (i) => ({ text: `deal ${str(i.amount)} damage to ${cardRef(i.target ?? "subject")} unless a card with this card's title has dealt it damage this round (it is marked for the round once the damage is dealt)`, read: ["amount", "target"] }),
   PlaceResourceTokens: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on ${i.code === undefined ? cardRef(i.on) : `the card in play with code ${str(i.code)} (when it is not in play, on the card that holds redirectResources, else nowhere)`}`, read: ["amount", "on", "code"] }),
   AddResources: (i, ctx) => ({ text: `add ${amount(i.amount, ctx)} resources to ${cardRef(i.to ?? "host")}`, read: ["amount", "to"] }),

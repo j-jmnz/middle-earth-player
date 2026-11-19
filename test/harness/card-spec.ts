@@ -88,6 +88,8 @@ export const won: Expect = { expect: "won" };
 export const notWon: Expect = { expect: "notWon" };
 /** A frame of this name was pushed while the action ran. */
 export const frame = (name: string): Expect => ({ expect: "frame", name });
+/** The window the actions left open is (or, with `value` false, is not) of this kind: the look window a look at the Investigation deck opens. */
+export const window = (kind: string, value = true): Expect => ({ expect: "window", kind, value });
 /** The intent is legal now (for a card, one of its own: a Response offered after the action). */
 export const offers = (intent: PlayerIntent["type"], code?: string, value = true): Expect => ({ expect: "offers", intent, ...(code ? { code } : {}), ...(value ? {} : { value }) });
 /**

@@ -50,7 +50,7 @@ function markerHolds(state: ScenarioState, trait: string, type: string, ctx: Red
 }
 
 /** The reveal in progress of this card gains Doomed `amount` on top of its printed Doomed (read as the reveal frame raises the threat, windows/frames.ts). */
-function markDoomed(state: ScenarioState, cardId: string, amount: number): ScenarioState {
+export function markDoomed(state: ScenarioState, cardId: string, amount: number): ScenarioState {
   const index = state.stack.findLastIndex((frame) => frame.frame === "reveal" && frame.cardId === cardId && frame.data.kind === "reveal");
   if (index < 0) return state;
   const stack = state.stack.map((entry, at) => (at === index && entry.data.kind === "reveal" ? { ...entry, data: { ...entry.data, extraDoomed: (entry.data.extraDoomed ?? 0) + amount } } : entry));

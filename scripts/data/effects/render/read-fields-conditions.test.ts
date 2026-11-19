@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
+import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, INVESTIGATION_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
 import type { Obj } from "./kit.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";
 
@@ -62,6 +62,7 @@ describe("effects render read fields, conditions", () => {
     ...ESCAPE_CONDITION_SAMPLES,
     ...ERECH_CONDITION_SAMPLES,
     ...FOG_CONDITION_SAMPLES,
+    ...INVESTIGATION_CONDITION_SAMPLES,
     ...GUARDIAN_CONDITION_SAMPLES,
     ...LONG_DARK_CONDITION_SAMPLES,
     lastFortitudePassed: [{ kind: "lastFortitudePassed" }],

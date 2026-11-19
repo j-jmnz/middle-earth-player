@@ -55,6 +55,7 @@ export type Expect =
   | { expect: "won" }
   | { expect: "notWon" }
   | { expect: "frame"; name: string }
+  | { expect: "window"; kind: string; value: boolean }
   | { expect: "offers"; intent: PlayerIntent["type"]; code?: string; value?: boolean };
 
 export type Row = { line: string; layout?: Layout; act: Act | readonly Act[]; expect: Expect | readonly Expect[]; name?: string };

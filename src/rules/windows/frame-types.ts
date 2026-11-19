@@ -98,6 +98,10 @@ export type EffectData = {
   looked?: readonly string[];
   // The seats that looked at cards of the encounter deck in this effect: the look is announced (`lookedAtEncounterDeck`) once the whole effect has resolved (families/encounter/looked.ts).
   lookedBy?: readonly number[];
+  // The cards of the Investigation deck this effect showed in a look window: each hears the look (`lookedAtInvestigationDeck`) once the whole effect has resolved (families/investigation/look.ts).
+  investigationLooked?: readonly string[];
+  // The codes the actor named in this effect (NameInvestigation, `suspect:<code>` and `hideout:<code>`), for the accusation that follows (families/investigation/accuse.ts).
+  named?: readonly string[];
   // The options a `different` Choose has taken in this effect (families/deck/choose.ts).
   options?: readonly string[];
   // The seat the event that offered this Response happened to.

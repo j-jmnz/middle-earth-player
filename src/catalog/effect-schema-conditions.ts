@@ -193,6 +193,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("namedFlag"), name: z.string().min(1), stat: z.string().min(1) }),
   // The active location has no Discover keyword to resolve (none printed, or the keyword is ignored): "If they cannot, Abandoned Ruins gains surge and doomed 2" (19106:A:1; emce.discover). Read by the wilderland family.
   z.strictObject({ kind: z.literal("discoverUnavailable") }),
+  // Murder at the Prancing Pony (investigation family): a card in play says to ignore the Investigate keyword (IgnoreKeyword `investigate`, 50703:B:1).
+  z.strictObject({ kind: z.literal("investigateIgnored") }),
+  // The top card of the Investigation deck has one of these Traits: the card the Investigate keyword just showed when it looked at one card ("if the looked at card is a Suspect or a Hideout", 50720:A:2). Read by the investigation family.
+  z.strictObject({ kind: z.literal("investigationTop"), traits: z.array(z.string().min(1)).min(1) }),
   // A card with this code is attached to a hero (`is`) or is not.
   z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
   // Read while a stat is read, not when a constant effect is synced. `defending`: the holder is the declared defender
