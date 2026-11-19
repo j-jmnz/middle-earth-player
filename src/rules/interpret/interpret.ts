@@ -34,6 +34,7 @@ import { announceEnteredHand } from "../families/island/hand.ts";
 import { playerSource } from "../families/quest/threat.ts";
 import { queueHeard } from "../families/quest/events.ts";
 import { announceSetupActive } from "../families/quest/places.ts";
+import { exhaustAnnounced } from "../windows/exhaust.ts";
 
 export type ReduceContext = {
   effects: readonly Effect[];
@@ -157,9 +158,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
     case "Commit":
       // A card the effect names commits as it is, and is announced (families/attack.ts).
       if (instruction.target) return commitCard(state, instruction.target, focus);
-      return focus.sourceId
-        ? updateCard(state, focus.sourceId, { committed: true, exhausted: true })
-        : state;
+      return focus.sourceId ? exhaustAnnounced(state, focus.sourceId, ctx, { committed: true }) : state;
     case "MakeActiveLocation":
       return announceSetupActive(runSetupVerb(state, instruction, ctx, focus.sourceId), ctx, steps);
     case "AddToStaging":

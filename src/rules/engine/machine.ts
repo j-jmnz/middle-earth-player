@@ -25,6 +25,7 @@ import { commitFortitude } from "../families/mount-doom/commit.ts";
 import { commitEscape } from "../families/escape/commit.ts";
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { drawMany, gainSeatResources, type ReduceContext } from "../interpret/interpret.ts";
 import { applyPass, modeAfterPass } from "../windows/pass.ts";
 import { applyResolution, openResolution } from "../setup/resolution.ts";
@@ -155,7 +156,7 @@ export function applyIntent(
     }
     case "Commit":
       // The first player commits characters to the Sailing test, not to the quest (families/sea/sailing.ts).
-      return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, steps);
+      return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, ctx, steps);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
     case "CommitFortitude":
@@ -434,14 +435,16 @@ function chooseEnemy(
   return { ...engaged, window: null, engagement: { ordinal: cursor.ordinal + 1, engagedThisPass: true } };
 }
 
-function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[]): ScenarioState {
+function commit(state: ScenarioState, cardIds: readonly string[], ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
+  // One commit is one occurrence: its characters' Responses share a window (rr.triggering-condition), the ones that hear
+  // them exhaust ("After ~ exhausts", 12166:A:2) among them.
+  const occurrence = `commit:${state.round}:${state.activeSeat}`;
   for (const id of cardIds) {
     // "Does not exhaust to commit to a quest" (a flag) leaves the character ready.
-    next = updateCard(next, id, { committed: true, exhausted: !flagged(next, id, "noExhaustQuest") });
+    next = flagged(next, id, "noExhaustQuest") ? updateCard(next, id, { committed: true, exhausted: false }) : exhaustAnnounced(next, id, ctx, { committed: true }, { occurrence });
     steps.push({ kind: "commit", cardId: id });
-    // One commit is one occurrence: its characters' Responses share a window (rr.triggering-condition).
-    next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id, occurrence: `commit:${state.round}:${state.activeSeat}` });
+    next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id, occurrence });
   }
   return committedTo(next, state.activeSeat, cardIds.length);
 }

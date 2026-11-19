@@ -29,5 +29,6 @@ describe("private data", () => {
         return PATTERNS.filter(([, pattern]) => pattern.test(text)).map(([what]) => `${file}: ${what}`);
       });
     expect(hits).toEqual([]);
-  });
+    // It reads every tracked text file: about 1.5 s alone, past the 5 s default on a CI shard that runs other files beside it.
+  }, 30_000);
 });

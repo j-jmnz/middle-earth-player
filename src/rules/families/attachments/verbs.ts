@@ -13,8 +13,9 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard } from "../../core/keywords.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { exhaustAnnounced } from "../../windows/exhaust.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { flagged, inPlay, updateCard } from "../../core/state.ts";
+import { flagged, inPlay } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { openStrike } from "../attack/index.ts";
 import { healBlocked } from "../burden/life.ts";
@@ -73,7 +74,7 @@ export function declareAttack(state: ScenarioState, instruction: Extract<Instruc
   if (chosen.length === 0) return state;
   let next = state;
   for (const id of chosen) {
-    if (!flagged(next, id, "noExhaustAttack")) next = updateCard(next, id, { exhausted: true });
+    if (!flagged(next, id, "noExhaustAttack")) next = exhaustAnnounced(next, id, ctx);
     next = queueEvent(next, { trigger: "declaredAttacker", seat: focus.seat, cardId: id, other: enemyId });
   }
   return openStrike(next, focus.seat, enemyId, chosen, topFrame(next)?.id, ctx, steps);

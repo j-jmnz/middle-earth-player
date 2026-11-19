@@ -9,9 +9,10 @@ import { hasKeyword, modifiedStat, placeDamage } from "../core/keywords.ts";
 import { heldAmountByClass } from "../core/holder-classes.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
-import { flagged, heldAmount, livingSeats, updateCard } from "../core/state.ts";
+import { flagged, heldAmount, livingSeats } from "../core/state.ts";
 import { dealOneShadow, type ReduceContext } from "../interpret/interpret.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { resolveAttack } from "./shadow.ts";
 import { engagementCostOf } from "../quest/quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "../engine/step-window.ts";
@@ -203,7 +204,7 @@ export function applyDefense(
   // A character with "does not exhaust to defend" stays ready (rr.exhausted). Its declaration is announced ("After ~ is
   // declared as a defender").
   const ready = staysReadyToDefend(state, defenderId, ctx);
-  const declaredState = ready ? state : updateCard(state, defenderId, { exhausted: true });
+  const declaredState = ready ? state : exhaustAnnounced(state, defenderId, ctx);
   const exhausted: ScenarioState = markDefender(
     {
       ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId }),
@@ -218,7 +219,7 @@ export function applyDefense(
   if (more) return more;
   // 6.4.1: the defender is declared; an action window comes before the shadow card is turned up. The Responses to the
   // declaration ("After ~ is declared as a defender") come before the shadow card too.
-  return enemyAttackWindow(exhausted, ctx, "shadow") ?? holdAttack(exhausted, ctx, "shadow", ["declaredDefender"]) ?? resolveAttack(exhausted, ctx, steps);
+  return enemyAttackWindow(exhausted, ctx, "shadow") ?? holdAttack(exhausted, ctx, "shadow", ["declaredDefender", "exhausted"]) ?? resolveAttack(exhausted, ctx, steps);
 }
 
 export function applyUndefended(
@@ -336,7 +337,7 @@ export function applyPlayerAttack(
   let next: ScenarioState = { ...state, declaredAttacks: extra ? state.declaredAttacks : [...state.declaredAttacks, `${seat}:${enemyId}`], window: null };
   for (const attackerId of attackerIds) {
     if (!next.cards[attackerId]) continue;
-    if (!flagged(next, attackerId, "noExhaustAttack")) next = updateCard(next, attackerId, { exhausted: true });
+    if (!flagged(next, attackerId, "noExhaustAttack")) next = exhaustAnnounced(next, attackerId, ctx);
     next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
   }
   const declared: ScenarioState = announceEnemyAttacked(declareStrike(next, { seat, enemyId, attackerIds: [...attackerIds], ...backAfter(state.window, enemyId) }), seat, enemyId, attackerIds, ctx);
