@@ -255,12 +255,12 @@ Read the sections your task touches.
   - 61–81 On a phone (~350)
   - 82–133 Commands (~2.0K) ← 4
 - `docs/discord-issues.md` — Discord issue bot (~2.9K tok)
-- `docs/releasing.md` — Releasing (~5.2K tok)
+- `docs/releasing.md` — Releasing (~5.4K tok)
   - 5–20 Start a release (~340) ← 1
-  - 21–36 Jobs (~2.0K) ← 4
+  - 21–36 Jobs (~2.1K) ← 4
   - 37–43 Add the desktop app to a release (~350) ← 1
   - 44–47 Installs count (~180) ← 2
-  - 48–72 Caches (~760)
+  - 48–72 Caches (~820) ← 1
   - 73–107 Signing (~980) ← 2
     - 77–80 Desktop signing (optional) (~220) ← 1
     - 81–94 Android key (~250) ← 1
@@ -354,7 +354,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Old Forest (1); releasing.md, Add the desktop app to a release (1); releasing.md, Jobs (1)
+- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Old Forest (1); releasing.md, Add the desktop app to a release (1); releasing.md, Caches (1); releasing.md, Jobs (1)
 - `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Foundations of Stone (1); brief.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
