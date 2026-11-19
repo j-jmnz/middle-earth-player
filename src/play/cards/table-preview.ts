@@ -94,6 +94,9 @@ export function previewCards(
   // `ruleDoc`: the document whose wording a keyword's rule is quoted from first (the open scenario's own booklet; glossary.ts, scenarioRuleDoc), or null for the Rules Reference.
   options: { ruleDoc?: string | null } = {},
 ): { cards: PreviewCard[]; start: number } {
+  // A choice whose rows are card codes, not cards on the table (the random undiscovered treasures to choose among, 120165:A:3;
+  // a boon of the campaign pool): a long press shows the printed card.
+  if (!game.cards[cardId] && ctx.cards.has(cardId)) return { cards: [{ code: cardId, ...describe(cardId), effects: [] }], start: 0 };
   const earlier = earlierStages(game, ctx, cardId);
   const ids = [...inspectTargets(game, cardId), ...extra.filter((id) => id !== cardId), ...earlier];
   const groups = ids.map((id, index): PreviewCard[] => {

@@ -161,3 +161,18 @@ describe("the keyword chips of a previewed card", () => {
     expect(words("01074", null)).toEqual(["When Revealed", "Shadow"]);
   });
 });
+
+describe("a card code that is not on the table", () => {
+  it("previews the printed card: a row of random undiscovered treasures to choose among (120165:A:3)", () => {
+    const table = buildTable(base, { stage: "141022" });
+    const code = FRODO;
+    expect(Object.values(table.state.cards).some((card) => card.id === code)).toBe(false);
+    const shown = previewCards(table.state, table.ctx, code, describeCode, (id) => id);
+    expect(shown).toEqual({ cards: [{ code, name: `name ${code}`, source: null, effects: [] }], start: 0 });
+  });
+
+  it("previews nothing for an id that is neither a card on the table nor a printed card", () => {
+    const table = buildTable(base, { stage: "141022" });
+    expect(previewCards(table.state, table.ctx, "no-such-card", describeCode, (id) => id).cards).toEqual([]);
+  });
+});
