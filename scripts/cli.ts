@@ -69,6 +69,11 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     smoke: { steps: [{ script: "checks/desktop-smoke.ts" }], about: "launches the desktop app on a seeded export and checks it (--skip-build, --app <packed app>, --require-bundle, --expect-version)" },
     stage: { steps: [{ script: "desktop/stage.ts" }], about: "the release job's installers from desktop/out, with a .sha256 each and the 2 GiB check (--tag, --out, --suffix, --github-output)" },
   },
+  browser: {
+    shot: { steps: [catalog, canvaskit, { script: "browser/shot.ts" }], about: "opens routes of the web build in Chromium, writes PNGs to .agent/shots and prints each page's errors ([route...] --fixture <name> --tap <testID> --dark --landscape --ids --text --base <url>)" },
+    run: { steps: [catalog, canvaskit, { script: "browser/run.ts" }], about: "runs a scratch Playwright script against the web build (<script.ts>, default export (app) => …; scripts/browser/app.ts)" },
+    serve: { steps: [catalog, canvaskit, { script: "browser/serve.ts" }], about: "serves the web export on 127.0.0.1 until stopped (--port, --fresh, --reuse)" },
+  },
   doc: {
     index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },
     section: { steps: [{ script: "docs/index.ts", args: ["section"] }], about: 'prints one doc section: <file> "<heading>"' },
