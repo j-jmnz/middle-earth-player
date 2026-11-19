@@ -54,7 +54,7 @@ Read the sections your task touches.
   - 497–500 Support (~90)
   - 501–516 Attribution (~410)
   - 517–520 License (~50)
-- `docs/architecture.md` — Architecture (~28.5K tok)
+- `docs/architecture.md` — Architecture (~28.6K tok)
   - 7–41 Stack (~1.2K)
   - 42–77 Processes (~690)
   - 78–161 Modules (~2.4K) ← 3
