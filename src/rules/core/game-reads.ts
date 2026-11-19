@@ -20,6 +20,24 @@ function textOf(memo: WeakMap<Effect, string>, effect: Effect, write: (effect: E
   return text;
 }
 
+// Whether a record reads a needle, per needle and record: the needles are the engine's own literals, so a new list asks each record
+// once per needle, not once per list.
+const MENTIONS = new Map<string, WeakMap<Effect, boolean>>();
+
+function mentions(effect: Effect, key: string, test: (effect: Effect) => boolean): boolean {
+  let byEffect = MENTIONS.get(key);
+  if (!byEffect) {
+    byEffect = new WeakMap();
+    MENTIONS.set(key, byEffect);
+  }
+  let found = byEffect.get(effect);
+  if (found === undefined) {
+    found = test(effect);
+    byEffect.set(effect, found);
+  }
+  return found;
+}
+
 // The codes of the cards in a game, per cards record. A record is never changed once the reducer returns it (docs/architecture.md,
 // State), and many states share one (a mode or a window change keeps it), so the set is built once for all of them.
 const PRESENT = new WeakMap<ScenarioState["cards"], ReadonlySet<string>>();
@@ -53,7 +71,7 @@ export function gameReads(state: ScenarioState, ctx: ReduceContext, needle: stri
   }
   let codes = byNeedle.get(needle);
   if (!codes) {
-    codes = new Set(ctx.effects.filter((effect) => textOf(RECORD_TEXT, effect, (record) => record).includes(needle)).map((effect) => effect.cardCode));
+    codes = new Set(ctx.effects.filter((effect) => mentions(effect, needle, (record) => textOf(RECORD_TEXT, record, (it) => it).includes(needle))).map((effect) => effect.cardCode));
     byNeedle.set(needle, codes);
   }
   return anyPresent(state, codes);
@@ -72,7 +90,7 @@ export function gameReadsOnTrigger(state: ScenarioState, ctx: ReduceContext, tri
   }
   let codes = byNeedle.get(key);
   if (!codes) {
-    codes = new Set(ctx.effects.filter((effect) => "trigger" in effect && effect.trigger === trigger && textOf(INSTRUCTIONS_TEXT, effect, (record) => record.instructions).includes(needle)).map((effect) => effect.cardCode));
+    codes = new Set(ctx.effects.filter((effect) => "trigger" in effect && effect.trigger === trigger && mentions(effect, key, (record) => textOf(INSTRUCTIONS_TEXT, record, (it) => it.instructions).includes(needle))).map((effect) => effect.cardCode));
     byNeedle.set(key, codes);
   }
   return anyPresent(state, codes);
