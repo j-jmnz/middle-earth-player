@@ -208,11 +208,11 @@ export function SeatPicker({
             {short ? <Label>{short}</Label> : null}
             <View className="mt-3.5 flex-row gap-2">
               {heroes.map((code) => (
-                <HeroTile key={code} hero={faceOf(code)} height={PARTY_TILE_HEIGHT * s} dense ringBearer={!slot && carries(code)} onPress={() => openCard(code)} />
+                <HeroTile key={code} hero={faceOf(code)} height={PARTY_TILE_HEIGHT * s} dense ringBearer={!slot && carries(code)} onPress={() => openCard(code)} onLongPress={() => openCard(code)} />
               ))}
               {slot ? (
                 ringBearer ? (
-                  <HeroTile hero={faceOf(ringBearer)} height={PARTY_TILE_HEIGHT * s} dense ringBearer onPress={() => openCard(ringBearer)} onRemove={() => onRingBearer(null)} />
+                  <HeroTile hero={faceOf(ringBearer)} height={PARTY_TILE_HEIGHT * s} dense ringBearer onPress={() => openCard(ringBearer)} onLongPress={() => openCard(ringBearer)} onRemove={() => onRingBearer(null)} />
                 ) : (
                   // The fourth place stays as room, so the tiles keep their width when the Ring-bearer is picked.
                   <View className="flex-1" />
