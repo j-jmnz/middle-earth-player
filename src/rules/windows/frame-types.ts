@@ -28,7 +28,11 @@ export type Modifier = {
   set?: boolean;
   // A `moreStagingThreat` modifier that counts 1 for each ally in this seat's discard pile each time it is read (RaiseStagingThreat `live`, families/dungeon).
   allyDiscardSeat?: number;
-  // The Trait a `traitGained` modifier gives its holder ("gain a Trait of your choice", 11195:A:5).
+  // A `moreStagingThreat` modifier that counts 1 for each Scout enemy in play each time it is read (RaiseStagingThreat `live: scoutEnemiesInPlay`).
+  liveScouts?: true;
+  // A `revealDoomed` modifier's amount while this stage is current, read when each card is revealed (RevealedGainDoomed `instead`, families/angmar/weather.ts).
+  stageAmount?: { stage: number; amount: number };
+  // The Trait a `traitGained` modifier gives its holder ("gain a Trait of your choice", 11195:A:5), or the Trait an `engagedThreatSeat` modifier narrows its enemies to (quest/engaged-threat.ts).
   trait?: string;
 };
 
@@ -106,6 +110,8 @@ export type EffectData = {
   // names (the enemy a character defends against).
   subject?: string;
   other?: string;
+  // The card the source was attached to when its own cost took it out of play ("Discard Cram to ready attached hero", 131011:A:2): "attached hero" still names it.
+  host?: string;
   // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
@@ -199,7 +205,7 @@ export type FrameData =
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
   // effects of the card just revealed (Frodo Baggins). `discard`: and the card is discarded, not shuffled back (The Master Ring).
   // `guards`: the card is revealed as the guard of this objective (rr.guarded): it is attached to it as it is placed in the staging area. `engage`: an enemy found by a search is put into play engaged with the revealing seat instead (SearchReveal `to: engaged`).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; extraSurge?: number; surgeLeft?: number; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; extraSurge?: number; extraDoomed?: number; surgeLeft?: number; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
   | HideData
   | FortitudeData
   | EscapeData
@@ -221,7 +227,8 @@ export type DelayedEffect = {
   // resolves otherwise. `questFailed`: the same, when they quest unsuccessfully (900307:A:1).
   // `endOfAttack`: the end of the player attack in progress (families/attack/flow.ts).
   // `startOfGame`: run once the opening hands are settled (misc family).
-  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "questFailed" | "endOfAttack" | "startOfGame";
+  // `beginningOfTravel`: run when the next travel phase begins (windows/triggers.ts crossBoundary).
+  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "questFailed" | "endOfAttack" | "startOfGame" | "beginningOfTravel";
   sourceId: string | null;
   seat: number;
   // The phase the effect was scheduled in. An end-of-phase effect fires when that phase ends.
@@ -269,7 +276,7 @@ export type PendingAttack = {
   damaged?: boolean;
   // Forced effects "when this enemy attacks" (141069:A:2) are resolving: the defense window opens once they are done.
   defenseWaits?: boolean;
-  // The additional shadow card (141069:A:2) whose cancel Responses were offered last.
+  // The additional shadow card (141069:A:2) turned face up whose cancel Responses are open; cleared once it resolves.
   extraOffered?: string;
   // A shadow card whose effect asks a player (a Pick or a Choose, 141071:A:2) is resolving in its own frame. The attack
   // goes on when it pops.
@@ -288,6 +295,10 @@ export type PendingAttack = {
   excessToStage?: boolean;
   // The damage beyond the remaining hit points of the defending character goes on the card in play with this title (901407:A:2, ExcessToCard).
   excessToCard?: string;
+  // The attack is Smaug's against Lake-town (Town-Baiting, 50211:A:1): the damage of an undefended attack is placed on Lake-town, and so is the damage beyond a defender's remaining hit points (families/smaug/attack.ts).
+  toLakeTown?: boolean;
+  // The damage beyond the remaining hit points of the defending character goes on Lake-town (Esgaroth Wharf's Shadow in a Town-Baiting attack; the flag `excessToLakeTown` of Smaug the Magnificent is read for the enemy).
+  excessToLakeTown?: boolean;
   // Shadow cards that are enemies and say "attacks the defending player" (Wolf Rider, 01081:A:2): each attacks once this attack has ended
   // (families/defense/shadow-attack.ts).
   shadowAttackers?: readonly string[];

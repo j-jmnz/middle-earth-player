@@ -46,6 +46,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("lastPlayer") }),
   // The Embassy from the Dark Tower's pair the running effect is on (EmbassyNext): `pair`, there is one (its player card still lies faceup); `playable`, its player card can be played at no cost by its owner now (146072:B:1). Read by src/rules/families/black-gate/embassy.ts.
   z.strictObject({ kind: z.literal("embassy"), is: z.enum(["pair", "playable"]) }),
+  // The erech family's condition (src/rules/families/erech/index.ts). `night`: the Night objective lying beside the quest is Dusk, Midnight, or either ("Dusk. ...", "Midnight. ...", "Dusk/Midnight. ..."; docs/brief.md, The Stone of Erech); false with none in play.
+  z.strictObject({ kind: z.literal("night"), is: z.enum(["dusk", "midnight", "duskOrMidnight"]) }),
   // The mount-doom family's conditions (src/rules/families/mount-doom/conditions.ts). `lastFortitudeFailed`, `lastFortitudePassed`: the last Fortitude test the running effect made was failed, or passed ("If you fail this test", 146051:A:1; "If a player passes this test", 146076:B:1);
   // false before the effect has made one. `fortitudeFailed`: a player failed a Fortitude test this round, `who` the actor ("If you failed a Fortitude test this round", 146055:A:3) or any player ("If a player has failed a Fortitude test this round", 146046:A:1).
   z.strictObject({ kind: z.literal("lastFortitudeFailed") }),
@@ -92,8 +94,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("otherLocationInPlay") }),
   // The actor controls a hero that is exhausted.
   z.strictObject({ kind: z.literal("heroExhausted") }),
-  // The attack in progress has no defender (declared or considered).
-  z.strictObject({ kind: z.literal("undefended") }),
+  // The attack in progress has no defender (declared or considered). `is: false`: it has one (an attack is in progress and defended): "Defending player must discard 1 ally card ... (2 allies instead if this attack is undefended)", 00012:A:3.
+  z.strictObject({ kind: z.literal("undefended"), is: z.boolean().optional() }),
   // `type`: only a card of this printed type counts ("discard cards from the top of the encounter deck until an enemy is discarded" is offered while an enemy is left in the deck, 146061:A:1). `victory`: the victory display is read too (146036:A:2).
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(), deckOnly: z.literal(true).optional(), victory: z.literal(true).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.
@@ -205,8 +207,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0).optional(), maxWillpower: z.number().int().min(0).optional(), ally: z.literal(true).optional() }),
   // The source card is attached to a card with this name.
   z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
-  // The actor controls a hero or ally in play with this code.
-  z.strictObject({ kind: z.literal("controls"), code: z.string().min(1) }),
+  // The actor controls a hero or ally in play with this code; with `who: "anyPlayer"`, any player does ("unless they control Derufin", 50303:B:2).
+  z.strictObject({ kind: z.literal("controls"), code: z.string().min(1), who: z.literal("anyPlayer").optional() }),
   // A copy of this card is out of play where an effect can take it from ("shuffle 1 out of play Ringwraith into the encounter
   // deck" on 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2): set aside, in the encounter discard pile or the victory display
   // (rr.in-play-and-out-of-play), or under a location (141049:A:1). See outOfPlayCopies in src/rules/interpret/conditions.ts.
@@ -334,6 +336,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),
+  // Every living player is at the source stage, sharing its staging area, or not (`is: false`): "unless each player in the game is at this stage" (148003:B:3). With one shared staging area it holds; false for a stage no player is at. Read by the breaking family.
+  z.strictObject({ kind: z.literal("allAtStage"), is: z.boolean() }),
   // The current quest, read by the angmar family: `side` a side quest is the current quest ("If the current quest is a side quest", 09047:A:1), `self` the source is the side quest that is the current quest ("While Orc Rearguard is the current quest", 09023:A:2),
   // `other` there is a quest card besides the current one that may be chosen to be the current quest (09049:A:2: the main quest card, or an encounter side quest in the staging area).
   z.strictObject({ kind: z.literal("currentQuest"), is: z.enum(["side", "self", "other"]) }),

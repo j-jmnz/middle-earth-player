@@ -6,7 +6,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { discardUntilAflame, engageFirstPlayer, healLocations, removeNamedFromGame, searchAflame, stageSetAside } from "./cards.ts";
+import { discardUntilAflame, engageFirstPlayer, engageLowestThreat, healLocations, removeNamedFromGame, searchAflame, stageSetAside } from "./cards.ts";
 import type { Focus } from "../index.ts";
 import { aflameSweep } from "./sweep.ts";
 
@@ -18,6 +18,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return searchAflame(state, instruction, focus, ctx, steps);
     case "EngageFirstPlayer":
       return engageFirstPlayer(state, focus, steps, instruction.moves === true);
+    case "EngageLowestThreat":
+      return engageLowestThreat(state, focus, steps);
     case "StageSetAside":
       return stageSetAside(state, instruction, focus, ctx, steps);
     case "RemoveNamedFromGame":
@@ -32,4 +34,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "aflame", settle: { sweep: aflameSweep }, verbs: ["DiscardUntilAflame", "SearchAflame", "EngageFirstPlayer", "StageSetAside", "RemoveNamedFromGame", "HealLocations", "EarnDealt"], run };
+export const manifest: RulesFamily = { name: "aflame", settle: { sweep: aflameSweep }, verbs: ["DiscardUntilAflame", "SearchAflame", "EngageFirstPlayer", "EngageLowestThreat", "StageSetAside", "RemoveNamedFromGame", "HealLocations", "EarnDealt"], run };

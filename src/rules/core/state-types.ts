@@ -43,7 +43,6 @@ export type ZoneName =
   | "play"
   | "engaged"
   | "seatStaging"
-  | "seatQuest"
   | "staging"
   | "activeLocation"
   | "secondActiveLocation"
@@ -74,6 +73,8 @@ export type ZoneName =
   // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
   // nothing that reads the Nightmare setup card reads it.
   | "modeCard"
+  // The Night objective beside the current quest (docs/brief.md, The Stone of Erech): in play, controlled by nobody, one card at a time (families/erech/).
+  | "nightObjective"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by nobody; the host is the Watcher.
   | "captive"
   // Out of play, facedown, under no player's control, still owned (`CardInstance.owner`): a card captured underneath another card (the host), or in a player's captured deck (no host, listed in `Seat.captured`; mec108.captured-cards, mec108.captured-deck).
@@ -96,9 +97,6 @@ export type CardInstance = {
   host: string | null;
   attachments: readonly string[];
   committed: boolean;
-  // The side quest a committed character quests on instead of the current quest (families/sidequests/quest.ts). Absent for the
-  // current quest.
-  questTo?: string;
   shadowId: string | null;
   // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
   // when there are none.
@@ -151,7 +149,7 @@ export type CardInstance = {
   carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
   // leaves play (emce.evil-creatures-deck). Absent on every other card.
-  deck?: "evilCreatures" | "balrog";
+  deck?: "evilCreatures" | "balrog" | "smaug";
 };
 
 export type Seat = {
@@ -165,9 +163,7 @@ export type Seat = {
   // This seat's own staging area, once stage 2B has created the separate areas (`ScenarioState.separate`): the ids of its encounter cards, a
   // subset of `ScenarioState.staging`, which keeps every staging card in any area (families/breaking/areas.ts).
   staging: readonly string[];
-  // The seat's player side quest (zone seatQuest), not a stage of the scenario's quest.
-  questStage: string | null;
-  // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null.
+  // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null, unless a stage no player is at is parked in it (Fog on the Barrow-downs, `parkedStage`).
   // Absent in every other game (families/breaking/areas.ts).
   stage?: string;
   // The seat's own active location while stages are separate (the card, zone activeLocation); `ScenarioState.activeLocation` and `secondActiveLocation` then mirror the
@@ -315,6 +311,8 @@ export type ScenarioState = {
   separate?: true;
   // The heroes a card shuffled into their owners' decks (Lost and Alone, 04124:A:1): each is put into play when its owner draws it, and its seat is not out of heroes while it waits (families/deck/hero.ts). Absent in every game that shuffles none.
   heroesInDeck?: readonly string[];
+  // The areas are isolated outside Escape from Mount Gram too: set while a player of Fog on the Barrow-downs is trapped at a stage of his own, so "each player", "the first player", "in play" and a player card's Doomed read the area (`isolatedAreas`, families/breaking/areas.ts). Dropped when the areas combine into one. Absent otherwise.
+  isolated?: true;
   // Only on a seat's view of the state (families/breaking/areas.ts viewOf): the seat it is the view of. mergeView drops it.
   viewSeat?: number;
   // The seats whose stage has dealt its archery this combat phase while stages are separate (machine.ts startCombat).
@@ -332,9 +330,12 @@ export type ScenarioState = {
   // The seats that have had their travel opportunity this round while stages are separate: each seat in player order may travel to a location of its own
   // staging area (machine.ts, travel.ts).
   travelDone?: readonly number[];
+  // The seats whose own quest phase ended this round while stages are separate ("End your quest phase (do not resolve the quest)", 148004:A:1): no more cards are revealed for them and their quest is not resolved
+  // (quest/stage-reveal.ts resolveSeparate, which drops the list once every other seat has resolved). Absent otherwise.
+  questEnded?: readonly number[];
   // Progress a stage 3B turned into cards to discard from the encounter deck, until the progress step is over (families/breaking/progress.ts).
   progressOwed?: readonly { seat: number; amount: number }[];
-  stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: { codes: readonly string[]; otherwise?: string; remove?: true }; deck?: true }[];
+  stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: { codes: readonly string[]; otherwise?: string; remove?: true; different?: true }; deck?: true }[];
   // The part number of the scenario's campaign card, in a campaign with XP (the amount `part`), and the campaign Setup instructions that resolve once the
   // quest card's Setup is done (ScenarioDefinition.afterSetup).
   part?: number;
@@ -384,6 +385,8 @@ export type ScenarioState = {
   pendingAttack: PendingAttack | null;
   // The round the first player was asked whether a side quest is the current quest (families/wilderland/night.ts); kept only in a game with encounter side quests.
   sideAsked?: number;
+  // The round the first player chose where the next Smaug goes (families/smaug/deck.ts); kept only in a game with a Smaug deck.
+  smaugAsked?: number;
   // The game deals encounter side quests in its encounter deck, not in a side quest deck of its own (Intruders in Chetwood, mec108.side-quests): the side quest reads of families/wilderland/night-quest.ts apply. Set at the start (markSideQuests), absent in every other game.
   sideQuests?: true;
   // The game has a card that asks whether progress was placed on a side quest this round ("if no progress was placed on Lie Low this round", 10081:A:1): the engine notes each placement as `progressPlacedHere` (families/angmar/progress.ts). Set at the start (markProgressNoted), absent in every other game.

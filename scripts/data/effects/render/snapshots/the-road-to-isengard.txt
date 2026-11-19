@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - exhaust the picked card
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if threat of the top card of the encounter discard pile is less than willpower of the card picked before (checked when this step runs, after the steps above; not tied to whether they did anything): 1 resource token(s) are placed on this card
-    - [json TakeControl {"verb":"TakeControl","who":"actor","when":{"kind":"less","left":2,"right":{"stat":"resources","of":"self"}}}]
+    - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
     - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): 3 resource(s) come off the resource pool of this card (discarded, not spent)
 
 ## 143047 Saruman
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 246 by template, 10 as JSON)
+(rendered pieces: 249 by template, 9 as JSON)

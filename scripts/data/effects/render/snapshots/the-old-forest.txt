@@ -1,0 +1,339 @@
+Scenario piles that place cards with no record (staging: 147012 Misleading Path; staging: 147013 Deep Gulley; staging: 147014 Strange Woods; staging: 147015 Wall of Trees; staging: 147016 Oppressive Forest; quest: 147001 Farewell to the Shire; quest: 147002 The Living Forest; quest: 147003 The Living Forest; quest: 147004 The Living Forest; quest: 147005 The Living Forest; quest: 147006 The Wicked Willow; setAside: 147007 Old Man Willow; setAside: 147011 Withywindle)
+
+## 147001 Farewell to the Shire
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+147001:A:1 (front): Setup: Set Old Man Willow and Withywindle aside, out of play. Each player searches the encounter deck and adds 1 different location to the staging area. Shuffle the encounter deck.
+  147001:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+    - shuffle the encounter deck
+
+147001:B:1 (back): When Revealed: Each player draws 1 card. Advance to a random stage 2A.
+  147001:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+    - advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
+
+## 147002 The Living Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+147002:A:1 (front): When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck.
+  147002:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of location (any player controls) in the staging area only is less than the number of players: the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+147002:B:1 (back): Forced: At the end of the planning phase, each player must exhaust a hero he controls.
+  147002:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    - for each player, first player first:
+      - choose ready hero (you control)
+      - exhaust the picked card
+
+147002:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
+  147002:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
+
+## 147003 The Living Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+147003:A:1 (front): When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck.
+  147003:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of location (any player controls) in the staging area only is less than the number of players: the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+147003:B:1 (back): Forced: At the beginning of the round, remove all progress from each location in play.
+  147003:forced:1: Forced when a phase begins
+    only if it is the Resource phase
+    - remove all the progress from each location (any player controls)
+
+147003:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
+  147003:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
+
+## 147004 The Living Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+147004:A:1 (front): When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck.
+  147004:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of location (any player controls) in the staging area only is less than the number of players: the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+147004:B:1 (back): Forced: At the end of the round, discard a random location from the victory display.
+  147004:forced:1: Forced at the end of the round
+    - discard a random location from the victory display to the encounter discard pile (chosen with the game's seed; X becomes its Victory points)
+
+147004:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
+  147004:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
+
+## 147005 The Living Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+147005:A:1 (front): When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck.
+  147005:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of location (any player controls) in the staging area only is less than the number of players: the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+147005:B:1 (back): Forced: The first player reveals 1 additional encounter card during the quest phase.
+  147005:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - reveal 1 additional encounter card(s) in the staging step this phase
+
+147005:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
+  147005:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
+
+## 147006 The Wicked Willow
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+147006:A:1 (front): When Revealed: Add Old Man Willow and Withywindle to the staging area. Reveal X encounter cards where X is the number of players in the game minus 1.
+  147006:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 147007 joins the staging area (it is not revealed)
+    - one set-aside card with code 147011 joins the staging area (it is not revealed)
+    - repeat the number of players - 1 times:
+      - the acting player reveals an encounter card
+
+147006:B:1 (back): Old Man Willow cannot leave the staging area but is considered to be engaged with each player and attacks each player in turn order during the combat phase (deal and resolve a shadow card for each attack).
+  147006:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "Old Man Willow": stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Old Man Willow": stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Old Man Willow": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Old Man Willow": stat noThreatContribution 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Old Man Willow": stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
+
+147006:B:2 (back): If the players defeat this stage, they win the game.
+  147006:constant:2: Constant
+    (no instructions)
+
+## 147007 Old Man Willow
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+147007:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+147007:A:2 (front): Forced: When Old Man Willow attacks, discard a random location from the victory display. The defending player raises his threat by X, where X is that location's victory point value.
+  147007:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard a random location from the victory display to the encounter discard pile (chosen with the game's seed; X becomes its Victory points)
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by X (the acting player)
+
+## 147008 Long Trailer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147008:A:1 (front): While Long Trailer is in the staging area it gains: 'Forced: After the active location leaves play as an explored location, Long Trailer makes an immediate attack against the first player.'
+  147008:forced:1: Forced on the event activeExplored
+    only if this card is in the staging area
+    - this card attacks the first player now, from the staging area
+
+## 147009 Grasping Root
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147009:A:1 (front): Forced: After Grasping Root engages a player, that player must assign X damage among characters he controls. X is the number of locations in the victory display.
+  147009:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player assigns the number of location (any player controls) in the victory display damage among the character (you control), one at a time
+
+## 147010 Army of Flies
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147010:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+147010:A:2 (front): Forced: After Army of Flies engages a player, that player discards a non-objective attachment he controls.
+  147010:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+147010:A:3 (shadow): Shadow: Defending player discards a non-objective attachment he controls.
+  147010:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 147011 Withywindle
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+147011:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+147011:A:2 (front): The players cannot win the game while Withywindle is in play.
+  147011:constant:1: Constant
+    - the players cannot defeat this stage while this holds
+
+147011:A:3 (front): While Withywindle is the active location, the first player reveals 1 additional encounter card during the quest phase.
+  147011:constant:2: Constant
+    only if this card is the active location
+    - the table: stat revealMore 1, while this card is in play
+
+## 147012 Misleading Path
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+147012:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+147012:A:2 (front): When faced with the option to travel, the players must travel to Misleading Path if there is no active location.
+  147012:constant:1: Constant
+    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+
+147012:A:3 (shadow): Shadow: Defending player discards each ally card in his hand.
+  147012:shadow:1: Shadow
+    - for each ally (you control) in hand:
+      - discard the picked card
+
+## 147013 Deep Gulley
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+147013:A:1 (front): While Deep Gulley is in the staging area, it gains: 'Forced: After a player optionally engages an enemy, that player raises his threat by X, where X is the engaged enemy's Attack.'
+  147013:forced:1: Forced on the event optionallyEngaged
+    only if this card is in the staging area
+    - raise threat by attack of the card the event is about (the player the event is about)
+
+## 147014 Strange Woods
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+147014:A:1 (front): While Strange Woods is in the staging area, characters cannot be healed.
+  147014:constant:1: Constant
+    only if this card is in the staging area
+    - each character (any player controls): stat cannotBeHealed 1, while this card is in play
+
+147014:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 2.
+  147014:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 2 (each player)
+
+## 147015 Wall of Trees
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+147015:A:1 (front): X equals the number of players in the game.
+  147015:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+  147015:constant:2: Constant
+    only if this card is in the victory display
+    - this card: stat gainsVictory the number of players, while this card is in play
+
+147015:A:2 (front): While Wall of Trees is in the staging area, progress must be placed on Wall of Trees before it can be placed on the current quest.
+  147015:constant:3: Constant
+    only if this card is in the staging area
+    - this card: stat progressFirstRequired 1, while this card is in play
+
+## 147016 Oppressive Forest
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+147016:A:1 (front): While Oppressive Forest is in the staging area, each player cannot play more than 1 card each round.
+  147016:constant:1: Constant
+    only if this card is in the staging area
+    - each player cannot play more than 1 card each round, in any phase (a card put into play is not played and does not count)
+
+147016:A:2 (shadow): Shadow: If there are no locations in the staging area, add this location to the staging area.
+  147016:shadow:1: Shadow
+    - if the number of location (any player controls) in the staging area only is at most 0: this card goes to the staging area (it is not revealed)
+
+## 147017 Swaying Without Wind
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147017:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+147017:A:2 (front): When Revealed: Choose a location in the victory display and return it to the staging area. If no location was returned to the staging area this way, Swaying Without Wind gains surge.
+  147017:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) in the victory display
+    - the picked card goes to the staging area (it is not revealed)
+    - then, if not (the picked card is a location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 147018 Falling Branches
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147018:A:1 (front): When Revealed: Each player removes a character he controls from the quest and deals 2 damage to that character (3 damage instead if that character is an ally).
+  147018:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose character (you control) committed to the quest
+      - the last picked character is removed from the quest (it stays exhausted)
+      - then, if the picked card is a ally (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
+      - then, if not (the picked card is a ally (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+147018:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is an ally.)
+  147018:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the defender is a ally (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a ally (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 147019 Song of Sleep
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147019:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+147019:A:2 (front): When Revealed: Remove a questing hero you control from the quest and attach Song of Sleep to that hero. Counts as a Condition attachment with the text: 'Limit 1 per hero. Treat attached hero's printed text box as if it were blank (except for Traits). Attached hero cannot ready.'
+  147019:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) committed to the quest, with no attachment named "Song of Sleep"
+    - this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - the last picked character is removed from the quest (it stays exhausted)
+  147019:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - this attachment may be attached to a hero (limit 1 of it per host)
+    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat cannotReady 1, while this card is in play
+
+## 147020 Lost and Witless
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147020:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+147020:A:2 (front): When Revealed: Discard all progress from each location in the staging area. If there is a non-unique active location, randomly choose a location in the staging area and switch it with the active location.
+  147020:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - remove all the progress from each location (any player controls) in the staging area only
+    - then, if there is a non-unique location (any player controls) that is the active location to choose (checked when this step runs, after the steps above; not tied to whether they did anything): a location of the staging area chosen at random (with the game's seed) becomes the active location without traveling (the active location goes back to the staging area, keeping its tokens); a Forced effect "after it becomes the active location" resolves
+
+## 147021 Ending and Failing
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147021:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+147021:A:2 (front): When Revealed: At the end of the phase, raise each player's threat by X where X is the number of enemies in the staging area.
+  147021:whenRevealed:1: When revealed
+    - later, at the end of this phase:
+      - raise threat by the number of enemy (any player controls) in the staging area only (each player)
+
+147021:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
+  147021:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 147022 Tom Bombadil
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+147022:A:1 (front): When Revealed: Choose a player. That player gains control of Tom Bombadil, ready and committed to the quest. At the end of the round, discard Tom Bombadil. Then, shuffle the encounter discard pile into the encounter deck. This effect cannot be canceled.
+  147022:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls) chosen by the first player
+    - [json TakeRevealedCard {"verb":"TakeRevealedCard","who":"picked","committed":true}]
+    - later, at the end of the round (cannot be canceled while the number of hero (any player controls) is at least 0):
+      - discard this card [also {"counted":true}]
+      - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
+
+(rendered pieces: 212 by template, 8 as JSON)

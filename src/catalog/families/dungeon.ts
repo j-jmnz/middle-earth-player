@@ -20,7 +20,8 @@ const VERBS = [
   // 01104:A:1, "Until the end of the phase, raise the total Threat in the staging area by X": the table holds the raise (moreStagingThreat) until
   // `until`. It adds to the Threat of the cards in the staging area, so it counts in the quest phase and for the engagement checks of the phase.
   // `live: "alliesInDiscard"` (145060:A:2, an encounter card's lasting effect, faq.lasting-effects): the raise is 1 for each ally in the actor's discard pile at every moment until `until`, not the number when it resolved; `amount` is then absent (the effect schema refuses both and neither).
-  z.strictObject({ verb: z.literal("RaiseStagingThreat"), amount: positiveAmountSchema.optional(), until: z.enum(["endOfPhase", "endOfRound"]), live: z.literal("alliesInDiscard").optional(), ...when }),
+  // `live: "scoutEnemiesInPlay"` (00013:A:1, "Raise the total Threat of the staging area by 1 for each Scout enemy in play"): the same, 1 for each enemy with the Scout trait in the staging area or engaged with a player.
+  z.strictObject({ verb: z.literal("RaiseStagingThreat"), amount: positiveAmountSchema.optional(), until: z.enum(["endOfPhase", "endOfRound"]), live: z.enum(["alliesInDiscard", "scoutEnemiesInPlay"]).optional(), ...when }),
   // Setup (01123:A:1, "place the Nazgûl of Dol Guldur face up but out of play, alongside the quest deck"): the set-aside card with this code is
   // turned faceup, still out of play.
   z.strictObject({ verb: z.literal("TurnFaceUp"), code: z.string().min(1), ...when }),

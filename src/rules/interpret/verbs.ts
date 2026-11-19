@@ -1,7 +1,7 @@
 // Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
 import { isStatCondition, type Instruction } from "../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "./amounts.ts";
+import { frameScope, hostOf, refCard, resolveAmount } from "./amounts.ts";
 import { runAttackVerb } from "../combat/attack-verbs.ts";
 import { characters } from "../combat/combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
@@ -16,12 +16,14 @@ import { queueEvent } from "../windows/queue.ts";
 import { queueFront } from "../families/play/refs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
-import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "../quest/quest.ts";
+import { engageEnemy, engageWith, stagingEnemies } from "../quest/quest.ts";
+import { placeEffectProgress } from "../families/quest/effect-progress.ts";
 import { restricted } from "./restrictions.ts";
 import { nextUint, shuffleIds } from "../core/seed.ts";
 import { afterProgress } from "../quest/stage-reveal.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { queueHeard } from "../families/quest/events.ts";
+import { countDiscarded } from "../families/south/damage.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
 import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
@@ -118,7 +120,7 @@ export function runExtraVerb(
       return removeQuestProgress(state, questProgressMoved(state, instruction), steps);
     case "PlaceQuestProgress": {
       const before = steps.length;
-      const placed = placeQuestProgress(state, questProgressMoved(state, instruction), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
+      const placed = placeEffectProgress(state, questProgressMoved(state, instruction), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
       return afterProgress(placed, before, ctx, steps);
     }
     case "DiscardUntilEnemies":
@@ -193,9 +195,9 @@ export function runExtraVerb(
       return next;
     }
     case "Discard":
-      return discardTarget(state, instruction.target.kind, focus, ctx, steps);
+      return discardTarget(state, instruction.target.kind, focus, ctx, steps, { counted: instruction.counted === true });
     case "Destroy":
-      return discardTarget(state, instruction.target.kind, focus, ctx, steps, true);
+      return discardTarget(state, instruction.target.kind, focus, ctx, steps, { destroy: true });
     case "UncommitAll": {
       const seat = seatFor(state, instruction.who, focus.seat);
       let next = state;
@@ -205,7 +207,9 @@ export function runExtraVerb(
     case "TakeControl": {
       if (!focus.sourceId || !state.cards[focus.sourceId]) return state;
       const seat = seatFor(state, instruction.who, focus.seat);
-      return updateCard(moveCard(state, focus.sourceId, { zone: "play", seat }), focus.sourceId, { face: "up", exhausted: false });
+      // A shadow card that is taken (Ranger of Ithilien, 00015:A:2) stops being its enemy's shadow card: the move forgets it on the enemy (detach), and the card loses the enemy as its host.
+      const fromShadow = state.cards[focus.sourceId]?.zone === "shadow";
+      return updateCard(moveCard(state, focus.sourceId, { zone: "play", seat }), focus.sourceId, { face: "up", exhausted: false, ...(fromShadow ? { host: null } : {}) });
     }
     case "ReduceOpeningHand":
       return { ...state, openingHandReduction: state.openingHandReduction + instruction.amount };
@@ -241,7 +245,7 @@ export function runExtraVerb(
 // The host of the source card moves to the seat's heroes with the resources on it. Each card attached to
 // it follows, still attached. A seat left with no heroes is eliminated at once.
 function transferHost(state: ScenarioState, focus: VerbFocus, seat: number, steps: EngineStep[]): ScenarioState {
-  const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
+  const hostId = hostOf(state, focus.sourceId);
   const host = hostId ? state.cards[hostId] : undefined;
   if (!hostId || !host || host.controller == null || host.controller === seat) return state;
   const attachments = [...host.attachments];
@@ -282,7 +286,7 @@ export function raiseFor(
 ): ScenarioState {
   const who = instruction.who;
   // The controller of the card the source is attached to (a claimed objective on a hero): nobody when it is attached to nothing.
-  const host = who === "hostController" && focus.sourceId ? state.cards[state.cards[focus.sourceId]?.host ?? ""] : undefined;
+  const host = who === "hostController" ? state.cards[hostOf(state, focus.sourceId) ?? ""] : undefined;
   if (who === "hostController" && host?.controller == null) return state;
   // The defending player: the player the source enemy is engaged with (rr.defending-player).
   const seats = raisedSeats(state, who, focus.seat, who === "defendingPlayer" ? defendingPlayer(state, focus.sourceId) : host?.controller);
@@ -397,7 +401,7 @@ function discardTarget(
   focus: VerbFocus,
   ctx: ReduceContext,
   steps: EngineStep[],
-  destroy = false,
+  how: { readonly destroy?: boolean; readonly counted?: boolean },
 ): ScenarioState {
   const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" || kind === "other" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
@@ -405,11 +409,14 @@ function discardTarget(
   if (kind === "other" && !inPlay(state.cards[id]?.zone ?? "removed")) return state;
   // "Unique locations cannot be discarded from play by encounter card effects" (12193:B:1): the card holds the flag.
   if (flagged(state, id, "cannotBeDiscardedByEncounter") && isEncounterCardEffect(state, ctx.cards, focus.sourceId)) return state;
-  if (destroy) {
+  if (how.destroy === true) {
     const instance = state.cards[id];
     return instance && inPlay(instance.zone) ? destroyAndAnnounce(state, instance, printedOf(ctx.cards, instance.code), ctx.cards, steps) : state;
   }
-  return destroyCard(state, id, ctx.cards, steps);
+  const before = state.cards[id];
+  const next = destroyCard(state, id, ctx.cards, steps);
+  // A `counted` discard of a card that left play counts for the effect's `noneDiscarded` ("Then" resolves only if the discard did, rr.then).
+  return how.counted === true && before && inPlay(before.zone) && !inPlay(next.cards[id]?.zone ?? "removed") ? countDiscarded(next, 1) : next;
 }
 
 // The reveal frame of the source card counts each separate instance of surge it was given (rr.surge) for the rest of that reveal.

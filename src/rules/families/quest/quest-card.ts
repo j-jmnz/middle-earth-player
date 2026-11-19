@@ -1,6 +1,7 @@
 // Rules: rr.quest-advancement, rr.step-3-4, mec108.side-quests-in-play, mec108.captured-cards (data/rules/entries.json); ledger line 10176:A:1.
 //
-// "A quest card in play": the quest cards a player can name when a card places progress on one. The current quest stage of the player's area, the encounter side quests in the staging area and the player side quests in the quest areas.
+// "A quest card in play": the quest cards a player can name when a card places progress on one. The current quest stage of the player's area, the side quests in the staging area, encounter and player.
+import { effectProgressBarredOn } from "./effect-progress.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { ruleCause } from "../../core/cause.ts";
@@ -13,18 +14,18 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { putOnStage, questPointsOf } from "../../quest/quest.ts";
-import { currentSideQuest } from "../wilderland/night-quest.ts";
+import { currentSideQuest, isSideQuest } from "../wilderland/night-quest.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import { stageOf, stagingOf } from "../breaking/areas.ts";
 import { rescueRandom } from "../captured/rescue.ts";
-import { placeOnSideQuest, sideQuestIds } from "../sidequests/quest.ts";
+import { placeOnSideQuest } from "../sidequests/quest.ts";
 import type { Focus } from "../index.ts";
 
 // The quest cards in play the asking player can name.
 export function questCardPool(state: ScenarioState, asking: number, ctx: ReduceContext): string[] {
   const stage = stageOf(state, asking);
-  const staged = stagingOf(state, asking).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "encounter-side-quest");
-  return [...(stage ? [stage] : []), ...staged, ...sideQuestIds(state)];
+  const staged = stagingOf(state, asking).filter((id) => isSideQuest(state, id, ctx));
+  return [...(stage ? [stage] : []), ...staged];
 }
 
 // PlaceProgressOnQuestCard: see the schema entry.
@@ -36,6 +37,7 @@ export function placeProgressOnQuestCard(state: ScenarioState, instruction: Extr
   const type = printedOf(ctx.cards, quest.code).type;
   if (type === "quest") {
     if (id !== stageOf(state, focus.seat) || state.stageCleared) return state;
+    if (effectProgressBarredOn(state, id)) return state;
     if (flagged(state, id, "progressRescues")) return rescueRandom(state, id, amount);
     const before = steps.length;
     const placed = putOnStage(state, id, amount, questPointsOf(state, quest, ctx.cards), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, ruleCause("rr.step-3-4"), { counted: false, reduced: currentSideQuest(state) == null });

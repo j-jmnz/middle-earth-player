@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CONDITION_TEMPLATES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
+import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
 import type { Obj } from "./kit.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";
 
@@ -26,7 +26,7 @@ describe("effects render read fields, conditions", () => {
     lastPlayer: [{ kind: "lastPlayer" }],
     otherPlayer: [{ kind: "otherPlayer" }],
     handHasCard: [{ kind: "handHasCard" }],
-    undefended: [{ kind: "undefended" }],
+    undefended: [{ kind: "undefended" }, { kind: "undefended", is: false }],
     questSucceeded: [{ kind: "questSucceeded" }],
     questFailed: [{ kind: "questFailed" }],
     logged: [{ kind: "logged", line: "A line", is: false }],
@@ -60,6 +60,8 @@ describe("effects render read fields, conditions", () => {
     soleAttacker: [{ kind: "soleAttacker" }],
     lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }],
     ...ESCAPE_CONDITION_SAMPLES,
+    ...ERECH_CONDITION_SAMPLES,
+    ...FOG_CONDITION_SAMPLES,
     ...GUARDIAN_CONDITION_SAMPLES,
     ...LONG_DARK_CONDITION_SAMPLES,
     lastFortitudePassed: [{ kind: "lastFortitudePassed" }],
@@ -67,7 +69,7 @@ describe("effects render read fields, conditions", () => {
     hostControlledByActor: [{ kind: "hostControlledByActor" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
     matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false, inStaging: true }],
-    controls: [{ kind: "controls", code: "12345" }],
+    controls: [{ kind: "controls", code: "12345" }, { kind: "controls", code: "12345", who: "anyPlayer" }],
     freeOfEncounters: [{ kind: "freeOfEncounters" }],
     // The combinators are not in the table: renderCondition words them.
     not: [{ kind: "not", condition: { kind: "firstPlayer" } }],

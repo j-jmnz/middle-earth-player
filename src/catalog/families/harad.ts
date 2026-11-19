@@ -10,7 +10,8 @@ const VERBS = [
   // "Place each Harad enemy in the staging area facedown under The Black Gate" (144027:A:1), "place attacking enemy facedown under The Black Gate" (144037:A:2): the card (the picked card by default, `self`: the attacking enemy in an AfterAttack)
   // leaves play for the zone `under`, facedown, beneath the card in play with this code. Its attachments are discarded, its tokens go, and the card that hears "placed underneath" is told (`placedUnder`). A card not in play, or no host in play, changes nothing.
   // `afterAttack`: "place attacking enemy facedown under The Black Gate after this attack" (144039:A:2): while an attack is in progress the placement is made once it has ended, as an AfterAttack makes its instructions; with none in progress it is made at once.
-  z.strictObject({ verb: z.literal("PlaceFacedownUnder"), code: z.string().min(1), target: cardRefSchema.optional(), afterAttack: z.literal(true).optional(), ...when }),
+  // `host: "self"` (instead of `code`): the host is the source card itself, not the first card in play with a code ("each player places an ally he controls facedown under this location", 148008:A:2); a player card placed this way is still its owner's and returns to his hand (ReturnFacedownToHands).
+  z.strictObject({ verb: z.literal("PlaceFacedownUnder"), code: z.string().min(1).optional(), host: z.literal("self").optional(), target: cardRefSchema.optional(), afterAttack: z.literal(true).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

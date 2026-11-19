@@ -65,7 +65,7 @@ export function hears(state: ScenarioState, effect: Effect, listener: CardInstan
   // A card whose printed text box is blank has none of its abilities (rr.blank).
   if (textBlank(state, listener.id, ctx.cards)) return false;
   // A character that cannot trigger its effect cannot use its own Responses (Sacked!, 02048:A:1).
-  if (effect.timing === "response" && flagged(state, listener.id, "cannotTriggerEffects")) return false;
+  if (effect.timing === "response" && (flagged(state, listener.id, "cannotTriggerEffects") || (listener.controller != null && flagged(state, `seat:${listener.controller}`, "cannotTriggerEffects")))) return false;
   if (effect.byEncounterDeck && !event.fromDeck) return false;
   // Damage that cannot be canceled (DamageCard `uncancelable`) is not offered to an ability that cancels it.
   if (event.uncancelable && effect.instructions.some((instruction) => instruction.verb === "CancelDamage")) return false;

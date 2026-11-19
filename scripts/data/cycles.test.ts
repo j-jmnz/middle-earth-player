@@ -1,5 +1,5 @@
 // Rules: mec109.campaign-mode (data/rules/entries.json). What every cycle (scripts/data/campaign-defs.ts, `kind: "cycle"`) has in common, whichever it is: no campaign card, prelude,
-// booklet or starter deck, scenarios in play order and with a Nightmare deck each, a ledger file of its own, and a place in the campaign index as a cycle with no box. The pins of one
+// booklet or starter deck, scenarios in play order and with a Nightmare deck each (but for the Standalone scenarios, which have none), a ledger file of its own, and a place in the campaign index as a cycle with no box. The pins of one
 // cycle's cards are in its own test (shadows-of-mirkwood.test.ts, dwarrowdelf.test.ts).
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -13,6 +13,8 @@ import { loadAnyScenario, loadCampaign } from "./load-scenarios.ts";
 import { DATA_DIR } from "./paths.ts";
 import { nightmareDeckOf } from "./nightmare-defs.ts";
 
+// The cycles whose scenarios have no Nightmare deck: the Standalone scenarios were printed on their own, with none (README.md, Roadmap).
+const NO_NIGHTMARE: ReadonlySet<string> = new Set(["standalone-scenarios"]);
 const cycles = CAMPAIGNS.filter((campaign) => campaign.kind === "cycle");
 const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; kind: string; scenarioCount: number; box: string | null }[];
 
@@ -38,10 +40,13 @@ describe.each(cycles.map((cycle) => [cycle.id, cycle] as const))("the %s cycle",
     expect(existsSync(path.join(DATA_DIR, "printed", `${def.ledger ?? id}.json`))).toBe(true);
   });
 
-  it("gives every scenario a Nightmare deck and files its authored effects and seed finder in the folder of the cycle's id", () => {
+  it("gives every scenario a Nightmare deck (but for the cycles that have none) and files its authored effects and seed finder in the folder of the cycle's id", () => {
     for (const scenario of cycle.scenarios) {
-      expect(loadAnyScenario(scenario).nightmare, scenario).toBeDefined();
-      expect(nightmareDeckOf(scenario), scenario).toBeDefined();
+      if (NO_NIGHTMARE.has(id)) expect(loadAnyScenario(scenario).nightmare, scenario).toBeUndefined();
+      else {
+        expect(loadAnyScenario(scenario).nightmare, scenario).toBeDefined();
+        expect(nightmareDeckOf(scenario), scenario).toBeDefined();
+      }
       expect(authoredRel(scenario, id), scenario).toBe(`${id}/${scenario}`);
       expect(seedFinderRel(scenario, id), scenario).toBe(`${id}/${scenario}`);
     }

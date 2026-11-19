@@ -62,7 +62,7 @@ export type StartSeat = {
 };
 
 // The zones a scenario deals: every pile but the Evil Creatures discard pile, which starts empty.
-type DealtZone = Exclude<PileZone, "evilCreaturesDiscard">;
+type DealtZone = Exclude<PileZone, "evilCreaturesDiscard" | "smaugDiscard">;
 
 export type StartScenario = {
   seatCount: 1 | 2;
@@ -132,6 +132,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     for (const code of codes) state = spawn(state, code, { zone }).state;
     // The Evil Creatures deck has a discard pile of its own, which exists from the start (emce.evil-creatures-deck).
     if (zone === "evilCreaturesDeck") state = { ...state, piles: { ...state.piles, evilCreaturesDiscard: state.piles?.evilCreaturesDiscard ?? [] } };
+    // So does the Smaug deck (docs/brief.md, The Battle of Lake-town).
+    if (zone === "smaugDeck") state = { ...state, piles: { ...state.piles, smaugDiscard: state.piles?.smaugDiscard ?? [] } };
   }
   if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);
   if (input.doubleSided && input.doubleSided.length > 0) state = dealDoubleSided(state, input.doubleSided, ctx);
@@ -225,6 +227,8 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     );
     if (next.failure || next.lost) return next;
   }
+  // The quest card's Setup can deal a card that reads progress on a side quest (Lie Low, shuffled in by Into the Ettenmoors, 10064:A:1): the game notes it now.
+  next = markProgressNoted(next, ctx);
   if (next.questStage) next = timeOnReveal(updateCard(next, next.questStage, { face: "B" }), next.questStage, ctx);
   // A pool card's Setup that waited for a host the quest card's Setup puts into play, and the campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup), go down first, so they resolve after it.
   next = attachPending(next, ctx, steps);

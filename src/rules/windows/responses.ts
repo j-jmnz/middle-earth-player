@@ -15,7 +15,7 @@ import type { EngineStep, LegalIntent, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import type { GameEvent, ResponseOffer, ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, perilLock } from "../core/state.ts";
-import { payUsage, controllerSeat, offerable, usable, usageReason } from "../player/usage.ts";
+import { hostLostToCost, payUsage, controllerSeat, offerable, usable, usageReason } from "../player/usage.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { announceAbility, announcePlayerAbility } from "../families/deck/pressure.ts";
 import { isPlayerCardEffect } from "../core/keywords.ts";
@@ -173,6 +173,7 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       ...(event.participants ? { participants: event.participants } : {}),
       ...(aboutCard(event) ? { subject: aboutCard(event) } : {}),
       ...(event.other ? { other: event.other } : {}),
+      ...hostLostToCost(state, paid, intent.cardId),
       // A Response to damage just dealt resolves before the damaged card can be destroyed (rr.cancel).
       ...(event.trigger === "damageDealt" && event.cardId ? { dealt: event.amount ?? 0, hold: event.cardId } : {}),
       // Any other event's amount is the effect's X (the attachments an explored location had, 19026:A:2).

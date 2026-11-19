@@ -16,6 +16,7 @@ import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep, Payment, PlayerIntent } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier, raiseThreat, uniqueBlocked } from "../../core/keywords.ts";
+import { noteHandPlay } from "../wilderland/rounds.ts";
 import { playBlocked } from "../sidequests/contract.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { heroPays, hasResourceMatch } from "../../player/payments.ts";
@@ -103,6 +104,8 @@ export function afterPlay(before: ScenarioState, state: ScenarioState, intent: P
   const seat = before.activeSeat;
   const printed = printedOf(ctx.cards, card.code);
   let next = noteSpent(state, intent.payments, ctx);
+  // A card played from the hand counts toward a per-round limit on cards from the hand (LimitHandPlaysPerRound, 00017:B:2); one played from the deck or the discard pile does not.
+  if (card.zone === "hand") next = noteHandPlay(next, ctx, seat, intent.cardId);
   const paid = intent.payments.filter((payment) => payment.amount > 0);
   const played = next.played ?? [];
   const last = played.at(-1);

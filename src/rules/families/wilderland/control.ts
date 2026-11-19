@@ -33,7 +33,7 @@ export function controlFreedObjectives(state: ScenarioState, ctx: ReduceContext)
   for (const card of Object.values(state.cards)) {
     if (card.zone !== "play" || !codes.has(card.code) || card.controller === first || !freeOfEncounters(next, card.id)) continue;
     // The card is an objective, not any player's: control moves without making the old controller its owner.
-    next = updateCard(giveControl(next, card.id, first), card.id, { owner: undefined });
+    next = updateCard(giveControl(next, card.id, first, ctx.cards), card.id, { owner: undefined });
   }
   for (const id of state.staging) {
     const card = next.cards[id];

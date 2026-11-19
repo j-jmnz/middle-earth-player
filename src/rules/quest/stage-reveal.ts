@@ -5,7 +5,6 @@ import { runQuestResolution } from "./explore.ts";
 import { afterQuestOutcome, questOutcome } from "../families/quest/outcome.ts";
 import { questFailureRaise } from "../families/quest/threat.ts";
 import { askQuestProgress } from "../families/attachments/quest.ts";
-import { resolveSideQuests, sideQuestTotals } from "../families/sidequests/quest.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { gameReadsOnTrigger } from "../core/game-reads.ts";
 import { isLocationId } from "../core/printed.ts";
@@ -37,15 +36,15 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const before = steps.length;
   // Who was committed, read before resolving clears it, and the threat a failed quest raises (families/quest/).
   const outcome = questOutcome(state, ctx);
-  // The progress each side quest takes from its committed characters, read before resolution clears who is committed.
-  const sides = sideQuestTotals(state, ctx);
   const canAdvance = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
   // Once stages are separate each seat resolves the quest of its own stage in player order, against its own staging area (mec109.multiple-staging-areas).
   const quested = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
-  const resolved = keepCommitted(resolveSideQuests(quested, sides, ctx, steps), state);
+  const resolved = keepCommitted(quested, state);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
-  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);
+  // Progress placed anywhere in this resolution (the active location, a location that takes it first, the stage), for the trigger the table hears once.
+  const placed = steps.slice(before).some((step) => step.kind === "progress" && step.amount > 0);
+  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), { ...outcome, placed }, ctx, steps);
 }
 
 // "Forced: when the quest total is counted" (04016:A:1, Fanuidhol): fired once a phase, only in a game with a card that hears it (the marker is the table's `questTotalAnnounced`).
@@ -70,10 +69,13 @@ const failureAmountRead = (state: ScenarioState, ctx: ReduceContext): boolean =>
 function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean): ScenarioState {
   let next = state;
   for (const seat of areaSeats(state)) {
+    // A seat whose own quest phase ended resolves nothing (EndQuestPhase `own`, 148004:A:1).
+    if ((state.questEnded ?? []).includes(seat)) continue;
     next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat, failureAmountRead(state, ctx));
     if (next.stageCleared || next.lost) break;
   }
-  return clearCommitted(next);
+  const { questEnded: _ended, ...rest } = next;
+  return clearCommitted(rest);
 }
 
 // After progress was placed on the quest (from `steps[before]` on): each stage the quest advanced to has its When Revealed

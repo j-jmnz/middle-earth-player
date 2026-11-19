@@ -21,7 +21,16 @@ No phase is open.
 ## Open items
 
 ### Reviews
-- Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, and the card frames' ux fix. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
+- Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, the card frames' ux fix, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest and Fog on the Barrow-downs. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
+
+### Readings (not user-confirmed)
+- Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
+- A claimed treasure is not an attachment for card effects (`recommended`, docs/brief.md, Ered Mithrin).
+- A played player side quest goes to the staging area: The Lost Realm text read from a transcription; no official PDF is pinned in data/sources.json (docs/brief.md).
+- East Road Ranger 10008:A:1: "committed to a side quest" means committed while a side quest is the current quest (`recommended`).
+
+### Engine code
+- The leave-play loss is checked in loseWhenLeftPlay and still in destroyCard and releaseAttachments: foresight.ts reads `lost` from the latter two, so they stay until foresight uses loseWhenLeftPlay.
 
 ### Cards tab views
 - `pnpm data sync pictures` has not run since every card got a picture check: Google Drive's quota refused it (2026-11-18). Re-run it, then check that no pin moved to a smaller picture.
@@ -53,6 +62,11 @@ No phase is open.
 - `frommoria-won` is not committed: no seed in 400 wins Flight from Moria with the saved decklists (heroes destroyed by round 3).
 - `level-won` is not committed: no seed in 500 wins The Seventh Level with the saved decklists (their heroes are gone by round 3).
 - `pit-won` is not committed: no seed in 500 wins Into the Pit with the saved decklists (their heroes are destroyed by round 3 or 4).
+- `town-won` is not committed: no seed in 100 wins The Battle of Lake-town with the saved decklists.
+- `osgiliath-won` is not committed: no seed in 1200 wins The Massing at Osgiliath with the saved decklists (their heroes fall by round 2 to 4).
+- `erech-won` is not committed: no seed in 500 wins The Stone of Erech with the saved decklists.
+- `forest-won` is not committed: no seed in 100 wins The Old Forest with the saved decklists.
+- `downs-won` is not committed: no seed in 500 wins Fog on the Barrow-downs with the saved decklists.
 - `carrock-won` is not committed: no seed in 900 wins Conflict at the Carrock with the saved decklists (they cannot kill the four Trolls before threat 50).
 - `returnmirkwood-won` is not committed: no seed in 600 wins Return to Mirkwood two-handed on Easy with the saved decklists.
 - `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists.
@@ -130,8 +144,11 @@ No phase is open.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
 ### Rules and engine (Angmar Awakened)
+- Objective allies (Wilyador, Iârion, Amarthiúl, Captain Sahír, Na'asiyah): a player card that returns one to "its owner's hand" puts it in the encounter discard pile, and the players lose when it leaves play (agent recommendation; no ruling found, `docs/brief.md`, A Journey to Rhosgobel). Not user-confirmed.
 - Angmar Awakened data: Easy counts of Angmar Captain (09045, 1) and Angmar Marauder (09044, 2) in Escape from Mount Gram and Ruins of Arnor (09056, 2) in The Treachery of Rhudaur follow Hall of Beorn against DragnCards' E05 decks; no printed icon check. Not user-confirmed.
 - Angmar Awakened data: `MEC108_CHANGED` is empty because no scan shows the MEC108 printing of the 155 reprinted encounter cards; a rewording cannot be found until one is read. Not user-confirmed.
+- Claimed objectives with no printed return (Athelas, the Clues of Rhudaur) go to the encounter discard pile with their hero (semi-official FAQ 1.23, community; `docs/brief.md`, A Journey to Rhosgobel). Not user-confirmed.
+- Claimed objectives whose text claims them "if unattached" (Ashen Brazier, Loot objectives, Durin's Key, Urdug's Horn) return to the staging area when detached (agent recommendation, no source; `docs/brief.md`, Ered Mithrin). Not user-confirmed.
 - Angmar Awakened data: the Prison Cell, Savage Trollspawn and Amarthiúl (Wastes) piles follow each quest's Setup over DragnCards' load layout (agent recommendation). Not user-confirmed.
 - Angmar Awakened campaign cards: Iârion's Pendant at 10166:B:1 goes to the player the first player names, as the Ered Mithrin boon-ally ruling (agent recommendation; no ruling found). Not user-confirmed.
 - Angmar Awakened campaign cards: "add the Mysterious Omens side quest to the Campaign Log" (10159:A:2) adds it to the Campaign Pool (agent recommendation). Not user-confirmed.
@@ -206,14 +223,14 @@ No phase is open.
 - The Treachery of Rhudaur: each Clue's boon (10184:B:1) goes into its controller's deck as well as the pool (agent recommendation). Not user-confirmed.
 - Renderer gaps, The Treachery of Rhudaur (behaviour proven by tests): unclaimed side quests counted by 10094:B:4, Ghostly Ruins' unpayable Travel (10103:A:2), the main quest barred from Centuries of Sorrow's choice and Haunting Fog with no current quest (10105:A:2, 10108:A:1), Amarthiúl as an ally and the shared limit (10113), the boon into the deck (10184:B:1), "Restricted." on 10185 to 10187.
 - `modifiedStat` (`src/rules/core/keywords.ts`) reads traits with no effect list, so a trait an effect grants is not seen by stat conditions such as `defendingAgainst` (the condition path sees it).
-- Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
+- Intruders in Chetwood: quest cards in play are the main quest, the staged side quests, encounter and player, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
 - Intruders in Chetwood: Time counters come off after the end-of-refresh Forced effects. Not user-confirmed.
 - Intruders in Chetwood: Outlying Homestead (09020:A:2) bars threat reduction by player card effects only. Not user-confirmed.
 - Intruders in Chetwood: Sudden Assault (09021:A:1) attacks first and searches for an Orc War Party only if no attack was made. Not user-confirmed.
 - Intruders in Chetwood: Angmar Orc's ally choice (09043:A:1) may take Iârion; the first player chooses. Not user-confirmed.
-- Intruders in Chetwood: Pressing Needs (09049:A:2): search-and-reveal a side quest or make a different quest card current; player side quests not eligible. Not user-confirmed.
+- Intruders in Chetwood: Pressing Needs (09049:A:2): search-and-reveal a side quest or make a different quest card current; a staged player side quest is eligible. Not user-confirmed.
 - Intruders in Chetwood: Weight of Responsibility (09050) counts quest cards when it resolves. Not user-confirmed.
 - Intruders in Chetwood: Stop the War Party's Setup (09068:A:1): each player searches for one location with a different title. Not user-confirmed.
 - Intruders in Chetwood: Protect the Innocent (10158:A:1) takes 1 damage per attack that damages a character. Not user-confirmed.
@@ -255,7 +272,6 @@ No phase is open.
 - Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
 - Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
-- A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
 - `items-baseline` collapsed on Android in the path; it is still in `card-pool.tsx` and `log/[saveId].tsx`.
 - Why the path screen was laid out taller than the window on Android is not known. The action bar's overrun measure stays for screens that keep a bar.
 - Web only: opening Cards, Import or a deck first can raise "error during concurrent rendering" (expo-sqlite "Sync operation timeout"; React recovers). Rows ending in a stepper warn "nested button".
@@ -328,6 +344,20 @@ No phase is open.
 - A discarded shadow card keeps its `host` (`detach` in `src/rules/core/zones.ts`); clearing it changes every `golden.json` (the field only), so it waits for an all-scenario engine bump. Workarounds: `src/rules/families/encounter/moves.ts` (a move to the active location) and `inspectTargets` in `src/play/store/selectors.ts`.
 - The Nightmare decks are not in `pnpm effects render --all`, so their renders have no snapshot (`scripts/data/effects/render/snapshots`).
 - Renderer gaps, Shadows of Mirkwood (behaviour proven by spec rows and line tests): a pick or count of `control: any` does not say it reaches the staging area; the final-stage win (02013:B:2); `activeThreat`, `returnsToEncounterDeck`, `cannotTriggerEffects`, `progressCap`, `returnsWithoutActive`, `undefendedToHolder`, `shadowHitsAll` and `treacheryHitsAll` show as flags; "engaged with a player" reads "the player"; victory-display stats read "while in play"; the seat a Response or a next player is counted from; `escapePassed` heard only from its own test (02106:B:2); a self-only travel bar reads "any location" (02065:A:3).
+
+### Rules and engine (Standalone scenarios)
+- The Massing at Osgiliath has no rulesheet and no official ruling; its readings are in `docs/brief.md` (The Massing at Osgiliath). Agent recommendations, not user-confirmed: Snaga Scouts engages every copy (00002:A:1), Wainriders' threat per damage placed (00004:A:1), Wolves from Mordor (00003:A:1), Wainrider Captain's "top Scout" (00005:A:1), Morgulduin (00009:A:1), Pelennor Fields charged once and satisfied by the raise (00010:A:1), Cut Off's discard offered only when payable (00012:A:3), Ranger of Ithilien's shadow (00015:A:2), Through the Ruins' count (00017:B:2), Anduin Crossing's once a round and its quest-phase timing (00018:B:3).
+- The Massing at Osgiliath, community only, not user-confirmed: Easy deals the Normal deck; Ranger of Ithilien enters committed in the quest phase (00015:A:1); Anduin Crossing's discard-or-commit-nothing (00018:B:3).
+- The Battle of Lake-town: the Smaug deck and Burn X rules come from the Quest Companion, a community source, not a card or rulesheet. Not user-confirmed.
+- The Battle of Lake-town, agent recommendations or community only, not user-confirmed: the blind play-or-staging Smaug choice; Smaug the Magnificent's excess (50206:A:2); burn damage on characters counts as an encounter effect and Great House's own Burn counts (50205:A:2, 50210:A:1, 50221:A:2); the hero-discard cancel offered from the first player (50209:A:2, 50210:A:2); Town-Baiting's defender is the last player (50211:A:1); North Pier bars damage but not Smaug's carry-over (50218:A:2); Fisherman's Dock's travel and exhaust (50223:A:2); Esgaroth Wharf's additional attack against Lake-town (50224:A:3); The Old Thrush's Defense -X lasts the attack (50208:A:2).
+- The Stone of Erech, agent recommendations or community only, not user-confirmed: the Night objectives' 4-progress check is passive and the next one enters with no progress; Spectral counts Willpower modifiers, not Attack bonuses; Relic from the Dark Years covers the attack it is played in; Derufin enters ready under the first player; stage 2B's and Tarlang's Neck's choices are the first player's; Restless Dead and Blackroot Graves move, not reveal; the Night objective, Spectral and stage 3B Battle rules come from RulesPal's transcription, a community source (`docs/brief.md`, The Stone of Erech).
+- The Old Forest, agent recommendations or community only, not user-confirmed: the Easy copy counts (Hall of Beorn only); a different random stage 2A returns the left stage to the quest deck (147001:B:1, 147002:B:2); the stage 2B Forced fires once per quest that placed progress anywhere; Ending and Failing's X counts Old Man Willow (147021); the revealing player chooses on Peril cards, the first player otherwise; "beginning of the round" is the Resource phase's start (147003:B:1); Falling Branches and Song of Sleep do nothing with no eligible committed character (147018, 147019) (`docs/brief.md`, The Old Forest).
+- Renderer gaps, The Old Forest: the setup search's "different" prints as JSON (147001:A:1); `AdvanceToStage` prints as JSON (147002–147005:B:2); the first player as the extra card's revealer does not print (147005:B:1, 147011:A:3); the last stage's win has no words (147006:B:2); Old Man Willow's raise reads "the acting player", not the defending player (147007:A:2); `Restrict travelOnly` prints as JSON (147012:A:2); `blankText` does not say it keeps Traits (147019:A:2); `TakeRevealedCard` prints as JSON (147022:A:1).
+- Fog on the Barrow-downs, agent recommendations or community only, not user-confirmed: the Easy copy counts (Hall of Beorn only); a left 4A copy returns to the quest deck, so a player can be trapped again; an empty encounter deck during a 4A Wight discard shuffles the discard in; the Hollow Circle, Standing Stones and Long Groping Arm searches shuffle even when nothing is found; a player who joins a stage later in the round is not held by Frozen by Fear; Tom Bombadil's chooser is the first player of the revealer's area; RulesPal's phase skip with nobody at 3B and its combining rule, and Vision of the Palantír's X in 4A, are community only; from the Build: a parked 3B's active location returns to the staging area, 4B's location cancel raises threat by the Threat read before the discard, the player chooses the Great Barrow when 4B is defeated, and Frozen by Fear also bars playing events; the first player chooses the Great Barrow when a 4B player is eliminated; from the Finish: stage 4A's discard shuffles the discard pile in when the deck runs out, an opt-in `reshuffle` on `DiscardUntil` set only there (148004:A:1), and Hollow Circle, Standing Stones and Great Barrow are Immune by override where Hall of Beorn lists no keyword (`docs/brief.md`, Fog on the Barrow-downs).
+- Renderer gaps, Fog on the Barrow-downs: the `inVictory` condition (148002:B:2, 148003:B:3), `RaiseThreatAtStage` (148003:B:2), the `stagingArea`, `atStage` and `engagedWith` pick keys (148004:B:2, 148009:A:1, 148010:A:1, 148016:A:1, 148017:A:2, 148018:A:2), `{facedown, plus}` (148008:A:1), `ReturnFacedownToHands` (148008:A:2) and `ImmediateAttackEach` with a trait (148014:A:1) print as JSON; the 4A discard does not say the discard pile is shuffled in (148004:A:1); a travel `Restrict` with no location reads "any location" for "here" (148007:A:1); Dark-wight's "you" does not name the engaged player (148013:A:1); `noneReturned` reads as returned cards for attacks made (148014:A:1); `cannotTriggerEffects` has no words (148017:A:2).
+- Renderer gaps, The Stone of Erech: `noQuestProgress` has no gloss for "quest card only" (50303:B:2); the `maxWillpower` pick filter prints as JSON (50306:A:2, 50306:A:3, 50319:A:2, 50326:A:1); the doomed gloss says "when played" for an encounter card (50314:A:3); `SkipTravelPhase` has no template (50324:A:1).
+- Renderer gaps, The Battle of Lake-town (behaviour proven by spec rows and line tests): who may use the Refresh Action (50203:B:2); "defeat Smaug to defeat this stage" (50203:B:3); a shadow card per attack (50204:A:2); the acting player of a shadow is the defending player (50216:A:3); `step canTravel` and `AddSourceToVictory` print as JSON (50219:A:2); the Dock's second active slot and its unpayable case (50223:A:2).
+- Renderer gaps, The Massing at Osgiliath (behaviour proven by spec rows and line tests): `noPlayerAttachments` (00001:A:1) and `damageToThreat` (00004:A:1) show as flags; the Witch-king's chooser and raised threat read "the acting player" and "the player the event is about", not the defending player (00001:A:3); the defenders' removal from combat (00007:A:2) and the old active location's return to staging (00009:A:2) do not print; `noEffectProgress` does not say it covers the quest and the active location, effect progress only (00018:B:1); Anduin Crossing's "ally named Ranger of Ithilien" filter does not say it takes the objective ally (00018:B:3).
 
 ## Standing decisions
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.

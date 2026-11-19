@@ -50,7 +50,7 @@ cards have no file under `src/effects/authored/families/`.
 - Your records: `src/effects/authored/families/<F>.ts` (`RECORDS`, `REPLACES`) for a family, or
   the scenario's authored file (`AUTHORED_EFFECTS`, `AUTHORED_REPLACES`; `docs/architecture.md`, Effects) for a scenario.
 - A new family is wired in at three places, each one line: `src/catalog/families/index.ts` (`CATALOG_FAMILIES`), `src/rules/families/index.ts`
-  (`RULES_FAMILIES`) and `src/effects/authored/families/index.ts` (when it has records there). `src/catalog/families/families.test.ts`
+  (`rulesFamilies()`) and `src/effects/authored/families/index.ts` (when it has records there). `src/catalog/families/families.test.ts`
   fails if two families add the same trigger or flag; `src/rules/interpret/family-manifest.test.ts` fails if a declared verb has no runner or a runner answers an undeclared one. A scenario's authored file is picked up by
   `pnpm data build`, which writes the barrel `src/effects/generated/authored.ts` (`scripts/data/effects/barrel.ts`); the coverage test fails while it is stale.
 

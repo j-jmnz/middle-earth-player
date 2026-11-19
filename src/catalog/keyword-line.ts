@@ -22,6 +22,7 @@ export const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   sailing: "sailing",
   uncharted: "uncharted",
   phantom: "phantom",
+  spectral: "spectral",
   dire: "dire",
   // PASS (dwd.locate-test): a card that prints it passes a locate test it is discarded for (src/rules/families/long-dark/).
   pass: "pass",
@@ -36,6 +37,7 @@ export const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
   boarding: "boarding",
   aflame: "aflame",
   regenerate: "regenerate",
+  burn: "burn",
 };
 
 // Hall of Beorn lists one keyword per entry, with the trailing period: "Hide 2.", "Surge.".

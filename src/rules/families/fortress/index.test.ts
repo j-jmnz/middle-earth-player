@@ -18,7 +18,7 @@ import { textBlank } from "../attachments/hold.ts";
 import { probeTable } from "../../../../scripts/card-smoke/encounter.ts";
 import { encounterWorld, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
 import { allyCard, idOf, resolveRecords } from "../../../../test/harness/scene-kit.ts";
-import { RULES_FAMILIES } from "../index.ts";
+import { rulesFamilies } from "../index.ts";
 import { manifest } from "./index.ts";
 
 let world: EncounterWorld;
@@ -76,7 +76,7 @@ describe("143073:B:1 the Defense keyword", () => {
   });
 
   it("is a hook the core calls, not a call by name: a list without the fortress family resolves the quest as the core does", () => {
-    const others = RULES_FAMILIES.filter((family) => family !== manifest && family.name !== "fortress");
+    const others = rulesFamilies().filter((family) => family !== manifest && family.name !== "fortress");
     const after = withFamilies(others, () => resolveQuest(table, cardsOf(), [], open));
     expect(threatOf(after)).toBeGreaterThan(threatOf(table) ?? 0);
   });

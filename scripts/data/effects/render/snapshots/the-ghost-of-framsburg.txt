@@ -53,7 +53,9 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19094:A:2 (front): If unattached, the first player claims Crypt Key and attaches it to a hero he controls.
   19094:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 19094:A:3 (front): Response: When the players travel to a Discover location, exhaust Crypt Key to either increase or decrease its Discover value by 1 before resolving it.
   19094:response:1: Response after the players travel (heard about location (any player controls); cost: exhaust this card)
@@ -75,7 +77,9 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19095:A:2 (front): If unattached, the first player claims Old Lantern and attaches it to a hero he controls.
   19095:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 19095:A:3 (front): Action: Exhaust Old Lantern to choose a player to look at the top X cards of his deck, where X is the Discover value of the active location. He adds one of those cards to his hand and places the rest on the bottom of his deck.
   19095:action:1: Action (cost: exhaust this card)
@@ -98,7 +102,9 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19096:A:2 (front): If unattached, the first player claims Scatha's Teeth and attaches it to a hero he controls.
   19096:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 19096:A:3 (front): Action: Exhaust Scatha's Teeth and attached hero to choose a player. That player reduces his threat by 2.
   19096:action:1: Action (cost: exhaust this card and exhaust the attached card)
@@ -367,4 +373,4 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     only if the card with code 19098 is not in the victory display
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 193 by template, 39 as JSON)
+(rendered pieces: 196 by template, 39 as JSON)

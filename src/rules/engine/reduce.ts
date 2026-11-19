@@ -1,5 +1,6 @@
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
+import { loseWhenLeftPlay } from "../core/eliminate.ts";
 import { rejectionReason } from "./legal.ts";
 import { syncConstants } from "../interpret/constants.ts";
 import { registerHostListeners } from "../families/attachments/hold.ts";
@@ -16,7 +17,7 @@ export function reduce(state: ScenarioState, intent: PlayerIntent, ctx: ReduceCo
   const reason = rejectionReason(state, intent, ctx);
   if (reason) return { ok: false, reason, state };
   const steps: EngineStep[] = [];
-  const settled = syncConstants(settle(applyIntent(state, intent, ctx, steps), ctx, steps), ctx);
+  const settled = loseWhenLeftPlay(state, syncConstants(settle(applyIntent(state, intent, ctx, steps), ctx, steps), ctx), ctx.cards);
   if (settled.failure) return { ok: false, reason: settled.failure, state };
   return { ok: true, state: noteHistory(state, settled, intent, steps), steps };
 }

@@ -102,5 +102,10 @@ export function readyBarred(state: ScenarioState, id: string, byPlayer?: Readonl
   const card = state.cards[id];
   if (byPlayer == null || card == null) return false;
   const printed = printedOf(byPlayer, card.code);
-  return state.modifiers.some((modifier) => modifier.stat === "cannotReadyByPlayerCard" && modifier.amount > 0 && modifierActive(state, modifier) && heldBy(modifier, card, printed));
+  return flaggedByClass(state, card, printed, "cannotReadyByPlayerCard");
+}
+
+/** A flag modifier the card holds by its id or by a class it belongs to (`cannotQuest` on every character one seat controls, 00018:B:3). */
+export function flaggedByClass(state: ScenarioState, instance: CardInstance, printed: PrintedCard, stat: ModifierStat): boolean {
+  return state.modifiers.some((modifier) => modifier.stat === stat && modifier.amount > 0 && modifierActive(state, modifier) && heldBy(modifier, instance, printed));
 }

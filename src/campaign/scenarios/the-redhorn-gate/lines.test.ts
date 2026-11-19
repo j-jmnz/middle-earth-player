@@ -245,7 +245,7 @@ describe("04021:A:1 Fallen Stones", () => {
     made.cards.set("sq", definePrinted({ code: "sq", name: "sq", type: "encounter-side-quest", questPoints: 6 }));
     made.cards.set("psq", definePrinted({ code: "psq", name: "psq", type: "player-side-quest", sphere: "neutral", cost: 0, questPoints: 6 }));
     let state = spawn(made.state, "sq", { zone: "staging" }).state;
-    state = spawn(state, "psq", { zone: "seatQuest", seat: 0 }).state;
+    state = spawn(state, "psq", { zone: "staging" }).state;
     state = updateCard(state, idOf(state, "sq"), { progress: 2 });
     state = updateCard(state, idOf(state, "psq"), { progress: 1 });
     const done = resolveRecords(state, made.ctx, "04021", "whenRevealed", undefined, () => "remove");

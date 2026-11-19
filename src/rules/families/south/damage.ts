@@ -54,11 +54,18 @@ export function discardEach(state: ScenarioState, instruction: Extract<Instructi
     next = card.zone === "hand" ? discardFromHand(next, id, seat) : moveCard(next, id, { zone: "discard", seat });
     count += 1;
   }
-  const data = count > 0 ? effectData(next) : undefined;
-  return data ? patchTop(next, { data: { ...data, discardedCount: (data.discardedCount ?? 0) + count } }) : next;
+  return countDiscarded(next, count);
 }
 
-/** The `noneDiscarded` condition: the running effect's DiscardEach has discarded no card. Null for any other condition. */
+/** The running effect has discarded `count` more cards (a Discard of a card in play counts too: "Discard Tom Bombadil. Then, shuffle ...", 147022:A:1, rr.then). */
+export function countDiscarded(state: ScenarioState, count: number): ScenarioState {
+  const data = count > 0 ? effectData(state) : undefined;
+  return data ? patchTop(state, { data: { ...data, discardedCount: (data.discardedCount ?? 0) + count } }) : state;
+}
+
+/** The `noneDiscarded` condition: the running effect's DiscardEach has discarded no card and DiscardFromDeck has discarded none from a deck (Great Bridge, 50222:A:2). Null for any other condition. */
 export function noneDiscarded(state: ScenarioState, condition: Condition): boolean | null {
-  return condition.kind === "noneDiscarded" ? (effectData(state)?.discardedCount ?? 0) === 0 : null;
+  if (condition.kind !== "noneDiscarded") return null;
+  const data = effectData(state);
+  return (data?.discardedCount ?? 0) === 0 && (data?.discardedFromDecks ?? []).length === 0;
 }

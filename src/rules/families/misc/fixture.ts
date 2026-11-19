@@ -32,6 +32,7 @@ const EXTRA: PrintedCard[] = [
   ally("04083", "Warden of Healing", "neutral", ["Noldor"]),
   heroCard("04128", "Elrond", "lore", ["Noldor", "Noble"]),
   attachment("09011", "Athelas", "neutral", ["Item"]),
+  attachment("131011", "Cram", "neutral", ["Item"]),
   ally("10147", "Galadhrim Healer", "neutral", ["Silvan"]),
   heroCard("11001", "Círdan the Shipwright", "leadership", ["Noldor", "Noble"]),
   ally("22111", "Dale Messenger", "neutral", ["Dale"]),

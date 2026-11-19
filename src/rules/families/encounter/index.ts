@@ -10,7 +10,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lowerThreat, playerCardEffectCanChoose } from "../../core/keywords.ts";
 import { isPlayerType, printedOf } from "../../core/printed.ts";
-import { placeQuestProgress } from "../../quest/quest.ts";
+import { placeEffectProgress } from "../quest/effect-progress.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
@@ -75,7 +75,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ShuffleEncounterDiscard":
       return instruction.alsoVictory === true ? shuffleDiscardAndVictoryIn(state, ctx, instruction.trait, instruction.type, instruction.name) : shuffleDiscardIn(state, ctx, instruction.trait, instruction.type, instruction.name);
     case "DiscardUntil":
-      return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait);
+      return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait, instruction.reshuffle === true);
     case "DamageEachWithAttachment":
       return damageEachWithAttachment(state, instruction, focus, ctx, steps);
     case "RevealFromDiscard":
@@ -119,7 +119,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
       if (amount <= 0) return state;
       const before = steps.length;
-      const placed = placeQuestProgress(state, amount, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
+      const placed = placeEffectProgress(state, amount, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
       return afterProgress(placed, before, ctx, steps);
     }
     case "RaiseThreatTo": {

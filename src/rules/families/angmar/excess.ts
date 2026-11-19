@@ -1,5 +1,5 @@
 // Rules: rr.damage, rr.hit-points, mec108.side-quests-in-play (data/rules/entries.json); ledger line 10074:A:1. "For each excess point of combat damage dealt by Cruel Mountain-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) you
-// must remove 1 progress from each quest card in play": each quest card in play (the main quest stage, each encounter side quest in the staging area and each player side quest, the quest cards of `questCardPool`) loses as many progress tokens as there are excess points, no more than it holds.
+// must remove 1 progress from each quest card in play": each quest card in play (the main quest stage, each side quest in the staging area, the quest cards of `questCardPool`) loses as many progress tokens as there are excess points, no more than it holds.
 import type { Cause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";

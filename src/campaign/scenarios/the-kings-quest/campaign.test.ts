@@ -72,13 +72,14 @@ describe("The King's Quest in the ered-mithrin campaign", { timeout: 60_000 }, (
     expect(log.allyLines ?? []).toEqual([]);
     // A Growing Threat was dealt and used up in part 2; the Dol Guldur Orcs card its Resolution discarded until found is in the pool.
     expect(log.encounterPool?.["12167"]).toBeUndefined();
-    expect(log.encounterPool?.["01089"]).toBe(1);
+    expect(log.encounterPool?.["01094"]).toBe(1);
+    expect(log.encounterPool?.["01095"]).toBe(1);
     expect(log.treasures).toHaveLength(2);
     // The checklist reads the same log as the game does.
     const facts = wilderlandFacts(log, campaign.id);
     expect(facts.treasures).toEqual(log.treasures);
     expect(facts.encounterPool).toEqual(log.encounterPool);
-    expect(poolEncounterCopies(log.encounterPool ?? {})).toContain("01089");
+    expect(poolEncounterCopies(log.encounterPool ?? {})).toContain("01095");
     const given = afterEarlier(2);
     const state = opened(kingsquestStart(2, 3, "Normal", undefined, given));
     expect(state.campaignFacts?.treasures).toEqual(given.treasures);

@@ -28,8 +28,9 @@ exact match: copy them) or the nearest existing records. The vocabulary is in `.
 3. Take rule wording from `data/rules/entries.json` (`pnpm data query`), not from memory. Rule ids you cite must exist there. A reading they leave open is researched online in the order `.claude/rules/authority.md` (Open points) gives, and reported with its status and URLs.
 4. Run `pnpm effects open` (it rewrites `src/effects/open-lines.ts`; commit the change only when the task is to burn the
    list down), `pnpm typecheck`, `pnpm lint`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
-   `pnpm test smoke <codes>` for the cards you wrote. Report what is green and every
-   line you could not express, with the mechanic it needs.
+   `pnpm test smoke <codes>` for the cards you wrote (a failure prints the `pnpm game show` source that opens its table;
+   `pnpm game scene` tries a card on a layout's table: `docs/development.md`, Reading a game as text). Report what is green
+   and every line you could not express, with the mechanic it needs.
 
 A test of a scenario's records builds its table with the scenario's scene (`test/scenarios/<scenario-id>/scene.ts`, written by `pnpm scenario new` on the helpers of `test/harness/scene-kit.ts`: `resolveRecords`, `finish`, `answer`, the fight) next to the scenario's other tests in `src/campaign/scenarios/<scenario-id>/`.
 

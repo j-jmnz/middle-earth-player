@@ -14,7 +14,7 @@ import { capturedByHost } from "../../rules/families/captured/pile.ts";
 import { grappledWith } from "../../rules/families/grapple/values.ts";
 import { prisonersOfSeat } from "../../rules/families/prisoner/index.ts";
 import { declaredDefenders } from "../../rules/families/defense/defenders.ts";
-import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../../rules/families/breaking/areas.ts";
+import { activeOf, areaOf, isSeparate, parkedStage, sharedStaging, stageOf, stagingOf } from "../../rules/families/breaking/areas.ts";
 
 import { threatRows } from "./foresight.ts";
 import { isDiscardPile, opensList, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId } from "./pile-ids.ts";
@@ -121,13 +121,11 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
         const card = game.cards[id];
         return card != null && card.host == null && !fighting.has(id);
       });
-      // The seat's player side quest stands first in its row: its quest area (families/sidequests/play.ts).
-      const quest = owner.questStage && game.cards[owner.questStage] ? [owner.questStage] : [];
       // Then its ships, the Dream-chaser before any other (dcce.ship-objectives), then its heroes and the rest.
       const ships = facts ? shipsFirst(game, here, facts) : [];
       const rest = facts ? here.filter((id) => !ships.includes(id)) : here;
       // The hero this seat's player holds as the prisoner is still in play: facedown beside the seat's cards, with Mendor under it.
-      return [...quest, ...ships, ...rest, ...prisonersOfSeat(game, seat)];
+      return [...ships, ...rest, ...prisonersOfSeat(game, seat)];
     }
     case "hand":
       return owner?.hand ?? NONE;
@@ -138,6 +136,8 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
 function areaOrShared(game: ScenarioState, seat: number): readonly string[] {
   const own = stagingOf(game, seat);
   if (!isSeparate(game)) return own;
+  // The staging cards of a parked stage (Fog on the Barrow-downs, stage 3B with no player at it) are in no player's area: the table draws them in none, and a dial and the stage's preview name them (readouts/standalone-scenarios/barrow-downs.ts).
+  if (parkedStage(game) != null) return own;
   const shared = sharedStaging(game);
   return shared.length > 0 ? [...own, ...shared] : own;
 }
@@ -156,14 +156,12 @@ function shipsFirst(game: ScenarioState, ids: readonly string[], facts: ZoneFact
   return ids.filter((id) => rank(id) != null).sort((a, b) => (rank(a) ?? 1) - (rank(b) ?? 1));
 }
 
+// An ally the active location guards (Arwen under Goblin Gate, 901402:B:1, the `guardedAlly` flag) is drawn under it in the active location's zone, not in the staging area.
+const guardedAllyOf = (game: ScenarioState, card: CardInstance | undefined): readonly string[] => (card?.guard === true && card.host != null && flagged(game, card.host, "guardedAlly") ? [card.host] : []);
+const heldUnderActive = (game: ScenarioState): string | null => guardedAllyOf(game, game.activeLocation ? game.cards[game.activeLocation] : undefined)[0] ?? null;
+
 // The staging area's cards in the order the table draws them: each guarded objective is followed by the encounter cards attached to it
 // (rr.guarded), so a guard stands beside the objective it guards.
-// An ally the active location guards (Arwen under Goblin Gate, 901402:B:1, the `guardedAlly` flag) is drawn under it in the active location's zone, not in the staging area.
-const heldUnderActive = (game: ScenarioState): string | null => {
-  const active = game.activeLocation ? game.cards[game.activeLocation] : undefined;
-  return active?.guard === true && active.host != null && flagged(game, active.host, "guardedAlly") ? active.host : null;
-};
-
 function stagingOrder(game: ScenarioState, staging: readonly string[]): readonly string[] {
   const held = heldUnderActive(game);
   if (held != null && staging.includes(held)) return stagingOrder(game, staging.filter((id) => id !== held));
@@ -230,7 +228,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
     // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2).
     const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : NONE;
-    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" && card.guard === true && card.host != null && flagged(game, card.host, "guardedAlly") ? [card.host] : [])]);
+    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" ? guardedAllyOf(game, card) : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
     const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;
@@ -289,6 +287,8 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "cavesDeck":
     case "haradDeck":
     case "angmarOrcDeck":
+    case "smaugDeck":
+    case "smaugDiscard":
       return game.piles?.[pile] ?? NONE;
     case "victory":
       return game.victory;
@@ -429,7 +429,8 @@ export function onTableFor(game: ScenarioState, seat: number, folded?: ReadonlyS
       // Once stages are separate the table draws the seat's own area, stage and active location: a card of another seat's is not on it.
       case "staging": {
         const area = areaOf(game, cardId);
-        return area == null || area === seat;
+        // A card of a parked stage's staging area is in no area: it is not on the table the seat sees.
+        return area == null ? parkedStage(game) == null : area === seat;
       }
       case "activeLocation":
       case "secondActiveLocation":

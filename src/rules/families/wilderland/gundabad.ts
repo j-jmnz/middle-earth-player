@@ -20,6 +20,7 @@ import { fireForced } from "../../windows/triggers.ts";
 import { listenerInPlay } from "../nightmare/guards.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
+import { backIntoQuestDeck } from "./random-stage.ts";
 import { arrivalFace } from "../quest/order.ts";
 import type { Focus } from "../index.ts";
 
@@ -70,9 +71,9 @@ export function replaceCurrent(state: ScenarioState, nextId: string, how: Replac
   const current = currentId ? state.cards[currentId] : undefined;
   if (!currentId || !current || (currentId === nextId && !how.shuffle)) return state;
   const before = steps.length;
-  if (current.progress > 0) steps.push({ kind: "progress", targetId: currentId, amount: -current.progress, cause: currentCause(steps, UNATTRIBUTED) });
-  let next = releaseAttachments(state, currentId, ctx.cards, steps);
-  next = updateCard(moveCard(next, currentId, { zone: how.leaves ?? "questDeck" }), currentId, { progress: 0, face: "A" });
+  const cause = currentCause(steps, UNATTRIBUTED);
+  let next = backIntoQuestDeck(releaseAttachments(state, currentId, ctx.cards, steps), currentId, cause, steps);
+  if (how.leaves) next = moveCard(next, currentId, { zone: how.leaves });
   if (how.shuffle) next = shuffleDeck(next);
   const arriving = how.shuffle ? (next.questDeck[0] ?? currentId) : nextId;
   next = moveCard(next, arriving, { zone: "questStage" });

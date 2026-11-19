@@ -1,5 +1,6 @@
 import dwarrowdelf from "../../../data/campaigns/dwarrowdelf.json";
 import shadowsOfMirkwood from "../../../data/campaigns/shadows-of-mirkwood.json";
+import standaloneScenarios from "../../../data/campaigns/standalone-scenarios.json";
 import dreamChaser from "../../../data/campaigns/dream-chaser.json";
 import fellowship from "../../../data/campaigns/fellowship-of-the-ring.json";
 import darkOfMirkwood from "../../../data/campaigns/the-dark-of-mirkwood.json";
@@ -23,6 +24,11 @@ import watcherInTheWater from "../../../data/scenarios/the-watcher-in-the-water.
 import longDark from "../../../data/scenarios/the-long-dark.json";
 import foundationsOfStone from "../../../data/scenarios/foundations-of-stone.json";
 import shadowAndFlame from "../../../data/scenarios/shadow-and-flame.json";
+import massing from "../../../data/scenarios/the-massing-at-osgiliath.json";
+import lakeTown from "../../../data/scenarios/the-battle-of-lake-town.json";
+import stoneOfErech from "../../../data/scenarios/the-stone-of-erech.json";
+import oldForest from "../../../data/scenarios/the-old-forest.json";
+import fogOnTheBarrowDowns from "../../../data/scenarios/fog-on-the-barrow-downs.json";
 import anduin from "../../../data/scenarios/journey-along-the-anduin.json";
 import knife from "../../../data/scenarios/a-knife-in-the-dark.json";
 import past from "../../../data/scenarios/a-shadow-of-the-past.json";
@@ -80,8 +86,8 @@ import { campaignDataSchema, parseAnyScenarioData, type AnyScenarioData, type Ca
 // source for them. Metro needs static JSON imports, so the map is written by hand; campaign-data.test.ts checks it against
 // data/campaigns/index.json and data/scenarios. Each file is parsed (zod) the first time it is asked for, not when the module
 // loads, and kept: the app opens without parsing every scenario, and a screen pays only for the ones it shows.
-const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([shadowsOfMirkwood, dwarrowdelf, fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
-const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([intoThePit, seventhLevel, flightFromMoria, redhornGate, roadToRivendell, watcherInTheWater, longDark, foundationsOfStone, shadowAndFlame, past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm, hunt, carrock, rhosgobel, emynMuil, deadMarshes, returnToMirkwood].map((raw) => [raw.id, raw]));
+const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([shadowsOfMirkwood, dwarrowdelf, standaloneScenarios, fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
+const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([intoThePit, seventhLevel, flightFromMoria, redhornGate, roadToRivendell, watcherInTheWater, longDark, foundationsOfStone, shadowAndFlame, past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm, hunt, carrock, rhosgobel, emynMuil, deadMarshes, returnToMirkwood, massing, lakeTown, stoneOfErech, oldForest, fogOnTheBarrowDowns].map((raw) => [raw.id, raw]));
 
 const campaigns = new Map<string, CampaignData>();
 const scenarios = new Map<string, AnyScenarioData>();
@@ -96,12 +102,14 @@ export function campaignIds(): readonly string[] {
  * campaign whose flags (saga, booklet) the box's standalone games follow. The Oath and The Caves of Nibin-Dûm are in two campaigns
  * but one box, The Dark of Mirkwood. `name` is the printed product.
  */
-export type Box = { id: string; name: string; campaignId: string; scenarios: readonly string[] };
+export type Box = { id: string; name: string; campaignId: string; scenarios: readonly string[]; /** Titles of the cycle's scenarios not built yet, in release order (the campaign file's `later`); each waits under Coming later. */ later?: readonly string[] };
 
 export const BOXES: readonly Box[] = [
   // In the campaigns table's order (`position`): by release, the Lord of the Rings saga boxes together at the Fellowship's.
   // Shadows of Mirkwood is a cycle, not a campaign: its six Adventure Packs have no Campaign Mode and are played standalone only (docs/brief.md, Shadows of Mirkwood).
   { id: "shadows-of-mirkwood", name: "Shadows of Mirkwood", campaignId: "shadows-of-mirkwood", scenarios: ["the-hunt-for-gollum", "conflict-at-the-carrock", "a-journey-to-rhosgobel", "the-hills-of-emyn-muil", "the-dead-marshes", "return-to-mirkwood"] },
+  // The Standalone scenarios cycle likewise, one box in release order; its scenarios not built yet wait under Coming later (docs/brief.md, Standalone scenarios).
+  { id: "standalone-scenarios", name: "Standalone scenarios", campaignId: "standalone-scenarios", scenarios: ["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs"], later: standaloneScenarios.later },
   // Dwarrowdelf is the second cycle (docs/brief.md, Dwarrowdelf): the Khazad-dûm expansion and six Adventure Packs, standalone only.
   { id: "dwarrowdelf", name: "Dwarrowdelf", campaignId: "dwarrowdelf", scenarios: ["into-the-pit", "the-seventh-level", "flight-from-moria", "the-redhorn-gate", "road-to-rivendell", "the-watcher-in-the-water", "the-long-dark", "foundations-of-stone", "shadow-and-flame"] },
   { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },

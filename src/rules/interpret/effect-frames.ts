@@ -19,7 +19,7 @@ import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, withSeat } from "../core/state.ts";
-import { sharing } from "../families/breaking/areas.ts";
+import { isolatedAreas, sharing } from "../families/breaking/areas.ts";
 import { guardianSeats, otherThanGuardian } from "../families/guardian/seats.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { holdsNow } from "./verbs.ts";
@@ -52,6 +52,8 @@ export type EffectSpec = {
   // The card the answered event was about, and the other card it names.
   subject?: string;
   other?: string;
+  // The host the source lost to its own cost (EffectData.host).
+  host?: string;
   // The damage the answered event dealt, and the card whose destruction waits while the effect resolves.
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip).
@@ -90,6 +92,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.picked ? { picked: spec.picked } : {}),
     ...(spec.subject ? { subject: spec.subject } : {}),
     ...(spec.other ? { other: spec.other } : {}),
+    ...(spec.host ? { host: spec.host } : {}),
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
     ...(spec.excess != null ? { excess: spec.excess } : {}),
     ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),
@@ -273,7 +276,7 @@ function expandPlayers(
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect") return state;
   // The players sharing the acting player's staging area when areas are joined (families/captured/); every living player otherwise. `seats: "guardian"`: the player guarding Gollum, and the others while a card widens the effect (families/guardian/seats.ts).
-  const seats = instruction.seats === "guardian" ? guardianSeats(state, ctx, topFrame(state)?.cardId ?? null) : instruction.seats === "otherThanGuardian" ? otherThanGuardian(state) : instruction.seats === "engaged" ? engagedSeats(state, topFrame(state)?.cardId ?? null) : state.capture && state.separate ? sharing(state, item.seat) : livingSeats(state);
+  const seats = instruction.seats === "guardian" ? guardianSeats(state, ctx, topFrame(state)?.cardId ?? null) : instruction.seats === "otherThanGuardian" ? otherThanGuardian(state) : instruction.seats === "engaged" ? engagedSeats(state, topFrame(state)?.cardId ?? null) : isolatedAreas(state) ? sharing(state, item.seat) : livingSeats(state);
   const ordered = instruction.order === "lastFirst" ? [...seats].reverse() : seats;
   const expanded = ordered.flatMap((seat) =>
     instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat, chosen: null, ...(cause ? { cause } : {}) })),
@@ -333,7 +336,9 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
   // The source is the attacking enemy, or the shadow card dealt to it for this attack (144039:A:2, 144057:A:2).
   const isItsShadowCard = source?.zone === "shadow" && source.host === attack?.enemyId;
   if (!attack || !sourceId || (attack.enemyId !== sourceId && !isItsShadowCard)) return state;
-  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "ImmediateAttack" }], afterCause: currentCause(steps, UNATTRIBUTED) } };
+  // Smaug's attack against Lake-town (50211:A:1) is followed by another against Lake-town (Esgaroth Wharf's Shadow, 50224:A:3; docs/brief.md, The Battle of Lake-town).
+  const next: Instruction = attack.toLakeTown === true ? { verb: "AttackLakeTown" } : { verb: "ImmediateAttack" };
+  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), next], afterCause: currentCause(steps, UNATTRIBUTED) } };
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window. `shadow`: a shadow card is dealt for the attack (the default); `keep`: with none dealt, the shadow cards the enemy holds stay.

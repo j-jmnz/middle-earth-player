@@ -3,7 +3,9 @@
 // and healing the cards that player controls, Responses to healing and readying, and the Response that follows the resource draw.
 import { describe, expect, it } from "vitest";
 
+import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
+import { EFFECTS } from "../../../effects/index.ts";
 import { doRefresh } from "../../engine/refresh.ts";
 import { updateCard } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
@@ -11,6 +13,8 @@ import { attach, damage, miscCtx } from "./fixture.ts";
 import { offered, passResponses, play, put, run, seat, send, trigger, triggers } from "../play/fixture.ts";
 
 const ctx = miscCtx(RECORDS);
+// Cram's records are the player pool's (src/effects/authored/pool/OHaUH.ts).
+const cramCtx = miscCtx([...RECORDS, ...EFFECTS.filter((effect) => effect.cardCode === "131011")]);
 
 describe("choose a player, then heal what that player controls", () => {
   it("Beorn's Hospitality heals all damage on each hero of the chosen player only (01068:A:1)", () => {
@@ -108,6 +112,54 @@ describe("choose one", () => {
     expect(state.window).toMatchObject({ kind: "choose", options: expect.arrayContaining(["discard", "keep"]) });
     state = send(state, { type: "Choose", optionId: "discard" }, ctx);
     expect(state.cards[wound.id]?.zone).not.toBe("attached");
+  });
+
+  it("Cram readies the hero it was attached to after its cost discards it (131011:A:2)", () => {
+    const table = seat(1, ["dwarf", "rohan"]);
+    const cram = put(table.state, "131011", "play");
+    const hero = table.heroes[0] ?? "";
+    let state = updateCard(attach(cram.state, cram.id, hero), hero, { exhausted: true });
+    state = trigger(state, cram.id, "131011:action:1", cramCtx);
+    expect(state.cards[cram.id]?.zone).toBe("discard");
+    expect(state.cards[hero]?.exhausted).toBe(false);
+  });
+
+  // A record that discards itself as its cost and then reads its host: every host read goes through refCard or hostOf (src/rules/interpret/amounts.ts), not only Ready.
+  describe("host reads after a cost that discards the source (EffectData.host)", () => {
+    const record = (id: string, instructions: unknown[]): Effect =>
+      ({ id, cardCode: "131011", lines: ["131011:A:2"], timing: "action", cost: { kind: "discardSelf" }, instructions }) as unknown as Effect;
+    const hostCtx = miscCtx([
+      ...RECORDS,
+      ...EFFECTS.filter((effect) => effect.cardCode === "131011"),
+      record("fixture:heal", [{ verb: "Heal", amount: 2, target: "host" }, { verb: "AddResources", amount: 2, to: "host" }]),
+      record("fixture:pick", [{ verb: "Pick", pick: { type: "hero", control: "any", isHost: true } }, { verb: "AddResources", amount: 1, to: "picked" }]),
+      record("fixture:when", [{ verb: "AddResources", amount: 3, to: "host", when: { kind: "matches", card: "host", pick: { type: "hero", control: "any", state: "exhausted" } } }]),
+    ]);
+    const setUp = () => {
+      const table = seat(1, ["dwarf", "rohan"]);
+      const cram = put(table.state, "131011", "play");
+      const hero = table.heroes[0] ?? "";
+      return { cram, hero, state: updateCard(damage(attach(cram.state, cram.id, hero), hero, 3), hero, { exhausted: true }) };
+    };
+
+    it("heals the host and adds resources to it", () => {
+      const { cram, hero, state } = setUp();
+      const after = trigger(state, cram.id, "fixture:heal", hostCtx);
+      expect(after.cards[cram.id]?.zone).toBe("discard");
+      expect(after.cards[hero]).toMatchObject({ damage: 1, resources: (state.cards[hero]?.resources ?? 0) + 2 });
+    });
+
+    it("picks the host with isHost", () => {
+      const { cram, hero, state } = setUp();
+      const after = trigger(state, cram.id, "fixture:pick", hostCtx);
+      expect(after.cards[hero]?.resources).toBe((state.cards[hero]?.resources ?? 0) + 1);
+    });
+
+    it("reads a host condition of an instruction", () => {
+      const { cram, hero, state } = setUp();
+      const after = trigger(state, cram.id, "fixture:when", hostCtx);
+      expect(after.cards[hero]?.resources).toBe((state.cards[hero]?.resources ?? 0) + 3);
+    });
   });
 
   it("Miner of the Iron Hills discards a Condition attachment from play (01061:A:1)", () => {

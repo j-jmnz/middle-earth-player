@@ -16,9 +16,10 @@ export type CatalogFamily = {
 type Field = "verbs" | "triggers" | "flags";
 
 /** The tuple of one field over a tuple of families, in list order, so the schemas the lists build keep their literal types. */
-export type Collect<List extends readonly CatalogFamily[], Key extends Field> = List extends readonly [infer Head extends CatalogFamily, ...infer Tail extends readonly CatalogFamily[]]
-  ? readonly [...Head[Key], ...Collect<Tail, Key>]
-  : readonly [];
+// Tail-recursive with an accumulator, so a long list of families does not reach the compiler's instantiation depth.
+export type Collect<List extends readonly CatalogFamily[], Key extends Field, Acc extends readonly unknown[] = readonly []> = List extends readonly [infer Head extends CatalogFamily, ...infer Tail extends readonly CatalogFamily[]]
+  ? Collect<Tail, Key, readonly [...Acc, ...Head[Key]]>
+  : Acc;
 
 export function collect<const List extends readonly CatalogFamily[], const Key extends Field>(families: List, key: Key): Collect<List, Key> {
   return families.flatMap((family): readonly unknown[] => family[key]) as unknown as Collect<List, Key>;

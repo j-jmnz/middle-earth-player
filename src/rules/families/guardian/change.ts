@@ -1,5 +1,5 @@
 // Rules: sotm.guarding-gollum, rr.ownership-and-control, rr.first-player (data/rules/entries.json); ledger lines 02126:A:1, 02130:A:2.
-import type { EngineStep } from "../../core/intents.ts";
+import type { PrintedCard } from "../../core/printed.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { giveControl } from "../play/control.ts";
@@ -17,9 +17,9 @@ export function guardGollum(state: ScenarioState, code: string, _focus: Focus): 
 }
 
 /** ChangeGuardian: Gollum passes to the player picked last, with what is attached to him; announced as a change of control. */
-export function changeGuardian(state: ScenarioState, _steps: EngineStep[]): ScenarioState {
+export function changeGuardian(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
   const gollum = guardedGollum(state);
   const seat = lastPickedSeat(state);
   if (!gollum || seat == null || guardianLocked(state)) return state;
-  return giveControl(state, gollum.id, seat);
+  return giveControl(state, gollum.id, seat, cards);
 }

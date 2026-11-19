@@ -23,7 +23,7 @@ export const ESCAPE_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Mad
   AddToX: (i, ctx) => ({ text: `the effect's X grows by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   MoveResources: (i, ctx) => ({ text: `move ${i.all === true ? "all the resource tokens" : `${amount(i.amount, ctx)} resource tokens`} from the card picked before the last to the last card picked`, read: ["amount", "all"] }),
   ReturnFromDiscard: (i, ctx) => ({
-    text: `return ${i.count == null ? "every" : `the topmost ${amount(i.count, ctx)}`} ${str(i.trait)} ${i.anyType === true ? "card(s)" : "enemies"} of the encounter discard pile to ${i.to === "deckTop" ? `the top of the encounter deck${i.order === "random" ? ", in a random order" : ""}, facedown (the cards ArrangeEncounter may reorder)` : "the staging area"} (they are not revealed: no When Revealed${i.to === "deckTop" ? ", no engagement" : "; one with the ambush keyword makes its engagement checks on entering the staging area"}; the number returned${i.treacheries === true ? ", the treachery cards only," : ""} is counted)`,
+    text: `return ${i.count == null ? "every" : `the topmost ${amount(i.count, ctx)}`} ${str(i.trait)} ${i.anyType === true ? "card(s)" : "enemies"} of the encounter discard pile ${i.to === "deckTop" ? `to the top of the encounter deck${i.order === "random" ? ", in a random order" : ""}, facedown (the cards ArrangeEncounter may reorder)` : i.to === "engagedFirstPlayer" ? "into play engaged with the first player" : "to the staging area"} (they are not revealed: no When Revealed${i.to === "deckTop" || i.to === "engagedFirstPlayer" ? ", no engagement" : "; one with the ambush keyword makes its engagement checks on entering the staging area"}; the number returned${i.treacheries === true ? ", the treachery cards only," : ""} is counted)`,
     read: ["trait", "count", "anyType", "to", "order", "treacheries"],
   }),
 };
@@ -56,7 +56,7 @@ export const ESCAPE_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   EscapeValue: [{ verb: "EscapeValue", amount: 3 }],
   AddToX: [{ verb: "AddToX", amount: 2 }],
   MoveResources: [{ verb: "MoveResources", all: true }, { verb: "MoveResources", amount: 2 }],
-  ReturnFromDiscard: [{ verb: "ReturnFromDiscard", trait: "Undead", count: { players: true } }, { verb: "ReturnFromDiscard", trait: "Snow", anyType: true, to: "deckTop", order: "random", treacheries: true }],
+  ReturnFromDiscard: [{ verb: "ReturnFromDiscard", trait: "Undead", count: { players: true } }, { verb: "ReturnFromDiscard", trait: "Snow", anyType: true, to: "deckTop", order: "random", treacheries: true }, { verb: "ReturnFromDiscard", trait: "Undead", count: 1, to: "engagedFirstPlayer" }],
 };
 export const ESCAPE_CONDITION_SAMPLES: Readonly<Record<string, readonly Obj[]>> = { lastEscapeFailed: [{ kind: "lastEscapeFailed" }], lastEscapePassed: [{ kind: "lastEscapePassed" }], noneReturned: [{ kind: "noneReturned" }], returnedBelow: [{ kind: "returnedBelow", than: 2 }] };
 

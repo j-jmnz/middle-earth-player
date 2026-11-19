@@ -68,6 +68,11 @@ import waterFixtures from "./fixtures/the-watcher-in-the-water.json";
 import darkFixtures from "./fixtures/the-long-dark.json";
 import stoneFixtures from "./fixtures/foundations-of-stone.json";
 import flameFixtures from "./fixtures/shadow-and-flame.json";
+import osgiliathFixtures from "./fixtures/the-massing-at-osgiliath.json";
+import townFixtures from "./fixtures/the-battle-of-lake-town.json";
+import erechFixtures from "./fixtures/the-stone-of-erech.json";
+import forestFixtures from "./fixtures/the-old-forest.json";
+import downsFixtures from "./fixtures/fog-on-the-barrow-downs.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -154,6 +159,11 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-long-dark": darkFixtures,
   "foundations-of-stone": stoneFixtures,
   "shadow-and-flame": flameFixtures,
+  "the-massing-at-osgiliath": osgiliathFixtures,
+  "the-battle-of-lake-town": townFixtures,
+  "the-stone-of-erech": erechFixtures,
+  "the-old-forest": forestFixtures,
+  "fog-on-the-barrow-downs": downsFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
@@ -181,15 +191,18 @@ export function fixture(name: FixtureName): Fixture {
   return { campaignId: stored.campaignId ?? FELLOWSHIP_ID, seatCount, loadout, seed: stored.seed, intents: stored.intents as PlayerIntent[], log: stored.log == null ? emptyLog(seatCount) : parseLog(stored.log), past };
 }
 
-/** A new save holding the fixture's open scenario, stamped with this build's engine version and catalog version. */
-export function fixtureSave(name: FixtureName, id: string, dataHash: number): Save {
+/**
+ * A new save holding the fixture's open scenario, stamped with this build's engine version and catalog version. `at` keeps only its first intents, so
+ * the save opens on an earlier moment of the same game (the e2e route's `?at=`, the same count `pnpm game show --at` prints).
+ */
+export function fixtureSave(name: FixtureName, id: string, dataHash: number, at?: number): Save {
   const found = fixture(name);
   return {
     id,
     campaignId: found.campaignId,
     seatCount: found.seatCount,
     log: found.log,
-    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: [...found.intents] },
+    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: found.intents.slice(0, at ?? found.intents.length) },
     loadout: found.loadout,
   };
 }
@@ -209,7 +222,7 @@ export function standaloneFixture(name: FixtureName): StandaloneFixture {
 }
 
 /** A new standalone game holding the fixture's open scenario, stamped with this build's engine version and catalog version. */
-export function fixtureStandalone(name: FixtureName, id: string, dataHash: number): StandaloneGame {
+export function fixtureStandalone(name: FixtureName, id: string, dataHash: number, at?: number): StandaloneGame {
   const found = standaloneFixture(name);
   return {
     id,
@@ -217,7 +230,7 @@ export function fixtureStandalone(name: FixtureName, id: string, dataHash: numbe
     scenarioId: found.loadout.scenarioId,
     seatCount: found.seatCount,
     loadout: found.loadout,
-    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: [...found.intents] },
+    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: found.intents.slice(0, at ?? found.intents.length) },
     result: null,
   };
 }

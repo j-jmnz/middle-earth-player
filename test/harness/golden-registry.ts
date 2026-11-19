@@ -64,6 +64,11 @@ import * as water from "../scenarios/the-watcher-in-the-water/game.ts";
 import * as dark from "../scenarios/the-long-dark/game.ts";
 import * as stone from "../scenarios/foundations-of-stone/game.ts";
 import * as flame from "../scenarios/shadow-and-flame/game.ts";
+import * as osgiliath from "../scenarios/the-massing-at-osgiliath/game.ts";
+import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
+import * as erech from "../scenarios/the-stone-of-erech/game.ts";
+import * as forest from "../scenarios/the-old-forest/game.ts";
+import * as downs from "../scenarios/fog-on-the-barrow-downs/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -154,4 +159,9 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-long-dark", "The Long Dark", dark.DARK_GOLDENS, dark.darkWorld, dark.playGolden),
   entry("foundations-of-stone", "Foundations of Stone", stone.STONE_GOLDENS, stone.stoneWorld, stone.playGolden),
   entry("shadow-and-flame", "Shadow and Flame", flame.FLAME_GOLDENS, flame.flameWorld, flame.playGolden),
+  entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
+  entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
+  entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),
+  entry("the-old-forest", "The Old Forest", forest.FOREST_GOLDENS, forest.forestWorld, forest.playGolden),
+  entry("fog-on-the-barrow-downs", "Fog on the Barrow-downs", downs.DOWNS_GOLDENS, downs.downsWorld, downs.playGolden),
 ];

@@ -460,7 +460,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145075:B:3 (back): The players cannot travel to Pelennor locations.
   145075:constant:3: Constant
-    - the players cannot travel to any location while this holds [also {"trait":"Pelennor"}]
+    - the players cannot travel to locations with the trait Pelennor while this holds
 
 145075:B:4 (back): Forced: When an enemy is destroyed, place progress on this stage equal to that enemy's total Threat (progress must be placed on the active location first).
   145075:forced:1: Forced after an enemy is destroyed
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 319 by template, 35 as JSON)
+(rendered pieces: 320 by template, 34 as JSON)

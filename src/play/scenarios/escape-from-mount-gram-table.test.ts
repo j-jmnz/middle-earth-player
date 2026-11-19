@@ -8,7 +8,7 @@ import { expectOk } from "../../rules/core/test-fixture.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { moveCard, spawn } from "../../rules/core/zones.ts";
-import { capturedByHost, capturedDeck } from "../../rules/families/captured/pile.ts";
+import { capturedByHost, capturedDeck, capturedUnder } from "../../rules/families/captured/pile.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { begin } from "../../../test/scenarios/escape-from-mount-gram/begun.ts";
 import { gramWorld } from "../../../test/scenarios/escape-from-mount-gram/game.ts";
@@ -38,6 +38,11 @@ beforeAll(async () => {
 
 const two = (): ScenarioState => ({ ...begin(ctx, 2), sideQuests: true });
 const solo = (): ScenarioState => ({ ...begin(ctx, 1), sideQuests: true });
+// A card put into play by hand, without the cards its own Capture X takes on entering play: the tests place the captured cards under it themselves.
+const spawnBare = (state: ScenarioState, code: string, dest: Parameters<typeof spawn>[2]): { state: ScenarioState; id: string } => {
+  const made = spawn(state, code, dest, "up");
+  return { id: made.id, state: capturedUnder(made.state, made.id).reduce((next, held) => moveCard(next, held, { zone: "removed" }), made.state) };
+};
 const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
 const idName = (state: ScenarioState) => (id: string) => nameOf(state.cards[id]?.code ?? "");
 const idOf = (state: ScenarioState, code: string, zone?: string) => Object.values(state.cards).find((card) => card.code === code && (zone == null || card.zone === zone))?.id ?? "";
@@ -176,7 +181,7 @@ describe("Loot the Dungeons in every area", () => {
 
 describe("Stop the Executioners' time", () => {
   const timed = (counters: number): { state: ScenarioState; id: string } => {
-    const made = spawn(two(), EXECUTIONERS, { zone: "staging", area: 0 }, "up");
+    const made = spawnBare(two(), EXECUTIONERS, { zone: "staging", area: 0 });
     const id = made.id;
     return { id, state: { ...made.state, cards: { ...made.state.cards, [id]: { ...made.state.cards[id]!, resources: counters } } } };
   };
@@ -205,7 +210,7 @@ describe("Stop the Executioners' dial counts the characters under it by owner", 
   const dialOf = (state: ScenarioState) => angmarDials(state, ctx, nameOf).find((one) => one.id.startsWith("time:"));
   // Puts the executioners in play with `counters` time counters and a captured card of each (code, seat) under it.
   const held = (counters: number, cards: readonly (readonly [string, number])[], base: ScenarioState = two()): { state: ScenarioState; id: string } => {
-    const made = spawn(base, EXECUTIONERS, { zone: "staging", area: 0 }, "up");
+    const made = spawnBare(base, EXECUTIONERS, { zone: "staging", area: 0 });
     let state: ScenarioState = { ...made.state, cards: { ...made.state.cards, [made.id]: { ...made.state.cards[made.id]!, resources: counters } } };
     for (const [code, seat] of cards) state = spawn(state, code, { zone: "captured", hostId: made.id, seat }, "down").state;
     return { state, id: made.id };
@@ -244,7 +249,7 @@ describe("what a pick and a preview say apart", () => {
   });
 
   it("10053:A:3 says the current-quest line as well as the captured cards under a side quest that is the current quest", () => {
-    const made = spawn(two(), EXECUTIONERS, { zone: "staging", area: 0 }, "up");
+    const made = spawnBare(two(), EXECUTIONERS, { zone: "staging", area: 0 });
     const state = spawn(made.state, "10178", { zone: "captured", hostId: made.id, seat: 0 }, "down").state;
     const flagged = { ...state, modifiers: [...state.modifiers, { instanceId: made.id, sourceId: made.id, stat: "currentQuest", amount: 1, until: "endOfPhase" }] } as ScenarioState;
     expect(detail(flagged, made.id)).toContain("captured underneath");
@@ -266,7 +271,7 @@ describe("what a pick and a preview say apart", () => {
 describe("a pick that spans seats names the owner on each row", () => {
   it("10044:A:2 Dungeon Guard: the rescued cards of both players, each row naming the player whose card it is", () => {
     const base = two();
-    const made = spawn(base, DUNGEON_GUARD, { zone: "staging", area: 1 }, "up");
+    const made = spawnBare(base, DUNGEON_GUARD, { zone: "staging", area: 1 });
     let state = spawn(made.state, "10176", { zone: "captured", hostId: made.id, seat: 0 }, "down").state;
     state = spawn(state, "10178", { zone: "captured", hostId: made.id, seat: 1 }, "down").state;
     const gone = settle({ ...moveCard(state, made.id, { zone: "encounterDiscard" }), window: null }, ctx, []);

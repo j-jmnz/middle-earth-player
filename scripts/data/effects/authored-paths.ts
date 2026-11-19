@@ -7,6 +7,8 @@ import { loadCampaignsInOrder } from "../load-scenarios.ts";
 export const AUTHORED_CAMPAIGN_FOLDERS: Readonly<Record<string, string>> = {
   "the-return-of-the-king": "return-of-the-king",
   "angmar-awakened": "angmar-awakened",
+  "shadows-of-mirkwood": "shadows-of-mirkwood",
+  "standalone-scenarios": "standalone-scenarios",
 };
 
 const CYCLE_IDS: ReadonlySet<string> = new Set(CAMPAIGNS.filter((campaign) => campaign.kind === "cycle").map((campaign) => campaign.id));

@@ -19,7 +19,7 @@ import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
-import { areaHeadOf, firstOfArea } from "../families/breaking/areas.ts";
+import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
 import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
 // Costs and limits on an Action or a Response. A cost is paid when the effect is triggered, before
@@ -27,8 +27,8 @@ import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
 export function controllerSeat(state: ScenarioState, source: CardInstance): number {
   if (source.controller != null) return source.controller;
-  // Mount Gram: the first player of the card's own staging area answers for an encounter card while the areas are separate (mec108.create-staging-area).
-  const head = state.capture ? areaHeadOf(state, source.id) : null;
+  // Isolated areas: the first player of the card's own staging area answers for an encounter card while the areas are separate (mec108.create-staging-area).
+  const head = isolatedAreas(state) ? areaHeadOf(state, source.id) : null;
   return head == null ? state.firstPlayer : firstOfArea(state, head);
 }
 
@@ -275,6 +275,12 @@ export function payUsage(
     ...(rule.per === "attack" && attack ? { attack } : {}),
   };
   return noteCampaignUse({ ...next, uses: [...next.uses, use] }, effect, sourceId);
+}
+
+/** The card the source was attached to before its cost was paid, when paying took it off ("Discard Cram to ready attached hero", 131011:A:2): the effect's "attached hero" still names it. */
+export function hostLostToCost(before: ScenarioState, paid: ScenarioState, sourceId: string): { host?: string } {
+  const host = before.cards[sourceId]?.host;
+  return host && paid.cards[sourceId]?.host !== host ? { host } : {};
 }
 
 // A Forced or triggered effect with a limit spends it when it resolves ("Limit once per game", 01130:A:4): the use is recorded as a

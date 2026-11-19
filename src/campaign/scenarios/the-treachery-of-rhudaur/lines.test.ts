@@ -211,7 +211,7 @@ describe("the Clue objectives", () => {
     const run = finish(resolveRecords(t.state, t.ctx, "10110", "action", clue, choose), t.ctx, choose);
     expect(run.state.cards[amarthiul]?.exhausted).toBe(true);
     expect(run.state.cards[clue]?.host).toBe(amarthiul);
-    const given = giveControl(run.state, amarthiul, 1);
+    const given = giveControl(run.state, amarthiul, 1, t.ctx.cards);
     expect(given.cards[amarthiul]?.controller).toBe(1);
     expect(given.cards[clue]?.controller).toBe(1);
     expect(given.cards[clue]?.host).toBe(amarthiul);

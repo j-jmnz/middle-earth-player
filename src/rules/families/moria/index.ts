@@ -40,8 +40,13 @@ function inPlayWith(state: ScenarioState, code: string): string | undefined {
 // answers them and no keyword changes them (142040:A:1, 142043:A:1). The step records the change.
 function changeDamage(state: ScenarioState, code: string, change: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const id = inPlayWith(state, code);
-  const card = id ? state.cards[id] : undefined;
-  if (!id || !card) return state;
+  return id ? changeDamageOn(state, id, change, steps, ctx) : state;
+}
+
+/** The same by card id (Lake-town's damage tokens, families/smaug/): `change` tokens come on or off the card, healing limited by `healDamage`. */
+export function changeDamageOn(state: ScenarioState, id: string, change: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
+  const card = state.cards[id];
+  if (!card) return state;
   // Damage taken off a character is healed damage, so a healCap (145033:A:1) limits it.
   const healed = change > 0 ? null : healDamage(state, id, -change, ctx);
   const amount = healed ? -healed.healed : change;

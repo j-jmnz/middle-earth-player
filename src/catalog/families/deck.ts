@@ -118,6 +118,9 @@ const FLAGS = [
   // Held by the table while a card in play says so: no player draws a card ("While Enchanted Stream is the active location, players
   // cannot draw cards", 01095:A:1). drawOne (rules/interpret/interpret.ts) reads it, so every draw is stopped, a resource phase draw included.
   "cannotDraw",
+  // Held by a seat: it cannot draw cards from card effects ("While Cold-wight is engaged with a player, that player cannot draw cards from card effects", 148012:A:1). The framework's draws (the opening hand, the resource phase's) are not card effects, so they still happen;
+  // drawMany (rules/interpret/interpret.ts) reads it.
+  "noCardDraw",
 ] as const;
 
 export const manifest = { name: "deck", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

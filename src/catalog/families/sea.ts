@@ -106,6 +106,10 @@ const VERBS = [
   // resources to a Raider enemy in play" (12160:A:1). Declining to travel, or traveling to a location with another title, costs the first player's choice of a card that matches `pick` getting `amount` resources
   // (families/sea/streets.ts); with no such card the players can only travel to a location with the source's title.
   z.strictObject({ verb: z.literal("TravelOrAddResources"), amount: z.number().int().positive(), pick: pickSchema, ...when }),
+  // Constant on a location in the staging area: "If the players have crossed the Anduin, Pelennor Fields gains: 'When faced with the option to travel, the players must either travel to Pelennor Fields or raise each player's threat
+  // by 3.'" (00010:A:1). Declining to travel, or traveling to a location with another title, raises each player's threat by `amount` (families/sea/streets.ts); raising it satisfies the "must", as the resources do for Streets of Umbar.
+  // Raising threat is always possible, so the players are never forced to travel. With two copies, traveling to either satisfies both and the threat is raised once.
+  z.strictObject({ verb: z.literal("TravelOrRaiseThreat"), amount: z.number().int().positive(), ...when }),
   // Constant on a card in play: no more than `max` cards of this type can enter play each round, played or put into play ("While Corsair Waters is the active location, no more than 1 ally can enter play each
   // round", 12155:A:1). An ally that entered play and left again counts (families/sea/entries.ts).
   // `perPlayer`: each player's own count, by the seat that controls the ally as it enters ("Each player cannot play, or put into play, more than 1 ally each round", 144071:B:2; rr.play-and-put-into-play).

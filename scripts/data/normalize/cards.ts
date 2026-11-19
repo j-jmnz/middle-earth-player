@@ -431,9 +431,13 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
     const inSet = set?.encounterSet ? { ...withBurden, encounterSet: set.encounterSet } : withBurden;
     const named = set?.name ? { ...inSet, name: set.name } : inSet;
+    // A scan address a source misspells (Hall of Beorn's "The-Wiched-Willow-3A.jpg"): the printed card's pictures, for the first printing.
+    const pictured = set?.imageUrls ? { ...named, printings: named.printings.map((printing, index) => (index === 0 ? { ...printing, imageUrls: set.imageUrls } : printing)) } : named;
+    // A trait a source garbles (Hall of Beorn's "Nazg√l"): the printed traits, in print order.
+    const traited = set?.traits ? { ...pictured, traits: set.traits } : pictured;
     // A printed stat a source leaves out: Threat and engagement cost of a burden enemy (Hall of Beorn files its Threat icon as Willpower), and
-    // the stats and Victory of a ship, which Hall of Beorn has no field for.
-    const printedStats = { ...named, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health", "victory"]) };
+    // the stats and Victory of a ship, which Hall of Beorn has no field for. A Victory printed as X (Wall of Trees), which Hall of Beorn files as the number 254, is `null` in the override: the card carries none and its records read X.
+    const printedStats = { ...traited, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health"]), ...(set?.victory !== undefined ? { victory: set.victory } : {}) };
     // A quest stage that prints no quest points, which Hall of Beorn fills with 0 (a stage with 0 would be completed as it is revealed): both sides carry none.
     const stated = set?.questPoints !== undefined ? { ...printedStats, questPoints: set.questPoints, back: printedStats.back ? { ...printedStats.back, questPoints: set.questPoints } : printedStats.back } : printedStats;
     // A card type a source files wrongly: a ship-enemy that Hall of Beorn lists as an enemy (the scan prints SHIP-ENEMY).

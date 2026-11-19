@@ -10,10 +10,10 @@ import { pickSchema } from "./effect-schema-pick.ts";
 // `other` is the second card the answered event names: the enemy a character defends against or attacks, the enemy an
 // attack destroyed, the defender of an attack that resolved.
 // `previous` is the card picked before the last, `discardTop` the top card of the encounter discard pile (the last card put there), `questStage` the main quest card now (Hrogar's Hill, 19083:B:1).
-export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage"]);
+export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage", "smaug", "lakeTown"]);
 
 // The decks beside the encounter deck a record names (emce.caves-deck, emce.evil-creatures-deck, mec112.setup-journey-to-the-cross-roads; src/rules/core/piles.ts NAMED_PILES): the one list `pile` of a wilderland verb, the amount `pile` and the condition `pileHas` share.
-export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs"]);
+export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").
@@ -103,7 +103,7 @@ export const amountExprSchema = z.strictObject({
   discardedThreat: z.literal(true).optional(),
   // The Willpower the character the attack destroyed had in play, kept when the attack damaged it ("raise your threat by the destroyed character's Willpower", 10107:A:2); 0 when none was kept. Read by the angmar family.
   destroyedWillpower: z.literal(true).optional(),
-  // The number of quest cards in play: the main quest card, the encounter side quests in the staging area and the player side quests in the quest areas, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
+  // The number of quest cards in play: the main quest card, the side quests in the staging area, encounter and player, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
   questCards: z.literal(true).optional(),
   // Every shadow card dealt to an enemy in play, the staging area's and the engaged ones, added up ("where X is the number of shadow cards in play", 10126:A:1). Read by the angmar family.
   shadowCardsInPlay: z.literal(true).optional(),
@@ -133,6 +133,9 @@ export const amountExprSchema = z.strictObject({
   minasTirithLeft: z.literal(true).optional(),
   // A count the earlier Resolution recorded in the Campaign Log's notes ("X is the number recorded in the campaign log", 145078:A:1), 0 when none is recorded or the game has no log. Read by the campaign family.
   recorded: z.enum(RECORDED_COUNTS).optional(),
+  // The Battle of Lake-town (docs/brief.md, The Battle of Lake-town), read by the smaug family: the damage on Lake-town ("X is the amount of damage on Lake-town", 50222:A:2), and the Victory points in the victory display (50203:B:3).
+  lakeTownDamage: z.literal(true).optional(),
+  victoryDisplay: z.literal(true).optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);

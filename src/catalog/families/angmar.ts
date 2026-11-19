@@ -24,15 +24,20 @@ const VERBS = [
   // The actor places every card of their hand facedown underneath the source, an encounter side quest ("Each player places all cards in his hand facedown underneath Lost in the Wilderness", 09051:A:1). The cards stay their player's and are out of play; ReturnFacedownToHands gives
   // them back. An empty hand puts nothing.
   z.strictObject({ verb: z.literal("PlaceHandUnderSelf"), ...when }),
-  // The first player chooses a quest card other than the current quest to be the current quest until the end of the phase: the main quest card or an encounter side quest in the staging area ("choose a different quest card in play to be the current quest", 09049:A:2;
-  // mec108.side-quests-in-play). A player side quest in a quest area cannot be the current quest. Nothing is chosen when there is only the current one.
+  // The first player chooses a quest card other than the current quest to be the current quest until the end of the phase: the main quest card or a side quest in the staging area, encounter or player ("choose a different quest card in play to be the current quest", 09049:A:2;
+  // mec108.side-quests-in-play). Nothing is chosen when there is only the current one.
   z.strictObject({ verb: z.literal("ChooseCurrentQuest"), ...when }),
   // Campaign Setup: a copy of the card from the supply is put into play attached to the card in play with this title ("Attach Iârion's Pendant to Iârion", 10156:A:2). It resolves after the quest card's Setup, which puts the host into play; with no such host nothing is attached.
   verbFlags(z.strictObject({ verb: z.literal("AttachNewTo"), code, to: z.string().min(1) }), { setupRole: "afterSetup" }),
   // Campaign Setup: starting with the first player, each player may place `damage` damage on the card with this code to add `resources` resource to each of their heroes' pools ("each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes'
   // resource pools", 10156:A:2). The tokens are placed, not dealt: nothing cancels them, and a player may take the card to its limit. `seat` is engine use: the player whose turn it is.
   // A constant marker on a quest stage ("The first Weather treachery card revealed each round gains surge", 09069:B:1): the first card with this Trait revealed in a round (from the encounter deck or by an effect) gains Surge as it is revealed (rr.surge). `type` is the card type, a treachery unless it says "enemy" ("The first Undead enemy revealed each round gains surge", 09039:A:1, a marker with a record condition: while Haunted Keep is the active location). Each Trait has one tally a round, kept while no card holds the marker.
-  z.strictObject({ verb: z.literal("FirstTraitSurge"), trait: z.string().min(1), type: z.enum(["treachery", "enemy"]).optional() }),
+  // `doomed`: the card also gains Doomed X as it is revealed ("The first Scout enemy revealed from the encounter deck each round gains surge and doomed 2", 00008:A:1), on top of its printed Doomed (rr.keywords).
+  z.strictObject({ verb: z.literal("FirstTraitSurge"), trait: z.string().min(1), type: z.enum(["treachery", "enemy"]).optional(), doomed: z.number().int().positive().optional() }),
+  // "Until the end of the phase, each card revealed by the encounter deck gains doomed 1. (Doomed 3 instead if the players have crossed the Anduin.)" (00014:A:2): a lasting effect of an encounter card, so it is
+  // recalculated as each card is revealed (faq.lasting-effects): every card revealed from now until `until`, a surge-revealed one included, gains Doomed `amount` (rr.keywords: it adds to a printed Doomed), or
+  // `instead.amount` while the current stage is `instead.stage`. The card that holds the effect was revealed before it and gains nothing.
+  z.strictObject({ verb: z.literal("RevealedGainDoomed"), amount: z.number().int().positive(), instead: z.strictObject({ stage: z.number().int().positive(), amount: z.number().int().positive() }).optional(), until: z.enum(["endOfPhase", "endOfRound"]) }),
   // The phase in progress ends once the effect that ends it has finished: the steps of the phase left are skipped and the next phase begins ("End the current phase", 09070:A:1; mec108.campaign-mode). In the quest phase the characters stay exhausted but are no longer committed and
   // the quest is not resolved (as EndQuestPhase); in the combat phase the attacks left are not made.
   z.strictObject({ verb: z.literal("EndPhase"), ...when }),
@@ -182,6 +187,8 @@ const FLAGS = [
   "advanceNow",
   // On a card: the Doomed X it gains is the amount of this modifier, on top of its printed Doomed ("While the current quest has 0 progress on it, Wight of Rhudaur gains doomed 2", 10099:A:2; read as the card is revealed, windows/frames.ts, rr.doomed-x).
   "gainsDoomed",
+  // On the table, from RevealedGainDoomed: each card revealed while it holds gains Doomed (the modifier's amount, or its `stageAmount` while that stage is current).
+  "revealDoomed",
   // On a character the attack in progress damaged, until the end of the phase: its Willpower then, kept for an effect that reads the destroyed character's Willpower (engine use, families/angmar/last-known.ts).
   "lastWillpower",
   // On a location in the staging area: the first 2 progress that would be placed on a quest card each round are placed on it instead ("the first 2 progress that would be placed on a quest each round must be placed on Forbidden Descent, instead", 10101:A:1; families/angmar/sponge.ts). Each copy takes 2 a round.

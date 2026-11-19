@@ -73,7 +73,7 @@ export async function smokeScenario(scenarioId: string, options: { games?: numbe
 }
 
 const gameLine = (scenario: string, game: GameSummary, problem: NonNullable<GameSummary["problem"]>): string =>
-  `${scenario} game ${game.game} (seed ${game.seed}, ${game.profile} heroes, ${game.seats} seat${game.seats > 1 ? "s" : ""}) intent ${problem.step} (round ${problem.round}, window ${problem.window ?? "none"}): ${JSON.stringify(problem.intent)}: ${problem.message}`;
+  `${scenario} game ${game.game} (seed ${game.seed}, ${game.profile} heroes, ${game.seats} seat${game.seats > 1 ? "s" : ""}) intent ${problem.step} (round ${problem.round}, window ${problem.window ?? "none"}): ${JSON.stringify(problem.intent)}: ${problem.message} (\`pnpm game show encounter:${scenario}:${game.game} --legal\` opens it)`;
 
 /** The problems of a summary that are not in `known`: what fails the run. */
 export function problemsOf(summary: EncounterSummary, known: readonly KnownFailure[] = KNOWN): string[] {

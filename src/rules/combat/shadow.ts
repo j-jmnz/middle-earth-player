@@ -113,9 +113,13 @@ export function discardResolvedShadowOf(state: ScenarioState, enemyId: string): 
   return next;
 }
 
-// The next additional shadow card still face down: one already resolved stays with the enemy, face up.
+// The next additional shadow card to resolve: the one turned up for its cancel Responses while it is still with the enemy,
+// else the first still face down. One already resolved stays with the enemy, face up.
 function nextExtraShadow(state: ScenarioState, enemyId: string): string | undefined {
-  return state.cards[enemyId]?.extraShadowIds?.find((id) => state.cards[id]?.face !== "up");
+  const ids = state.cards[enemyId]?.extraShadowIds ?? [];
+  const offered = state.pendingAttack?.extraOffered;
+  if (offered != null && ids.includes(offered)) return offered;
+  return ids.find((id) => state.cards[id]?.face !== "up");
 }
 
 // End of the combat phase: every shadow card dealt this round is discarded (ltp.shadow-discard).
@@ -147,8 +151,9 @@ export function attackResumes(state: ScenarioState): boolean {
 }
 
 // The additional shadow cards (141069:A:2) resolve after the first, in the order dealt, each after its own cancel offer
-// (rr.cancel). A resolved or canceled card is turned face up and stays with the enemy, so the next one is the first still
-// face down. Returns the state and whether the attack now waits for settle.
+// (rr.cancel). The card is turned face up before the offer, so the player sees the effect a Response would cancel. A resolved
+// or canceled card stays with the enemy, face up, so the next one is the first still face down. Returns the state and
+// whether the attack now waits for settle.
 function resolveExtraShadows(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): { state: ScenarioState; waits: boolean } {
   let next = state;
   for (let guard = 0; guard < 20; guard += 1) {
@@ -156,14 +161,18 @@ function resolveExtraShadows(state: ScenarioState, ctx: ReduceContext, steps: En
     const shadowId = attack ? nextExtraShadow(next, attack.enemyId) : undefined;
     if (!attack || shadowId == null) return { state: next, waits: false };
     if (attack.extraOffered !== shadowId && cardHasShadowEffect(next, shadowId, ctx) && !flagged(next, attack.enemyId, "shadowsImmune")) {
-      const marked: ScenarioState = { ...next, pendingAttack: { ...attack, extraOffered: shadowId, shadowCanceled: false } };
+      const turned = updateCard(next, shadowId, { face: "up" });
+      const marked: ScenarioState = { ...turned, pendingAttack: { ...attack, extraOffered: shadowId, shadowCanceled: false } };
       const offered = offerResponses(marked, { trigger: "shadowPending", seat: attack.seat }, ctx, steps);
       if (offered.stack.length > marked.stack.length) return { state: { ...offered, window: null }, waits: true };
       next = offered;
     }
     const current = next.pendingAttack ?? attack;
     const canceled = current.extraOffered === shadowId && current.shadowCanceled === true;
-    next = canceled ? updateCard(next, shadowId, { face: "up" }) : resolveShadowCard(next, shadowId, attack.seat, ctx, steps);
+    // The offer is over: the card is no longer the one waiting for its Responses.
+    const { extraOffered: _offered, ...rest } = current;
+    const settled: ScenarioState = { ...next, pendingAttack: rest };
+    next = canceled ? updateCard(settled, shadowId, { face: "up" }) : resolveShadowCard(settled, shadowId, attack.seat, ctx, steps);
     if (next.lost || next.failure || next.pendingAttack?.shadowFrame != null) return { state: next, waits: true };
   }
   return { state: next, waits: false };
@@ -178,10 +187,13 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   // A canceled attack resolves nothing more (rr.cancel).
   if (attackCanceled(next)) return finishAttack(next, ctx, steps);
   if (!begun.shadowResolved) {
-    // The shadow effect has just triggered: a Response may cancel it first (Hasty Stroke). The attack waits for the
-    // Responses, and settle comes back here when they are done.
-    if (!begun.shadowOffered && hasShadowEffect(next, begun.enemyId, ctx) && !flagged(next, begun.enemyId, "shadowsImmune")) {
-      const offered = offerResponses({ ...next, pendingAttack: { ...begun, shadowOffered: true } }, { trigger: "shadowPending", seat: begun.seat }, ctx, steps);
+    // The shadow effect has just triggered: a Response may cancel it first (Hasty Stroke). The card is turned face up
+    // first, so the player sees the effect before choosing (rr.shadow-effects). The attack waits for the Responses, and
+    // settle comes back here when they are done.
+    const shadowId = next.cards[begun.enemyId]?.shadowId;
+    if (!begun.shadowOffered && shadowId && hasShadowEffect(next, begun.enemyId, ctx) && !flagged(next, begun.enemyId, "shadowsImmune")) {
+      const turned = updateCard(next, shadowId, { face: "up" });
+      const offered = offerResponses({ ...turned, pendingAttack: { ...begun, shadowOffered: true } }, { trigger: "shadowPending", seat: begun.seat }, ctx, steps);
       // The defense window is over: the defender is declared. Settle runs the Responses, then the attack goes on.
       if (offered.stack.length > next.stack.length) return { ...offered, window: null };
       next = offered;

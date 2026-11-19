@@ -2,10 +2,8 @@
 // dcce.sailing-tests, dcce.boarding, rr.winning-the-game, rr.victory, rr.destroy, rr.forced, rr.action, ltp.campaign-setup-checklist (data/rules/entries.json).
 import { expect, it } from "vitest";
 
-import { expectOk } from "../../../rules/core/test-fixture.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
+import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import type { PlayerIntent } from "../../../rules/core/intents.ts";
-import type { StartScenario } from "../../../rules/setup/setup.ts";
 import { CORSAIRS_GOLDENS, afterHaven, blessingChoices, playGolden, corsairsWorld, type CorsairsDecks, type CorsairsGolden } from "../../../../test/scenarios/the-city-of-corsairs/game.ts";
 import { CODES, campaign, corsairs } from "../../../../test/scenarios/the-city-of-corsairs/scene.ts";
 import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
@@ -26,12 +24,14 @@ const WARSHIP = CODES.corsairWarship;
 // The Círdan's Blessing the golden's players took ("skip" refuses it).
 const chosenCards = (golden: CorsairsGolden): string[] => (golden.choices ?? blessingChoices()).filter((item) => item !== "skip");
 
-// What a replay of a golden shows besides its final state: the moments the records act in, so the suite can say which of them the goldens reach.
+// What a golden shows besides its final state: the moments the records act in, so the suite can say which of them the goldens reach.
+// Read from the states the one play kept (playGolden, trail), not from a second play.
 type Seen = Set<string>;
-function replay(game: { start: StartScenario; intents: readonly PlayerIntent[] }, ctx: ReduceContext): Seen {
+function replay(game: { kept: ScenarioState; intents: readonly PlayerIntent[]; trail?: readonly ScenarioState[] }): Seen {
   const seen: Seen = new Set();
-  let state = startScenario(game.start, ctx);
-  state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
+  const trail = game.trail;
+  if (!trail) throw new Error("the golden was played without its trail (playGolden, trail)");
+  let state = game.kept;
   const scan = (now: ScenarioState): void => {
     const stage = code(now, now.questStage ?? "");
     for (const card of Object.values(now.cards)) {
@@ -51,11 +51,11 @@ function replay(game: { start: StartScenario; intents: readonly PlayerIntent[] }
     const attack = now.pendingAttack;
     if (attack && code(now, attack.enemyId) === CODES.captainSahir && now.cards[attack.enemyId]?.controller !== attack.seat) seen.add("Captain Sahír attacks the other player");
   };
-  for (const intent of game.intents) {
+  for (const [at, intent] of game.intents.entries()) {
     // Streets of Umbar (12160:A:1): the players decline to travel, or travel to a location of another title, with it in the staging area.
     const streets = of(state, CODES.streetsOfUmbar).some((card) => card.zone === "staging");
     if (streets && state.window?.kind === "travel" && !state.activeLocation && (intent.type === "DeclineTravel" || (intent.type === "Travel" && code(state, intent.locationId) !== CODES.streetsOfUmbar))) seen.add("the Streets of Umbar tax");
-    state = expectOk(reduce(state, intent, ctx)).state;
+    state = trail[at] ?? state;
     scan(state);
     if (intent.type === "Trigger") seen.add(`Trigger ${intent.effectId}`);
   }
@@ -121,7 +121,7 @@ goldenSuite<CorsairsGolden, CorsairsDecks>({
 
     it("reaches the moments the records act in: the Black Key leaving with the Stormcaller, the swap to the second deck, The Black Sword's Refresh Action and its removal, Captain Sahír indestructible with lethal damage and then destroyed, the Stormcaller sunk, Gavin returned, Ominous Fate carried to the second deck, Captain Sahír's attack on the other player, the Streets of Umbar tax", () => {
       const reached = new Set<string>();
-      for (const golden of CORSAIRS_GOLDENS) for (const item of replay(game(golden), world(golden).ctx)) reached.add(item);
+      for (const golden of CORSAIRS_GOLDENS) for (const item of replay(game(golden))) reached.add(item);
       for (const wanted of [
         "Black Key removed from the game",
         "stage 3",

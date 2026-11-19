@@ -25,6 +25,7 @@ import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
 import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
+import { attackStatAgainst } from "../families/attack/spectral.ts";
 import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 
@@ -391,10 +392,12 @@ export function attackStrength(state: ScenarioState, attackerIds: readonly strin
   let attack = 0;
   // "Immune to ranged damage" (Great Cave-troll, 03042:A:1; dwd.immune-to-ranged-damage): a character that takes part through the ranged keyword deals it no damage, a ranged character that attacks it another way does.
   const strike = flagged(state, enemyId, "immuneToRangedDamage") && state.pendingStrike?.enemyId === enemyId ? state.pendingStrike : undefined;
+  // Against a Spectral enemy a character's Willpower is its attack strength (families/attack/spectral.ts).
+  const stat = attackStatAgainst(state, enemyId, cards);
   for (const attackerId of attackerIds) {
     const attacker = state.cards[attackerId];
     if (attacker && strike && rangedAttack(strike, attacker)) continue;
-    if (attacker) attack += modifiedStat(state, attacker, "attack", cards, enemyId);
+    if (attacker) attack += modifiedStat(state, attacker, stat, cards, enemyId);
   }
   return attack;
 }

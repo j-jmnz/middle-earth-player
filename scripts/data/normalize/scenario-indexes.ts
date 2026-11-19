@@ -1,6 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, AnyScenarioData } from "../../../src/catalog/scenario-data.ts";
-import { PRODUCTS, type CampaignDef } from "../campaign-defs.ts";
+import { CAMPAIGN_SUFFIX, PRODUCTS, type CampaignDef } from "../campaign-defs.ts";
 
 // The RingsDB twin packs (PRODUCTS): DragnCards names the Fellowship boxes by product, RingsDB by these pack codes.
 const TWIN_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => (product.twinPack ? [product.twinPack] : [])));
@@ -35,14 +35,18 @@ export function campaignsOf(
   scenarios: readonly AnyScenarioData[],
   campaignCards: Readonly<Record<string, string>>,
   preludes: ReadonlyMap<string, { code: string }[]>,
+  scenarioIndex: readonly { Title: string; Product: string }[] = [],
 ): { data: CampaignData; def: CampaignDef }[] {
   return campaignDefs.map((def) => {
     const built = def.scenarios.filter((scenario) => scenarios.some((item) => item.id === scenario.id));
+    // The titles Hall of Beorn lists under the cycle's later products, product by product in the def's order.
+    const later = def.kind === "cycle" ? (def.later ?? []).flatMap((product) => scenarioIndex.filter((entry) => entry.Product === product || entry.Title === product).map((entry) => entry.Title.replace(CAMPAIGN_SUFFIX, ""))) : [];
     const data: CampaignData = {
       id: def.id,
       name: def.name,
       scenarios: built.map((scenario) => scenario.id),
       ...(def.kind === "cycle" ? { kind: "cycle" as const } : {}),
+      ...(later.length > 0 ? { later } : {}),
       // A cycle's scenarios have no campaign card (the file leaves the field out, which reads as empty).
       campaignCards: Object.fromEntries(built.flatMap((scenario) => (campaignCards[scenario.id] !== undefined ? [[scenario.id, campaignCards[scenario.id]]] : def.kind === "cycle" ? [] : [[scenario.id, ""]]))),
       ...(def.bookletId !== undefined ? { bookletId: def.bookletId } : {}),

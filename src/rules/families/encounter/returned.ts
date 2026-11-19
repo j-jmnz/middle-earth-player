@@ -32,7 +32,9 @@ export function returnFromDiscard(state: ScenarioState, instruction: Extract<Ins
     const data = effectData(next);
     if (data) next = patchTop(next, { data: { ...data, looked: order } });
   } else {
-    for (const id of ids) next = moveEncounter(next, id, "staging", focus.seat, ctx, steps);
+    // Engaged with the first player (Blackroot Graves), or the staging area.
+    const [zone, seat] = instruction.to === "engagedFirstPlayer" ? (["engaged", state.firstPlayer] as const) : (["staging", focus.seat] as const);
+    for (const id of ids) next = moveEncounter(next, id, zone, seat, ctx, steps);
   }
   const counted = instruction.treacheries === true ? ids.filter((id) => typeOf(state, id, ctx) === "treachery").length : ids.length;
   const data = topFrame(next)?.data;

@@ -8,6 +8,7 @@ import { pictureKey } from "../canvas/picture-key.ts";
 import { islandTell } from "../words/scenarios/uncharted.ts";
 import { STEP_WORDS } from "../phases/rail.ts";
 import type { SheetNames, SheetOption, SheetStat } from "./sheet-types.ts";
+import { pseudoHostWords } from "../cards/host-words.ts";
 
 export function step(game: ScenarioState): string {
   return STEP_WORDS[game.mode] ?? game.phase;
@@ -109,9 +110,9 @@ export function tiedLabel(game: ScenarioState, ctx: ReduceContext, names: SheetN
 }
 
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
-  if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
-  // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments/play.ts).
-  if (id === "staging") return { id, label: "The staging area", code: null };
+  // The staging area, where a Trap or a Guarded attachment is played, and a seat's play area (src/rules/families/attachments/play.ts).
+  const place = pseudoHostWords(id, false);
+  if (place) return { id, label: place, code: null };
   const card = game.cards[id];
   // Lost Islands share one name: what tells them apart (progress, place in staging) follows it.
   if (card) return { id, label: cardLabel(game, names, id), code: pictureKey(card) };

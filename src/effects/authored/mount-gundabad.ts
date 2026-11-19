@@ -10,7 +10,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 // to side B at the beginning of the quest phase, may be bypassed at the end of the combat phase (families/wilderland/gundabad.ts) and goes to the victory display when it is defeated.
 // Rules: emce.gundabad-quest-deck, emce.bypassing, emce.setup-mount-gundabad, emce.caves-deck-gundabad, emce.treasure, emce.campaign-log, emce.campaign-pool-encounter, emce.immune, emce.indestructible, rr.guarded, rr.quest-advancement, rr.first-player (data/rules/entries.json).
 // "The quest cards in the victory display" (X is 1 more than their number, 19125:A:1) counts The Side Door and each stage 2 defeated.
-const QUESTS_IN_VICTORY: PickSpec = { type: "card", control: "any", from: "victory", cardType: "quest" };
+const QUESTS_IN_VICTORY: PickSpec = { type: "card", control: "any", from: "victory", questCardType: true };
 const X = { count: QUESTS_IN_VICTORY, plus: 1 } as const;
 const AT_LEAST_QUESTS = (min: number): Extract<Condition, { kind: "count" }> => ({ kind: "count", pick: QUESTS_IN_VICTORY, min });
 // Dagnir wherever she is in play, in the staging area or engaged: the holder of a lasting effect, and the enemy a Forced effect or a When Revealed picks.

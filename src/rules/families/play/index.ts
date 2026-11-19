@@ -17,7 +17,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PutIntoPlayFromHand":
       return putFromHand(state, instruction, focus, ctx, steps);
     case "ChangeControl":
-      return changeControl(state, instruction, focus, steps);
+      return changeControl(state, instruction, focus, steps, ctx);
     case "TakeFirstPlayer":
       return takeFirstPlayer(state, focus.seat);
     case "Doomed":

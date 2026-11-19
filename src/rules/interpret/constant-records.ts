@@ -2,6 +2,7 @@ import { isStatCondition, type Effect, type Instruction } from "../../catalog/bo
 
 import { holds } from "./conditions.ts";
 import { textBlank } from "../families/attachments/hold.ts";
+import { sideOf } from "../families/breaking/areas.ts";
 import { effectsOfCard } from "../families/misc/text.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
@@ -65,10 +66,13 @@ function* scanConstants(state: ScenarioState, ctx: ReduceContext): Generator<Con
   for (const source of sources) {
     // A card whose printed text box is blank has no constant abilities (rr.blank).
     if (textBlank(state, source.id, ctx.cards)) continue;
+    // A card in the staging area of a parked stage has no player at it (isolated areas): its constants hold for nobody.
+    const side = sideOf(state, source);
+    if (side == null) continue;
     for (const effect of effectsOfCard(state, ctx, source)) {
       if (effect.timing !== "constant") continue;
       if ((source.zone === "victory") !== fromVictory(effect)) continue;
-      const scope = { actor: source.controller ?? state.firstPlayer, sourceId: source.id, returned: 0 };
+      const scope = { actor: side, sourceId: source.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       for (const instruction of effect.instructions) {
         if ("when" in instruction && instruction.when && !isStatCondition(instruction.when) && !holds(state, instruction.when, scope, ctx)) continue;

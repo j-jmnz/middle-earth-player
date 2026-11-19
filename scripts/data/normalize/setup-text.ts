@@ -128,6 +128,8 @@ export type SetupStep =
   | "placeDamageForResources" // "each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes' resource pools": `count` the damage, `resources` the resources
   | "placeLoggedDamage" // "place damage on it equal to the amount of damage noted in the Campaign Log": `codes` the card (Protect the Innocent)
   | "buildOrcDeck" // "Create the Orc deck (see insert) and set it next to the quest deck": mec108.orc-deck
+  // The Battle of Lake-town: each quoted from the stage 1A card Setup.
+  | "buildSmaugDeck" // "Shuffle all copies of Smaug into a separate Smaug Deck": `codes` the three Smaug titles
   | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"
   | "addToStartingHand" // "Each player adds 1 copy of Determination to their starting hand"
   | "shuffleHandIntoDeck" // "Each player shuffles his starting hand into his deck"

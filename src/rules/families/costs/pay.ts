@@ -32,6 +32,13 @@ export function flagIcons(state: ScenarioState, id: string): Sphere[] {
   return ICON_FLAGS.filter(([flag]) => heldAmount(state, id, flag) > 0).map(([, sphere]) => sphere);
 }
 
+const LOSABLE: ReadonlySet<Sphere> = new Set(["leadership", "lore", "spirit", "tactics"]);
+
+// Whether a hero lost the icon of this sphere: with `losesIcons` it has none of its Lore, Leadership, Spirit and Tactics icons, printed or gained (Haunted Valley, 50321:A:1); a neutral, Fellowship or Baggins icon stays.
+export function iconLost(state: ScenarioState, heroId: string, sphere: Sphere | null): boolean {
+  return sphere != null && LOSABLE.has(sphere) && state.cards[heroId]?.zone === "heroes" && heldAmount(state, heroId, "losesIcons") > 0;
+}
+
 // Whether the card being paid for matches a filter, from its player's side (its zone is not read).
 function fits(state: ScenarioState, cardId: string, pick: PickSpec, seat: number, ctx: ReduceContext): boolean {
   return matchesPick(state, cardId, pick, { seat, sourceId: null, counting: true }, ctx);

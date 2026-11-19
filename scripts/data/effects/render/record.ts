@@ -52,6 +52,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   lost: "when the \"Lost:\" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)",
   progressWouldBePlaced: "before progress is placed on this location (the whole placement, the effect's X, waits for this effect)",
   progressPlacedOnSelf: "after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)",
+  questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
 
 const LIMIT: Readonly<Record<string, string>> = {

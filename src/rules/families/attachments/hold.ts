@@ -72,8 +72,19 @@ export function textBlank(state: ScenarioState, id: string, cards: ReadonlyMap<s
 export function withStagingThreat(state: ScenarioState, total: number, cards: ReadonlyMap<string, PrintedCard>): number {
   const less = heldAmount(state, "table", "lessStagingThreat");
   // "Raise the total Threat in the staging area by X" (moreStagingThreat, families/dungeon.ts); one counting the allies in a discard pile is read live (faq.lasting-effects).
-  const more = heldAmount(state, "table", "moreStagingThreat") + liveAllyRaise(state, cards);
+  const more = heldAmount(state, "table", "moreStagingThreat") + liveAllyRaise(state, cards) + liveScoutRaise(state, cards);
   return less === 0 && more === 0 ? total : Math.max(0, total + more - less);
+}
+
+// The live part of the table's moreStagingThreat that counts Scout enemies (00013:A:1): 1 for each enemy with the Scout trait in the staging area or engaged with a player, for each such modifier while it holds.
+function liveScoutRaise(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): number {
+  const raises = state.modifiers.filter((modifier) => modifier.stat === "moreStagingThreat" && modifier.liveScouts === true && modifierActive(state, modifier)).length;
+  if (raises === 0) return 0;
+  let scouts = 0;
+  for (const instance of Object.values(state.cards)) {
+    if ((instance.zone === "staging" || instance.zone === "engaged") && printedOf(cards, instance.code).type === "enemy" && printedOf(cards, instance.code).traits.includes("Scout")) scouts += 1;
+  }
+  return raises * scouts;
 }
 
 // The live part of the table's moreStagingThreat: 1 for each ally in the discard pile of the seat a RaiseStagingThreat `live` named, while it holds.

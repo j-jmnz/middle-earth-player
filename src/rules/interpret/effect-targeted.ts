@@ -4,7 +4,7 @@ import { announceLooked } from "../families/encounter/looked.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 import { immuneToSource } from "../families/misc/guards.ts";
 import { characters } from "../combat/combat.ts";
-import { frameScope, refCard } from "./amounts.ts";
+import { frameScope, hostOf, refCard } from "./amounts.ts";
 import { askTarget } from "../windows/choices.ts";
 import { hasTrait } from "./conditions.ts";
 import { outOfPlayChoices, searchable } from "./search.ts";
@@ -41,9 +41,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
   switch (instruction.verb) {
     case "ReturnToStaging": {
       const target = instruction.target;
-      const source = sourceId ? state.cards[sourceId] : undefined;
       if (target.kind === "self") return sourceId ? [sourceId] : [];
-      if (target.kind === "host") return source?.host ? [source.host] : [];
+      if (target.kind === "host") return [hostOf(state, sourceId)].filter((id): id is string => id != null);
       if (target.kind === "activeLocation") {
         // The acting seat's own active location once stages are separate.
         const active = activeOf(state, item.seat);

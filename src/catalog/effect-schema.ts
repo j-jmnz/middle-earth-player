@@ -172,9 +172,10 @@ const delaySchema = z.strictObject({
   // `questSucceeded`: when the players quest successfully this phase, and never if they do not ("If the players quest
   // successfully, deal 1 damage to that enemy", 19112:A:1).
   // `startOfGame`: once the opening hands and mulligans are done, before the first round (a Setup that needs the players to choose).
+  // `beginningOfTravel`: when the next travel phase begins ("advance to stage 3B at the beginning of the travel phase", 148004:B:2; rr.delayed-effects).
   // `questFailed`: when the players quest unsuccessfully this phase, and never if they do not ("If the players quest unsuccessfully this phase,
   // put the Nazgûl of Dol Guldur into play", 900307:A:1; rr.step-3-4).
-  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "questFailed", "endOfAttack", "startOfGame"]),
+  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "questFailed", "endOfAttack", "startOfGame", "beginningOfTravel"]),
   uncancelable: conditionSchema.optional(),
   // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
   subject: z.literal("picked").optional(),
@@ -195,6 +196,8 @@ const eachSchema = verbFlags(z.strictObject({
   upTo: z.union([z.number().int().positive(), z.literal("any"), amountExprSchema]).optional(),
   totalCost: amountSchema.optional(),
   taken: z.array(z.string()).optional(),
+  // With `upTo`: the actor must choose that many (or all of them when fewer match: nothing is asked then), and `rest` runs for each matching card he did not choose, as the picked card ("Discard all but X allies you control", 148004:A:1). The chosen cards get `instructions`.
+  rest: z.array(z.discriminatedUnion("verb", simpleVerbs)).optional(),
   ...when,
 }), { runsInFrame: true });
 

@@ -5,6 +5,7 @@
 // reader where it has one (hasKeyword, hasPhantom, indestructible, playerCardEffectCanChoose, heldAmount); this file only puts the answers in a list.
 import { cardArchery } from "../../rules/combat/combat.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
+import { hasSpectral } from "../../rules/families/attack/spectral.ts";
 import { hasPhantom } from "../../rules/families/grey-company/phantom.ts";
 import { hasKeyword, indestructible, playerCardEffectCanChoose, printedKeywordsBlank, toughnessOf } from "../../rules/core/keywords.ts";
 import { printedOf } from "../../rules/core/printed.ts";
@@ -18,7 +19,7 @@ export type CardKeyword = { key: KeywordKey; word: string; lost: boolean };
 
 // Keywords with a printed flag or value and no reader of their own: shown while the text counts, struck through when the card lost its keywords.
 const PRINTED_FLAGS = ["peril", "permanent", "battle", "siege", "sailing", "dire", "pass"] as const;
-const PRINTED_VALUES = ["hide", "secrecy", "boarding", "aflame"] as const;
+const PRINTED_VALUES = ["hide", "secrecy", "boarding", "aflame", "burn"] as const;
 
 /** The card's keywords now, in KEYWORD_RULES' order. Empty for a card that is not in the game. */
 export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: string): CardKeyword[] {
@@ -75,6 +76,7 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   else shown("immune", kw.immuneToPlayerCardEffects);
   if (hasPhantom(game, cardId, ctx)) add("phantom", false);
   else if (kw.phantom && usable) add("phantom", true);
+  if (kw.spectral && usable) add("spectral", lostAll || !hasSpectral(game, cardId, ctx.cards));
 
   return (Object.keys(KEYWORD_RULES) as KeywordKey[]).flatMap((key) => found.get(key) ?? []);
 }

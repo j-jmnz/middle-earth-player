@@ -95,7 +95,8 @@ const TRIGGERS = ["attached", "resourcesSpent"] as const;
 // Resource icons a card has while it holds the flag (amount 1): "Amarthiúl gains the Tactics resource icon", "give attached
 // hero a Leadership icon until the end of the phase". `collectsResources`: a card that is not a hero collects this many
 // resources each resource phase (rr.step-1-2) into its own pool. `engagementCheckCost`: an enemy gets this much more
-// engagement cost while it makes an engagement check with the player who controls the modifier's source (Orc Disguise).
-const FLAGS = ["leadershipIcon", "loreIcon", "tacticsIcon", "spiritIcon", "collectsResources", "engagementCheckCost"] as const;
+// engagement cost while it makes an engagement check with the player who controls the modifier's source (Orc Disguise). `losesIcons`: on a hero, it has none of its Lore, Leadership, Spirit and
+// Tactics icons, printed or gained ("all ready heroes lose all Lore, Leadership, Spirit and Tactics icons", 50321:A:1); read by iconLost (rules/families/costs/pay.ts).
+const FLAGS = ["leadershipIcon", "loreIcon", "tacticsIcon", "spiritIcon", "collectsResources", "engagementCheckCost", "losesIcons"] as const;
 
 export const manifest = { name: "costs", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -50,6 +50,7 @@ describe("effects render read fields, picks", () => {
     copyInDiscard: true,
     controlled: true,
     questCard: true,
+    questCardType: true,
     maxHitPointsLeft: 2,
     looked: true,
     lowestAttack: true,
@@ -83,6 +84,7 @@ describe("effects render read fields, picks", () => {
     attached: true,
     participating: true,
     controlledBy: "attackers",
+    sideQuest: true,
   };
   const SAMPLES: readonly Obj[] = [
     BIG,

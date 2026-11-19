@@ -18,6 +18,7 @@ import type { PreviewCard } from "./card-preview.tsx";
 import { stageDetail } from "../readouts/fortress.ts";
 import { advanceHold, questObjective, stagePoints } from "../readouts/objective.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
+import { forestScore, forestStageWords } from "../readouts/standalone-scenarios/old-forest-words.ts";
 import { headingLook, headingPreviewSteps, headingPreviewTitle, headingStepOf } from "../dream-chaser/heading.ts";
 import { inspectTargets } from "../store/selectors.ts";
 import { whyNotPlayable } from "../choice/why.ts";
@@ -47,7 +48,9 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   const detail = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(detail ? { detail } : {}) };
   const objective = questObjective(game, ctx, line);
-  return { title: name, detail: objective ? `To win: ${objective}` : "No quest points" };
+  // A stage 2 of The Old Forest has no quest points: it says what its Victory points test sends the quest to.
+  const forest = forestScore(game, ctx);
+  return { title: name, detail: objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points" };
 }
 
 /**

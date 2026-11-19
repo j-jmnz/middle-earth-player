@@ -49,6 +49,8 @@ export function lineTimings(line: string): Set<string> {
   if (/^Forced:\s+While\b/i.test(line.trim())) allowed.add("constant");
   // A "(Counts as a ... attachment with the text: ...)" line also grants the attachment's own constant text, and so does an enemy that attaches itself "as a Tentacle attachment with the text: ..." (04073:A:1).
   if (/\bas an? (?:\w+ )?attachment/i.test(line)) allowed.add("constant");
+  // A claimed objective's "(If detached, return Book of Mazarbul to the staging area.)" (03024:A:2) is a constant rule of its own beside the Action that claims it: the flag `returnsToStagingArea` (families/objectives/claimed.ts).
+  if (/\(If (?:detached|unattached), return [^)]*to the staging area\.?\)/i.test(line)) allowed.add("constant");
   // "While in a player's hand, Lost in the Wild gains: "Cannot be discarded by player card effects. ..."" gives the card a constant ability of its own from the hand (18026:A:1).
   if (/While in a player's hand, .+ gains: "/.test(line)) allowed.add("constant");
   // An attachment's quoted text with no label of its own may trigger on a condition, as any unlabelled line may ("Counts as a Condition

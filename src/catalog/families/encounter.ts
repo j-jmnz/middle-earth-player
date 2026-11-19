@@ -78,9 +78,10 @@ const VERBS = [
   // The topmost `count` cards of the encounter discard pile that are enemies with this Trait are returned to the staging area, not revealed: no When Revealed, no engagement check ("Return the top X Undead enemies in the encounter discard pile to the staging area", 900810:A:1). Fewer when the pile holds
   // fewer. The number returned is the effect's `returned` count, read by `noneReturned` ("If no enemies were returned ... gains surge").
   // Widened for The Redhorn Gate ("Return the top 2 Snow cards in the encounter discard pile to the top of the encounter deck", 04020:A:1; "Return all Snow cards ... in random order", 901308:A:1): `anyType` takes cards of every type, not only enemies; no `count` takes every match;
+  // `to: "engagedFirstPlayer"` puts the enemy into play engaged with the first player, still not revealed ("return the topmost Undead enemy in the encounter discard pile to play, engaged with the first player", 50319:A:1);
   // `to: "deckTop"` puts them on top of the encounter deck, facedown, not revealed (the most recent one on top, or shuffled among themselves with `order: "random"`), and they are the cards ArrangeEncounter may put in another order; `treacheries` counts only the treachery
   // cards among them as returned (the effect's `returned`, read by `noneReturned` and `returnedBelow`: "If this effect returned less than 2 Snow treachery cards").
-  z.strictObject({ verb: z.literal("ReturnFromDiscard"), trait: z.string().min(1), count: positiveAmountSchema.optional(), anyType: z.literal(true).optional(), to: z.enum(["staging", "deckTop"]).optional(), order: z.literal("random").optional(), treacheries: z.literal(true).optional(), ...when }),
+  z.strictObject({ verb: z.literal("ReturnFromDiscard"), trait: z.string().min(1), count: positiveAmountSchema.optional(), anyType: z.literal(true).optional(), to: z.enum(["staging", "deckTop", "engagedFirstPlayer"]).optional(), order: z.literal("random").optional(), treacheries: z.literal(true).optional(), ...when }),
 
   // Reveals the top `count` cards of the encounter deck one at a time: an enemy is revealed in full in a staging of its own (rr.reveal: its When Revealed, Surge, Doomed and the Forced effects that hear a reveal) and joins the staging area, and every other
   // card is discarded unresolved, with no When Revealed, no Surge and no Doomed ("Reveal the top X cards of the encounter deck, adding all enemies to the staging area. Discard the other revealed cards without resolving them", 03068:B:2, 901110:A:1). When the
@@ -96,7 +97,8 @@ const VERBS = [
   // Discards cards from the top of the encounter deck until one of `type` is discarded, or the deck is empty (rr.effects).
   // That card becomes the picked card. With `trait`, the card must have that trait too ("a Warg enemy", 142025:A:2).
   // `types` instead of `type`: a card of any of them ("until he discards an enemy or location", 18078:A:1).
-  z.strictObject({ verb: z.literal("DiscardUntil"), type: discardType.optional(), types: z.array(encounterType).min(2).optional(), trait: z.string().min(1).optional(), ...when }),
+  // `reshuffle`: a deck that runs out first has the encounter discard pile shuffled back in and the discarding goes on, when the discard pile holds such a card (faq.last-encounter-card, 148004:A:1); with none in either pile nothing is found.
+  z.strictObject({ verb: z.literal("DiscardUntil"), type: discardType.optional(), types: z.array(encounterType).min(2).optional(), trait: z.string().min(1).optional(), reshuffle: z.literal(true).optional(), ...when }),
   // The "when revealed" effects of the picked card (or `card`) resolve for the actor, as if it had just been revealed. It
   // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed.
   verbFlags(z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }), { runsInFrame: true }),

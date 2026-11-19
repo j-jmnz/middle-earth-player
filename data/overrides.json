@@ -110,6 +110,19 @@
     },
     {
       "match": {
+        "code": "00001"
+      },
+      "set": {
+        "traits": [
+          "Nazgûl",
+          "Captain"
+        ]
+      },
+      "reason": "Hall of Beorn's export garbles the trait as 'Nazg√l' (the encoding that also garbles 'Lórien' above). The scan prints 'Nazgûl. Captain.'; Nazgûl is the trait of every other Nazgûl card.",
+      "source": "scan 00001.A (data/printed/standalone-scenarios.json)"
+    },
+    {
+      "match": {
         "code": "12100"
       },
       "set": {
@@ -800,6 +813,16 @@
     },
     {
       "match": {
+        "code": "147015"
+      },
+      "set": {
+        "victory": null
+      },
+      "reason": "Hall of Beorn gives Wall of Trees the Victory 254, its code for X. The scan prints Threat X, quest points 4 and Victory X, where X equals the number of players, so the card has no number and its records read X.",
+      "source": "scan 147015.A, sha256 12e16baaf12ddaa467bbfe8c7db5190e04d9ba1606b03178e26a0e9a53ada011 (data/printed/standalone-scenarios.json)"
+    },
+    {
+      "match": {
         "code": "18029"
       },
       "set": {
@@ -1224,6 +1247,42 @@
     },
     {
       "match": {
+        "code": "148005"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Hollow Circle prints \"Immune to player card effects.\"; Hall of Beorn lists no Immune keyword for it, so the engine would read no immunity.",
+      "source": "scan 148005.A (data/printed/standalone-scenarios.json)"
+    },
+    {
+      "match": {
+        "code": "148006"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Standing Stones prints \"Immune to player card effects.\"; Hall of Beorn lists no Immune keyword for it, so the engine would read no immunity.",
+      "source": "scan 148006.A (data/printed/standalone-scenarios.json)"
+    },
+    {
+      "match": {
+        "code": "148007"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Great Barrow prints \"Peril. Immune to player card effects. The players cannot travel here.\"; Hall of Beorn lists Peril but no Immune keyword for it, so the engine would read no immunity.",
+      "source": "scan 148007.A (data/printed/standalone-scenarios.json)"
+    },
+    {
+      "match": {
         "code": "145079"
       },
       "set": {
@@ -1339,6 +1398,20 @@
       },
       "reason": "Hall of Beorn spells the card's title \"Vile Afflication\"; the scan and DragnCards print Vile Affliction.",
       "source": "scan 10137.A (data/printed/angmar-awakened.json); data/raw/dragncards/cardDb.tsv"
+    },
+    {
+      "match": {
+        "code": "147006"
+      },
+      "set": {
+        "name": "The Wicked Willow",
+        "imageUrls": [
+          "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3A.jpg",
+          "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3B.jpg"
+        ]
+      },
+      "reason": "Hall of Beorn spells the stage 3 quest card 'The Wiched Willow' in its title and slug and in the scan addresses, which answer 403. The card prints 'The Wicked Willow' (DragnCards' deck Q99.04 and RulesPal's transcription name it so), and the spelled-right addresses serve both sides.",
+      "source": "hallofbeorn.com/Export/EncounterCards (Slug The-Wiched-Willow-TOF); s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3A.jpg; dragncards Q99.04"
     }
   ],
   "scenarioPiles": [
@@ -1588,6 +1661,70 @@
       "pile": "setAside",
       "reason": "DragnCards loads the 4 copies of A Foe Beyond in the staging area (Q02.3, E02.3). The quest card A Presence in the Dark (03069) prints a Setup that removes all copies of A Foe Beyond from the encounter deck and then shuffles 1 copy per player back into it, so the copies are set aside at Setup, not staged.",
       "source": "dragncards preBuiltDecks.json (Q02.3, E02.3); A Presence in the Dark 03069 printed Setup; hallofbeorn.com/Export/Scenarios/Flight-from-Moria"
+    },
+    {
+      "scenario": "the-massing-at-osgiliath",
+      "code": "00002",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads the 12 Scout cards (4 copies of each of the 3 titles) set aside (Q99.01). The quest card Beyond Expectations (00016) prints \"Setup: Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area. ... Shuffle any unused Scout cards back into the encounter deck.\", so one copy of Snaga Scouts per player is staged and the other copies of its 4 stay in the encounter deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.01); Beyond Expectations 00016 printed Setup; hallofbeorn Scenarios/The-Massing-at-Osgiliath"
+    },
+    {
+      "scenario": "the-massing-at-osgiliath",
+      "code": "00003",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads the 12 Scout cards (4 copies of each of the 3 titles) set aside (Q99.01). The quest card Beyond Expectations (00016) prints \"Setup: Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area. ... Shuffle any unused Scout cards back into the encounter deck.\", so one copy of Wolves from Mordor per player is staged and the other copies of its 4 stay in the encounter deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.01); Beyond Expectations 00016 printed Setup; hallofbeorn Scenarios/The-Massing-at-Osgiliath"
+    },
+    {
+      "scenario": "the-massing-at-osgiliath",
+      "code": "00004",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads the 12 Scout cards (4 copies of each of the 3 titles) set aside (Q99.01). The quest card Beyond Expectations (00016) prints \"Setup: Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area. ... Shuffle any unused Scout cards back into the encounter deck.\", so one copy of Wainriders per player is staged and the other copies of its 4 stay in the encounter deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.01); Beyond Expectations 00016 printed Setup; hallofbeorn Scenarios/The-Massing-at-Osgiliath"
+    },
+    {
+      "scenario": "the-battle-of-lake-town",
+      "code": "50207",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads Lake-town set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: ... Search the encounter deck for Lake-town and add it to the staging area.\", so it is a staged objective at the start of the game.",
+      "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; hallofbeorn Scenarios/The-Battle-of-Lake-town"
+    },
+    {
+      "scenario": "the-battle-of-lake-town",
+      "code": "50204",
+      "from": "setAside",
+      "pile": "smaugDeck",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Mighty is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/brief.md, The Battle of Lake-town).",
+      "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
+    },
+    {
+      "scenario": "the-battle-of-lake-town",
+      "code": "50205",
+      "from": "setAside",
+      "pile": "smaugDeck",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Terrible is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/brief.md, The Battle of Lake-town).",
+      "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
+    },
+    {
+      "scenario": "the-battle-of-lake-town",
+      "code": "50206",
+      "from": "setAside",
+      "pile": "smaugDeck",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Magnificent is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/brief.md, The Battle of Lake-town).",
+      "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
+    },
+    {
+      "scenario": "the-stone-of-erech",
+      "code": "50307",
+      "from": "setAside",
+      "pile": "activeLocation",
+      "reason": "DragnCards loads Tarlang's Neck set aside (Q99.03). The quest card The Disappearance (50301) prints \"Setup: Make Tarlang's Neck the active location.\", so it is the active location at the start of the game.",
+      "source": "dragncards preBuiltDecks.json (Q99.03); The Disappearance 50301 printed Setup"
     }
   ],
   "scenarioRemovals": [
@@ -1749,6 +1886,93 @@
       "easy": 3,
       "reason": "The Black Gate Opens set prints 40 cards (Reeking Moat 11/40, scan 146029.A). Hall of Beorn's quantities for the set's encounter cards sum to 40 with 3 Reeking Moat; DragnCards' Q0C.17 and E0C.17 load 2, which makes 39. Hall of Beorn lists 3 in both Normal and Easy; no printed source shows an Easy mark, and the DragnCards Easy deck repeats the Normal count, so Easy keeps all 3. Not confirmed by a printed source.",
       "source": "scan 146029.A (11/40); hallofbeorn.com/Export/Scenarios/The-Black-Gate-Opens; dragncards Q0C.17, E0C.17"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147018",
+      "easy": 1,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 2 of Falling Branches's 3 copies (Easy 1); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147008",
+      "easy": 2,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 2 of Long Trailer's 4 copies (Easy 2); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147019",
+      "easy": 1,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 1 of Song of Sleep's 2 copies (Easy 1); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147012",
+      "pile": "staging",
+      "easy": 0,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 1 of Misleading Path's 2 copies (Easy 1); the copy a player finds with the Setup search is the one set out, the copy in the deck stays; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-old-forest",
+      "code": "147016",
+      "pile": "staging",
+      "easy": 0,
+      "reason": "DragnCards has no Easy deck for The Old Forest, so Easy loads Q99.04 unchanged. Hall of Beorn's Easy counts (its scenario list; 34 Easy encounter cards against 41 Normal) remove 1 of Oppressive Forest's 2 copies (Easy 1); the copy a player finds with the Setup search is the one set out, the copy in the deck stays; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148008",
+      "easy": 2,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Ancient Barrow's 3 copies (Easy 2); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148011",
+      "easy": 3,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Barrow-wight's 4 copies (Easy 3); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148018",
+      "easy": 1,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Dreadful Song's 2 copies (Easy 1); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148017",
+      "easy": 2,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Frozen by Fear's 3 copies (Easy 2); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148009",
+      "easy": 3,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 1 of Stone Ring's 4 copies (Easy 3); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148014",
+      "easy": 0,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) drop both copies of I'm Waiting for You! (Easy 0); the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "fog-on-the-barrow-downs",
+      "code": "148007",
+      "pile": "setAside",
+      "easy": 3,
+      "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 2 of Great Barrow's 5 copies (Easy 3); all copies are set aside by stage 1A's Setup, so the setAside pile loses them; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
     }
   ],
   "campaigns": [
@@ -1831,28 +2055,6 @@
       "released": "2019-08-02",
       "reason": "No source names a cycle. Hall of Beorn lists the scenarios of A Shadow in the East and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 28 and 29. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
       "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 28 and 29; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
-    {
-      "id": "standalone-scenarios",
-      "name": "Standalone scenarios",
-      "kind": "cycle",
-      "products": [
-        "2011",
-        "2012",
-        "2013",
-        "2014",
-        "2015",
-        "2016",
-        "2017",
-        "The Wizard's Quest",
-        "The Woodland Realm",
-        "The Mines of Moria",
-        "Escape from Khazad-dûm",
-        "The Hunt for the Dreadnaught"
-      ],
-      "released": "2011-09-21",
-      "reason": "The official scenarios printed on their own, outside a cycle or a saga: RingsDB's cycle 50 packs that are not A Long-extended Party's (The Massing at Osgiliath to The Hunt for the Dreadnaught). Hall of Beorn lists the event scenarios of 2011 to 2017 under the year and the others under their own product. They have no Campaign Mode, so they are grouped as one cycle the Scenarios tab lists; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 50; hallofgondor.com/release-dates (released: US release of the first product)"
     }
   ],
   "outOfScope": [
@@ -1863,6 +2065,18 @@
     }
   ],
   "productCodes": [
+    {
+      "set": "The Stone of Erech",
+      "prefix": "503",
+      "reason": "Hall of Beorn numbers The Stone of Erech's cards 00001 to 00027 (RingsDbCardId), which are the codes of The Massing at Osgiliath's and The Battle of Lake-town's 00001 to 00019 and 00024, and RingsDB lists no card of TSoE. A code must name one card, so the earlier two keep their codes and the Stone's are 503 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 3 for the pack's position in it (50301 The Disappearance, 50327 The Gloaming).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Stone of Erech, Number, RingsDbCardId); ringsdb.com packs (TSoE, cycle 50, position 3; no cards listed)"
+    },
+    {
+      "set": "The Battle of Lake-town",
+      "prefix": "502",
+      "reason": "Hall of Beorn numbers The Battle of Lake-town's cards 00001 to 00024 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of TBoLT. A code must name one card, so the Massing keeps its codes and Lake-town's are 502 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 2 for the pack's position in it (50201 Terror from the Mountain, 50224 Esgaroth Wharf). A later standalone scenario whose codes collide takes 50 and its position the same way.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Battle of Lake-town, Number, RingsDbCardId); ringsdb.com packs (TBoLT, cycle 50, position 2; no cards listed)"
+    },
     {
       "set": "The Dark of Mirkwood",
       "prefix": "410",
@@ -1935,6 +2149,12 @@
     }
   ],
   "dragnPackAliases": [
+    {
+      "dragncards": "The Battle of Lake-Town",
+      "pack": "TBoLT",
+      "reason": "DragnCards spells the pack \"The Battle of Lake-Town\" (capital T) where Hall of Beorn and the cards print \"The Battle of Lake-town\", so the row's pack does not name the product. Its collector numbers (1 to 24) and names are Hall of Beorn's own, so the row's number and name find the card in TBoLT.",
+      "source": "DragnCards preBuiltDecks.json (Q99.02) and cardDb.tsv (packName The Battle of Lake-Town, numberInPack); hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Battle of Lake-town, Number)"
+    },
     {
       "dragncards": "Core Set",
       "pack": "RevCore",
@@ -2219,6 +2439,14 @@
       "code": "100158",
       "reason": "Protect the Innocent and Arnor Ravaged are the two sides of one card (#158; the Deadmen's Dike campaign card: \"Add Arnor Ravaged to the Campaign Pool in its place (found on the opposite side of Protect the Innocent)\"), and Hall of Beorn gives both RingsDbCardId 10158. Protect the Innocent keeps RingsDB's code; Arnor Ravaged, which RingsDB lists no record for, takes '100' and the collector number, which no other card bears.",
       "source": "data/raw/hallofbeorn (EncounterCards.json); data/raw/ringsdb/cards/AACE.json; mec108.campaign-setup-deadmens-dike"
+    }
+  ],
+  "scenarioStages": [
+    {
+      "scenario": "the-old-forest",
+      "code": "147006",
+      "reason": "Hall of Beorn's scenario file lists the quest cards of stages 1 and 2 only. The Wicked Willow (stage 3A, 3B, card 6 of 24 in the box; the stage 2B text advances to stage 3A) is a quest card of the encounter set, and DragnCards' deck Q99.04 deals it as the last quest stage.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
     }
   ]
 }

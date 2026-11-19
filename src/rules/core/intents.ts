@@ -38,7 +38,8 @@ export type EngineStep =
   // of the card it hits (0 for the hero an undefended attack hits, `undefended`). The damage placed is the `damage` step
   // after it.
   | { kind: "strike"; side: "enemy" | "player"; enemyId: string; targetId: string; attack: number; defense: number; undefended: boolean; cause: Cause }
-  | { kind: "cancel"; cardId: string }
+  // `by`: the card whose effect canceled a revealed card (Trapped Inside a Barrow, 148004:B:1); absent when a player canceled an effect.
+  | { kind: "cancel"; cardId: string; by?: string }
   // An enemy attached itself facedown to a location in the staging area (dcce.grapple): the enemy is not named, it is facedown now.
   | { kind: "grapple"; enemyId: string; locationId: string }
   // A grappled enemy came out from under its location, faceup, into the staging area (dcce.grapple): named, it was seen faceup when it was revealed.
@@ -63,8 +64,7 @@ export type PlayerIntent =
   // The players give the scenario up from the table menu: the game is lost, whatever window is open.
   | { type: "Resign" }
   | { type: "PlayCard"; cardId: string; payments: readonly Payment[]; hostId?: string }
-  // `sideQuestId`: the characters quest on that side quest in a quest area instead of the current quest.
-  | { type: "Commit"; cardIds: readonly string[]; sideQuestId?: string }
+  | { type: "Commit"; cardIds: readonly string[] }
   | { type: "CommitHide"; cardIds: readonly string[] }
   | { type: "CommitFortitude"; cardIds: readonly string[] }
   | { type: "CommitEscape"; cardIds: readonly string[] }

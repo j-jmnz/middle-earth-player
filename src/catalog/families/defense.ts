@@ -136,6 +136,9 @@ const FLAGS = [
   "excessToThreat",
   // On an enemy: each point of the combat damage its attack deals beyond the remaining hit points of the character it damages is 1 damage the defending player assigns to another character he controls, once the attack ends (Cave-troll, 03020:A:1; families/defense/excess.ts).
   "excessToDamage",
+  // On an enemy: each point of damage its attack places on a character raises the defending player's threat by 1 ("Each damage dealt by Wainriders raises the defending player's threat by 1", 00004:A:1). The player the attack is against is the
+  // defending player even when another player's Sentinel character defended; damage canceled or shielded is not dealt, and a shadow card's damage is not this enemy's attack.
+  "damageToThreat",
   // The holder does not exhaust to defend against enemies with the Trait of the modifier's `when` (`defendingAgainst`): "Grimbeorn the Old does not exhaust to defend against Troll enemies" (02037:A:1).
   "noExhaustDefendVersus",
   // On an enemy: its Defense cannot be reduced, whatever lowers it (900506:A:1); increases still count.

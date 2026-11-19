@@ -40,7 +40,7 @@ const GROUP_PILE: Readonly<Record<string, Pile>> = {
 // ("Prepare the Corsair deck", "Prepare the Uncharted deck"), never by a line naming each card, and they count toward their encounter sets.
 // Ered Mithrin's decks (evilCreaturesDeck, cavesDeck, sideQuestDeck, spidersDeck, orcsDeck) are built by the Setup's deck steps the same way, and
 // The Two Towers' second encounter decks (haradDeck, greatSpiderDeck) by the Setup's encounter set that is shuffled under a card or set aside.
-const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"]);
+const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"]);
 
 // A scenario is written only when every check passes. The rest are listed in problems and stay unbuilt
 // until an override or a template resolves them.
@@ -148,6 +148,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       const card = bySlug.get(quest.Slug);
       return card && !isNightmareCard(card) ? [card.code] : [];
     });
+    for (const rule of overrides.scenarioStages) if (rule.scenario === id && !questCodes.includes(rule.code)) questCodes.push(rule.code);
     let stages = questCodes;
 
     // The printed Setup of the first quest stage and of the campaign card.
@@ -428,8 +429,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const everything = placed.map((item) => textOf(item.code)).join("\n");
     const widgets = {
       hide: /\bHide (?:test|\d)/.test(everything) || placed.some((item) => byCode.get(item.code)?.keywords?.hide != null),
-      secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))),
-      perSeatStaging: stages.some((code) => /creates? (?:his|their|your) own staging area/i.test(textOf(code))),
+      // A stage that says "There can be 2 active locations", or a dealt card that grants the slot (Fisherman's Dock: "There are now 2 active locations").
+      secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))) || /There are now 2 active locations/.test(everything),
+      // A stage that creates a staging area for each player (Breaking of the Fellowship, Escape from Mount Gram), or a dealt card that sends a player to a staging area of his own (Great Barrow, 148007).
+      perSeatStaging: stages.some((code) => /creates? (?:his|their|your) own staging area/i.test(textOf(code))) || /create your own staging area/.test(everything),
     };
 
     // DragnCards' decks, where a deck of the same cards exists (copy counts only, not piles).
@@ -473,6 +476,6 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     );
   }
 
-  const campaigns = campaignsOf(campaignDefs, scenarios, campaignCards, preludes);
+  const campaigns = campaignsOf(campaignDefs, scenarios, campaignCards, preludes, raw.scenarioIndex);
   return { scenarios, campaigns, problems };
 }

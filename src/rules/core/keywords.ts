@@ -10,7 +10,7 @@ import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlaye
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
-import { claimedDestination, returnedToDeck } from "../families/objectives/claimed.ts";
+import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
@@ -55,7 +55,7 @@ export function modifiedStat(
   against?: string,
 ): number {
   // "Use their Willpower instead of Defense" (06038).
-  if (stat === "defense" && defenseFromWillpower(state, instance.id)) return modifiedStat(state, instance, "willpower", cards, against);
+  if (stat === "defense" && defenseFromWillpower(state, instance, cards)) return modifiedStat(state, instance, "willpower", cards, against);
   // "During the encounter phase, treat each enemy's engagement cost as if it were 0" (41005:B:1).
   if (stat === "engagementCost" && state.phase === "Encounter" && flagged(state, "table", "engagementCostZero")) return 0;
   const printed = printedOf(cards, instance.code);
@@ -352,13 +352,14 @@ function heroHostInPlay(state: ScenarioState, instance: CardInstance): boolean {
 export function defeatedDestination(
   instance: CardInstance,
   printed: PrintedCard,
+  state: ScenarioState,
 ): Destination {
   if ((printed.type === "enemy" || isLocationCard(printed)) && victoryOf(instance, printed) != null) {
     return { zone: "victory" };
   }
   // A card put into play for a time leaves the game when it leaves play (PutIntoPlay `then: removeFromGame`, 11212:A:2).
   if (instance.temporary) return { zone: "removed" };
-  // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives/claimed.ts).
+  // A claimed objective whose text returns it (01108:A:2, 12071:A:1) goes back to the staging area when discarded or detached (families/objectives/claimed.ts).
   // A Captive destroyed under To Isengard! or an enemy goes to its owner's discard pile (families/captives).
   const usual: Destination =
     // An ally in the staging area under nobody's control (Retreat from Osgiliath, 145074:B:2) and a player card lying on a Nameless enemy (families/nameless) are still their owner's: they go to that discard pile.
@@ -367,7 +368,7 @@ export function defeatedDestination(
       : printed.type === "quest"
         ? { zone: "setAside" }
         : { zone: "encounterDiscard" };
-  return claimedDestination(instance, usual);
+  return claimedDestination(state, instance, usual);
 }
 
 // Each card attached to a card that leaves play is discarded at the same time (rr.attachment-cards), to the discard pile of
@@ -404,11 +405,18 @@ export function releaseAttachments(
       steps.push({ kind: "destroy", targetId: attachmentId });
       continue;
     }
+    // A claimed objective that is discarded when it is detached (The Old Thrush, 50208:A:2).
+    const detached = discardedDetached(next, attachmentId);
+    if (detached) {
+      next = detached;
+      steps.push({ kind: "destroy", targetId: attachmentId });
+      continue;
+    }
     const printed = printedOf(cards, attachment.code);
     const dest: Destination =
       (cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent) || flagged(next, attachmentId, "removedWithHost")
         ? { zone: "removed" }
-        : defeatedDestination(attachment, printed);
+        : defeatedDestination(attachment, printed, next);
     next = moveCard(next, attachmentId, dest);
     steps.push({ kind: "destroy", targetId: attachmentId });
     if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
@@ -446,7 +454,7 @@ export function destroyCard(
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).
   // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
-  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious), { released: instance.attachments, defeated: byDamage });
+  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious, next), { released: instance.attachments, defeated: byDamage });
   steps.push({ kind: "destroy", targetId: id });
   if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   next = discardedFromPlay(next, instance, byDamage);

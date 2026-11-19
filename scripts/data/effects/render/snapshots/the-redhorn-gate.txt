@@ -271,7 +271,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
   04024:whenRevealed:1: When revealed
     - for each ready character (any player controls):
       - exhaust the picked card
-      - then, if it is the Quest phase (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is committed to the quest without exhausting (a character that cannot quest stays out)
+      - then, if it is the Quest phase (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is committed to the quest without exhausting (it counts as committing, so a "when a character commits" effect hears it; a character that cannot quest stays out)
 
 ## 04025 Mountain Goblin
 (the scenario deals it into the encounter pile; the piles place it, no record does)

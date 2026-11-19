@@ -59,6 +59,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "ModifyStat", stat: "cannotAttack", amount: 1, until: "whileSourceInPlay", target: "host" }, { verb: "ModifyStat", stat: "noExhaustQuest", amount: 1, until: "whileSourceInPlay", target: "host" }],
     },
 
+    // "(If detached, return Book of Mazarbul to the staging area.)" (03024:A:2): the flag `returnsToStagingArea` sends it back when its hero leaves play or it is discarded (families/objectives/claimed.ts).
+    { id: "03024:constant:2", cardCode: BOOK, lines: ["03024:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+
     // 03030 Chieftain of the Pit: +3 Attack until the end of the round it is revealed; its Shadow makes it attack again once this attack ends, dealt another shadow card (faq.additional-attacks).
     { id: "03030:whenRevealed:1", cardCode: "03030", lines: ["03030:A:1"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 3, until: "endOfRound", target: "self" }] },
     { id: "03030:shadow:1", cardCode: "03030", lines: ["03030:A:2"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },

@@ -239,6 +239,10 @@ describe("the other lines a row cannot show", () => {
     expect(settled.seats[0]?.hand).toHaveLength(0);
     const own = defeatSideQuest(updateCard(taken, wilderness, { progress: 4 }), wilderness, t.ctx, []);
     expect(settle({ ...own, window: null, mode: "stopped" }, t.ctx, []).seats[0]?.hand).toHaveLength(2);
+    // Revealed from the encounter deck, it is stamped with the revealing seat as its controller: the hand still waits under it for its own Forced effect, not a discard pile.
+    const revealed = defeatSideQuest(updateCard(taken, wilderness, { progress: 4, controller: 0 }), wilderness, t.ctx, []);
+    const back = settle({ ...revealed, window: null, mode: "stopped" }, t.ctx, []);
+    expect([back.seats[0]?.hand.length, back.seats[0]?.discard.length]).toEqual([2, 0]);
   });
 
   it("10157:A:1 adds nothing while the host is held facedown under Rescue Iârion", () => {

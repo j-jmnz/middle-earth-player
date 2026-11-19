@@ -15,15 +15,16 @@ import { moveCard } from "../../core/zones.ts";
 import { exploring } from "../island/map.ts";
 import { redirectProgress } from "../quest/blizzard.ts";
 import { holdPlacement, holdsProgress } from "../long-dark/hold.ts";
+import { familyTravelSecond } from "../../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 export type Slot = "activeLocation" | "secondActiveLocation";
 
-// The slot a location traveled to, or made active by an effect, goes in; null when both are taken (or the one is, with no second).
-export function freeSlot(state: ScenarioState): Slot | null {
+// The slot a location traveled to, or made active by an effect, goes in; null when both are taken (or the one is, with no second). `locationId`: the location traveled to, which a family may let take the second slot (Fisherman's Dock, 50223:A:2).
+export function freeSlot(state: ScenarioState, locationId?: string): Slot | null {
   if (!state.activeLocation) return "activeLocation";
   if (heldAmount(state, "table", "extraActiveLocation") > 0 && !state.secondActiveLocation) return "secondActiveLocation";
-  return null;
+  return locationId != null && familyTravelSecond(state, locationId) ? "secondActiveLocation" : null;
 }
 
 // The players must travel to a location if able (mec109.stage-4).
@@ -105,6 +106,18 @@ export function notePlaced(state: ScenarioState, id: string, amount: number): Sc
   return { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId: id, stat: "progressPlaced", amount, until: "endOfRound" }] };
 }
 
+// `placed` of the progress goes on the active location `id` (the caller took its room into account): it is noted for a cap, and a full one is explored.
+export function placeOn(state: ScenarioState, id: string, placed: number, cards: Cards, steps: EngineStep[]): ScenarioState {
+  const location = state.cards[id];
+  if (!location || placed <= 0) return state;
+  let next = notePlaced(updateCard(state, id, { progress: location.progress + placed }), id, placed);
+  steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("rr.step-3-4") });
+  const points = questPointsOf(next, location, cards);
+  // Under Exploration a location that is full stays in play (families/island/map.ts).
+  if (points != null && location.progress + placed >= points && !exploring(next)) next = destroyCard(next, id, cards, steps, true);
+  return next;
+}
+
 // Progress from questing goes on the active locations first (rr.active-location): each takes what it can, a location that is held
 // back goes after the ones that are not, and a full one is explored. Returns the progress left for the quest card.
 export function placeOnActive(state: ScenarioState, amount: number, cards: Cards, steps: EngineStep[]): { state: ScenarioState; remaining: number } {
@@ -122,15 +135,8 @@ export function placeOnActive(state: ScenarioState, amount: number, cards: Cards
     const placed = redirected.remaining;
     const diverted = wanted - placed;
     remaining -= diverted;
-    next = redirected.state;
-    if (placed > 0) {
-      next = notePlaced(updateCard(next, id, { progress: location.progress + placed }), id, placed);
-      steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("rr.step-3-4") });
-      remaining -= placed;
-      const points = questPointsOf(next, location, cards);
-      // Under Exploration a location that is full stays in play (families/island/map.ts).
-      if (points != null && location.progress + placed >= points && !exploring(next)) next = destroyCard(next, id, cards, steps, true);
-    }
+    next = placeOn(redirected.state, id, placed, cards, steps);
+    remaining -= placed;
     if (diverted > 0) break;
   }
   return { state: next, remaining };

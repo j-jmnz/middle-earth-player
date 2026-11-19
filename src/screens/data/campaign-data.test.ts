@@ -54,7 +54,7 @@ describe("the registry", () => {
   });
 
   it("splits the scenarios into the boxes, each scenario in one, each box inside its own campaign", () => {
-    expect(BOXES.map((box) => box.name)).toEqual(["Shadows of Mirkwood", "Dwarrowdelf", "Revised Core Set", "The Dark of Mirkwood", "Angmar Awakened Campaign Expansion", "The Fellowship of the Ring Saga Expansion", "The Two Towers Saga Expansion", "The Return of the King Saga Expansion", "Dream-chaser Campaign Expansion", "Ered Mithrin Campaign Expansion"]);
+    expect(BOXES.map((box) => box.name)).toEqual(["Shadows of Mirkwood", "Standalone scenarios", "Dwarrowdelf", "Revised Core Set", "The Dark of Mirkwood", "Angmar Awakened Campaign Expansion", "The Fellowship of the Ring Saga Expansion", "The Two Towers Saga Expansion", "The Return of the King Saga Expansion", "Dream-chaser Campaign Expansion", "Ered Mithrin Campaign Expansion"]);
     // The boxes are in the campaigns table's order (`position`): by release, the saga boxes together at the Fellowship's.
     const positions = BOXES.map((box) => index.find((entry) => entry.id === box.campaignId)?.position ?? 0);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
@@ -75,6 +75,9 @@ describe("the registry", () => {
     expect(BOXES.find((box) => box.id === "the-two-towers")?.scenarios).toEqual(campaignOf("the-two-towers")?.scenarios);
     expect(boxOf("shelobs-lair")?.id).toBe("the-two-towers");
     expect(boxOf("nowhere")).toBeNull();
+    // The Standalone scenarios cycle is one box; the scenarios not built yet are its campaign file's `later`.
+    expect(BOXES.find((box) => box.id === "standalone-scenarios")?.later).toEqual(campaignOf("standalone-scenarios")?.later);
+    expect(boxOf("the-massing-at-osgiliath")?.name).toBe("Standalone scenarios");
   });
 
   it("takes a standalone game's flags from its box: saga for the Fellowship and The Two Towers", () => {

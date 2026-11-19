@@ -13,7 +13,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard, modifiedStat } from "../../core/keywords.ts";
 import { effectsOf } from "../../windows/listen.ts";
-import { hasQuestPoints, printedOf, type PrintedCard } from "../../core/printed.ts";
+import { hasQuestPoints, isQuestCardType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
@@ -23,7 +23,7 @@ import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../../c
 export function questHosts(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
   const stage = stageOf(state, seat);
   const others = Object.values(state.cards)
-    .filter((card) => card.id !== stage && inPlay(card.zone) && card.zone !== "questStage" && printedOf(ctx.cards, card.code).type === "quest")
+    .filter((card) => card.id !== stage && inPlay(card.zone) && card.zone !== "questStage" && isQuestCardType(printedOf(ctx.cards, card.code).type))
     .map((card) => card.id);
   return [...(stage ? [stage] : []), ...others];
 }

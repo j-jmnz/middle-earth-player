@@ -75,6 +75,8 @@ const FLAGS = [
   "cannotBeAttackedByRanged",
   // On an enemy: only characters with the Ranged keyword, printed or gained, can attack or defend against it ("Only characters with ranged can attack or defend against Moria Bats", 04127:A:1); with none able its attack is undefended.
   "onlyRangedCombat",
+  // On an enemy, until the modifier ends: it loses the Spectral keyword ("that enemy loses the Spectral keyword until the end of the phase", 50311:A:1; docs/brief.md, The Stone of Erech): characters attacking it use their Attack again.
+  "losesSpectral",
 ] as const;
 
 export const manifest = { name: "attack", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
