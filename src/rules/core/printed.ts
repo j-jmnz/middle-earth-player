@@ -345,7 +345,12 @@ export function scenarioOwned(printed: PrintedCard): boolean {
 
 // A quest card (mec108.side-quests: "Side quests are a new type of quest card"): a quest stage, an encounter side quest or a player side quest.
 export function isQuestCardType(type: CardType): boolean {
-  return type === "quest" || type === "encounter-side-quest" || type === "player-side-quest";
+  return type === "quest" || isSideQuestType(type);
+}
+
+// A side quest, encounter or player (mec108.side-quests).
+export function isSideQuestType(type: CardType): boolean {
+  return type === "encounter-side-quest" || type === "player-side-quest";
 }
 
 // A treasure is a player card ("Treasure is a new type of player card", emce.treasure).

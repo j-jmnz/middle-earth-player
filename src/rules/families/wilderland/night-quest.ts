@@ -6,7 +6,7 @@ import { modifiedStat } from "../../core/keywords.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { noteQuestPlaced, questRoom } from "../caves/progress.ts";
 import { NAMED_PILES, pileDealt } from "../../core/piles.ts";
-import { printedOf } from "../../core/printed.ts";
+import { isQuestCardType, isSideQuestType, printedOf } from "../../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { flagged, updateCard } from "../../core/state.ts";
 import { noteProgressPlaced, reduceQuestProgress } from "../angmar/progress.ts";
@@ -25,8 +25,7 @@ export function markSideQuests(state: ScenarioState, cards: ReduceContext["cards
 
 /** A side quest card, encounter or player: a player side quest in play lies in the staging area like an encounter one (The Lost Realm rules, mec108.side-quests-in-play). */
 export const isSideQuest = (state: ScenarioState, id: string, ctx: Pick<ReduceContext, "cards">): boolean => {
-  const type = printedOf(ctx.cards, state.cards[id]?.code ?? "").type;
-  return type === "encounter-side-quest" || type === "player-side-quest";
+  return isSideQuestType(printedOf(ctx.cards, state.cards[id]?.code ?? "").type);
 };
 
 /** The side quests in the staging area, in the order they were added. */
@@ -88,6 +87,6 @@ export function placeOnCurrentSideQuest(from: ScenarioState, wanted: number, car
 /** Whether the card is a quest card or a side quest: damage it deals is no "non-quest effect" (Dagnir's cap, 19074:A:2). */
 export function isQuestSource(state: ScenarioState, sourceId: string | null, ctx: Pick<ReduceContext, "cards">): boolean {
   const type = sourceId ? printedOf(ctx.cards, state.cards[sourceId]?.code ?? "").type : null;
-  return type === "quest" || type === "encounter-side-quest";
+  return type != null && isQuestCardType(type);
 }
 

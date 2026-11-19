@@ -22,7 +22,7 @@ import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
-import { cardTypeOf, isAllyLike, isQuestCardType, isPlayerType, printedOf } from "../core/printed.ts";
+import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
 import { activeFor, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
@@ -200,7 +200,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
   if (spec.cardType && printed.type !== spec.cardType) return false;
   if (spec.questCardType && !isQuestCardType(printed.type)) return false;
-  if (spec.sideQuest && printed.type !== "player-side-quest" && printed.type !== "encounter-side-quest") return false;
+  if (spec.sideQuest && !isSideQuestType(printed.type)) return false;
   if (spec.notCardType && printed.type === spec.notCardType) return false;
   if (spec.committed != null && instance.committed !== spec.committed) return false;
   if (spec.participating && !(at.participants ?? []).includes(id)) return false;
