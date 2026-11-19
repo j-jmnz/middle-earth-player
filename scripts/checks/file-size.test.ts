@@ -13,7 +13,7 @@ const MOST_LINES = 500;
 const GENERATED = ["src/effects/generated/", "src/effects/open-lines.ts", "src/ui/icons/", "src/catalog/version.ts"];
 
 const OVER_LIMIT: Readonly<Record<string, number>> = {
-  "src/effects/authored/families/sidequests.ts": 851,
+  "src/effects/authored/families/sidequests.ts": 849,
   "src/rules/combat/combat.test.ts": 598,
   "src/play/layout/layout.test.ts": 584,
   "src/screens/images/queue.native.ts": 548,

@@ -42,7 +42,7 @@ export const RECORDS: readonly Effect[] = [
       {
         verb: "ForEachPlayer",
         order: "firstFirst",
-        instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck" } }, { verb: "MovePicked", to: "hand" }, { verb: "ShuffleDeck" }],
+        instructions: [{ verb: "Choose", who: "actor", options: [{ id: "search", instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck" } }, { verb: "MovePicked", to: "hand" }] }, { id: "decline", instructions: [] }] }, { verb: "ShuffleDeck" }],
       },
     ],
   },
@@ -74,7 +74,7 @@ export const RECORDS: readonly Effect[] = [
       {
         verb: "ForEachPlayer",
         order: "firstFirst",
-        instructions: [{ verb: "Pick", pick: { type: "enemy", control: "you", engaged: "you", nonUnique: true } }, { verb: "Discard", target: { kind: "picked" } }],
+        instructions: [{ verb: "Choose", who: "actor", options: [{ id: "discard", requires: { kind: "canPick", pick: { type: "enemy", control: "you", engaged: "you", nonUnique: true } }, instructions: [{ verb: "Pick", pick: { type: "enemy", control: "you", engaged: "you", nonUnique: true } }, { verb: "Discard", target: { kind: "picked" } }] }, { id: "decline", instructions: [] }] }],
       },
     ],
   },
@@ -90,9 +90,7 @@ export const RECORDS: readonly Effect[] = [
         verb: "ForEachPlayer",
         order: "firstFirst",
         instructions: [
-          { verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 10, cardType: "ally", intoPlay: true } },
-          { verb: "MovePicked", to: "play" },
-          { verb: "ShuffleDeck", when: { kind: "matches", card: "picked", pick: { type: "ally", control: "you" } } },
+          { verb: "Choose", who: "actor", options: [{ id: "search", instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 10, cardType: "ally", intoPlay: true } }, { verb: "MovePicked", to: "play" }, { verb: "ShuffleDeck" }] }, { id: "decline", instructions: [] }] },
         ],
       },
     ],
