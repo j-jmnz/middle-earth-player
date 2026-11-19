@@ -151,8 +151,8 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50607:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about enemy (any player controls) named "Naurlhûg")
     only if all of: (the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)) and (another player is still in the game)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the attacking enemy engages the next player
-    - this enemy attacks now, dealt no shadow card
+    - the attacking enemy engages the next player [also {"target":"subject"}]
+    - this enemy attacks now, dealt no shadow card [also {"target":"subject"}]
 
 50607:B:3 (back): When Naurlhûg is defeated, the players win the game.
   50607:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Naurlhûg")
@@ -574,8 +574,8 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
   50630:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a non-unique enemy (any player controls): choose objective (you control) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}]
-    - then, if the attacking enemy is a non-unique enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy becomes the guard of the picked card, attached to it in the staging area (an engaged guard stays engaged)
+    - then, if the attacking enemy is a non-unique enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy becomes the guard of the picked card, attached to it in the staging area (an engaged guard stays engaged) (an objective a character holds is detached first, into the staging area faceup and unclaimed)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy to the staging area
 
-(rendered pieces: 320 by template, 38 as JSON)
+(rendered pieces: 318 by template, 40 as JSON)

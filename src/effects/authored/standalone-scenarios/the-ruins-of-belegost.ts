@@ -154,7 +154,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     trigger: "attackResolved",
     subject: NAURLHUG_ENEMY,
     condition: { kind: "all", conditions: [{ kind: "shadowBlank" }, { kind: "otherPlayer" }] },
-    instructions: [{ verb: "EngageNextPlayer" }, { verb: "ImmediateAttack", shadow: false }],
+    instructions: [{ verb: "EngageNextPlayer", target: "subject" }, { verb: "ImmediateAttack", shadow: false, target: "subject" }],
   },
   { id: "50607:triggered:1", cardCode: STAGE_4A, lines: ["50607:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: NAURLHUG_ENEMY, instructions: [{ verb: "WinGame" }] },
 
@@ -400,7 +400,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     timing: "shadow",
     instructions: [
       { verb: "Pick", pick: YOUR_LOOT, when: HAZARD_ENEMY_ATTACKER },
-      { verb: "AttachGuard", guard: "attacker", to: "picked", stayEngaged: true, when: HAZARD_ENEMY_ATTACKER },
+      { verb: "AttachGuard", guard: "attacker", to: "picked", stayEngaged: true, detach: true, when: HAZARD_ENEMY_ATTACKER },
       { verb: "AfterAttack", instructions: [{ verb: "ReturnToStaging", target: { kind: "attacker" }, when: X_AT_LEAST_1 }] },
     ],
   },

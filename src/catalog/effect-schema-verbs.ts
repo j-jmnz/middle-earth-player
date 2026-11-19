@@ -265,7 +265,8 @@ export const simpleVerbs = [
   // The source enemy attacks now, dealt a shadow card of its own; with `shadow: false` it is dealt none ("makes an additional attack after this one. (Do not deal it a shadow card.)", 18022:A:1).
   // `keepShadows` (with `shadow: false`): the shadow cards the enemy already holds are not discarded first, so they all resolve in this attack ("do not deal it another shadow card for this attack", 10131:A:2).
   // `afterThis`: while the source enemy's attack is in progress the new attack is made once this one has ended ("makes an additional attack against you after this one", 143052:A:1); with no attack under way nothing happens.
-  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), keepShadows: z.literal(true).optional(), afterThis: z.literal(true).optional(), ...when }), { runsInFrame: true }),
+  // `target: subject`: the enemy the answered event is about, engaged with a player, attacks that player, not the source (a Forced effect of the quest stage, "it makes an immediate attack. Do not deal it a shadow card", 50607:B:2).
+  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), keepShadows: z.literal(true).optional(), afterThis: z.literal(true).optional(), target: z.literal("subject").optional(), ...when }), { runsInFrame: true }),
   // The attack in progress counts as undefended, even if a defender was declared.
   verb("ConsiderUndefended"),
   // The actor readies one hero they control.
@@ -423,7 +424,8 @@ export const simpleVerbs = [
   // hero counts as having these resource icons while it pays for that card. The top card of the deck is faceup.
   z.strictObject({ verb: z.literal("PlayFromDeckTop"), icons: z.array(z.enum(["leadership", "tactics", "spirit", "lore"])).min(1), ...when }),
   // The source enemy leaves the player it is engaged with and engages the next player. `announces`: the engagement is announced (`engaged`), as any engagement is, so the enemy's own "after ~ engages a player" Forced effect fires again (Goblin Sneak, 04098:A:1).
-  z.strictObject({ verb: z.literal("EngageNextPlayer"), announces: z.literal(true).optional(), ...when }),
+  // `target: subject`: the enemy the answered event is about engages the next player, from a record on another card ("After Naurlhûg attacks ... it engages the next player", 50607:B:2, a Forced effect of the quest stage).
+  z.strictObject({ verb: z.literal("EngageNextPlayer"), announces: z.literal(true).optional(), target: z.literal("subject").optional(), ...when }),
   // The host of the source card, its resource pool, and every card attached to it pass to a seat.
   z.strictObject({ verb: z.literal("TransferHost"), who: whoSchema, ...when }),
   // The players win the scenario. The resolution choices follow.

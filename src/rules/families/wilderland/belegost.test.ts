@@ -230,3 +230,37 @@ describe("FirstTraitSurge `type: any` (50604:B:1)", () => {
     expect(codesOf(done, done.encounterDeck)).toEqual(["hazard", "orc"]);
   });
 });
+
+describe("AttachGuard `detach` (50630:A:2) and EngageNextPlayer `target: subject` (50607:B:2)", () => {
+  const inFrame = (state: ScenarioState, extra: { picked?: string[]; subject?: string }) =>
+    pushEffectFrame(state, { frame: "ResolveEffect", sourceId: null, actor: 0, peril: false, effectId: "x:forced:1", instructions: [], picked: extra.picked ?? [], ...(extra.subject ? { subject: extra.subject } : {}), cancel: null, blockCancel: null }, []);
+
+  it("detaches a Loot objective a hero holds into the staging area, faceup and unclaimed, and the attacking enemy guards it while it stays engaged", () => {
+    const base = table();
+    const hero = base.seats[0]!.heroes[0]!;
+    const loot = spawn(base, "loot1", { zone: "attached" });
+    const held = updateCard(attachTo(loot.state, loot.id, hero), loot.id, { claimed: true, controller: 0 });
+    const enemy = spawn(held, "orc", { zone: "engaged", seat: 0 });
+    const ctx = ctxOf(LOOT);
+    const done = runInstruction(inFrame(enemy.state, { picked: [loot.id] }), { verb: "AttachGuard", guard: "self", to: "picked", stayEngaged: true, detach: true }, { seat: 0, sourceId: enemy.id }, ctx, []);
+    expect(done.cards[loot.id]).toMatchObject({ zone: "staging", face: "up", controller: null });
+    expect(done.cards[loot.id]?.claimed).toBeUndefined();
+    expect(done.cards[hero]?.attachments).not.toContain(loot.id);
+    expect(done.cards[enemy.id]).toMatchObject({ zone: "engaged", host: loot.id, guard: true });
+    // Without `detach` an objective a hero holds is not a guarded objective: nothing happens.
+    const plain = runInstruction(inFrame(enemy.state, { picked: [loot.id] }), { verb: "AttachGuard", guard: "self", to: "picked", stayEngaged: true }, { seat: 0, sourceId: enemy.id }, ctx, []);
+    expect(plain.cards[loot.id]?.zone).toBe("attached");
+  });
+
+  it("moves the enemy the event is about, not the source, to the next player", () => {
+    const base = table(2);
+    const enemy = spawn(base, "orc", { zone: "engaged", seat: 0 });
+    const stage = Object.values(enemy.state.cards).find((card) => card.code === "stage")?.id ?? "";
+    const done = runInstruction(inFrame(enemy.state, { subject: enemy.id }), { verb: "EngageNextPlayer", target: "subject" }, { seat: 0, sourceId: stage }, ctxOf([]), []);
+    expect(done.cards[enemy.id]).toMatchObject({ zone: "engaged", controller: 1 });
+    // With one player there is no next player.
+    const solo = spawn(table(), "orc", { zone: "engaged", seat: 0 });
+    const same = runInstruction(inFrame(solo.state, { subject: solo.id }), { verb: "EngageNextPlayer", target: "subject" }, { seat: 0, sourceId: null }, ctxOf([]), []);
+    expect(same.cards[solo.id]?.controller).toBe(0);
+  });
+});

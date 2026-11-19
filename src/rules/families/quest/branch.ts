@@ -39,7 +39,7 @@ export function attachedStageFrom(state: ScenarioState, currentCode: string, car
   if (!named) return null;
   const attached = Object.values(state.cards).some((card) => {
     const host = card.host ? state.cards[card.host] : undefined;
-    return card.code === named.code && card.zone === "attached" && host != null && cardTypeOf(host, printedOf(cards, host.code)) === "hero";
+    return card.code === named.code && (card.zone === "attached" || card.zone === "play") && host != null && cardTypeOf(host, printedOf(cards, host.code)) === "hero";
   });
   const code = attached ? named.then : named.otherwise;
   const waiting = state.questDeck.find((id) => state.cards[id]?.code === code);

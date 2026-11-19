@@ -233,7 +233,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, { shadow: instruction.shadow !== false, keep: instruction.keepShadows === true });
+      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, instruction.target === "subject" ? (frameScope(state, item.seat, frame.cardId).subject ?? null) : frame.cardId, item.seat, ctx, steps, { shadow: instruction.shadow !== false, keep: instruction.keepShadows === true });
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
