@@ -50,19 +50,22 @@ export async function standInWorld(codes: readonly string[], stats: HeroStats): 
 }
 
 // `checks` is the tableDigest of the table after each of `intents` (src/campaign/digest.ts): the golden snapshot pins them, so a scenario's checks move only when a change reaches its games.
-export type PlayedGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[]; checks?: number[] };
+// `trail`: the state after each intent, kept when the play asks for it, so a check that reads the moments between (a golden suite's
+// `checks`) reads them from the one play instead of playing the game again (.claude/rules/code-standards.md, Test cost).
+export type PlayedGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[]; checks?: number[]; trail?: ScenarioState[] };
 
 /**
  * Plays a game from its start: the first seat keeps its opening hand (a second seat's Keep is the first of `intents`), then
  * `answer` gives every intent until the scenario is lost, or won and every Resolution choice is answered, or `limit` intents.
  */
-export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (state: ScenarioState, memory: Set<string>) => PlayerIntent, limit: number): PlayedGame {
+export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (state: ScenarioState, memory: Set<string>) => PlayerIntent, limit: number, options: { trail?: boolean } = {}): PlayedGame {
   const opened = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
   const kept = opened.state;
   const steps: EngineStep[] = [...opened.steps];
   let state = kept;
   const intents: PlayerIntent[] = [];
   const checks: number[] = [];
+  const trail: ScenarioState[] = [];
   const memory = new Set<string>();
   for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
     const intent = answer(state, memory);
@@ -71,11 +74,12 @@ export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (sta
     steps.push(...result.steps);
     intents.push(intent);
     checks.push(tableDigest(state));
+    if (options.trail) trail.push(state);
     // A card in the staging area, engaged or active shows its face (face-check.ts).
     const facedown = faceProblems(state);
     if (facedown.length > 0) throw new Error(`After intent ${intents.length} (${JSON.stringify(intent)}): ${facedown.join("; ")}`);
   }
-  return { start, kept, state, intents, steps, checks };
+  return { start, kept, state, intents, steps, checks, ...(options.trail ? { trail } : {}) };
 }
 
 /**
@@ -251,15 +255,15 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
   }
 
   /** Plays until the scenario is lost, or won and every Resolution choice is answered. */
-  function play(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, options: { facts?: Omit<CampaignFacts, "modeCard">; log?: CampaignLog; policy?: Partial<P>; mode?: ModeCard; choices?: readonly string[]; limit?: number; standalone?: boolean } = {}): PlayedGame {
+  function play(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, options: { facts?: Omit<CampaignFacts, "modeCard">; log?: CampaignLog; policy?: Partial<P>; mode?: ModeCard; choices?: readonly string[]; limit?: number; standalone?: boolean; trail?: boolean } = {}): PlayedGame {
     const policy = { ...spec.policy, ...options.policy };
-    return playToEnd(start(seatCount, seed, difficulty, { facts: options.facts, log: options.log, modeCard: options.mode, choices: options.choices, standalone: options.standalone }), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit);
+    return playToEnd(start(seatCount, seed, difficulty, { facts: options.facts, log: options.log, modeCard: options.mode, choices: options.choices, standalone: options.standalone }), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit, { trail: options.trail });
   }
 
-  /** A golden: its upgraded cards or, after the earlier parts, their levels as the campaign facts; the earlier parts' log; its policy over the default. */
-  function playGolden(golden: CampaignGoldenBase & { policy?: Partial<P> }, ctx: ReduceContext, choices?: readonly string[]): PlayedGame {
+  /** A golden: its upgraded cards or, after the earlier parts, their levels as the campaign facts; the earlier parts' log; its policy over the default; `trail` keeps each state. */
+  function playGolden(golden: CampaignGoldenBase & { policy?: Partial<P> }, ctx: ReduceContext, choices?: readonly string[], options: { trail?: boolean } = {}): PlayedGame {
     const facts = golden.upgraded ? { prisoner: null, usedOnce: [], counters: {}, upgraded: spec.upgraded } : golden.after && spec.levels ? { prisoner: null, usedOnce: [], counters: {}, levels: spec.levels } : undefined;
-    return play(golden.seatCount, golden.seed, golden.difficulty, ctx, { facts, log: golden.after ? after(golden.seatCount) : undefined, policy: golden.policy, mode: golden.mode, choices, standalone: golden.standalone });
+    return play(golden.seatCount, golden.seed, golden.difficulty, ctx, { facts, log: golden.after ? after(golden.seatCount) : undefined, policy: golden.policy, mode: golden.mode, choices, standalone: golden.standalone, trail: options.trail });
   }
 
   return { world, after, plan, start, play, playGolden };

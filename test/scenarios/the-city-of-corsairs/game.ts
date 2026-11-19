@@ -192,6 +192,6 @@ const game = campaignGame<CorsairsDecks, CorsairsPolicy>({
   earlier: { xp: [4, 3, 5, 4, 4, 5, 4, 1], pool: [{ code: "11176" }, { code: CODES.cirdanSBlessing }], marks: { "11080": 1, "11172": 2, "11184": 3, "11198": 2, [CODES.gavin]: 4 } },
 });
 
-export const playGolden = (golden: CorsairsGolden, ctx: ReduceContext): CorsairsGame => game.playGolden(golden, ctx, golden.choices ?? blessingChoices());
+export const playGolden = (golden: CorsairsGolden, ctx: ReduceContext): CorsairsGame => game.playGolden(golden, ctx, golden.choices ?? blessingChoices(), { trail: true });
 
 export { DREAM_CHASER_LOST, HUNT, THREAT_LOST };

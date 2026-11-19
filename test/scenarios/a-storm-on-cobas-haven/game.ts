@@ -170,5 +170,5 @@ const game = campaignGame<HavenDecks, HavenPolicy>({
   earlier: { xp: [4, 3, 5, 4, 4, 5, 4], pool: [{ code: "11176" }], marks: { "11080": 1, "11172": 2, "11184": 3, "11198": 2 } },
 });
 
-export const playGolden = (golden: HavenGolden, ctx: ReduceContext): HavenGame => game.playGolden(golden, ctx, golden.choices ?? blessingChoices());
+export const playGolden = (golden: HavenGolden, ctx: ReduceContext): HavenGame => game.playGolden(golden, ctx, golden.choices ?? blessingChoices(), { trail: true });
 export { DREAM_CHASER_LOST, THREAT_LOST };
