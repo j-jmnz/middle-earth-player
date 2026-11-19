@@ -63,6 +63,8 @@ describe("parseShotArgs", () => {
     expect(() => parseShotArgs(["--nope"], "/repo")).toThrow("unknown flag --nope");
     expect(() => parseShotArgs(["--tap"], "/repo")).toThrow("--tap needs a value");
     expect(() => parseShotArgs(["--size", "big"], "/repo")).toThrow("--size");
+    expect(() => parseShotArgs(["--at", "x"], "/repo")).toThrow("--at");
+    expect(parseShotArgs(["--fixture", "duo", "--at", "5"], "/repo")).toMatchObject({ fixture: "duo", at: 5, routes: [] });
   });
 
   it("puts the fixture's save id in {save}, and opens where the fixture landed when no route is named", () => {

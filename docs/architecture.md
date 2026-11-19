@@ -152,7 +152,7 @@ src/screens/            the app around the table
   kit/  nav/  art/  data/      the chrome UI kit and palette; navigation and insets; backdrops and hero art; databases, schema and stores
   deck/  pool/  campaign/  briefing/  history/  session/  table/  settings/  rules/  images/  booklets/
 test/                   test support: harness/, scenarios/<scenario-id>/ (scene.ts, game.ts)
-scripts/                commands: data/ (sync, build, check, query, effects), build/ (catalog, scans, booklets), desktop/ (dev, build, pack), docs/, e2e/, card-smoke/, checks/ (a11y-web, desktop-smoke), browser/ (the web export in Chromium for pnpm browser and the a11y check), tools/ (pnpm move), log.ts
+scripts/                commands: data/ (sync, build, check, query, effects), build/ (catalog, scans, booklets), desktop/ (dev, build, pack), docs/, e2e/, card-smoke/, checks/ (a11y-web, desktop-smoke), browser/ (the web export in Chromium for pnpm browser and the a11y check), game/ (pnpm game: a fixture or golden as text), tools/ (pnpm move), log.ts
 desktop/                the Electron shell, outside the app's bundle (main, preload, serve, policy, identity, bounds, menu); imports nothing from src/. Built into desktop/build and desktop/out (gitignored)
 data/  assets/  drizzle/  modules/  plugins/   sources and builds; bundled files; user.db migrations; native modules; Expo and Babel plugins
 .maestro/               showcase/, subflows/ (the README's screenshot flows)

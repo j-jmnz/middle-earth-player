@@ -23,12 +23,29 @@ pnpm browser shot /settings --tap app-settings-theme-dark --tap text=About
 pnpm browser run <scratchpad>/flow.ts                # a flow shot cannot express
 ```
 
-- **What it opens.** The static web export with the e2e seed, so `--fixture <name>` writes a fixture save (names in `src/campaign/fixtures/registry.ts`) and `{save}` in a route is its save id. With no route it shoots where the fixture landed, or `/`. The export is made again only when its inputs changed (`scripts/browser/web-export.ts`): about 10 s on a warm Metro cache, a minute and a half cold. `--fresh` forces it, `--reuse` keeps the last one, and `--base http://localhost:8081` opens a running `pnpm web` instead.
+- **What it opens.** The static web export with the e2e seed, so `--fixture <name>` writes a fixture save (names in `src/campaign/fixtures/registry.ts`) and `{save}` in a route is its save id. `--at <n>` keeps the fixture's first n intents, so the table opens on the moment `pnpm game show <name> --at <n>` prints. With no route it shoots where the fixture landed, or `/`. The export is made again only when its inputs changed (`scripts/browser/web-export.ts`): about 10 s on a warm Metro cache, a minute and a half cold. `--fresh` forces it, `--reuse` keeps the last one, and `--base http://localhost:8081` opens a running `pnpm web` instead.
 - **Taps.** `--tap` takes a testID (react-native-web writes it as `data-testid`), a Playwright selector (`text=Theme`, `[role=button]`) or `x,y` in CSS pixels for the table's canvas, which has no elements for its cards. Each tap is followed by a shot. A target that is not there fails after 5 s and lists the testIDs that are; `--ids` lists them on every shot, and `--text` prints the page's text.
 - **What it reports.** Console errors and warnings, uncaught errors, and requests that failed or answered 400 and over. Requests off localhost are blocked (card pictures come from the network unless `pnpm assets scans` ran), and `--net` lets them through. An uncaught error, a wait that times out or a missing tap target fails the run.
 - **Options.** `--dark` or `--both` themes, `--landscape` or `--size <w>x<h>` (phone portrait by default), `--full-page`, `--settle <ms>` after each load and tap (1000), `--wait <testID>` before the first shot, `--out <dir>`.
 - **Scripts.** `pnpm browser run <file>` imports a file that default-exports `async (app) => {}`, where `app` is the `App` of `scripts/browser/app.ts`: `open`, `seed`, `tap`, `shot`, `testIds`, `problems`, and Playwright's `context`. Keep the file in the scratchpad, not the repository. `app.open` closes the page it opened before, since a second tab waits forever on the app's database.
 - **Chromium.** `scripts/browser/chromium.ts` launches Playwright's own browser (`pnpm exec playwright install chromium`), else a cloud container's Chromium at `/opt/pw-browsers/chromium`; `CHROMIUM_PATH=<binary>` wins over both.
+
+## Reading a game as text
+
+`pnpm game` replays a save fixture or a scenario's golden through the reducer and prints it as text, for debugging the engine without a screen. A source is a fixture name (`duo`, `mirkwood-lost`) or `<scenario-id>/<golden number or name>`; `pnpm game list` lists both.
+
+```bash
+pnpm game show mirkwood-lost --until round=3 --legal
+pnpm game show duo --at 5 --send '{"type":"Pass"}'
+pnpm game log passage-through-mirkwood/1 --from 40 --to 60 --steps
+pnpm game diff passage-through-mirkwood/1
+```
+
+- **`show`** replays to a moment and prints the table: the round, the phase and the open window, the quest, the staging area and its threat, each seat's heroes, cards in play, engaged enemies and hand, and the stack. A stat a modifier moved shows its printed number beside it. `--at <n>` stops after n intents and `--until` at the first state a condition holds for (`lost`, `won`, `round=N`, `phase=X`, `mode=X`, `window=X`, `seat=N`, `code=X`). `--legal` lists the intents the engine offers, with the cards each may take and the JSON to send. `--send '<intent>'` (repeatable) sends one more intent and prints its engine steps, or the reducer's reason for refusing it. `--full` adds the modifiers, delayed effects and the decks' order; `--json` prints the raw state.
+- **`log`** prints one line per intent with its round, phase and seat. `--steps` adds the engine steps under each, with the rule or effect that caused every number. `--from`, `--to`, `--until` and `--grep <text>` narrow it.
+- **`diff`** plays a golden now and compares it with its `golden.json`. It names the first intent where they part and prints the table both reached, or the fields where the final states differ. A failing golden test names the goldens that moved and points here.
+- A fixture's replay that the reducer refuses stops there, and `show` says which intent and why. The fixture tests point here when a fixture no longer replays.
+- Cards are named as `Title (code) #id`; an intent names cards by the id. Hidden cards are named too: this is for debugging, not the player's view.
 
 ## On a desktop
 
@@ -61,7 +78,7 @@ A build signed with a free Apple ID stops opening after 7 days. Run the command 
 
 ## Commands
 
-Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `browser`, `desktop`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
+Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `browser`, `game`, `desktop`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
 
 | Command | What it does |
 | --- | --- |
@@ -73,6 +90,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm test encounter <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) plus seeded games with random legal intents, and reports errors, stalls and replay differences. `--all` covers every playable scenario. |
 | `pnpm test phone-bundle` | Exports the Android and the iOS bundle (`--no-bytecode`; iOS needs no Xcode) in a temporary worktree at the merge base with `origin/main` and in this tree, and fails, naming the first modules that differ, unless each platform's two are byte-identical (it reports IDENTICAL per platform): the web and desktop work leaves the phone's bundle as it is (`docs/architecture.md`, Screens). It takes about four minutes, needs `pnpm assets catalog` first and the history of `origin/main`, and skips with a message without them. `--base <ref>` compares another commit; `--keep` keeps the exports; `--if-desktop-work` does nothing unless the diff touches desktop work, which is how the pull request job (`phone-bundle` in `.github/workflows/test.yml`) runs it. |
 | `pnpm test a11y` | Audits the main web screens with axe-core in Chromium and fails on serious or critical findings. It finds Chromium as `pnpm browser` does. `--skip-export` reuses the last export even when its inputs changed. |
+| `pnpm game show <source>` | Replays a fixture or golden to a moment and prints the table as text (Reading a game as text). `pnpm game log` prints its intents and engine steps, `pnpm game diff` where a golden leaves `golden.json`, `pnpm game list` the sources. |
 | `pnpm browser shot [route...]` | Opens routes of the web build in Chromium, writes a PNG of each to `.agent/shots` and prints each page's errors (Checking a screen in a browser). |
 | `pnpm browser run <script.ts>` | Runs a scratch Playwright script against the web build. |
 | `pnpm browser serve` | Serves the web export on `127.0.0.1` until stopped and prints its address. |

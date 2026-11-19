@@ -15,3 +15,9 @@ export function dealSeed(random: () => number = Math.random): number {
 export function e2eBuild(): boolean {
   return e2eSeed() != null;
 }
+
+/** The `at` of an e2e fixture link (`/e2e/duo?at=5`): how many of the fixture's intents to keep, or undefined for all of them. */
+export function e2eAt(value: string | readonly string[] | undefined): number | undefined {
+  const text = Array.isArray(value) ? value[0] : value;
+  return typeof text === "string" && /^\d+$/.test(text) ? Number(text) : undefined;
+}
