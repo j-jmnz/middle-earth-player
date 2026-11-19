@@ -17,6 +17,7 @@ import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, inPlay, updateCard } from "../core/state.ts";
 import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
@@ -210,16 +211,16 @@ export function payUsage(
   for (const cost of costsOf(effect)) {
     switch (cost.kind) {
       case "exhaustSelf":
-        next = updateCard(next, sourceId, { exhausted: true });
+        next = exhaustAnnounced(next, sourceId, ctx);
         break;
       case "exhaustHost": {
         const host = next.cards[sourceId]?.host;
-        if (host) next = updateCard(next, host, { exhausted: true });
+        if (host) next = exhaustAnnounced(next, host, ctx);
         break;
       }
       case "exhaustCode": {
         const ring = Object.values(next.cards).find((card) => card.code === cost.code && inPlay(card.zone) && !card.exhausted && (card.controller ?? seat) === seat);
-        if (ring) next = updateCard(next, ring.id, { exhausted: true });
+        if (ring) next = exhaustAnnounced(next, ring.id, ctx);
         break;
       }
       case "addSelfToVictory":

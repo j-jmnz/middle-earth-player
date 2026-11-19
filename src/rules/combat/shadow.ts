@@ -271,11 +271,11 @@ export function resumeAttack(state: ScenarioState, ctx: ReduceContext, steps: En
     case "defense":
       // Defenders declared by an effect before the defense step (11007, 12140), or a canceled attack, skip it.
       if (attackCanceled(cleared)) return finishAttack(cleared, ctx, steps);
-      if (defendersDeclared(cleared)) return enemyAttackWindow(cleared, ctx, "shadow") ?? holdAttack(cleared, ctx, "shadow", ["declaredDefender"]) ?? resolveAttack(cleared, ctx, steps);
+      if (defendersDeclared(cleared)) return enemyAttackWindow(cleared, ctx, "shadow") ?? holdAttack(cleared, ctx, "shadow", ["declaredDefender", "exhausted"]) ?? resolveAttack(cleared, ctx, steps);
       return { ...cleared, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
     // More defenders were declared (01038): the window after the declaration (6.4.1), then the shadow cards.
     case "defenders":
-      return enemyAttackWindow(cleared, ctx, "shadow") ?? holdAttack(cleared, ctx, "shadow", ["declaredDefender"]) ?? resolveAttack(cleared, ctx, steps);
+      return enemyAttackWindow(cleared, ctx, "shadow") ?? holdAttack(cleared, ctx, "shadow", ["declaredDefender", "exhausted"]) ?? resolveAttack(cleared, ctx, steps);
     case "shadow":
     case "damage":
       return resolveAttack(cleared, ctx, steps);

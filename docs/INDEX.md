@@ -108,7 +108,7 @@ Read the sections your task touches.
     - 593–606 Journey Along the Anduin (~2.1K)
     - 607–627 Escape from Dol Guldur (~2.9K)
     - 628–642 The Oath (~2.4K)
-    - 643–660 The Caves of Nibin-Dûm (~2.4K)
+    - 643–660 The Caves of Nibin-Dûm (~2.5K)
   - 661–719 Dream-chaser (~16.2K) ← 4
   - 720–748 Ered Mithrin (~16.7K) ← 9
   - 749–1309 Angmar Awakened (~69.4K) ← 6

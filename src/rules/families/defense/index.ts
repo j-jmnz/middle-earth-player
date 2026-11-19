@@ -11,6 +11,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { exhaustAnnounced } from "../../windows/exhaust.ts";
 import type { Frame, Modifier, QueueItem, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
@@ -45,7 +46,7 @@ function strikeBack(state: ScenarioState, instruction: Extract<Instruction, { ve
   const enemy = state.cards[enemyId];
   if (!attacker || !enemy || attacker.controller == null || !inPlay(attacker.zone) || enemy.zone !== "engaged") return state;
   if (!isCharacterType(printedOf(ctx.cards, attacker.code))) return state;
-  const exhausted = attacker.exhausted || flagged(state, attackerId, "noExhaustAttack") ? state : updateCard(state, attackerId, { exhausted: true });
+  const exhausted = attacker.exhausted || flagged(state, attackerId, "noExhaustAttack") ? state : exhaustAnnounced(state, attackerId, ctx);
   const declared = queueEvent(exhausted, { trigger: "declaredAttacker", seat: attacker.controller, cardId: attackerId, other: enemyId });
   const modifier: Modifier | null = instruction.defense ? { instanceId: enemyId, sourceId: focus.sourceId ?? attackerId, stat: "defense", amount: instruction.defense, until: "endOfPhase" } : null;
   const weakened = modifier ? { ...declared, modifiers: [...declared.modifiers, modifier] } : declared;

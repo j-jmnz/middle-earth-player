@@ -16,6 +16,7 @@ import { currentSideQuest } from "../wilderland/night-quest.ts";
 import { placeOnMainQuest } from "../../quest/quest.ts";
 import { placeEffectProgress } from "../quest/effect-progress.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { exhaustAnnounced } from "../../windows/exhaust.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -84,7 +85,7 @@ export function declareAttack(state: ScenarioState, instruction: Extract<Instruc
   const seat = attacker.controller;
   const exhausts = !instruction.exhausted && !flagged(state, attackerId, "noExhaustAttack");
   const frameId = topFrame(state)?.id;
-  let next = exhausts ? updateCard(state, attackerId, { exhausted: true }) : state;
+  let next = exhausts ? exhaustAnnounced(state, attackerId, ctx) : state;
   next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
   return openStrike(next, seat, enemyId, [attackerId], frameId, ctx, steps, instruction.ranged);
 }
