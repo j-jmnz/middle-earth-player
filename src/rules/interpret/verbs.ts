@@ -1,7 +1,7 @@
 // Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
 import { isStatCondition, type Instruction } from "../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "./amounts.ts";
+import { frameScope, hostOf, refCard, resolveAmount } from "./amounts.ts";
 import { runAttackVerb } from "../combat/attack-verbs.ts";
 import { characters } from "../combat/combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
@@ -240,7 +240,7 @@ export function runExtraVerb(
 // The host of the source card moves to the seat's heroes with the resources on it. Each card attached to
 // it follows, still attached. A seat left with no heroes is eliminated at once.
 function transferHost(state: ScenarioState, focus: VerbFocus, seat: number, steps: EngineStep[]): ScenarioState {
-  const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
+  const hostId = hostOf(state, focus.sourceId);
   const host = hostId ? state.cards[hostId] : undefined;
   if (!hostId || !host || host.controller == null || host.controller === seat) return state;
   const attachments = [...host.attachments];
@@ -281,7 +281,7 @@ export function raiseFor(
 ): ScenarioState {
   const who = instruction.who;
   // The controller of the card the source is attached to (a claimed objective on a hero): nobody when it is attached to nothing.
-  const host = who === "hostController" && focus.sourceId ? state.cards[state.cards[focus.sourceId]?.host ?? ""] : undefined;
+  const host = who === "hostController" ? state.cards[hostOf(state, focus.sourceId) ?? ""] : undefined;
   if (who === "hostController" && host?.controller == null) return state;
   // The defending player: the player the source enemy is engaged with (rr.defending-player).
   const seats = raisedSeats(state, who, focus.seat, who === "defendingPlayer" ? defendingPlayer(state, focus.sourceId) : host?.controller);
