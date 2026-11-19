@@ -1,16 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { FOLD_QUIET, FOLD_SLOP, OPEN_FOLD, foldOnScroll, type FoldScroll } from "./scroll-fold";
+import { FOLD_SLOP, OPEN_FOLD, foldOnScroll, openAt, type FoldScroll } from "./scroll-fold";
 
 const ROOM = 120;
+const END = 5000;
 
-// Feeds offsets one after another, each `step` ms after the last, from `start`.
-function run(offsets: number[], start: FoldScroll = OPEN_FOLD, step = 16, from = 1000): FoldScroll {
-  let state = start;
-  offsets.forEach((y, i) => {
-    state = foldOnScroll(state, y, from + i * step, ROOM);
-  });
-  return state;
+// Feeds offsets one after another, with the list able to scroll to `end`.
+function run(offsets: number[], start: FoldScroll = OPEN_FOLD, end = END): FoldScroll {
+  return offsets.reduce((state, y) => foldOnScroll(state, y, end, ROOM), start);
 }
 
 describe("the pool's filters fold on scroll", () => {
@@ -23,7 +20,7 @@ describe("the pool's filters fold on scroll", () => {
   });
 
   it("stay open through a small wobble", () => {
-    expect(run([200, 200 + FOLD_SLOP - 1, 200], { ...OPEN_FOLD, anchor: 200 }).folded).toBe(false);
+    expect(run([200, 200 + FOLD_SLOP - 1, 200], openAt(200)).folded).toBe(false);
   });
 
   it("fold on a slow scroll made of many small steps", () => {
@@ -31,22 +28,36 @@ describe("the pool's filters fold on scroll", () => {
   });
 
   it("show again when the list scrolls up", () => {
-    const folded = run([0, 100, 200, 300], OPEN_FOLD, 200);
+    const folded = run([0, 100, 200, 300]);
     expect(folded.folded).toBe(true);
-    expect(run([290, 280, 260], folded, 200, 2000).folded).toBe(false);
+    expect(run([290, 280, 260], folded).folded).toBe(false);
   });
 
-  it("show again at the top, even inside the quiet time", () => {
-    const folded = foldOnScroll({ ...OPEN_FOLD, anchor: 100 }, 300, 1000, ROOM);
-    expect(folded.folded).toBe(true);
-    expect(foldOnScroll(folded, 0, 1001, ROOM).folded).toBe(false);
+  it("show again on a quick scroll up right after a fold", () => {
+    const folded = run([0, 300]);
+    expect(run([300 - FOLD_SLOP - 1], folded).folded).toBe(false);
   });
 
-  it("keep the fold while the list moves its offset after the fold", () => {
-    const folded = foldOnScroll({ ...OPEN_FOLD, anchor: 900 }, 1000, 1000, ROOM);
-    // Near the foot the taller list moves the offset up by the filters' height.
-    const clamped = foldOnScroll(folded, 1000 - ROOM, 1000 + FOLD_QUIET / 2, ROOM);
-    expect(clamped.folded).toBe(true);
-    expect(foldOnScroll(clamped, 1000 - ROOM, 1000 + FOLD_QUIET * 2, ROOM).folded).toBe(true);
+  it("show again at the top", () => {
+    expect(run([0, 300, 0]).folded).toBe(false);
+  });
+
+  it("keep the fold while the list pulls its offset back to its new end", () => {
+    const folded = run([4800, 5000], openAt(4800));
+    expect(folded.folded).toBe(true);
+    // The fold makes the list taller by the filters' height: its end, and the offset with it, move up by that much.
+    const pulled = foldOnScroll(folded, END - ROOM, END - ROOM, ROOM);
+    expect(pulled.folded).toBe(true);
+    // The next scroll up from there still shows them.
+    expect(foldOnScroll(pulled, END - ROOM - FOLD_SLOP - 1, END - ROOM, ROOM).folded).toBe(false);
+  });
+
+  it("keep the fold through iOS's bounce at the foot", () => {
+    const folded = run([4800, 5000], openAt(4800));
+    expect(run([5040, 5080, 5040, 5000], folded).folded).toBe(true);
+  });
+
+  it("keep the filters open on a scroll up after the list changes in the middle", () => {
+    expect(run([480, 460, 440], openAt(500)).folded).toBe(false);
   });
 });
