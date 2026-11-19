@@ -32,19 +32,22 @@ pnpm browser run <scratchpad>/flow.ts                # a flow shot cannot expres
 
 ## Reading a game as text
 
-`pnpm game` replays a save fixture or a scenario's golden through the reducer and prints it as text, for debugging the engine without a screen. A source is a fixture name (`duo`, `mirkwood-lost`) or `<scenario-id>/<golden number or name>`; `pnpm game list` lists both.
+`pnpm game` replays a save fixture or a scenario's golden through the reducer and prints it as text, for debugging the engine without a screen. A source is a fixture name (`duo`, `mirkwood-lost`), `<scenario-id>/<golden number or name>` (`pnpm game list` lists both), or a smoke run: `encounter:<scenario-id>:<game>` is one numbered game of `pnpm test encounter`, replayed in full, and `smoke:<code>[:<seed>[:<deal>]]` one card's run of `pnpm test smoke`, opened on the table its failing intent was sent on (that run deals copies of the card outside the reducer, so it has no replay from the start). A smoke failure prints the source that opens it.
 
 ```bash
 pnpm game show mirkwood-lost --until round=3 --legal
 pnpm game show duo --at 5 --send '{"type":"Pass"}'
 pnpm game log passage-through-mirkwood/1 --from 40 --to 60 --steps
 pnpm game diff passage-through-mirkwood/1
+pnpm game show encounter:the-oath:7 --at 120 --legal
+pnpm game scene passage-through-mirkwood '{"phase":"Combat","engaged":["01096"],"hand":["01034"],"heroResources":3}' --legal
 ```
 
 - **`show`** replays to a moment and prints the table: the round, the phase and the open window, the quest, the staging area and its threat, each seat's heroes, cards in play, engaged enemies and hand, and the stack. A stat a modifier moved shows its printed number beside it. `--at <n>` stops after n intents and `--until` at the first state a condition holds for (`lost`, `won`, `round=N`, `phase=X`, `mode=X`, `window=X`, `seat=N`, `code=X`). `--legal` lists the intents the engine offers, with the cards each may take and the JSON to send. `--send '<intent>'` (repeatable) sends one more intent and prints its engine steps, or the reducer's reason for refusing it. `--full` adds the modifiers, delayed effects and the decks' order; `--json` prints the raw state.
 - **`log`** prints one line per intent with its round, phase and seat. `--steps` adds the engine steps under each, with the rule or effect that caused every number. `--from`, `--to`, `--until` and `--grep <text>` narrow it.
 - **`diff`** plays a golden now and compares it with its `golden.json`. It names the first intent where they part and prints the table both reached, or the fields where the final states differ. A failing golden test names the goldens that moved and points here.
-- A fixture's replay that the reducer refuses stops there, and `show` says which intent and why. The fixture tests point here when a fixture no longer replays.
+- **`scene <scenario-id> '<layout>'`** builds the table a card's test would (`tableFromLayout`, `test/harness/layout.ts`) and reads it as `show` does, so `--legal` and `--send` try a card before its test is written. The layout is the kit's `Layout` as JSON, inline or `@<file>`; the heroes are the kit's stand-ins, and a player card it names that the scenario does not deal is loaded from `data/cards`.
+- A replay that the reducer refuses, or that throws, stops there, and `show` says which intent and why. The fixture tests point here when a fixture no longer replays.
 - Cards are named as `Title (code) #id`; an intent names cards by the id. Hidden cards are named too: this is for debugging, not the player's view.
 
 ## On a desktop

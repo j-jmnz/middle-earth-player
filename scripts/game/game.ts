@@ -6,12 +6,15 @@
 //   pnpm game show duo --at 5 --send '{"type":"Pass"}'    # after 5 intents, then what one more intent does, or why it is refused
 //   pnpm game log passage-through-mirkwood/1 --from 40 --to 60 --steps
 //   pnpm game diff passage-through-mirkwood/1             # where the golden played now leaves golden.json
+//   pnpm game show encounter:the-oath:7 --at 120          # a game of `pnpm test encounter`; smoke:<code> opens a card smoke failure
+//   pnpm game scene passage-through-mirkwood '{"phase":"Combat","engaged":["01096"]}' --legal   # a table from a test layout
 import { flagValue, flagValues } from "../args.ts";
 import { runScript, type Log } from "../log.ts";
 import { reduce, type PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 import { firstDifferent, stateDiff } from "./diff.ts";
 import { intentText, stepText } from "./names.ts";
+import { layoutOf, sceneSource } from "./scene-source.ts";
 import { listSources, loadSource, type GameSource } from "./source.ts";
 import { stateText } from "./state-text.ts";
 import { parseUntil, walk, type Move } from "./walk.ts";
@@ -21,7 +24,8 @@ const USAGE = `usage:
   pnpm game show <source> [--at <n> | --until <cond>] [--legal] [--full] [--json] [--send '<intent json>']...
   pnpm game log <source> [--from <n>] [--to <n>] [--until <cond>] [--steps] [--grep <text>]
   pnpm game diff <scenario-id>/<golden>
-<source> is a fixture name or <scenario-id>/<golden number or name>; <cond> is lost, won, round=N, phase=X, mode=X, window=X, seat=N or code=X.`;
+  pnpm game scene <scenario-id> ['<layout json>' | @<file>] [show's flags]
+<source> is a fixture name, <scenario-id>/<golden number or name>, encounter:<scenario-id>:<game> or smoke:<code>[:<seed>[:<deal>]]; <cond> is lost, won, round=N, phase=X, mode=X, window=X, seat=N or code=X.`;
 
 function number(args: readonly string[], flag: string): number | undefined {
   const value = flagValue(args, flag);
@@ -109,7 +113,13 @@ async function main(log: Log): Promise<void> {
     process.stdout.write(`${listSources().join("\n")}\n`);
     return;
   }
-  if (!["show", "log", "diff"].includes(command) || !name || name.startsWith("--")) throw new Error(USAGE);
+  if (!["show", "log", "diff", "scene"].includes(command) || !name || name.startsWith("--")) throw new Error(USAGE);
+  if (command === "scene") {
+    // The layout is the argument after the scenario, when it is not a flag.
+    const layout = args[0] !== undefined && !args[0].startsWith("--") ? args.shift() : undefined;
+    show(log, sceneSource(name, layoutOf(layout, process.env.INIT_CWD ?? process.cwd())), args);
+    return;
+  }
   const source = await loadSource(name);
   if (command === "show") show(log, source, args);
   else if (command === "log") timeline(source, args);

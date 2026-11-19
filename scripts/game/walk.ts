@@ -49,7 +49,13 @@ export function walk(source: GameSource, options: { at?: number; until?: Until }
   if (options.until?.(state)) return { state, at: 0, moves, refused: null };
   for (let index = 0; index < last; index += 1) {
     const intent = source.intents[index] as PlayerIntent;
-    const result = reduce(state, intent, source.ctx);
+    // A throw is a refusal too: a smoke failure is often one, and the table before it is what the reader needs.
+    let result: ReturnType<typeof reduce>;
+    try {
+      result = reduce(state, intent, source.ctx);
+    } catch (error) {
+      return { state, at: index, moves, refused: { index, intent, reason: `the reducer threw: ${error instanceof Error ? error.message : String(error)}` } };
+    }
     if (!result.ok) return { state, at: index, moves, refused: { index, intent, reason: result.reason } };
     moves.push({ index, intent, before: state, after: result.state, steps: result.steps });
     state = result.state;

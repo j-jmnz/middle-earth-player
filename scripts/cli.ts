@@ -82,6 +82,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     list: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["list"], env: QUIET }], about: "lists the fixtures and goldens pnpm game reads" },
     show: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["show"], env: QUIET }], about: "a fixture or golden replayed to a moment, as text (<source> --at <n> | --until <cond>, --legal, --full, --send '<intent>', --json)" },
     log: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["log"], env: QUIET }], about: "a fixture's or golden's intents, one line each, with their engine steps (<source> --from, --to, --until, --steps, --grep)" },
+    scene: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["scene"], env: QUIET }], about: "a table built from a test layout, read as show reads a game (<scenario-id> '<layout json>' | @<file>, then show's flags)" },
     diff: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["diff"], env: QUIET }], about: "where a golden played now leaves its golden.json, with the table both reached (<scenario-id>/<golden>)" },
   },
   doc: {
