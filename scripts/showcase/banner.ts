@@ -2,13 +2,13 @@
 // theme and banner-rivendell.webp for its light one (the README picks between them with <picture>). Each is the app icon and
 // name in Marcellus SC over that theme's tablet still of the Helm's Deep table, standing on the right and faded into the theme's ground
 // on the left, where the words are. Chromium lays it out, so the font is the app's own file (assets/fonts) and not whatever the system has.
-// Env: BANNER_CHROMIUM is the Chromium binary to use where Playwright's own is not installed (a cloud container has one).
+// Chromium is found as scripts/browser/chromium.ts says (CHROMIUM_PATH, Playwright's own, or a cloud container's).
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { chromium } from "playwright";
 import sharp from "sharp";
 
+import { launchChromium } from "../browser/chromium.ts";
 import { runScript } from "../log.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
@@ -47,9 +47,7 @@ function page(theme: (typeof THEMES)[number]): string {
 }
 
 void runScript("showcase-banner", async (log) => {
-  // A container's Chromium runs as root and needs the sandbox off, as in scripts/checks/a11y-web.ts.
-  const custom = process.env.BANNER_CHROMIUM || undefined;
-  const browser = await chromium.launch({ executablePath: custom, args: custom ? ["--no-sandbox"] : [] });
+  const browser = await launchChromium();
   try {
     const tab = await browser.newPage({ viewport: { width: WIDTH, height: HEIGHT } });
     for (const theme of THEMES) {
