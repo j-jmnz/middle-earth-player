@@ -101,11 +101,12 @@ describe("Discord issue bot", () => {
     expect(body.data.components[2].component.value).toBe("**Gandalf** costs 4, not 5 @sam\nSteps: play him\n\n> **sam:** Same here\n> in Mirkwood");
   });
 
-  it("creates the labelled issue on submit, links it in the channel and tells the moderator", async () => {
+  it("creates the labelled issue on submit, links it in a thread on the report and tells the moderator", async () => {
     const calls = stubFetch({
       "GET /channels/200/messages/300": report,
       "POST github/repos/owner/repo/issues": { number: 42, html_url: "https://github.com/owner/repo/issues/42" },
-      "POST /channels/200/messages": {},
+      "POST /channels/200/messages/300/threads": { id: "300" },
+      "POST /channels/300/messages": {},
       "PATCH /webhooks/100/t/messages/@original": {},
     });
     const components = [
@@ -123,10 +124,12 @@ describe("Discord issue bot", () => {
     });
     expect((issue.body as { body: string }).body).toContain("Reported on Discord by **Frodo** ([message](https://discord.com/channels/1/200/300)). Filed by **elrond**");
     expect((issue.body as { body: string }).body).toMatch(/<!-- discord issue:m:200:300 -->$/);
-    const reply = calls.find((call) => call.method === "POST" && call.url.endsWith("/channels/200/messages"))!;
-    expect(reply.body).toMatchObject({ message_reference: { message_id: "300" }, content: expect.stringContaining("#42") });
+    const thread = calls.find((call) => call.url.endsWith("/channels/200/messages/300/threads"))!;
+    expect(thread.body).toEqual({ name: "#42 Gandalf costs 5", auto_archive_duration: 10080 });
+    const link = calls.find((call) => call.method === "POST" && call.url.endsWith("/channels/300/messages"))!;
+    expect(link.body).toEqual({ content: expect.stringContaining("#42"), allowed_mentions: { parse: [] } });
     const told = calls.find((call) => call.method === "PATCH")!;
-    expect(told.body).toMatchObject({ content: expect.stringContaining("I posted the link in the channel") });
+    expect(told.body).toMatchObject({ content: expect.stringContaining("I posted the link beside the report") });
   });
 
   it("tells the moderator when GitHub refuses the issue", async () => {

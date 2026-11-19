@@ -149,9 +149,36 @@ export function sourceInBody(body: string | null | undefined): SourceRef | null 
   return found ? sourceFromId(found[1]!) : null;
 }
 
-/** Posts where the report is: a reply to the report message, or a message in the thread. Mentions never ping. */
-export async function postAt(env: Env, source: SourceRef, content: string): Promise<void> {
-  const channelId = source.kind === "message" ? source.channelId : source.threadId;
-  const reference = source.kind === "message" ? { message_reference: { message_id: source.messageId, fail_if_not_exists: false } } : {};
-  await discord(env, "POST", `/channels/${channelId}/messages`, { content, ...reference, allowed_mentions: { parse: [] } });
+// A week: the longest a thread stays open with no message before Discord archives it. A post opens it again.
+const THREAD_ARCHIVE_MINUTES = 10080;
+
+// The thread on a report message: the one already there (a thread started on a message has the message's id), or a new
+// one named `threadName`. Null when there can be none: the message is itself in a thread or a forum post, or the bot
+// may not create threads in the channel (Create Public Threads).
+async function threadOn(env: Env, channelId: string, messageId: string, threadName: string): Promise<string | null> {
+  try {
+    if (await discord(env, "GET", `/channels/${messageId}`)) return messageId;
+    const thread = await discord<{ id: string }>(env, "POST", `/channels/${channelId}/messages/${messageId}/threads`, {
+      name: clip(threadName, 100),
+      auto_archive_duration: THREAD_ARCHIVE_MINUTES,
+    });
+    return thread?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Posts where the report is: in the thread on the report message (started as `threadName` when there is none), else
+ * as a reply to the message; for a thread report, in the thread. Mentions never ping.
+ */
+export async function postAt(env: Env, source: SourceRef, content: string, threadName: string): Promise<void> {
+  const message = { content, allowed_mentions: { parse: [] } };
+  if (source.kind === "thread") {
+    await discord(env, "POST", `/channels/${source.threadId}/messages`, message);
+    return;
+  }
+  const thread = await threadOn(env, source.channelId, source.messageId, threadName);
+  if (thread) await discord(env, "POST", `/channels/${thread}/messages`, message);
+  else await discord(env, "POST", `/channels/${source.channelId}/messages`, { ...message, message_reference: { message_id: source.messageId, fail_if_not_exists: false } });
 }

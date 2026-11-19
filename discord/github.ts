@@ -39,6 +39,11 @@ function quote(text: string): string {
   return clipped.split("\n").map((line) => `> ${line}`).join("\n");
 }
 
+// The thread the bot starts on a report message for its issue.
+function threadName(issue: Issue): string {
+  return `#${issue.number} ${issue.title}`;
+}
+
 // The issue's name in a message, linked without a preview card.
 function named(issue: Issue): string {
   return `[#${issue.number}](<${issue.html_url}>) (${issue.title})`;
@@ -73,7 +78,7 @@ async function postRelease(env: Env, release: NonNullable<Delivery["release"]>):
   for (const number of closedBy(release.body ?? "")) {
     const issue = await github<Issue>(env, "GET", `/repos/${env.GITHUB_REPO}/issues/${number}`);
     const source = sourceInBody(issue?.body);
-    if (issue && source) await postAt(env, source, `The fix for ${named(issue)} is in [${release.tag_name}](<${release.html_url}>). Update the app to get it.`);
+    if (issue && source) await postAt(env, source, `The fix for ${named(issue)} is in [${release.tag_name}](<${release.html_url}>). Update the app to get it.`, threadName(issue));
   }
 }
 
@@ -93,7 +98,7 @@ export async function handleGitHub(request: Request, env: Env): Promise<Response
     const message = issueMessage(event, delivery);
     const source = sourceInBody(delivery.issue?.body);
     if (!message || !source) return new Response("Nothing to post.");
-    await postAt(env, source, message);
+    await postAt(env, source, message, threadName(delivery.issue!));
     return new Response("Posted.");
   } catch (error) {
     return new Response(error instanceof Error ? error.message : String(error), { status: 500 });
