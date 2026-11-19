@@ -1,5 +1,5 @@
 import type { Obj } from "./kit.ts";
-import { ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, LONG_DARK_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES } from "./verbs.ts";
+import { ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
@@ -12,6 +12,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...SMAUG_SAMPLES,
   ...ERECH_SAMPLES,
   ...FOG_SAMPLES,
+  ...RUINS_SAMPLES,
   ModifyStat: [
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: HERO, eachResource: true, doesNotStack: true },
     { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true },
@@ -104,7 +105,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ChooseCurrentQuest: [{ verb: "ChooseCurrentQuest" }],
   AttachNewTo: [{ verb: "AttachNewTo", code: "10157", to: "Iârion" }],
   TradeDamageForResources: [{ verb: "TradeDamageForResources", code: "10158", damage: 4, resources: 1 }],
-  FirstTraitSurge: [{ verb: "FirstTraitSurge", trait: "Weather", type: "enemy", doomed: 2 }],
+  FirstTraitSurge: [{ verb: "FirstTraitSurge", trait: "Weather", type: "enemy", doomed: 2 }, { verb: "FirstTraitSurge", trait: "Hazard", type: "any" }],
   RevealedGainDoomed: [{ verb: "RevealedGainDoomed", amount: 1, instead: { stage: 4, amount: 3 }, until: "endOfPhase" }],
   FlipTimeObjective: [{ verb: "FlipTimeObjective", to: "other" }, { verb: "FlipTimeObjective", to: "night" }],
   RecordStartingThreat: [{ verb: "RecordStartingThreat", amount: -2 }],

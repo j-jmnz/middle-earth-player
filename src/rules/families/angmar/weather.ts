@@ -29,6 +29,8 @@ function markersOf(ctx: Pick<ReduceContext, "effects">): readonly Marker[] {
 
 // The card type a marker applies to: a treachery unless it names one.
 const markerType = (marker: Marker): string => marker.type ?? "treachery";
+// A marker of `type: any` is held by a card of any type and has one tally for all of them (50604:B:1, the first Hazard card).
+const ANY = "any";
 
 // Whether the game holds a card that prints a marker for this Trait and type and can enter play by a reveal this round: one in play, or an encounter card dealt in a pile (Haunted Keep in the encounter deck), not one the game removed and not a quest stage waiting its turn (the next stage sets the marker when it arrives).
 function holderDealt(state: ScenarioState, markers: readonly Marker[], trait: string, type: string, ctx: ReduceContext): boolean {
@@ -38,7 +40,7 @@ function holderDealt(state: ScenarioState, markers: readonly Marker[], trait: st
 
 // Whether a card of this type and Trait was already revealed this round: a `traitRevealed` tally a card of the type with the Trait put on the table.
 function alreadyTallied(state: ScenarioState, trait: string, type: string, ctx: ReduceContext): boolean {
-  return state.modifiers.some((modifier) => modifier.stat === "traitRevealed" && modifier.amount > 0 && modifierActive(state, modifier) && printedOf(ctx.cards, state.cards[modifier.sourceId ?? ""]?.code ?? "").type === type && hasTrait(state, modifier.sourceId ?? "", trait, ctx));
+  return state.modifiers.some((modifier) => modifier.stat === "traitRevealed" && modifier.amount > 0 && modifierActive(state, modifier) && (type === ANY || printedOf(ctx.cards, state.cards[modifier.sourceId ?? ""]?.code ?? "").type === type) && hasTrait(state, modifier.sourceId ?? "", trait, ctx));
 }
 
 // The marker for this Trait and type in force now (its constant record's own condition holds: the stage, or Haunted Keep while it is the active location), or undefined.
@@ -65,12 +67,14 @@ export function noteFirstTrait(state: ScenarioState, cardId: string, ctx: Reduce
   if (!card || top?.data.kind !== "reveal" || top.cardId !== cardId || constantVerbCodes(ctx, MARKER).size === 0) return state;
   const type = printedOf(ctx.cards, card.code).type;
   // The Traits of this card that a marker of its type names; each is tallied once, against the tally as the round began this reveal (a card with two such Traits tallies both).
-  const markers = markersOf(ctx).filter((marker) => markerType(marker) === type && hasTrait(state, cardId, marker.trait, ctx));
+  const markers = markersOf(ctx).filter((marker) => (markerType(marker) === type || markerType(marker) === ANY) && hasTrait(state, cardId, marker.trait, ctx));
   let next = state;
   for (const trait of new Set(markers.map((marker) => marker.trait))) {
-    if (alreadyTallied(state, trait, type, ctx) || !holderDealt(state, markers, trait, type, ctx)) continue;
+    // The kind of tally this Trait has: a marker for any type counts every type together.
+    const kind = markers.some((marker) => marker.trait === trait && markerType(marker) === ANY) ? ANY : type;
+    if (alreadyTallied(state, trait, kind, ctx) || !holderDealt(state, markers, trait, kind, ctx)) continue;
     next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId: cardId, stat: "traitRevealed" as const, amount: 1, until: "endOfRound" as const }] };
-    const holds = markerHolds(next, trait, type, ctx);
+    const holds = markerHolds(next, trait, kind, ctx);
     if (!holds) continue;
     next = markSurge(next, cardId);
     if (holds.doomed != null) next = markDoomed(next, cardId, holds.doomed);

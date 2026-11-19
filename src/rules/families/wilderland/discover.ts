@@ -17,7 +17,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { heldAmount, updateCard } from "../../core/state.ts";
+import { heldAmount, inPlay, updateCard } from "../../core/state.ts";
 import { shuffleDiscardIn, effectData, moveEncounter } from "../encounter/moves.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { moveCard } from "../../core/zones.ts";
@@ -73,7 +73,10 @@ export function discoverUnavailable(state: ScenarioState, ctx: ReduceContext): b
  * run where no player can be asked the first is taken. Then the location hears `discovered`.
  */
 function resolveKeyword(state: ScenarioState, asked: Instruction, locationId: string, seat: number, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const depth = valueOf(state, ctx, locationId, focus.seat);
+  const value = valueOf(state, ctx, locationId, focus.seat);
+  // "Look at X additional cards" (50622:A:3) and "reveals an additional looked at Hazard card for each other player" (50623:A:3): the location's own constants add to what the keyword looks at and reveals.
+  const depth = value > 0 ? value + Math.max(0, heldAmount(state, locationId, "discoverLooked")) : 0;
+  const revealed = 1 + Math.max(0, heldAmount(state, locationId, "discoverHazards"));
   const ready = depth > 0 ? deepEnough(state, depth, steps) : state;
   const looked = ready.encounterDeck.slice(0, depth);
   const loot = constantVerbCodes(ctx, "Loot");
@@ -85,16 +88,18 @@ function resolveKeyword(state: ScenarioState, asked: Instruction, locationId: st
   // The Hazard cards among those looked at: one is selected at random, with the game's seed.
   const hazards = looked.filter((id) => id !== chosen && hasTrait(next, id, "Hazard", ctx));
   const drawn = shuffleIds(hazards, next.seed, next.seedCursor);
-  const hazard = drawn.ids[0];
+  const picks = drawn.ids.slice(0, revealed);
+  const hazard = picks[0];
   next = { ...next, seedCursor: drawn.cursor };
   if (depth > 0) steps.push({ kind: "discover", locationId, looked, ...(chosen !== undefined ? { loot: chosen } : {}), ...(hazard !== undefined ? { hazard } : {}), cause: currentCause(steps, ruleCause("emce.discover")) });
   // The rest are discarded before the Hazard is revealed, a deliberate order: emce.discover lists the reveal as step 3 and the discard as step 4, but the reveal is a frame that resolves after this verb returns, so the
-  // discard has to be done by then; the Hazard is moved to the top of the deck and revealed by it, added to the staging area (or resolved, a treachery).
-  for (const id of looked) if (id !== chosen && id !== hazard) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
-  const announced = queueHeard(next, ctx, { trigger: "discovered", seat: null, cardId: locationId, amount: hazard === undefined ? 0 : 1 });
-  if (hazard === undefined) return announced;
-  const onTop = { ...announced, encounterDeck: [hazard, ...announced.encounterDeck.filter((id) => id !== hazard)] };
-  return startReveal(onTop, seat, ctx, steps);
+  // discard has to be done by then; the Hazard is moved to the top of the deck and revealed by it, added to the staging area (or resolved, a treachery). Each extra Hazard is revealed the same way, one at a time.
+  for (const id of looked) if (id !== chosen && !picks.includes(id)) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
+  let announced = queueHeard(next, ctx, { trigger: "discovered", seat: null, cardId: locationId, amount: hazard === undefined ? 0 : 1 });
+  for (const id of picks) {
+    announced = startReveal({ ...announced, encounterDeck: [id, ...announced.encounterDeck.filter((other) => other !== id)] }, seat, ctx, steps);
+  }
+  return announced;
 }
 
 /** Discover X for the location that became the active location (the source of the Forced record). A location the players traveled to has it held back to the end of the travel step (`pushDiscover`). */
@@ -131,9 +136,10 @@ export function pushDiscover(state: ScenarioState, locationId: string, ctx: Redu
  * choice). Nothing happens when no enemy was found or no Loot objective lies in the discard pile.
  */
 export function attachLootFromDiscard(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttachLootFromDiscard" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const guard = lastPicked(state);
+  // `to: self`: the source location guards the Loot objective, which must not be guarded already (50626:A:2).
+  const guard = instruction.to === "self" ? focus.sourceId : lastPicked(state);
   const enemy = guard ? state.cards[guard] : undefined;
-  if (!guard || !enemy || enemy.zone !== "staging") return state;
+  if (!guard || !enemy || (instruction.to === "self" ? !inPlay(enemy.zone) : enemy.zone !== "staging")) return state;
   const loot = constantVerbCodes(ctx, "Loot");
   const candidates = state.encounterDiscard.filter((id) => loot.has(state.cards[id]?.code ?? ""));
   if (focus.chosen == null && candidates.length > 1 && effectData(state)) return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, candidates);

@@ -11,28 +11,28 @@ import { copyLine, withCopies } from "./reprint.ts";
 // A Loot objective enters play only through the Discover keyword of the active location, which attaches it to the location as a guarded objective (emce.discover, emce.loot); once nothing guards it the first player claims it (`ClaimWhenFree`) and attaches it to a hero.
 // "The Loot objectives the players control" is a count of the claimed ones (`lootKeyword`, `controlled`). The Discover keyword is a Forced effect of the location when it becomes the active location; the Response of Crypt Key adjusts its value before it resolves (families/wilderland/discover.ts).
 // Rules: emce.discover, emce.loot, emce.setup-the-ghost-of-framsburg, emce.guarded-x, emce.treasure, emce.campaign-pool-encounter, emce.immune, rr.guarded, rr.first-player, rr.travel (data/rules/entries.json).
-const LOOT: PickSpec = { type: "objective", control: "any", controlled: true, lootKeyword: true };
+export const LOOT: PickSpec = { type: "objective", control: "any", controlled: true, lootKeyword: true };
 // X, the number of Loot objectives the players control: Fram's Shade's Threat, Attack and Defense, and the number of shadow cards it is dealt (19098:A:2, 19098:A:3).
 const LOOT_COUNT = { count: LOOT } as const;
 const FRAMS_SHADE: PickSpec = { type: "card", control: "any", names: ["Fram's Shade"], engagedEnemies: true };
 const FRAMS_SHADE_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Fram's Shade"] };
 // "X is the tens digit of the first player's threat" (19099:A:1, 19103:A:2).
 const TENS = { firstPlayerTens: true } as const;
-const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]) => ({ verb: "ForEachPlayer" as const, order: "firstFirst" as const, instructions });
+export const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]) => ({ verb: "ForEachPlayer" as const, order: "firstFirst" as const, instructions });
 // The Discover value of the active location is at least 1: Old Lantern and Crypt Key have something to work on.
-const HAS_DISCOVER: Condition = { kind: "not", condition: { kind: "discoverUnavailable" } };
+export const HAS_DISCOVER: Condition = { kind: "not", condition: { kind: "discoverUnavailable" } };
 const ACTIVE_LOCATION_IS_DARK: Condition = { kind: "matches", card: "activeLocation", pick: { type: "location", control: "any", trait: "Dark" } };
 // The X of the running effect is 1 or more: the characters the attack destroyed ("If this attack destroys a character", 19107:A:2), the Hazard cards a Discover revealed (19103:A:3).
-const X_AT_LEAST_1: Condition = { kind: "x", min: 1 };
+export const X_AT_LEAST_1: Condition = { kind: "x", min: 1 };
 // "Discover X" is a Forced effect of the location once it is the active location.
-const discoverKeyword = (code: string, line: string, amount: Extract<Instruction, { verb: "Discover" }>["amount"]): Effect => ({ id: `${code}:forced:1`, cardCode: code, lines: [line], timing: "forced", trigger: "becameActive", subject: "self", instructions: [{ verb: "Discover", amount }] });
+export const discoverKeyword = (code: string, line: string, amount: Extract<Instruction, { verb: "Discover" }>["amount"]): Effect => ({ id: `${code}:forced:1`, cardCode: code, lines: [line], timing: "forced", trigger: "becameActive", subject: "self", instructions: [{ verb: "Discover", amount }] });
 // The Loot keyword and the claim of the objective once it is free (19094 to 19096, and Ashen Brazier in pool/EMCE.ts).
-const lootRecords = (code: string): Effect[] => [
+export const lootRecords = (code: string): Effect[] => [
   { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "Loot" }] },
   { id: `${code}:constant:2`, cardCode: code, lines: [`${code}:A:2`], timing: "constant", instructions: [{ verb: "ClaimWhenFree" }, { verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
 ];
 // True while the players control fewer than `min` Loot objectives: what a stage or The Cursed Tomb restricts (travel, advance) on.
-const FEWER_LOOT_THAN = (min: number): Condition => ({ kind: "not", condition: { kind: "count", pick: LOOT, min } });
+export const FEWER_LOOT_THAN = (min: number): Condition => ({ kind: "not", condition: { kind: "count", pick: LOOT, min } });
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [

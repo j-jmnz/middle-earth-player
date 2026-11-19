@@ -438,7 +438,8 @@ export const simpleVerbs = [
   // The last picked card is placed facedown under the source location. While it is there it is out of play (141049:A:1).
   verb("PlaceUnderSelf"),
   // Each card under the source location returns to the staging area face up (141049:A:2). `to: "engaged"`: each is put into play engaged with the first player instead, and counts as engaging him ("put each enemy under it into play engaged with the first player", 146029:A:2).
-  z.strictObject({ verb: z.literal("ReturnUnderToStaging"), to: z.literal("engaged").optional(), ...when }),
+  // `from`: the cards under the card in play with this code, not under the source ("add the Loot objective from underneath Stalking the Ruins to the staging area faceup", 50621:A:3).
+  z.strictObject({ verb: z.literal("ReturnUnderToStaging"), to: z.literal("engaged").optional(), from: z.string().min(1).optional(), ...when }),
   // The source card (a shadow card) is shuffled into the encounter deck instead of being discarded (141069:A:3).
   verb("ShuffleSelfIntoEncounterDeck"),
   // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed

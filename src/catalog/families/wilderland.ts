@@ -214,7 +214,11 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ResolveDiscover"), ...when }),
   // "Then, attach a Loot objective in the encounter discard pile to that enemy as a guarded objective" (19101:A:2): after a DiscardUntil and a MoveEncounterCard put the enemy in the staging area, a Loot objective of the encounter discard pile (the first player chooses among several) is added to the staging area
   // and the picked enemy guards it (rr.guarded). Nothing happens when no enemy was found or no Loot objective is in the discard pile.
-  z.strictObject({ verb: z.literal("AttachLootFromDiscard"), ...when }),
+  // `to: self` (50626:A:2, "search the encounter discard pile for a Loot objective and attach it to Secret Chamber as a guarded objective"): the guard is the source location, which need not be an enemy a DiscardUntil found.
+  z.strictObject({ verb: z.literal("AttachLootFromDiscard"), to: z.literal("self").optional(), ...when }),
+  // The Ruins of Belegost (standalone-scenarios part 6; ledger line 50601:A:1; rr.in-play-and-out-of-play): "Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins (without looking). Shuffle the others into the encounter deck."
+  // Of the set-aside cards with these `codes` the game's seed picks one, which goes facedown under the card in play with the code `under`; the others go into the encounter deck, facedown, which the record's next ShuffleEncounterDeck shuffles. Nothing happens when `under` is not in play.
+  verbFlags(z.strictObject({ verb: z.literal("HideRandomLoot"), codes: z.array(code).min(2), under: code, ...when }), { setupRuns: "top" }),
   // Resolution: "Shuffle the encounter discard pile into the encounter deck and discard cards from the top until 2 Hazard cards are discarded. The players, as a group, must choose 1 of those cards and add it to the campaign pool" (12189:B:6; emce.campaign-pool-encounter): the discard
   // pile is shuffled in, cards come off the top into the discard pile until `count` Hazard cards are among them (or the deck is empty), and the first player chooses for the group one of those Hazard cards: an encounter card joins the Campaign Pool's encounter cards, a burden joins the pool as a burden.
   // Run by the Resolution (rules/setup/resolution.ts).
@@ -316,6 +320,9 @@ const FLAGS = [
   "dealtShadows",
   // On a location: the adjustment a Response made to its Discover value this phase, positive or negative ("increase or decrease its Discover value by 1 before resolving it", 19094:A:3). Read by the Discover keyword (families/wilderland/discover.ts).
   "discoverValue",
+  // On a location (a constant ModifyStat of the location itself): the number of cards its Discover keyword looks at beyond its value ("look at X additional cards", 50622:A:3), and the number of looked-at Hazard cards beyond the first it reveals ("the first player reveals an additional looked at Hazard card for each other player", 50623:A:3). Read by the Discover keyword (families/wilderland/discover.ts).
+  "discoverLooked",
+  "discoverHazards",
   // On an enemy: a player can optionally engage it only while a unique enemy is engaged with them ("cannot be optionally engaged except by a player who is engaged with a unique enemy", 12192:A:1). Read by the optional-engagement hook (families/wilderland/engage.ts).
   "optionalEngageUnique",
   // On a seat (target eachSeat): the most its threat can be reduced by player card effects each round ("each player's threat cannot be reduced by more than 1 via player card effects each round", 19104:A:2). Read by lowerThreatByEffect (families/quest/threat.ts).

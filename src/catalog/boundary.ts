@@ -159,6 +159,8 @@ const stageSchema = z.strictObject({
   catchUp: z.number().int().positive().optional(),
   // The stages defeating this one proceeds to in a random order, each played once: one of `codes` still in the quest deck, else `otherwise`; with `remove` the stage defeated leaves the game (AdvanceToRandomStage, 19048:B:2).
   randomNext: z.strictObject({ codes: z.array(z.string()).min(2), otherwise: z.string().optional(), remove: z.literal(true).optional(), different: z.literal(true).optional() }).optional(),
+  // The stage defeating this one proceeds to when the card with the code `code` is attached to a hero (`then`), else `otherwise`; a stage already played comes back (AdvanceIfAttached, 50601:B:3).
+  attachedNext: z.strictObject({ code: z.string(), then: z.string(), otherwise: z.string() }).optional(),
   // A stage 2 of a quest deck that is not flipped when it is revealed: it arrives side A up and shows side B from the beginning of the quest phase (FlipAtQuestPhase, 19135:A:2; emce.gundabad-quest-deck).
   deck: z.literal(true).optional(),
 });

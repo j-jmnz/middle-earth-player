@@ -15,9 +15,10 @@ import { STONE_SAMPLES, STONE_TEMPLATES } from "./stone.ts";
 import { SMAUG_SAMPLES, SMAUG_TEMPLATES } from "./smaug.ts";
 import { ERECH_SAMPLES, ERECH_TEMPLATES } from "./erech.ts";
 import { FOG_SAMPLES, FOG_TEMPLATES } from "./fog.ts";
+import { RUINS_SAMPLES, RUINS_TEMPLATES } from "./ruins.ts";
 
 export { ESCAPE_SAMPLES } from "./escape.ts";
-export { ERECH_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, LONG_DARK_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES };
+export { ERECH_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -72,7 +73,7 @@ const FLIP_GOLLUM = {
 export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES, ...STAT_TEMPLATES,
-  ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES,
+  ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES,
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),
   // The mount-doom family (src/catalog/families/mount-doom.ts).
   FortitudeTest: (i, ctx) => {
@@ -191,7 +192,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     text: `${i.guard === undefined ? "this card" : cardRef(i.guard)} becomes the guard of ${i.to === undefined ? "the picked objective" : cardRef(i.to)}, attached to it in the staging area${i.replaceGuards === true ? " (the objective's own guards are detached first and stay in the staging area)" : ""}${i.stayEngaged === true ? " (an engaged guard stays engaged)" : ""}`,
     read: ["guard", "to", "replaceGuards", "stayEngaged"],
   }),
-  FirstTraitSurge: (i) => ({ text: `the first ${str(i.trait)} ${i.type === "enemy" ? "enemy" : "treachery"} card revealed each round gains surge${i.doomed != null ? ` and doomed ${str(i.doomed)}` : ""}`, read: ["trait", "type", "doomed"] }),
+  FirstTraitSurge: (i) => ({ text: `the first ${str(i.trait)} ${i.type === "enemy" ? "enemy card" : i.type === "any" ? "card (of any type)" : "treachery card"} revealed each round gains surge${i.doomed != null ? ` and doomed ${str(i.doomed)}` : ""}`, read: ["trait", "type", "doomed"] }),
   RevealedGainDoomed: (i) => ({ text: `until the end of the ${i.until === "endOfRound" ? "round" : i.until === "endOfPhase" ? "phase" : str(i.until)}, each card revealed gains doomed ${str(i.amount)}${i.instead != null ? ` (doomed ${str((i.instead as Obj).amount)} while the current stage is stage ${str((i.instead as Obj).stage)})` : ""}, recalculated as each is revealed`, read: ["amount", "instead", "until"] }),
   DiscardFromDeck: (i, ctx) => ({
     text: `the top ${amount(i.amount, ctx)} card(s) of the acting player's deck${i.shuffle === true ? " (shuffled first)" : ""} go to their discard pile${i.count === undefined ? "" : `; X becomes how many of them are a ${pick(i.count, ctx)}${i.costAtLeast === undefined ? "" : ` with a printed cost of at least ${amount(i.costAtLeast, ctx)}`}`}`,

@@ -165,7 +165,8 @@ export function runExtraVerb(
         for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = moveEncounter(next, id, "engaged", next.firstPlayer, ctx, steps);
         return next;
       }
-      for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: turnedUp(next, id) });
+      const host = instruction.from != null ? Object.values(state.cards).find((card) => card.code === instruction.from && inPlay(card.zone))?.id : focus.sourceId;
+      for (const id of host ? cardsUnder(state, host) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: turnedUp(next, id) });
       return next;
     }
     case "DamageAll":

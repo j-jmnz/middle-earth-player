@@ -35,7 +35,7 @@ export function discardEncounterPerPlayer(state: ScenarioState, focus: Focus): S
 
 /** RevealDiscarded: the actor reveals the next enemy of the trait among the cards the effect discarded that still lie in the discard pile, and the verb comes round again while more are left. */
 export function revealDiscarded(state: ScenarioState, instruction: Verb<"RevealDiscarded">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const options = (effectData(state)?.looked ?? []).filter((id) => state.cards[id]?.zone === "encounterDiscard" && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy" && hasTrait(state, id, instruction.trait, ctx));
+  const options = (effectData(state)?.looked ?? []).filter((id) => state.cards[id]?.zone === "encounterDiscard" && (instruction.anyType === true || printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy") && hasTrait(state, id, instruction.trait, ctx));
   const first = options[0];
   if (first === undefined || state.seats[focus.seat]?.eliminated) return state;
   const more = options.length > 1 ? queueFront(state, [{ instruction, seat: focus.seat, chosen: null }]) : state;

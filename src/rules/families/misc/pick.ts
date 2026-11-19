@@ -31,6 +31,8 @@ export function miscPickMatches(state: ScenarioState, id: string, spec: PickSpec
   if (spec.objective && printedOf(ctx.cards, instance.code).type !== "objective") return false;
   // The seat the effect runs for, or the players whose characters took part in the attack the effect answers (families/encounter/discard-check.ts reads the same event).
   if (spec.controlledBy === "actor" && instance.controller !== at.seat) return false;
+  // "each character controlled by the first player" (50627:A:2): the first player's cards, whoever resolves the effect.
+  if (spec.controlledBy === "firstPlayer" && instance.controller !== state.firstPlayer) return false;
   if (spec.controlledBy === "attackers" && !(at.participants ?? []).some((attacker) => state.cards[attacker]?.controller === instance.controller)) return false;
   // The player this card (an enemy, engaged with him) is controlled by: the defending player, whoever the effect asks to choose (901504:A:1, `who: firstPlayer`).
   if (spec.controlledBy === "source") {
