@@ -26,8 +26,12 @@ export function inPlayLimitReason(state: ScenarioState, cardId: string, ctx: Red
   return copies >= limit ? `Limit ${limit} copies of ${name} in play` : null;
 }
 
-// The side quest enters the staging area (of the seat that played it, once the staging areas are separate), which is a game with side quests from then on, and is announced as played and entered, like any card played from the hand.
+// The one way a player side quest enters play, however it got there (played from the hand, put into play by an effect): it lies in the staging area (of the seat that put it there, once the staging areas are separate), which is a game with side quests from then on.
+export function placeSideQuest(state: ScenarioState, cardId: string, seat: number): ScenarioState {
+  return { ...moveCard(state, cardId, { zone: "staging", area: seat }), sideQuests: true };
+}
+
+// A side quest played from the hand is announced as played and entered, like any card played from the hand.
 export function enterStaging(state: ScenarioState, cardId: string, seat: number, _steps: EngineStep[]): ScenarioState {
-  const placed: ScenarioState = { ...moveCard(state, cardId, { zone: "staging", area: seat }), sideQuests: true };
-  return queueEvent(queueEvent(placed, { trigger: "played", seat, cardId }), { trigger: "enteredPlay", seat, cardId });
+  return queueEvent(queueEvent(placeSideQuest(state, cardId, seat), { trigger: "played", seat, cardId }), { trigger: "enteredPlay", seat, cardId });
 }

@@ -29,6 +29,7 @@ import { healBlocked } from "../families/burden/life.ts";
 import { healDamage } from "../families/dreamchaser/heal-cap.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { addToVictory } from "../families/sidequests/victory.ts";
+import { placeSideQuest } from "../families/sidequests/play.ts";
 import { isQuestSource } from "../families/wilderland/night-quest.ts";
 import { announceCanceled } from "../families/nightmare/index.ts";
 
@@ -250,6 +251,8 @@ export function runPlayerVerb(
       const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
       // An ally taken from another player's discard pile is put into play under the new controller and stays its owner's card.
       const owner = card.controller != null && card.controller !== seat && card.owner == null ? { owner: card.controller } : {};
+      // A player side quest put into play lies in the staging area, as one played does (families/sidequests/play.ts).
+      if (printedOf(ctx.cards, card.code).type === "player-side-quest") return queueEvent(updateCard(placeSideQuest(state, id, seat), id, { exhausted: false, ...owner }), { trigger: "enteredPlay", seat, cardId: id });
       const entered = updateCard(moveCard(state, id, { zone: "play", seat }), id, { exhausted: false, ...owner });
       return queueEvent(entered, { trigger: "enteredPlay", seat, cardId: id });
     }

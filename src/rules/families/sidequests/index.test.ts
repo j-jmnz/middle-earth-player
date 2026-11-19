@@ -5,6 +5,10 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
+import { effectCause } from "../../core/cause.ts";
+import { settle } from "../../engine/machine.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
 import { askCurrentQuest } from "../wilderland/night.ts";
@@ -48,6 +52,19 @@ describe("playing a player side quest", () => {
     // The question is a frame of its own, with the side quest among its options.
     expect(asked?.stack).toHaveLength(1);
     expect(JSON.stringify(asked?.stack)).toContain(quest.id);
+  });
+});
+
+describe("a player side quest put into play by an effect", () => {
+  it("lies in the staging area and makes it a game with side quests, as a played one does (mec108.side-quests-in-play)", () => {
+    const table = seat(1, ["dwarf", "rohan"]);
+    const quest = put(table.state, "09014", "discard");
+    const record: Effect = { id: "x:response:1", cardCode: "stage", lines: ["x:A:1"], timing: "response", trigger: "played", instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "discard" } }, { verb: "MovePicked", to: "play" }] };
+    const framed = pushEffectFrame({ ...quest.state, window: null }, { frame: "event", sourceId: null, actor: 0, peril: false, effectId: record.id, instructions: record.instructions, cancel: null, blockCancel: null, cause: effectCause(record) }, []);
+    const done = settle(framed, { ...ctx, effects: [record] }, []);
+    expect(done.cards[quest.id]).toMatchObject({ zone: "staging" });
+    expect(done.staging).toContain(quest.id);
+    expect(done.sideQuests).toBe(true);
   });
 });
 
@@ -179,6 +196,7 @@ describe("a defeated side quest", () => {
     state = send(state, { type: "Commit", cardIds: [table.heroes[0] ?? ""] }, ctx);
     state = run(passQuestWindow(state), ctx);
     state = trigger(state, quest.id, "09014:response:1", ctx);
+    for (let index = 0; index < 2; index += 1) state = run(send(state, { type: "Choose", optionId: "search" }, ctx), ctx);
     expect(state.seats[0].hand.length).toBe(1);
     expect(state.seats[1].hand.length).toBe(1);
   });
@@ -192,6 +210,7 @@ describe("a defeated side quest", () => {
     state = send(state, { type: "Commit", cardIds: [table.heroes[0] ?? ""] }, ctx);
     state = run(passQuestWindow(state), ctx);
     state = trigger(state, quest.id, "10058:response:1", ctx);
+    for (let index = 0; index < 2; index += 1) state = run(send(state, { type: "Choose", optionId: "discard" }, ctx), ctx);
     expect(state.cards[orc0.id]?.zone).toBe("encounterDiscard");
     expect(state.cards[orc1.id]?.zone).toBe("encounterDiscard");
   });
