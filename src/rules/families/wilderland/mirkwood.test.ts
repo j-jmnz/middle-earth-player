@@ -208,4 +208,16 @@ describe("an Objective-Location is a location (rr.victory)", () => {
     const staged = spawn(base(), "path", { zone: "staging" });
     expect(pickCandidates(staged.state, { type: "location", control: "any" }, 0, [], null, ctx())).not.toContain(staged.id);
   });
+
+  it("is no location subject of a trigger while it lies in the staging area: revealing one does not trigger a Forest location card", () => {
+    const staged = spawn(base(), "path", { zone: "staging" });
+    const hall = spawn(staged.state, "hall", { zone: "staging" });
+    const listener = hall.state.cards[hall.id]!;
+    const pick = { type: "location", control: "any", trait: "Forest" } as const;
+    expect(matchesPick(hall.state, staged.id, pick, { seat: 0, sourceId: null }, ctx())).toBe(false);
+    expect(subjectMatches(hall.state, staged.id, pick, listener, ctx())).toBe(false);
+    // Once it is the active location it is one again.
+    const active = moveCard(hall.state, staged.id, { zone: "activeLocation" });
+    expect(subjectMatches(active, staged.id, pick, listener, ctx())).toBe(true);
+  });
 });
