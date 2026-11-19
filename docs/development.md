@@ -12,6 +12,24 @@ This builds the catalog and opens the app through Metro. Narrow the window to ph
 
 There's also a Codespaces devcontainer (`.devcontainer/devcontainer.json`) that installs the dependencies and builds the catalog. Run `pnpm web` there and open port 8081.
 
+## Checking a screen in a browser
+
+`pnpm browser` lets an agent, or you, see a screen without a phone: it opens the web build in headless Chromium, writes PNGs and prints what each page logged. Read the PNGs to see the screen and the printed list to see what broke.
+
+```bash
+pnpm browser shot /settings /decks --dark            # two screens, dark theme
+pnpm browser shot --fixture duo /table/{save} --landscape --ids
+pnpm browser shot /settings --tap app-settings-theme-dark --tap text=About
+pnpm browser run <scratchpad>/flow.ts                # a flow shot cannot express
+```
+
+- **What it opens.** The static web export with the e2e seed, so `--fixture <name>` writes a fixture save (names in `src/campaign/fixtures/registry.ts`) and `{save}` in a route is its save id. With no route it shoots where the fixture landed, or `/`. The export is made again only when its inputs changed (`scripts/browser/web-export.ts`): about 10 s on a warm Metro cache, a minute and a half cold. `--fresh` forces it, `--reuse` keeps the last one, and `--base http://localhost:8081` opens a running `pnpm web` instead.
+- **Taps.** `--tap` takes a testID (react-native-web writes it as `data-testid`), a Playwright selector (`text=Theme`, `[role=button]`) or `x,y` in CSS pixels for the table's canvas, which has no elements for its cards. Each tap is followed by a shot. A target that is not there fails after 5 s and lists the testIDs that are; `--ids` lists them on every shot, and `--text` prints the page's text.
+- **What it reports.** Console errors and warnings, uncaught errors, and requests that failed or answered 400 and over. Requests off localhost are blocked (card pictures come from the network unless `pnpm assets scans` ran), and `--net` lets them through. An uncaught error, a wait that times out or a missing tap target fails the run.
+- **Options.** `--dark` or `--both` themes, `--landscape` or `--size <w>x<h>` (phone portrait by default), `--full-page`, `--settle <ms>` after each load and tap (1000), `--wait <testID>` before the first shot, `--out <dir>`.
+- **Scripts.** `pnpm browser run <file>` imports a file that default-exports `async (app) => {}`, where `app` is the `App` of `scripts/browser/app.ts`: `open`, `seed`, `tap`, `shot`, `testIds`, `problems`, and Playwright's `context`. Keep the file in the scratchpad, not the repository. `app.open` closes the page it opened before, since a second tab waits forever on the app's database.
+- **Chromium.** `scripts/browser/chromium.ts` launches Playwright's own browser (`pnpm exec playwright install chromium`), else a cloud container's Chromium at `/opt/pw-browsers/chromium`; `CHROMIUM_PATH=<binary>` wins over both.
+
 ## On a desktop
 
 ```bash
@@ -43,7 +61,7 @@ A build signed with a free Apple ID stops opening after 7 days. Run the command 
 
 ## Commands
 
-Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `desktop`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
+Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `browser`, `desktop`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
 
 | Command | What it does |
 | --- | --- |
@@ -54,7 +72,10 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm test smoke <codes>` | Plays a seeded game with those cards and reports errors and stalls. `--all` covers every card. |
 | `pnpm test encounter <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) plus seeded games with random legal intents, and reports errors, stalls and replay differences. `--all` covers every playable scenario. |
 | `pnpm test phone-bundle` | Exports the Android and the iOS bundle (`--no-bytecode`; iOS needs no Xcode) in a temporary worktree at the merge base with `origin/main` and in this tree, and fails, naming the first modules that differ, unless each platform's two are byte-identical (it reports IDENTICAL per platform): the web and desktop work leaves the phone's bundle as it is (`docs/architecture.md`, Screens). It takes about four minutes, needs `pnpm assets catalog` first and the history of `origin/main`, and skips with a message without them. `--base <ref>` compares another commit; `--keep` keeps the exports; `--if-desktop-work` does nothing unless the diff touches desktop work, which is how the pull request job (`phone-bundle` in `.github/workflows/test.yml`) runs it. |
-| `pnpm test a11y` | Audits the main web screens with axe-core in Chromium and fails on serious or critical findings. It needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path>`. |
+| `pnpm test a11y` | Audits the main web screens with axe-core in Chromium and fails on serious or critical findings. It finds Chromium as `pnpm browser` does. `--skip-export` reuses the last export even when its inputs changed. |
+| `pnpm browser shot [route...]` | Opens routes of the web build in Chromium, writes a PNG of each to `.agent/shots` and prints each page's errors (Checking a screen in a browser). |
+| `pnpm browser run <script.ts>` | Runs a scratch Playwright script against the web build. |
+| `pnpm browser serve` | Serves the web export on `127.0.0.1` until stopped and prints its address. |
 | `pnpm lint` | Runs Oxlint (`.oxlintrc.json`). |
 | `pnpm typecheck` | Type-checks with tsrs. |
 | `pnpm data sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. It is the only command that uses the network. `scans` and `pictures` run only when you name them, after `data build`. |
