@@ -94,8 +94,8 @@ describe("keywords", () => {
     state = spawned.state;
     const instance = state.cards[spawned.id];
     if (!instance) throw new Error("missing card");
-    expect(defeatedDestination(instance, elf)).toEqual({ zone: "discard", seat: 0 });
-    expect(defeatedDestination(instance, relic)).toEqual({ zone: "discard", seat: 0 });
+    expect(defeatedDestination(instance, elf, state)).toEqual({ zone: "discard", seat: 0 });
+    expect(defeatedDestination(instance, relic, state)).toEqual({ zone: "discard", seat: 0 });
     const fallen = placeDamage(state, spawned.id, 3, cards, [], "framework", ruleCause("rr.effects"));
     expect(fallen.cards[spawned.id]?.zone).toBe("discard");
     expect(fallen.seats[0]?.discard).toContain(spawned.id);

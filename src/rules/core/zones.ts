@@ -439,7 +439,9 @@ export function spawn(
     nextId: state.nextId + 1,
     cards: { ...state.cards, [id]: instance },
   };
-  return { state: stampEntry(attach(recorded, id, dest), id, "removed"), id };
+  // A card dealt straight into play enters it like a moved one: it joins the cards in every area and captures (families/captured/entry.ts).
+  const entered = stampEntry(attach(recorded, id, dest), id, "removed");
+  return { state: entered.capture && inPlay(dest.zone) ? captureOnEntry(entered, id, dest) : entered, id };
 }
 
 /** The face a card shows when it is turned faceup from a deck, the encounter discard pile or the set-aside cards: its Upgraded side, side B, in a campaign that has upgraded it (dcce.scalable-upgradable), else faceup. */

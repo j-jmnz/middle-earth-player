@@ -23,6 +23,9 @@ No phase is open.
 ### Reviews
 - Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, and the card frames' ux fix. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
 
+### Readings (not user-confirmed)
+- Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
+
 ### Cards tab views
 - `pnpm data sync pictures` has not run since every card got a picture check: Google Drive's quota refused it (2026-11-18). Re-run it, then check that no pin moved to a smaller picture.
 - The Messenger of the King heroes keep RingsDB's pictures (about 430×600): no larger source was found (agent recommendation, not user-confirmed).
@@ -123,8 +126,11 @@ No phase is open.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
 ### Rules and engine (Angmar Awakened)
+- Objective allies (Wilyador, Iârion, Amarthiúl, Captain Sahír, Na'asiyah): a player card that returns one to "its owner's hand" puts it in the encounter discard pile, and the players lose when it leaves play (agent recommendation; no ruling found, `docs/brief.md`, A Journey to Rhosgobel). Not user-confirmed.
 - Angmar Awakened data: Easy counts of Angmar Captain (09045, 1) and Angmar Marauder (09044, 2) in Escape from Mount Gram and Ruins of Arnor (09056, 2) in The Treachery of Rhudaur follow Hall of Beorn against DragnCards' E05 decks; no printed icon check. Not user-confirmed.
 - Angmar Awakened data: `MEC108_CHANGED` is empty because no scan shows the MEC108 printing of the 155 reprinted encounter cards; a rewording cannot be found until one is read. Not user-confirmed.
+- Claimed objectives with no printed return (Athelas, the Clues of Rhudaur) go to the encounter discard pile with their hero (semi-official FAQ 1.23, community; `docs/brief.md`, A Journey to Rhosgobel). Not user-confirmed.
+- Claimed objectives whose text claims them "if unattached" (Ashen Brazier, Loot objectives, Durin's Key, Urdug's Horn) return to the staging area when detached (agent recommendation, no source; `docs/brief.md`, Ered Mithrin). Not user-confirmed.
 - Angmar Awakened data: the Prison Cell, Savage Trollspawn and Amarthiúl (Wastes) piles follow each quest's Setup over DragnCards' load layout (agent recommendation). Not user-confirmed.
 - Angmar Awakened campaign cards: Iârion's Pendant at 10166:B:1 goes to the player the first player names, as the Ered Mithrin boon-ally ruling (agent recommendation; no ruling found). Not user-confirmed.
 - Angmar Awakened campaign cards: "add the Mysterious Omens side quest to the Campaign Log" (10159:A:2) adds it to the Campaign Pool (agent recommendation). Not user-confirmed.

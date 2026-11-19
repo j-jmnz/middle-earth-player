@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.in-play-and-out-of-play, rr.reveal, rr.staging, rr.guarded, rr.restricted
+// Rules: mec109.multiple-staging-areas, rr.attachment-cards, rr.in-play-and-out-of-play, rr.reveal, rr.staging, rr.guarded, rr.restricted
 // (data/rules/entries.json). The player Guarded (X) keyword and the Trap cards' "Play ~ into the staging area unattached" have
 // no rules text in data/rules: the card text and the objective Guarded rule (rr.guarded) are read instead.
 //
@@ -25,6 +25,7 @@ import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
+import { areaHeadOf, stagingDest } from "../breaking/areas.ts";
 import { discardUntilType } from "../encounter/discard-until.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
@@ -72,7 +73,7 @@ export function playTargets(state: ScenarioState, seat: number, code: string, ct
 
 // Moves an attachment where a pseudo host puts it: the staging area, unattached, or a seat's play area (that seat controls it).
 function placeUnattached(state: ScenarioState, id: string, hostId: string, seat: number): ScenarioState {
-  if (hostId === STAGING_HOST) return updateCard(moveCard(state, id, { zone: "staging" }), id, { controller: seat, face: "up", exhausted: false });
+  if (hostId === STAGING_HOST) return updateCard(moveCard(state, id, stagingDest(state, seat)), id, { controller: seat, face: "up", exhausted: false });
   const target = seatOf(hostId) ?? seat;
   const moved = updateCard(moveCard(state, id, { zone: "play", seat: target }), id, { exhausted: false });
   return target === seat ? moved : updateCard(moved, id, { owner: seat });
@@ -195,6 +196,8 @@ export function attachSourceTo(state: ScenarioState, instruction: Extract<Instru
   const targetId = refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId));
   const target = targetId ? state.cards[targetId] : undefined;
   if (!source || !target || target.id === source.id || target.id === source.host || !inPlay(source.zone) || !inPlay(target.zone)) return state;
+  // A Trap waiting in a staging area takes only an enemy that enters that area once stages are separate (mec109.multiple-staging-areas).
+  if (source.zone === "staging" && areaHeadOf(state, source.id) !== areaHeadOf(state, target.id)) return state;
   if (!playerCardEffectCanChoose(printedOf(ctx.cards, target.code), state, target.id) || attachBlocked(state, ctx, target.id, source.code)) return state;
   const seat = source.controller ?? focus.seat;
   const old = source.host ? state.cards[source.host] : undefined;

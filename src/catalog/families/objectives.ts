@@ -42,6 +42,9 @@ const FLAGS = [
   // On a claimed objective: when the hero it is attached to leaves play, the objective returns to the top of the encounter deck instead of the staging area ("Forced: After attached hero is damaged or leaves play, return this card to the top of the
   // encounter deck", 02014:A:2). Read where a card's attachments are released (families/objectives/claimed.ts).
   "returnsToEncounterDeck",
+  // On a claimed objective: when the hero it is attached to leaves play, or it is discarded, the objective returns to the staging area ("If detached, return Gandalf's Map to the staging area", 01108:A:2). A claimed objective
+  // without it counts as an attachment and is discarded with its host (Athelas 02063, the Rhudaur Clues). Read where a card is sent away (families/objectives/claimed.ts).
+  "returnsToStagingArea",
 ] as const;
 
 export const manifest = { name: "objectives", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

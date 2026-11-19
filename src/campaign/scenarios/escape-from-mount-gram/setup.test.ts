@@ -3,6 +3,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { printedOf } from "../../../rules/core/printed.ts";
+import { stagingOf } from "../../../rules/families/breaking/areas.ts";
+import { questCardPool } from "../../../rules/families/quest/quest-card.ts";
 import { capturedDeck, capturedUnder } from "../../../rules/families/captured/pile.ts";
 import { recordStolenCards } from "../../../rules/families/campaign/damage-tracking.ts";
 import { spawn } from "../../../rules/core/zones.ts";
@@ -47,6 +49,16 @@ describe("Setup", () => {
     expect(capturedUnder(state, cell)).toHaveLength(3);
     expect(capturedDeck(state, 0)).toHaveLength(20 - 5 - 7 - 3);
   });
+
+  for (const seats of [1, 2] as const) {
+    it(`10175:A:1 ${seats} seat(s): Loot the Dungeons, added by the Setup, is in each player's staging area and quest card pool`, () => {
+      const state = begin(seats);
+      const loot = idOf(state, "10175");
+      const seen = Array.from({ length: seats }, (_, seat) => ({ seat, staging: stagingOf(state, seat).includes(loot), pool: questCardPool(state, seat, world.ctx).includes(loot) }));
+      expect(state.capture?.here).toEqual([loot]);
+      expect(seen.every((one) => one.staging && one.pool)).toBe(true);
+    });
+  }
 
   it("10039:A:1 Capture 7 takes the top 7 cards of the captured deck, after Loot took the bottom 5, each owned by the player", () => {
     const state = begin(1);

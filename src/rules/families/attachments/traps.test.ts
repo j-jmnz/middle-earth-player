@@ -14,7 +14,8 @@ import { reduce } from "../../engine/reduce.ts";
 import { stagingThreat } from "../../quest/quest.ts";
 import { declarableEnemies } from "../../combat/combat.ts";
 import { updateCard, withMode, type ScenarioState } from "../../core/state.ts";
-import { attachTo } from "../../core/zones.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { attachmentCtx, deck, offered, play, put, resolveChoices, seat, send } from "./fixture.ts";
 
 const ctx = attachmentCtx(EFFECTS);
@@ -201,3 +202,35 @@ describe("Secret Vigil", () => {
   });
 });
 
+
+describe("a Trap when the stages are separate (mec109.multiple-staging-areas)", () => {
+  // Two seats, each with its own staging area; the Trap is played by seat 0, and an orc then enters one area.
+  function entering(area: number): { state: ScenarioState; trap: string; orc: string } {
+    const table = seat(2);
+    const separate = { ...table.state, separate: true } satisfies ScenarioState;
+    const trap = put(separate, "05017", "hand");
+    const played = send(trap.state, { type: "PlayCard", cardId: trap.id, payments: [{ heroId: table.heroes[0] ?? "", amount: 2 }], hostId: "staging" }, ctx);
+    const orc = put(played, "orc", "hand");
+    const moved = moveCard(orc.state, orc.id, { zone: "staging", area });
+    const queued = queueEvent(moved, { trigger: "addedToStaging", seat: area, cardId: orc.id });
+    return { state: settle({ ...queued, window: null }, ctx, []), trap: trap.id, orc: orc.id };
+  }
+
+  it("goes into the staging area of the seat that played it", () => {
+    const table = seat(2);
+    const trap = put({ ...table.state, separate: true }, "05017", "hand");
+    const played = send(trap.state, { type: "PlayCard", cardId: trap.id, payments: [{ heroId: table.heroes[0] ?? "", amount: 2 }], hostId: "staging" }, ctx);
+    expect(played.seats[0].staging).toContain(trap.id);
+    expect(played.seats[1].staging).not.toContain(trap.id);
+  });
+
+  it("attaches to the next enemy that enters its own staging area", () => {
+    const { state, trap, orc } = entering(0);
+    expect(state.cards[trap]).toMatchObject({ zone: "play", host: orc });
+  });
+
+  it("does not attach to an enemy that enters another seat's staging area", () => {
+    const { state, trap } = entering(1);
+    expect(state.cards[trap]).toMatchObject({ zone: "staging", host: null });
+  });
+});

@@ -10,6 +10,7 @@ import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "..
 import { legalTargets } from "../../rules/engine/reduce.ts";
 
 import { checkFor, playCaution } from "../cards/not-applied.ts";
+import { hostName } from "../cards/host-words.ts";
 import { playRequest, type PayRequest, type Share } from "./pay.ts";
 import { STEP_WORDS, windowPoint } from "../phases/rail.ts";
 import type { DistributePurpose, DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet, WindowSheet } from "./sheet-types.ts";
@@ -181,7 +182,7 @@ export function playSheet(game: ScenarioState, ctx: ReduceContext, legal: readon
     kind: "pick",
     key: `play:${cardId}:${hostId ?? ""}`,
     step: step(game),
-    title: hostId ? `Attach ${name} to ${names.card(hostId)}` : `Play ${name}`,
+    title: hostId ? `Attach ${name} to ${hostName(names.card, hostId)}` : `Play ${name}`,
     note: said("It costs nothing."),
     verb: "",
     options: [],

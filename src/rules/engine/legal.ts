@@ -88,7 +88,7 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
 export function legalTargets(state: ScenarioState, selection: Selection, ctx: ReduceContext): readonly string[] {
   switch (selection.type) {
     case "PlayCard":
-      return attachmentTargets(state, state.cards[selection.cardId]?.code, ctx);
+      return attachmentTargets(state, selection.cardId, ctx);
     case "Commit":
       return askingToCommit(state) ? sailingCommitters(state, ctx) : committers(state, state.activeSeat, ctx);
     case "CommitHide":

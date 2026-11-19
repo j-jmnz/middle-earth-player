@@ -49,6 +49,15 @@ const gateKeyClaim = (code: string): Effect => ({
   instructions: [{ verb: "Pick", pick: READY_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
 });
 
+// "If unattached, return Gate Key to the staging area": the flag `returnsToStagingArea` (families/objectives/claimed.ts) sends it back when its hero leaves play or it is discarded.
+const gateKeyReturns = (code: string): Effect => ({
+  id: `${code}:constant:1`,
+  cardCode: code,
+  lines: [`${code}:A:1`],
+  timing: "constant",
+  instructions: [{ verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }],
+});
+
 const gateKeyLook = (code: string, side: "A" | "B", line: number): Effect => {
   const holds: Condition = { kind: "all", conditions: [HERO_HOLDS_KEY, { kind: "canPick", pick: TEMPLE_FACEDOWN }] };
   return side === "A"
@@ -165,6 +174,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 12071 Gate Key, and the reprint 110078 on both sides.
   gateKeyClaim("12071"),
+  gateKeyReturns("12071"),
   gateKeyLook("12071", "A", 2),
   copyLine("12071:A:1", "110078:A:1"),
   gateKeyLook("110078", "A", 2),

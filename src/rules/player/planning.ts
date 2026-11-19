@@ -260,11 +260,7 @@ export function playReason(
   if (printed.type === "attachment") {
     if (!intent.hostId) return "Choose a host";
     const host = state.cards[intent.hostId];
-    // The staging area or a seat's play area, for a card that goes there (families/attachments/play.ts).
-    const targets = playTargets(state, state.activeSeat, instance.code, ctx) ?? attachmentHostIds(state, state.activeSeat, instance.code, ctx);
-    // An attachment played from the discard pile by Stalwart goes onto that hero only (the permission is the hero's).
-    const grantOnly = instance.zone === "discard" && !discardPlay(ctx, instance.code).allowed;
-    if (!targets.includes(intent.hostId) || (grantOnly && !discardGrantHosts(state, state.activeSeat).includes(intent.hostId))) {
+    if (!playHosts(state, instance, ctx).includes(intent.hostId)) {
       if (host && !playerCardEffectCanChoose(printedOf(ctx.cards, host.code), state, host.id, printed)) {
         return "Immune to player card effects";
       }
@@ -278,11 +274,20 @@ export function playReason(
   );
 }
 
-export function attachmentTargets(state: ScenarioState, code: string | undefined, ctx: ReduceContext): readonly string[] {
-  if (!code) return [];
-  const printed = ctx.cards.get(code);
-  if (!printed || printed.type !== "attachment") return [];
-  return playTargets(state, state.activeSeat, code, ctx) ?? attachmentHostIds(state, state.activeSeat, code, ctx);
+// The hosts the engine accepts for this attachment card: the staging area or a seat's play area for a card that goes there (families/attachments/play.ts),
+// else the cards it may attach to. One played from the discard pile by Stalwart goes onto that hero only (the permission is the hero's).
+function playHosts(state: ScenarioState, instance: { code: string; zone: string }, ctx: ReduceContext): readonly string[] {
+  const targets = playTargets(state, state.activeSeat, instance.code, ctx) ?? attachmentHostIds(state, state.activeSeat, instance.code, ctx);
+  const grantOnly = instance.zone === "discard" && !discardPlay(ctx, instance.code).allowed;
+  if (!grantOnly) return targets;
+  const granted = discardGrantHosts(state, state.activeSeat);
+  return targets.filter((id) => granted.includes(id));
+}
+
+export function attachmentTargets(state: ScenarioState, cardId: string | undefined, ctx: ReduceContext): readonly string[] {
+  const instance = cardId ? state.cards[cardId] : undefined;
+  if (!instance || ctx.cards.get(instance.code)?.type !== "attachment") return [];
+  return playHosts(state, instance, ctx);
 }
 
 function paymentReason(

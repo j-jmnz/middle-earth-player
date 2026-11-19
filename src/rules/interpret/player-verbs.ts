@@ -17,9 +17,9 @@ import type { ReduceContext } from "./interpret.ts";
 import { lowerThreatByEffect, playerSource } from "../families/quest/threat.ts";
 import { destroyCard, placeDamage } from "../core/keywords.ts";
 import { stagingLocations } from "../quest/quest.ts";
-import type { ScenarioState } from "../core/state.ts";
+import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
-import { printedOf, type PrintedCard } from "../core/printed.ts";
+import { printedOf, scenarioOwned, type PrintedCard } from "../core/printed.ts";
 import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
@@ -120,7 +120,9 @@ export function runPlayerVerb(
     }
     case "PutOnDeck": {
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
-      return putOnDeck(state, id, instruction.position);
+      const target = state.cards[id];
+      // The scenario owns an encounter card (rr.ownership-and-control): it has no deck of a player to go to.
+      return target && inPlay(target.zone) && scenarioOwned(printedOf(ctx.cards, target.code)) ? toEncounterDiscard(state, target) : putOnDeck(state, id, instruction.position);
     }
     case "MoveResources": {
       const list = pickedList(state);
@@ -255,7 +257,8 @@ export function runPlayerVerb(
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
       const card = state.cards[id];
       if (!card || !inPlay(card.zone) || card.controller == null) return state;
-      const returned = moveCard(state, id, { zone: "hand", seat: card.owner ?? card.controller });
+      // The scenario owns an encounter card (an objective-ally: Wilyador, Iârion), so it has no hand to return to: it leaves play into the encounter discard pile, the area the scenario owns (rr.ownership-and-control).
+      const returned = scenarioOwned(printedOf(ctx.cards, card.code)) ? toEncounterDiscard(state, card) : moveCard(state, id, { zone: "hand", seat: card.owner ?? card.controller });
       return queueEvent(returned, { trigger: "allyLeftPlay", seat: card.controller, subject: id });
     }
     case "ShuffleSelfIntoDeck": {
@@ -335,6 +338,11 @@ export function exhaustCard(state: ScenarioState, id: string): ScenarioState {
   const card = state.cards[id];
   if (!card || card.exhausted) return state;
   return queueEvent(updateCard(state, id, { exhausted: true }), { trigger: "exhausted", seat: card.controller, cardId: id });
+}
+
+// A card of the scenario that a player effect takes out of play by "return" goes to the encounter discard pile, whoever controls it.
+function toEncounterDiscard(state: ScenarioState, card: CardInstance): ScenarioState {
+  return updateCard(moveCard(state, card.id, { zone: "encounterDiscard" }), card.id, { owner: undefined });
 }
 
 // A player card goes on top or at the bottom of its owner's deck, or is shuffled in. Only a player card has a deck to go to.

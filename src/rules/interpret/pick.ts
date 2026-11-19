@@ -5,6 +5,7 @@ import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds } from "../player/attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "../combat/combat.ts";
+import { hostOf } from "./amounts.ts";
 import { countsAsAttachment, hasTrait } from "./conditions.ts";
 import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
@@ -212,9 +213,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs/pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
-  if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
+  if (spec.notHost && at.sourceId != null && hostOf(state, at.sourceId) === id) return false;
   if (spec.engagedThisRound && heldAmount(state, id, "engagedThisRound") <= 0) return false;
-  if (spec.isHost && (at.sourceId == null || state.cards[at.sourceId]?.host !== id)) return false;
+  if (spec.isHost && (at.sourceId == null || hostOf(state, at.sourceId) !== id)) return false;
   if (spec.active && !activeFor(state, asking, spec.stagingArea === "any").includes(id)) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments/pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
@@ -365,9 +366,10 @@ export function pickCandidates(
 // The cards attached to the source, to the source's host, to the active location, or to the defending character.
 function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLocation" | "defender", sourceId: string | null): string[] {
   const source = sourceId ? state.cards[sourceId] : undefined;
+  const hostId = hostOf(state, sourceId);
   const defender = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? state.cards[state.pendingAttack.defenderId] : undefined;
   const holder =
-    where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
+    where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : hostId ? state.cards[hostId] : undefined;
   return holder ? holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed")) : [];
 }
 
