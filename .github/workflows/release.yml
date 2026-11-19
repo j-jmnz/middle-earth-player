@@ -19,6 +19,10 @@ on:
         description: "Build and check only: the builds are workflow artifacts, no tag, release or TestFlight upload is made"
         type: boolean
         default: true
+      add_desktop_from_run:
+        description: "Only add the desktop app to a release that went out without it: the id of that release's run, whose desktop build has since finished. Nothing is built."
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -30,6 +34,8 @@ concurrency:
 
 jobs:
   plan:
+    # Off when the run only adds the desktop app to a release, so every build, the checks and publish are skipped with it.
+    if: ${{ inputs.add_desktop_from_run == '' }}
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.plan.outputs.tag }}
@@ -599,8 +605,8 @@ jobs:
   # dry run tidies its own branch (docs/releasing.md, Caches).
   cleanup:
     needs: [assets, web, desktop, android, ios]
-    # Runs after a failed build too, so the caches of the legs that finished are still tidied.
-    if: ${{ !cancelled() }}
+    # Runs after a failed build too, so the caches of the legs that finished are still tidied; not when nothing was built.
+    if: ${{ !cancelled() && inputs.add_desktop_from_run == '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -628,6 +634,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      # A rerun that found its release already out and only added the desktop app; TestFlight has had that build already.
+      added: ${{ steps.released.outputs.released }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -636,6 +645,17 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
+      # A rerun of failed jobs after this job went out without the desktop app (its build was cancelled or failed, then rerun):
+      # the tag exists, so the release is not made again and the desktop files are added to it instead.
+      - id: released
+        name: Check whether the release is out
+        env:
+          TAG: ${{ needs.plan.outputs.tag }}
+          DESKTOP_RESULT: ${{ needs.desktop.result }}
+        run: |
+          if ! git rev-parse --verify --quiet "refs/tags/$TAG" > /dev/null; then echo "released=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ "$DESKTOP_RESULT" != success ]; then echo "::error::$TAG is already released and the desktop build did not finish, so there is nothing to add."; exit 1; fi
+          echo "released=true" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: android
@@ -652,6 +672,7 @@ jobs:
           merge-multiple: true
           path: ${{ runner.temp }}/out
       - name: Write the notes and the SideStore/AltStore source
+        if: ${{ steps.released.outputs.released != 'true' }}
         env:
           BUMP: ${{ inputs.bump }}
           TAG: ${{ needs.plan.outputs.tag }}
@@ -675,6 +696,7 @@ jobs:
             --cert-sha256 "$(cat "$RUNNER_TEMP/out/certificate.sha256")" --notes "$RUNNER_TEMP/notes.md"
           pnpm --silent release source --tag "$TAG" --ipa "$ipa" --notes "$RUNNER_TEMP/notes.md" --out "$RUNNER_TEMP/out/source.json"
       - name: Tag and release
+        if: ${{ steps.released.outputs.released != 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.plan.outputs.tag }}
@@ -689,6 +711,15 @@ jobs:
           if [ "$GITHUB_REF_NAME" != main ]; then latest=false; fi
           gh release create "$TAG" "${assets[@]}" "$RUNNER_TEMP/out/source.json" \
             --target "$GITHUB_SHA" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --latest="$latest"
+      - name: Add the desktop app to the release
+        if: ${{ steps.released.outputs.released == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.plan.outputs.tag }}
+          OUT: ${{ runner.temp }}/out
+          TESTFLIGHT_URL: ${{ vars.TESTFLIGHT_URL }}
+          WINDOWS_SIGNED: ${{ needs.plan.outputs.desktop_signed }}
+        run: .github/scripts/add-desktop.sh
       # The README's installs badge (docs/releasing.md, Installs count). A failure here must not fail a release that is already out.
       - name: Update the installs count
         continue-on-error: true
@@ -701,13 +732,14 @@ jobs:
           name: notes
           path: ${{ runner.temp }}/notes.md
           retention-days: 14
+          overwrite: true
 
   # The optional TestFlight channel, only when the Apple signing is set up. After the release, so a rerun of this job alone
   # finishes a release whose upload failed.
   testflight:
     needs: [plan, ios, publish]
     # An explicit test: the implicit success() would also skip it when the optional desktop build, upstream of publish, failed.
-    if: ${{ !cancelled() && needs.publish.result == 'success' && needs.plan.outputs.ios_signed == 'true' }}
+    if: ${{ !cancelled() && needs.publish.result == 'success' && needs.publish.outputs.added != 'true' && needs.plan.outputs.ios_signed == 'true' }}
     runs-on: macos-latest
     timeout-minutes: 90
     steps:
@@ -738,3 +770,67 @@ jobs:
           export PILOT_CHANGELOG="$(head -c 3900 "$RUNNER_TEMP/notes.md")"
           fastlane pilot upload --api_key_path "$RUNNER_TEMP/asc-key.json" --ipa "$(ls "$RUNNER_TEMP"/ios/*.ipa)"
           rm -f "$RUNNER_TEMP/asc-key.json"
+
+  # Adds the desktop app to a release that went out without it, from the installers a later attempt of that release's run
+  # built and launched (docs/releasing.md, Add the desktop app to a release). A rerun of an old run uses that run's workflow,
+  # which may not know how to add them, so this is started on its own. Nothing is built or tagged.
+  add-desktop:
+    if: ${{ inputs.add_desktop_from_run != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - id: run
+        name: Find the release run's commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN: ${{ inputs.add_desktop_from_run }}
+        run: |
+          workflow=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN" --jq .path)
+          if [ "$workflow" != .github/workflows/release.yml ]; then echo "::error::Run $RUN is not a run of release.yml."; exit 1; fi
+          echo "sha=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN" --jq .head_sha)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.run.outputs.sha }}
+          fetch-depth: 0
+      # The notes come from the released commit (its engine, catalog and scenarios); the release scripts, from this run's
+      # commit, since the released one may predate them.
+      - id: tag
+        name: Find the release
+        run: |
+          tag=$(git tag --points-at HEAD --list 'v[0-9]*.[0-9]*.[0-9]*')
+          if [ -z "$tag" ] || [ "$(echo "$tag" | wc -l)" != 1 ]; then echo "::error::The run's commit is not one release (tags: ${tag:-none})."; exit 1; fi
+          git checkout "$GITHUB_SHA" -- scripts/release .github/scripts
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: android
+          path: ${{ runner.temp }}/out
+          run-id: ${{ inputs.add_desktop_from_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ios
+          path: ${{ runner.temp }}/out
+          run-id: ${{ inputs.add_desktop_from_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: desktop-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/out
+          run-id: ${{ inputs.add_desktop_from_run }}
+          github-token: ${{ github.token }}
+      - name: Add the desktop app to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+          OUT: ${{ runner.temp }}/out
+          TESTFLIGHT_URL: ${{ vars.TESTFLIGHT_URL }}
+          WINDOWS_SIGNED: ${{ secrets.WINDOWS_CERT_BASE64 != '' && secrets.WINDOWS_CERT_PASSWORD != '' }}
+        run: .github/scripts/add-desktop.sh

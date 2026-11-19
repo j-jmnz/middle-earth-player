@@ -82,11 +82,27 @@ describe("release.yml desktop jobs", () => {
     expect(cond).not.toMatch(/needs\.(desktop|web)\.result == 'success'/);
     expect(publish).toContain("needs.desktop.result == 'success'");
     expect(publish).toContain("--desktop-missing");
-    expect(all.get("cleanup")).toContain("if: ${{ !cancelled() }}");
+    expect(all.get("cleanup")).toContain("if: ${{ !cancelled() && inputs.add_desktop_from_run == '' }}");
     // TestFlight follows publish alone: the implicit success() would skip it when the desktop build failed.
     const tfCond = /^\s*if: (.*)$/m.exec(all.get("testflight") ?? "")?.[1] ?? "";
     expect(tfCond).toContain("!cancelled()");
     expect(tfCond).toContain("needs.publish.result == 'success'");
+  });
+
+  // docs/releasing.md, Add the desktop app to a release: a rerun adds the desktop files to the release it finds out, and a run
+  // started with add_desktop_from_run builds nothing and adds them from that release's run.
+  it("adds the desktop app to a release that went out without it", () => {
+    const publish = all.get("publish") ?? "";
+    expect(publish).toContain('git rev-parse --verify --quiet "refs/tags/$TAG"');
+    expect(publish).toContain("run: .github/scripts/add-desktop.sh");
+    expect(publish).toContain("overwrite: true");
+    expect(/^\s*if: (.*)$/m.exec(all.get("testflight") ?? "")?.[1]).toContain("needs.publish.outputs.added != 'true'");
+    expect(all.get("plan")).toContain("if: ${{ inputs.add_desktop_from_run == '' }}");
+    const add = all.get("add-desktop") ?? "";
+    expect(add).toContain("if: ${{ inputs.add_desktop_from_run != '' }}");
+    expect(add).toContain("run-id: ${{ inputs.add_desktop_from_run }}");
+    expect(add).toContain("run: .github/scripts/add-desktop.sh");
+    expect(add).not.toMatch(/\bneeds:/);
   });
 
   it("starts the web export beside the assets job and waits for it, as the native builds do", () => {
