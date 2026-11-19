@@ -1,7 +1,7 @@
 import type { Amount, Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 import { consideredEngaged } from "../considered-engaged.ts";
 import { AUTHORED_EFFECTS as LOST_IN_MIRKWOOD } from "../lost-in-mirkwood.ts";
-import { copyLine, withCopies } from "../reprint.ts";
+import { withCopies } from "../reprint.ts";
 import { EACH_PLAYER, FEWER_LOOT_THAN, LOOT, X_AT_LEAST_1, discoverKeyword, lootRecords } from "../the-ghost-of-framsburg.ts";
 
 // Records for The Ruins of Belegost (standalone-scenarios cycle part 6, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
@@ -176,6 +176,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "50608:forced:2", cardCode: STALKING, lines: ["50608:A:2"], timing: "forced", trigger: "stageRevealed", instructions: [{ verb: "RemoveResourceTokens", code: STALKING, amount: { stat: "resources", of: "self" } }, { verb: "SetAsideInPlay", code: NAURLHUG }] },
 
   // 50609 Sword of Belegost (Loot, Restricted). Attached hero gets +4 Attack (the template record 50609:A:3). Response: exhaust it to cancel a shadow effect just triggered.
+  // Attached hero only: the template record 50609:constant:1 reads any host, so this one replaces it.
+  { id: "50609:constant:1", cardCode: SWORD, lines: ["50609:A:3"], timing: "constant", condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any" } }, instructions: [{ verb: "ModifyStat", stat: "attack", amount: 4, until: "whileSourceInPlay", target: "host" }] },
   ...lootCards(SWORD, 2),
   { id: "50609:response:1", cardCode: SWORD, lines: ["50609:A:4"], timing: "response", trigger: "shadowPending", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "CancelEffect" }] },
   // 50610 Map of Ered Luin. Action: exhaust it, a non-unique location gets -2 Threat until the end of the phase.
@@ -202,7 +204,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     timing: "action",
     cost: { kind: "exhaustSelf" },
     instructions: [
-      { verb: "Pick", pick: { type: "enemy", control: "any", nonUnique: true } },
+      { verb: "Pick", pick: { type: "enemy", control: "any", nonUnique: true, staging: true } },
       { verb: "ModifyStat", stat: "attack", amount: -1, until: "endOfPhase", target: "picked" },
       { verb: "ModifyStat", stat: "defense", amount: -1, until: "endOfPhase", target: "picked" },
     ],
@@ -252,7 +254,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     ],
   },
   // 50618 Old Stone Troll. -10 engagement cost for each Loot objective attached to a hero; only the engaged player can declare attackers against it.
-  { id: "50618:constant:2", cardCode: "50618", lines: ["50618:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: { count: LOOT_ATTACHED, times: -10 }, until: "whileSourceInPlay", target: "self" }] },
+  { id: "50618:constant:2", cardCode: "50618", lines: ["50618:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: { count: LOOT_ATTACHED, times: 10, negative: true }, until: "whileSourceInPlay", target: "self" }] },
   { id: "50618:constant:3", cardCode: "50618", lines: ["50618:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "attackOnlyByEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   // 50619 Orc of Ered Luin. When Revealed: it makes an immediate attack against each player who controls a Loot objective, in turn order. The Shadow: after this attack it engages the next player and attacks (Pathless Country's record 141072:shadow:1 says it in other words).
   {
@@ -276,7 +278,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "50620",
     lines: ["50620:A:2"],
     timing: "shadow",
-    instructions: [{ verb: "EngageShadowCard", when: { kind: "count", pick: YOUR_LOOT, min: 1 } }, { verb: "DealShadow", when: { kind: "sourceIn", zone: "engaged" } }],
+    instructions: [{ verb: "EngageShadowCard", when: { kind: "count", pick: YOUR_LOOT, min: 1 } }, { verb: "DealShadowTo", target: "self", when: { kind: "sourceIn", zone: "engaged" } }],
   },
 
   // 50621 Naurlhûg's Lair. Discover 5; immune to player card effects. When it is explored the Loot objective under Stalking the Ruins is added to the staging area faceup. Travel: X resources (X the players) go on Stalking the Ruins.
@@ -307,7 +309,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     lines: ["50623:A:2"],
     timing: "constant",
     condition: IN_STAGING,
-    instructions: [{ verb: "IncreaseCost", amount: 1, fromHand: true, pick: { type: "card", control: "any", cardType: "ally" } }],
+    instructions: [{ verb: "IncreaseCost", amount: 1, pick: { type: "card", control: "any", cardType: "ally" } }],
   },
 
   // 50624 Darkened Tunnel. Discover 2. In the staging area it gains: after a "when revealed" effect is canceled, discard the top card of the encounter deck; a Hazard card so discarded is revealed from the discard pile. Travel: 1 resource on Stalking the Ruins.
@@ -354,9 +356,16 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "50627",
     lines: ["50627:A:3"],
     timing: "shadow",
+    // A Repeat of one round gives the discard the frame a remembered card needs (a shadow effect with none runs outside one).
     instructions: [
-      { verb: "DiscardRandomFromHand", remember: true },
-      { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker", when: { kind: "matches", card: "picked", pick: { type: "card", control: "any", cardType: "event" } } },
+      {
+        verb: "Repeat",
+        times: 1,
+        instructions: [
+          { verb: "DiscardRandomFromHand", remember: true },
+          { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker", when: { kind: "matches", card: "picked", pick: { type: "card", control: "any", cardType: "event" }, inPlay: false } },
+        ],
+      },
     ],
   },
   // 50628 Spawn of Thangorodrim. When Revealed: with Naurlhûg in play it attacks the first player; otherwise 1 resource goes on Stalking the Ruins; then with 3 or more Naurlhûg is added. The Shadow: an additional attack against you (the same words as Ravenous Spider's).
@@ -372,7 +381,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
       { verb: "AddSetAsideToStaging", code: NAURLHUG, when: THREE_ON_STALKING },
     ],
   },
-  copyLine("18035:A:2", "50628:A:2"),
+  // The additional attack is dealt a new shadow card, the old ones discarded first (faq.additional-attacks); written on its own, not copied from 18035:A:2 (which deals none).
+  { id: "50628:shadow:1", cardCode: "50628", lines: ["50628:A:2"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
   // 50629 Concealed Spikes. When Revealed: each player assigns X damage among their characters, X 1 more than the Discover value of the active location. The Shadow: assign X damage, X the attachments you control, unless you discard the highest cost attachment you control.
   { id: "50629:whenRevealed:1", cardCode: "50629", lines: ["50629:A:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "AssignDamage", amount: DISCOVER_PLUS_1, pick: { type: "character", control: "you" } }])] },
   {
@@ -408,4 +418,4 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { pool: LOST_IN_MIRKWOOD },
 );
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+export const AUTHORED_REPLACES: readonly string[] = ["50609:constant:1"];

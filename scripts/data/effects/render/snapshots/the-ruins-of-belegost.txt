@@ -192,6 +192,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50609:A:3 (front): Attached hero gets +4 Attack.
   50609:constant:1: Constant
+    only if its host is a hero (any player controls)
     - its host: stat attack 4, while this card is in play
 
 50609:A:4 (front): Response: Exhaust Sword of Belegost to cancel a shadow effect just triggered.
@@ -275,7 +276,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 50613:A:3 (front): Action: Exhaust Dwarven Torch to choose a non-unique enemy. That enemy gets -1 Attack and -1 Defense until the end of the phase.
   50613:action:1: Action (cost: exhaust this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose non-unique enemy (any player controls)
+    - choose non-unique enemy (any player controls) or in the staging area
     - the picked card: stat attack -1, until the end of the phase
     - the picked card: stat defense -1, until the end of the phase
 
@@ -368,7 +369,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50618:A:2 (front): Old Stone Troll gets -10 engagement cost for each Loot objective attached to a hero.
   50618:constant:2: Constant
-    - this card: stat engagementCost the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] x -10, while this card is in play
+    - this card: stat engagementCost minus (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] x 10), while this card is in play
 
 50618:A:3 (front): Only the engaged player can declare attackers against Old Stone Troll.
   50618:constant:3: Constant
@@ -400,7 +401,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50620:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json EngageShadowCard {"verb":"EngageShadowCard","when":{"kind":"count","pick":{"type":"objective","control":"you","controlled":true,"lootKeyword":true},"min":1}}]
-    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
+    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this card is dealt a shadow card
 
 ## 50621 Naurlhûg's Lair
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -451,7 +452,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 50623:A:2 (front): While Flooded Hall is in the staging area, increase the cost to play each ally by 1.
   50623:constant:2: Constant
     only if this card is in the staging area
-    - while this card is in play, each card a player plays (from its owner's hand only) that is a card (any player controls) of card type ally costs 1 more (every player's; several such cards stack)
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) of card type ally costs 1 more (every player's; several such cards stack)
 
 50623:A:3 (front): Forced: When resolving the Discover keyword on Flooded Hall, the first player reveals an additional looked at Hazard card for each other player in the game.
   50623:forced:2: Forced after this location becomes the active location (heard about this card)
@@ -524,9 +525,9 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50627:A:3 (shadow): Shadow: Discard 1 random card from your hand. If the discarded card is an event, attacking enemy gets +2 Attack.
   50627:shadow:1: Shadow
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
-    - then, if the picked card is a card (any player controls) of card type event (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - repeat 1 times:
+      - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+      - then, if the picked card is a card (any player controls) of card type event that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 50628 Spawn of Thangorodrim
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -541,8 +542,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50628:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   50628:shadow:1: Shadow
-    - when the attack in progress ends:
-      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 50629 Concealed Spikes
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -578,4 +578,4 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy to the staging area
 
-(rendered pieces: 318 by template, 40 as JSON)
+(rendered pieces: 320 by template, 40 as JSON)
