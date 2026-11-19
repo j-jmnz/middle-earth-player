@@ -35,8 +35,8 @@ export function loseWhenLeftPlay(before: ScenarioState, after: ScenarioState, ca
 }
 
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
-// owners' discard piles, and the enemies engaged with it return to the staging area with their damage. An attack on
-// that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
+// owners' discard piles (a player side quest in the staging area is one it controls, and goes to its owner's pile, not the encounter discard pile), and the enemies engaged with it
+// return to the staging area with their damage. An attack on that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
 // faq.first-player-elimination). Nothing is cleared once the game is lost. With `ctx`, an enemy that returns to the staging area queues "returnedToStaging" in a game whose records name it (146017:A:1).
 export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, ctx?: ReduceContext): ScenarioState {
   if (state.lost) return state;
@@ -47,7 +47,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     const seat = next.seats[index];
     if (!seat?.eliminated) continue;
     const controlled = Object.values(next.cards).filter(
-      (card) => !(heir != null && isGollum(card.code)) && card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging" && card.zone !== "questStage",
+      (card) => !(heir != null && isGollum(card.code)) && card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "questStage" && (card.zone !== "staging" || !fromEncounterDeck(printedOf(cards, card.code))),
     );
     const smeagol = heir == null ? undefined : Object.values(next.cards).find((card) => card.code === SMEAGOL && card.controller === index && card.zone === "play");
     if (controlled.length === 0 && seat.engaged.length === 0 && !smeagol) continue;

@@ -10,8 +10,9 @@ import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { stagingThreat } from "../../quest/quest.ts";
 import { areaOf, areaSeats, headOf, sharedStaging, stageOf, stagingOf, viewOf } from "./areas.ts";
 import { clearEliminated } from "../../core/eliminate.ts";
-import { withSeat } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { updateCard, withSeat } from "../../core/state.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { DIVIDED, FRODOS_CHOICE, SEAT_OF_SEEING, codes, loadBreakingWorld, makeBreaking, recordOf, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 import { first } from "../../../../test/harness/scene-kit.ts";
@@ -212,5 +213,17 @@ describe("an area whose head is eliminated (mec108.joining-another-player, rr.pl
     expect(after.seats[1].staging).toEqual([]);
     expect(after.cards[first(split.state, "scout")]?.zone).toBe("encounterDiscard");
     expect(after.seats[0].staging).toEqual(split.state.seats[0].staging);
+  });
+
+  it("sends a player side quest it controlled in its area to its owner's discard pile, not the encounter discard pile (rr.player-elimination)", () => {
+    const split = make({ seats: 2, stage: "separate", staging: [], areas: [["grunt"], ["scout"]] });
+    const cards = new Map(world.cards).set("psq", definePrinted({ code: "psq", name: "Player Quest", type: "player-side-quest", questPoints: 4 }));
+    const spawned = spawn(split.state, "psq", { zone: "staging", area: 1 });
+    const quest = updateCard(spawned.state, spawned.id, { controller: 1, owner: 1 });
+    const gone = withSeat(quest, 1, { ...quest.seats[1], eliminated: true });
+    const after = clearEliminated(gone, cards);
+    expect(after.cards[spawned.id]?.zone).toBe("discard");
+    expect(after.seats[1].discard).toContain(spawned.id);
+    expect(after.cards[first(split.state, "scout")]?.zone).toBe("encounterDiscard");
   });
 });
