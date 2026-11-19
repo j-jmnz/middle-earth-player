@@ -58,7 +58,7 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     name: "Standalone scenarios",
     kind: "cycle",
     released: "2011-09-21",
-    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost"],
+    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony"],
     scenarios: [
       // DragnCards' deck Q99.01 has no Easy twin: Hall of Beorn's Easy counts equal the Normal ones, so Easy loads the same deck.
       { id: "the-massing-at-osgiliath", product: "The Massing at Osgiliath", deck: { normal: "Q99.01", easy: "Q99.01" } },
@@ -72,9 +72,11 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       { id: "fog-on-the-barrow-downs", product: "Fog on the Barrow-downs", deck: { normal: "Q99.05", easy: "Q99.05" } },
       // DragnCards' deck E99.06 is the Easy twin of Q99.06: it holds none of the three copy pairs Hall of Beorn gives Easy 0 (Flooded Hall, Old Stone Troll, Spawn of Thangorodrim).
       { id: "the-ruins-of-belegost", product: "The Ruins of Belegost", deck: { normal: "Q99.06", easy: "E99.06" } },
+      // DragnCards' deck E99.07 is the Easy twin of Q99.07.
+      { id: "murder-at-the-prancing-pony", product: "Murder at the Prancing Pony", deck: { normal: "Q99.07", easy: "E99.07" } },
     ],
     // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
-    later: ["Murder at the Prancing Pony", "2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
+    later: ["2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
     saga: false,
     ledger: "standalone-scenarios",
   },

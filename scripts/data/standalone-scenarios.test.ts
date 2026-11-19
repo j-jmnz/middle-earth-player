@@ -1,5 +1,5 @@
 // Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs and The Ruins of Belegost: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost and Murder at the Prancing Pony: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -21,19 +21,20 @@ const stone = loadAnyScenario("the-stone-of-erech");
 const forest = loadAnyScenario("the-old-forest");
 const fog = loadAnyScenario("fog-on-the-barrow-downs");
 const ruins = loadAnyScenario("the-ruins-of-belegost");
+const murder = loadAnyScenario("murder-at-the-prancing-pony");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 6, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 7, playable: true, box: null })]);
   });
 });
 
@@ -246,5 +247,44 @@ describe("The Ruins of Belegost", () => {
     expect(ledger.byKey.get(keyOf("50608", "A"))?.lines[0]).toMatch(/place 1 resource on Stalking the Ruins/);
     expect(ledger.byKey.get(keyOf("50616", "A"))?.lines).toHaveLength(3);
     expect(ledger.byKey.get(keyOf("50615", "A"))?.misprints).toHaveLength(1);
+  });
+});
+
+describe("Murder at the Prancing Pony", () => {
+  it("has codes 507 and the collector number, which Hall of Beorn's 00001 to 00029 would share with The Massing at Osgiliath's (overrides.productCodes), and its own Easy deck", () => {
+    expect(murder).toMatchObject({ id: "murder-at-the-prancing-pony", name: "Murder at the Prancing Pony", stages: ["50701", "50702", "50703"] });
+    expect(murder.campaignCard).toBeUndefined();
+    expect(murder.campaignPlaced).toEqual([]);
+    expect(murder.source).toMatchObject({ dragnNormal: "Q99.07", dragnEasy: "E99.07" });
+    expect(murder.nightmare).toBeUndefined();
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "MatPP"));
+    expect(own.map((card) => card.code)).toEqual(Array.from({ length: 29 }, (_, at) => `507${String(at + 1).padStart(2, "0")}`));
+    expect(byCode.get("01005")?.printings.some((printing) => printing.pack === "MatPP")).toBe(false);
+    expect(byCode.get("50715")?.name).toBe("The Prancing Pony");
+    expect(byCode.get("141045")?.name).toBe("The Prancing Pony");
+  });
+
+  it("deals the 36 encounter cards of Normal and the 27 of Easy (Hall of Beorn's page: 40 against 50 cards), The Prancing Pony active, 1 Ramshackle Manor staged and the 5 Suspects, 5 Hideouts and Taken by Surprise set aside (50701:A:1)", () => {
+    for (const seats of [1, 2, 3, 4]) {
+      expect(encounterCodes(murder, "Normal", seats), `${seats} seats`).toHaveLength(36);
+      expect(encounterCodes(murder, "Easy", seats), `${seats} seats`).toHaveLength(27);
+    }
+    const aside = ["50704", "50705", "50706", "50707", "50708", "50709", "50710", "50711", "50712", "50713", "50714"];
+    expect(setupInstructions(murder, "Normal").filter((step) => step.verb === "SetAside").map((step) => step.code).sort()).toEqual([...aside, "50714"].sort());
+    expect(setupInstructions(murder, "Easy").filter((step) => step.verb === "SetAside").map((step) => step.code).sort()).toEqual(aside);
+    expect(setupInstructions(murder).filter((step) => step.verb === "AddToStaging").map((step) => ("code" in step ? step.code : ""))).toEqual(["50716"]);
+    expect(murder.cards.find((card) => card.pile === "activeLocation")).toMatchObject({ code: "50715", normal: 1, easy: 1 });
+    expect(murder.cards.find((card) => card.code === "50717")).toMatchObject({ normal: 3, easy: 1 });
+  });
+
+  it("has every printed side read from its scan, the Setup and the Hideout and Suspect lines as printed (Hall of Beorn has typos)", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("507")).flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(32);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("50702", "B"))?.lines[0]).toMatch(/from the Investigation deck/);
+    expect(ledger.byKey.get(keyOf("50704", "A"))?.lines[2]).toMatch(/discard pile, and victory display/);
+    expect(ledger.byKey.get(keyOf("50726", "A"))?.lines[1]).toMatch(/attached and return that enemy/);
+    expect(ledger.byKey.get(keyOf("50722", "A"))?.lines[0]).toMatch(/Bree-land Informant makes an attack/);
   });
 });

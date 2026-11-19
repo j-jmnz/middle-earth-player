@@ -70,7 +70,6 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"141024:whenRevealed:2","cardCode":"141024","lines":["141024:B:1"],"timing":"whenRevealed","instructions":[{"verb":"SearchReveal","code":"141039","who":"firstPlayer"},{"verb":"ShuffleEncounterDeck"}]},
   {"id":"141024:triggered:1","cardCode":"141024","lines":["141024:B:2"],"timing":"triggered","trigger":"hideFailed","instructions":[{"verb":"EngageAll","trait":"Nazgûl","who":"actor"}]},
   {"id":"141024:response:1","cardCode":"141024","lines":["141024:B:3"],"timing":"response","trigger":"hideSucceeded","instructions":[{"verb":"PlaceProgressOnLocation","perPlayer":2}]},
-  {"id":"141025:constant:1","cardCode":"141025","lines":["141025:B:1"],"timing":"constant","condition":{"kind":"inPlay","code":"141045","is":true},"instructions":[{"verb":"Restrict","what":"advance"}]},
   {"id":"141026:constant:1","cardCode":"141026","lines":["141026:B:3"],"timing":"constant","condition":{"kind":"inPlay","code":"141048","is":true},"instructions":[{"verb":"Restrict","what":"advance"}]},
   {"id":"141028:constant:1","cardCode":"141028","lines":["141028:B:1"],"timing":"constant","condition":{"kind":"inVictory","code":"141058","is":false},"instructions":[{"verb":"Restrict","what":"advance"}]},
   {"id":"141031:response:1","cardCode":"141031","lines":["141031:A:1"],"timing":"response","trigger":"leftPlay","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Draw","perHero":"Hobbit"}]}]},

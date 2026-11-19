@@ -1741,6 +1741,55 @@
   ],
   "scenarioEasy": [
     {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50714",
+      "easy": 1,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 1 for Taken by Surprise (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50717",
+      "easy": 1,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 1 for Dark Alley (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50718",
+      "easy": 2,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 2 for Market Square (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50724",
+      "easy": 2,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 2 for Greenway Footpad (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50725",
+      "easy": 2,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 2 for Chetwood Outlaw (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50727",
+      "easy": 1,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 1 for Smoke and Mirrors (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50729",
+      "easy": 1,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 1 for Deadly Accusations (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
       "scenario": "the-ghost-of-framsburg",
       "code": "19099",
       "easy": 1,
@@ -2065,6 +2114,12 @@
     }
   ],
   "productCodes": [
+    {
+      "set": "Murder at the Prancing Pony",
+      "prefix": "507",
+      "reason": "Hall of Beorn numbers Murder at the Prancing Pony's cards 00001 to 00029 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and others, and RingsDB lists no card of MatPP. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 507 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 7 for the pack's position in it (50701 Investigating the Crime, 50729 Deadly Accusations). Legolas (01005), the product's player card, is RingsDB's Core Set hero and keeps his code.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet Murder at the Prancing Pony, Number, RingsDbCardId); ringsdb.com packs (MatPP, cycle 50, position 7; no cards listed)"
+    },
     {
       "set": "The Ruins of Belegost",
       "prefix": "506",

@@ -3012,6 +3012,557 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "50701",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Investigating-the-Crime-1A.jpg",
+        "sha256": "f5e32800fd57633360b50501957fb07b67cfee43ede8993016ba9687dcf974cc"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for the 5 Suspect enemies and 5 Hideout locations. Randomly select 1 Suspect and 1 Hideout and set them aside out of play, facedown (without looking at them). Build the Investigation deck (see rules) and place it next to the quest deck. Make The Prancing Pony the active location and add 1 Ramshackle Manor to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50701",
+      "side": "B",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Investigating-the-Crime-1B.jpg",
+        "sha256": "3aab024b59c3b4e692972694837878ca40c2321b9e50b48787c56fb26ee72ffe"
+      },
+      "lines": [
+        "No more than 4 progress can be placed on this stage each round.",
+        "Forced: At the beginning of the quest phase, each player must choose: either raise his threat by 2, or reveal an additional encounter card this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50702",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Running-out-of-Time-2A.jpg",
+        "sha256": "a376b51a53e8a29242ddaf12b656fed3c8f39d5ed4bd132e2aab446aec356e25"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top of the encounter deck until X locations are discarded. X is the number of players in the game. Add each discarded location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50702",
+      "side": "B",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Running-out-of-Time-2B.jpg",
+        "sha256": "ada4987e16a654abed256fb2d4b713690989e2efaf73856832e1a18f1685c6b7"
+      },
+      "lines": [
+        "Forced: After the players quest unsuccessfully, choose 1 random card from the Investigation deck and remove it from the game (without looking at it).",
+        "Forced: After the players place progress on this stage from questing successfully, the first player must choose: either reveal an encounter card and remain at this stage, or make the accusation (see rules) and advance to stage 3A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50703",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Apprehending-the-Killer-3A.jpg",
+        "sha256": "17754a6d0ca8c1528064105ac8c7551c54f4d26d9e02ff18a274886af5ed195e"
+      },
+      "lines": [
+        "When Revealed: Each player besides the first player searches the encounter deck and discard pile for a Brigand enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50703",
+      "side": "B",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Apprehending-the-Killer-3B.jpg",
+        "sha256": "b760b1df7cfd5a6a7471cbfadd18983d3f59b69270607b1574471648804a9972"
+      },
+      "lines": [
+        "Ignore the Investigate keyword when the active location is explored.",
+        "Forced: At the beginning of the encounter phase, each suspect enemy in play engages the first player.",
+        "While at least 1 Hideout location is in play, Suspect enemies cannot take damage. If there are no Suspect enemies in play, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50704",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Bill-Ferny's-House.jpg",
+        "sha256": "115652b722f9a65b87a7965040c187971f7bce99992d83127c471ddc80c3a08d"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Bill Ferny's House is in the victory display, each Suspect, and each shadow card dealt to a Suspect, is immune to player card effects.",
+        "Travel: Search the encounter deck, discard pile, and victory display for Bill Ferny and add him to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50705",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Staddle-Hiding-Hole.jpg",
+        "sha256": "22775bd9a97987058d1a82f24d6fb50de1b6fb2bb284585e86e0608b29b34c80"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Staddle Hiding Hole is in the victory display, each player not engaged with a Suspect cannot declare attackers against that Suspect.",
+        "Travel: Search the encounter deck and discard pile for a Greenway Footpad, reveal it, and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50706",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Combe-Storehouse.jpg",
+        "sha256": "8e3c50f438f1afc94d8a63db3530f3a48fe54cf2d4481ca136efd729150c7a6d"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Combe Storehouse is in the victory display, each Suspect gains: \"Forced: After this enemy engages a player, it makes an immediate attack.\"",
+        "Travel: Search the encounter deck and discard pile for a Lawless Ruffian and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50707",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Archet-Trading-Post.jpg",
+        "sha256": "0a728b70903d80dc62a752d69cf8129b45e4004bd9ada5f1b5d7516d837d47f1"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Archet Trading Post is in the victory display, each Suspect cannot take more than 5 damage each round.",
+        "Travel: Search the encounter deck and discard pile for a Bree-land Informant and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50708",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Chetwood-Campsite.jpg",
+        "sha256": "cb215ac73f6167542bfc08f95dd8ca622e6c45a93a1a97237a817fb8b7b24b1c"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Chetwood Campsite is in the victory display, each Suspect gets +1 Threat, +1 Attack, and +1 Defense.",
+        "Travel: Search the encounter deck and discard pile for a Chetwood Outlaw and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50709",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Todd-the-Troll.jpg",
+        "sha256": "be0b3fb1ab34e520e0469ccb0b76e74f6b028ef27c2e911b91647fec5074005f"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Excess combat damage dealt by Todd the Troll (damage dealt beyond the remaining hit points of the character damaged by this attack) must be assigned as an increase to your threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50710",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Susie-the-Spider.jpg",
+        "sha256": "77ac8483fad768894aa214110c2a4eea75235242377252ef6c157747ea906164"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "X is the number of Brigand enemies in play.",
+        "While at least 1 other Brigand enemy is in play, Susie the Spider cannot take damage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50711",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Wolf-pelt-Jake.jpg",
+        "sha256": "62cb4e044e48d385e6ca867e4d9ca715d3310bb5ac29dc59ff8c841cd30c4e82"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: After Wolf-pelt Jake attacks and destroys an ally, return him to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50712",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Johnny-Goblin-fingers.jpg",
+        "sha256": "4c64ab2027a7675fe1d5bda2d7b1ddde5fed1684e771ccf2287a2ae543576c90"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: When Johnny Goblin-fingers attacks, the defending player discards 1 random card from his hand and raises his threat by X, where X is the printed cost of the discarded card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50713",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Old-Orc-eyes.jpg",
+        "sha256": "0e5be87b959893db90b9a276e35af84c1a3584ce0d1f68fcf46cc41aeb1f6a95"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: After an attack resolves in which Old Orc-eyes was dealt a shadow card with no shadow effect, he makes an additional attack against you. Do not deal Old Orc-eyes a shadow card for this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50714",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Taken-by-Surprise.jpg",
+        "sha256": "c2c1d05b98e93ec724dead5dda516636f7499299c0a9af21680c73a979ac8c99"
+      },
+      "lines": [
+        "Forced: When a player looks at any number of cards from the Investigation deck, if Taken by Surprise is among the looked at cards, shuffle the encounter discard pile into the encounter deck and discard cards until an enemy is discarded. Put the discarded enemy into play engaged with the first player. Then remove Taken by Surprise from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50715",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/The-Prancing-Pony.jpg",
+        "sha256": "5cd691bb1bd05a7fc0e64d6c39fccfa492b28f6e47c3c9803384e0b493616812"
+      },
+      "lines": [
+        "Forced: When The Prancing Pony is explored, the first player must choose: either look at the top 2 cards of the Investigation deck, or each player draws 2 cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50716",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Ramshackle-Manor.jpg",
+        "sha256": "a6b7d408568879fd3bfa7b2fd9b41ec47bde376a669046e862ad45605047374e"
+      },
+      "lines": [
+        "Investigate 2.",
+        "When a player card effect reduces a player's threat by any amount, reduce that amount to 1.",
+        "Travel: Raise each player's threat by 1 to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50717",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Dark-Alley.jpg",
+        "sha256": "a8ab2f3f0bf3398931d31768388ff89c34cbbb470536f377cfc9a0c3704d6e63"
+      },
+      "lines": [
+        "Investigate 3.",
+        "Enemies in the staging area cannot take damage.",
+        "Travel: Shuffle the encounter discard pile into the encounter deck and discard cards until an enemy is discarded. Add the discarded enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50718",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Market-Square.jpg",
+        "sha256": "a217d6a46d60a127a23ccf2db2c9e25c4d7e894d48c49bd627b8a5f84761ae72"
+      },
+      "lines": [
+        "Investigate 2.",
+        "Forced: After a player places any amount of progress on a location in the staging area, he raises his threat by 1.",
+        "Travel: Each player spends 1 resource to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50719",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Old-Warehouse.jpg",
+        "sha256": "e9c8aa1f8ab49089f799af14f5afaab24a421a5ba381c5558ca96092d1dd856e"
+      },
+      "lines": [
+        "Investigate 1.",
+        "Forced: When triggering the Investigate keyword on Old Warehouse, the first player must choose: either look at 2 additional cards, or reduce each player's threat by 3.",
+        "Travel: Reveal the top card of the encounter deck to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50720",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Village-Stable.jpg",
+        "sha256": "a91533353e7be3805d7e7868bb2e7bf26fcd7f9c2c7de3b15b892950677be4f0"
+      },
+      "lines": [
+        "Investigate 1.",
+        "Response: After triggering the Investigate keyword on Village Stable, if the looked at card is a Suspect or a Hideout, add Village Stable to the victory display to add that card to the staging area.",
+        "Travel: Each player discards 1 random card from his hand to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50721",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Bill-Ferny.jpg",
+        "sha256": "c2d74486eca13d7aa9ec60b7d62b5e439bc03d44c384729624932116aeeb806d"
+      },
+      "lines": [
+        "Cannot be optionally engaged.",
+        "The first treachery revealed each round gains doomed 1 and its effects cannot be canceled.",
+        "Shadow: Either raise your threat by 4, or this attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50722",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Bree-land-Informant.jpg",
+        "sha256": "00c865fe060248b58b620cc9988262b5fa38c5d121d27f6b31180715212205f8"
+      },
+      "lines": [
+        "Response: After Bree-land Informant makes an attack against you, if it was dealt a shadow card with no shadow effect, raise your threat by 1 and spend 1 resource to look at the bottom card of the Investigation deck. Then, discard Bree-land Informant."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50723",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Lawless-Ruffian.jpg",
+        "sha256": "429a7f019f86baaa4b44cf4dd3f0fc60ccbcc3dc3d02c20c466c87f0d43c2dd4"
+      },
+      "lines": [
+        "While engaged with a player with threat 35 or higher, Lawless Ruffian gets +2 Attack.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50724",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Greenway-Footpad.jpg",
+        "sha256": "1be6c80b98b8b440a4d5cf9441a40b7f6928b543ec7b7c3b2b42df28ac981fa8"
+      },
+      "lines": [
+        "When Revealed: Either raise each player's threat by 2 or Greenway Footpad makes an immediate attack against the first player.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if your threat is 35 or higher)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50725",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Chetwood-Outlaw.jpg",
+        "sha256": "76a841f5bad73a43a422307ce07a3c84fdd7998c56b0a9866435c62fba5023a9"
+      },
+      "lines": [
+        "Forced: After you optionally engage Chetwood Outlaw, raise your threat by 4.",
+        "Shadow: Either raise your threat by 2, or return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50726",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Hired-Muscle.jpg",
+        "sha256": "3ae03420c8dbdaeca322a04f60204edd5a45ff376f734fd34e556ca5a5ba4c9b"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Attach to a Brigand enemy without a copy of Hired Muscle attached and return that enemy to the staging area. (Counts as a Condition attachment with the text: \"Attached enemy gets +1 Threat, +1 Attack, +1 Defense and gains: 'Forced: When attached enemy is defeated, look at the bottom card of the Investigation deck.'\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50727",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Smoke-and-Mirrors.jpg",
+        "sha256": "286bd6447a01b2e929b00fbd9d2c343281542cd1b3392ea5944fde377edca492"
+      },
+      "lines": [
+        "When Revealed: Discard the top X cards of the encounter deck, where X is 1 more than the Investigate value of the active location. Until the end of the phase, add the Threat of each card discarded by this effect to the total Threat in the staging area.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50728",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Rising-Body-Count.jpg",
+        "sha256": "04676a744e3f1442d00786fa8e251ae9eb54c079289ca0b5c78aa50862365f03"
+      },
+      "lines": [
+        "When Revealed: Either raise each player's threat by 2, or shuffle Rising Body Count into the Investigation deck.",
+        "Shadow: If this attack destroys a character, either raise your threat by 2, or shuffle Rising Body Count into the Investigation deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50729",
+      "side": "A",
+      "printing": "MatPP",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Deadly-Accusations.jpg",
+        "sha256": "fa7e8bab3e8e4d22f350471dfbf3296f2d4f9e4b7f25f9012ae105e284715c51"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by X, where X is 1 more than the Investigate value of the active location.",
+        "Shadow: Attacking enemy gets +X Attack, where X is the Investigate value of the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

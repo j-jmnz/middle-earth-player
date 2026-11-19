@@ -133,6 +133,10 @@ export type SetupStep =
   // The Ruins of Belegost: each quoted from the stage 1A card Setup (50601).
   | "hideLoot" // "Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins": `codes` the five, `to` Stalking the Ruins
   | "shuffleOthersIn" // "Shuffle the others into the encounter deck": `codes` the five Loot objectives
+  // Murder at the Prancing Pony: each quoted from the stage 1A card Setup (50701).
+  | "findSuspectsAndHideouts" // "Search the encounter deck for the 5 Suspect enemies and 5 Hideout locations": `codes` the ten
+  | "hideSuspectAndHideout" // "Randomly select 1 Suspect and 1 Hideout and set them aside out of play, facedown (without looking at them)": `codes` the ten
+  | "buildInvestigationDeck" // "Build the Investigation deck (see rules)": `codes` the ten and Taken by Surprise; the eight not hidden and Taken by Surprise are shuffled facedown into the deck
   | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"
   | "addToStartingHand" // "Each player adds 1 copy of Determination to their starting hand"
   | "shuffleHandIntoDeck" // "Each player shuffles his starting hand into his deck"

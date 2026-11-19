@@ -131,6 +131,7 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Old Forest", packs: ["TOF"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2014", scenarioTitle: "The Old Forest" },
   { name: "Fog on the Barrow-downs", packs: ["FotBd"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2014", scenarioTitle: "Fog on the Barrow-downs" },
   { name: "The Ruins of Belegost", packs: ["TRoB"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2015", scenarioTitle: "The Ruins of Belegost" },
+  { name: "Murder at the Prancing Pony", packs: ["MatPP"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2015", scenarioTitle: "Murder at the Prancing Pony" },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
   { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },

@@ -57,6 +57,28 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     const loot = names.cards.filter((card) => card.type === "objective" && card.encounterSet === "The Ruins of Belegost" && /^Loot\b/.test(card.text ?? "") && card.name !== "Sword of Belegost");
     return loot.length === 0 ? null : [{ kind: "step", step: "shuffleOthersIn", codes: loot.map((card) => card.code) }];
   }
+  // Murder at the Prancing Pony (50701): "Search the encounter deck for the 5 Suspect enemies and 5 Hideout locations. Randomly select 1 Suspect and 1 Hideout and set them aside out of play,
+  // facedown (without looking at them). Build the Investigation deck (see rules) and place it next to the quest deck." The load list sets all ten and both copies of Taken by Surprise aside;
+  // the first step finds the ten, the second hides one Suspect and one Hideout, the third shuffles the other eight with the Taken by Surprise copies into the Investigation deck (rules card 2).
+  if ((match = /^Search the encounter deck for the (\d+) Suspect enemies and (\d+) Hideout locations$/.exec(sentence))) {
+    const suspects = names.cards.filter((card) => card.type === "enemy" && card.traits.includes("Suspect") && card.encounterSet === "Investigation");
+    const hideouts = names.cards.filter((card) => card.type === "location" && card.traits.includes("Hideout") && card.encounterSet === "Investigation");
+    return suspects.length !== Number(match[1]) || hideouts.length !== Number(match[2]) ? null : [{ kind: "step", step: "findSuspectsAndHideouts", codes: [...suspects, ...hideouts].map((card) => card.code) }];
+  }
+  if (/^Randomly select 1 Suspect and 1 Hideout and set them aside out of play, facedown \(without looking at them\)$/.test(sentence)) {
+    const cards = names.cards.filter((card) => card.encounterSet === "Investigation" && (card.traits.includes("Suspect") || card.traits.includes("Hideout")));
+    return cards.length === 0 ? null : [{ kind: "step", step: "hideSuspectAndHideout", codes: cards.map((card) => card.code) }];
+  }
+  if (/^Build the Investigation deck \(see rules\) and place it next to the quest deck$/.test(sentence)) {
+    const cards = names.cards.filter((card) => card.encounterSet === "Investigation");
+    return cards.length === 0 ? null : [{ kind: "step", step: "buildInvestigationDeck", codes: [...new Set(cards.map((card) => card.code))] }];
+  }
+  // "Make The Prancing Pony the active location and add 1 Ramshackle Manor to the staging area".
+  if ((match = /^Make (.+?) the active location and add (\d+|an?|one) (.+?) to the staging area$/.exec(sentence))) {
+    const active = names.codesOf(match[1] ?? "");
+    const staged = names.codesOf(match[3] ?? "");
+    return active.length === 0 || staged.length === 0 ? null : [{ kind: "active", codes: active }, { kind: "stage", codes: staged, perPlayer: null, count: /^\d+$/.test(match[2] ?? "") ? Number(match[2]) : 1 }];
+  }
   // "Shuffle any unused Scoutcards back into the encounter deck" (the card prints "Scoutcards"): the copies not staged stay in the encounter deck.
   if (/^Shuffle any unused Scout ?cards back into the encounter deck$/.test(sentence)) return [{ kind: "shuffleEncounterDeck" }];
   return null;

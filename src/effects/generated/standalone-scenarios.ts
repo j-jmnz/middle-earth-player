@@ -12,4 +12,10 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"50616:constant:1","cardCode":"50616","lines":["50616:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"50617:constant:1","cardCode":"50617","lines":["50617:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noPlayerAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"50618:constant:1","cardCode":"50618","lines":["50618:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noPlayerAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"50709:constant:1","cardCode":"50709","lines":["50709:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"50710:constant:1","cardCode":"50710","lines":["50710:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"50711:constant:1","cardCode":"50711","lines":["50711:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"50712:constant:1","cardCode":"50712","lines":["50712:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"50713:constant:1","cardCode":"50713","lines":["50713:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"50719:travel:1","cardCode":"50719","lines":["50719:A:3"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
 ];

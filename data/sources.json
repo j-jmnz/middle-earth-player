@@ -7,7 +7,7 @@
         "kind": "git",
         "value": "629db897de0c5a82a72610ff76e22dc01f59a4ac"
       },
-      "fetchedAt": "2026-11-19T20:14:22.763Z",
+      "fetchedAt": "2026-11-19T22:16:13.773Z",
       "files": [
         {
           "path": "raw/dragncards/cardDb.tsv",
@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "872458e7c19764d4cde8c6491ffc3f8a626e3e9c7aa513c9df359d9444cc1e3f"
+        "value": "438abb7dd9371506358dfac47143fc43610acf014c541b4a509d27f459a4d9f3"
       },
-      "fetchedAt": "2026-11-19T20:14:20.171Z",
+      "fetchedAt": "2026-11-19T22:16:11.407Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -541,6 +541,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs",
           "sha256": "11469da3529bb0f7d60ab6de7bf5b3b34a4be1e4a77f117e66cf47474b3b0546",
           "bytes": 11639
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Murder-at-the-Prancing-Pony",
+          "sha256": "e29c7c8adc3b084e9381ec8b409d163bad695af2325bf327df930a946cbcebb1",
+          "bytes": 12824
         }
       ]
     },
@@ -5455,9 +5461,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "59ee5ee3797c7d2317db2b7f3fe5b6f612fe4c886e2853510ce41997183c3baa"
+        "value": "e699cfb32467b93e9f31591e5ae8e29696bd12d8877e69165b571bcb01b5babb"
       },
-      "fetchedAt": "2026-11-19T20:37:39.288Z",
+      "fetchedAt": "2026-11-19T22:40:08.588Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -26676,6 +26682,198 @@
           "bytes": 4187688
         },
         {
+          "path": "pictures/50701.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1im7Arqg-YatwKjRaNNGfGh05rTmQEQld&export=download&confirm=t",
+          "sha256": "d20b0bec4d6d64fe625242b8c92a5786c6b81bfe33cb58f5eda440eae2dc21ed",
+          "bytes": 3236019
+        },
+        {
+          "path": "pictures/50701.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ijbOzCrI7zsmabUefZdqeX08CBKMjCn6&export=download&confirm=t",
+          "sha256": "269cac795c18eb8f75b0c071019f4bf2f34ca2b46a0d7090336c65657e46cf11",
+          "bytes": 3302542
+        },
+        {
+          "path": "pictures/50702.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ibmXTetpl-6yToMlUBnP9Mh5MEEMCOut&export=download&confirm=t",
+          "sha256": "9a5fddc2390d6bc46f29e09769941fc468472a22eb968e6b6382087b1e9df60c",
+          "bytes": 3185291
+        },
+        {
+          "path": "pictures/50702.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1iY12QkxFohuV9ibZsTSklpBkKe3pkOZg&export=download&confirm=t",
+          "sha256": "ac35209d6a6f0f510fa03dc57fce4ac5c71f8c70e5c57031203dbd4d8e5b2fb7",
+          "bytes": 3146704
+        },
+        {
+          "path": "pictures/50703.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1j4CO_CoCd3NfbcSv2qfN1qAu18jsWoUr&export=download&confirm=t",
+          "sha256": "b442c6dc9952a48d0c23d1009c246e49a36369d5b20289b41c22fff14347a9dc",
+          "bytes": 3372700
+        },
+        {
+          "path": "pictures/50703.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1j3aFLy4bpU6d_kXqetzIyrjS3jZ-P5nJ&export=download&confirm=t",
+          "sha256": "17cfddf59f399a62da11b291fd50e10f9cc8a5a2a602c2b9d3826e13887295c1",
+          "bytes": 3178339
+        },
+        {
+          "path": "pictures/50704.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1gQ9VXPTc-Swmmh3nOx5qbd21ZzVE2kC_&export=download&confirm=t",
+          "sha256": "044a59ad3f96e86471139f9a3025d47b4e648f20af95d0d7ac1524f76925c148",
+          "bytes": 4235509
+        },
+        {
+          "path": "pictures/50705.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1h4ccREy2E9BQIMPqG9bzWVJtv-BdeR4D&export=download&confirm=t",
+          "sha256": "8b6f68f6b13589a9b7b01b2254d85ee62bf37ee228ab6a47631403c70ec2c655",
+          "bytes": 4179984
+        },
+        {
+          "path": "pictures/50706.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1h-Uqoq9nKSZJ-oRlPNLUqv7PSc27O-v-&export=download&confirm=t",
+          "sha256": "a77b52e2b6df518e058db6b9b85b9ed5dea439a1b8fedeeb0589abf9f32db938",
+          "bytes": 4347333
+        },
+        {
+          "path": "pictures/50707.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1gxrxqU1I35i9X9qQRlfRuYpCjsW7NtKi&export=download&confirm=t",
+          "sha256": "fc7129f9666a838cd06701191c6e5c4f4b2d442246a6e457bf92629df80f3216",
+          "bytes": 4251405
+        },
+        {
+          "path": "pictures/50708.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1gt5gbDdCP_k0Yyx62u_xxzSVaLfnJ6X_&export=download&confirm=t",
+          "sha256": "3b285ae7c285f479ec1bf87a2651f9e5d65033d9562cce04aa54ab40c4ffea00",
+          "bytes": 4236740
+        },
+        {
+          "path": "pictures/50709.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hJMm2VH-Oe7JnVKFzqrLhbRxEVwKtlMw&export=download&confirm=t",
+          "sha256": "c4cfa71d40287ddfd9310ce7b0f2e4475ef27922adcb6171953306ecc2e607f1",
+          "bytes": 4222101
+        },
+        {
+          "path": "pictures/50710.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hCQlSGfl9mJKvzehCrnSgtRapnehQ-kj&export=download&confirm=t",
+          "sha256": "40824432ce6c173aa0d5a521aaf6fe731ac62a947805104bfa4cacb6a35d9ee6",
+          "bytes": 4159035
+        },
+        {
+          "path": "pictures/50711.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1h8ZGEklFKBq9dE938_Pt-Ee7Sbw6Q6KB&export=download&confirm=t",
+          "sha256": "4e01df195747c636c1158db63f84d045820c09d5467733a8e9a77724cc33e1b8",
+          "bytes": 4316619
+        },
+        {
+          "path": "pictures/50712.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1h8L94vcwFVqZdGFVF_uig0ZOSUKoxCH9&export=download&confirm=t",
+          "sha256": "acc8ecc710eaad7d63ca78e2e4aff36e6a1879c69b1975932779f9217cd633c9",
+          "bytes": 4172607
+        },
+        {
+          "path": "pictures/50713.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hWjsA1QqdB7_eFQRCXdTsN1h5yXcACjy&export=download&confirm=t",
+          "sha256": "77b317c6306537607b52a8bd1ed954f8c39a42ce57caa96256fcb9dfbc442bb8",
+          "bytes": 4239057
+        },
+        {
+          "path": "pictures/50714.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hWciHQT5Srzk78kwIgbMquE_v1QF07jR&export=download&confirm=t",
+          "sha256": "7df9e0e2bc248680073c8e98bbd161f4a372dd7bf142b403aea73714bf5132d3",
+          "bytes": 4200172
+        },
+        {
+          "path": "pictures/50715.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hQP65oi4NNSKotXWNJg1jDzVLhkQKMaO&export=download&confirm=t",
+          "sha256": "940aae59215fecc88154bc7930138e561c5b9b824eb78ee4ae4ad8bdacd16000",
+          "bytes": 4337472
+        },
+        {
+          "path": "pictures/50716.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hMhWMk5Koiqwbz15BxBCJEv4iEya8Msd&export=download&confirm=t",
+          "sha256": "a51adad4094380d29b40cf36653396607e938d5e549daf3aeefff00177101093",
+          "bytes": 4260698
+        },
+        {
+          "path": "pictures/50717.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hsQlysqAYvIIL8hKpQIXXWCeOUH8g5CP&export=download&confirm=t",
+          "sha256": "335161ceca1f0acd8b99974e81b0829c484ab211a89980a630ad8d02e68a6971",
+          "bytes": 4232706
+        },
+        {
+          "path": "pictures/50718.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hrhhZaqJxgRhJh9teRDW-3yzfUv547GZ&export=download&confirm=t",
+          "sha256": "d44e726fede3c46155a3e5e874a2c328cf6981aeee2e499fdc58bb4ad8d7dbc3",
+          "bytes": 4208367
+        },
+        {
+          "path": "pictures/50719.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hmPQsXALmabrILDZqkRR17_BWG4BWaXu&export=download&confirm=t",
+          "sha256": "cc2e819ebadf3d9a25fa6775de7a70feead0c5bcc3220510ba8c78832cfe5537",
+          "bytes": 4316416
+        },
+        {
+          "path": "pictures/50720.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1hdoWa1z3ueHJz1JkbXCgMKJ11EDrSBuF&export=download&confirm=t",
+          "sha256": "5c7ded9e374de8ffd9ecbcc76dace0e4b9c4987f47cfb0a6cf71a1fc534b7019",
+          "bytes": 4321057
+        },
+        {
+          "path": "pictures/50721.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1i7bc8dOXRyotO9SXmK16dPFzq7XoFB2l&export=download&confirm=t",
+          "sha256": "bfd31036686920974c7a1c3b395afe1de2e173d55d825f8d77ed8bc2767ea37b",
+          "bytes": 4226244
+        },
+        {
+          "path": "pictures/50722.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1i5cIK1ITd_3xLJWn9gZTipY-9V4pS7TZ&export=download&confirm=t",
+          "sha256": "6315fee1cc2e16c0aaa6e51d36b286a8119d3695cb86b29039a1543e864c59fa",
+          "bytes": 4271290
+        },
+        {
+          "path": "pictures/50723.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1i-YD5OvF-z5zbrak0pX8dFj3igtHhnyT&export=download&confirm=t",
+          "sha256": "044f49911b0db861f6ded6d3c1630870c87950bbd2b140611b8105a5c73bbb41",
+          "bytes": 4134305
+        },
+        {
+          "path": "pictures/50724.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ht8Nlah1UVpjCmwwzmDNyu79MU5MPCXU&export=download&confirm=t",
+          "sha256": "c0b6c233b1e0ed8166c4f3d989ac9c4343079b20a7c1c3e195cd334affb809f9",
+          "bytes": 4063949
+        },
+        {
+          "path": "pictures/50725.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1iQFkDEdCJhLTzvymibcxH0tLs91TSi2s&export=download&confirm=t",
+          "sha256": "9ef7ef1b772cbbf9f61127a455ea18e4fb3d6b1dc44b90331c229023a0bc0b6e",
+          "bytes": 4215266
+        },
+        {
+          "path": "pictures/50726.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1iEgLuu3ry_gH8mPxzzKjs8OkPnFHAtvX&export=download&confirm=t",
+          "sha256": "7ea2d78788257bd393389057ec5b71791ee22320aa948c3b6acf8986f7c50b68",
+          "bytes": 4186704
+        },
+        {
+          "path": "pictures/50727.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1iDM6bIh6LDZKJT_MNPBdP27rWnBeC1F6&export=download&confirm=t",
+          "sha256": "e7a9ecdd578bdf1ecc6135db14b9d4f5ebdeb4ee62452cdd2f4a3acbd42c54c5",
+          "bytes": 4233815
+        },
+        {
+          "path": "pictures/50728.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1iC4qCQUrpU3ig6QNicdxzy3eVP-BUUWi&export=download&confirm=t",
+          "sha256": "2af738897e044b875a9960158dffb3132dda37d4e8adc59fb061a60fb34f5ee1",
+          "bytes": 4266466
+        },
+        {
+          "path": "pictures/50729.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ix4CMmBLGFuNsjsdTRwB5hyLVJjsFAqM&export=download&confirm=t",
+          "sha256": "cd6c156f8c2044741223df06aea01415756daa4bbdc46b3b9d56e36e351d318c",
+          "bytes": 4196371
+        },
+        {
           "path": "pictures/9901014.A.jpg",
           "url": "https://ringsdb.com/bundles/cards/9901014.png",
           "sha256": "f2828886b5066e11af9dd567c382535ed8b30bd0107ba42352c868cc9f01645b",
@@ -28072,9 +28270,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "7d0f89073b529bd9e0d51b77a321ae55b9c9d7165c0a0887b7c1e89ba72cf317"
+        "value": "c532f62ba4b9d48ea03a36c965ddbfa48b7de1d8e0365553abc66c202b958bc2"
       },
-      "fetchedAt": "2026-11-19T20:26:57.108Z",
+      "fetchedAt": "2026-11-19T22:30:12.084Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -40171,6 +40369,198 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Covered-Pit.jpg",
           "sha256": "ac465f3a89e5ad908cf1d77e5dc902e9a5495c3c08947c29dbbca916886c07ae",
           "bytes": 132113
+        },
+        {
+          "path": "scans/50701.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Investigating-the-Crime-1A.jpg",
+          "sha256": "f5e32800fd57633360b50501957fb07b67cfee43ede8993016ba9687dcf974cc",
+          "bytes": 134084
+        },
+        {
+          "path": "scans/50701.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Investigating-the-Crime-1B.jpg",
+          "sha256": "3aab024b59c3b4e692972694837878ca40c2321b9e50b48787c56fb26ee72ffe",
+          "bytes": 128489
+        },
+        {
+          "path": "scans/50702.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Running-out-of-Time-2A.jpg",
+          "sha256": "a376b51a53e8a29242ddaf12b656fed3c8f39d5ed4bd132e2aab446aec356e25",
+          "bytes": 132320
+        },
+        {
+          "path": "scans/50702.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Running-out-of-Time-2B.jpg",
+          "sha256": "ada4987e16a654abed256fb2d4b713690989e2efaf73856832e1a18f1685c6b7",
+          "bytes": 130479
+        },
+        {
+          "path": "scans/50703.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Apprehending-the-Killer-3A.jpg",
+          "sha256": "17754a6d0ca8c1528064105ac8c7551c54f4d26d9e02ff18a274886af5ed195e",
+          "bytes": 124559
+        },
+        {
+          "path": "scans/50703.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Apprehending-the-Killer-3B.jpg",
+          "sha256": "b760b1df7cfd5a6a7471cbfadd18983d3f59b69270607b1574471648804a9972",
+          "bytes": 128138
+        },
+        {
+          "path": "scans/50704.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Bill-Ferny's-House.jpg",
+          "sha256": "115652b722f9a65b87a7965040c187971f7bce99992d83127c471ddc80c3a08d",
+          "bytes": 124268
+        },
+        {
+          "path": "scans/50705.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Staddle-Hiding-Hole.jpg",
+          "sha256": "22775bd9a97987058d1a82f24d6fb50de1b6fb2bb284585e86e0608b29b34c80",
+          "bytes": 128858
+        },
+        {
+          "path": "scans/50706.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Combe-Storehouse.jpg",
+          "sha256": "8e3c50f438f1afc94d8a63db3530f3a48fe54cf2d4481ca136efd729150c7a6d",
+          "bytes": 132311
+        },
+        {
+          "path": "scans/50707.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Archet-Trading-Post.jpg",
+          "sha256": "0a728b70903d80dc62a752d69cf8129b45e4004bd9ada5f1b5d7516d837d47f1",
+          "bytes": 128739
+        },
+        {
+          "path": "scans/50708.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Chetwood-Campsite.jpg",
+          "sha256": "cb215ac73f6167542bfc08f95dd8ca622e6c45a93a1a97237a817fb8b7b24b1c",
+          "bytes": 125680
+        },
+        {
+          "path": "scans/50709.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Todd-the-Troll.jpg",
+          "sha256": "be0b3fb1ab34e520e0469ccb0b76e74f6b028ef27c2e911b91647fec5074005f",
+          "bytes": 131102
+        },
+        {
+          "path": "scans/50710.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Susie-the-Spider.jpg",
+          "sha256": "77ac8483fad768894aa214110c2a4eea75235242377252ef6c157747ea906164",
+          "bytes": 127395
+        },
+        {
+          "path": "scans/50711.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Wolf-pelt-Jake.jpg",
+          "sha256": "62cb4e044e48d385e6ca867e4d9ca715d3310bb5ac29dc59ff8c841cd30c4e82",
+          "bytes": 133715
+        },
+        {
+          "path": "scans/50712.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Johnny-Goblin-fingers.jpg",
+          "sha256": "4c64ab2027a7675fe1d5bda2d7b1ddde5fed1684e771ccf2287a2ae543576c90",
+          "bytes": 128516
+        },
+        {
+          "path": "scans/50713.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Old-Orc-eyes.jpg",
+          "sha256": "0e5be87b959893db90b9a276e35af84c1a3584ce0d1f68fcf46cc41aeb1f6a95",
+          "bytes": 134258
+        },
+        {
+          "path": "scans/50714.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Taken-by-Surprise.jpg",
+          "sha256": "c2c1d05b98e93ec724dead5dda516636f7499299c0a9af21680c73a979ac8c99",
+          "bytes": 137233
+        },
+        {
+          "path": "scans/50715.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/The-Prancing-Pony.jpg",
+          "sha256": "5cd691bb1bd05a7fc0e64d6c39fccfa492b28f6e47c3c9803384e0b493616812",
+          "bytes": 128812
+        },
+        {
+          "path": "scans/50716.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Ramshackle-Manor.jpg",
+          "sha256": "a6b7d408568879fd3bfa7b2fd9b41ec47bde376a669046e862ad45605047374e",
+          "bytes": 120910
+        },
+        {
+          "path": "scans/50717.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Dark-Alley.jpg",
+          "sha256": "a8ab2f3f0bf3398931d31768388ff89c34cbbb470536f377cfc9a0c3704d6e63",
+          "bytes": 118669
+        },
+        {
+          "path": "scans/50718.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Market-Square.jpg",
+          "sha256": "a217d6a46d60a127a23ccf2db2c9e25c4d7e894d48c49bd627b8a5f84761ae72",
+          "bytes": 127433
+        },
+        {
+          "path": "scans/50719.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Old-Warehouse.jpg",
+          "sha256": "e9c8aa1f8ab49089f799af14f5afaab24a421a5ba381c5558ca96092d1dd856e",
+          "bytes": 121255
+        },
+        {
+          "path": "scans/50720.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Village-Stable.jpg",
+          "sha256": "a91533353e7be3805d7e7868bb2e7bf26fcd7f9c2c7de3b15b892950677be4f0",
+          "bytes": 128715
+        },
+        {
+          "path": "scans/50721.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Bill-Ferny.jpg",
+          "sha256": "c2d74486eca13d7aa9ec60b7d62b5e439bc03d44c384729624932116aeeb806d",
+          "bytes": 122759
+        },
+        {
+          "path": "scans/50722.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Bree-land-Informant.jpg",
+          "sha256": "00c865fe060248b58b620cc9988262b5fa38c5d121d27f6b31180715212205f8",
+          "bytes": 127397
+        },
+        {
+          "path": "scans/50723.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Lawless-Ruffian.jpg",
+          "sha256": "429a7f019f86baaa4b44cf4dd3f0fc60ccbcc3dc3d02c20c466c87f0d43c2dd4",
+          "bytes": 125861
+        },
+        {
+          "path": "scans/50724.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Greenway-Footpad.jpg",
+          "sha256": "1be6c80b98b8b440a4d5cf9441a40b7f6928b543ec7b7c3b2b42df28ac981fa8",
+          "bytes": 127745
+        },
+        {
+          "path": "scans/50725.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Chetwood-Outlaw.jpg",
+          "sha256": "76a841f5bad73a43a422307ce07a3c84fdd7998c56b0a9866435c62fba5023a9",
+          "bytes": 129365
+        },
+        {
+          "path": "scans/50726.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Hired-Muscle.jpg",
+          "sha256": "3ae03420c8dbdaeca322a04f60204edd5a45ff376f734fd34e556ca5a5ba4c9b",
+          "bytes": 129500
+        },
+        {
+          "path": "scans/50727.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Smoke-and-Mirrors.jpg",
+          "sha256": "286bd6447a01b2e929b00fbd9d2c343281542cd1b3392ea5944fde377edca492",
+          "bytes": 132596
+        },
+        {
+          "path": "scans/50728.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Rising-Body-Count.jpg",
+          "sha256": "04676a744e3f1442d00786fa8e251ae9eb54c079289ca0b5c78aa50862365f03",
+          "bytes": 125296
+        },
+        {
+          "path": "scans/50729.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Deadly-Accusations.jpg",
+          "sha256": "fa7e8bab3e8e4d22f350471dfbf3296f2d4f9e4b7f25f9012ae105e284715c51",
+          "bytes": 138279
         },
         {
           "path": "scans/900101.A.jpg",
