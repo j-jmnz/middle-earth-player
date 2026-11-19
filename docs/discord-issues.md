@@ -11,7 +11,7 @@ Both commands open the same form: a title, the type and the report text. The typ
 
 1. Creates the issue in `GITHUB_REPO` (`discord/wrangler.toml`) with the label.
 2. Adds the report's attachments as links, the reporter's Discord name, a link to the Discord message or thread, and your name.
-3. Starts a thread on the report message, named for the issue (`#42 Gandalf costs 5`), and posts the issue link in it. For `/issue`, it posts the link in the thread that you ran it in.
+3. Starts a thread on the report message, named for the issue (`#42 Gandalf costs 5`), and thanks the reporter there with the issue link. For `/issue`, it posts in the thread that you ran it in.
 4. Tells you, in a message only you see, that it created the issue or why it could not.
 
 ## Issue updates
@@ -20,13 +20,15 @@ After that, the bot posts each change of the issue in the same thread. If the th
 
 | GitHub event | Message in Discord |
 | --- | --- |
-| Issue closed as completed | The issue is fixed, and the fix comes in the next release. |
-| Issue closed as not planned, or as a duplicate | The issue is closed, and why. |
-| Issue reopened | The issue is open again. |
-| A person comments on the issue | Who commented, the comment's first 600 characters as a quote, and a link. Comments from bots are not posted. |
-| A release is published | For each issue that the release notes close (`closes #n`), the version that has the fix. A prerelease posts nothing. |
+| Issue closed as completed | 🎉 The issue is fixed and will be in the next app update. |
+| Issue closed as not planned, or as a duplicate | The issue is closed, and where to read why. |
+| Issue reopened | The issue is reopened for another look. |
+| A person comments on the issue | 💬 Who replied, the comment's first 600 characters as a quote, and a link. Comments from bots are not posted. |
+| A release is published | 🚀 For each issue that the release notes close (`closes #n`), the version that has the fix. A prerelease posts nothing. This is the last post for that issue. |
 
 The bot's messages do not ping anyone. The bot only follows issues that it made: each one keeps its Discord place in a hidden comment at the end of the issue body (`<!-- discord issue:… -->`). Do not delete that line when you edit the issue. If the report message or thread is deleted, the bot skips the update.
+
+After the release post, the bot stops following the issue: it changes the hidden line to `<!-- discord released issue:… -->`, so a later comment, close or reopen posts nothing in Discord. To follow the issue again (for example, after a regression), change the line back to `<!-- discord issue:… -->`.
 
 Discord attachment links expire after about a day. To keep a screenshot, open the issue and drag the picture into a comment.
 
@@ -55,7 +57,7 @@ You need a Cloudflare account with Workers (`workers.dev` subdomain set), admin 
 1. On GitHub, open **Settings → Developer settings → Personal access tokens → Fine-grained tokens** and select **Generate new token**.
 2. Set **Resource owner** to the repository's owner and **Repository access** to **Only select repositories**: `middle-earth-player`.
 3. Under **Repository permissions**, set **Issues** to **Read and write**. GitHub adds **Metadata: Read-only** itself. Give no other permission.
-4. Set an expiry date and write it in your calendar. When the token expires, the bot tells you "GitHub answered 401". Make a new token and do step 3 of Deploy the Worker again for `GITHUB_TOKEN`.
+4. Set an expiry date and write it in your calendar. When the token expires, the bot tells you "the GitHub token has expired or is wrong". Make a new token and do step 3 of Deploy the Worker again for `GITHUB_TOKEN`.
 5. Copy the token.
 
 The issues show your GitHub account as their author, because the token is yours. To show a bot account instead, make the token on a second GitHub account that has write access to the repository.
@@ -156,11 +158,12 @@ The commands are for members with the **Manage Messages** permission (`default_m
 - **See the Worker's log.** In the `discord` folder, run `npx wrangler tail`, then use the command again. The Cloudflare dashboard also shows the log under **Workers & Pages → middle-earth-issues → Logs**.
 - **Discord refuses the Interactions Endpoint URL.** The `DISCORD_PUBLIC_KEY` secret does not match the application's Public Key, or the URL is wrong. Put the secret again and save the URL again.
 - **"This interaction failed".** The Worker did not answer in three seconds or gave an error. See the log.
-- **"I cannot read that report".** The bot cannot see the channel, or **Message Content Intent** is off.
-- **"GitHub answered 401" or "403".** The GitHub token expired or has no Issues write permission for this repository.
-- **"GitHub answered 422".** The title is not valid, or a label is missing: the repository must have the labels `bug`, `rules` and `accessibility`.
+- **"I couldn't read that message".** The bot cannot see the channel, or **Message Content Intent** is off.
+- **"The GitHub token has expired or is wrong", or "isn't allowed to create issues".** The GitHub token expired or has no Issues write permission for this repository.
+- **"GitHub didn't accept the title or a label".** The title is not valid, or a label is missing: the repository must have the labels `bug`, `rules` and `accessibility`.
+- **"Something went wrong on my side" or another GitHub error.** Run `npx wrangler tail` and try again: the log has the full error.
 - **No issue update in Discord.** On GitHub, open **Settings → Webhooks**, select the webhook and read **Recent Deliveries**. `401` means that `GITHUB_WEBHOOK_SECRET` and the webhook's secret are different. `500` shows the error: for example, the bot cannot post in that channel. `Nothing to post.` means that the bot did not make that issue, the marker line was deleted, or the event is not one in Issue updates. You can send a failed delivery again with **Redeliver**.
-- **"I could not post the link beside the report".** The bot has no Send Messages permission (or Send Messages in Threads) in that channel. The issue was still created.
+- **"I couldn't post in that channel".** The bot has no Send Messages permission (or Send Messages in Threads) in that channel. The issue was still created.
 - **The bot replies to the message instead of starting a thread.** The bot has no Create Public Threads permission in that channel, or the message is already in a thread.
 
 ## Change it

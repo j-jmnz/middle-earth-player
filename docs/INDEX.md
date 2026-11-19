@@ -254,7 +254,22 @@ Read the sections your task touches.
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
   - 82–133 Commands (~2.0K) ← 4
-- `docs/discord-issues.md` — Discord issue bot (~2.9K tok)
+- `docs/discord-issues.md` — Discord issue bot (~3.1K tok)
+  - 5–16 What it does (~290)
+  - 17–36 Issue updates (~460)
+  - 37–40 How it works (~190)
+  - 41–148 Set it up (~1.4K)
+    - 45–54 Create the Discord application (~180)
+    - 55–64 Create the GitHub token (~220)
+    - 65–96 Deploy the Worker (~240)
+    - 97–101 Connect Discord to the Worker (~80)
+    - 102–119 Connect GitHub to the Worker (~220)
+    - 120–134 Register the commands (~170)
+    - 135–144 Add the bot to the server (~180)
+    - 145–148 Choose who can use it (~80)
+  - 149–155 Use it (~80)
+  - 156–168 Find a problem (~480)
+  - 169–174 Change it (~90)
 - `docs/releasing.md` — Releasing (~5.4K tok)
   - 5–20 Start a release (~340) ← 1
   - 21–36 Jobs (~2.1K) ← 4

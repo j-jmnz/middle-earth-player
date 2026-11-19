@@ -4,7 +4,7 @@
 // bot posts each issue update beside the report (docs/discord-issues.md).
 import { editReply, type Context, type Env } from "./env.ts";
 import { handleGitHub } from "./github.ts";
-import { createIssue, issueBody, issueForm, readForm } from "./issue.ts";
+import { createIssue, failureReason, issueBody, issueForm, readForm } from "./issue.ts";
 import { loadReport, nameOf, postAt, sourceFromId, sourceToId, type SourceRef } from "./source.ts";
 import { verifyDiscordRequest } from "./verify.ts";
 
@@ -62,9 +62,9 @@ function sourceOf(interaction: Interaction): SourceRef | null {
 // The command opens the form. It must answer within three seconds, so it reads the report once and does no more.
 async function openForm(env: Env, interaction: Interaction): Promise<Response> {
   const source = sourceOf(interaction);
-  if (!source || !interaction.guild_id) return note("Use `/issue` inside a thread or a forum post. To use one message, right-click it and select **Apps → Create GitHub issue**.");
+  if (!source || !interaction.guild_id) return note("`/issue` only works inside a thread or forum post. To report a single message, right-click it and choose **Apps → Create GitHub issue**.");
   const report = await loadReport(env, interaction.guild_id, source);
-  if (!report) return note("I cannot read that report. Make sure that I can see this channel and that the Message Content intent is on.");
+  if (!report) return note("I couldn't read that message. Check that I can see this channel and that the Message Content intent is on in the Developer Portal.");
   return json({ type: MODAL, data: issueForm(sourceToId(source), report) });
 }
 
@@ -75,28 +75,36 @@ async function fileIssue(env: Env, interaction: Interaction, source: SourceRef, 
     const report = await loadReport(env, interaction.guild_id!, source);
     const filedBy = interaction.member ? nameOf(interaction.member.user) : "a moderator";
     const issue = await createIssue(env, values, issueBody(values, report, filedBy, source));
-    const link = `Created issue [#${issue.number}](<${issue.url}>): ${values.title}`;
-    const posted = await postLink(env, source, link, `#${issue.number} ${values.title}`);
-    await editReply(env, interaction.token, posted ? `${link}. I posted the link beside the report.` : `${link}. I could not post the link beside the report.`);
+    const number = `**[#${issue.number}](<${issue.url}>)**`;
+    const thanks = report ? `Thanks for the report, **${report.author}**!` : "Thanks for the report!";
+    const posted = await postLink(env, source, `${thanks} It's now tracked as ${number} on GitHub. I'll post updates here.`, `#${issue.number} ${values.title}`);
+    await editReply(env, interaction.token, doneMessage(number, posted));
   } catch (error) {
-    await editReply(env, interaction.token, `I could not create the issue. ${error instanceof Error ? error.message : String(error)}`.slice(0, 2000));
+    console.error("Creating the issue failed", error);
+    await editReply(env, interaction.token, `Sorry, I couldn't create the issue: ${failureReason(error)}`);
   }
 }
 
+// What the moderator hears once the issue exists, by where the link went.
+function doneMessage(number: string, posted: "thread" | "reply" | null): string {
+  if (posted === "thread") return `Done! I created ${number} and posted it in a thread on the report.`;
+  if (posted === "reply") return `Done! I created ${number} and posted it as a reply to the report.`;
+  return `I created ${number}, but I couldn't post in that channel. Check that I have Send Messages there.`;
+}
+
 // The issue link beside the report. A channel the bot cannot post in still keeps the issue.
-async function postLink(env: Env, source: SourceRef, content: string, threadName: string): Promise<boolean> {
+async function postLink(env: Env, source: SourceRef, content: string, threadName: string): Promise<"thread" | "reply" | null> {
   try {
-    await postAt(env, source, content, threadName);
-    return true;
+    return await postAt(env, source, content, threadName);
   } catch {
-    return false;
+    return null;
   }
 }
 
 function submitForm(env: Env, interaction: Interaction, context: Context): Response {
   const source = sourceFromId(interaction.data?.custom_id ?? "");
   const values = readForm(interaction.data?.components ?? []);
-  if (!source || !values || !interaction.guild_id) return note("The form is not complete. Run the command again.");
+  if (!source || !values || !interaction.guild_id) return note("Something was missing from the form. Please run the command again.");
   context.waitUntil(fileIssue(env, interaction, source, values));
   return json({ type: DEFERRED_CHANNEL_MESSAGE, data: { flags: EPHEMERAL } });
 }
