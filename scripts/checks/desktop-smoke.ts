@@ -164,20 +164,22 @@ async function refusals(session: Session): Promise<string> {
 }
 
 // The Settings backup is a Blob download (`<a download>`): the shell must turn it into a save dialog offering the file's name, not save it unasked. The listener cancels the
-// download once the shell's own handler has run, so no dialog stays open on the run's screen.
+// download once the shell's own handler has run, so no dialog stays open on the run's screen. The listener is in place before the link is clicked: the first evaluate
+// returns once it is registered and parks the offer on the main process's global, and the second waits for it, so a download that fires at once is not missed.
 async function download(session: Session): Promise<string> {
   const { app, page } = session;
   if (app === null) throw new Error("no main process to listen on");
-  const offered = app.evaluate(
-    ({ session: electronSession }) =>
-      new Promise<{ name: string; path: string }>((resolve) => {
-        electronSession.defaultSession.once("will-download", (_event, item) => {
-          const offer = { name: item.getFilename(), path: item.getSaveDialogOptions().defaultPath ?? "" };
-          item.cancel();
-          resolve(offer);
-        });
-      }),
-  );
+  type Offer = { name: string; path: string };
+  await app.evaluate(({ session: electronSession }) => {
+    (globalThis as { smokeOffer?: Promise<Offer> }).smokeOffer = new Promise<Offer>((resolve) => {
+      electronSession.defaultSession.once("will-download", (_event, item) => {
+        const offer = { name: item.getFilename(), path: item.getSaveDialogOptions().defaultPath ?? "" };
+        item.cancel();
+        resolve(offer);
+      });
+    });
+  });
+  const offered = app.evaluate(() => (globalThis as { smokeOffer?: Promise<Offer> }).smokeOffer as Promise<Offer>);
   await page.evaluate(() => {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob(["backup"]));
