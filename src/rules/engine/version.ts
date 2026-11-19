@@ -47,9 +47,11 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 30, scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship", "raid-on-the-grey-havens", "the-thing-in-the-depths", "journey-up-the-anduin", "the-kings-quest", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland", "the-weather-hills", "the-wastes-of-eriador", "escape-from-mount-gram", "the-road-to-isengard", "journey-to-the-cross-roads", "shelobs-lair", "the-passing-of-the-grey-company", "the-battle-of-the-pelennor-fields", "the-tower-of-cirith-ungol", "the-black-gate-opens", "mount-doom", "conflict-at-the-carrock"], note: "Legolas, Blade of Gondolin and The Steadfast place no progress while the active location is immune to player card effects: not on the location and not on the quest." },
   { version: 31, scenarios: "all", note: "A shadow card is turned face up before you choose a Response that cancels its effect, like Hasty Stroke, so you can read the effect first." },
   { version: 32, scenarios: "all", note: "A card that exhausts to quest, attack, defend or pay a cost now triggers its \"after it exhausts\" effects, like Turayn, Arwen Undómiel, Tiny and Grievous Wound." },
+  { version: 33, scenarios: "all", note: "A card played from your hand at no cost, like the Silvan allies Host of Galadhrim plays again, needs no hero of its sphere." },
+  { version: 33, scenarios: ["across-the-ettenmoors", "a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "An event played at no cost, like one Send for Help finds or one Scavenge for Supplies lets you play, needs no hero of its sphere." },
 ];
 
-export const ENGINE_VERSION = 32;
+export const ENGINE_VERSION = 33;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {
