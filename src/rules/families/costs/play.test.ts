@@ -88,6 +88,31 @@ describe("a card an effect plays from the hand (PlayFromHand)", () => {
   });
 });
 
+// Records that play a card at no cost from the hand (Scavenge for Supplies, 10083:A:2) or the deck (Send for Help, 11211:A:2),
+// and a Tactics event they play.
+const freeFromHand = card("free-hand", "event", "neutral", 0);
+const freeFromDeck = card("free-deck", "event", "neutral", 0);
+const tacticsEvent = card("tactics-event", "event", "tactics", 1);
+const FREE: Effect[] = [
+  ...RECORDS,
+  { id: "free-hand:action:1", cardCode: "free-hand", lines: ["free-hand:A:1"], timing: "action", instructions: [{ verb: "PlayFromHand", pick: { type: "card", control: "you" }, free: true }] },
+  { id: "free-deck:action:1", cardCode: "free-deck", lines: ["free-deck:A:1"], timing: "action", instructions: [{ verb: "PlayFrom", pick: { type: "card", control: "you", from: "deck" }, free: true }] },
+  { id: "tactics-event:action:1", cardCode: "tactics-event", lines: ["tactics-event:A:1"], timing: "action", instructions: [{ verb: "LowerThreat", amount: 5, who: "actor" }] },
+];
+
+describe("an event an effect plays at no cost", () => {
+  for (const [giver, zone] of [["free-hand", "hand"], ["free-deck", "deck"]] as const) {
+    it(`needs no hero of its sphere (${giver === "free-hand" ? "PlayFromHand" : "PlayFrom"})`, () => {
+      const { state, ctx } = table(FREE, [...CARDS, freeFromHand, freeFromDeck, tacticsEvent], [["lead"]]);
+      const event = put(withThreat(state, 0, 30), "tactics-event", zone);
+      const source = put(event.state, giver, "hand");
+      const after = expectOk(reduce(source.state, { type: "PlayCard", cardId: source.id, payments: [] }, ctx)).state;
+      expect(after.cards[event.id]?.zone).toBe("discard");
+      expect(after.seats[0].threat).toBe(25);
+    });
+  }
+});
+
 describe("additional costs", () => {
   it("Guardian of Rivendell needs 2 other cards to discard, chosen as it is played", () => {
     const { state, ids, ctx } = table(RECORDS, CARDS, [["lore"]]);

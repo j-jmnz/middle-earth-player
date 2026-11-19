@@ -48,6 +48,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 31, scenarios: "all", note: "A shadow card is turned face up before you choose a Response that cancels its effect, like Hasty Stroke, so you can read the effect first." },
   { version: 32, scenarios: "all", note: "A card that exhausts to quest, attack, defend or pay a cost now triggers its \"after it exhausts\" effects, like Turayn, Arwen Undómiel, Tiny and Grievous Wound." },
   { version: 33, scenarios: "all", note: "A card played from your hand at no cost, like the Silvan allies Host of Galadhrim plays again, needs no hero of its sphere." },
+  { version: 33, scenarios: ["across-the-ettenmoors", "a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "An event played at no cost, like one Send for Help finds or one Scavenge for Supplies lets you play, needs no hero of its sphere." },
 ];
 
 export const ENGINE_VERSION = 33;

@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 407–412 Catalog build (~410)
   - 413–429 Tests (~1.9K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~277.1K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~277.2K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -307,7 +307,7 @@ STATUS.md, then the active phase file.
   - 14–20 Phases (~20)
   - 21–362 Open items (~16.4K)
     - 23–25 Reviews (~90)
-    - 26–32 Readings (not user-confirmed) (~170)
+    - 26–32 Readings (not user-confirmed) (~180)
     - 33–35 Engine code (~50)
     - 36–41 Cards tab views (~160)
     - 42–44 README (~90)
