@@ -102,7 +102,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "12184:resolution:2", cardCode: "12184", lines: ["12184:B:4"], timing: "resolution", instructions: [{ verb: "ChooseStagedLocationForPool" }] },
 
     // 19036 Durin's Key: claimed by the first player once nothing guards it (attached to one of their heroes); Action: exhaust it to give each location -1 Threat; at the beginning of the quest phase the player who controls it looks at the top 3 cards of the encounter deck, reveals 1 and discards the rest.
-    { id: "19036:constant:1", cardCode: "19036", lines: ["19036:A:1"], timing: "constant", instructions: [{ verb: "ClaimWhenFree" }] },
+    { id: "19036:constant:1", cardCode: "19036", lines: ["19036:A:1"], timing: "constant", instructions: [{ verb: "ClaimWhenFree" }, { verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     { id: "19036:action:1", cardCode: "19036", lines: ["19036:A:2"], timing: "action", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "ModifyStat", stat: "threat", amount: -1, until: "endOfPhase", holders: { type: "location", control: "any" } }] },
     {
       id: "19036:forced:1",
@@ -114,7 +114,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: LOOK_AT_THREE,
     },
     // 19037 Urdug's Horn: attached to Urdug once nothing guards it; when Urdug attacks (as an ally, or as an enemy) the top card of the encounter deck is discarded and its Threat added to his Attack until the end of the phase.
-    { id: "19037:constant:1", cardCode: "19037", lines: ["19037:A:1"], timing: "constant", instructions: [{ verb: "ClaimWhenFree", host: "Urdug" }] },
+    { id: "19037:constant:1", cardCode: "19037", lines: ["19037:A:1"], timing: "constant", instructions: [{ verb: "ClaimWhenFree", host: "Urdug" }, { verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     {
       id: "19037:forced:1",
       cardCode: "19037",

@@ -25,8 +25,9 @@ export function leaveWith(state: ScenarioState, card: CardInstance, released: re
       next = returned;
       continue;
     }
-    const owner = attachment.owner ?? attachment.controller;
-    // A claimed objective returns to the staging area (families/objectives/claimed.ts).
+    // A claimed objective is an encounter card whose controller is the hero's: it has no player owner (rr.ownership-and-control).
+    const owner = attachment.claimed ? attachment.owner : (attachment.owner ?? attachment.controller);
+    // A claimed objective whose text returns it goes back to the staging area (families/objectives/claimed.ts).
     next = sendAway(next, id, owner != null ? { zone: "discard", seat: owner } : { zone: "encounterDiscard" });
     gone.push(id);
   }
