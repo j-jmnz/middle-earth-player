@@ -101,7 +101,7 @@ export function playCard(
 }
 
 function actionRecords(ctx: ReduceContext, code: string): Effect[] {
-  return ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "action");
+  return effectsOf(ctx, code).filter((effect) => effect.timing === "action");
 }
 
 // The effects of an event whose condition holds now.
@@ -148,7 +148,7 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
   if (records.length === 0) {
     // An event whose only records are Responses is played from its Response window, never as an ordinary play.
     const code = state.cards[cardId]?.code ?? "";
-    const own = ctx.effects.filter((effect) => effect.cardCode === code);
+    const own = effectsOf(ctx, code);
     if (own.some((effect) => effect.timing === "response")) return "That card cannot be played";
     // An event with no record at all: as the engine applies it, its Action could not change the game state, so it is not
     // initiated (rr.triggered-ability: "can only be initiated if its effect has the potential to change the game state on
