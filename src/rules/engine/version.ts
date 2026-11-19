@@ -39,6 +39,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 30, scenarios: ["across-the-ettenmoors", "intruders-in-chetwood", "the-wastes-of-eriador"], note: "The hands under Lost in the Wilderness stay there when it leaves play without being defeated, instead of going to the discard pile." },
   { version: 30, scenarios: ["a-journey-to-rhosgobel", "the-treachery-of-rhudaur", "roam-across-rhovanion", "the-ghost-of-framsburg", "a-storm-on-cobas-haven"], note: "A claimed objective that prints no return to the staging area, like Athelas and the Clues of Rhudaur, goes to the encounter discard pile when its hero leaves play." },
   { version: 30, scenarios: ["escape-from-mount-gram"], note: "Loot the Dungeons, which the campaign card adds at the start, is now in every player's staging area, so it counts as a quest card and takes progress." },
+  { version: 30, scenarios: ["breaking-of-the-fellowship"], note: "When the players have separate staging areas, a Trap played into the staging area goes into your own area and attaches only to an enemy that enters that area." },
 ];
 
 export const ENGINE_VERSION = 30;
