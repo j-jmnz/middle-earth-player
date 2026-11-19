@@ -7,12 +7,12 @@ import { CATALOG_FAMILIES, FAMILY_VERBS } from "../../catalog/families/index.ts"
 import { simpleInstructionSchema } from "../../catalog/effect-schema-verbs.ts";
 import { fixtureDefinition } from "../core/test-fixture.ts";
 import { blankScenario } from "../core/state.ts";
-import { RULES_FAMILIES } from "../families/index.ts";
+import { rulesFamilies } from "../families/index.ts";
 
 // Every verb a mechanic family declares (src/catalog/families) has a runner (src/rules/families), and every verb a runner answers is declared. An
 // unhandled verb would fail only at play, as "Unimplemented instruction X" (rules/interpret/verbs.ts).
 const declared: readonly string[] = FAMILY_VERBS.map((schema) => schema.shape.verb.value);
-const answered: readonly string[] = RULES_FAMILIES.flatMap((family) => family.verbs);
+const answered: readonly string[] = rulesFamilies().flatMap((family) => family.verbs);
 
 // Declared verbs no runner answers, because the code that reads the effect records finds them there and nothing executes them (a constant's marker).
 // Each names the file that reads it; the test checks the file does.
@@ -32,7 +32,7 @@ const DECLARED_BY_CORE = ["ReduceNextCost", "ShuffleIntoEncounterDeck", "AttachS
 
 describe("mechanic family manifests", () => {
   it("lists the same families on both sides, in the same order", () => {
-    expect(RULES_FAMILIES.map((family) => family.name)).toEqual(CATALOG_FAMILIES.map((family) => family.name));
+    expect(rulesFamilies().map((family) => family.name)).toEqual(CATALOG_FAMILIES.map((family) => family.name));
   });
 
   it("declares no verb twice and no runner verb twice", () => {
@@ -68,7 +68,7 @@ describe("mechanic family manifests", () => {
     const state = blankScenario({ seatCount: 1, seed: 4, definition: fixtureDefinition(["stage"]) });
     const ctx = { effects: [], cards: new Map() };
     const notTaken: string[] = [];
-    for (const family of RULES_FAMILIES) {
+    for (const family of rulesFamilies()) {
       for (const verb of family.verbs) {
         try {
           if (family.run(state, { verb } as unknown as Instruction, { seat: 0, sourceId: null }, ctx, []) === null) notTaken.push(`${family.name}: ${verb}`);
