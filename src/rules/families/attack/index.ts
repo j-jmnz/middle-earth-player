@@ -1,5 +1,5 @@
 // Rules: rr.attacks-outside-the-combat-phase, rr.step-6-8b, rr.step-6-8-3, rr.active-location, rr.quest-advancement,
-// faq.limitations-on-attacks (data/rules/entries.json).
+// faq.limitations-on-attacks, faq.legolas-active-location, faq.legolas-immune-location (data/rules/entries.json).
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import { announceEnemyAttacked } from "../aflame/attack.ts";
 import type { CardRef, Condition, Instruction } from "../../../catalog/boundary.ts";
@@ -8,7 +8,11 @@ import { continueStrike } from "../../combat/combat.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
-import { isCharacterType, printedOf } from "../../core/printed.ts";
+import { hasQuestPoints, isCharacterType, printedOf } from "../../core/printed.ts";
+import { isPlayerCardEffect, playerCardEffectCanChoose, sourcePrinted } from "../../core/keywords.ts";
+import { immuneToSource } from "../misc/guards.ts";
+import { activeLocations, progressRoom } from "../south/locations.ts";
+import { currentSideQuest } from "../wilderland/night-quest.ts";
 import { placeOnMainQuest, placeQuestProgress } from "../../quest/quest.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { restricted } from "../../interpret/restrictions.ts";
@@ -34,6 +38,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "QuestProgress": {
       const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
       if (amount <= 0) return state;
+      // The active location takes the progress first (faq.legolas-active-location); one immune to the effect ignores it, and the quest gets none (faq.legolas-immune-location).
+      if (!(instruction.main && currentSideQuest(state) != null) && immuneBuffer(state, focus.sourceId, ctx)) return state;
       const before = steps.length;
       const gate = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
       const placed = instruction.main ? placeOnMainQuest(state, amount, ctx.cards, steps, gate) : placeQuestProgress(state, amount, ctx.cards, steps, gate);
@@ -89,6 +95,16 @@ export function openStrike(state: ScenarioState, seat: number, enemyId: string, 
   next = discardPlayedEvent(pickAttacker(next, attackerIds.at(-1) ?? "", frameId), frameId);
   // 6.8.1: an action window comes before its strength; the Responses to the declaration resolve first either way.
   return playerAttackWindow(next, ctx, "strike") ?? awaitStrike(next, ctx) ?? continueStrike(next, ctx, steps);
+}
+
+// The active location that would take a card's progress on the current quest first (placeOnActive, families/south/locations.ts) is
+// immune to that card's effects: a player card effect cannot affect it (mec109.immune-to-player-card-effects, families/misc/guards.ts).
+function immuneBuffer(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): boolean {
+  if (!sourceId || !isPlayerCardEffect(state, ctx.cards, sourceId)) return false;
+  const id = activeLocations(state).find((candidate) => hasQuestPoints(printedOf(ctx.cards, state.cards[candidate]?.code ?? "")) && progressRoom(state, candidate, ctx.cards) > 0);
+  const location = id ? state.cards[id] : undefined;
+  if (!id || !location) return false;
+  return !playerCardEffectCanChoose(printedOf(ctx.cards, location.code), state, id, sourcePrinted(state, ctx.cards, sourceId)) || immuneToSource(state, id, sourceId, ctx);
 }
 
 // "Declared as the only attacker" (143015:A:3): the attack in progress was declared with exactly one attacker (rr.step-6-8b: the attackers of an attack are declared together).

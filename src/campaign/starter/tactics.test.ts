@@ -1,5 +1,6 @@
 // Rules: rr.response, rr.multiple-defenders, rr.step-6-4-1, rr.step-6-4-3, rr.step-6-8-2, rr.active-location, rr.ranged,
-// rr.reveal, rr.play-restrictions-and-permissions, rr.modifiers, rr.restricted, rr.hit-points (data/rules/entries.json).
+// rr.reveal, rr.play-restrictions-and-permissions, rr.modifiers, rr.restricted, rr.hit-points, faq.legolas-immune-location
+// (data/rules/entries.json).
 // The core-set Learn to Play Tactics deck (core-tactics), brought into scope on request (user request, 2026-10-26): Gimli,
 // Legolas, Thalin, Gondorian Spearman, Blade Mastery, Rain of Arrows, Thicket of Spears, Swift Strike, Stand Together, Blade of
 // Gondolin, Citadel Plate and Dwarven Axe.
@@ -32,12 +33,14 @@ const ORC = "orc";
 const GOBLIN = "goblin";
 const WEAK = "weak";
 const POUNDER = "pounder";
+// Bucklebury Ferry: Immune to player card effects.
+const FERRY = "141035";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([GIMLI, LEGOLAS, THALIN, SPEARMAN, BLADE_MASTERY, RAIN, THICKET, SWIFT, STAND, GONDOLIN, PLATE, AXE]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([FERRY, GIMLI, LEGOLAS, THALIN, SPEARMAN, BLADE_MASTERY, RAIN, THICKET, SWIFT, STAND, GONDOLIN, PLATE, AXE]))]);
   cards.set(ORC, definePrinted({ code: ORC, name: "Orc", type: "enemy", traits: ["Orc"], threat: 1, engagementCost: 40, attack: 2, defense: 1, health: 5 }));
   cards.set(GOBLIN, definePrinted({ code: GOBLIN, name: "Goblin", type: "enemy", traits: ["Goblin"], threat: 1, engagementCost: 40, attack: 2, defense: 1, health: 5 }));
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 1 }));
@@ -102,6 +105,16 @@ describe("Legolas (01005:A:2; line 1 is Ranged)", () => {
     let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [legolas] }, tab.ctx);
     run = send(run, { type: "Trigger", cardId: legolas, effectId: "01005:response:1" }, tab.ctx);
     expect(run.steps.filter((step) => step.kind === "progress").map((step) => (step.kind === "progress" ? step.targetId : ""))).toContain(idsOf(tab, "141034"));
+  });
+
+  it("places none while the active location is immune to player card effects, on it or on the quest (faq.legolas-immune-location)", () => {
+    const tab = table({ heroes: [{ code: LEGOLAS, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], active: FERRY });
+    const legolas = idsOf(tab, LEGOLAS);
+    const stage = tab.state.questStage ?? "";
+    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [legolas] }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: legolas, effectId: "01005:response:1" }, tab.ctx);
+    expect(run.state.cards[idsOf(tab, FERRY)]?.progress).toBe(0);
+    expect(run.state.cards[stage]?.progress).toBe(0);
   });
 });
 
