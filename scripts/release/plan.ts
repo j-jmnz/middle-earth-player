@@ -17,6 +17,7 @@ import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf
 // Usage: pnpm release plan [--bump auto|patch|minor|major] prints the next tag and its notes. In CI:
 //   --branch <name>        the branch being released (default: GITHUB_REF_NAME, else the checked-out branch)
 //   --expect <tag>         fails unless the planned tag is this one (the publish job re-plans the tag the plan job chose)
+//   --released <tag>       writes the notes of a tag already released at HEAD instead of planning the next one (the publish job adds the desktop files to a release that went out without them)
 //   --notes <file>         writes the notes there instead of printing them
 //   --apk <file>           adds the APK's name and SHA-256 to the notes; --cert-sha256 <hex> adds its signing certificate
 //   --ipa <file>           adds the IPA's name and SHA-256
@@ -105,12 +106,8 @@ function reach(previous: string): { all: boolean; names: string[] } {
   return { all: found.all, names: found.scenarios.map(scenarioName) };
 }
 
-async function main(log: Log): Promise<void> {
-  const args = process.argv.slice(2);
-  const request = (flag(args, "--bump") ?? "auto") as BumpRequest;
-  if (!BUMP_REQUESTS.includes(request)) throw new Error(`--bump is one of ${BUMP_REQUESTS.join(", ")}, not "${request}"`);
-  const branch = flag(args, "--branch") ?? process.env.GITHUB_REF_NAME ?? git(["rev-parse", "--abbrev-ref", "HEAD"]);
-
+/** The next tag from the commits since the last one, refused when the branch may not cut it, it exists, HEAD is already released or it is not `--expect`. */
+function plannedTag(args: string[], request: BumpRequest, branch: string, log: Log): { previous: string | undefined; tag: string } {
   const previous = previousTag();
   const changes = changesSince(previous);
   const next = nextVersion(previous ? parseTag(previous) : undefined, changes, request);
@@ -126,6 +123,28 @@ async function main(log: Log): Promise<void> {
   if (headTags !== "") throw new Error(`HEAD is already released as ${headTags.split("\n").join(", ")}`);
   const expected = flag(args, "--expect");
   if (expected && expected !== tag) throw new Error(`planned ${tag}, expected ${expected}: a tag or commit moved since the plan`);
+  return { previous, tag };
+}
+
+/** A tag the release workflow already made on HEAD, with the release before it, so its notes can be written again. */
+function releasedTag(tag: string): { previous: string | undefined; tag: string } {
+  if (!parseTag(tag)) throw new Error(`"${tag}" is not a release tag`);
+  const at = tryGit(["rev-list", "-n", "1", `refs/tags/${tag}`]);
+  if (!at) throw new Error(`${tag} does not exist`);
+  if (at !== git(["rev-parse", "HEAD"])) throw new Error(`${tag} is not on HEAD: check out the released commit`);
+  return { previous: tryGit(["describe", "--tags", "--abbrev=0", "--match", RELEASE_TAGS, `${tag}^`]), tag };
+}
+
+async function main(log: Log): Promise<void> {
+  const args = process.argv.slice(2);
+  const request = (flag(args, "--bump") ?? "auto") as BumpRequest;
+  if (!BUMP_REQUESTS.includes(request)) throw new Error(`--bump is one of ${BUMP_REQUESTS.join(", ")}, not "${request}"`);
+  const branch = flag(args, "--branch") ?? process.env.GITHUB_REF_NAME ?? git(["rev-parse", "--abbrev-ref", "HEAD"]);
+
+  const released = flag(args, "--released");
+  if (released && flag(args, "--expect")) throw new Error("--released and --expect together: the tag is either planned or already made");
+  const { previous, tag } = released ? releasedTag(released) : plannedTag(args, request, branch, log);
+  const changes = changesSince(previous);
 
   const apkFile = flag(args, "--apk");
   const apk = apkFile ? { name: path.basename(apkFile), sha256: await fileSha256(apkFile), certificateSha256: flag(args, "--cert-sha256") } : undefined;
