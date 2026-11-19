@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { loadCards } from "./load-cards.ts";
 import { parseKeywordTokens } from "./normalize/keywords.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
+import { traitKey } from "./normalize/cards.ts";
 import { titleKey } from "./normalize/names.ts";
 
 // The 26 dealt cards for A Shadow of the Past, as the MEC109 (The Fellowship of the Ring) printing prints them.
@@ -260,5 +261,18 @@ describe("Mirkwood Paths cards", () => {
     for (const code of ["19066", "19067", "19068", "19069", "19070", "19071", "19072", "19073"]) {
       expect(cards.get(code), code).toMatchObject({ type: "encounter-side-quest", encounterSet: "Fire in the Night" });
     }
+  });
+});
+
+// A trait check compares spellings exactly, so a trait two sources spell two ways ("Dunedain", "Dúnedain") would miss the cards of one.
+describe("trait spellings", () => {
+  it("spells each trait one way", () => {
+    const spellings = new Map<string, Set<string>>();
+    for (const card of cards.values()) for (const trait of card.traits) spellings.set(traitKey(trait), (spellings.get(traitKey(trait)) ?? new Set()).add(trait));
+    expect([...spellings.values()].filter((set) => set.size > 1).map((set) => [...set])).toEqual([]);
+  });
+
+  it("gives Thurindir the Dúnedain trait (issue 121)", () => {
+    expect(cards.get("17028")?.traits).toEqual(["Dúnedain", "Ranger"]);
   });
 });

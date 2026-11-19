@@ -451,5 +451,21 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     cards.push(cardSchema.parse({ ...next, backType }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));
-  return { cards, report };
+  return { cards: oneTraitSpelling(cards), report };
+}
+
+// A trait folded to plain lowercase letters: "Dúnedain" and "Dunedain" are one key.
+export function traitKey(trait: string): string {
+  return trait.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+}
+
+// A trait two sources spell two ways (RingsDB's "Dunedain" on Thurindir, Hall of Beorn's and the card's "Dúnedain") takes the spelling
+// with the accent, the one the cards print, so a trait check finds every card that has it.
+function oneTraitSpelling(cards: Card[]): Card[] {
+  const accented = new Map<string, string>();
+  for (const trait of cards.flatMap((card) => card.traits)) if (/[^\x00-\x7f]/.test(trait)) accented.set(traitKey(trait), trait);
+  return cards.map((card) => {
+    const traits = card.traits.map((trait) => accented.get(traitKey(trait)) ?? trait);
+    return traits.some((trait, index) => trait !== card.traits[index]) ? { ...card, traits } : card;
+  });
 }
