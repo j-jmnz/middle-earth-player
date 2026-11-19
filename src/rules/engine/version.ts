@@ -44,9 +44,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 30, scenarios: "all", note: "Delay the Enemy, Send for Aid and Gather Information let each player decline, as their text says \"may\"." },
   { version: 30, scenarios: ["escape-from-mount-gram"], note: "Loot the Dungeons, which the campaign card adds at the start, is now in every player's staging area, so it counts as a quest card and takes progress." },
   { version: 30, scenarios: ["breaking-of-the-fellowship"], note: "When the players have separate staging areas, a Trap played into the staging area goes into your own area and attaches only to an enemy that enters that area." },
+  { version: 31, scenarios: "all", note: "A shadow card is turned face up before you choose a Response that cancels its effect, like Hasty Stroke, so you can read the effect first." },
 ];
 
-export const ENGINE_VERSION = 30;
+export const ENGINE_VERSION = 31;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

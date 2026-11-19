@@ -39,14 +39,17 @@ describe("opening the table", () => {
   it("a game a change reached is not written on read: it asks for a choice and the row stays", () => {
     const { user } = openUser();
     const save = fixtureSave(name, "s1", CATALOG_VERSION);
-    const old = { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1 } };
+    // The save is from before the newest version whose lines include both an "all" line and one scoped to other scenarios.
+    const scoped = (change: (typeof ENGINE_CHANGES)[number]) => change.scenarios !== "all" && !change.scenarios.includes("a-shadow-of-the-past");
+    const from = Math.max(...ENGINE_CHANGES.filter(scoped).map((change) => change.version)) - 1;
+    const old = { ...save, active: { ...save.active!, engineVersion: from } };
     writeSave(user, old);
     const before = savedAt(user).get("s1");
-    // The sheet lists the lines of the missed version that reach the fixture's scenario: the "all" lines, and none scoped to other scenarios.
+    // The sheet lists the lines of the missed versions that reach the fixture's scenario: the "all" lines, and none scoped to other scenarios.
     expect(old.loadout!.scenarioId).toBe("a-shadow-of-the-past");
-    const missed = ENGINE_CHANGES.filter((change) => change.version === ENGINE_VERSION);
+    const missed = ENGINE_CHANGES.filter((change) => change.version > from && change.version <= ENGINE_VERSION);
     const everywhere = missed.filter((change) => change.scenarios === "all").map((change) => change.note);
-    const elsewhere = missed.filter((change) => change.scenarios !== "all" && !change.scenarios.includes("a-shadow-of-the-past")).map((change) => change.note);
+    const elsewhere = missed.filter(scoped).map((change) => change.note);
     expect(everywhere.length).toBeGreaterThan(0);
     expect(elsewhere.length).toBeGreaterThan(0);
     const opened = openTable(catalog, user, "s1");
