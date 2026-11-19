@@ -73,6 +73,7 @@ import townFixtures from "./fixtures/the-battle-of-lake-town.json";
 import erechFixtures from "./fixtures/the-stone-of-erech.json";
 import forestFixtures from "./fixtures/the-old-forest.json";
 import downsFixtures from "./fixtures/fog-on-the-barrow-downs.json";
+import belegostFixtures from "./fixtures/the-ruins-of-belegost.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -164,6 +165,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-stone-of-erech": erechFixtures,
   "the-old-forest": forestFixtures,
   "fog-on-the-barrow-downs": downsFixtures,
+  "the-ruins-of-belegost": belegostFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
