@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~282.6K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~282.7K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -152,13 +152,13 @@ Read the sections your task touches.
     - 2017–2044 The Long Dark (~4.8K) ← 4
     - 2045–2076 Foundations of Stone (~4.3K) ← 3
     - 2077–2107 Shadow and Flame (~4.1K) ← 4
-  - 2108–2280 Standalone scenarios (~23.8K) ← 1
+  - 2108–2280 Standalone scenarios (~23.9K) ← 1
     - 2112–2135 The Massing at Osgiliath (~2.5K) ← 1
     - 2136–2158 The Battle of Lake-town (~4.0K) ← 36
     - 2159–2175 The Stone of Erech (~2.2K) ← 20
     - 2176–2210 The Old Forest (~4.1K) ← 10
     - 2211–2246 Fog on the Barrow-downs (~5.0K) ← 9
-    - 2247–2280 The Ruins of Belegost (~5.7K) ← 1
+    - 2247–2280 The Ruins of Belegost (~5.8K) ← 1
   - 2281–2289 Nightmare (~410) ← 22
   - 2290–2332 Deckbuilding (~2.5K) ← 1
   - 2333–2412 Effects (~4.1K)
