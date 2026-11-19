@@ -77,30 +77,27 @@ export function HeroTile({
   const mark = markedSphere(hero.sphereCode);
   // The long press is also an action in the reader's menu (docs/design-system.md, Screen reader); its hint joins the tap's.
   const longPress = onLongPress ? longPressA11y("Show card", () => onLongPress(preview)) : null;
-  return (
-    <View
-      className={`flex-1 overflow-hidden ${flush ? "" : "rounded-item"}`}
-      style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : (shadow ?? dropShadowOf(t, 8, 18, 0.8)) }) }}
-    >
-      {card != null ? (
-        <View>
-          <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={card} height={height} />
-          {hero.sphereCode === "fellowship" ? (
-            <View className="absolute left-1 rounded-control px-1.5 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
-              <Text testID={`saga-only-${hero.code}`} className="text-micro font-semibold text-accentHigh" numberOfLines={1}>
-                Saga only
-              </Text>
-            </View>
-          ) : null}
-          {loss ? (
-            <View className="absolute left-1 right-1 rounded-control px-1 py-0.5" style={{ bottom: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
-              <Text testID={`hero-loss-${hero.code}`} className="text-center text-micro text-muted" numberOfLines={1}>
-                {loss}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      ) : (
+  // The tile's face: the whole card (the deck editor) or the painting with its name band.
+  const face =
+    card != null ? (
+      <View>
+        <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={card} height={height} />
+        {hero.sphereCode === "fellowship" ? (
+          <View className="absolute left-1 rounded-control px-1.5 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+            <Text testID={`saga-only-${hero.code}`} className="text-micro font-semibold text-accentHigh" numberOfLines={1}>
+              Saga only
+            </Text>
+          </View>
+        ) : null}
+        {loss ? (
+          <View className="absolute left-1 right-1 rounded-control px-1 py-0.5" style={{ bottom: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+            <Text testID={`hero-loss-${hero.code}`} className="text-center text-micro text-muted" numberOfLines={1}>
+              {loss}
+            </Text>
+          </View>
+        ) : null}
+      </View>
+    ) : (
       <CroppedArt card={hero} region={crop ?? (bare ? COVER : PAINTING)} height={height}>
         {bare ? null : (
           <>
@@ -145,8 +142,15 @@ export function HeroTile({
           </>
         )}
       </CroppedArt>
-      )}
+    );
+  return (
+    <View
+      className={`flex-1 overflow-hidden ${flush ? "" : "rounded-item"}`}
+      style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : (shadow ?? dropShadowOf(t, 8, 18, 0.8)) }) }}
+    >
       {onPress ? (
+        // The button holds the face, as the deck grid's cards and the editor's fan do: an empty button laid over the picture took no
+        // tap on a phone.
         <Pressable
           testID={`hero-${hero.code}`}
           collapsable={false}
@@ -157,10 +161,18 @@ export function HeroTile({
           onPress={onPress}
           onLongPress={onLongPress ? () => onLongPress(preview) : undefined}
           delayLongPress={350}
-          // A transparent fill at full opacity, not an invisible view: iOS skips a view below 0.01 opacity when it hit-tests.
-          style={({ pressed }) => ({ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: pressed ? withAlphaHex(palette.night, 0.25) : "transparent" })}
-        />
-      ) : null}
+          style={{ flex: 1 }}
+        >
+          {({ pressed }) => (
+            <>
+              {face}
+              {pressed ? <View pointerEvents="none" style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: withAlphaHex(palette.night, 0.25) }} /> : null}
+            </>
+          )}
+        </Pressable>
+      ) : (
+        face
+      )}
       {onRemove ? (
         <Pressable
           testID={`hero-remove-${hero.code}`}

@@ -1,0 +1,2359 @@
+{
+  "campaign": "standalone-scenarios",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+  ],
+  "entries": [
+    {
+      "code": "00001",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/The-Witch-king.jpg",
+        "sha256": "edc65a37e18e1f4f6dddea3fd635c66f83307800a6801890eebd75f4614be256"
+      },
+      "lines": [
+        "Players cannot play attachments on The Witch-king.",
+        "While The Witch-king is in the staging area, each character gets -1 Willpower.",
+        "Forced: After The Witch-king attacks, he returns to the staging area unless the defending player raises his threat by 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00002",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Snaga-Scouts.jpg",
+        "sha256": "5bb5339cda4daacad6f4bf07d5d90e8d358d0525221045205d26a2c4f70c4a4a"
+      },
+      "lines": [
+        "Forced: At the beginning of the encounter phase, all copies of Snaga Scouts engage the player with the lowest threat. (The first player chooses in case of a tie.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00003",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wolves-from-Mordor.jpg",
+        "sha256": "cd0f1265ea7c0a0338d2ffbb0fe09a76dca81158bb85146ecd19f47ef7958d4a"
+      },
+      "lines": [
+        "Forced: After Wolves from Mordor attack and destroy a character, shuffle Wolves from Mordor into the encounter deck.",
+        "Shadow: Deal 2 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00004",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wainriders.jpg",
+        "sha256": "8e2770335f7bb259abae22f525c0127e878b718275ff4dbef7742716a56a1c0b"
+      },
+      "lines": [
+        "Each damage dealt by Wainriders raises the defending player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00005",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Wainrider-Captain.jpg",
+        "sha256": "7ebdd7d81c43a7d4a5e8b8742b08924fe24e34eb9d3fb5ddf9e6bf1b89c1c04e"
+      },
+      "lines": [
+        "When Revealed: Move the top Scout enemy from the encounter discard pile to the staging area. (Top 2 Scout enemies instead if the players have crossed the Anduin.)",
+        "Shadow: If this attack is undefended, attacking enemy gets +2 Attack if it is a Scout."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00006",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Uruk-Vanguard.jpg",
+        "sha256": "7b6322a4cce0a7302b309c7ae26c1846935eb8d0534f6e4bdfa0b2a826d18139"
+      },
+      "lines": [
+        "If the players have crossed the Anduin, Uruk Vanguard gets +3 Attack.",
+        "Shadow: attacking enemy gets +1 Attack. (+2 Attack instead if players have crossed the Anduin)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00007",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Captured-Watchtower.jpg",
+        "sha256": "e2f91976f49961b81a5d994a24cdca015705e99ca5eaa710e72ec427aaee1ab7"
+      },
+      "lines": [
+        "If the players have crossed the Anduin, Captured Watchtower gets +3 Threat.",
+        "Shadow: Remove all defending characters from combat. This attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00008",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Emyn-Arnen-Overlook.jpg",
+        "sha256": "fbabc4f8ef93f7535aa9981b5d7e9ad79dd556e8f97e4b10050e33e659d8fe0e"
+      },
+      "lines": [
+        "The first Scout enemy revealed from the encounter deck each round gains surge and doomed 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00009",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Morgulduin.jpg",
+        "sha256": "a923a7e5ef99cab29bb98267d35acee7faaf5c16a4162e567f2bbe7b5f702c00"
+      },
+      "lines": [
+        "While Morgulduin is the active Location, it gains: 'Forced: When a character commits to a Quest, deal 1 damage to that character.'",
+        "Shadow: If the players have not yet crossed the Anduin, return any current active location to the staging area. Morgulduin becomes the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00010",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Pelennor-Fields.jpg",
+        "sha256": "94c76dfa07bf3b1318159c8b766f3c0fe64d4b667e713358a681693ad6b5d699"
+      },
+      "lines": [
+        "If the players have crossed the Anduin, Pelennor Fields gains: 'When faced with the option to travel, the players must either travel to Pelennor Fields or raise each player's threat by 3.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00011",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Ruins-of-Osgiliath.jpg",
+        "sha256": "7f56b63be137659c7bbd20758f7eb76327d74db7fb37b21e49bc8715a6abb469"
+      },
+      "lines": [
+        "If the players have not crossed the Anduin, Ruins of Osgiliath gets +3 Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00012",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Cut-Off.jpg",
+        "sha256": "739d0b3e527b94de07cf3e65638803ecfc6bbaa8426c45a7d2b386ec07745c00"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player must discard all ally cards from his hand, if able.",
+        "Shadow: Defending player must discard 1 ally card from his hand or attacking enemy gets +3 Attack. (2 allies instead if this attack is undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00013",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Dark-Pursuit.jpg",
+        "sha256": "8f8fe6875a55912b9ed8fbf4be499226bd693b9b465c3117a647a7a6fbe4358a"
+      },
+      "lines": [
+        "When Revealed: Raise the total Threat of the staging area by 1 for each Scout enemy in play. If there are no Scout enemies in play, Dark Pursuit gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00014",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Massing-at-Osgiliath.jpg",
+        "sha256": "c73d2bad7b41ab09379c35f5c9351bbd1a2b8ec90203f211484b70c8274c34ff"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Until the end of the phase, each card revealed by the encounter deck gains doomed 1. (Doomed 3 instead if the players have crossed the Anduin.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00015",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Ranger-of-Ithilien.jpg",
+        "sha256": "b60bf1a01b0cede84b430da209d3d5251653e23bd9498934cc4293b7a03231eb"
+      },
+      "lines": [
+        "When Revealed: The first player takes control of Ranger of Ithilien, exhausted and committed to the quest. Then, Ranger of Ithilien gains surge.",
+        "Shadow: Deal 2 damage to attacking enemy. The defending player may exhaust a character he controls to take control of Ranger of Ithilien."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00016",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Beyond-Expectations-1A.jpg",
+        "sha256": "d02359d589e7b7af4fc4eac054cf3ea20a9d71d210afe98298dc38241f04d427"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area. Remove The Witch-king from the encounter deck and set him aside, out of play. Shuffle any unused Scout cards back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00016",
+      "side": "B",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Beyond-Expectations-1B.jpg",
+        "sha256": "5383a9e6bf6ebb5184ce4af4fd0d399c37beebf736175e0df245a5086a590891"
+      },
+      "lines": [
+        "Players cannot travel to West Bank locations."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00017",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Through-the-Ruins-2A.jpg",
+        "sha256": "15be5405ccf6db787cc642e0c3a4a1418de97cc79ce4b3cbcf093d0e27e7b180"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00017",
+      "side": "B",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Through-the-Ruins-2B.jpg",
+        "sha256": "485b5a07b5acacc5d64b33f46a1a76cd2709293910489435eef4d50b5958df2d"
+      },
+      "lines": [
+        "Players cannot travel to West Bank locations.",
+        "Each player cannot play or put into play more than 1 card from his hand each round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00018",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Anduin-Crossing-3A.jpg",
+        "sha256": "35bb83dd2a7ef62d2a633dc057b2c065db4fac48d68720934e8af71b33ad8e0e"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00018",
+      "side": "B",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Anduin-Crossing-3B.jpg",
+        "sha256": "9c55aa63435cd28e2ec863c0bc9fb2278a6a5734700a674800eb3e3a47e6eb29"
+      },
+      "lines": [
+        "Progress tokens from card effects cannot be placed on this quest card or the active location.",
+        "Players cannot travel to East Bank or West Bank locations.",
+        "In order to commit characters to the quest, a player must first choose a hero or 1 Ranger of Ithilien card he controls. Discard each chosen card from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00019",
+      "side": "A",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Race-to-Minas-Tirith-4A.jpg",
+        "sha256": "4c83f77fd6b0fe83e5e324fb6f85433404bdab54b68b67b0ed07990c7c2b22ed"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "00019",
+      "side": "B",
+      "printing": "TMaO",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Massing-at-Osgiliath/Race-to-Minas-Tirith-4B.jpg",
+        "sha256": "e422811f86be1a5cb22b65e16b30ad72afefd8a496fe3e907a80cdff0e76eb23"
+      },
+      "lines": [
+        "When Revealed: Add The Witch-king to the staging area.",
+        "Players have now crossed the Anduin. Players cannot travel to East Bank locations.",
+        "If the players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50201",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Terror-from-the-Mountain-1A.jpg",
+        "sha256": "981fe4b3be9e6f048a5ae5a679476ba4350b32fb1c08fc604c7c96bd1c7a1330"
+      },
+      "lines": [
+        "Setup: Shuffle all copies of Smaug into a separate Smaug deck. Search the encounter deck for Lake-town and add it to the staging area. Shuffle the encounter deck. Then, reveal 1 card from the encounter deck per player, and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50201",
+      "side": "B",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Terror-from-the-Mountain-1B.jpg",
+        "sha256": "4e75466105a9dbc46f2f21639c5134b3c89c98cce6d34955c7b453aa0c81b386"
+      },
+      "lines": [
+        "Smaug cannot have more than 6 damage on him.",
+        "When Revealed: Deal 1 damage to Lake-town for each player in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50202",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fire-and-Water-2A.jpg",
+        "sha256": "208f1eb265c961b7ee17a17bacb1dcfabb70a9000661894c75febc7a17c2891d"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50202",
+      "side": "B",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fire-and-Water-2B.jpg",
+        "sha256": "bd2c160a352001a1f66ec84114d245dbfac515a7e1b5aed80e9d6c21448a0094"
+      },
+      "lines": [
+        "Smaug cannot have more than 12 damage on him.",
+        "When the players quest successfully, any number of progress tokens that would be placed on this quest may instead be discarded to remove the same amount of damage from Lake-town."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50203",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Dragon's-Wrath-3A.jpg",
+        "sha256": "90bc634d5a9d3fbe37a648d72832952cb14cbd949df128c327906d6f6d4bd727"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50203",
+      "side": "B",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Dragon's-Wrath-3B.jpg",
+        "sha256": "84cdd20226089aa3752e34e09de814e04844e71083546067ed7a62265fedc9a2"
+      },
+      "lines": [
+        "Forced: During the quest phase, reveal 1 additional card from the encounter deck",
+        "Refresh Action: Reset the quest deck to stage 2B.",
+        "The players must defeat Smaug to defeat this stage. When Smaug is defeated, compare the number of damage tokens on Lake-town with the number of victory points in the victory display. If the players have more victory points, they have won the game. Otherwise, Lake-town has burned and the players have lost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50204",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Mighty.jpg",
+        "sha256": "dfa6f37c9eef35354e95be0cf3804ad28fde787e72dd85d2993857fd671a56ef"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "When Revealed: Smaug the Mighty makes an immediate attack against each player (deal and resolve a shadow card for each attack)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50205",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Terrible.jpg",
+        "sha256": "04a6a7f09761ef99ca0676f75501d0ed9d6b05252e5ecad4f720e6ddd50d4b25"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "When Revealed: Resolve all burn damage from all locations in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50206",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Smaug-the-Magnificent.jpg",
+        "sha256": "cde7d0389ba1c75ce4c439c93a5336111ce38c173353f98039fd9185960f819e"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Excess damage from attacks by Smaug the Magnificent must be assigned to Lake-town.",
+        "When Revealed: Move 3 damage from Smaug the Magnificent to Lake-town."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50207",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Lake-town.jpg",
+        "sha256": "0ba75e10e6b408f27ff147636a3922093b57a3ae89d44866eed83982aea08c91"
+      },
+      "lines": [
+        "If Lake-town has 50 or more damage on it, Lake-town has completely burned and the players have lost the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50208",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Old-Thrush.jpg",
+        "sha256": "89de061eb90b24dd7d1822612ae3a578a8038c4fee537ddeb8854fc12a5745cc"
+      },
+      "lines": [
+        "Guarded.",
+        "Action: Exhaust a hero to claim this objective and attach it to that hero when it is free of encounters. (Counts as an attachment with the text: \"If detached, discard The Old Thrush. Response: After attached hero exhausts to attack Smaug, discard X cards from hand to reduce Smaug's Defense by X.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50209",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Close-to-the-Flame.jpg",
+        "sha256": "48f5a64f536905b3b64ca8edcb6e9814f73bb9dfea73ca2201745d3ed7fee8e8"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each character in play.",
+        "Shadow: Deal 1 damage to each character in play. Any player may discard a hero to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50210",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Scorching-Blast.jpg",
+        "sha256": "9863925b62de2354ae574403e1c8ca9f365b5ea9b5571e97bce8d34876ffbf0b"
+      },
+      "lines": [
+        "When Revealed: Resolve all burn damage from all locations in play.",
+        "Shadow: Resolve this card's \"When Revealed\" effect. Any player may discard a hero to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50211",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Town-Baiting.jpg",
+        "sha256": "42afec90f5dd8c98379e40d7d01069ae04f645baf6f3b19698c909c94e290346"
+      },
+      "lines": [
+        "When Revealed: Smaug makes an attack against Lake-town. The last player may declare a defender against this attack. Excess damage from this attack must be placed on Lake-town. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50212",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Dire-Magnificence.jpg",
+        "sha256": "55f8c7cde5c06a2b0cf6de796f0e04065f5d6eb00840949ea37d781e28cd7ec9"
+      },
+      "lines": [
+        "When Revealed: Each player must choose and discard 1 ally he controls, if able. Deal 2 damage to Lake-town for each player that cannot.",
+        "Shadow: If this attack destroys a character, Smaug engages the next player and makes an immediate attack against that player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50213",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Catching-Fire.jpg",
+        "sha256": "ea573916f6f1274b020d94ae31764607784f31865045e3d50a8f20f6dbdb6748"
+      },
+      "lines": [
+        "When Revealed: Choose and shuffle 1 Pier location from the victory display back into the encounter deck. If no location was shuffled into the encounter deck by this effect, Catching Fire gains surge.",
+        "Shadow: Defending character gets -2 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50214",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Reckless-in-His-Rage.jpg",
+        "sha256": "30283644bd24d5f20caa7f8aafd84f787727f6894da0d333f9b1c1103390cb24"
+      },
+      "lines": [
+        "When Revealed: If Smaug is in play, he gets +2 Threat, +2 Attack, -2 Defense and gains the text: \"Allies cannot be declared as defenders.\" This effect lasts until the end of the round.",
+        "Shadow: If this attack destroys a character, resolve all burn damage on locations in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50215",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/West-Pier.jpg",
+        "sha256": "085c627e8117ecc23e95db25e168922605993a2df882f043e3350c5d9625fab3"
+      },
+      "lines": [
+        "Each location in play gains Burn 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50216",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/The-Master's-Manor.jpg",
+        "sha256": "e9c778100d5de610167131141d7add6a0e839cd45a83398d8f73ae6136e95d7a"
+      },
+      "lines": [
+        "Burn 3.",
+        "When Revealed: Move all damage from Smaug to Lake-town.",
+        "Shadow: If this attack destroys a character, defending player discards his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50217",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/South-Pier.jpg",
+        "sha256": "c6f8d39f5efeaa1beeb69644d377a24cceb9018861534edc5e03a6695a120124"
+      },
+      "lines": [
+        "Burn 2.",
+        "When faced with the option to travel, players cannot travel to other locations."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50218",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/North-Pier.jpg",
+        "sha256": "8e459391cfa431caf4c5e7b7573eac36bdfba0bec802ae917e317fd80d77a31f"
+      },
+      "lines": [
+        "Burn 2.",
+        "Smaug cannot be damaged."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50219",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Merchant's-District.jpg",
+        "sha256": "22d970b845b5b61c209c52b0a15a7af3b9f0206ad742e39b1ce9941f6c6d930e"
+      },
+      "lines": [
+        "Burn 1.",
+        "Travel Action: Deal 2 damage per player to Lake-town to add this location to the victory display.",
+        "Shadow: Deal 1 damage on Lake-town. (4 damage instead if undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50220",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/East-Pier.jpg",
+        "sha256": "077632a1615f4a264155020eb20a13170635abf6946695dd2ea08babc7e38d5e"
+      },
+      "lines": [
+        "Burn 1.",
+        "\"When Revealed\" effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50221",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Great-House.jpg",
+        "sha256": "97a2fde6318c9f7bb3329d076434ecb49c5f4a100d2734c70b996d2cfd4d6453"
+      },
+      "lines": [
+        "Burn 3.",
+        "When Revealed: Resolve all burn damage from all locations in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50222",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Great-Bridge.jpg",
+        "sha256": "28ed62a85abef9323812978c8c9cbaa5dae573754f529ad1d582a0e3d0461bbd"
+      },
+      "lines": [
+        "Burn 2.",
+        "When Revealed: Discard X cards from each player's deck. X is the amount of damage on Lake-town. (If no cards are discarded by this effect, Great Bridge gains surge.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50223",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Fisherman's-Dock.jpg",
+        "sha256": "99b43f64ed3aaadff07465ea71dc831bbacca16f80bc675525a162bc3a37e4f1"
+      },
+      "lines": [
+        "Burn 1.",
+        "Travel: If there is 1 active location, exhaust a hero to travel here. (There are now 2 active locations.)",
+        "Shadow: Add this location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50224",
+      "side": "A",
+      "printing": "TBoLT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Lake-town/Esgaroth-Wharf.jpg",
+        "sha256": "7cc087baa09fc6d3916e01aeb60111f947f5d10699fefb57f82a4553be5047d5"
+      },
+      "lines": [
+        "Burn 1.",
+        "All locations are immune to player card effects.",
+        "Shadow: Attacking enemy gets +2 Attack. Then, it makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50301",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Disappearance-1A.jpg",
+        "sha256": "5e969b0cb674cfdcb04188ec1299a2f810eb103fef88853112320d2557546842"
+      },
+      "lines": [
+        "Setup: Make Tarlang's Neck the active location. Set Derufin, The Lord of the Dead, The Stone of Erech, and the 3 Night objectives aside, out of play. Shuffle the encounter deck. Place Eventide into play, next to the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50301",
+      "side": "B",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Disappearance-1B.jpg",
+        "sha256": "9eb5136cb79b0eca023d9590060e25ec39f27d41934841df85aa852e1b42d7d6"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player, adding them to the staging area.",
+        "Players cannot defeat this stage while Tarlang's Neck is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50302",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Terror-of-the-Dead-2A.jpg",
+        "sha256": "6e3b0bb4632f5c95a127211f50640dbee48d8a6ba1d3e3d49b50512e3b457dd0"
+      },
+      "lines": [
+        "When Revealed: Add The Stone of Erech to the staging area and attach Derufin to it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50302",
+      "side": "B",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Terror-of-the-Dead-2B.jpg",
+        "sha256": "85e3868ff580baadb368bb6ebc8057145e7a2ef2c9ebb5a4d54554664c0d1f2c"
+      },
+      "lines": [
+        "Forced: At the beginning of each round, the players must choose: each player skips the next planning phase, or heroes do not collect resources during the resource phase this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50303",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Shadow-Host-3A.jpg",
+        "sha256": "b28116724c2a00fede7e22735d88d7484ffc507407f45287fbabd2aae3886316"
+      },
+      "lines": [
+        "When Revealed: Starting with the first player, each player searches the encounter deck and discard pile for 1 Oathbreaker enemy, reveals it, and adds it to the staging area. Add the Lord of the Dead to the staging area.",
+        "Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50303",
+      "side": "B",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Shadow-Host-3B.jpg",
+        "sha256": "dcc88f21bc3bced4b7ff45c109898775778ef242b6b909e291f1028e2800bb07"
+      },
+      "lines": [
+        "Midnight. Battle (Characters use their Attack instead of Willpower when questing.)",
+        "Players cannot place progress on this stage unless they control Derufin.",
+        "If the players defeat this stage, they have escaped the Blackroot Vale with Derufin and won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50304",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Derufin.jpg",
+        "sha256": "690cd2ad63c1f0c27266d232d8e92f716238385975fc0056bd02c19d803e53f7"
+      },
+      "lines": [
+        "Forced: After the players travel to The Stone of Erech, the first player gains control of Derufin.",
+        "Dusk. Derufin gets -1 Willpower",
+        "Midnight. Derufin gets -2 Willpower",
+        "If Derufin leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50305",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Lord-of-the-Dead.jpg",
+        "sha256": "4da872385a4344da88442024c93499c6e6000addff52202eba31229b1255653e"
+      },
+      "lines": [
+        "Spectral. Cannot have attachments.",
+        "While you are engaged with The Lord of the Dead, treat all printed text boxes on characters you control as if they were blank (except for Traits.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50306",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Stone-of-Erech-Location.jpg",
+        "sha256": "3779bf04a1924e4c45a0ef2f6bddf018cf3112a25c108d7bc11aee30f67cedcd"
+      },
+      "lines": [
+        "Immune to player card effects. X is twice the number of players in the game.",
+        "While The Stone of Erech is that active location, characters with less than 2 Willpower cannot ready.",
+        "Travel: Exhaust each character with less than 2 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50307",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Tarlang's-Neck.jpg",
+        "sha256": "d1a5fad90565042da81e802b1892ed8bed8279b907c97f5170d8032b8945d9a9"
+      },
+      "lines": [
+        "While Tarlang's Neck is the active location, it gains, 'Forced: At the beginning of the encounter phase, the players must either immediately end the encounter phase, or the first player must engage all enemies in the staging area.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50308",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Eventide.jpg",
+        "sha256": "6541caffc17875cf5fabb64b70c4054eaad93f61d35f8af18aeda87676cde374"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 progress on Eventide.",
+        "If there are 4 or more progress on Eventide, add it to the victory display and put Dusk into play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50309",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Dusk.jpg",
+        "sha256": "67d9687dfa76ca48f23003232eed18a03f784df22ebe22e125788a35c64009c0"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 progress on Dusk.",
+        "If there are 4 or more progress on Dusk, add it to the victory display and put Midnight into play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50310",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Midnight.jpg",
+        "sha256": "170bc2b3513b48d63d13396cde65044bff39ff1bf04567a421e4801f3327cbcb"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 progress on Midnight. Then, raise each player's threat by the number of progress on Midnight."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50311",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Relic-from-the-Dark-Years.jpg",
+        "sha256": "14da7d8f3265bb9ea0a7e1b337033e59f9ac2f60aaf9d311134443dac55eb247"
+      },
+      "lines": [
+        "Midnight. Action: Claim this objective and attach it to a hero you control. Counts as an Artifact attachment with the text: 'When attached hero attacks an Oathbreaker, that enemy loses the Spectral keyword until the end of the phase.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50312",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-man.jpg",
+        "sha256": "4f27dbb68f1e3ec23417ef4f8e750eb88004a4ec791666e7c0e01bbad5f90f34"
+      },
+      "lines": [
+        "Spectral.",
+        "When Revealed: Players cannot play events until the end of the round.",
+        "Shadow: Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50313",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Restless-Dead.jpg",
+        "sha256": "f5c6ba8b8f183220a276465a5ce3d4358d14328a9076323a6bb65001e37ef134"
+      },
+      "lines": [
+        "Spectral.",
+        "When Revealed: Return the topmost Undead enemy in the encounter discard pile to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50314",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Whisperer.jpg",
+        "sha256": "3ce7b04fe568644eae959787d74330942bfe885d908ba9c620e86764a471b529"
+      },
+      "lines": [
+        "Spectral.",
+        "Dusk. Whisperer gets +1 Threat.",
+        "Midnight. Whisperer gets +2 Threat and gains doomed 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50315",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-Host-Captain.jpg",
+        "sha256": "59a14623bca46e09c7afb44b617361aaf3808fcd83e18338cc673d5a3eb09f35"
+      },
+      "lines": [
+        "Spectral.",
+        "Dusk. Shadow Host Captain gets +1 Attack and +1 Defense.",
+        "Midnight. Shadow Host Captain gets +2 Attack and +2 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50316",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Regretful-Shade.jpg",
+        "sha256": "1a8e53803f4df05f74a28a566b0ad8f65ad14a15f668e40d4d59964273b1c325"
+      },
+      "lines": [
+        "Spectral. Surge.",
+        "Shadow: Deal attacking enemy 1 additional shadow card (Dusk. 2 additional cards instead. Midnight. 3 additional cards instead)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50317",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Banks-of-Morthond.jpg",
+        "sha256": "65ed5a968769ae7cdcb52423c99640b42d026f6b0dc09056a936c005cf24f738"
+      },
+      "lines": [
+        "While Banks of Morthond is the active location, each location in the staging area gets -1 Threat.",
+        "Shadow: If this attack destroys a character, add 1 progress to the current Night objective."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50318",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Vale-of-Shadows.jpg",
+        "sha256": "ca72c483b196b668bb689f8dd263628d848f9ec3a7a05f40f3907ef5cd494998"
+      },
+      "lines": [
+        "When Revealed: Make Vale of Shadows the active location. If another location is currently active, return it to the staging area.",
+        "Dusk. Vale of Shadows gets +2 quest points.",
+        "Midnight. Vale of Shadows gets +4 quest points."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50319",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Blackroot-Graves.jpg",
+        "sha256": "034513f2e46ab398a419dd7cdd2ee38dbb3b3b36035b9a044150c81c23362bbb"
+      },
+      "lines": [
+        "Forced: When Blackroot Graves is explored, return the topmost Undead enemy in the encounter discard pile to play, engaged with the first player.",
+        "Shadow: If defending character has 0 Willpower, deal 2 damage to that character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50320",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Shadow-of-Dwimorberg.jpg",
+        "sha256": "352d97ff783f9d46962cd0fffdad01e572643f3ffb30a752e539c2680ccdf715"
+      },
+      "lines": [
+        "Dusk. Shadow of Dwimorberg gets +2 Threat.",
+        "Midnight. Shadow of Dwimorberg gets +4 Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50321",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Haunted-Valley.jpg",
+        "sha256": "d601d438526c62191edbd0fee5a77be735c7a8c426f1db29f32782e9148f1914"
+      },
+      "lines": [
+        "While this location is in the staging area, all ready heroes lose all Lore, Leadership, Spirit and Tactics icons.",
+        "Planning Action: Exhaust a hero. Any player may trigger this action."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50322",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Midnight-Throng.jpg",
+        "sha256": "db9b4efbf90c99f2f2cf9559f57ddbb130eb03d98bb2a2fa7b8a4d7510ded6f7"
+      },
+      "lines": [
+        "When Revealed: Starting with the first player, each player must search the encounter deck and discard pile for an Undead enemy, reveal it, and add it to the staging area. Shuffle the encounter deck.",
+        "Midnight. This effect cannot be canceled.",
+        "Shadow: Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50323",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Murmurs-of-Dread.jpg",
+        "sha256": "739c4582eda2b2ab333fd5b053407b899d1a4be5f406bd0d4b796438ec38b6d0"
+      },
+      "lines": [
+        "When Revealed: All characters get -1 Willpower until the end of the round.",
+        "Shadow: Dusk/Midnight. Attacking enemy makes an additional attack after this one.",
+        "Midnight. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50324",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Groping-Horror.jpg",
+        "sha256": "31b4c855874942ee880e6e72bbaca899cc10c0e765f9e15020721cc99cea4384"
+      },
+      "lines": [
+        "When Revealed: The first player must choose: skip the next travel phase, or each player must pass his hand to the player on his left (discard your hand instead if you are the only player in the game).",
+        "Midnight. Groping Horror gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50325",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/Driven-by-Fear.jpg",
+        "sha256": "2eb8297161be54bf8d433629051fe8fcfbc8f473ad471d5d7b4243e851720320"
+      },
+      "lines": [
+        "When Revealed: The first player attaches Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attached character's text box as if it was blank (except for Traits.)'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50326",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Dead-Ride-Behind.jpg",
+        "sha256": "29d2c4dc0dfa68645e86fd01ea31716ccfd4bd866b2bf28eaa2a627f2a4cd32f"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each character with less than 2 Willpower (Dusk. less than 3 Willpower instead. Midnight. less than 4 Willpower instead)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50327",
+      "side": "A",
+      "printing": "TSoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Gloaming.jpg",
+        "sha256": "cf9106e68de1e5188f3b17ca41fb998411831bc3c48fe33e73abb118a7a75369"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Add 1 progress to the current Night objective."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147001",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Farewell-to-the-Shire-1A.jpg",
+        "sha256": "c239abc630d8ac5f3d121a7caa58113a3f9a5e626c0987ffed60825329b9ca67"
+      },
+      "lines": [
+        "Setup: Set Old Man Willow and Withywindle aside, out of play. Each player searches the encounter deck and adds 1 different location to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147001",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Farewell-to-the-Shire-1B.jpg",
+        "sha256": "b78595fdcc4a3a84340fb215f974b921c8e759253ed1286b79942e68007ca7d3"
+      },
+      "lines": [
+        "When Revealed: Each player draws 1 card. Advance to a random stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147002",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Dark-Bad-Place-2A.jpg",
+        "sha256": "39f2d612f7028efc985aa8a4912a0c9723299c0827a3a5c9d6145b24b9a42030"
+      },
+      "lines": [
+        "When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147002",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Dark-Bad-Place-2B.jpg",
+        "sha256": "dde855e9d4657b2696d12194fc432b353009d74d23d3c72f5b8b6765fbfc9494"
+      },
+      "lines": [
+        "Forced: At the end of the planning phase, each player must exhaust a hero he controls.",
+        "Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147003",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Choked-with-Brambles-2A.jpg",
+        "sha256": "39f2d612f7028efc985aa8a4912a0c9723299c0827a3a5c9d6145b24b9a42030"
+      },
+      "lines": [
+        "When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147003",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Choked-with-Brambles-2B.jpg",
+        "sha256": "fd7797887d01ad886a37dfa9279a63397b54d4bf800d37d5ad57b2baf98a7141"
+      },
+      "lines": [
+        "Forced: At the beginning of the round, remove all progress from each location in play.",
+        "Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147004",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Shifting-Trees-2A.jpg",
+        "sha256": "39f2d612f7028efc985aa8a4912a0c9723299c0827a3a5c9d6145b24b9a42030"
+      },
+      "lines": [
+        "When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147004",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Shifting-Trees-2B.jpg",
+        "sha256": "04ac912d2cac592920f79d58ba101ed484dadec3ada27eef5f83173bee0ced7e"
+      },
+      "lines": [
+        "Forced: At the end of the round, discard a random location from the victory display.",
+        "Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147005",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Closing-in-Around-Them-2A.jpg",
+        "sha256": "39f2d612f7028efc985aa8a4912a0c9723299c0827a3a5c9d6145b24b9a42030"
+      },
+      "lines": [
+        "When Revealed: If the number of locations in the staging area is less than the number of players in the game, search the encounter deck and discard pile for a location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147005",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Living-Forest-Closing-in-Around-Them-2B.jpg",
+        "sha256": "960c7d9c22a5f3a38504f1e343961d8bfe1ab3b85a84c493e0f5c4d57600449a"
+      },
+      "lines": [
+        "Forced: The first player reveals 1 additional encounter card during the quest phase.",
+        "Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147006",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3A.jpg",
+        "sha256": "fed9b639be03a9fad55eded1f62d703a663e68b12b08cb7815a547e1b9becd73"
+      },
+      "lines": [
+        "When Revealed: Add Old Man Willow and Withywindle to the staging area. Reveal X encounter cards where X is the number of players in the game minus 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147006",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3B.jpg",
+        "sha256": "c1016d4f40308c7714f67a675124d6964e3a1deadbe503356dd292f366ed9144"
+      },
+      "lines": [
+        "Old Man Willow cannot leave the staging area but is considered to be engaged with each player and attacks each player in turn order during the combat phase (deal and resolve a shadow card for each attack).",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147007",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Old-Man-Willow.jpg",
+        "sha256": "763c11bb5175ae8223cae164a520ba713ce65282de67d400ab51563d0f0340df"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects.",
+        "Forced: When Old Man Willow attacks, discard a random location from the victory display. The defending player raises his threat by X, where X is that location's victory point value."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147008",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Long-Trailer.jpg",
+        "sha256": "cdea9605bdb07a0252e959dde06144c6ed9049791ec68aa3d7cb0d511e703d0f"
+      },
+      "lines": [
+        "While Long Trailer is in the staging area it gains: 'Forced: After the active location leaves play as an explored location, Long Trailer makes an immediate attack against the first player.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147009",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Grasping-Root.jpg",
+        "sha256": "3628c34f9a15ae45ca7e67100a07a97668e312415d15978a36a085a581c56c98"
+      },
+      "lines": [
+        "Forced: After Grasping Root engages a player, that player must assign X damage among characters he controls. X is the number of locations in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147010",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Army-of-Flies.jpg",
+        "sha256": "cc276e2b4c857df57b5aca9f63bd5fd95bb9049b8fbd7d750418673b0df8ba29"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Army of Flies engages a player, that player discards a non-objective attachment he controls.",
+        "Shadow: Defending player discards a non-objective attachment he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147011",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Withywindle.jpg",
+        "sha256": "b3b02a7df8144c15116a6cbaa51b37f0c2780aac91fe80cc6e812dd19c959a2e"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "The players cannot win the game while Withywindle is in play.",
+        "While Withywindle is the active location, the first player reveals 1 additional encounter card during the quest phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147012",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Misleading-Path.jpg",
+        "sha256": "e65562665b254c4eb89a25b3092dd54f11c902c447b0e40f16bb002d46f15b66"
+      },
+      "lines": [
+        "Surge.",
+        "When faced with the option to travel, the players must travel to Misleading Path if there is no active location.",
+        "Shadow: Defending player discards each ally card in his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147013",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Deep-Gulley.jpg",
+        "sha256": "e8e64c08ff7feffb28a1a1a015b8fe0064ed1c8cc0acf34017ccdac151b01567"
+      },
+      "lines": [
+        "While Deep Gulley is in the staging area, it gains: 'Forced: After a player optionally engages an enemy, that player raises his threat by X, where X is the engaged enemy's Attack.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147014",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Strange-Woods.jpg",
+        "sha256": "156960b9d5eb4dc070455f49d2d02af73eebe98cce17ba47ece150a25ce5dfc4"
+      },
+      "lines": [
+        "While Strange Woods is in the staging area, characters cannot be healed.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147015",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Wall-of-Trees.jpg",
+        "sha256": "12e16baaf12ddaa467bbfe8c7db5190e04d9ba1606b03178e26a0e9a53ada011"
+      },
+      "lines": [
+        "X equals the number of players in the game.",
+        "While Wall of Trees is in the staging area, progress must be placed on Wall of Trees before it can be placed on the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147016",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Oppressive-Forest.jpg",
+        "sha256": "ec88cce3bf9f57dd27f88741b6ec370091db7ce0337939f4776c94c9ef923d4f"
+      },
+      "lines": [
+        "While Oppressive Forest is in the staging area, each player cannot play more than 1 card each round.",
+        "Shadow: If there are no locations in the staging area, add this location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147017",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Swaying-Without-Wind.jpg",
+        "sha256": "091b0aa8e529f82eae646919b0f4807b256d39f9cdf76e8c6963352487533a3e"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Choose a location in the victory display and return it to the staging area. If no location was returned to the staging area this way, Swaying Without Wind gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147018",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Falling-Branches.jpg",
+        "sha256": "79efb910c0da8339374ee10eb8364b0d891ebe0b9c1537f0c5bf1db4cdac6c9a"
+      },
+      "lines": [
+        "When Revealed: Each player removes a character he controls from the quest and deals 2 damage to that character (3 damage instead if that character is an ally).",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is an ally.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147019",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Song-of-Sleep.jpg",
+        "sha256": "67dfbf0ead1451f582880817e52b62005015e82e1c348008c061bac2486e6be5"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Remove a questing hero you control from the quest and attach Song of Sleep to that hero. Counts as a Condition attachment with the text: 'Limit 1 per hero. Treat attached hero's printed text box as if it were blank (except for Traits). Attached hero cannot ready.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147020",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Lost-and-Witless.jpg",
+        "sha256": "af09540af3792550d2091ea341322580269487f5e9282711faaf204d280a67cd"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Discard all progress from each location in the staging area. If there is a non-unique active location, randomly choose a location in the staging area and switch it with the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147021",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Ending-and-Failing.jpg",
+        "sha256": "d4bbf5dbf00be0b8ac187a65b1024ec4e5c25e4ecb5e059f0b2eb6f42d447350"
+      },
+      "lines": [
+        "Doomed 2.",
+        "When Revealed: At the end of the phase, raise each player's threat by X where X is the number of enemies in the staging area.",
+        "Shadow: Return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147022",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Tom-Bombadil.jpg",
+        "sha256": "bdeb940495dda818d72a577894c3fa13ef9a0fad738bf9110be7f2ce7be3851c"
+      },
+      "lines": [
+        "When Revealed: Choose a player. That player gains control of Tom Bombadil, ready and committed to the quest. At the end of the round, discard Tom Bombadil. Then, shuffle the encounter discard pile into the encounter deck. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147023",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Old-Forest-SetupA.jpg",
+        "sha256": "aa3a7c9b7579efe4d18eaac218a1a957867c2042f38ef881855c36246cba9733"
+      },
+      "lines": [
+        "You are playing Campaign Mode.",
+        "Setup: The first player attaches Old Bogey-stories to a hero in play."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        },
+        {
+          "line": 2,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147023",
+      "side": "B",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Old-Forest-SetupB.jpg",
+        "sha256": "8d7ed614226bc89a4cc95d58cfc713ef688566fa5a2fc6cfd3d90bb3f411dbf2"
+      },
+      "lines": [
+        "Resolution: If there are at least 12 damage tokens on Old Man Willow, the players have earned the Old Bogey-stories boon card."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "147024",
+      "side": "A",
+      "printing": "TOF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/Old-Bogey-stories.jpg",
+        "sha256": "879aa0fe12648227205d419981bdc2ff6ada4b4972d6033a7a012a92d7aef069"
+      },
+      "lines": [
+        "Setup: The first player attaches Old Bogey-stories to a hero in play.",
+        "Action: Add Old Bogey-stories to the victory display to shuffle your hand of at least 6 cards into your deck. Then, draw 6 cards."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        },
+        {
+          "line": 2,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, The Old Forest)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148001",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/The-House-of-Tom-Bombadil-1A.jpg",
+        "sha256": "49964c1334df092e4602194759ab501272121541c59f6dcb85cad9e18e6f843a"
+      },
+      "lines": [
+        "Setup: Set each copy of Great Barrow, Standing Stones, and Hollow Circle aside, out of play. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148001",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/The-House-of-Tom-Bombadil-1B.jpg",
+        "sha256": "8402ae6c02a08a373d3eb041f689763362a13fd2aa8b791087eb44bb87c23d65"
+      },
+      "lines": [
+        "Skip the quest phase.",
+        "Forced: At the end of the round, place 1 progress on this stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148002",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Across-the-Downs-2A.jpg",
+        "sha256": "a1b5052e13ae3bd41129ea7a2dc876c32b48cd06fa2885961eba7795621aded5"
+      },
+      "lines": [
+        "When Revealed: Add Hollow Circle to the staging area. Each player reveals 1 encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148002",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Across-the-Downs-2B.jpg",
+        "sha256": "4d69d5076ddde78bfde901258aaeaa3d04938b1e7b31b3a1d189464f551c7a9d"
+      },
+      "lines": [
+        "Forced: At the end of the refresh phase, raise each player's threat by 1.",
+        "The players cannot defeat this stage unless Hollow Circle is in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148003",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Lost-in-the-Fog-3A.jpg",
+        "sha256": "b4ff7cc9d07f7fd0433e0f36a687501ffb80a03ca90ee2d1333376bcd618e3f3"
+      },
+      "lines": [
+        "When Revealed: The first player adds Standing Stones to the staging area. Each other player reveals 1 encounter card. Shuffle the encounter discard pile and each copy of Great Barrow into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148003",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Lost-in-the-Fog-3B.jpg",
+        "sha256": "74772306136759471c16721b5937f04a5651ac30154b2a3154ffa6bc0a9e3e07"
+      },
+      "lines": [
+        "Progress cannot be placed here while Great Barrow is in play.",
+        "Forced: After a player is eliminated (at any stage), raise the threat of each player at this stage by 10.",
+        "The players cannot defeat this stage unless each player in the game is at this stage and Standing Stones is in the victory display. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148004",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Trapped-Inside-a-Barrow-4A.jpg",
+        "sha256": "9de11c52d39a1d8a81d310c059013ae13da7c79052083c59f2a3ee871c6e4f36"
+      },
+      "lines": [
+        "When Revealed: End your quest phase (do not resolve the quest). Discard cards from the encounter deck until a Wight enemy is discarded. Add the discarded Wight enemy to the staging area. Discard all but X allies you control where X is the number of enemies engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148004",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Trapped-Inside-a-Barrow-4B.jpg",
+        "sha256": "969c8e19dc8640e1e8e10bfab828ce4c18e65e96125454181b7305c26674310f"
+      },
+      "lines": [
+        "Forced: When a location is revealed at this stage, cancel its effects and discard it. Then, raise your threat by that card's Threat (including modifiers).",
+        "Forced: After this stage is defeated, advance to stage 3B at the beginning of the travel phase (combining staging areas with stage 3B) and place 1 progress on a Great Barrow at that stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148005",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Hollow-Circle.jpg",
+        "sha256": "52e31c9b57bfaf0c4d3a072fdc659b0acbe4390da9eac15cbfd32260a966a058"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: Each player searches the encounter deck and discard pile for a Wight enemy and puts it into play engaged with him. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148006",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Standing-Stones.jpg",
+        "sha256": "da8b5656633b103e51e0c47786188fefc5203df7afe0dad47994bbb72c72dc6c"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: The first player searches the encounter deck, discard pile, and victory display for a Great Barrow and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148007",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Great-Barrow.jpg",
+        "sha256": "0334b237f414469e5204bf6176c1b8e0e135f6dc0388c094f4b8d9c42356d739"
+      },
+      "lines": [
+        "Peril. Immune to player card effects. The players cannot travel here.",
+        "Forced: After Great Barrow enters the staging area, remove each character you control from the quest and create your own staging area. Then advance to a separate stage 4A by yourself."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148008",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Ancient-Barrow.jpg",
+        "sha256": "843c3d2b682ff12df1cee41cc220701f5d1427fbe3e3713d586b397ec4a170f6"
+      },
+      "lines": [
+        "X is 1 plus the number of facedown cards under this location.",
+        "Forced: After Ancient Barrow enters play, each player places an ally he controls facedown under this location. When Ancient Barrow leaves play as an explored location, return each ally under this location to its owner's hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148009",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Stone-Ring.jpg",
+        "sha256": "027742da036a504361cd123a3014f012153efcaa375bddaacd17d87a841e6664"
+      },
+      "lines": [
+        "While Stone Ring is in the staging area, each Wight enemy engaged with a player gets +1 Attack and +1 Defense and applies the first sentence of its game text to each player at this stage as if it were engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148010",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/North-Downs.jpg",
+        "sha256": "af9f0d7142f6fc7d9d36d519dabf15591e689707482f81c41d3e6e311f49553a"
+      },
+      "lines": [
+        "While North Downs is in the staging area, characters use their Willpower instead of their Defense when defending against Wight enemies.",
+        "Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148011",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Barrow-wight.jpg",
+        "sha256": "e7a8b77aa8ad43cdf5c15373668d418f0934609c6de1ff477f702b53ba4a94fc"
+      },
+      "lines": [
+        "While Barrow-wight is engaged with a player, that player's threat cannot be reduced.",
+        "Forced: After Barrow-wight attacks and destroys a character, that character's controller raises his threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148012",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Cold-wight.jpg",
+        "sha256": "837c87744b7b6be65b4ac26521ad7e4ebb2a1151267fcae108a69a80bff67994"
+      },
+      "lines": [
+        "While Cold-wight is engaged with a player, that player cannot draw cards from card effects.",
+        "Forced: After Cold-wight attacks and destroys a character, that character's controller discards a random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148013",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Dark-wight.jpg",
+        "sha256": "1f54cc7af91e786c4aada393680f1539eddff6e37924c9715f74a5f6b8cbc7c0"
+      },
+      "lines": [
+        "While Dark-wight is engaged with a player, that player's heroes cannot gain resources from card effects.",
+        "Forced: After Dark-wight attacks and destroys a character, that character's controller discards all resources from each hero he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148014",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/I'm-Waiting-for-You.jpg",
+        "sha256": "2597ad2c653ce7fa1acf64c09d8615b1b749aa03e207c8a1b9161426f615ff21"
+      },
+      "lines": [
+        "When Revealed: Each Wight enemy engaged with a player makes an immediate attack. If no attacks were made this way, I'm Waiting for You! gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending character is an ally)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148015",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Long-Groping-Arm.jpg",
+        "sha256": "860587b262ca953d446c1a22d760d46b7a8868f181ecc98bac34bba6ded2ad89"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Until the end of the phase, each Wight enemy engaged with you contributes its Threat to the total Threat in the staging area. If no enemies are engaged with you, search the encounter deck and discard pile for a Wight enemy and put it into play engaged with you. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148016",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Chill-Fog.jpg",
+        "sha256": "0dce7126b61de964262ca6d125f8480dbbee109de06ab79f926aeb297b2352dc"
+      },
+      "lines": [
+        "When Revealed: Discard all resources in play. Each player raises his threat by 1 for each resource he discarded this way. If no resources were discarded this way, Chill Fog gains surge.",
+        "Shadow: Raise your threat by 1 for each damage dealt by this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148017",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Frozen-by-Fear.jpg",
+        "sha256": "02606f79eaab57a084e50d777413d31477ba465d84076d4279c0ed16781a8f4c"
+      },
+      "lines": [
+        "Surge. Doomed 1.",
+        "When Revealed: Until the end of the round, players cannot trigger Action or Response effects.",
+        "Shadow: Until the end of the round, attacking enemy cannot take damage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148018",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Dreadful-Song.jpg",
+        "sha256": "242cf3cf398b3f317ca813b5cc02f8a5c11d5c3076063c91462d60d42c01dc36"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Attach to a questing hero you control. Counts as a Condition attachment with the text: \"Limit 1 per hero. Attached hero's Willpower is reduced to 0. Forced: At the end of the round, raise your threat by 1 for each Wight enemy engaged with you.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148019",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Tom-Bombadil.jpg",
+        "sha256": "bdeb940495dda818d72a577894c3fa13ef9a0fad738bf9110be7f2ce7be3851c"
+      },
+      "lines": [
+        "When Revealed: Choose a player. That player gains control of Tom Bombadil, ready and committed to the quest. At the end of the round, discard Tom Bombadil. Then, shuffle the encounter discard pile into the encounter deck. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148020",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Fog-on-the-Barrow-downs-SetupA.jpg",
+        "sha256": "bc2f9beac8fa6656ef0a2677cead9839a75e0692ab8550fd9780525eccba0d46"
+      },
+      "lines": [
+        "You are playing Campaign Mode.",
+        "While any player is at stage 4B, the first player cannot lose control of the first player token."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        },
+        {
+          "line": 2,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148020",
+      "side": "B",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Fog-on-the-Barrow-downs-SetupB.jpg",
+        "sha256": "c0847ebc50f55a4d6b5de77f649643fc0a8994adf51d949d4812e93b8507ffb5"
+      },
+      "lines": [
+        "Resolution: The players have earned the Ho! Tom Bombadil! boon card."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "148021",
+      "side": "A",
+      "printing": "FotBd",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Fog-on-the-Barrow-downs/Ho-Tom-Bombadil.jpg",
+        "sha256": "a6c29b82e07af6e34edbf985ee5d5cd1dd4c1d9e28002147fb37bd0e0f2c8242"
+      },
+      "lines": [
+        "Setup: The first player adds this card to his hand.",
+        "Response: Add this card to the victory display and remove it from the campaign pool to cancel the \"when revealed\" effects of an encounter card just revealed from the encounter deck."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        },
+        {
+          "line": 2,
+          "reason": "Campaign Mode only: the Standalone scenarios cycle is standalone only with no campaign log, so the build deals no campaign card or boon (docs/brief.md, Fog on the Barrow-downs)."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    }
+  ]
+}

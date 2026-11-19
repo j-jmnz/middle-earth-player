@@ -197,8 +197,9 @@ export const pickSchema = z.strictObject({
   // printed Ranged keyword").
   printedKeyword: z.enum(["ranged", "sentinel"]).optional(),
   // An enemy engaged with the player the effect last picked (`picked`: "each enemy engaged with that player"), or one not engaged
-  // with the chooser (`notYou`: in the staging area, with `staging`, or engaged with another player).
-  engagedWith: z.enum(["picked", "notYou"]).optional(),
+  // with the chooser (`notYou`: in the staging area, with `staging`, or engaged with another player), or one engaged with the controller of the card the source is attached to
+  // (`host`: "for each Wight enemy engaged with you" on an encounter attachment, whose "you" is the attached hero's controller, 148018:A:2).
+  engagedWith: z.enum(["picked", "notYou", "host"]).optional(),
   // An attachment on the card the answered event is about ("a Weapon attached to that character").
   onSubject: z.boolean().optional(),
   // A card with at least this many printed hit points ("an enemy with 5 or more printed hit points").

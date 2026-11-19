@@ -71,10 +71,14 @@ export const printedKeywordsSchema = z.strictObject({
   uncharted: z.boolean().optional(),
   // Aflame X on a location (dcce.aflame): the damage that destroys it, and puts it facedown underneath The Havens Burn (src/rules/families/aflame/). A numbered keyword with a value of 0 does not exist.
   aflame: z.number().int().positive().optional(),
+  // Burn X on a location (docs/brief.md, The Battle of Lake-town): the burn damage "Resolve all burn damage" adds up (src/rules/families/smaug/). A numbered keyword with a value of 0 does not exist.
+  burn: z.number().int().positive().optional(),
   // Grapple (highest or lowest printed Threat or quest points) on an enemy (dcce.grapple): the staging-area location it attaches to, facedown, when it is revealed (src/rules/families/grapple/).
   grapple: z.enum(["highestThreat", "lowestThreat", "highestQuestPoints", "lowestQuestPoints"]).optional(),
   // Phantom on an enemy (mec113.phantom): the damage its attack would deal is canceled and the defending player raises their threat by that much (src/rules/families/grey-company/).
   phantom: z.boolean().optional(),
+  // Spectral on an enemy (docs/brief.md, The Stone of Erech): characters attacking it use their Willpower instead of their Attack to determine attack strength (src/rules/families/attack/spectral.ts).
+  spectral: z.boolean().optional(),
   // Dire on a quest card (mec113.dire): while the main quest has it, each player's elimination level is 99, non-boon player card effects lower a player's threat by at most 1 each round and Valour triggers at 80 threat (src/rules/families/black-gate/dire.ts).
   dire: z.boolean().optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
@@ -146,7 +150,7 @@ const stageSchema = z.strictObject({
   // Defeating this stage when the Stormcaller is at this stage number wins the game (CatchUpWins, 12013:B:3).
   catchUp: z.number().int().positive().optional(),
   // The stages defeating this one proceeds to in a random order, each played once: one of `codes` still in the quest deck, else `otherwise`; with `remove` the stage defeated leaves the game (AdvanceToRandomStage, 19048:B:2).
-  randomNext: z.strictObject({ codes: z.array(z.string()).min(2), otherwise: z.string().optional(), remove: z.literal(true).optional() }).optional(),
+  randomNext: z.strictObject({ codes: z.array(z.string()).min(2), otherwise: z.string().optional(), remove: z.literal(true).optional(), different: z.literal(true).optional() }).optional(),
   // A stage 2 of a quest deck that is not flipped when it is revealed: it arrives side A up and shows side B from the beginning of the quest phase (FlipAtQuestPhase, 19135:A:2; emce.gundabad-quest-deck).
   deck: z.literal(true).optional(),
 });

@@ -36,7 +36,9 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const resolved = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
-  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);
+  // Progress placed anywhere in this resolution (the active location, a location that takes it first, the stage), for the trigger the table hears once.
+  const placed = steps.slice(before).some((step) => step.kind === "progress" && step.amount > 0);
+  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), { ...outcome, placed }, ctx, steps);
 }
 
 // A card in the game answers a failed quest with an X amount (Urdug's Gambit, 19051:B:2): the event carries the shortfall for it.
@@ -47,10 +49,13 @@ const failureAmountRead = (state: ScenarioState, ctx: ReduceContext): boolean =>
 function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean): ScenarioState {
   let next = state;
   for (const seat of areaSeats(state)) {
+    // A seat whose own quest phase ended resolves nothing (EndQuestPhase `own`, 148004:A:1).
+    if ((state.questEnded ?? []).includes(seat)) continue;
     next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat, failureAmountRead(state, ctx));
     if (next.stageCleared || next.lost) break;
   }
-  return clearCommitted(next);
+  const { questEnded: _ended, ...rest } = next;
+  return clearCommitted(rest);
 }
 
 // After progress was placed on the quest (from `steps[before]` on): each stage the quest advanced to has its When Revealed

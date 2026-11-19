@@ -10,7 +10,7 @@ import { pickCandidates } from "../interpret/pick.ts";
 import { lastPicked, seatOf } from "../interpret/player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { addModifier } from "../core/keywords.ts";
-import { headOf } from "../families/breaking/areas.ts";
+import { headOf, isolatedAreas } from "../families/breaking/areas.ts";
 import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, isTraitedEnemies, isTraitedLocations, isTraitedStaging, STAGING_CLASS, traitedEnemies, traitedLocations, traitedStaging, ownCharacters } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
@@ -149,7 +149,7 @@ export function modifyStat(
   for (const id of targets) {
     if (trait != null && !id.startsWith("seat:") && !isTraitedEnemies(id) && !isTraitedStaging(id) && !isTraitedLocations(id) && !hasTrait(next, id, trait, ctx)) continue;
     if (id === "table") next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId, stat: instruction.stat, amount, until: instruction.until }] };
-    else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
+    else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until, ...(trait != null && instruction.stat === "engagedThreatSeat" ? { trait } : {}) }] };
     else next = isClassHolder(id)
       ? addClassModifier(next, id, sourceId, instruction.stat, amount, instruction.until)
       : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
@@ -157,8 +157,8 @@ export function modifyStat(
   // A condition read each time the stat is read stays on the modifiers it made ("+3 Attack while attacking an enemy with a
   // higher engagement cost than your threat", 04004:A:1).
   const kept = instruction.when;
-  // Mount Gram: an encounter card's lasting effect on each enemy reaches the enemies of its own staging area only while the areas are separate (mec108.create-staging-area).
-  if (state.separate && state.capture && instruction.target === "enemies" && !kept && next.modifiers.length > state.modifiers.length) {
+  // Isolated areas: an encounter card's lasting effect on each enemy reaches the enemies of its own staging area only (mec108.create-staging-area).
+  if (isolatedAreas(state) && instruction.target === "enemies" && !kept && next.modifiers.length > state.modifiers.length) {
     const area = { kind: "inArea" as const, seat: headOf(state, focus.seat) };
     return { ...next, modifiers: [...state.modifiers, ...next.modifiers.slice(state.modifiers.length).map((modifier) => ({ ...modifier, when: area }))] };
   }

@@ -1,4 +1,5 @@
 import type { Effect } from "../../catalog/boundary.ts";
+import { consideredEngaged } from "./considered-engaged.ts";
 
 // Records for the cards of The Ring Goes South (scenario 4) that no template in scripts/data/effects/templates.ts reads in full.
 // The second active location, the Ring-bearer facedown under the Watcher and the enemy engaged with every player are the south
@@ -46,7 +47,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 142024 Watcher in the Water (Indestructible and the immunity are keywords). It stays in the staging area, is considered engaged
   // with each player (it attacks each one, and any character may attack it) and adds no Threat there (rr.engaged). A:3 is its
   // sixth damage token.
-  {"id":"142024:constant:1","cardCode":"142024","lines":["142024:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"engagedWithAll","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"cannotBeEngaged","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"noThreatContribution","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"attackableByAny","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"142024:constant:1","cardCode":"142024","lines":["142024:A:2"],"timing":"constant","instructions":consideredEngaged()},
   {"id":"142024:forced:1","cardCode":"142024","lines":["142024:A:3"],"timing":"forced","trigger":"damaged","subject":"self","condition":{"kind":"damageReached","nth":6},"instructions":[{"verb":"ReleaseRingBearer","damage":1}]},
 
   // 142025 Great Warg Chief

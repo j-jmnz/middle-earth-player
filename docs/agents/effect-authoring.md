@@ -285,6 +285,7 @@ Read each new record against these before the review. Each one is a card bug a r
 - **The card's own name in a filter.** A count "for each copy of ~" or "~ chosen" counts cards with that printed title, not every chosen card.
 - **An optional ability whose whole effect is barred.** A Response or Action must not be offered while another card's flag stops everything it does (`noResourcesPlaced` on "place 1 resource here"): give it a `condition` on that flag. `pnpm effects render` prints a `note:` on such a record, saying whether it is offered while barred.
 - **A Shadow's condition.** A Shadow record runs on the `when` of its instructions only (`combat/shadow.ts`, `resolveShadowCard`); a record-level `condition` on a `timing: "shadow"` record is never read, and `scripts/checks/record-routes.test.ts` fails on one. Put the condition on each instruction that depends on it.
+- **A Travel cost gated by `when`.** A cost line that holds only in some state ("if there is 1 active location, exhaust a hero") carries the `when` on each of its instructions, and `travelCostUnpayable` (`interpret/restrictions.ts`) skips a line whose `when` does not hold: test that the location is a travel target in both states, with every hero exhausted.
 - **New core state.** Test it at its boundaries, not only on the normal path: a phase's end, an Undo, a save and load.
 - **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
 

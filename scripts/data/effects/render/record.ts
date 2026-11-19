@@ -49,6 +49,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   beginningOfPhase: "when a phase begins",
   stagingStepBegins: "when the staging step begins, before the first card is revealed",
   becameActive: "after this location becomes the active location",
+  questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
 
 const LIMIT: Readonly<Record<string, string>> = {

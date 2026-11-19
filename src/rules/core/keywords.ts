@@ -10,7 +10,7 @@ import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlaye
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
-import { claimedDestination, returnedToDeck } from "../families/objectives/claimed.ts";
+import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
@@ -49,7 +49,7 @@ export function modifiedStat(
   against?: string,
 ): number {
   // "Use their Willpower instead of Defense" (06038).
-  if (stat === "defense" && defenseFromWillpower(state, instance.id)) return modifiedStat(state, instance, "willpower", cards, against);
+  if (stat === "defense" && defenseFromWillpower(state, instance, cards)) return modifiedStat(state, instance, "willpower", cards, against);
   // "During the encounter phase, treat each enemy's engagement cost as if it were 0" (41005:B:1).
   if (stat === "engagementCost" && state.phase === "Encounter" && flagged(state, "table", "engagementCostZero")) return 0;
   const printed = printedOf(cards, instance.code);
@@ -384,6 +384,13 @@ export function releaseAttachments(
     const toDeck = returnedToDeck(next, attachmentId);
     if (toDeck) {
       next = toDeck;
+      steps.push({ kind: "destroy", targetId: attachmentId });
+      continue;
+    }
+    // A claimed objective that is discarded when it is detached (The Old Thrush, 50208:A:2).
+    const detached = discardedDetached(next, attachmentId);
+    if (detached) {
+      next = detached;
       steps.push({ kind: "destroy", targetId: attachmentId });
       continue;
     }

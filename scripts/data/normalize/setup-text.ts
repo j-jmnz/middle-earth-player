@@ -3,6 +3,7 @@ import { readAngmarAwakened } from "./setup-angmar-awakened.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
 import { readReturnOfTheKing } from "./setup-return-of-the-king.ts";
 import { readShadowsOfMirkwood } from "./setup-shadows-of-mirkwood.ts";
+import { readStandaloneScenarios } from "./setup-standalone-scenarios.ts";
 import { readTwoTowers } from "./setup-two-towers.ts";
 import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
@@ -128,6 +129,8 @@ export type SetupStep =
   | "placeDamageForResources" // "each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes' resource pools": `count` the damage, `resources` the resources
   | "placeLoggedDamage" // "place damage on it equal to the amount of damage noted in the Campaign Log": `codes` the card (Protect the Innocent)
   | "buildOrcDeck" // "Create the Orc deck (see insert) and set it next to the quest deck": mec108.orc-deck
+  // The Battle of Lake-town: each quoted from the stage 1A card Setup.
+  | "buildSmaugDeck" // "Shuffle all copies of Smaug into a separate Smaug Deck": `codes` the three Smaug titles
   | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"
   | "addToStartingHand" // "Each player adds 1 copy of Determination to their starting hand"
   | "shuffleHandIntoDeck" // "Each player shuffles his starting hand into his deck"
@@ -341,7 +344,7 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readShadowsOfMirkwood(sentence, names);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readShadowsOfMirkwood(sentence, names) ?? readStandaloneScenarios(sentence, names);
     if (campaignStep) {
       clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {

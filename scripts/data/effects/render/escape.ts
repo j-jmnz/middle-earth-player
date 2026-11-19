@@ -22,7 +22,7 @@ export const ESCAPE_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Mad
   EscapeValue: (i) => ({ text: `this card counts Escape ${str(i.amount)} while it is dealt for an escape test (it does nothing in play)`, read: ["amount"] }),
   AddToX: (i, ctx) => ({ text: `the effect's X grows by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   MoveResources: (i, ctx) => ({ text: `move ${i.all === true ? "all the resource tokens" : `${amount(i.amount, ctx)} resource tokens`} from the card picked before the last to the last card picked`, read: ["amount", "all"] }),
-  ReturnFromDiscard: (i, ctx) => ({ text: `return the topmost ${amount(i.count, ctx)} ${str(i.trait)} enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)`, read: ["trait", "count"] }),
+  ReturnFromDiscard: (i, ctx) => ({ text: `return the topmost ${amount(i.count, ctx)} ${str(i.trait)} enemies of the encounter discard pile ${i.to === "engagedFirstPlayer" ? "into play engaged with the first player" : "to the staging area"} (they are not revealed: no When Revealed, no engagement; the number returned is counted)`, read: ["trait", "count", "to"] }),
 };
 
 export const ESCAPE_CONDITIONS: Readonly<Record<string, (c: Obj, ctx: Ctx) => Made>> = {
@@ -47,7 +47,7 @@ export const ESCAPE_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   EscapeValue: [{ verb: "EscapeValue", amount: 3 }],
   AddToX: [{ verb: "AddToX", amount: 2 }],
   MoveResources: [{ verb: "MoveResources", all: true }, { verb: "MoveResources", amount: 2 }],
-  ReturnFromDiscard: [{ verb: "ReturnFromDiscard", trait: "Undead", count: { players: true } }],
+  ReturnFromDiscard: [{ verb: "ReturnFromDiscard", trait: "Undead", count: { players: true } }, { verb: "ReturnFromDiscard", trait: "Undead", count: 1, to: "engagedFirstPlayer" }],
 };
 export const ESCAPE_CONDITION_SAMPLES: Readonly<Record<string, readonly Obj[]>> = { lastEscapeFailed: [{ kind: "lastEscapeFailed" }], lastEscapePassed: [{ kind: "lastEscapePassed" }], noneReturned: [{ kind: "noneReturned" }] };
 

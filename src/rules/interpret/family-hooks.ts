@@ -50,6 +50,7 @@ type Hooked = {
   readonly cost: readonly RulesFamily[];
   readonly forced: readonly RulesFamily[];
   readonly unpayable: readonly RulesFamily[];
+  readonly second: readonly RulesFamily[];
   readonly play: readonly RulesFamily[];
   readonly playReason: readonly RulesFamily[];
   readonly revealed: readonly RulesFamily[];
@@ -73,6 +74,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       cost: families.filter((family) => family.travel?.cost != null),
       forced: families.filter((family) => family.travel?.forced != null),
       unpayable: families.filter((family) => family.travel?.unpayable != null),
+      second: families.filter((family) => family.travel?.second != null),
       play: families.filter((family) => family.play != null),
       playReason: families.filter((family) => family.playReason != null),
       revealed: families.filter((family) => family.revealed != null),
@@ -127,6 +129,12 @@ export function runSettle(phase: SettlePhase, state: ScenarioState, ctx: ReduceC
 /** Whether some family lets the players travel from where they are. */
 export function familyMayTravel(state: ScenarioState, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
   for (const family of hooked(families).may) if (family.travel?.may?.(state, ctx) === true) return true;
+  return false;
+}
+
+/** Whether some family lets the players travel to the location as a second active location. */
+export function familyTravelSecond(state: ScenarioState, locationId: string, families: readonly RulesFamily[] = active()): boolean {
+  for (const family of hooked(families).second) if (family.travel?.second?.(state, locationId) === true) return true;
   return false;
 }
 

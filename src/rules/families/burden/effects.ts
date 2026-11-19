@@ -28,6 +28,20 @@ export function endQuestPhase(state: ScenarioState): ScenarioState {
   return { ...withMode(next, "resolution"), questResolved: true };
 }
 
+// The acting player's quest phase ends while the areas are separate (148004:A:1): the seat reveals no more cards this staging step, its characters stop being committed, and `questEnded` makes the resolution leave its quest out.
+// The reveals the seat already made are taken off the cursor's count, so the other seats still reveal theirs. Without separate areas this is the whole phase ending.
+export function endOwnQuestPhase(state: ScenarioState, seat: number): ScenarioState {
+  if (state.mode !== "staging" || !state.separate) return endQuestPhase(state);
+  let next = state;
+  const cursor = state.revealCursor;
+  if (cursor) {
+    const made = Array.from({ length: cursor.index }, (_, at) => cursor.seats[at % Math.max(1, cursor.seats.length)]).filter((index) => index === seat).length;
+    next = { ...next, revealCursor: { seats: cursor.seats.filter((index) => index !== seat), index: Math.max(0, cursor.index - made) } };
+  }
+  for (const card of Object.values(state.cards)) if (card.committed && card.controller === seat) next = updateCard(next, card.id, { committed: false });
+  return { ...next, questEnded: [...(state.questEnded ?? []), seat] };
+}
+
 // The first player token goes to the next player in the game (rr.first-player); with no other player it stays. The token passing
 // is announced as at the end of the refresh phase.
 export function passFirstPlayer(state: ScenarioState): ScenarioState {

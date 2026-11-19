@@ -82,5 +82,6 @@ export function questCardDefeatedHeard(state: ScenarioState, ctx: ReduceContext)
 
 /** The final stage that holds the win is defeated: it stays the current quest card, marked held, and its own Forced effects hear that it was defeated (`questCardDefeated`). They win the game or reset the quest (`ReturnToStage`, which clears the mark); nothing else ends it. */
 export function holdStage(state: ScenarioState, id: string): ScenarioState {
-  return queueEvent({ ...state, stageHeld: id }, { trigger: "questCardDefeated", seat: null, subject: id });
+  // Once stages are separate the event is about the seat whose stage was defeated, so its Forced effect resolves for that seat (148004:B:2).
+  return queueEvent({ ...state, stageHeld: id }, { trigger: "questCardDefeated", seat: state.viewSeat ?? null, subject: id });
 }

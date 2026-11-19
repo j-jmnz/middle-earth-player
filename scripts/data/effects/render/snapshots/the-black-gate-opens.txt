@@ -273,7 +273,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146041:whenRevealed:1: When revealed
     - the first player chooses one of:
       * option "control":
-        - [json TakeControl {"verb":"TakeControl","who":"actor"}]
+        - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
       * option "discard" (only if all of: ([json condition {"kind":"resources","min":1,"sphere":"fellowship"}]) and (there is a non-unique enemy (any player controls) in the staging area only to choose)):
         - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
         - choose non-unique enemy (any player controls) in the staging area only
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 209 by template, 24 as JSON)
+(rendered pieces: 210 by template, 23 as JSON)

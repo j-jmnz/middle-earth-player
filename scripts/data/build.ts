@@ -91,6 +91,7 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
       name: campaign.name,
       scenarios: campaign.scenarios,
       ...(def.kind === "cycle" ? { kind: "cycle" as const } : {}),
+      ...(campaign.later !== undefined ? { later: campaign.later } : {}),
       campaignCards: campaign.campaignCards,
       prelude: campaign.prelude,
       starterDecks: def.starterDecks ? loadStarterDecks(cards, entries) : [],

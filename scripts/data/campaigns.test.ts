@@ -16,11 +16,12 @@ const index = campaignIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_D
 
 describe("data/campaigns/index.json", () => {
   it("lists the built campaigns playable and the later campaigns and cycles locked, with the scenario counts Hall of Beorn lists", () => {
-    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king", "shadows-of-mirkwood"]);
+    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king", "shadows-of-mirkwood", "standalone-scenarios"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
     // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The Return of the King is built (scripts/data/return-of-the-king.test.ts) and playable from its first scenario, its box named by no override. Angmar Awakened is built (scripts/data/angmar-awakened.test.ts) and playable from its first scenario. The other locked entries have no scenario files: the
     // campaigns played in Campaign Mode, under their RCO boxes, then the cycles: scenarios that are part of no campaign (data/overrides.json, campaigns).
     const locked = index.filter((entry) => !entry.playable).map((entry) => [entry.name, entry.kind, entry.scenarioCount]);
+    // The Standalone scenarios cycle is built one scenario at a time and playable from its first (The Massing at Osgiliath): its count is the scenarios built.
     expect(locked).toEqual([
       ["Dwarrowdelf", "cycle", 9],
       ["The Hobbit", "cycle", 6],
@@ -28,10 +29,9 @@ describe("data/campaigns/index.json", () => {
       ["The Ring-maker", "cycle", 9],
       ["Haradrim", "cycle", 9],
       ["Vengeance of Mordor", "cycle", 9],
-      ["Standalone scenarios", "cycle", 14],
     ]);
-    // The Shadows of Mirkwood cycle is playable from its first scenario (The Hunt for Gollum); the other cycles are locked.
-    expect(index.filter((entry) => entry.playable && entry.kind !== "campaign").map((entry) => entry.id)).toEqual(["shadows-of-mirkwood"]);
+    // The Shadows of Mirkwood cycle is playable from its first scenario (The Hunt for Gollum) and the Standalone scenarios cycle from The Massing at Osgiliath; the other cycles are locked.
+    expect(index.filter((entry) => entry.playable && entry.kind !== "campaign").map((entry) => entry.id)).toEqual(["shadows-of-mirkwood", "standalone-scenarios"]);
     expect(index.filter((entry) => entry.kind === "cycle").every((entry) => entry.box === null)).toBe(true);
     // Every campaign is built, so none is locked.
     expect(index.filter((entry) => !entry.playable && entry.kind === "campaign")).toEqual([]);
@@ -61,7 +61,9 @@ describe("data/campaigns/index.json", () => {
   });
 
   it("accounts for every official product Hall of Beorn lists: built, coming later, or a reprint the app plays from its revised box", () => {
-    const products = new Set(hobScenarioIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "raw", "hallofbeorn", "Scenarios.json"), "utf8"))).map((entry) => entry.Product));
+    const index = hobScenarioIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "raw", "hallofbeorn", "Scenarios.json"), "utf8")));
+    const products = new Set(index.map((entry) => entry.Product));
+    const titles = new Set(index.map((entry) => entry.Title));
     const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
     // The 2011 Core Set and the Two-Player Limited Edition Starter print the scenarios the Revised Core Set and The Dark of Mirkwood reprint.
     const reprinted = ["Core Set", "Two-Player Limited Edition Starter"];
@@ -72,11 +74,13 @@ describe("data/campaigns/index.json", () => {
       "The Scouring of the Shire", "The Nine are Abroad", "The Siege of Erebor", "The Shire's Reckoning", "The Hobbit", "Strange News in Bree", "Fangs in the Dark",
       "First Age", "Trial Upon the Marches", "Among the Outlaws", "The Betrayal of Mîm", "The Fall of Nargothrond", "Skirmish in the Shire", "Down the Baranduin", "Dwarf Lord Battle",
     ];
-    const unaccounted = [...products].filter((product) => !listed.has(product) && !reprinted.includes(product) && !fanMade.includes(product));
+    // The Standalone scenarios cycle is built one scenario at a time: the products of the ones not built yet are its `later` (scripts/data/campaign-defs.ts), moved to its products as each is built.
+    const standaloneToBuild = CAMPAIGNS.flatMap((campaign) => ("later" in campaign ? (campaign.later ?? []) : []));
+    const unaccounted = [...products].filter((product) => !listed.has(product) && !reprinted.includes(product) && !fanMade.includes(product) && !standaloneToBuild.includes(product));
     expect(unaccounted).toEqual([]);
     // Each name above is a product Hall of Beorn lists, so a rename upstream fails here rather than hiding a product.
-    expect([...reprinted, ...fanMade].filter((product) => !products.has(product))).toEqual([]);
-    expect([...reprinted, ...fanMade].filter((product) => listed.has(product))).toEqual([]);
+    expect([...reprinted, ...fanMade, ...standaloneToBuild].filter((product) => !products.has(product) && !titles.has(product))).toEqual([]);
+    expect([...reprinted, ...fanMade, ...standaloneToBuild].filter((product) => listed.has(product))).toEqual([]);
   });
 
   it("lists The Two Towers, built from six scenario files, as a playable campaign of six scenarios after Ered Mithrin", () => {

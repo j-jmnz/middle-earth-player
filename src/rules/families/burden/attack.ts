@@ -11,6 +11,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { PendingAttack, QueueItem, ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
+import { isolatedAreas, sharing } from "../breaking/areas.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
@@ -22,9 +23,9 @@ import { effectData } from "../encounter/moves.ts";
 
 type Each = Extract<Instruction, { verb: "ImmediateAttackEach" }>;
 
-// The enemies engaged with a player now, in player order and the order they engaged in.
-function engagedEnemies(state: ScenarioState): string[] {
-  return livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? []);
+// The enemies engaged with a player now, in player order and the order they engaged in; while the areas are isolated, only those engaged with the players sharing the acting seat's area ("each Wight enemy engaged with a player", 148014:A:1: at the revealer's stage).
+function engagedEnemies(state: ScenarioState, seat: number): string[] {
+  return (isolatedAreas(state) ? sharing(state, seat) : livingSeats(state)).flatMap((index) => state.seats[index]?.engaged ?? []);
 }
 
 // ImmediateAttackEach. The first time it runs it queues an attack for each engaged enemy ahead of the rest of the effect; each
@@ -35,7 +36,7 @@ export function immediateAttackEach(state: ScenarioState, instruction: Each, foc
   if (!data) return state;
   // `trait`: only the engaged enemies with it ("All engaged Troll enemies attack", 900208:A:1).
   const trait = instruction.trait;
-  const queued = (instruction.own ? (state.seats[focus.seat]?.engaged ?? []) : engagedEnemies(state))
+  const queued = (instruction.own ? (state.seats[focus.seat]?.engaged ?? []) : engagedEnemies(state, focus.seat))
     .filter((enemy) => (trait == null || hasTrait(state, enemy, trait, ctx)) && (instruction.notTrait == null || !hasTrait(state, enemy, instruction.notTrait, ctx)))
     .map((enemy): QueueItem => ({ instruction: { ...instruction, enemy }, seat: focus.seat, chosen: null }));
   return patchTop(state, { data: { ...data, queue: [...queued, ...data.queue] } });

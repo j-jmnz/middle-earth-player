@@ -11,6 +11,8 @@ import { heldAmount, inPlay } from "../../core/state.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { victoryPointsOf } from "../../core/printed-stat.ts";
 import { moveEncounter, typeOf } from "../encounter/moves.ts";
 import { addResourceTokens } from "../nightmare/dungeon.ts";
 import type { Focus } from "../index.ts";
@@ -60,13 +62,24 @@ export function returnRandomVictory(state: ScenarioState, focus: Focus, ctx: Red
   return chosen ? moveEncounter({ ...state, seedCursor: shuffled.cursor }, chosen, "staging", focus.seat, ctx, steps) : state;
 }
 
-/** DiscardRandomVictoryLocation: a location of the victory display with the Trait, chosen with the seed, goes to the encounter discard pile (900709:A:1). */
-export function discardRandomVictory(state: ScenarioState, trait: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const locations = state.victory.filter((id) => typeOf(state, id, ctx) === "location" && hasTrait(state, id, trait, ctx));
-  if (locations.length === 0) return state;
-  const shuffled = shuffleIds(locations, state.seed, state.seedCursor);
-  const chosen = shuffled.ids[0];
-  return chosen ? moveEncounter({ ...state, seedCursor: shuffled.cursor }, chosen, "discard", focus.seat, ctx, steps) : state;
+/**
+ * DiscardRandomVictoryLocation: a location of the victory display (with the Trait, when one is named), chosen with the seed, goes to the encounter discard pile (900709:A:1, 147007:A:2). The effect's X becomes the Victory points it scored in the display,
+ * read before it leaves (0 when none was there), for the amount that follows ("raises his threat by X, where X is that location's victory point value").
+ */
+export function discardRandomVictory(state: ScenarioState, trait: string | undefined, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const locations = state.victory.filter((id) => typeOf(state, id, ctx) === "location" && (trait == null || hasTrait(state, id, trait, ctx)));
+  const shuffled = locations.length === 0 ? null : shuffleIds(locations, state.seed, state.seedCursor);
+  const chosen = shuffled?.ids[0];
+  if (!shuffled || !chosen) return trait == null ? withX(state, 0) : state;
+  const worth = victoryPointsOf(state, chosen, ctx.cards);
+  const moved = moveEncounter({ ...state, seedCursor: shuffled.cursor }, chosen, "discard", focus.seat, ctx, steps);
+  return trait == null ? withX(moved, worth) : moved;
+}
+
+// The effect frame's X: what a later instruction of the effect reads as `{ x: true }`.
+function withX(state: ScenarioState, x: number): ScenarioState {
+  const data = topFrame(state)?.data;
+  return data?.kind === "effect" ? patchTop(state, { data: { ...data, x } }) : state;
 }
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {

@@ -102,6 +102,8 @@ const FLAGS = [
   // The holder gains no resources from player card effects (1), or from cards that are not treasures (2).
   "noPlayerCardResources",
   "noNonTreasureResources",
+  // The holder, a hero, gains no resources from card effects ("that player's heroes cannot gain resources from card effects", 148013:A:1): the resources a hero collects in the resource phase are not a card effect (mayGainResources, families/misc/guards.ts).
+  "noCardResources",
   // The holder (an enemy) deals no damage in the attack it makes ("this attack deals no damage").
   "dealsNoDamage",
   // The holder loses the Eagle trait ("Attached character loses the Eagle trait", 900607:A:2): hasTrait reads no Eagle trait on it, whether printed or gained.

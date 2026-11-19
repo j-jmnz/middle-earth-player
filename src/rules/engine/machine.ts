@@ -64,6 +64,7 @@ import { refillEncounterDeck } from "../interpret/verbs.ts";
 import { committedTo } from "../families/stormcaller/commit.ts";
 import { announceCollected } from "../families/aflame/attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "../families/sea/sailing.ts";
+import { askSmaug } from "../families/smaug/deck.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../families/sea/sailing-legal.ts";
 import { askCurrentQuest } from "../families/wilderland/night.ts";
 import { phaseEnds } from "../families/angmar/phase.ts";
@@ -223,8 +224,10 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       return openPass(state);
     // The Sailing test comes before the characters are committed to the quest (dcce.sailing).
     case "questCommit":
-      return askCurrentQuest(state, ctx, steps) ?? sailingStep(state, ctx) ?? openPass(state);
+      return askCurrentQuest(state, ctx, steps) ?? askSmaug(state, ctx, steps) ?? sailingStep(state, ctx) ?? openPass(state);
     case "planning": {
+      // "Each player skips the next planning phase" (50302:B:1): no window opens and no card is played from the hand.
+      if (flagged(state, "table", "skipPlanning")) return withMode(state, "questCommit");
       const opened = openPass(state);
       return { ...opened, planningSeat: opened.activeSeat };
     }
@@ -288,7 +291,8 @@ function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 
 function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   let next = state;
-  for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps, ruleCause("rr.step-1-2"));
+  // "Heroes do not collect resources during the resource phase this round" (50302:B:1): the collection is skipped; effects that add resources still work.
+  if (!flagged(next, "table", "noCollect")) for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps, ruleCause("rr.step-1-2"));
   next = announceCollected(next, ctx);
   const drawn: Record<number, string[]> = {};
   for (const seat of livingSeats(next)) {

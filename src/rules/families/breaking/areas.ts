@@ -6,12 +6,13 @@
 // - `Seat.staging` lists the encounter cards in that seat's area; `Seat.stage` is its quest stage (the stage 3 and 4 cards). `ScenarioState.separate`
 //   is true from then on. Every card in an area is still in the zone `staging`, and `ScenarioState.staging` still lists every staging card in any
 //   area plus the cards in no area yet (the shared staging area stage 2B empties), so the code that does not care which area reads it unchanged.
-//   `ScenarioState.questStage`, the shared stage, is null while stages are separate.
+//   `ScenarioState.questStage`, the shared stage, is null while stages are separate, except a stage no player is at (Fog on the Barrow-downs' parked 3B, `parkedStage`), which stays in it.
 // - Each seat has an active location of its own at its stage (`Seat.active`, the card in the zone activeLocation): the quest only applies to a player's own stage
 //   (mec109.multiple-staging-areas), and the active location takes that quest's progress first (rr.active-location). `ScenarioState.activeLocation` and
 //   `secondActiveLocation` mirror seat 0's and seat 1's active location, so code that reads them outside a seat's view still sees them; in a seat's view
 //   `activeLocation` is that seat's and `secondActiveLocation` is null.
 // - A game that never separates has no `separate`, empty seat lists and no `Seat.stage`, so each function here returns what the shared state holds.
+// - Fog on the Barrow-downs separates only some of its players (families/breaking/barrow.ts): `ScenarioState.isolated` makes each area resolve alone (`isolatedAreas`), and a stage no player is at is parked in `ScenarioState.questStage` (`parkedStage`).
 // - The engine asks per seat through `viewOf`: the state as that seat sees it, with `staging` its own area and `questStage` its own stage, so
 //   the threat total, the engagement checks, the travel and pick helpers and the quest's progress and advance read the seat's staging area and stage
 //   without knowing about seats. `mergeView` writes what a view changed back. Nothing is cached on the view.
@@ -22,6 +23,12 @@ import { moveCard } from "../../core/zones.ts";
 
 export function isSeparate(state: ScenarioState): boolean {
   return state.separate === true;
+}
+
+// Whether each area resolves as if only its players were in the game ("each player", "the first player", "in play" and a player card's Doomed read the area, mec108.create-staging-area): Escape from Mount Gram's areas always are (it has captured decks, `capture`),
+// and Fog on the Barrow-downs' once a player is trapped (`isolated`). Breaking of the Fellowship's areas are not.
+export function isolatedAreas(state: ScenarioState): boolean {
+  return state.separate === true && (state.capture != null || state.isolated === true);
 }
 
 // The seat whose area and stage the seat has: itself, or the player it joined (mec108.joining-another-player, families/captured/join.ts). A game that never joins returns the seat.
@@ -55,6 +62,17 @@ export function areaHeadOf(state: ScenarioState, id: string): number | null {
   return card.zone === "engaged" && card.controller != null ? headOf(state, card.controller) : null;
 }
 
+// The seat a card's constants and records read as "you" and "the first player": its controller (the first player with none), or, while the areas are isolated, the engaged player of an engaged enemy, else the first player of the area it lies in (a staging card's controller is whoever revealed it, not whoever is there now).
+// Null for a staging card or an active location in no area while a stage is parked: no player is at it, so its constants hold for nobody. (Escape from Mount Gram's cards in every area have no area either, and keep their controller.)
+export function sideOf(state: ScenarioState, card: CardInstance): number | null {
+  if (!isolatedAreas(state)) return card.controller ?? state.firstPlayer;
+  // An enemy engaged with a player is that player's: its "you" is the engaged player, not the first of the area.
+  if (card.zone === "engaged" && card.controller != null) return card.controller;
+  const head = areaHeadOf(state, card.id);
+  if (head != null) return firstOfArea(state, head);
+  return parkedStage(state) != null && (card.zone === "staging" || card.zone === "activeLocation") ? null : (card.controller ?? state.firstPlayer);
+}
+
 // The living seats that own an area (not a seat that joined another): the seats a phase resolves for once stages are separate. A game with no joined seat returns every living seat.
 export function areaSeats(state: ScenarioState): number[] {
   return state.separate ? livingSeats(state).filter((index) => headOf(state, index) === index) : livingSeats(state);
@@ -81,7 +99,8 @@ export function inAreaOf(state: ScenarioState, card: CardInstance, seat: number)
   if (!state.separate) return true;
   if (card.zone === "engaged") return card.controller != null && headOf(state, card.controller) === seat;
   const area = areaOf(state, card.id);
-  return area == null || headOf(state, area) === seat;
+  // A staging card in no seat's list is in no area while its stage is parked, and in every area before stage 2B deals it out.
+  return area == null ? parkedStage(state) == null : headOf(state, area) === seat;
 }
 
 // The seat whose staging area holds the card, or null when it is in no area (the shared staging area, or not in staging).
@@ -96,6 +115,11 @@ export function sharedStaging(state: ScenarioState): readonly string[] {
   if (!state.separate) return state.staging;
   const owned = new Set(state.seats.flatMap((seat) => seat.staging));
   return state.staging.filter((id) => !owned.has(id));
+}
+
+// The stage no player is at while the areas are isolated (Fog on the Barrow-downs, stage 3B when every player is trapped): the stage in play with no seat, held in `ScenarioState.questStage`. Null otherwise.
+export function parkedStage(state: ScenarioState): string | null {
+  return state.separate === true && state.isolated === true ? state.questStage : null;
 }
 
 // The seat's quest stage, or the shared one when stages are not separate.
@@ -128,7 +152,7 @@ export function viewOf(state: ScenarioState, seat: number | undefined): Scenario
   // A card that is in every area is in this seat's too (mergeView leaves it out of the seat's own list).
   const everywhere = everyArea(state);
   // Mount Gram: "the first player" of an effect in an area is the area's own (the table's first player may be in another area).
-  const first = state.capture ? { firstPlayer: firstOfArea(state, head) } : {};
+  const first = isolatedAreas(state) ? { firstPlayer: firstOfArea(state, head) } : {};
   return { ...state, ...first, staging: everywhere.length > 0 ? [...owner.staging, ...everywhere] : owner.staging, questStage: owner.stage ?? null, activeLocation: owner.active ?? null, secondActiveLocation: null, viewSeat: head };
 }
 
@@ -147,7 +171,7 @@ export function activeFor(state: ScenarioState, seat: number, all = false): stri
 }
 
 // The shared slots mirror the seats' active locations (see the header).
-function mirrored(state: ScenarioState): ScenarioState {
+export function mirrorActive(state: ScenarioState): ScenarioState {
   const first = state.seats[0].active ?? null;
   const second = state.seats[1].active ?? null;
   return state.activeLocation === first && state.secondActiveLocation === second ? state : { ...state, activeLocation: first, secondActiveLocation: second };
@@ -173,9 +197,9 @@ export function mergeView(state: ScenarioState, asked: number | undefined, view:
   const added = [...now, ...elsewhere].filter((id) => !state.staging.includes(id));
   const { viewSeat: _seat, ...plain } = view;
   // The view's first player is the area's own (viewOf), unless the view passed the token on.
-  const first = state.capture && view.firstPlayer === firstOfArea(state, seat) ? { firstPlayer: state.firstPlayer } : {};
+  const first = isolatedAreas(state) && view.firstPlayer === firstOfArea(state, seat) ? { firstPlayer: state.firstPlayer } : {};
   const merged: ScenarioState = { ...plain, ...first, seats, questStage: state.questStage, staging: [...kept, ...added] };
-  return mirrored({ ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") });
+  return mirrorActive({ ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") });
 }
 
 // Runs `act` on the seat's view and writes the result back.
@@ -219,5 +243,5 @@ function passArea(state: ScenarioState, seat: number, heir: number): ScenarioSta
     if (index !== heir && other?.joined === seat) next = withSeat(next, index, { ...other, joined: heir });
   }
   const { stage: _stage, active: _active, ...left } = next.seats[seat] ?? owner;
-  return mirrored(withSeat(next, seat, { ...left, staging: [] }));
+  return mirrorActive(withSeat(next, seat, { ...left, staging: [] }));
 }

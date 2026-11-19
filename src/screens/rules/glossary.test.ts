@@ -125,6 +125,8 @@ describe("the rules a keyword chip quotes", () => {
     expect(ruleTip("trg.secrecy")).toMatchObject({ source: "The Redhorn Gate rules, page 1", openable: true });
     // The Honour of the Rohirrim spans are in no glossary document.
     expect(ruleTip("hon.siege")?.openable).toBe(false);
+    expect(ruleTip("local:burn")).toMatchObject({ source: "Quest Companion (community source)", openable: false });
+    expect(ruleTip("local:nothing")).toBeNull();
     expect(ruleTip("no.such.rule")).toBeNull();
   });
 });

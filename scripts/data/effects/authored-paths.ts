@@ -6,6 +6,7 @@ export const AUTHORED_CAMPAIGN_FOLDERS: Readonly<Record<string, string>> = {
   "the-return-of-the-king": "return-of-the-king",
   "angmar-awakened": "angmar-awakened",
   "shadows-of-mirkwood": "shadows-of-mirkwood",
+  "standalone-scenarios": "standalone-scenarios",
 };
 
 /** The path under src/effects/authored/, without the extension, of the file named `id` for a scenario (or the campaign card file) of `campaignId`. */

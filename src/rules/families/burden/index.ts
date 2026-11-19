@@ -10,7 +10,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { immediateAttackEach } from "./attack.ts";
 import { attachSelfToRingBearer, moveBurden, revealBurden, shuffleBurdenDeck } from "./deck.ts";
-import { announceProgress, endQuestPhase, passFirstPlayer, removeAllQuestProgress, setStatUntil } from "./effects.ts";
+import { announceProgress, endOwnQuestPhase, endQuestPhase, passFirstPlayer, removeAllQuestProgress, setStatUntil } from "./effects.ts";
 import { reduceLife } from "./life.ts";
 import { shuffleCopyIntoEachDeck } from "./player-deck.ts";
 
@@ -35,7 +35,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PassFirstPlayer":
       return passFirstPlayer(state);
     case "EndQuestPhase":
-      return endQuestPhase(state);
+      return instruction.own ? endOwnQuestPhase(state, focus.seat) : endQuestPhase(state);
     case "SetStatUntil":
       return setStatUntil(state, instruction, focus, ctx);
     case "RemoveAllQuestProgress":

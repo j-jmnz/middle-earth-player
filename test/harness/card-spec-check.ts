@@ -40,7 +40,8 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
           break;
         }
         case "flag": {
-          const got = flagged(state, idOf(state, item.code), item.name);
+          // "table" names the table's own flags (skipPlanning, noCollect, cannotPlayEvents, noQuestProgress), which no card holds.
+          const got = flagged(state, item.code === "table" ? "table" : idOf(state, item.code), item.name);
           if (got !== item.value) problems.push(`${item.code} ${item.name} is ${got}, not ${item.value}`);
           break;
         }

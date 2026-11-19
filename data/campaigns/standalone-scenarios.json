@@ -1,0 +1,25 @@
+{
+  "id": "standalone-scenarios",
+  "name": "Standalone scenarios",
+  "scenarios": [
+    "the-massing-at-osgiliath",
+    "the-battle-of-lake-town",
+    "the-stone-of-erech",
+    "the-old-forest",
+    "fog-on-the-barrow-downs"
+  ],
+  "kind": "cycle",
+  "later": [
+    "The Ruins of Belegost",
+    "Murder at the Prancing Pony",
+    "The Siege of Annúminas",
+    "Attack on Dol Guldur",
+    "The Wizard's Quest",
+    "The Woodland Realm",
+    "The Mines of Moria",
+    "Escape from Khazad-dûm",
+    "The Hunt for the Dreadnaught"
+  ],
+  "starterDecks": [],
+  "saga": false
+}

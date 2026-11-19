@@ -40,8 +40,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("EncounterKeyword"), ...when }),
   // Shuffles one set-aside copy of the card with this code into the encounter deck ("Shuffle 1 of your set aside Ranger of the
   // North allies into the encounter deck"): the actor's own copy with `own`, any player's otherwise. Nothing happens with none.
-  // Run by a quest card's Setup inside its ForEachPlayer ("shuffle 1 'Sacked!' card per player back into the encounter deck", 02035:A:1).
-  verbFlags(z.strictObject({ verb: z.literal("ShuffleSetAsideIntoEncounterDeck"), code: z.string().min(1), own: z.boolean().optional(), ...when }), { setupRuns: "inForEachPlayer" }),
+  // Run by a quest card's Setup inside its ForEachPlayer ("shuffle 1 'Sacked!' card per player back into the encounter deck", 02035:A:1). `all`: every set-aside copy goes ("Shuffle the encounter discard pile and each copy of Great Barrow into the encounter deck", 148003:A:1).
+  verbFlags(z.strictObject({ verb: z.literal("ShuffleSetAsideIntoEncounterDeck"), code: z.string().min(1), own: z.boolean().optional(), all: z.literal(true).optional(), ...when }), { setupRuns: "inForEachPlayer" }),
   // The source card, an Encounter-keyword player card just revealed into the staging area, enters the play area of the player
   // `who` names (the last picked player, the actor or the first player): ready, or `committed` to the quest, still its owner's card.
   z.strictObject({ verb: z.literal("TakeRevealedCard"), who: z.enum(["picked", "actor", "firstPlayer"]), committed: z.boolean().optional(), ...when }),
