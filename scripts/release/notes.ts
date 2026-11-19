@@ -76,7 +76,7 @@ export function renderNotes(input: NotesInput): string {
           ? "- Windows: download the `-win-x64.exe` installer below and run it, or unzip the `-win-x64.zip` and run the app from the folder without installing. The installer is signed."
           : "- Windows: download the `-win-x64.exe` installer below and run it, or unzip the `-win-x64.zip` and run the app from the folder without installing. The app is not signed, so Windows SmartScreen warns first: choose More info, then Run anyway.",
         "- Mac: download the `.dmg`, open it and drag Middle-Earth Player to Applications. The app is not signed by Apple, so the first time, right-click it and choose Open, then Open again. It runs on Apple silicon and Intel Macs.",
-        "- Linux: download the `.AppImage`, make it executable (`chmod +x`) and run it, or install the `.deb` with your package manager.",
+        "- Linux: download the `.AppImage`, make it executable (`chmod +x`) and run it, or install the `.deb` with your package manager. AppImageUpdate and the AppImage managers update the AppImage in place.",
         "- The desktop app plays fully offline and keeps your campaigns on that computer; Settings can back them up to a file.",
       ]),
   );

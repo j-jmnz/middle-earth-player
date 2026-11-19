@@ -11,6 +11,7 @@ directories:
   output: desktop/out
   buildResources: assets/images
 # Artifact names are middle-earth-player-<tag>-<os>-<arch>.<ext>, written out per OS: electron-builder's own ${arch} is x86_64 for an AppImage and amd64 for a .deb.
+# The AppImage is middle-earth-player-<tag>-x86_64.AppImage instead: the AppImage catalog asks for no OS in its name (scripts/desktop/release-files.ts).
 # No auto-update (docs/architecture.md, Desktop, Packaging): no publish target, so no latest*.yml or app-update.yml is written.
 publish: null
 asar: true
@@ -66,3 +67,6 @@ linux:
   synopsis: "Play The Lord of the Rings: The Card Game solo, offline"
   maintainer: Middle-Earth Player <noreply@users.noreply.github.com>
   artifactName: middle-earth-player-v${version}-linux-x64.${ext}
+# `pnpm desktop stage` writes the update information into the release copy and makes its .zsync file (scripts/desktop/appimage.ts).
+appImage:
+  artifactName: middle-earth-player-v${version}-x86_64.${ext}

@@ -13,9 +13,10 @@ ipa=$(ls "$OUT"/*.ipa)
 # A missing OS leaves its glob unexpanded, so the plan fails on it instead of adding only some of the installers.
 desktop=()
 files=()
-for file in "$OUT"/*-"$TAG"-win-x64.* "$OUT"/*-"$TAG"-mac-universal.* "$OUT"/*-"$TAG"-linux-x64.*; do
+# The AppImage is -x86_64 and has a .zsync file beside it (scripts/desktop/release-files.ts).
+for file in "$OUT"/*-"$TAG"-win-x64.* "$OUT"/*-"$TAG"-mac-universal.* "$OUT"/*-"$TAG"-linux-x64.* "$OUT"/*-"$TAG"-x86_64.AppImage*; do
   files+=("$file")
-  case "$file" in *.sha256) ;; *) desktop+=(--desktop "$file") ;; esac
+  case "$file" in *.sha256|*.zsync) ;; *) desktop+=(--desktop "$file") ;; esac
 done
 signed=(); if [ "${WINDOWS_SIGNED:-}" = true ]; then signed=(--windows-signed); fi
 pnpm --silent release plan --released "$TAG" --apk "$apk" --ipa "$ipa" "${desktop[@]}" "${signed[@]}" \

@@ -93,7 +93,7 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
       desktop: [
         { name: "middle-earth-player-v0.4.0-win-x64.exe", sha256: "aa11" },
         { name: "middle-earth-player-v0.4.0-mac-universal.dmg", sha256: "bb22" },
-        { name: "middle-earth-player-v0.4.0-linux-x64.AppImage", sha256: "cc33" },
+        { name: "middle-earth-player-v0.4.0-x86_64.AppImage", sha256: "cc33" },
       ],
     });
     expect(notes).toContain("- Windows: download the `-win-x64.exe` installer");
@@ -103,7 +103,7 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes).toContain("- Linux: download the `.AppImage`");
     expect(notes).toContain("\n`middle-earth-player-v0.4.0-win-x64.exe` SHA-256: `aa11`\n");
     expect(notes).toContain("\n`middle-earth-player-v0.4.0-mac-universal.dmg` SHA-256: `bb22`\n");
-    expect(notes).toContain("\n`middle-earth-player-v0.4.0-linux-x64.AppImage` SHA-256: `cc33`\n");
+    expect(notes).toContain("\n`middle-earth-player-v0.4.0-x86_64.AppImage` SHA-256: `cc33`\n");
     // The install lines are there before any file is built, as the Android and iPhone ones are.
     expect(renderNotes(base)).toContain("- Windows: download");
     expect(renderNotes(base)).not.toContain("SHA-256");

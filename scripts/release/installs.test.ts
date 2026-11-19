@@ -11,7 +11,7 @@ describe("the README's installs badge (docs/releasing.md, Installs count)", () =
         { assets: [asset("middle-earth-player-v0.2.0.apk", 10), asset("middle-earth-player-v0.2.0.apk.sha256", 4), asset("source.json", 900)] },
         { assets: [asset("middle-earth-player-v0.1.0.ipa", 5), asset("middle-earth-player-v0.1.0-win-x64.exe", 3), asset("certificate.sha256", 1)] },
       ],
-      [{ assets: [asset("middle-earth-player-v0.0.9-win-x64.zip", 1), asset("middle-earth-player-v0.0.9-mac-universal.dmg", 2), asset("middle-earth-player-v0.0.9-linux-x64.AppImage", 6), asset("middle-earth-player-v0.0.9-linux-x64.deb", 7)] }, {}],
+      [{ assets: [asset("middle-earth-player-v0.0.9-win-x64.zip", 1), asset("middle-earth-player-v0.0.9-mac-universal.dmg", 2), asset("middle-earth-player-v0.0.9-x86_64.AppImage", 6), asset("middle-earth-player-v0.0.9-linux-x64.deb", 7)] }, {}],
     ];
     expect(installsOf(pages)).toBe(34);
     expect(installsOf(pages[0] ?? [])).toBe(18);

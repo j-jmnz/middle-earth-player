@@ -528,6 +528,9 @@ jobs:
       # The system libraries Electron needs and xvfb for the display (the smoke script runs itself under xvfb-run), only when the image lacks them.
       - if: runner.os == 'Linux'
         run: .github/scripts/linux-browser-deps.sh node_modules/electron/dist/electron
+      # zsyncmake makes the AppImage's .zsync file (pnpm desktop stage), which AppImageUpdate and the AppImage managers update from.
+      - if: runner.os == 'Linux'
+        run: command -v zsyncmake > /dev/null || { sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends zsync; }
       # The web job's own timeout.
       - name: Wait for the web export
         env:
@@ -544,12 +547,13 @@ jobs:
           WIN_CSC_LINK: ${{ matrix.os == 'windows' && needs.plan.outputs.desktop_signed == 'true' && secrets.WINDOWS_CERT_BASE64 || '' }}
           WIN_CSC_KEY_PASSWORD: ${{ matrix.os == 'windows' && needs.plan.outputs.desktop_signed == 'true' && secrets.WINDOWS_CERT_PASSWORD || '' }}
         run: pnpm desktop pack --skip-build
-      # Every installer this OS makes must exist, stay under GitHub's 2 GiB asset limit and get a SHA-256 file (Node hashes, so no sha256sum or shasum).
+      # Every installer this OS makes must exist, stay under GitHub's 2 GiB asset limit and get a SHA-256 file (Node hashes, so no sha256sum or shasum). On Linux the
+      # AppImage also gets its update information, pointing at this repository's releases, and a .zsync file.
       - id: stage
         name: Check and name the installers
         env:
           DRY_RUN: ${{ inputs.dry_run }}
-        run: pnpm --silent desktop stage --tag "$TAG" --out "$RUNNER_TEMP/out" --github-output $([ "$DRY_RUN" = "true" ] && echo --suffix -dry-run)
+        run: pnpm --silent desktop stage --tag "$TAG" --out "$RUNNER_TEMP/out" --repository "$GITHUB_REPOSITORY" --github-output $([ "$DRY_RUN" = "true" ] && echo --suffix -dry-run)
       # The packed app, not the checkout's: it must start, be cross-origin isolated, load a picture and a booklet page from its own bundle and
       # make no request off app://, and report the tag's version.
       - name: Launch the packed app
@@ -653,8 +657,8 @@ jobs:
           desktop=(--desktop-missing)
           if [ "$DESKTOP_RESULT" = success ]; then
             desktop=()
-            for file in "$RUNNER_TEMP"/out/*-win-x64.* "$RUNNER_TEMP"/out/*-mac-universal.* "$RUNNER_TEMP"/out/*-linux-x64.*; do
-              case "$file" in *.sha256) ;; *) desktop+=(--desktop "$file") ;; esac
+            for file in "$RUNNER_TEMP"/out/*-win-x64.* "$RUNNER_TEMP"/out/*-mac-universal.* "$RUNNER_TEMP"/out/*-linux-x64.* "$RUNNER_TEMP"/out/*-x86_64.AppImage*; do
+              case "$file" in *.sha256|*.zsync) ;; *) desktop+=(--desktop "$file") ;; esac
             done
           fi
           signed=(); if [ "$WINDOWS_SIGNED" = true ]; then signed=(--windows-signed); fi
@@ -670,7 +674,7 @@ jobs:
         run: |
           assets=("$RUNNER_TEMP"/out/*.apk "$RUNNER_TEMP"/out/*.apk.sha256 "$RUNNER_TEMP"/out/*.ipa "$RUNNER_TEMP"/out/*.ipa.sha256)
           if [ "$DESKTOP_RESULT" = success ]; then
-            assets+=("$RUNNER_TEMP"/out/*-win-x64.* "$RUNNER_TEMP"/out/*-mac-universal.* "$RUNNER_TEMP"/out/*-linux-x64.*)
+            assets+=("$RUNNER_TEMP"/out/*-win-x64.* "$RUNNER_TEMP"/out/*-mac-universal.* "$RUNNER_TEMP"/out/*-linux-x64.* "$RUNNER_TEMP"/out/*-x86_64.AppImage*)
           fi
           # A patch cut from a release/vX.Y branch does not take "Latest" from a newer line on main.
           latest=true

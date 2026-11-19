@@ -31,7 +31,7 @@ With Debug tools switched on in Settings (it is off by default), the table menu 
 
 Installing the APK, or installing the iOS app through SideStore or AltStore, sends this project nothing. SideStore and AltStore sign the app with your Apple ID on your own device, under their own privacy policies, and your Apple ID never reaches this project.
 
-The desktop installers (a Windows installer or zip, a Mac disk image, a Linux AppImage or `.deb`) come from this project's GitHub Releases page, are not signed by Microsoft or Apple, and send this project nothing when you run them. A Windows or Mac system may check an unsigned download with its own services under its vendor's policy; that is the system's check, not the app's.
+The desktop installers (a Windows installer or zip, a Mac disk image, a Linux AppImage or `.deb`) come from this project's GitHub Releases page, are not signed by Microsoft or Apple, and send this project nothing when you run them. The AppImage names this project's GitHub Releases page as its update source; only an AppImage update tool you run yourself reads it, never the app. A Windows or Mac system may check an unsigned download with its own services under its vendor's policy; that is the system's check, not the app's.
 
 If you install through TestFlight, Apple handles that under [Apple's privacy policy](https://www.apple.com/legal/privacy/). Any feedback or crash reports you send through TestFlight go to the maintainer and are used only to fix the app.
 

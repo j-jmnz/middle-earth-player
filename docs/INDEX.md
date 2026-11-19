@@ -37,7 +37,7 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` (~8.0K tok)
+- `README.md` (~8.1K tok)
   - 58–95 Features (~550)
     - 81–95 Themes (~190)
   - 96–114 What you can play (~280)
@@ -54,7 +54,7 @@ Read the sections your task touches.
   - 498–501 Support (~90)
   - 502–517 Attribution (~410)
   - 518–521 License (~50)
-- `docs/architecture.md` — Architecture (~28.6K tok)
+- `docs/architecture.md` — Architecture (~28.7K tok)
   - 7–41 Stack (~1.2K)
   - 42–77 Processes (~690)
   - 78–162 Modules (~2.4K) ← 3
@@ -255,9 +255,9 @@ Read the sections your task touches.
   - 61–81 On a phone (~350)
   - 82–133 Commands (~2.0K) ← 4
 - `docs/discord-issues.md` — Discord issue bot (~2.9K tok)
-- `docs/releasing.md` — Releasing (~5.4K tok)
+- `docs/releasing.md` — Releasing (~5.6K tok)
   - 5–20 Start a release (~340) ← 1
-  - 21–36 Jobs (~2.1K) ← 4
+  - 21–36 Jobs (~2.3K) ← 6
   - 37–43 Add the desktop app to a release (~350) ← 1
   - 44–47 Installs count (~180) ← 2
   - 48–72 Caches (~820) ← 1
@@ -356,7 +356,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/card-smoke`: brief.md, Standalone play (1)
 - `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Old Forest (1); releasing.md, Add the desktop app to a release (1); releasing.md, Caches (1); releasing.md, Jobs (1)
 - `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Foundations of Stone (1); brief.md, The Two Towers (1)
-- `scripts/desktop`: releasing.md, Jobs (1)
+- `scripts/desktop`: releasing.md, Jobs (2)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/game`: development.md, Reading a game as text (1)

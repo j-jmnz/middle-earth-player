@@ -173,6 +173,9 @@ describe("release.yml desktop jobs", () => {
     expect(desktop).toContain("--require-bundle");
     expect(desktop).toContain("name: desktop-${{ matrix.os }}");
     const publish = all.get("publish") ?? "";
-    for (const glob of ["*-win-x64.*", "*-mac-universal.*", "*-linux-x64.*"]) expect(publish).toContain(glob);
+    for (const glob of ["*-win-x64.*", "*-mac-universal.*", "*-linux-x64.*", "*-x86_64.AppImage*"]) expect(publish).toContain(glob);
+    expect(publish).toContain("*.sha256|*.zsync) ;;");
+    expect(desktop).toContain('--repository "$GITHUB_REPOSITORY"');
+    expect(desktop).toMatch(/install -y -q --no-install-recommends zsync/);
   });
 });

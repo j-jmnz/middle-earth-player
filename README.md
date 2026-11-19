@@ -195,7 +195,7 @@ The desktop apps aren't signed by Microsoft or Apple, so the first launch shows 
 
 - **Windows:** run `middle-earth-player-v<version>-win-x64.exe`. When SmartScreen says "Windows protected your PC", choose More info, then Run anyway. Or unzip the portable `-win-x64.zip` anywhere and run `Middle-Earth Player.exe`.
 - **macOS:** open `middle-earth-player-v<version>-mac-universal.dmg` and drag the app to Applications. The first time, right-click it and choose Open twice. On macOS 15 or later, try to open it once, then choose Open Anyway in System Settings, Privacy & Security.
-- **Linux:** run `chmod +x` on `middle-earth-player-v<version>-linux-x64.AppImage`, then run it. Or install the `.deb`, for example `sudo apt install ./middle-earth-player-v<version>-linux-x64.deb`.
+- **Linux:** run `chmod +x` on `middle-earth-player-v<version>-x86_64.AppImage`, then run it. AppImageUpdate and the AppImage managers can update it in place to each new release. Or install the `.deb`, for example `sudo apt install ./middle-earth-player-v<version>-linux-x64.deb`.
 
 Saves stay on that computer ([PRIVACY.md](PRIVACY.md) says where). To update, install the new release over the old one. To move or copy your campaigns, use Settings, Back up saves, then Restore from a backup on the other computer. The app never updates itself.
 
