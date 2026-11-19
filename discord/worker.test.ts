@@ -12,7 +12,7 @@ beforeAll(async () => {
   keys = (await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"])) as CryptoKeyPair;
   const raw = new Uint8Array(await crypto.subtle.exportKey("raw", keys.publicKey));
   const publicKey = [...raw].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-  env = { DISCORD_PUBLIC_KEY: publicKey, DISCORD_APPLICATION_ID: "100", DISCORD_BOT_TOKEN: "bot", GITHUB_TOKEN: "gh", GITHUB_REPO: "owner/repo" };
+  env = { DISCORD_PUBLIC_KEY: publicKey, DISCORD_APPLICATION_ID: "100", DISCORD_BOT_TOKEN: "bot", GITHUB_TOKEN: "gh", GITHUB_WEBHOOK_SECRET: "hook", GITHUB_REPO: "owner/repo" };
 });
 
 afterEach(() => vi.unstubAllGlobals());
@@ -122,6 +122,7 @@ describe("Discord issue bot", () => {
       body: expect.stringContaining("Gandalf costs 4.\n\n### Attachments\n\n- [shot.png](https://cdn.discordapp.com/shot.png)"),
     });
     expect((issue.body as { body: string }).body).toContain("Reported on Discord by **Frodo** ([message](https://discord.com/channels/1/200/300)). Filed by **elrond**");
+    expect((issue.body as { body: string }).body).toMatch(/<!-- discord issue:m:200:300 -->$/);
     const reply = calls.find((call) => call.method === "POST" && call.url.endsWith("/channels/200/messages"))!;
     expect(reply.body).toMatchObject({ message_reference: { message_id: "300" }, content: expect.stringContaining("#42") });
     const told = calls.find((call) => call.method === "PATCH")!;

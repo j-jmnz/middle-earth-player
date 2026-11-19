@@ -103,7 +103,7 @@ async function threadReport(env: Env, guildId: string, threadId: string, replies
   // A thread made from a channel message: the report is that message, in the parent channel.
   const original = starter?.type === THREAD_STARTER ? starter.message_reference : undefined;
   if (original?.channel_id && original.message_id) {
-    starter = (await discord<Message>(env, "GET", `/channels/${original.channel_id}/messages/${original.message_id}`));
+    starter = await discord<Message>(env, "GET", `/channels/${original.channel_id}/messages/${original.message_id}`);
   }
   if (!starter) return null;
   const read = replies ? [starter, ...rest] : [starter];
@@ -133,4 +133,25 @@ export function sourceFromId(customId: string): SourceRef | null {
   const thread = /^issue:t:(\d+):([01])$/.exec(customId);
   if (thread) return { kind: "thread", threadId: thread[1]!, replies: thread[2] === "1" };
   return null;
+}
+
+// The issue body keeps its Discord source in a comment GitHub does not show, so an issue event can find where to post.
+const MARKER = /<!-- discord (issue:[mt]:\d+:\d+) -->/;
+
+/** The comment the issue body carries for its source. */
+export function sourceMarker(source: SourceRef): string {
+  return `<!-- discord ${sourceToId(source)} -->`;
+}
+
+/** The source an issue body names, or null for an issue the bot did not make. */
+export function sourceInBody(body: string | null | undefined): SourceRef | null {
+  const found = body ? MARKER.exec(body) : null;
+  return found ? sourceFromId(found[1]!) : null;
+}
+
+/** Posts where the report is: a reply to the report message, or a message in the thread. Mentions never ping. */
+export async function postAt(env: Env, source: SourceRef, content: string): Promise<void> {
+  const channelId = source.kind === "message" ? source.channelId : source.threadId;
+  const reference = source.kind === "message" ? { message_reference: { message_id: source.messageId, fail_if_not_exists: false } } : {};
+  await discord(env, "POST", `/channels/${channelId}/messages`, { content, ...reference, allowed_mentions: { parse: [] } });
 }
