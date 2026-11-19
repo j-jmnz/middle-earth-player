@@ -9,7 +9,7 @@ import type { Cause } from "../../rules/core/cause.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { embassyPairNow } from "../readouts/black-gate.ts";
 import { ringBearerId } from "../../rules/families/burden/deck.ts";
-import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
+import { frameScope, hostOf, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { holds } from "../../rules/interpret/conditions.ts";
 import { pickCandidates } from "../../rules/interpret/pick.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
@@ -143,7 +143,7 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   const scope = frameScope(a.game, seat, a.source);
   const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, picked: "The picked card", n: a.amountNow, pursuitLimit: a.game.widgets.pursuitTracker };
   // The card the record's card lies on ("Exhaust Frodo Baggins, who carries A Heavy Burden") and the Ring-bearer, named only where an entry says them.
-  const hostId = a.source ? a.game.cards[a.source]?.host : undefined;
+  const hostId = hostOf(a.game, a.source);
   // An AssignDamage not yet split into steps holds all of its amount.
   if (a.instruction.verb === "AssignDamage") values.left = a.instruction.left ?? resolveAmount(a.game, a.instruction.amount, scope, a.ctx);
   values.host = hostId ? a.names.card(hostId) : "Its host";

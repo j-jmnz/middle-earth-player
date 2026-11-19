@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../../rules/core/test-fixture.ts";
-import { printedOf } from "../../rules/core/printed.ts";
+import { printedFromCard, printedOf } from "../../rules/core/printed.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 import { withThreat } from "../../rules/core/state.ts";
 import { deckPlayHero, markDeckPlay } from "../../rules/player/deck-play.ts";
@@ -9,6 +9,8 @@ import { moveCard } from "../../rules/core/zones.ts";
 import { nextIntent } from "../../../test/harness/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../../test/scenarios/a-shadow-of-the-past/game.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadCards } from "../../../scripts/data/load-cards.ts";
+import { tableFromLayout } from "../../../test/harness/layout.ts";
 import { buildTable } from "../../../test/harness/scene.ts";
 
 import { cardSize, HAND_SHOW, handCardSize, tableLayout } from "../layout/layout.ts";
@@ -180,9 +182,24 @@ describe("drops", () => {
     const names = { card: (id: string) => (id === sting.id ? "Sting" : id), line: () => null };
     const legal = legalIntents(sting.state, sctx);
     expect(dropOutcome(sting.state, sctx, legal, sting.id, { kind: "zone", zone: "staging" })).toEqual({ kind: "play", cardId: sting.id, hostId: "staging" });
-    expect(playSheet(sting.state, sctx, legal, names, sting.id, "staging")?.title).toBe("Attach Sting to the staging area");
-    expect(intentWords({ type: "PlayCard", cardId: sting.id, payments: [], hostId: "staging" }, names.card)).toBe("Played Sting on the staging area");
-    expect(intentWords({ type: "PlayCard", cardId: sting.id, payments: [], hostId: "seat:0" }, names.card)).toBe("Played Sting on Player 1");
+    expect(playSheet(sting.state, sctx, legal, names, sting.id, "staging")?.title).toBe("Play Sting into the staging area");
+    expect(intentWords({ type: "PlayCard", cardId: sting.id, payments: [], hostId: "staging" }, names.card)).toBe("Played Sting into the staging area");
+    const seat0 = { type: "PlayCard", cardId: sting.id, payments: [], hostId: "seat:0" } as const;
+    expect(intentWords(seat0, names.card, sting.state, () => "playArea")).toBe("Played Sting into your play area");
+    expect(intentWords(seat0, names.card, { ...sting.state, seatCount: 2 }, () => "playArea")).toBe("Played Sting into Player 1's play area");
+    expect(intentWords(seat0, names.card, { ...sting.state, seatCount: 2 }, () => "threatDial")).toBe("Played Sting on Player 1's threat dial");
+  });
+
+  it("a player side quest is dropped on the staging area and is played with no host", () => {
+    const t = tableFromLayout("passage-through-mirkwood", { phase: "Planning", heroResources: 3, hand: ["09014"] });
+    const sideQuest = loadCards().find((card) => card.code === "09014");
+    if (sideQuest) t.cards.set("09014", printedFromCard(sideQuest));
+    const sctx = t.ctx;
+    const quest = { state: t.state, id: Object.values(t.state.cards).find((card) => card.code === "09014")?.id ?? "" };
+    const legal = legalIntents(quest.state, sctx);
+    expect(dropTargets(quest.state, sctx, legal, quest.id)).toEqual([{ kind: "zone", zone: "staging" }]);
+    expect(dropOutcome(quest.state, sctx, legal, quest.id, { kind: "zone", zone: "staging" })).toEqual({ kind: "play", cardId: quest.id, hostId: null });
+    expect(dropOutcome(quest.state, sctx, legal, quest.id, { kind: "zone", zone: "play" })).toEqual({ kind: "none" });
   });
 
   it("a character dropped on the quest stage joins the commit being built, not the quest", () => {

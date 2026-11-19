@@ -11,6 +11,7 @@ import { guideLine } from "../phases/reference.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "../phases/stops.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
+import { playIntoRule } from "../../rules/families/attachments/play.ts";
 import { stageName } from "../../rules/families/wilderland/gundabad.ts";
 import { fateNames } from "../words/scenarios/fate-beats.ts";
 import { mustBypassLead } from "../words/scenarios/gundabad-beats.ts";
@@ -62,13 +63,15 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
   const mustBypass = useCallback((cardId: string) => mustBypassLead(ctx, store.getState().game.cards[cardId]?.code ?? ""), [store, ctx]);
   // The lines of The Fate of Wilderland's banner: where the objective stands, the card an attack discards, the enemy that took no damage, the treachery that raises the staging area's Threat (words/scenarios/fate-beats.ts).
   const fate = useMemo(() => fateNames(ctx, names.card), [ctx, names]);
+  // Where a card with a PlayInto record goes, for the banner after Undo (host-words.ts).
+  const playInto = useCallback((cardId: string) => playIntoRule(ctx, store.getState().game.cards[cardId]?.code ?? "")?.into, [store, ctx]);
   // After it, the state it made. Read once per moment.
   const said = useMemo((): Moment | null => {
     if (!shown) return null;
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
-    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage, revealed, stageName: stageNamed, mustBypass, fate }));
+    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after, playInto), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage, revealed, stageName: stageNamed, mustBypass, fate }));
     return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow, stage, revealed, stageName: stageNamed, mustBypass, fate });
-  }, [shown, names, shadow, stage, revealed, stageNamed, mustBypass, fate]);
+  }, [shown, names, shadow, stage, revealed, stageNamed, mustBypass, fate, playInto]);
   // The round summary, once the round's own moment has had its say (outcome.ts, roundSummary).
   const summary = useMemo((): Moment | null => {
     if (shown?.kind !== "sent" || !shown.ended) return null;
