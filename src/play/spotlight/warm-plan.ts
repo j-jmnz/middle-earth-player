@@ -39,10 +39,10 @@ function clashOf(area: StageArea, index: number, total: number, clash: Clash): C
 /** The warm plan on a screen of this size. */
 export function warmPlan(width: number, height: number): SpotlightPlan {
   const area: StageArea = { width, height, origin: { x: 0, y: 0 }, safe: { top: 0, right: 0, bottom: 0, left: 0 } };
-  const base = { attack: 3, defense: 2, undefended: false };
+  const base = { attack: 3, defense: 2, undefended: false, hitPoints: 4 };
   const clashes = [
     { ...base, attackers: ["a1", "a2", "a3", "a4"], target: "t1", damage: 2, destroyed: false, shadow: "s1" },
-    { ...base, attackers: ["a5"], target: "t2", damage: 3, destroyed: true, shadow: null },
+    { ...base, attackers: ["a5"], target: "t2", damage: 3, destroyed: true, shadow: null, hitPoints: 3 },
     { ...base, attackers: ["a6"], target: "t3", damage: 0, destroyed: false, shadow: null },
   ].map((clash, index, all) => clashOf(area, index, all.length, clash));
   return { seq: -1, clashes, codes: [WARM_CODE], span: spotlightSpan(clashes.length), canvas: { width, height }, area };

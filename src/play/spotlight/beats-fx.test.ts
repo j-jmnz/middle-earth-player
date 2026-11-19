@@ -3,8 +3,8 @@
 import { describe, expect, it } from "vitest";
 
 import { MOTION } from "../../ui/motion-tokens.ts";
-import { beatsAt, burstAt, burstGap, darkAt, frameAt, spotlightSpan, type ClashShape } from "./beats.ts";
-import { FX, numberAt, shakeAt, stampLook, traumaAt, traumaStart, WOBBLE_HZ } from "./fx.ts";
+import { beatsAt, burstAt, burstGap, darkAt, frameAt, spotlightSpan, tokenLandAt, type ClashShape } from "./beats.ts";
+import { FX, numberAt, shakeAt, resultLook, traumaAt, traumaStart, WOBBLE_HZ } from "./fx.ts";
 import { SPOT } from "./shape.ts";
 
 const ALONE = { first: true, last: true };
@@ -97,19 +97,21 @@ describe("the hit", () => {
     expect(frameAt(HIT, 2700 + 250, 1).number.alpha).toBe(0);
   });
 
-  it("bounces the defense medallion of a blocked attack once, to 1.25, and stamps Blocked", () => {
+  it("bounces the shields that held a blocked attack once, to 1.25, and brings in Blocked at the impact", () => {
     const bounces = range(700, 5).map((hit) => frameAt(BLOCKED, 1220 + hit, 1).badgeD / Math.max(frameAt(BLOCKED, 1220 + hit, 1).badgeA, 1e-9));
     expect(Math.max(...bounces)).toBeGreaterThan(1.2);
     expect(Math.max(...bounces)).toBeLessThanOrEqual(SPOT.bounce + 0.05);
     expect(frameAt(BLOCKED, 1219, 1).badgeD).toBe(frameAt(BLOCKED, 1219, 1).badgeA);
-    expect(frameAt(BLOCKED, 1220, 1).stamp).toBe(0);
-    expect(frameAt(BLOCKED, 1220 + 160, 1).stamp).toBe(1);
-    expect(frameAt(BLOCKED, 1220 + 100, 1).stamp).toBeGreaterThan(0);
-    // An attack that dealt damage bounces nothing and stamps nothing.
+    expect(frameAt(BLOCKED, 1220, 1).result).toBe(0);
+    expect(frameAt(BLOCKED, 1220 + 160, 1).result).toBe(1);
+    expect(frameAt(BLOCKED, 1220 + 100, 1).result).toBeGreaterThan(0);
+    // The gauge shows the broken shields from the impact on.
+    expect(frameAt(BLOCKED, 1219, 1).struck).toBe(false);
+    expect(frameAt(BLOCKED, 1221, 1).struck).toBe(true);
+    // An attack that dealt damage bounces nothing.
     expect(frameAt(HIT, 1500, 1).badgeD).toBe(frameAt(HIT, 1500, 1).badgeA);
-    expect(range(3200, 20).every((t) => frameAt(HIT, t, 1).stamp === 0)).toBe(true);
-    expect(stampLook(1)).toEqual({ scale: 1, alpha: 1 });
-    expect(stampLook(0.2).scale).toBeGreaterThan(1.15);
+    expect(resultLook(1)).toEqual({ scale: 1, alpha: 1 });
+    expect(resultLook(0.2).scale).toBeGreaterThan(1.1);
   });
 
   it("pops the count when the last token has landed, with phase 23's pop, and not before", () => {
@@ -121,6 +123,21 @@ describe("the hit", () => {
     expect(Math.max(...pops)).toBeGreaterThan(1.3);
     expect(pops[pops.length - 1]).toBeCloseTo(1, 1);
     expect(frameAt(BLOCKED, 1900, 1).landed).toBe(false);
+  });
+
+  it("lands each token at its own time, the gauge's hearts light then, and the result word follows the last", () => {
+    const lands = [0, 1, 2].map((index) => tokenLandAt(index, 3, 1));
+    expect(lands).toEqual([1220 + 220, 1220 + 90 + 220, 1620]);
+    // The heart sparks' clock starts as the first token lands.
+    expect(frameAt(HIT, lands[0]! - 1, 1).emberT).toBe(-1);
+    expect(frameAt(HIT, lands[0]! + 10, 1).emberT).toBe(10);
+    expect(range(3200, 20).every((t) => frameAt(BLOCKED, t, 1).emberT === -1)).toBe(true);
+    expect(frameAt(HIT, 1620, 1).result).toBe(0);
+    expect(frameAt(HIT, 1620 + 160, 1).result).toBe(1);
+    // A kill holds longer at the hit, so its tokens leave later.
+    expect(tokenLandAt(0, 2, 1, { first: true, last: true, destroyed: true })).toBe(1280 + 220);
+    // At Quick the same picture plays 0.6 as long.
+    expect(tokenLandAt(1, 3, 0.6)).toBeCloseTo(lands[1]! * 0.6, 6);
   });
 });
 
@@ -140,10 +157,11 @@ describe("a destroyed target", () => {
     expect(frameAt(HIT, 2950, 1).flyTarget).toBeLessThan(1);
   });
 
-  it("stamps Destroyed as the burn begins, and lets it go at the end of the return", () => {
-    expect(frameAt(KILL, 1699, 1).stamp).toBe(0);
-    expect(frameAt(KILL, 2700 + 160, 1).stamp).toBe(1);
-    expect(frameAt(KILL, 3200, 1).stamp).toBeCloseTo(0, 6);
+  it("brings in Destroyed as the last token lands, and lets it go over the first half of the return", () => {
+    const lands = tokenLandAt(1, 2, 1, { ...KILL });
+    expect(frameAt(KILL, lands, 1).result).toBe(0);
+    expect(frameAt(KILL, lands + 160, 1).result).toBe(1);
+    expect(frameAt(KILL, 2700 + 250, 1).result).toBe(0);
   });
 
   it("burns as fast as the next attack swaps in when it is not the last", () => {

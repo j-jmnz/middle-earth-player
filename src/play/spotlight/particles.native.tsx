@@ -1,5 +1,5 @@
 // The combat spotlight's particles as Skia Atlas draws (docs/design-system-table.md, Spotlight): the glow (the charge's
-// converging embers), the streaks (sparks, or a block's silver deflection) and the ash of a burn. Three draws of one sprite texture,
+// converging embers, then the sparks of the gauge's lit hearts), the streaks (sparks, or a block's silver deflection) and the ash of a burn. Three draws of one sprite texture,
 // each added to the picture with the "plus" blend (ATLAS_BLEND). The UI thread fills each draw's buffers from the attack's frame
 // (useRSXformBuffer, useColorBuffer; the layout of a slot is spotlight/atlas.ts), so nothing here renders again while the spotlight plays.
 import {
@@ -69,7 +69,7 @@ function Draw({ draw, texture, times, emitters }: { draw: 0 | 1 | 2; texture: Sh
 export function Particles({ texture, frame, dark, emitters }: { texture: SharedValue<SkImage | null>; frame: SharedValue<Frame>; dark: SharedValue<number>; emitters: Emitters }) {
   const times = useDerivedValue((): Times => {
     const f = frame.get();
-    return { convergeT: f.convergeT, sparkT: f.sparkT, ashT: f.ashT, dark: dark.get() };
+    return { convergeT: f.convergeT, sparkT: f.sparkT, emberT: f.emberT, ashT: f.ashT, dark: dark.get() };
   });
   return (
     <>

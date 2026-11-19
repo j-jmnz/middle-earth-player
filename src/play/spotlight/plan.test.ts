@@ -37,7 +37,7 @@ function layoutOf(game: ScenarioState): TableLayout {
 // The first attack of the seeded game `wanted` accepts, with the Keep that opened it.
 function attack(seed: number, keep: number, wanted: (reduced: Reduced) => boolean): Reduced {
   const start = expectOk(reduce(startScenario(starterStart(DECK, seed), ctx), { type: "Keep" }, ctx)).state;
-  const found = playUntil(ctx, start, keep, (reduced) => clashesOf(reduced.prev, reduced.next, reduced.steps).length > 0 && wanted(reduced));
+  const found = playUntil(ctx, start, keep, (reduced) => clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards).length > 0 && wanted(reduced));
   if (!found) throw new Error(`Seed ${seed} never reached that attack`);
   return found;
 }
@@ -62,14 +62,15 @@ describe("the stage", () => {
     const right = stage.target.x + stage.target.w;
     expect(Math.abs(left + right - PHONE.width)).toBeLessThanOrEqual(2);
     expect(Math.abs(stage.target.y + stage.target.h / 2 - 0.47 * PHONE.height)).toBeLessThanOrEqual(1);
-    // A medallion straddles each card's foot, the point of contact is on the target's near edge, the number is at its center.
+    // The attack value and the gauge straddle the cards' feet, the gauge may reach 25 pt past each side of the target, the caption is
+    // under it; the point of contact is on the target's near edge, the number is at its center.
     expect(stage.badgeA.cy).toBe(stage.target.y + stage.target.h);
-    expect(stage.badgeD.cy).toBe(stage.target.y + stage.target.h);
-    expect(stage.badgeD.cx).toBeCloseTo(stage.target.x + stage.target.w / 2, 6);
-    expect(stage.radius).toBe(26);
+    expect(stage.gauge.cy).toBe(stage.target.y + stage.target.h);
+    expect(stage.gauge.cx).toBeCloseTo(stage.target.x + stage.target.w / 2, 6);
+    expect(stage.gauge.room).toBe(stage.target.w + 50);
+    expect(stage.caption).toEqual({ cx: stage.gauge.cx, cy: stage.gauge.cy + SPOT.captionGap, right: PHONE.width - 8 });
     expect(stage.contact.x).toBe(stage.target.x);
     expect(stage.number).toEqual({ cx: stage.target.x + stage.target.w / 2, cy: stage.target.y + stage.target.h / 2 });
-    expect(stage.stamp.turn).toBeCloseTo((-8 * Math.PI) / 180, 9);
     expect(stage.corner.cx).toBeGreaterThan(stage.target.x + stage.target.w / 2);
     expect(stage.corner.cy).toBeLessThan(stage.target.y + stage.target.h / 2);
     expect(stage.drawBack).toBeGreaterThan(0);
@@ -131,9 +132,10 @@ describe("the stage", () => {
           const left = Math.min(...rects.map((rect) => rect.x));
           const right = Math.max(...rects.map((rect) => rect.x + rect.w));
           expect(right - left, key).toBeLessThanOrEqual(screen.width - 2 * 47 - 32 + 1);
-          // The medallions clear the note chip, which stands above the bottom inset.
-          expect(stage.note.cy + stage.note.h / 2, key).toBeLessThanOrEqual(screen.height - safe.bottom);
-          expect(stage.badgeD.cy + stage.radius, key).toBeLessThan(stage.note.cy - stage.note.h / 2);
+          // The note stands under the top inset and the cards clear it; the caption clears the bottom inset.
+          expect(stage.note.cy - stage.note.h / 2, key).toBeGreaterThanOrEqual(safe.top);
+          expect(stage.note.cy + stage.note.h / 2, key).toBeLessThan(stage.target.y);
+          expect(stage.caption.cy + SPOT.captionHalf, key).toBeLessThanOrEqual(screen.height - safe.bottom);
           expect(stage.note.cx).toBe(screen.width / 2);
         }
       }
@@ -143,11 +145,14 @@ describe("the stage", () => {
     expect(stageOf(area(844, 390), card, 1, false).target.h).toBe(234);
   });
 
-  it("shrinks a tall card when a medallion would touch the note chip above the bottom inset", () => {
+  it("shrinks a tall card when the caption would reach the bottom inset or the note the cards", () => {
     const flat = stageOf(area(844, 390), card, 1, false);
     const inset = stageOf(area(844, 390, { top: 0, right: 0, bottom: 34, left: 0 }), card, 1, false);
     expect(inset.target.h).toBeLessThan(flat.target.h);
-    expect(inset.badgeD.cy + inset.radius).toBeLessThan(inset.note.cy - inset.note.h / 2);
+    expect(inset.caption.cy + SPOT.captionHalf).toBeLessThanOrEqual(390 - 34);
+    const notch = stageOf(area(844, 390, { top: 60, right: 0, bottom: 0, left: 0 }), card, 1, false);
+    expect(notch.target.h).toBeLessThan(flat.target.h);
+    expect(notch.note.cy + notch.note.h / 2).toBeLessThan(notch.target.y);
   });
 
   it("flies a card between its slot and the stage: at its slot at 0, at the stage at 1", () => {
@@ -178,7 +183,7 @@ describe("the stage", () => {
 describe("the plan for a real state", () => {
   it("names who flies from where: the cards' slots before the state, the pictures, and the target's damage before and after", () => {
     const reduced = attack(2, 1, () => true);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     const before = layoutOf(reduced.prev);
     const after = layoutOf(reduced.next);
     const plan = buildPlan({ seq: 7, clashes, canvas: CANVAS, area: AREA, card: before.card, prev: reduced.prev, next: reduced.next, layouts: [before, after] });
@@ -206,8 +211,8 @@ describe("the plan for a real state", () => {
   });
 
   it("flies a turned shadow card from under its enemy and flips to the face the state names", () => {
-    const reduced = attack(1, 1, (found) => clashesOf(found.prev, found.next, found.steps)[0]?.shadow != null);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const reduced = attack(1, 1, (found) => clashesOf(found.prev, found.next, found.steps, ctx.cards)[0]?.shadow != null);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     const before = layoutOf(reduced.prev);
     const plan = buildPlan({ seq: 1, clashes, canvas: CANVAS, area: AREA, card: before.card, prev: reduced.prev, next: reduced.next, layouts: [before, layoutOf(reduced.next)] });
     const shadow = plan.clashes[0]?.shadow;
@@ -220,7 +225,7 @@ describe("the plan for a real state", () => {
 
   it("stands the players' attackers in the fan, in the accent of the players' attack", () => {
     const reduced = attack(115, 2, (found) => found.steps.some((step) => step.kind === "strike" && step.side === "player"));
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     const before = layoutOf(reduced.prev);
     const plan = buildPlan({ seq: 1, clashes, canvas: CANVAS, area: AREA, card: before.card, prev: reduced.prev, next: reduced.next, layouts: [before, layoutOf(reduced.next)] });
     expect(plan.clashes[0]?.enemyAttack).toBe(false);
@@ -241,9 +246,9 @@ describe("the plan for a real state", () => {
         state = found.next;
       }
       for (const [index, first] of seen.entries()) {
-        const second = seen.slice(index + 1).find((later) => clashesOf(later.prev, later.next, later.steps)[0]?.target === clashesOf(first.prev, first.next, first.steps)[0]?.target && !clashesOf(later.prev, later.next, later.steps)[0]?.destroyed);
+        const second = seen.slice(index + 1).find((later) => clashesOf(later.prev, later.next, later.steps, ctx.cards)[0]?.target === clashesOf(first.prev, first.next, first.steps, ctx.cards)[0]?.target && !clashesOf(later.prev, later.next, later.steps, ctx.cards)[0]?.destroyed);
         if (!second) continue;
-        const clashes = [...clashesOf(first.prev, first.next, first.steps), ...clashesOf(second.prev, second.next, second.steps)];
+        const clashes = [...clashesOf(first.prev, first.next, first.steps, ctx.cards), ...clashesOf(second.prev, second.next, second.steps, ctx.cards)];
         const target = clashes[0]?.target ?? "";
         const before = layoutOf(first.prev);
         const plan = buildPlan({ seq: 1, clashes, canvas: CANVAS, area: AREA, card: before.card, prev: first.prev, next: second.next, layouts: [before, layoutOf(second.next)] });
@@ -262,7 +267,7 @@ describe("the plan for a real state", () => {
 
   it("marks the first attack as the one that dims and the last as the one that goes back", () => {
     const reduced = attack(2, 1, () => true);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     const before = layoutOf(reduced.prev);
     const base = { canvas: CANVAS, area: AREA, card: before.card, prev: reduced.prev, next: reduced.next, layouts: [before, layoutOf(reduced.next)] };
     expect(buildPlan({ seq: 1, clashes, ...base }).clashes[0]?.shape).toMatchObject({ first: true, last: true });
@@ -273,7 +278,7 @@ describe("the plan for a real state", () => {
 
   it("seeds each attack's random effects with the moment's seq times 31 plus its index", () => {
     const reduced = attack(2, 1, () => true);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     const before = layoutOf(reduced.prev);
     const base = { canvas: CANVAS, area: AREA, card: before.card, prev: reduced.prev, next: reduced.next, layouts: [before, layoutOf(reduced.next)] };
     const plan = buildPlan({ seq: 7, clashes: [...clashes, ...clashes, ...clashes], ...base });
@@ -282,7 +287,7 @@ describe("the plan for a real state", () => {
 
   it("works the stage out on the screen area, and moves the whole stage with its size and insets, not with the canvas's origin", () => {
     const reduced = attack(2, 1, () => true);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     const before = layoutOf(reduced.prev);
     const base = { seq: 1, clashes, canvas: CANVAS, card: before.card, prev: reduced.prev, next: reduced.next, layouts: [before, layoutOf(reduced.next)] };
     const one = buildPlan({ ...base, area: AREA }).clashes[0];
@@ -300,7 +305,7 @@ describe("the plan for a real state", () => {
 
   it("runs several attacks one after another, and a card on neither table grows out of the middle", () => {
     const reduced = attack(2, 1, () => true);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps, ctx.cards);
     const empty = layoutOf(reduced.prev);
     const bare: TableLayout = { ...empty, slots: [] };
     const plan = buildPlan({ seq: 1, clashes: [...clashes, ...clashes], canvas: CANVAS, area: AREA, card: empty.card, prev: reduced.prev, next: reduced.next, layouts: [bare] });

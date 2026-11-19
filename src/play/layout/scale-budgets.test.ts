@@ -77,7 +77,8 @@ describe.each([UI_SCALES.large, UI_SCALES.xlarge])("scale 1 is unchanged and %s 
     expect(big.contact.y).toBeCloseTo(stage.contact.y * L, 6);
     expect(big.gap).toBeCloseTo(stage.gap * L, 6);
     expect(big.note.cy).toBeCloseTo(stage.note.cy * L, 6);
-    expect(big.radius).toBeCloseTo(stage.radius * L, 6);
+    expect(big.gauge.room).toBeCloseTo(stage.gauge.room * L, 6);
+    expect(big.caption.cy).toBeCloseTo(stage.caption.cy * L, 6);
   });
 
   it("row-fold and look-strip", () => {

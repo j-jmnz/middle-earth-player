@@ -68,7 +68,7 @@ describe("the tokens", () => {
     expect(MOTION.spotlightBurn).toEqual({ ms: 450, easing: "inQuad" });
     expect(MOTION.spotlightBurn.ms).toBeLessThanOrEqual(MOTION.spotlightReturn.ms);
     // The sub-tokens, none past 500 ms.
-    for (const name of ["spotlightFlash", "spotlightRing", "spotlightSparks", "spotlightShake", "spotlightNumberRise", "spotlightNumberSettle", "spotlightBurstStep", "spotlightBurstFly", "spotlightStamp", "spotlightRecoil", "spotlightFlip", "spotlightGlint", "spotlightTrailStep", "spotlightConverge", "spotlightStopKill"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
+    for (const name of ["spotlightFlash", "spotlightRing", "spotlightSparks", "spotlightShake", "spotlightNumberRise", "spotlightNumberSettle", "spotlightBurstStep", "spotlightBurstFly", "spotlightResult", "spotlightRecoil", "spotlightFlip", "spotlightGlint", "spotlightTrailStep", "spotlightConverge", "spotlightEmber", "spotlightStopKill"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
     // A kill stops for 160 ms, the extra 60 coming out of the impact.
     expect(MOTION.spotlightStopKill.ms).toBe(160);
     expect(MOTION.spotlightStopKill.ms - MOTION.spotlightStop.ms).toBeLessThan(MOTION.spotlightImpact.ms);
@@ -77,7 +77,7 @@ describe("the tokens", () => {
     expect(MOTION.spotlightNumberRise.ms).toBe(140);
     expect(MOTION.spotlightNumberSettle).toEqual({ ms: 260, zeta: 0.5 });
     expect(MOTION.spotlightRecoil).toEqual({ ms: 320, zeta: 0.5 });
-    expect([MOTION.spotlightStamp.ms, MOTION.spotlightFlip.ms, MOTION.spotlightGlint.ms, MOTION.spotlightTrailStep.ms]).toEqual([160, 300, 260, 16]);
+    expect([MOTION.spotlightResult.ms, MOTION.spotlightFlip.ms, MOTION.spotlightGlint.ms, MOTION.spotlightTrailStep.ms]).toEqual([160, 300, 260, 16]);
     // The effects that play in the impact fit inside it: three tokens 90 ms apart, the last landing as the burst ends; the shake and the sparks run on.
     expect(2 * MOTION.spotlightBurstStep.ms + MOTION.spotlightBurstFly.ms).toBeLessThanOrEqual(MOTION.spotlightImpact.ms);
     expect(MOTION.spotlightFlash.ms).toBeLessThan(MOTION.spotlightImpact.ms);

@@ -1,4 +1,4 @@
-// The combat spotlight's effect curves (docs/design-system-table.md, Spotlight): the flash, the shockwave ring, the stamp, the
+// The combat spotlight's effect curves (docs/design-system-table.md, Spotlight): the flash, the shockwave ring, the result word, the
 // trauma shake (Eiserloh's model), the damage number's pop and the camera push. Pure arithmetic on a time, worklet-safe (the
 // functions marked "worklet" run on the UI thread; in Node the directive is an unused string); spotlight/beats.ts reads them into a
 // frame. Lengths are logical points (the layer multiplies by the UI scale) or shares of a card's height.
@@ -47,11 +47,11 @@ export function ringAt(u: number): { r: number; alpha: number } {
   return { r: FX.ringStart + FX.ringGrow * ease("outCubic", u), alpha: 0.9 * fall * Math.sqrt(fall) };
 }
 
-/** A stamp ("Blocked", "Destroyed") at progress `p` (0..1, the frame's `stamp`): it lands from 1.35 down to 1 as it fades in. */
-export function stampLook(p: number): { scale: number; alpha: number } {
+/** The caption's result word at progress `p` (0..1, the frame's `result`): it settles from 1.2 down to 1 as it fades in. */
+export function resultLook(p: number): { scale: number; alpha: number } {
   "worklet";
   const x = clamp01(p);
-  return { scale: 1 + 0.35 * (1 - ease("outCubic", x)), alpha: Math.min(1, x * 1.6) };
+  return { scale: 1 + 0.2 * (1 - ease("outCubic", x)), alpha: Math.min(1, x * 1.6) };
 }
 
 /** The trauma an attack starts with: 0.55 plus 0.12 for each damage (at most 1), 1 on a kill, 0.35 when it was blocked. */

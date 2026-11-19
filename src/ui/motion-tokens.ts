@@ -110,7 +110,7 @@ export const MOTION = {
   toastIn: tween(160, null),
   toastOut: tween(120, null),
   // The combat spotlight, one attack (docs/design-system-table.md, Spotlight): the dark comes in and the cards arc to the center
-  // (enter), the medallions pop and a shadow card flips (read), the attacker draws back and glows (charge), strikes (lunge),
+  // (enter), the attack value and the gauge pop and a shadow card flips (read), the attacker draws back and glows (charge), strikes (lunge),
   // everything holds at the hit (stop), the target takes it (impact, with burstStep and burstFly inside it), the cards and the
   // result stay (hold) and both go back (return). A destroyed target burns inside the return (burn). The eight beats add up to `spotlight`.
   spotlightEnter: tween(350, "outCubic"),
@@ -119,7 +119,7 @@ export const MOTION = {
   spotlightLunge: tween(120, "inCubic"),
   spotlightStop: tween(100, null),
   spotlightImpact: tween(480, "linear"),
-  // After the impact the cards, the medallions and the result stay so they can be read (user request, 2026-10-30).
+  // After the impact the cards, the gauge and the result stay so they can be read (user request, 2026-10-30).
   spotlightHold: tween(1000, null),
   spotlightReturn: tween(500, "inCubic"),
   spotlightBurn: tween(450, "inQuad"),
@@ -130,7 +130,7 @@ export const MOTION = {
   spotlightReadAgain: tween(100, "outCubic"),
   spotlightChargeAgain: tween(200, "outQuad"),
   // Inside the impact: the flash and the shockwave ring, the sparks and the trauma shake, the damage number's rise and settle, the
-  // damage tokens' step and flight, the stamp and the attacker's recoil, the shadow card's flip and glint, and the gap between
+  // damage tokens' step and flight, the result word and the attacker's recoil, the shadow card's flip and glint, and the gap between
   // the afterimages of the lunge.
   spotlightFlash: tween(160, "outQuad"),
   spotlightRing: tween(360, "outCubic"),
@@ -140,7 +140,7 @@ export const MOTION = {
   spotlightNumberSettle: spring(260, 0.5),
   spotlightBurstStep: tween(90, null),
   spotlightBurstFly: tween(220, "outCubic"),
-  spotlightStamp: tween(160, "outCubic"),
+  spotlightResult: tween(160, "outCubic"),
   spotlightRecoil: spring(320, 0.5),
   spotlightFlip: tween(300, "outCubic"),
   spotlightGlint: tween(260, "linear"),
@@ -148,9 +148,10 @@ export const MOTION = {
   // A kill holds longer at the hit (a boss stop): this replaces `spotlightStop` for it and the extra is taken from `spotlightImpact`,
   // so the return and the run keep their times.
   spotlightStopKill: tween(160, null),
-  // The particles' lives at Normal speed (spotlight/particles.ts): the slowest converging ember's flight and the slowest ash's rise;
-  // each sprite lives a seeded share of its token.
+  // The particles' lives at Normal speed (spotlight/particles.ts): the slowest converging ember's flight, the slowest spark's rise
+  // from a heart the attack filled, and the slowest ash's rise; each sprite lives a seeded share of its token.
   spotlightConverge: tween(500, "linear"),
+  spotlightEmber: tween(480, "linear"),
   spotlightAsh: tween(1100, "linear"),
   spotlight: tween(3200, "linear"),
   // The hand scrub (phase 25): the held hand rises (and grows and turns its fan) over `scrubRise` and spreads sideways over `scrubSpread`,

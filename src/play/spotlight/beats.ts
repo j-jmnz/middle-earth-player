@@ -7,13 +7,14 @@
 //
 // One attack, at Normal (ms), when it is the only one (or the first of several, then without the last row):
 //   0    enter   the dark comes in, the cards arc from their slots to the center and overshoot, the black fog rolls in
-//   350  read    the medallions pop in; a turned shadow card flips in 3D with a glint
+//   350  read    the attack value and the gauge pop in; a turned shadow card flips in 3D with a glint
 //   650  charge  the attacker draws back and tilts, a rim glow builds, embers converge, the camera pushes in
 //   1000 lunge   a fast strike with three fading afterimages
 //   1120 stop    hit stop: everything holds; the flash peaks and the impact haptic plays
-//   1220 impact  ring, sparks, shake, knock-back and tint, the damage number and the tokens; or deflection, recoil and "Blocked"
-//   1700 hold    the cards, the medallions and the result stay so they can be read
-//   2700 return  both go back and the dark lifts; a destroyed target burns instead, with ash and "Destroyed"
+//   1220 impact  ring, sparks, shake, knock-back and tint, the damage number and the tokens (each lights a heart of the gauge as it
+//                lands, and the result word follows the last); or deflection, recoil, the shields that held and "Blocked"
+//   1700 hold    the cards, the gauge and the result stay so they can be read
+//   2700 return  both go back and the dark lifts; a destroyed target burns instead, with ash
 //   3200
 // A kill holds longer (a boss stop): 160 ms, the extra 60 taken from the impact, so the return and the run keep their times.
 // Several attacks in one state play under one dark: the second and later swap in over 200 ms (no flight from the slots, a read of
@@ -125,9 +126,11 @@ export type Frame = {
   // The whole attack's opacity (a later attack swaps in, an earlier one swaps out). The dark and the camera's push belong to the run
   // (`darkAt`, `punchAt`), not to one attack.
   fade: number;
-  // The medallions' scale: they pop in; the defense one bounces when the attack is blocked.
+  // The scale of the attack value and of the gauge: they pop in; the shields that held a blocked attack bounce (`badgeD` is theirs).
   badgeA: number;
   badgeD: number;
+  // The attack has struck (from the impact on): the gauge shows the shields it broke.
+  struck: boolean;
   // The attacker's pose, as `strikeOffset` reads it: how far it has drawn back (0..1), how far it has lunged (0..1), and how far
   // the block threw it back (0..1, a spring); and its tilt in radians.
   back: number;
@@ -144,11 +147,12 @@ export type Frame = {
   flash: number;
   ring: { r: number; alpha: number };
   // The effect clocks, ms at Normal speed (-1 before): the feet bank's fog (the whole attack; it drifts on it), converging embers (from
-  // the charge), sparks or deflection (from the impact) and ash (from the burn). The fog's and the charge's clocks stand still through the
-  // hit stop.
+  // the charge), sparks or deflection (from the impact), the sparks of the gauge's lit hearts (from the first token's landing) and ash
+  // (from the burn). The fog's and the charge's clocks stand still through the hit stop.
   fogT: number;
   convergeT: number;
   sparkT: number;
+  emberT: number;
   ashT: number;
   // The stage's trauma shake: x and y in logical points, the turn in radians.
   shakeX: number;
@@ -156,8 +160,9 @@ export type Frame = {
   shakeTurn: number;
   // The damage number: its scale, opacity, and how far it has drifted up (0..1).
   number: { scale: number; alpha: number; rise: number };
-  // The "Blocked" or "Destroyed" stamp (0..1; spotlight/fx.ts, stampLook).
-  stamp: number;
+  // The caption's result word ("1 damage", "Blocked", "Destroyed"; 0..1, spotlight/fx.ts, resultLook): it comes in at the impact
+  // when the attack was blocked, else as the last damage token lands.
+  result: number;
   // The shadow card's flip about its vertical axis (0 the back, pi the face) and the glint's sweep across it (0..1, 0 when off).
   flipAngle: number;
   glint: number;
@@ -175,10 +180,23 @@ export function burstGap(count: number, k: number, destroyed = false): number {
   return Math.max(1, Math.min(length(MOTION.spotlightBurstStep, k), (impactLength(k, destroyed) - length(MOTION.spotlightBurstFly, k)) / (count - 1)));
 }
 
+// When damage token `index` of `count` lands, ms into the attack. Declared before the worklets that call it: the worklet transform
+// makes each one a constant that captures what it calls, so a callee declared later is not there yet.
+function tokenLandOf(index: number, count: number, destroyed: boolean, b: Beats, k: number): number {
+  "worklet";
+  return b.impactAt + index * burstGap(count, k, destroyed) + length(MOTION.spotlightBurstFly, k);
+}
+
 /** When the last damage token lands, ms into the attack; 0 when there is no damage. */
 function landAt(damage: number, destroyed: boolean, b: Beats, k: number): number {
   "worklet";
-  return damage > 0 ? b.impactAt + (damage - 1) * burstGap(damage, k, destroyed) + length(MOTION.spotlightBurstFly, k) : 0;
+  return damage > 0 ? tokenLandOf(damage - 1, damage, destroyed, b, k) : 0;
+}
+
+/** When damage token `index` of `count` lands in the target's corner, ms into its attack at a scale: the gauge lights its heart then. */
+export function tokenLandAt(index: number, count: number, k: number, place: Place = { first: true, last: true }): number {
+  "worklet";
+  return tokenLandOf(index, count, place.destroyed === true, beatsAt(k, place), k);
 }
 
 // A spring kick `hit` ms after the impact: 0 before it, a short ramp to the peak, then back to 0 on the recoil spring.
@@ -202,7 +220,7 @@ export function frameAt(shape: ClashShape, t: number, k: number, seed = 0): Fram
   const flyAttackers = goes ? 1 - out : shape.first ? Math.max(0, ease("outBack", t / b.intro)) : 1;
   const flyTarget = shape.destroyed && t >= b.retAt ? 1 : flyAttackers;
   const fade = (shape.first ? 1 : appear) * (shape.last ? 1 : 1 - clamp01((t - b.retAt) / b.exit));
-  // What goes with the cards as they go back: the medallions, number and stamp fade out over the first half of the return.
+  // What goes with the cards as they go back: the attack value, the gauge, the number and the result fade out over the first half of the return.
   const halfOut = goes ? 1 - clamp01((t - b.retAt) / (b.ret / 2)) : 1;
 
   const bounce = blocked && hit > 0 ? popScale(hit, k, SPOT.bounce, MOTION.spotlightNumberRise, 0, MOTION.spotlightNumberSettle) : 1;
@@ -222,19 +240,21 @@ export function frameAt(shape: ClashShape, t: number, k: number, seed = 0): Fram
 
   // The clocks of the feet bank's fog and the charge hold through the hit stop and carry on from where they stood.
   const running = t - clamp01((t - b.stopAt) / b.stop) * b.stop;
-  const stampAt = blocked ? hit : shape.destroyed ? t - b.retAt : -1;
-  const stampOut = blocked ? halfOut : shape.destroyed && shape.last ? 1 - clamp01((t - b.retAt - b.ret * 0.6) / (b.ret * 0.4)) : 1;
   const shaken = shakeAt(traumaStart(shape.damage, shape.destroyed), hit, k, seed);
   const num = shape.damage > 0 ? numberAt(hit, k) : { scale: 0, alpha: 0, rise: 0 };
   // A destroyed target burns for the burn token on the last attack; on an earlier one it burns as fast as the next attack swaps in.
   const burnLength = shape.last ? length(MOTION.spotlightBurn, k) : b.exit;
-  const landed = shape.damage > 0 && t >= landAt(shape.damage, shape.destroyed, b, k);
+  const lands = landAt(shape.damage, shape.destroyed, b, k);
+  const landed = shape.damage > 0 && t >= lands;
+  const firstLand = shape.damage > 0 ? tokenLandOf(0, shape.damage, shape.destroyed, b, k) : -1;
+  const resultAt = blocked ? hit : t - lands;
   return {
     flyAttackers,
     flyTarget,
     fade,
     badgeA,
     badgeD,
+    struck: hit > 0,
     back: build * (1 - out),
     strike: lunged * (1 - out),
     recoil: blocked ? kicked : 0,
@@ -248,12 +268,13 @@ export function frameAt(shape: ClashShape, t: number, k: number, seed = 0): Fram
     fogT: t >= 0 ? running / k : -1,
     convergeT: t >= b.chargeAt ? (running - b.chargeAt) / k : -1,
     sparkT: hit >= 0 ? hit / k : -1,
+    emberT: firstLand >= 0 && t >= firstLand ? (t - firstLand) / k : -1,
     ashT: shape.destroyed && t >= b.retAt ? (t - b.retAt) / k : -1,
     shakeX: shaken.x,
     shakeY: shaken.y,
     shakeTurn: shaken.turn,
     number: { scale: num.scale, alpha: num.alpha * halfOut, rise: num.rise },
-    stamp: stampAt > 0 ? clamp01(stampAt / length(MOTION.spotlightStamp, k)) * stampOut : 0,
+    result: resultAt > 0 ? clamp01(resultAt / length(MOTION.spotlightResult, k)) * halfOut : 0,
     flipAngle: shape.shadow ? Math.PI * curve(MOTION.spotlightFlip, (t - b.readAt) / flipLength) : 0,
     glint: shape.shadow && glintAt > 0 && glintAt < 1 ? glintAt : 0,
     dissolve: shape.destroyed && t >= b.retAt ? curve(MOTION.spotlightBurn, (t - b.retAt) / burnLength) : 0,

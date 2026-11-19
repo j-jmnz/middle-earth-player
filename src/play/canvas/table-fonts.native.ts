@@ -16,24 +16,26 @@ const BARLOW = require("../../../assets/fonts/BarlowSemiCondensed-SemiBold.ttf")
 const BARLOW_BOLD = require("../../../assets/fonts/BarlowSemiCondensed-Bold.ttf") as number;
 
 /**
- * The spotlight's faces: the medallions' numbers, the damage count in the target's corner, the small words, the damage number
- * (Marcellus SC 64), the stamps (Marcellus SC 34) and the note chip (Barlow Bold 15).
+ * The spotlight's faces: the attack value (Marcellus SC 30), the damage count in the target's corner and the caption's and the gauge's
+ * numbers (Marcellus SC 19), the "+n" (Marcellus SC 14), the damage number (Marcellus SC 46), the result word (Marcellus SC 22), the
+ * caption's words (Barlow semibold 17) and the note (Barlow Bold 15).
  */
-export type SpotFonts = { pill: SkFont | null; count: SkFont | null; word: SkFont | null; number: SkFont | null; stamp: SkFont | null; note: SkFont | null };
+export type SpotFonts = { pill: SkFont | null; count: SkFont | null; word: SkFont | null; number: SkFont | null; result: SkFont | null; caption: SkFont | null; note: SkFont | null };
 
 /** The title file: Marcellus SC, or Barlow semibold under the Title face setting's Plain (display-prefs.ts). */
 export const titleFile = (plain: boolean): number => (plain ? BARLOW : MARCELLUS);
 
-/** The spotlight's faces at a UI scale; each is null while its file loads. `plain` draws the numbers and stamps in Barlow semibold. */
+/** The spotlight's faces at a UI scale; each is null while its file loads. `plain` draws the numbers and the result word in Barlow semibold. */
 export function useSpotFonts(scale = 1, plain = false): SpotFonts {
   const title = titleFile(plain);
-  const pill = useSharedFont(title, 24 * scale);
+  const pill = useSharedFont(title, SPOT.attackSize * scale);
   const count = useSharedFont(title, 19 * scale);
   const word = useSharedFont(title, 14 * scale);
   const number = useSharedFont(title, SPOT.numberSize * scale);
-  const stamp = useSharedFont(title, SPOT.stampSize * scale);
+  const result = useSharedFont(title, SPOT.resultSize * scale);
+  const caption = useSharedFont(BARLOW, 17 * scale);
   const note = useSharedFont(BARLOW_BOLD, SPOT.noteSize * scale);
-  return useMemo(() => ({ pill, count, word, number, stamp, note }), [pill, count, word, number, stamp, note]);
+  return useMemo(() => ({ pill, count, word, number, result, caption, note }), [pill, count, word, number, result, caption, note]);
 }
 
 export function useTableFonts(scale = 1, plain = false): Fonts {
