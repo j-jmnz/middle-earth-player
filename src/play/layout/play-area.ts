@@ -46,15 +46,20 @@ function rowStep(row: readonly ZoneEntry[], size: { w: number; h: number }, widt
   return size.w + m.gap - Math.max(0, natural - width) / (row.length - 1);
 }
 
-// The two rows of a stack, back then front: the ships go to the front row's left end (their attachments still peek and their damage stays in reach),
-// the front row as long as the back row would leave it; the rest keep their order. Without a ship it is the plain halves.
+// The two rows of a stack, back then front: the ships and then the heroes go to the front row's left end, so their attachments still
+// peek and their damage and resources stay in reach (user request, 2026-11-19: an ally in front covered a hero's attachments); the
+// front row is as long as the back row would leave it, longer when they need it; the rest keep their order. With neither it is the plain halves.
+function upFront(entry: ZoneEntry): boolean {
+  return entry.ship != null || entry.card.zone === "heroes";
+}
+
 function stackedRows(entries: readonly ZoneEntry[]): ZoneEntry[][] {
   const half = Math.ceil(entries.length / 2);
-  const ships = entries.filter((entry) => entry.ship != null);
-  if (ships.length === 0) return [entries.slice(0, half), entries.slice(half)];
-  const rest = entries.filter((entry) => entry.ship == null);
-  const need = Math.max(0, entries.length - half - ships.length);
-  return [rest.slice(0, rest.length - need), [...ships, ...rest.slice(rest.length - need)]];
+  const lead = entries.filter(upFront);
+  if (lead.length === 0) return [entries.slice(0, half), entries.slice(half)];
+  const rest = entries.filter((entry) => !upFront(entry));
+  const need = Math.max(0, entries.length - half - lead.length);
+  return [rest.slice(0, rest.length - need), [...lead, ...rest.slice(rest.length - need)]];
 }
 
 /**
