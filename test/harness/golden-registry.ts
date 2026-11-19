@@ -69,7 +69,7 @@ import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
 import * as erech from "../scenarios/the-stone-of-erech/game.ts";
 import * as forest from "../scenarios/the-old-forest/game.ts";
 import * as downs from "../scenarios/fog-on-the-barrow-downs/game.ts";
-// import * as belegost from "../scenarios/the-ruins-of-belegost/game.ts";
+import * as belegost from "../scenarios/the-ruins-of-belegost/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -165,5 +165,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),
   entry("the-old-forest", "The Old Forest", forest.FOREST_GOLDENS, forest.forestWorld, forest.playGolden),
   entry("fog-on-the-barrow-downs", "Fog on the Barrow-downs", downs.DOWNS_GOLDENS, downs.downsWorld, downs.playGolden),
-  // entry("the-ruins-of-belegost", "The Ruins of Belegost", belegost.BELEGOST_GOLDENS, belegost.belegostWorld, belegost.playGolden),
+  entry("the-ruins-of-belegost", "The Ruins of Belegost", belegost.BELEGOST_GOLDENS, belegost.belegostWorld, belegost.playGolden),
 ];
