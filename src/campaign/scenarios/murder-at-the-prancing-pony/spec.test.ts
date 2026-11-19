@@ -1,7 +1,7 @@
 // Rules: rr.forced, rr.travel, rr.search, rr.immune, rr.cannot, rr.engaged, rr.in-play-and-out-of-play, rr.victory, rr.quest-advancement, rr.keywords, faq.additional-attacks (data/rules/entries.json); docs/brief.md (Murder at the Prancing Pony).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, count, flag, handCount, quest, resolve, respond, reveal, offers, stat, stagingThreat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, damageOn, flag, handCount, quest, resolve, respond, reveal, offers, stat, stagingThreat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Murder at the Prancing Pony (standalone-scenarios part 7): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the seeded hiding of the Suspect and
@@ -61,6 +61,13 @@ const ROWS: readonly Row[] = [
   { line: "50727:A:1", name: "When Revealed: the top X cards of the encounter deck are discarded and their Threat added to the staging total", layout: { stage: "50701", active: "50717", deck: ["f3", "f3", "f3", "f3", "f3"] }, act: resolve("50727", "whenRevealed"), expect: [stagingThreat(12)] },
   { line: "50728:A:1", name: "When Revealed: either each player raises threat by 2 or it is shuffled into the Investigation deck", layout: { piles: DECK3, deck: ["f0"] }, act: [reveal("50728"), answer("shuffle")], expect: [count("50728", "investigationDeck", 1)] },
   { line: "50729:A:1", name: "When Revealed: each player raises their threat by 1 more than the Investigate value of the active location", layout: { stage: "50701", active: "50717", deck: ["f0"] }, act: reveal("50729"), expect: [threat(32)] },
+  // More rows (attacks and quest-phase choices).
+  { line: "50701:B:2", name: "Forced: at the beginning of the quest phase each player either raises their threat by 2", layout: { stage: "50701", phase: "Quest", threat: [30, 30], deck: F0 }, act: [announce("beginningOfPhase", undefined, BEGINNING_OF("Quest")), answer("threat")], expect: [threat(32)] },
+  { line: "50722:A:1", name: "Response: after Bree-land Informant attacks with a shadow card of no effect the defender raises threat by 1 and it is discarded", layout: { engaged: ["50722"], threat: [30, 30], deck: ["f0", "f0"], heroResources: 1, piles: DECK3 }, act: [attack("50722", { shadow: "f0", undefended: true }), respond("50722")], expect: [zone("50722", "encounterDiscard")] },
+  { line: "50713:A:2", name: "Forced: after an attack in which Old Orc-eyes was dealt a shadow card without a shadow effect he attacks again", layout: { engaged: ["50713"], deck: ["f0", "f0"] }, act: attack("50713", { shadow: "f0", undefended: true }), expect: [damageOn("dh1", 8)] },
+  { line: "50712:A:2", name: "Johnny Goblin-fingers: the card discarded raises the defender's threat by its printed cost", layout: { engaged: ["50712"], threat: [30, 30], hand: ["ally"], deck: ["f0", "f0"] }, act: attack("50712", { undefended: true }), expect: [handCount(0)] },
+  { line: "50719:A:1", name: "Investigate 1: the first player looks at the top card, which shows Taken by Surprise", layout: { stage: "50701", active: "50719", piles: TAKEN_ONLY, deck: ["f0"], discard: ["f3"] }, act: [announce("activeExplored", "50719"), answer("reduce")], expect: [zone("50714", "removed")] },
+  { line: "50719:A:2", name: "the first player may look at 2 additional cards, which shows Taken by Surprise among the three", layout: { stage: "50701", active: "50719", seed: 1, piles: { investigationDeck: ["f0", "f0", "50714"] }, deck: ["f0"], discard: ["f3"] }, act: [announce("activeExplored", "50719"), answer("look")], expect: [zone("50714", "removed")] },
 ];
 
 if (ROWS.length > 0) cardSpecs("murder-at-the-prancing-pony", ROWS);
