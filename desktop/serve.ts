@@ -1,5 +1,5 @@
 // What the app:// handler answers: which file a path names, its type, its headers and the part of it a Range asks for. Pure and Node-only (no Electron), so
-// desktop/serve.test.ts runs it, and scripts/checks/a11y-web.ts serves the same export through the same resolution.
+// desktop/serve.test.ts runs it, and scripts/browser/web-export.ts serves the same export through the same resolution.
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 

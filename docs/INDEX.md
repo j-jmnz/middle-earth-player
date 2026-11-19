@@ -8,7 +8,12 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~3.0K tok)
+- `CLAUDE.md` — Claude Code (~3.1K tok)
+  - 7–26 Data (~1.3K)
+  - 27–45 Commands (~1.1K)
+  - 46–49 Agents (~180)
+  - 50–53 Skills (~80)
+  - 54–57 Cloud sessions (~60)
 - `.claude/rules/agent-standards.md` — Agent standards (~350 tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
@@ -53,7 +58,7 @@ Read the sections your task touches.
   - 7–41 Stack (~1.2K)
   - 42–77 Processes (~690)
   - 78–161 Modules (~2.4K) ← 3
-    - 126–161 Repository map (~960) ← 1
+    - 126–161 Repository map (~980) ← 1
   - 162–187 State (~1.1K) ← 9
   - 188–209 Play loop (~250)
   - 210–235 Engine (~5.9K)
@@ -226,7 +231,12 @@ Read the sections your task touches.
     - 493–500 Booklet (~540) ← 2
     - 501–504 Database (~110)
   - 505–524 States (~620)
-- `docs/development.md` — Development (~2.6K tok)
+- `docs/development.md` — Development (~3.4K tok)
+  - 5–14 In a browser (~170)
+  - 15–32 Checking a screen in a browser (~670) ← 3
+  - 33–40 On a desktop (~210) ← 1
+  - 41–61 On a phone (~350)
+  - 62–111 Commands (~1.9K) ← 4
 - `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1
   - 20–35 Jobs (~1.8K) ← 4
