@@ -96,6 +96,8 @@ export type EffectData = {
   interrupted?: boolean;
   // The cards a Pick looked at in a deck: the ones still there are put back by ArrangeTop.
   looked?: readonly string[];
+  // The seats that looked at cards of the encounter deck in this effect: the look is announced (`lookedAtEncounterDeck`) once the whole effect has resolved (families/encounter/looked.ts).
+  lookedBy?: readonly number[];
   // The options a `different` Choose has taken in this effect (families/deck/choose.ts).
   options?: readonly string[];
   // The seat the event that offered this Response happened to.
@@ -133,6 +135,10 @@ export type EffectData = {
   fortitude?: "failed" | "passed";
   // The last escape test this effect made (EscapeTest; the `lastEscapeFailed` and `lastEscapePassed` conditions, families/escape/conditions.ts).
   escape?: "failed" | "passed";
+  // The last locate test this effect made (LocateTest; the `lastLocateFailed` and `lastLocatePassed` conditions, families/long-dark/conditions.ts).
+  locate?: "failed" | "passed";
+  // A Draw this effect ran drew a card (the `drew` condition: the text after "then" resolves only when the draw did, rr.then).
+  drew?: boolean;
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -185,7 +191,7 @@ export type EscapeData = {
 // `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
 // a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed. `fromStaging`: an
 // "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea/boarding.ts).
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; fromStaging?: boolean; shadowBlank?: true; at?: number };
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; fromStaging?: boolean; shadowBlank?: true; uncancelable?: true; at?: number };
 
 // A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
 // window answers several events of one occurrence.
@@ -287,6 +293,8 @@ export type PendingAttack = {
   toStage?: boolean;
   // The damage beyond the remaining hit points of the defending character goes on the main quest card (19083:B:1, 19080:A:3).
   excessToStage?: boolean;
+  // The damage beyond the remaining hit points of the defending character goes on the card in play with this title (901407:A:2, ExcessToCard).
+  excessToCard?: string;
   // The attack is Smaug's against Lake-town (Town-Baiting, 50211:A:1): the damage of an undefended attack is placed on Lake-town, and so is the damage beyond a defender's remaining hit points (families/smaug/attack.ts).
   toLakeTown?: boolean;
   // The damage beyond the remaining hit points of the defending character goes on Lake-town (Esgaroth Wharf's Shadow in a Town-Baiting attack; the flag `excessToLakeTown` of Smaug the Magnificent is read for the enemy).

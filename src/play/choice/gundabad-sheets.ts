@@ -13,7 +13,7 @@ import { damagedCharacterRow, type FireRow } from "./aflame-sheets.ts";
  */
 export function gundabadRow(pick: Instruction, next: Instruction | undefined, id: string, game: ScenarioState, ctx: ReduceContext, name: string): FireRow | null {
   if (!inGundabad(game)) return null;
-  if (pick.verb === "AssignDamage") return damagedCharacterRow(game, ctx, id, name, 1);
+  if (pick.verb === "AssignDamage") return damagedCharacterRow(game, ctx, id, name, pick.single === true ? (pick.left ?? 1) : 1);
   if (pick.verb !== "Pick" || pick.pick.committed !== true || pick.pick.control !== "you" || pick.pick.type !== "character" || next?.verb !== "DamageCard" || typeof next.amount !== "number") return null;
   return damagedCharacterRow(game, ctx, id, name, next.amount);
 }

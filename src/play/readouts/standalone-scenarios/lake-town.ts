@@ -9,7 +9,7 @@ import type { ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { lakeTownDamage, lakeTownId, lakeTownLimit, smaugInPlay, victoryPoints } from "../../../rules/families/smaug/cards.ts";
 
-import { scoreLimitWords, scoreWords, smaugLimitWords, smaugWords, townLimitWords, townNearWords, townWords } from "../../words/scenarios/smaug-table.ts";
+import { scoreLimitWords, scoreWords, smaugLimitWords, smaugWords, townLimitWords, townNearWords, townWords } from "../../words/scenarios/standalone-scenarios/smaug-table.ts";
 import type { TableDial } from "../dials.ts";
 
 /** The last stage of the quest: the players win by defeating Smaug there, and the score decides it. */

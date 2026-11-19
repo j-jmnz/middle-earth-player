@@ -1,4 +1,4 @@
-// Rules: rr.keywords, rr.blank, rr.sentinel, rr.ranged, rr.surge, mec109.indestructible, mec109.toughness, mec109.archery, mec113.phantom (data/rules/entries.json).
+// Rules: rr.keywords, rr.blank, rr.sentinel, rr.ranged, rr.surge, dwd.ambush, mec109.indestructible, mec109.toughness, mec109.archery, mec113.phantom (data/rules/entries.json).
 //
 // A card's keywords as they stand now, for the table's card preview: the printed ones, the ones a card effect gives (Sentinel, Ranged, Surge,
 // Toughness, Archery, Immune, Phantom), and the printed ones an effect or a blank text box takes away. Every reading goes through the engine's own
@@ -18,7 +18,7 @@ import { KEYWORD_RULES, type KeywordKey } from "./keyword-rules.ts";
 export type CardKeyword = { key: KeywordKey; word: string; lost: boolean };
 
 // Keywords with a printed flag or value and no reader of their own: shown while the text counts, struck through when the card lost its keywords.
-const PRINTED_FLAGS = ["peril", "permanent", "battle", "siege", "sailing", "dire"] as const;
+const PRINTED_FLAGS = ["peril", "permanent", "battle", "siege", "sailing", "dire", "pass"] as const;
 const PRINTED_VALUES = ["hide", "secrecy", "boarding", "aflame", "burn"] as const;
 
 /** The card's keywords now, in KEYWORD_RULES' order. Empty for a card that is not in the game. */
@@ -45,10 +45,14 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   shown("uncharted", isLostIsland(instance, ctx));
   shown("grapple", kw.grapple != null);
   shown("doomed", (kw.doomed ?? 0) > 0, kw.doomed ?? undefined);
+  shown("regenerate", (kw.regenerate ?? 0) > 0, kw.regenerate ?? undefined);
   shown("restricted", kw.restricted);
 
   if (heldAmount(game, cardId, "gainsSurge") > 0) add("surge", false);
   else shown("surge", kw.surge);
+  // Ambush: printed, or given by a card (Goblin Gate, 04043:A:1).
+  if (hasKeyword(game, cardId, "gainedAmbush", ctx.cards)) add("ambush", false);
+  else shown("ambush", kw.ambush);
 
   // Sentinel and Ranged: the engine's reader says whether the card has it now; one the card prints and does not have now is struck through.
   for (const key of ["sentinel", "ranged"] as const) {

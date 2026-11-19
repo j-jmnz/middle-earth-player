@@ -3,6 +3,7 @@
 //
 // The encounter family's verbs that ask a player to choose: they run from the effect frame (effect-frames.ts hands them the
 // queue item, so the choice comes back to them), and from anywhere else take the first option.
+import { announceLooked } from "./looked.ts";
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -102,7 +103,9 @@ function pickEncounter(state: ScenarioState, item: QueueItem, sourceId: string |
   if (instruction.verb !== "PickEncounter") return state;
   const options = encounterCandidates(state, instruction, item.seat, sourceId, ctx);
   if (!item.chosen && options.length > 1 && effectData(state)) return askTarget(state, item, options);
-  return pushPicked(state, item.chosen ?? options[0] ?? "");
+  const picked = pushPicked(state, item.chosen ?? options[0] ?? "");
+  // A search of the encounter deck looks at its cards (901506:A:1, looked.ts).
+  return instruction.from === "deck" || instruction.from === "deckAndDiscard" ? announceLooked(picked, ctx, item.seat) : picked;
 }
 
 // Puts the looked-at cards still on top of the encounter deck back in the order the actor chooses: the card for the top

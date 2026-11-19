@@ -208,7 +208,8 @@ const forEachPlayerSchema = verbFlags(z.strictObject({
   // `guardian`: only the player guarding Gollum, the instructions run for him as the acting player ("Raise the threat of the player guarding Gollum by 8", 02135:A:1). While a card says an effect that targets him also targets each other player (Dry Watercourse, 02132:A:1;
   // Ambushing Orcs, 900902:A:1) the other players follow, in player order (src/rules/families/guardian/seats.ts).
   // `otherThanGuardian`: each player but him, in player order ("reduce the threat of each player not guarding Gollum by 2", 02133:A:2).
-  seats: z.enum(["guardian", "otherThanGuardian"]).optional(),
+  // `engaged`: only the player the source enemy is engaged with ("the engaged player chooses", 901703:A:2); nobody when it is not engaged.
+  seats: z.enum(["guardian", "otherThanGuardian", "engaged"]).optional(),
   // An Each runs for the player acting: "deal 1 damage to each character controlled by the player guarding Gollum" is an Each of the characters he controls (02138:A:2).
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, eachSchema])),
 }), { runsInFrame: true });

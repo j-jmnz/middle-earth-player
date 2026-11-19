@@ -51,6 +51,15 @@ import { rhosgobelFixtures } from "./shadows-of-mirkwood/a-journey-to-rhosgobel.
 import { muilFixtures } from "./shadows-of-mirkwood/the-hills-of-emyn-muil.ts";
 import { deadmarshesFixtures } from "./shadows-of-mirkwood/the-dead-marshes.ts";
 import { returnmirkwoodFixtures } from "./shadows-of-mirkwood/return-to-mirkwood.ts";
+import { pitFixtures } from "./dwarrowdelf/into-the-pit.ts";
+import { levelFixtures } from "./dwarrowdelf/the-seventh-level.ts";
+import { frommoriaFixtures } from "./dwarrowdelf/flight-from-moria.ts";
+import { gateFixtures } from "./dwarrowdelf/the-redhorn-gate.ts";
+import { rivendellFixtures } from "./dwarrowdelf/road-to-rivendell.ts";
+import { waterFixtures } from "./dwarrowdelf/the-watcher-in-the-water.ts";
+import { darkFixtures } from "./dwarrowdelf/the-long-dark.ts";
+import { stoneFixtures } from "./dwarrowdelf/foundations-of-stone.ts";
+import { flameFixtures } from "./dwarrowdelf/shadow-and-flame.ts";
 import { osgiliathFixtures } from "./standalone-scenarios/the-massing-at-osgiliath.ts";
 import { townFixtures } from "./standalone-scenarios/the-battle-of-lake-town.ts";
 import { erechFixtures } from "./standalone-scenarios/the-stone-of-erech.ts";
@@ -116,6 +125,15 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-hills-of-emyn-muil": () => muilFixtures(),
   "the-dead-marshes": () => deadmarshesFixtures(),
   "return-to-mirkwood": () => returnmirkwoodFixtures(),
+  "into-the-pit": () => pitFixtures(),
+  "the-seventh-level": () => levelFixtures(),
+  "flight-from-moria": () => frommoriaFixtures(),
+  "the-redhorn-gate": () => gateFixtures(),
+  "road-to-rivendell": () => rivendellFixtures(),
+  "the-watcher-in-the-water": () => waterFixtures(),
+  "the-long-dark": () => darkFixtures(),
+  "foundations-of-stone": () => stoneFixtures(),
+  "shadow-and-flame": () => flameFixtures(),
   "the-massing-at-osgiliath": () => osgiliathFixtures(),
   "the-battle-of-lake-town": () => townFixtures(),
   "the-stone-of-erech": () => erechFixtures(),

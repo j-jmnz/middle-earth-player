@@ -32,7 +32,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148002:B:2 (back): The players cannot defeat this stage unless Hollow Circle is in the victory display.
   148002:constant:1: Constant
-    only if [json condition {"kind":"inVictory","code":"148005","is":false}]
+    only if the card with code 148005 is not in the victory display
     - the players cannot defeat this stage while this holds
 
 ## 148003 Lost in the Fog
@@ -58,7 +58,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148003:B:3 (back): The players cannot defeat this stage unless each player in the game is at this stage and Standing Stones is in the victory display. If the players defeat this stage, they win the game.
   148003:constant:2: Constant
-    only if any of: (some player in the game is not at this stage (or no player is)) or ([json condition {"kind":"inVictory","code":"148006","is":false}])
+    only if any of: (some player in the game is not at this stage (or no player is)) or (the card with code 148006 is not in the victory display)
     - the players cannot defeat this stage while this holds
   148003:constant:3: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -162,17 +162,17 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
   148009:constant:1: Constant
     only if this card is in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each Wight enemy (any player controls) [also {"atStage":true}]: stat attack 1, while this card is in play
-    - each Wight enemy (any player controls) [also {"atStage":true}]: stat defense 1, while this card is in play
+    - each Wight enemy (any player controls) at the acting player's staging area (every area before they are separate): stat attack 1, while this card is in play
+    - each Wight enemy (any player controls) at the acting player's staging area (every area before they are separate): stat defense 1, while this card is in play
   148009:constant:2: Constant
-    only if all of: (this card is in the staging area) and (the number of enemy (any player controls) named "Barrow-wight" [also {"atStage":true}] is at least 1)
-    - each player (any player controls) [also {"atStage":true}]: stat threatReductionBarred 1, while this card is in play
+    only if all of: (this card is in the staging area) and (the number of enemy (any player controls) at the acting player's staging area (every area before they are separate), named "Barrow-wight" is at least 1)
+    - each player (any player controls) at the acting player's staging area (every area before they are separate): stat threatReductionBarred 1, while this card is in play
   148009:constant:3: Constant
-    only if all of: (this card is in the staging area) and (the number of enemy (any player controls) named "Cold-wight" [also {"atStage":true}] is at least 1)
-    - each player (any player controls) [also {"atStage":true}]: stat noCardDraw (the player cannot draw cards from card effects; the opening hand and the resource phase's draw are not) 1, while this card is in play
+    only if all of: (this card is in the staging area) and (the number of enemy (any player controls) at the acting player's staging area (every area before they are separate), named "Cold-wight" is at least 1)
+    - each player (any player controls) at the acting player's staging area (every area before they are separate): stat noCardDraw (the player cannot draw cards from card effects; the opening hand and the resource phase's draw are not) 1, while this card is in play
   148009:constant:4: Constant
-    only if all of: (this card is in the staging area) and (the number of enemy (any player controls) named "Dark-wight" [also {"atStage":true}] is at least 1)
-    - each hero (any player controls) [also {"atStage":true}]: stat noCardResources (the hero cannot gain resources from card effects; the resources it collects in the resource phase are not one) 1, while this card is in play
+    only if all of: (this card is in the staging area) and (the number of enemy (any player controls) at the acting player's staging area (every area before they are separate), named "Dark-wight" is at least 1)
+    - each hero (any player controls) at the acting player's staging area (every area before they are separate): stat noCardResources (the hero cannot gain resources from card effects; the resources it collects in the resource phase are not one) 1, while this card is in play
 
 ## 148010 North Downs
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -180,7 +180,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 148010:A:1 (front): While North Downs is in the staging area, characters use their Willpower instead of their Defense when defending against Wight enemies.
   148010:constant:1: Constant
     only if this card is in the staging area
-    - if the card holding this stat (its host, or this card itself) is the declared defender of the attack against a Wight enemy: each character (any player controls) [also {"atStage":true}]: stat defenseFromWillpower 1, while this card is in play
+    - if the card holding this stat (its host, or this card itself) is the declared defender of the attack against a Wight enemy: each character (any player controls) at the acting player's staging area (every area before they are separate): stat defenseFromWillpower 1, while this card is in play
 
 148010:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, raise each player's threat by 2.
   148010:shadow:1: Shadow
@@ -236,7 +236,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 148014:A:1 (front): When Revealed: Each Wight enemy engaged with a player makes an immediate attack. If no attacks were made this way, I'm Waiting for You! gains surge.
   148014:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","trait":"Wight"}]
+    - each enemy engaged with a player with the trait Wight makes an immediate attack, each dealt a shadow card of its own
     - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 148014:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending character is an ally).
@@ -264,10 +264,10 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 148016:A:1 (front): When Revealed: Discard all resources in play. Each player raises his threat by 1 for each resource he discarded this way. If no resources were discarded this way, Chill Fog gains surge.
   148016:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if the resource tokens on hero (any player controls) [also {"atStage":true}] is less than 1: this card gains surge (one more encounter card is revealed when it has been resolved)
+    - if the resource tokens on hero (any player controls) at the acting player's staging area (every area before they are separate) is less than 1: this card gains surge (one more encounter card is revealed when it has been resolved)
     - for each player, first player first:
       - raise threat by the resource tokens on hero (you control) (the acting player)
-    - for each hero (any player controls) [also {"atStage":true}]:
+    - for each hero (any player controls) at the acting player's staging area (every area before they are separate):
       - all the resources come off the resource pool of the picked card (discarded, not spent)
 
 148016:A:2 (shadow): Shadow: Raise your threat by 1 for each damage dealt by this attack.
@@ -283,7 +283,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148017:A:2 (front): When Revealed: Until the end of the round, players cannot trigger Action or Response effects.
   148017:whenRevealed:1: When revealed
-    - each player (any player controls) [also {"atStage":true}]: stat cannotTriggerEffects 1, until the end of the round
+    - each player (any player controls) at the acting player's staging area (every area before they are separate): stat cannotTriggerEffects 1, until the end of the round
 
 148017:A:3 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
   148017:shadow:1: Shadow
@@ -320,4 +320,4 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
       - discard this card [also {"counted":true}]
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 203 by template, 23 as JSON)
+(rendered pieces: 218 by template, 8 as JSON)

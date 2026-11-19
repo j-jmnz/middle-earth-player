@@ -4,17 +4,18 @@
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause, type Cause } from "../core/cause.ts";
 import { checkCost } from "../families/costs/stats.ts";
-import { engagementBarred, noteEngaged } from "../families/quest/engage.ts";
-import { currentQuestHas } from "../families/quest/conditions.ts";
+import { engagementBarred, noteEngaged, optionalThreatBarred } from "../families/quest/engage.ts";
+import { currentQuestHas, willpowerIgnored } from "../families/quest/conditions.ts";
 import { noteHostDefeated, withStagingThreat } from "../families/attachments/hold.ts";
 import { progressFirstLocations } from "../families/attachments/quest.ts";
+import { absorbFirst } from "../families/quest/blizzard.ts";
 import { passSorcery } from "../families/angmar/reanimate/stage.ts";
-import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import { hasQuestPoints, isLocationCard, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, livingSeats, updateCard, updateCards, withMode } from "../core/state.ts";
+import { checkEngages } from "./check.ts";
 import { askSplit } from "../families/smaug/split.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
@@ -26,12 +27,12 @@ import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts"
 import { branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
+import { threatFromOtherAreas } from "../families/breaking/threat.ts";
 import { engagedContributors } from "./engaged-threat.ts";
 import { arrivalFace, orderedNext } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
-import { absorbProgress } from "../families/angmar/sponge.ts";
 import { currentSideQuest, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { replaceStageProgress } from "./progress-replaced.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
@@ -54,7 +55,8 @@ type Gate = (state: ScenarioState) => boolean;
 
 // One card's part of the total Threat in the staging area: where it stands (in staging, engaged but contributing, or the active location
 // that contributes) and the Threat it adds now.
-export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" };
+// `area`: for `elsewhere`, the seat whose staging area the card stands in.
+export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" | "elsewhere"; area?: number };
 
 // The cards that make up the total Threat in the staging area, and what the table's held effects add to or take from their sum
 // (withStagingThreat; the total never falls below 0). A card that "does not contribute its Threat" is left out.
@@ -76,6 +78,8 @@ export function stagingThreatSources(state: ScenarioState, cards: Cards, seat?: 
     const instance = id ? view.cards[id] : undefined;
     if (instance && flagged(view, instance.id, "activeThreat") && !flagged(view, instance.id, "noThreatContribution")) sources.push({ id: instance.id, threat: modifiedStat(view, instance, "threat", cards), from: "active" });
   }
+  // A location in another player's staging area that contributes its Threat to this area's total (Shivering River, 901707:A:1).
+  for (const found of threatFromOtherAreas(state, seat, cards)) sources.push({ ...found, from: "elsewhere" });
   const sum = sources.reduce((total, source) => total + source.threat, 0);
   return { sources, adjust: withStagingThreat(view, sum, cards) - sum };
 }
@@ -105,7 +109,7 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
     if (seat.eliminated || (only != null && headOf(view, index) !== headOf(view, only))) continue;
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = view.cards[id];
-      if (!instance?.committed) continue;
+      if (!instance?.committed || willpowerIgnored(view, id)) continue;
       // "Using its Attack instead of its Willpower" (11005:A:2).
       total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
     }
@@ -237,7 +241,7 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
   // "Progress cannot be placed here" (148003:B:1, while a Great Barrow is in play): the stage takes none, whatever places it.
   if (flagged(from, stageId, "noProgressPlaced")) return from;
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
-  const { state, remaining: absorbed } = absorbProgress(from, wanted, cards, steps);
+  const { state, remaining: absorbed } = absorbFirst(from, stageId, wanted, cards, steps);
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
   const amount = reduced ? reduceQuestProgress(state, absorbed) : absorbed;
   const stage = state.cards[stageId];
@@ -344,7 +348,7 @@ export function stagingLocations(state: ScenarioState, cards: Cards, seat?: numb
 export function optionalEnemies(state: ScenarioState, cards: Cards, seat?: number): string[] {
   const acting = seat ?? state.activeSeat;
   if (flagged(state, "table", "cannotBeOptionallyEngaged")) return [];
-  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage") && !familyOptionalEngageBarred(state, id, acting, cards));
+  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage") && !optionalThreatBarred(state, id, acting) && !familyOptionalEngageBarred(state, id, acting, cards));
 }
 
 // The enemies in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).
@@ -382,18 +386,12 @@ export function engageWith(state: ScenarioState, seat: number, enemyId: string, 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {
   // "Do not make engagement checks during the encounter phase" (01127:B:1): the table holds noEngagementChecks.
   if (flagged(state, "table", "noEngagementChecks")) return [];
-  // The threat the seat is treated as having (families/play/hooks.ts).
-  const threat = seatThreat(state, seat);
   const found: { id: string; cost: number }[] = [];
   // Engagement checks use only the seat's own staging area once stages are separate (mec109.multiple-staging-areas).
   for (const id of stagingEnemies(state, cards, seat)) {
     const instance = state.cards[id];
-    // An enemy that "does not make engagement checks" is passed over (it can still be engaged optionally).
-    if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks") || engagementBarred(state, id, seat, "checks")) continue;
-    // With what the enemy gets while checking against this player (Orc Disguise, families/costs/stats.ts).
-    const cost = checkCost(state, instance, seat, cards);
-    if (cost == null || cost > threat) continue;
-    found.push({ id, cost });
+    if (!instance || !checkEngages(state, id, seat, cards)) continue;
+    found.push({ id, cost: checkCost(state, instance, seat, cards) ?? 0 });
   }
   // Highest cost first: the check engages the enemy with the highest cost at or below threat (Learn to Play p14).
   found.sort((left, right) => right.cost - left.cost || left.id.localeCompare(right.id));

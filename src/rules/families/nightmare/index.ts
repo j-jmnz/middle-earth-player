@@ -27,6 +27,7 @@ import { cancelsReveal } from "../encounter/cancel.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { engageOutOfPlay, moveResourceFromHeroes, placeResourceTokens, returnToStage, takeHeroPrisoner, takeMorePrisoners } from "./dungeon.ts";
+import { discardAlliesToCost } from "./allies.ts";
 import { damageOncePerRound } from "./damage-once.ts";
 import { listenerInPlay } from "./guards.ts";
 import { seatThreat } from "../play/hooks.ts";
@@ -42,6 +43,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   switch (instruction.verb) {
     case "AttachToQuest":
       return attachToQuest(state, focus);
+    case "DiscardAlliesToCost":
+      return discardAlliesToCost(state, instruction, focus, ctx, steps);
     case "DamageOncePerRound":
       return damageOncePerRound(state, instruction, focus, ctx, steps);
     case "SearchToStaging":
@@ -320,4 +323,4 @@ function pickMost(
   return markPicked(state, chosen ?? "");
 }
 
-export const manifest: RulesFamily = { name: "nightmare", verbs: ["AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens", "DamageOncePerRound"], run };
+export const manifest: RulesFamily = { name: "nightmare", verbs: ["DiscardAlliesToCost", "AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens", "DamageOncePerRound"], run };

@@ -108,8 +108,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   if (familial !== null) return familial;
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
-    case "noneDiscarded": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "night":
+    case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives": case "discardedHasShadowOrTentacle": case "firstLetterMatches":
+    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "committedThisRound": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "lastLocateFailed": case "lastLocatePassed": case "hasPass": case "playerWithoutReady": case "drew": case "engagedWithLastPlayer": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "night":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -136,7 +136,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "island":
       return islandHolds(state, condition);
     case "handSize":
-      return livingSeats(state).every((seat) => (state.seats[seat]?.hand.length ?? 0) <= condition.max);
+      return (condition.actor === true ? [scope.actor] : livingSeats(state)).every((seat) => (state.seats[seat]?.hand.length ?? 0) <= condition.max);
     case "pursuit":
     case "picked":
     case "anyHand":
@@ -193,6 +193,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "noneReturned":
       return scope.returned === 0;
+    case "returnedBelow":
+      return scope.returned < condition.than;
     case "phase":
       // The action window after 7.4 (the engine's "End of round" step) is still in the refresh phase (rr.step-7-4,
       // rr.step-7-5): a Refresh Action may be used there. An ended phase an event names is read as it is.
@@ -266,7 +268,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       // Isolated areas (isolatedAreas): an enemy "in play" is one in the asking player's own area (mec108.create-staging-area).
       const area = isolatedAreas(state) ? headOf(state, scope.actor) : null;
       const found = Object.values(state.cards).some(
-        (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
+        (card) =>
+          inPlay(card.zone) && card.asAttachment == null && printedOf(ctx.cards, card.code).type === "enemy" && (condition.other !== true || card.id !== scope.sourceId) && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
       );
       return found === condition.is;
     }

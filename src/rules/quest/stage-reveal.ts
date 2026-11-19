@@ -10,13 +10,15 @@ import { gameReadsOnTrigger } from "../core/game-reads.ts";
 import { isLocationId } from "../core/printed.ts";
 import { advanceStage, clearCommitted, questPointsOf, resolveQuest } from "./quest.ts";
 import { defeatedBefore, questCardDefeatedHeard } from "../families/quest/branch.ts";
+import { unflippedStage } from "../families/quest/order.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { restricted } from "../interpret/restrictions.ts";
-import { flagged, withMode, type ScenarioState } from "../core/state.ts";
+import { flagged, inPlay, updateCards, withMode, type ScenarioState } from "../core/state.ts";
 import { areaSeats, stageSeat } from "../families/breaking/areas.ts";
 import { payOwed } from "../families/breaking/progress.ts";
 import { fireForced } from "../windows/triggers.ts";
+import { heard } from "../families/quest/events.ts";
 import { announceStageRevealed } from "../families/nightmare/setup.ts";
 import { timeOnReveal } from "../families/angmar/time.ts";
 
@@ -24,7 +26,10 @@ import { timeOnReveal } from "../families/angmar/time.ts";
 // its When Revealed effects pushed as frames. The second runs once those frames have popped, and ends
 // the phase. The phase does not end while a new stage is still resolving.
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (state.questResolved) return finish({ ...state, questResolved: false });
+  if (state.questResolved) return finish(clearCommitted({ ...state, questResolved: false }));
+  // The quest total is about to be counted: the cards that charge for a committed Willpower ask now, once, after the window that follows the staging step (rr.step-3-4).
+  const counted = announceQuestTotal(state, ctx, steps);
+  if (counted) return counted;
   // A location that may take the progress first asks the players once (Explorer's Almanac, families/attachments/quest.ts).
   const asked = askQuestProgress(state, ctx, steps);
   if (asked) return asked;
@@ -33,12 +38,27 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const outcome = questOutcome(state, ctx);
   const canAdvance = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
   // Once stages are separate each seat resolves the quest of its own stage in player order, against its own staging area (mec109.multiple-staging-areas).
-  const resolved = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
+  const quested = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
+  const resolved = keepCommitted(quested, state);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
   // Progress placed anywhere in this resolution (the active location, a location that takes it first, the stage), for the trigger the table hears once.
   const placed = steps.slice(before).some((step) => step.kind === "progress" && step.amount > 0);
   return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), { ...outcome, placed }, ctx, steps);
+}
+
+// "Forced: when the quest total is counted" (04016:A:1, Fanuidhol): fired once a phase, only in a game with a card that hears it (the marker is the table's `questTotalAnnounced`).
+function announceQuestTotal(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
+  if (!heard(state, ctx, "questTotalCounted") || flagged(state, "table", "questTotalAnnounced")) return null;
+  const marked: ScenarioState = { ...state, window: null, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questTotalAnnounced", amount: 1, until: "endOfPhase" }] };
+  return fireForced(marked, { trigger: "questTotalCounted", seat: null }, ctx, steps);
+}
+
+// While the table holds `heldCommitted` (Snowdrifts, 04012:B:2) the characters stay committed through the stage's defeat, so Caradhras' -1 and stage 3B's zero-Willpower discard reach them: the resolution clears them, so they are committed again here (the second pass clears them).
+function keepCommitted(resolved: ScenarioState, before: ScenarioState): ScenarioState {
+  if (!flagged(before, "table", "heldCommitted")) return resolved;
+  const kept = Object.values(before.cards).filter((card) => card.committed && inPlay(resolved.cards[card.id]?.zone ?? "removed"));
+  return updateCards(resolved, kept.map((card) => [card.id, { committed: true }]));
 }
 
 // A card in the game answers a failed quest with an X amount (Urdug's Gambit, 19051:B:2): the event carries the shortfall for it.
@@ -77,7 +97,9 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   // The first stage reached resolves first, so it is pushed last.
   for (const cardId of [...advanced].reverse()) {
     const code = next.cards[cardId]?.code;
-    const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+    // A stage 2 of a quest deck arrives side A: only the When Revealed printed on side A resolves now, its side B's when the stage is flipped (families/quest/order.ts).
+    const arrived = next.cards[cardId];
+    const effects = unflippedStage(next, arrived ?? { zone: "questStage", face: "B" }, ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed"));
     // A stage with Time X gets its time counters as it is revealed (10094:B:1, mec108.time-x).
     next = timeOnReveal(next, cardId, ctx);
     // "Forced: After stage 2B is revealed" (11182:A:3) goes down first, so it resolves once the stage's When Revealed effects have.

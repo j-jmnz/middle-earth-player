@@ -96,7 +96,8 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
       actor: state.separate ? state.activeSeat : state.firstPlayer,
       peril: false,
       effectId: first?.id ?? `${location.code}:travel`,
-      instructions: [...effects.flatMap((effect) => effect.instructions), ...granted, TRAVEL_HERE],
+      // A Travel effect that travels itself, before the test the card prints after it (Eastern Mines, 901605:A:1), needs no travel at the end.
+      instructions: [...effects.flatMap((effect) => effect.instructions), ...granted, ...(effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Travel")) ? [] : [TRAVEL_HERE])],
       causes: [...effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))), ...granted.map(() => ruleCause("rr.travel"))],
       cancel: null,
       blockCancel: null,

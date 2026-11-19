@@ -1,7 +1,9 @@
+import { CAMPAIGNS } from "../campaign-defs.ts";
 import { loadCampaignsInOrder } from "../load-scenarios.ts";
 
 // Where a scenario's authored effect file lives (src/effects/authored/). A campaign that has a folder here keeps its box's file and its scenarios' files in it (a
-// box whose scenarios would crowd the top level: scripts/checks/layout.test.ts holds the count); every other file is top-level, named for its scenario or campaign.
+// box whose scenarios would crowd the top level: scripts/checks/layout.test.ts holds the count); every other file is top-level, named for its scenario or campaign. A cycle
+// (scripts/data/campaign-defs.ts, `kind: "cycle"`) always has the folder of its id.
 export const AUTHORED_CAMPAIGN_FOLDERS: Readonly<Record<string, string>> = {
   "the-return-of-the-king": "return-of-the-king",
   "angmar-awakened": "angmar-awakened",
@@ -9,9 +11,14 @@ export const AUTHORED_CAMPAIGN_FOLDERS: Readonly<Record<string, string>> = {
   "standalone-scenarios": "standalone-scenarios",
 };
 
+const CYCLE_IDS: ReadonlySet<string> = new Set(CAMPAIGNS.filter((campaign) => campaign.kind === "cycle").map((campaign) => campaign.id));
+
+/** Every campaign folder under src/effects/authored/: the named ones and each cycle's. */
+export const AUTHORED_FOLDERS: readonly string[] = [...Object.values(AUTHORED_CAMPAIGN_FOLDERS), ...CYCLE_IDS];
+
 /** The path under src/effects/authored/, without the extension, of the file named `id` for a scenario (or the campaign card file) of `campaignId`. */
 export function authoredRel(id: string, campaignId: string | null): string {
-  const folder = campaignId == null ? undefined : AUTHORED_CAMPAIGN_FOLDERS[campaignId];
+  const folder = campaignId == null ? undefined : (AUTHORED_CAMPAIGN_FOLDERS[campaignId] ?? (CYCLE_IDS.has(campaignId) ? campaignId : undefined));
   return folder ? `${folder}/${id}` : id;
 }
 

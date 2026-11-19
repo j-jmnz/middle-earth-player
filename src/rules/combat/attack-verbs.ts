@@ -11,11 +11,12 @@ import { lastPicked, seatOf } from "../interpret/player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { addModifier } from "../core/keywords.ts";
 import { headOf, isolatedAreas } from "../families/breaking/areas.ts";
-import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, isTraitedEnemies, isTraitedLocations, isTraitedStaging, STAGING_CLASS, traitedEnemies, traitedLocations, traitedStaging, ownCharacters } from "../core/holder-classes.ts";
+import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, QUESTING_CHARACTERS_CLASS, isClassHolder, isTraitedEnemies, isTraitedLocations, isTraitedStaging, STAGING_CLASS, traitedEnemies, traitedLocations, traitedStaging, ownCharacters } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
 import { moveCard } from "../core/zones.ts";
+import { queueEvent } from "../windows/queue.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 
 // Verbs that read or change the enemy attack in progress.
@@ -35,7 +36,8 @@ export function runAttackVerb(state: ScenarioState, instruction: Instruction, fo
       const next = seats[(at + 1) % seats.length];
       if (next == null || next === enemy.controller) return state;
       steps.push({ kind: "engage", seat: next, enemyId: focus.sourceId });
-      return moveCard(state, focus.sourceId, { zone: "engaged", seat: next });
+      const moved = moveCard(state, focus.sourceId, { zone: "engaged", seat: next });
+      return instruction.announces ? queueEvent(moved, { trigger: "engaged", seat: next, subject: focus.sourceId }) : moved;
     }
     default:
       return state;
@@ -99,6 +101,10 @@ export function modifyStat(
     // Every character that is damaged, now and when it is damaged later (143061:A:2): the holder is the class, read by heldBy.
     case "damagedCharacters":
       targets = [DAMAGED_CHARACTERS_CLASS];
+      break;
+    // Every character committed to the quest, now and committing later (04022:A:1): the holder is the class, read by heldBy.
+    case "questingCharacters":
+      targets = [QUESTING_CHARACTERS_CLASS];
       break;
     // Every enemy in play, staged or engaged, now and entering later (143041:A:2): the holder is the class, read by heldBy.
     case "enemies":

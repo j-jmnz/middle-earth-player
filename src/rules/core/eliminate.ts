@@ -2,6 +2,7 @@
 import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
 import { DIRE_ELIMINATION_LEVEL } from "../families/black-gate/dire.ts";
+import { heroWaiting } from "../families/deck/hero.ts";
 import { discardArea } from "../families/breaking/areas.ts";
 import { discardIsolated } from "../families/breaking/barrow.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
@@ -146,6 +147,8 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
     // A hero in a captured deck or under a card is not killed (rr.player-elimination): a seat whose last hero in play left play stays in the game while one of its heroes is captured (families/captured/).
     const captured = seat.threat < level && seat.heroes.length === 0 && next.capture != null && Object.values(next.cards).some((card) => card.zone === "captured" && card.heroSlot != null && card.owner === index);
     if (captured) continue;
+    // A hero shuffled into the deck (Lost and Alone) is not killed: its seat stays while it waits to be drawn (families/deck/hero.ts).
+    if (seat.threat < level && seat.heroes.length === 0 && heroWaiting(next, index)) continue;
     if (seat.threat >= level || seat.heroes.length === 0) {
       // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).
       const saved = seat.heroes.length > 0 ? threatSaved(next, index) : null;

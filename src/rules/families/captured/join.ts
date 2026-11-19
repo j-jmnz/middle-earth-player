@@ -11,6 +11,8 @@ import { updateCard, withSeat } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
+import type { Restriction } from "../../interpret/restrictions.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
 import { areaSeats, stageSeat } from "../breaking/areas.ts";
 import type { Focus } from "../index.ts";
@@ -68,4 +70,14 @@ export function joinAnotherPlayer(state: ScenarioState, instruction: Verb<"JoinA
   const seat = (focus.sourceId ? stageSeat(state, focus.sourceId) : null) ?? focus.seat;
   const target = joinTarget(state, seat);
   return target == null ? advanceTogether(state, instruction.advanceTo, ctx, steps) : join(state, seat, target);
+}
+
+// The stages in play whose Forced effect joins another player with `holdsStage` (04114:B:2): they do not advance by the ordinary rule, so the quest holds them as a "cannot advance" does.
+export function joiningStages(state: ScenarioState, ctx: Pick<ReduceContext, "effects">): Restriction[] {
+  const held: Restriction[] = [];
+  for (const card of Object.values(state.cards)) {
+    if (card.zone !== "questStage") continue;
+    if (effectsOf(ctx, card.code).some((effect) => effect.timing === "forced" && effect.instructions.some((instruction) => instruction.verb === "JoinAnotherPlayer" && instruction.holdsStage === true))) held.push({ sourceId: card.id, what: "advance" });
+  }
+  return held;
 }

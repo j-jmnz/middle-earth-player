@@ -73,7 +73,8 @@ export const simpleVerbs = [
   // `eventSeat` is the player the answered event happened to.
   z.strictObject({ verb: z.literal("LowerThreat"), amount: positiveAmountSchema, who: z.enum(["actor", "picked", "eachSeat", "eventSeat"]), ...when }),
   // Places damage on the picked card (or `target`) as a player card effect (toughness and immunity apply).
-  z.strictObject({ verb: z.literal("DamageCard"), amount: positiveAmountSchema, target: cardRefSchema.optional(), ...when }),
+  // `uncancelable`: the damage cannot be canceled by an ability that cancels damage, though one that moves it to another card still can ("This effect cannot be canceled", 03028:A:1; docs/brief.md, Flight from Moria).
+  z.strictObject({ verb: z.literal("DamageCard"), amount: positiveAmountSchema, target: cardRefSchema.optional(), uncancelable: z.literal(true).optional(), ...when }),
   // Places progress tokens on the picked location, on every location in the staging area, on the source or the active
   // location. A full location is explored. `host`: the location the source is attached to.
   z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: positiveAmountSchema, target: z.enum(["picked", "eachStagingLocation", "self", "activeLocation", "subject", "host"]), ...when }),
@@ -176,10 +177,12 @@ export const simpleVerbs = [
   // Setup: each player draws this many fewer cards in the starting hand (and in a mulligan redraw).
   z.strictObject({ verb: z.literal("ReduceOpeningHand"), amount: z.number().int().positive(), ...when }),
   // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles. With `each`, every matching card goes and the deck is shuffled once ("shuffle all copies of the \"Sacked!\" card from the discard pile back into the encounter deck", 02041:A:1).
-  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), ...when }),
+  // `who: firstPlayer`: the first player chooses the card ("The first player chooses X Tentacle enemies", rr.first-player; Rippling From Beneath 901508:A:2); the actor does otherwise.
+  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), who: z.literal("firstPlayer").optional(), ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it. `cost`: the search is a Travel cost the players must be able to pay, so it needs a card to find ("Travel: The first player searches ... for a Warg enemy", 10024:A:2; rr.travel); read by the angmar family. `to: "engaged"`: the enemy found is revealed and put into play engaged with the revealing player instead of staged ("reveal it, and put it into play engaged with you", 143065:A:2).
   // `deckOnly`: the encounter deck alone is searched, not its discard pile ("Search the encounter deck for 1 copy of Prison Cell", 10039:A:2).
-  z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }),
+  // A Shadow effect with it runs in a frame, as its reveal waits for the card's When Revealed ("Search the encounter deck for a treachery card ... and reveal it", 901807:A:2).
+  verbFlags(z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }), { runsInFrame: true }),
   // Finds a card in the encounter deck or discard pile and puts it out without revealing it. With `each`, every card that
   // matches goes ("add each Nazgûl enemy found to the staging area", 141027:A:1) and nobody chooses.
   verbFlags(z.strictObject({
@@ -198,6 +201,9 @@ export const simpleVerbs = [
     // While a card with this code is in the encounter deck or its discard pile, the search must take it, until an earlier search of the same effect has taken one ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1; "one of those enemies must be Corsair Captain, if able", 145030:A:3: the first search takes it, the others are free).
     require: z.string().min(1).optional(),
+    // With `require`: only the search of the player an earlier Pick of this effect chose must take it ("each player searches ... the first player names which player's choice is Patrol Leader", 03065:B:1;
+    // rr.first-player); with no player picked (a game with one player) every search is held to it.
+    requireFor: z.literal("picked").optional(),
     // The card found is the effect's picked card afterward, for the instructions that follow ("add it to the staging area. Then, attach Heavy Cruiser to that objective", 12127:A:3).
     remember: z.literal(true).optional(),
     // With `to: "engaged"`: the card found comes into play engaged with the seat an earlier pick chose (PickHighestThreat), not with the searching player ("puts it into play engaged with the player with the highest threat", 10083:A:2).
@@ -248,6 +254,8 @@ export const simpleVerbs = [
       // character of that title ("Attach to Wilyador", 900608:A:2). A character that carries a copy is not offered, unless `unlimited` (the card has no limit per character). With none to host it the card is discarded.
       z.strictObject({ kind: z.literal("character"), trait: z.string().min(1).optional(), name: z.string().min(1).optional(), unlimited: z.literal(true).optional() }),
     ]),
+    // The attachment is announced as it attaches (the `attached` trigger, as a played attachment is, rr.attachment-cards): "more than 1 copy" on a hero is read as the second one attaches (04023:A:1).
+    announces: z.literal(true).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("UncommitAll"), who: whoSchema, ...when }),
@@ -298,6 +306,8 @@ export const simpleVerbs = [
     // (rr.play-and-put-into-play). `exceptAlone`: unless he is the only player remaining in the game. Read by src/rules/interpret/restrictions.ts (seatBarred) and src/rules/families/guardian/.
     guardian: z.literal(true).optional(),
     exceptAlone: z.literal(true).optional(),
+    // With "draw" on an enemy: binds the player the source is engaged with, and only while it is ("While Sentinel of the Deep is engaged with a player, that player cannot draw cards from card effects", 901604:A:1).
+    engagedPlayer: z.literal(true).optional(),
     ...when,
   }),
   // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's
@@ -412,18 +422,19 @@ export const simpleVerbs = [
   // Constant on a hero: once per phase the actor may play the top card of their deck as if it were in their hand, and the
   // hero counts as having these resource icons while it pays for that card. The top card of the deck is faceup.
   z.strictObject({ verb: z.literal("PlayFromDeckTop"), icons: z.array(z.enum(["leadership", "tactics", "spirit", "lore"])).min(1), ...when }),
-  // The source enemy leaves the player it is engaged with and engages the next player.
-  verb("EngageNextPlayer"),
+  // The source enemy leaves the player it is engaged with and engages the next player. `announces`: the engagement is announced (`engaged`), as any engagement is, so the enemy's own "after ~ engages a player" Forced effect fires again (Goblin Sneak, 04098:A:1).
+  z.strictObject({ verb: z.literal("EngageNextPlayer"), announces: z.literal(true).optional(), ...when }),
   // The host of the source card, its resource pool, and every card attached to it pass to a seat.
   z.strictObject({ verb: z.literal("TransferHost"), who: whoSchema, ...when }),
   // The players win the scenario. The resolution choices follow.
   verb("WinGame"),
   // Discards cards from the top of the encounter deck until `perPlayer` enemies for each player in the game have been
   // discarded, or the deck is empty, and puts each of those enemies into play engaged with the first player (141045:A:2).
-  // `to: staging`: they are added to the staging area instead ("Add each enemy discarded this way to the staging area", 142056:A:2).
+  // `to: staging`: they are added to the staging area instead ("Add each enemy discarded this way to the staging area", 142056:A:2). `to: reveal`: each is revealed, in the order discarded, in full (RevealEnemies; "Reveal all enemies discarded by this effect", 901402:A:1).
   // As a quest card's Setup it is run in a frame of its own after the deal ("Shuffle the encounter deck and discard cards from the top until X enemies are discarded", 19168:A:1).
   // `cardType: location`: locations are counted instead, and with `to: staging` each is added to the staging area ("Discard cards from the top until X locations are discarded... Add each location discarded this way to the staging area", 146077:A:1).
-  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), less: z.number().int().positive().optional(), trait: z.string().min(1).optional(), to: z.literal("staging").optional(), cardType: z.literal("location").optional(), ...when }), { setupRuns: "top" }),
+  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), less: z.number().int().positive().optional(), atLeast: z.number().int().positive().optional(), returnOthers: z.literal(true).optional(), trait: z.string().min(1).optional(), to: z.enum(["staging", "reveal"]).optional(), cardType: z.literal("location").optional(), ...when }), { setupRuns: "top" }),
+  // `atLeast`: the count never falls below it ("X is one less than the number of players in the game (minimum of 1)", 04086:B:1, with `less: 1`). `returnOthers`: the cards the effect discarded that are not counted go back into the encounter deck, which is shuffled; the rest of the discard pile stays ("shuffle the other discarded cards back into the encounter deck").
   // The last picked card is placed facedown under the source location. While it is there it is out of play (141049:A:1).
   verb("PlaceUnderSelf"),
   // Each card under the source location returns to the staging area face up (141049:A:2). `to: "engaged"`: each is put into play engaged with the first player instead, and counts as engaging him ("put each enemy under it into play engaged with the first player", 146029:A:2).

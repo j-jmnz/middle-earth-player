@@ -4,7 +4,7 @@
 // another scenario's records they keep their ordinary words. The verbs only Mount Gundabad's records use (BypassStage, SearchQuestDeck, ActivateFromCaves, LookAtStages, FlipInPlace) need no gate. Dragon-sickness joins the encounter decks of the later scenarios, so it is told in every game. Pure.
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
-import type { GameEvent, ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, heldAmount, type GameEvent, type ScenarioState } from "../../../rules/core/state.ts";
 import { stageName } from "../../../rules/families/wilderland/gundabad.ts";
 import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
@@ -57,6 +57,9 @@ export function questsInVictory(game: ScenarioState, ctx: ReduceContext): number
 }
 
 const progressLost = (progress: number): string => (progress === 0 ? "it has no progress to lose" : `it loses its ${progress} progress`);
+// What the table holds of Flight from Moria's bypass: Shadowed Corridor's threat each player pays first (`bypassThreat`), and the Nightmare setup card's shuffle in place of the bottom of the deck (`bypassShuffles`, 901201:A:2). Mount Gundabad holds neither.
+const bypassCost = (game: ScenarioState): number => heldAmount(game, "table", "bypassThreat");
+const bypassShuffles = (game: ScenarioState): boolean => flagged(game, "table", "bypassShuffles");
 const waiting = (game: ScenarioState): string => `${game.questDeck.length} ${game.questDeck.length === 1 ? "waits" : "wait"} in the quest deck`;
 
 /** The sentence over the Choose of Mount Gundabad: the bypass of a stage at the end of the combat phase (emce.bypassing), the search of a deck for an attachment and the discard that wins the game. Null for any other Choose, and outside Mount Gundabad. */
@@ -76,7 +79,10 @@ export function gundabadChooseNote(choose: Choose, game: ScenarioState, ctx: Red
   const defeat = source != null && effectsOf(ctx, game.cards[source]?.code ?? "").some((effect) => effect.trigger === "questCardDefeated") ? ", and its 'when defeated' effect does not happen" : "";
   const lost = progress === 0 ? "It has no progress to lose and goes" : `It loses its ${progress} progress and goes`;
   const stay = progress === 0 ? "the quest continues" : `it keeps its ${progress} progress`;
-  return `${source ? card : "This stage"}: bypass this stage? ${lost} to the bottom of the quest deck. It is not defeated: no victory display${defeat}. The next stage is revealed (${waiting(game)}). Stay and ${stay}.`;
+  const cost = bypassCost(game);
+  const pays = cost > 0 ? ` Each player first raises their threat by ${cost}.` : "";
+  if (bypassShuffles(game)) return `${source ? card : "This stage"}: bypass this stage?${pays} It ${progress === 0 ? "has no progress to lose and is" : `loses its ${progress} progress and is`} shuffled into the quest deck. It is not defeated: no victory display${defeat}. The top stage is revealed (${waiting(game)} besides this one, which can come straight back). Stay and ${stay}.`;
+  return `${source ? card : "This stage"}: bypass this stage?${pays} ${lost} to the bottom of the quest deck. It is not defeated: no victory display${defeat}. The next stage is revealed (${waiting(game)}). Stay and ${stay}.`;
 }
 
 /** The row of a branch of the bypass choice, of the search for an attachment or of the discard that wins the game, or null for another Choose. */
@@ -91,7 +97,11 @@ export function gundabadBranchWords(choose: Choose, optionId: string, game?: Sce
   }
   if (!isBypass(choose)) return null;
   const progress = game ? stageProgress(game) : 0;
-  if (optionId === "bypass") return progress > 0 ? `Bypass the stage: lose ${progress} progress, go to the bottom of the quest deck` : "Bypass the stage: go to the bottom of the quest deck";
+  if (optionId === "bypass") {
+    const cost = game ? bypassCost(game) : 0;
+    const where = game != null && bypassShuffles(game) ? "shuffle it into the quest deck" : "go to the bottom of the quest deck";
+    return `Bypass the stage: ${[...(cost > 0 ? [`raise your threat by ${cost}`] : []), ...(progress > 0 ? [`lose ${progress} progress`] : []), where].join(", ")}`;
+  }
   return progress > 0 ? `Stay on the stage: keep ${progress} progress` : "Stay on the stage";
 }
 

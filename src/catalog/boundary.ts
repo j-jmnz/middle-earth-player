@@ -44,6 +44,10 @@ const optionalInt = z.number().int().nullish();
 export const printedKeywordsSchema = z.strictObject({
   hide: z.number().int().positive().optional(),
   surge: z.boolean().optional(),
+  // Ambush (dwd.ambush): an enemy entering play makes each player, the first player first, an engagement check against it alone (src/rules/families/encounter/ambush.ts).
+  ambush: z.boolean().optional(),
+  // Regenerate X (dwd.regenerate): the enemy heals X damage from itself right after the first player token passes in the Refresh phase (src/rules/families/encounter/regenerate.ts).
+  regenerate: z.number().int().positive().optional(),
   doomed: z.number().int().positive().optional(),
   peril: z.boolean().optional(),
   archery: z.number().int().positive().optional(),
@@ -81,6 +85,8 @@ export const printedKeywordsSchema = z.strictObject({
   spectral: z.boolean().optional(),
   // Dire on a quest card (mec113.dire): while the main quest has it, each player's elimination level is 99, non-boon player card effects lower a player's threat by at most 1 each round and Valour triggers at 80 threat (src/rules/families/black-gate/dire.ts).
   dire: z.boolean().optional(),
+  // PASS on a card (dwd.locate-test): the card passes a locate test it is discarded for, and the Goblin Stalker reads it on a shadow card dealt to it (src/rules/families/long-dark/).
+  pass: z.boolean().optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
   sailingSuccess: z.number().int().positive().optional(),
@@ -88,6 +94,8 @@ export const printedKeywordsSchema = z.strictObject({
   eyeIcons: z.number().int().positive().optional(),
   // Not a keyword either: the location prints X for its quest points (`quest` stays null), and a constant record sets them (Hills of Wilderland, Underground Lake): the engine lets it take progress and be explored.
   questPointsX: z.boolean().optional(),
+  // Also a printed mark: the enemy prints X for its Attack and its hit points (the Nameless things): their numbers stay null, a record sets them, and the engine reads the hit points as 0 until it does.
+  statsX: z.boolean().optional(),
 });
 
 export const ringsDbPackSchema = z

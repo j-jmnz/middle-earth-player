@@ -27,9 +27,10 @@ export function attackPickMatches(state: ScenarioState, id: string, spec: PickSp
   if (spec.printedKeyword && !printed.keywords[spec.printedKeyword]) return false;
   if (spec.minHitPoints != null && (printed.health ?? 0) < spec.minHitPoints) return false;
   if (spec.topOfDiscard && !state.seats.some((seat) => seat.discard.at(-1) === id)) return false;
-  if (!spec.engagedWith && spec.sharesTrait !== "other" && !spec.onSubject) return true;
+  if (!spec.engagedWith && spec.sharesTrait !== "other" && !spec.onSubject && !spec.notOther) return true;
   const data = topFrame(state)?.data;
   const frame = data?.kind === "effect" ? data : undefined;
+  if (spec.notOther && id === (at.other ?? frame?.other)) return false;
   if (spec.engagedWith === "picked") {
     const seat = pickedSeat(at.picked && at.picked.length > 0 ? at.picked : (frame?.picked ?? []));
     if (seat == null || instance.zone !== "engaged" || instance.controller !== seat) return false;

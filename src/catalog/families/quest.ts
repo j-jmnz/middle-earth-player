@@ -89,6 +89,8 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // The quest resolves: the committed Willpower is about to be counted against the staging area's threat, once the window after the staging step has closed (rr.step-3-4). Fanuidhol's payment is asked here (04016:A:1).
+  "questTotalCounted",
   // About the table, once: the quest resolved successfully and placed progress on the active location, on a card that takes it first or on the stage ("After placing progress as the result of questing successfully", 147002:B:2). Not about one placement: a quest that fills a location
   // and goes on to the stage still raises it once.
   "questProgressPlaced",
@@ -150,11 +152,29 @@ const FLAGS = [
   // On an enemy, for the modifier's seat only: it makes no engagement checks against that player; it cannot engage that player.
   "noChecksAgainst",
   "cannotEngageSeat",
+  // On an enemy: a player whose threat is at least this much cannot optionally engage it ("Each player with a threat of 25 or higher cannot optionally engage Goblin Scout", 03060:A:1; rr.optional-engagement).
+  // An engagement check still engages him (rules/families/quest/engage.ts optionalThreatBarred).
+  "optionalEngageThreat",
   // On a seat: its threat cannot be reduced below its starting threat level, the threat set at Setup step 2 (rr.initial-threat-level; "Each player cannot reduce his threat below his initial threat level", 145064:B:2): a reduction stops at that level.
   // The game keeps the starting level while a card of it holds this flag (recordStartingThreat).
   "threatFloor",
   // On "table": the staging step of the quest phase is skipped (01128:B:2, "for the remainder of the game" while the stage is current).
   "skipStaging",
+  // On a hero, from the active location's constant: its Willpower counts toward the quest only while it holds `countsWillpower` ("heroes must spend 1 resource from their resource pool to count their Willpower during the quest phase", 04016:A:1; willpowerIgnored in
+  // families/quest/conditions.ts). The location's Forced effect when the quest total is counted asks the controller of each committed hero with a resource whether to spend 1 from its pool, and a hero that paid holds `countsWillpower` until the end of the phase.
+  "willpowerCostsResource",
+  // On a treachery in the staging area, set by its own When Revealed until it leaves play ("Add Blinding Blizzard to the staging area. Progress that would be placed on the current quest or on Snow locations are instead placed on Blinding Blizzard. When the 5th progress is placed on Blinding Blizzard,
+  // discard it", 901307:A:2): the card stays in the staging area after its reveal (windows/frames.ts), takes the progress that would go on the current quest stage or on a location with the Snow trait, in play or in the staging area, from questing or an effect, up to 5, and is discarded
+  // with the 5th; what it cannot take is placed as it would have gone without it (families/quest/blizzard.ts, read where progress is placed: rules/quest/quest.ts putOnStage, interpret/effect-verbs.ts placeProgress, south/locations.ts placeOnActive, attachments/quest.ts).
+  "progressRedirect",
+  // On a location, from its own constant ("Progress tokens that would be placed on Doors of Durin are instead placed on the current quest card", 04065:A:1): what would be placed on it from a card effect goes on the main quest stage, and it is never explored
+  // (families/quest/doors.ts, read in interpret/effect-verbs.ts placeProgress; questing places none on a location with no quest points).
+  "progressToQuest",
+  // Held by the table while the current stage holds it ("Snowdrifts" 04012:B:2: the stage is defeated while the characters are still committed, so Caradhras' -1 Willpower and stage 3B's discard at 0 reach them): the quest resolution keeps the commitments until its second pass
+  // (rules/quest/quest.ts resolveQuest, stage-reveal.ts resolutionStep).
+  "heldCommitted",
+  // Held by the table until the end of the phase: `questTotalCounted` was announced this phase (rules/quest/stage-reveal.ts).
+  "questTotalAnnounced",
 ] as const;
 
 export const manifest = { name: "quest", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

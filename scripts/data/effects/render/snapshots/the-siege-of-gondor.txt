@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 145030:A:3 (front): Travel: Each player searches the encounter deck and discard pile for a Corsair enemy and adds it to the staging area. One of those enemies must be Corsair Captain, if able.
   145030:travel:1: Travel
     - for each player, first player first:
-      - the acting player finds one Corsair enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"require":"145035"}]
+      - the acting player finds one Corsair enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 145035 is there to be found, the search must take it (the first search of the effect that can)
 
 ## 145031 Umbar War Galley
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -254,4 +254,4 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
         * option "damage" (only if there is a character (you control) to choose):
           - the acting player assigns the resource tokens on objective (any player controls) named "The Corsair Fleet" damage among the character (you control), one at a time
 
-(rendered pieces: 183 by template, 3 as JSON)
+(rendered pieces: 184 by template, 2 as JSON)

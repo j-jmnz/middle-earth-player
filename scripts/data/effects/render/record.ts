@@ -49,6 +49,9 @@ const TRIGGER: Readonly<Record<string, string>> = {
   beginningOfPhase: "when a phase begins",
   stagingStepBegins: "when the staging step begins, before the first card is revealed",
   becameActive: "after this location becomes the active location",
+  lost: "when the \"Lost:\" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)",
+  progressWouldBePlaced: "before progress is placed on this location (the whole placement, the effect's X, waits for this effect)",
+  progressPlacedOnSelf: "after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)",
   questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
 
@@ -112,6 +115,7 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (barred) lines.push(`  note: ${barred}`);
   if (instructions.length === 0) lines.push("  (no instructions)");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
-  instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, ctx, 1, at > 0)));
+  const inner = effect.trigger === "engaged" ? { ...ctx, engagedSeat: true } : ctx;
+  instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));
   return lines;
 }

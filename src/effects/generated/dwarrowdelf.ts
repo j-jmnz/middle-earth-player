@@ -1,0 +1,19 @@
+import type { Effect } from "../../catalog/boundary.ts";
+
+// Written by pnpm data build from data/cards and data/scenarios (dwarrowdelf). Do not edit.
+// scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.
+export const GENERATED_EFFECTS: readonly Effect[] = [
+  {"id":"03037:travel:1","cardCode":"03037","lines":["03037:A:1"],"timing":"travel","instructions":[{"verb":"Exhaust","target":{"kind":"byName","name":"Cave Torch"}}]},
+  {"id":"03040:shadow:1","cardCode":"03040","lines":["03040:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"}]},
+  {"id":"03041:constant:1","cardCode":"03041","lines":["03041:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},
+  {"id":"03052:whenRevealed:1","cardCode":"03052","lines":["03052:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ReturnToStaging","target":{"kind":"activeLocation"}},{"verb":"Travel","to":"self"}]},
+  {"id":"03063:shadow:1","cardCode":"03063","lines":["03063:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"not","condition":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Goblin"}}}},{"verb":"ModifyStat","stat":"attack","amount":3,"until":"endOfAttack","target":"attacker","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Goblin"}}}]},
+  {"id":"04025:shadow:1","cardCode":"04025","lines":["04025:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Mountain"}}}]},
+  {"id":"04026:shadow:1","cardCode":"04026","lines":["04026:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Mountain"}}}]},
+  {"id":"04088:constant:1","cardCode":"04088","lines":["04088:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"901004:shadow:1","cardCode":"901004","lines":["901004:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker","when":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Dark"}}}]},
+  {"id":"901104:whenRevealed:1","cardCode":"901104","lines":["901104:A:1"],"timing":"whenRevealed","instructions":[{"verb":"Each","pick":{"type":"enemy","control":"any","staging":true,"trait":"Goblin"},"instructions":[{"verb":"PlaceResourceTokens","amount":1,"on":"picked"}]}]},
+  {"id":"901108:travel:1","cardCode":"901108","lines":["901108:A:2"],"timing":"travel","instructions":[{"verb":"Each","pick":{"type":"enemy","control":"any","staging":true,"trait":"Goblin"},"instructions":[{"verb":"PlaceResourceTokens","amount":1,"on":"picked"}]}]},
+  {"id":"901109:whenRevealed:1","cardCode":"901109","lines":["901109:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Each","pick":{"type":"enemy","control":"any","staging":true,"trait":"Goblin"},"instructions":[{"verb":"PlaceResourceTokens","amount":1,"on":"picked"}]}]},
+  {"id":"901403:shadow:1","cardCode":"901403","lines":["901403:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"}]},
+];

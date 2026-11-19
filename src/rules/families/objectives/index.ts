@@ -36,7 +36,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "GuardObjective":
       return guardObjective(state, instruction, focus, ctx, steps);
     case "ClaimObjective":
-      return claimObjective(state, focus, ctx, steps);
+      return claimObjective(state, instruction, focus, ctx, steps);
     case "AttachGuard":
       return attachGuard(state, instruction, focus, ctx);
     // A constant kept by the settle sweep (control.ts): it does nothing when run.
@@ -71,13 +71,15 @@ export function guardedByType(state: ScenarioState, objectiveId: string, types: 
   return guardWith(moveEncounter(searched, found, "staging", focus.seat, ctx, steps), found, objectiveId);
 }
 
-// ClaimObjective: the source objective leaves the staging area for the last picked hero, controlled by that hero's controller; an objective ally a player controls (Amarthiúl, 10110:A:1) may be the host as well.
-function claimObjective(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = focus.sourceId;
+// ClaimObjective: the source objective leaves the staging area (or the hero it is attached to) for the last picked hero, controlled by that hero's controller; an objective ally a player controls (Amarthiúl, 10110:A:1) may be the host as well.
+function claimObjective(state: ScenarioState, instruction: Extract<Instruction, { verb: "ClaimObjective" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = instruction.card ? refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)) : focus.sourceId;
   const objective = id ? state.cards[id] : undefined;
   const heroId = lastPicked(state);
   const hero = heroId ? state.cards[heroId] : undefined;
-  if (!id || !objective || objective.zone !== "staging" || !freeOfEncounters(state, id) || !hero || (hero.zone !== "heroes" && hero.zone !== "play") || hero.controller == null) return state;
+  // A claimed objective attached to another hero is claimed from there as well: "A hero can also exhaust to claim Book of Mazarbul even if it is attached to another hero" (dwd.book-of-mazarbul); the claim moves it.
+  const claimable = objective?.zone === "staging" || (objective?.zone === "attached" && objective.claimed === true);
+  if (!id || !objective || !claimable || !freeOfEncounters(state, id) || !hero || (hero.zone !== "heroes" && hero.zone !== "play") || hero.controller == null) return state;
   const attached = attachTo(moveCard(state, id, { zone: "attached" }), id, heroId);
   const claimed = updateCard(attached, id, { face: "up", controller: hero.controller, claimed: true });
   return queueEvent(enforceRestricted(claimed, heroId, ctx, steps), { trigger: "claimed", seat: hero.controller, cardId: id });

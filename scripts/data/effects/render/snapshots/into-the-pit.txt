@@ -1,0 +1,359 @@
+Scenario piles that place cards with no record (quest: 03064 Entering the Mines; quest: 03065 Goblin Patrol; quest: 03066 A Way Up; activeLocation: 03016 East-gate; setAside: 03017 First Hall; setAside: 03018 Bridge of Khazad-dûm; attachedChosen: 03041 Cave Torch)
+
+## 03014 Patrol Leader
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03014:A:1 (front): Forced: Before Patrol Leader is dealt damage, discard the top card of the encounter deck. If the discarded card is an enemy, cancel that damage.
+  03014:forced:1: Forced on the event damageDealt (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): cancel all of the damage just dealt
+
+03014:A:2 (shadow): Shadow: Cancel all damage dealt to this enemy.
+  03014:shadow:1: Shadow
+    - the attacking enemy: stat cannotTakeDamage 1, until the end of the attack
+
+## 03015 Signs of Conflict
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03015:A:1: Doomed 2. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+03015:A:2 (shadow): Shadow: Defending player raises his threat by 2.
+  03015:shadow:1: Shadow
+    - raise threat by 2 (the acting player)
+
+## 03016 East-gate
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+03016:A:1 (front): Immune to card effects.
+  03016:constant:1: Constant
+    - this card: stat immuneToCardEffects 1, while this card is in play
+
+03016:A:2 (front): Players cannot optionally engage enemies and no engagement checks are made.
+  03016:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat cannotBeOptionallyEngaged 1, while this card is in play
+    - the table: stat noEngagementChecks 1, while this card is in play
+
+03016:A:3 (front): Forced: After East-gate leaves play as an explored location, add First Hall to the staging area.
+  03016:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - one set-aside card with code 03017 joins the staging area (it is not revealed)
+
+## 03017 First Hall
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+03017:A:1 (front): Travel: Each player must raise his threat by 3 to travel here.
+  03017:travel:1: Travel
+    - raise threat by 3 (each player)
+
+03017:A:2 (front): Forced: After First Hall leaves play as an explored location, add Bridge of Khazad-dûm to the staging area.
+  03017:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - one set-aside card with code 03018 joins the staging area (it is not revealed)
+
+## 03018 Bridge of Khazad-dûm
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+03018:A:1 (front): While Bridge of Khazad-dûm is the active location, players cannot play cards.
+  03018:constant:1: Constant
+    only if this card is the active location
+    - each player: stat cannotPlayCards 1, while this card is in play
+
+## 03019 Stairs of Náin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03019:A:1 (front): Travel: The first player must exhaust 1 character he controls to travel here.
+  03019:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control) chosen by the first player
+    - exhaust the picked card
+
+03019:A:2 (shadow): Shadow: Defending player must choose and exhaust 1 character he controls.
+  03019:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 03035 Goblin Follower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03035:A:1 (front): When Revealed: Goblin Follower engages the last player.
+  03035:whenRevealed:1: When revealed
+    - the source enemy engages the last player
+
+03035:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if attacking the last player.)
+  03035:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the actor is the last player (to the first player's right; the only player of a solo game)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the actor is the last player (to the first player's right; the only player of a solo game) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 03036 Branching Paths
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03036:A:1 (front): While Branching Paths is in the staging area, each Dark location gets +1 Threat.
+  03036:constant:1: Constant
+    only if this card is in the staging area
+    - each Dark location (any player controls): stat threat 1, while this card is in play
+
+03036:A:2 (front): Forced: After Branching Paths leaves play as an explored location, look at the top 3 cards of the encounter deck. Players must choose 1 of those to reveal and add to the staging area, moving the other 2 to the bottom of the deck.
+  03036:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
+    - [json BottomOtherLooked {"verb":"BottomOtherLooked"}]
+    - the acting player reveals an encounter card
+
+## 03037 Lightless Passage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03037:A:1 (front): Travel: Players must exhaust a Cave Torch to travel here.
+  03037:travel:1: Travel
+    - exhaust "Cave Torch"
+
+03037:A:2 (shadow): Shadow: Cancel all combat damage dealt to attacking enemy.
+  03037:shadow:1: Shadow
+    - the attacking enemy: stat combatDamageCanceled 1, until the end of the attack
+
+## 03038 Zigil Mineshaft
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03038:A:1 (front): Action: Raise each player's threat by 1 to place 1 progress token on Zigil Mineshaft.
+  03038:action:1: Action
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (each player)
+    - place 1 progress on this card
+
+## 03039 Many Roads
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03039:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+03039:A:2 (front): When Revealed: Shuffle all locations in the encounter discard pile back into the encounter deck.
+  03039:whenRevealed:1: When revealed
+    - shuffle the location cards of the encounter discard pile into the encounter deck
+
+## 03040 Burning Low
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03040:A:1 (front): When Revealed: Each enemy and location currently in the staging area gets +1 Threat until the end of the phase. (+3 Threat instead if it is a Dark location.) Players may exhaust a Cave Torch to cancel this effect.
+  03040:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the effect's X is set to 0
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "exhaust" (only if all of: (the actor controls the card with code 03041) and (the card with code 03041 in play is ready)):
+          - exhaust the card with code 03041
+          - the effect's X grows by 1
+        * option "keep":
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each Dark location (any player controls) in the staging area only: stat threat 2, until the end of the phase
+
+03040:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  03040:shadow:1: Shadow
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 03041 Cave Torch
+(the scenario deals it into the attachedChosen pile; the piles place it, no record does)
+
+03041:A:1 (front): Attach to a hero. Restricted.
+  03041:constant:1: Constant
+    - this attachment may be attached to a hero
+
+03041:A:2 (front): Action: Exhaust Cave Torch to place up to 3 progress tokens on a Dark location.
+  03041:action:1: Action
+    only if all of: (the card with code 03041 in play is ready) and (there is a Dark location (any player controls) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - exhaust this card
+    - the acting player chooses X, from 1 to 3
+    - choose Dark location (any player controls)
+    - place X progress on the picked card
+
+03041:A:3 (front): Forced: After Cave Torch exhausts, discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
+  03041:forced:1: Forced on the event exhausted (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 03048 Cave In
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03048:A:1 (front): When Revealed: Remove all progress tokens from the current quest card and active location. If Cave In removed no progress tokens, it gains surge.
+  03048:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if all of: (the current quest card holds no progress (neither is true while there is no current quest)) and (the number of location (any player controls) that a card effect can affect (not one immune to card effects), with progress on it, that is the active location is at most 0): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
+    - remove all the progress from the active location
+
+## 03049 Crumbling Ruin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03049:A:1 (front): When Revealed: Each player must exhaust a character and discard the top card of his deck, if able. If the printed cost of the discarded card is equal to or higher than the remaining hit points of the exhausted character, discard the exhausted character.
+  03049:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+      - the effect's X is set to 0
+      - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
+      - then, if [json condition {"kind":"xReachesRemaining"}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 03050 Dark and Dreadful
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03050:A:1 (front): When Revealed: Deal 1 damage to each exhausted character. (2 damage instead if the active location is a Dark location.)
+  03050:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the active location is a Dark location (any player controls)): deal 1 damage to each exhausted character (any player controls)
+    - then, if the active location is a Dark location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each exhausted character (any player controls)
+
+03050:A:2 (shadow): Shadow: Deal 1 damage to the defending character. (Attacking enemy gets +2 Attack instead if this attack is undefended.)
+  03050:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): deal 1 damage to the defender
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 03051 Sudden Pitfall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03051:A:1 (front): When Revealed: The first player must discard 1 questing character he controls, if able. This effect cannot be canceled.
+  03051:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control) committed to the quest, chosen by the first player
+    - discard the picked card
+
+03051:A:2 (shadow): Shadow: Discard the defending character from play.
+  03051:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): choose character (you control) defending
+    - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 03052 Dreadful Gap
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03052:A:1 (front): When Revealed: Immediately travel to Dreadful Gap. If another location is currently active, return it to the staging area.
+  03052:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return the active location to the staging area
+    - travel to this location
+
+03052:A:2 (front): X is the number of characters in play.
+  03052:constant:1: Constant
+    - this card: stat questPoints the number of character (any player controls), while this card is in play
+
+## 03053 Fouled Well
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03053:A:1 (front): When Revealed: Each player may choose and discard 1 card at random from his hand. If all players did not discard 1 card, Fouled Well gains surge.
+  03053:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the effect's X is set to 0
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if there is a card (you control) in hand to choose):
+          - the acting player discards 1 random card(s) from hand
+          - the effect's X grows by 1
+        * option "keep":
+    - then, if X is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 03060 Goblin Scout
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03060:A:1 (front): Each player with a threat of 25 or higher cannot optionally engage Goblin Scout.
+  03060:constant:1: Constant
+    - this card: stat optionalEngageThreat 25, while this card is in play
+
+## 03061 Goblin Swordsman
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03061:A:1 (front): Goblin Swordsman gets +2 Attack if its attack is undefended.
+  03061:constant:1: Constant
+    only if the attack has no defender
+    - this card: stat attack 2, while this card is in play
+
+03061:A:2 (shadow): Shadow: Add Goblin Swordsman to the staging area.
+  03061:shadow:1: Shadow
+    - this card goes to the staging area (it is not revealed)
+
+## 03062 Watchful Eyes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03062:A:1 (front): When Revealed: The first player attaches Watchful Eyes to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck and add it to the staging area.")
+  03062:whenRevealed:1: When revealed
+    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
+  03062:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  03062:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (its host is a exhausted hero (any player controls))
+    - the acting player reveals an encounter card
+
+## 03063 Goblin Tunnels
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03063:A:1 (front): While Goblin Tunnels is in the staging area, it gains: "Forced: After a Goblin is revealed from the encounter deck, remove a progress token from the current quest card."
+  03063:forced:1: Forced after a card is revealed (heard about Goblin enemy (any player controls); only when the encounter deck revealed it)
+    only if this card is in the staging area
+    - remove 1 progress from the current quest card (all of it when it holds less)
+
+03063:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
+  03063:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Goblin enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Goblin enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 03064 Entering the Mines
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03064:A:1 (front): Setup: Search the encounter deck for East-gate and Cave Torch. Put East-gate into play as the active location, and have the first player attach Cave Torch to a hero of his choice. Set First Hall and Bridge of Khazad-dûm aside, out of play. Shuffle the encounter deck.
+  03064:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - a copy of the card with code 03041 is set aside, out of play
+    - choose hero (any player controls) that the card with code 03041 can be attached to, chosen by the first player
+    - the set-aside copy of the card with code 03041 is attached to the last picked hero; if it would leave play it is removed from the game
+    - shuffle the encounter deck
+
+03064:B:1 (back): When Revealed: Reveal 1 encounter card per player, and add it to the staging area.
+  03064:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+03064:B:2 (back): Players cannot advance to the next stage of the scenario unless Bridge of Khazad-dûm is in their victory display.
+  03064:constant:1: Constant
+    only if the card with code 03018 is not in the victory display
+    - the players cannot defeat this stage while this holds
+
+## 03065 Goblin Patrol
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03065:B:1 (back): When Revealed: Each player must search the encounter deck and discard pile for 1 enemy of his choice, and add it to the staging area. One choice must be Patrol Leader, if able.
+  03065:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls) chosen by the first player
+    - for each player, first player first:
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 03014 is there to be found, the search must take it (the search of the player the first player named)
+    - shuffle the encounter deck
+
+03065:B:2 (back): Forced: After an enemy is revealed from the encounter deck, discard it instead of adding it to the staging area.
+  03065:forced:1: Forced after a card is revealed (heard about enemy (any player controls); only when the encounter deck revealed it)
+    - if the card the event is about is a enemy (any player controls) that is in the staging area: the card the event is about goes to the encounter discard pile
+
+03065:B:3 (back): If there are no enemies in play, immediately advance to the next stage of the scenario. (Players can also advance by placing 11 progress tokens on Goblin Patrol.)
+  03065:constant:1: Constant
+    only if there is no enemy in play (in the staging area or engaged)
+    - this card: stat advanceNow (once nothing is resolving the quest advances to the next stage at once) 1, while this card is in play
+
+## 03066 A Way Up
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03066:B:1 (back): Heroes do not collect resources during the resource phase.
+  03066:constant:1: Constant
+    - every hero in play: stat noCollection 1, while this card is in play
+
+03066:B:2 (back): If the players defeat this stage, they win the game.
+  03066:constant:2: Constant
+    (no instructions)
+
+(rendered pieces: 227 by template, 2 as JSON)

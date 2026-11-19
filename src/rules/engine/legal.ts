@@ -31,6 +31,7 @@ import { exploring } from "../families/island/map.ts";
 import { islandMayTravel, islandReach } from "../families/island/travel.ts";
 import { freeSlot, mustTravel } from "../families/south/locations.ts";
 import { viewOf } from "../families/breaking/areas.ts";
+import { commitLimitReason } from "../families/play/commit-limit.ts";
 import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "../families/sea/sailing-legal.ts";
 import { flaggedByClass } from "../core/holder-classes.ts";
 import { printedOf } from "../core/printed.ts";
@@ -277,7 +278,7 @@ function committers(state: ScenarioState, seat: number, ctx: ReduceContext): str
   return characters(state, seat, ctx.cards).filter((id) => {
     const instance = state.cards[id];
     // "Can commit to quests while exhausted" (11009:A:1).
-    return instance != null && (!instance.exhausted || flagged(state, id, "commitsExhausted")) && !instance.committed && !flaggedByClass(state, instance, printedOf(ctx.cards, instance.code), "cannotQuest");
+    return instance != null && (!instance.exhausted || flagged(state, id, "commitsExhausted")) && !instance.committed && !flaggedByClass(state, instance, printedOf(ctx.cards, instance.code), "cannotQuest") && (!flagged(state, id, "cannotExhaust") || flagged(state, id, "noExhaustQuest"));
   });
 }
 
@@ -292,7 +293,7 @@ function commitReason(
   for (const id of intent.cardIds) {
     if (!legal.has(id)) return "That character cannot commit";
   }
-  return null;
+  return commitLimitReason(state, state.activeSeat, intent.cardIds, ctx.cards);
 }
 
 function travelReason(

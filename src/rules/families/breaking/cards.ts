@@ -6,14 +6,14 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
-import { lastPicked } from "../../interpret/player-verbs.ts";
+import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { fallenBase, FALLEN_SUFFIX } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { raiseFor } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { areaOf, sharing, stageSeat, stagingDest } from "./areas.ts";
+import { areaOf, headOf, sharing, stageSeat, stagingDest } from "./areas.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { ringBearerId } from "../burden/deck.ts";
 
@@ -30,6 +30,8 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
       return moveToLeft(state, focus.sourceId);
     case "MoveToFirstStaging":
       return moveToFirstStaging(state, instruction.target === "picked" ? lastPicked(state) : focus.sourceId);
+    case "MoveToOtherPlayerArea":
+      return moveToOtherPlayerArea(state, focus.sourceId);
     case "FallIntoEvil":
       return fallIntoEvil(state, focus.sourceId, steps);
     case "ReturnFallenHero":
@@ -89,6 +91,18 @@ function moveToFirstStaging(state: ScenarioState, id: string | null): ScenarioSt
   if (!id || !card || (card.zone !== "staging" && card.zone !== "engaged")) return state;
   const moved = moveCard(state, id, stagingDest(state, state.firstPlayer));
   return updateCard(moved, id, { controller: state.separate ? state.firstPlayer : null });
+}
+
+// MoveToOtherPlayerArea (901703:A:2): the engaged enemy goes to the staging area of the player the engaged player picked (a player of a different area), as a staging card. With no other area to pick, players who share an area send it to that shared area (not separate, or joined);
+// with one player it stays engaged.
+function moveToOtherPlayerArea(state: ScenarioState, id: string | null): ScenarioState {
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card || card.zone !== "engaged" || card.controller == null) return state;
+  const own = headOf(state, card.controller);
+  const picked = seatOf(lastPicked(state));
+  if (picked != null && state.separate && headOf(state, picked) !== own) return updateCard(moveCard(state, id, { zone: "staging", area: headOf(state, picked) }), id, { controller: headOf(state, picked) });
+  if (livingSeats(state).every((seat) => seat === card.controller)) return state;
+  return updateCard(moveCard(state, id, stagingDest(state, card.controller)), id, { controller: state.separate ? own : null });
 }
 
 // Fallen Into Evil, attached to a hero: the hero is an enemy in the first player's staging area, its player no longer controlling it.

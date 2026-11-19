@@ -53,7 +53,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 11194:A:3 (front): Forced: After Captain Sahír flips over, remove Black Key (burden) from the game and attach Black Key (boon) to him. Add Sea Serpent (Menacing side) to the staging area. One player adds Come Together to their hand. For this game, X is plus 1 for Come Together.
   11194:forced:2: Forced on the event flipped (heard about card (any player controls) named "Captain Sahír")
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveCodeFromGame {"verb":"RemoveCodeFromGame","code":"11192"}]
+    - the card in play with code 11192 is removed from the game, wherever it is (in the staging area or attached)
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
     - the set-aside card with code 11196 joins the staging area (not revealed)
     - choose player (any player controls)
@@ -117,7 +117,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12039:B:3 (back): Progress cannot be placed on this stage unless Helm of the Stormcaller is in the victory display.
   12039:constant:2: Constant
-    - if [json condition {"kind":"inVictory","code":"12042","is":false}]: the table: stat noQuestProgress 1, while this card is in play
+    - if the card with code 12042 is not in the victory display: the table: stat noQuestProgress 1, while this card is in play
 
 ## 12040 Change of Plans
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -339,7 +339,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12054:A:2 (front): Giant Arm gets +2 Attack when attacking allies.
   12054:constant:1: Constant
-    - if [json condition {"kind":"versusDefender","ally":true}]: this card: stat attack 2, while this card is in play
+    - if the card holding this stat is an enemy attacking a declared defender that is an ally: this card: stat attack 2, while this card is in play
 
 12054:A:3 (shadow): Shadow: After this attack, either put Giant Arm into play engaged with you and deal it a shadow card, or resolve its Grapple keyword.
   12054:shadow:1: Shadow
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 169 by template, 33 as JSON)
+(rendered pieces: 172 by template, 30 as JSON)

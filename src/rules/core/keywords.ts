@@ -8,7 +8,7 @@ import { defendingAgainst } from "../families/angmar/combat.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
-import type { CardInstance, ScenarioState } from "./state.ts";
+import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
@@ -39,6 +39,12 @@ export { printedStat };
 // The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
 const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
 
+// A modifier a player card gives: its source is a player card (an attachment's bonus, a hero's ability, an event).
+function fromPlayerCard(state: ScenarioState, modifier: Modifier, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const source = state.cards[modifier.sourceId];
+  return source != null && isPlayerType(printedOf(cards, source.code));
+}
+
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
 // A set modifier overrides every other one, the most recent set winning (rr.modifiers).
 export function modifiedStat(
@@ -56,6 +62,8 @@ export function modifiedStat(
   // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
   let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
   let set: number | null = null;
+  // The table's noWillpowerGain, read once and only if a raise of Willpower is met.
+  let gainBarred: boolean | undefined;
   // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2), or its Defense (900506:A:1).
   let floor = total;
   for (const modifier of state.modifiers) {
@@ -70,6 +78,11 @@ export function modifiedStat(
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).
     if (modifier.when?.kind === "attacking" && !attackingHolds(state, modifier.when, instance, { effects: [], cards }, against)) continue;
+    // "Characters cannot gain Willpower from player card effects" (901306:A:1): a raise from a player card is not counted; a reduction is.
+    if (stat === "willpower" && !modifier.set && modifier.amount > 0) {
+      gainBarred ??= flagged(state, "table", "noWillpowerGain");
+      if (gainBarred && fromPlayerCard(state, modifier, cards)) continue;
+    }
     if (modifier.set) set = modifier.amount;
     else total += modifier.amount;
     if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
@@ -108,12 +121,14 @@ export function versusHighEngagement(
 
 // The holder is the enemy making the attack in progress and the character defending it has at most this many printed hit points (142071:A:2).
 // With `ally`, the defender is an ally (12054:A:2).
-export function versusDefender(state: ScenarioState, holder: CardInstance, versus: { maxHitPoints?: number; ally?: true }, cards: ReadonlyMap<string, PrintedCard>): boolean {
+export function versusDefender(state: ScenarioState, holder: CardInstance, versus: { maxHitPoints?: number; maxWillpower?: number; ally?: true }, cards: ReadonlyMap<string, PrintedCard>): boolean {
   const attack = state.pendingAttack;
   if (!attack || attack.enemyId !== holder.id || attack.defenderId == null || attack.undefended) return false;
   const defender = state.cards[attack.defenderId];
   const printed = defender ? printedOf(cards, defender.code) : null;
   if (printed == null || (versus.ally === true && cardTypeOf(defender!, printed) !== "ally")) return false;
+  // "if the defending character has less than 2 Willpower" (901303:A:1): its current Willpower, modifiers counted.
+  if (versus.maxWillpower != null && modifiedStat(state, defender!, "willpower", cards) > versus.maxWillpower) return false;
   return versus.maxHitPoints == null || (printed.health != null && printed.health <= versus.maxHitPoints);
 }
 
@@ -233,6 +248,8 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
   if (source === "player" && !playerCardEffectCanChoose(printed, state, id, sourcePrinted(state, cards, sourceId))) return state;
+  // "While The Watcher is in the staging area, it cannot be damaged by player card effects" (901502:A:1): the damage of a player card's effect is not placed; an attack's combat damage and an encounter card's are.
+  if (source === "player" && flagged(state, id, "noPlayerEffectDamage")) return state;
   // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
   if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
   // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
@@ -267,7 +284,8 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   const lethal = printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards);
   // Damage dealt to a character is first offered to the Responses that cancel it ("cancel X damage just dealt", rr.cancel).
   // A character it would destroy is destroyed by the sweep once they have had their chance (destroyOverwhelmed, damageHeld).
-  if (hurt && isCharacterType(printed)) {
+  // An enemy whose own Forced effect answers the damage dealt to it (Patrol Leader, 03014:A:1) is offered it the same way (families/encounter/patrol.ts markEnemyDamage).
+  if (hurt && (isCharacterType(printed) || (printed.type === "enemy" && state.enemyDamageHeard?.includes(instance.code) === true))) {
     next = queueEvent(next, { trigger: "damageDealt", seat: instance.controller, cardId: id, subject: id, amount: dealt });
     if (lethal && state.holdLethal) return next;
   }
@@ -344,8 +362,8 @@ export function defeatedDestination(
   // A claimed objective whose text returns it (01108:A:2, 12071:A:1) goes back to the staging area when discarded or detached (families/objectives/claimed.ts).
   // A Captive destroyed under To Isengard! or an enemy goes to its owner's discard pile (families/captives).
   const usual: Destination =
-    // An ally in the staging area under nobody's control (Retreat from Osgiliath, 145074:B:2) is still its owner's: it goes to that discard pile.
-    !fromEncounterDeck(printed) && (instance.controller != null || ((instance.captive === true || instance.zone === "staging") && instance.owner != null))
+    // An ally in the staging area under nobody's control (Retreat from Osgiliath, 145074:B:2) and a player card lying on a Nameless enemy (families/nameless) are still their owner's: they go to that discard pile.
+    !fromEncounterDeck(printed) && (instance.controller != null || ((instance.captive === true || instance.zone === "staging" || instance.nameless === true) && instance.owner != null))
       ? { zone: "discard", seat: instance.owner ?? instance.controller ?? 0 }
       : printed.type === "quest"
         ? { zone: "setAside" }
@@ -447,9 +465,12 @@ export function destroyCard(
 
 // A keyword a card prints or has gained: a flag modifier of the same name ("Attached hero gains sentinel", rr.sentinel,
 // rr.ranged).
-export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel" | "ranged" | "restricted" | "doomed" | "surge", cards: ReadonlyMap<string, PrintedCard>): boolean {
+export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel" | "ranged" | "restricted" | "doomed" | "surge" | "ambush" | "gainedAmbush", cards: ReadonlyMap<string, PrintedCard>): boolean {
   const instance = state.cards[id];
   if (!instance) return false;
+  // Ambush a card gave the enemy (`gainsAmbush`, dwd.ambush; Goblin Gate 04043:A:1), in addition to a printed one.
+  if (keyword === "gainedAmbush") return flagged(state, id, "gainsAmbush");
+  if (keyword === "ambush" && flagged(state, id, "gainsAmbush")) return true;
   const printed = printedOf(cards, instance.code);
   const blank = printedKeywordsBlank(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;

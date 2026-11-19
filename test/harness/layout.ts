@@ -9,7 +9,10 @@ import { holdCaptive } from "../../src/rules/families/captives/index.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
+import { markProgressHeld } from "../../src/rules/families/long-dark/hold.ts";
 import { markCapture } from "../../src/rules/families/captured/entry.ts";
+import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
+import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
@@ -40,7 +43,12 @@ export type Layout = {
   seed?: number;
   stage?: string;
   progress?: number;
-  active?: string;
+  // The side the current quest stage shows (B by default; A for a stage 2 of a quest deck that has not flipped yet, 03070:A:1).
+  side?: "A" | "B";
+  // A code, or a code with its tokens.
+  active?: Entry;
+  // The Nightmare setup card, side A faceup next to the quest deck, with its tokens (901001:A:2 counts on it).
+  nightmare?: Entry;
   deck?: readonly string[];
   discard?: readonly string[];
   staging?: readonly Entry[];
@@ -146,7 +154,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const code of stages) {
     const index = stages.indexOf(code);
     const placed = index === at ? { zone: "questStage" as const } : index > at ? { zone: "questDeck" as const } : { zone: "setAside" as const };
-    const spawned = spawn(state, code, placed, placed.zone === "questStage" ? "B" : "A");
+    const spawned = spawn(state, code, placed, placed.zone === "questStage" ? (layout.side ?? "B") : "A");
     state = code === stage ? updateCard(spawned.state, spawned.id, { progress: layout.progress ?? 0 }) : spawned.state;
   }
   const first = spawn(state, HERO, { zone: "heroes", seat: 0 });
@@ -176,7 +184,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const code of layout.setAside ?? []) put(code, { zone: "setAside" }, code, "up");
   for (const item of layout.engaged ?? []) put(entry(item).code, { zone: "engaged", seat: seatOf(item) }, item);
   for (const code of layout.victory ?? []) put(code, { zone: "victory" });
-  if (layout.active) put(layout.active, { zone: "activeLocation" });
+  if (layout.active) put(entry(layout.active).code, { zone: "activeLocation" }, layout.active);
+  if (layout.nightmare) put(entry(layout.nightmare).code, { zone: "nightmare" }, layout.nightmare, "up");
   if (layout.night) put(entry(layout.night).code, { zone: "nightObjective" }, layout.night, "up");
   if (layout.campaign && world.dealt.campaignCard !== undefined) put(world.dealt.campaignCard, { zone: "campaign" });
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
@@ -199,8 +208,13 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
   state = markSideQuests(state, cards);
   state = markProgressNoted(state, ctx);
+  // A game that deals Twisting Passage holds the progress placed on it for its test, as the start notes it (families/long-dark/hold.ts markProgressHeld).
+  state = markProgressHeld(state, ctx);
   // The cards with Capture X, and the cards in every area, as Escape from Mount Gram's start notes them (families/captured/entry.ts markCapture).
   state = markCapture(state, ctx);
+  // The enemies whose own Forced effect hears the damage dealt to them (families/encounter/patrol.ts markEnemyDamage).
+  state = markEnemyDamage(state, ctx);
+  state = markSeatedRows(state, ctx);
   state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
 }

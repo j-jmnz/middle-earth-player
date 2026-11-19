@@ -4,6 +4,8 @@ import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import type { CardInstance } from "../../rules/core/state.ts";
+import { flagged } from "../../rules/core/state.ts";
+import { BLIZZARD_LIMIT } from "../../rules/families/quest/blizzard.ts";
 
 
 import { dungeonDetail } from "./dungeon-preview.ts";
@@ -53,12 +55,12 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
 
 /**
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
- * quest. Empty for a card with none (a card in the hand, a fresh enemy).
+ * quest. Empty for a card with none (a card in the hand, a fresh enemy). `progressLimit`: the progress is counted against a limit ("3 / 5 progress", Blinding Blizzard, 901307:A:2).
  */
-export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "committed">): string[] {
+export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "committed">, progressLimit?: number): string[] {
   return [
     ...(card.damage > 0 ? [`${card.damage} damage`] : []),
-    ...(card.progress > 0 ? [`${card.progress} progress`] : []),
+    ...(card.progress > 0 ? [`${card.progress}${progressLimit == null ? "" : ` / ${progressLimit}`} progress`] : []),
     ...(card.resources > 0 ? [`${card.resources} resource${card.resources === 1 ? "" : "s"}`] : []),
     ...(card.exhausted ? ["Exhausted"] : []),
     ...(card.committed ? ["Committed"] : []),
@@ -116,7 +118,7 @@ export function previewCards(
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
-    const tokens = tokenLines(card);
+    const tokens = tokenLines(card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined);
     const keywords = previewKeywords(game, ctx, id, described.text, options.ruleDoc ?? null);
     const sides = contractSides(printedOf(ctx.cards, card.code).type, described.text);
     if (sides) {

@@ -79,7 +79,10 @@ const SEEN = new WeakMap<object, number>();
 export function announceProgress(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const from = Math.min(SEEN.get(steps) ?? 0, steps.length);
   SEEN.set(steps, steps.length);
-  if (steps.length === from || !listens(state, ctx, "progressPlaced")) return state;
+  // A card whose own record hears `progressPlacedOnSelf` (Bottomless Chasm, 901606:A:1) hears every placement on it, the one that explores it too; only a game that deals one raises it.
+  const heard = listens(state, ctx, "progressPlaced");
+  const onSelf = listens(state, ctx, "progressPlacedOnSelf");
+  if (steps.length === from || (!heard && !onSelf)) return state;
   // The player who placed the progress (the step's `seat`, stamped by the effect that placed it) is told only to a card that asks for it (`eventSeat`, 19102:A:2); every other game announces it with no seat.
   const reads = gameReadsOnTrigger(state, ctx, "progressPlaced", '"eventSeat"');
   // The amount just placed ("X is the amount of progress just placed", 146020:A:3) is told only to a card that reads X: the Forced record hears it as its `x`.
@@ -88,7 +91,8 @@ export function announceProgress(state: ScenarioState, steps: EngineStep[], ctx:
   for (const step of steps.slice(from)) {
     if (step.kind !== "progress" || step.amount <= 0) continue;
     const card = next.cards[step.targetId];
-    if (card && inPlay(card.zone)) next = queueEvent(next, { trigger: "progressPlaced", seat: reads ? (step.seat ?? null) : null, cardId: step.targetId, ...(amounts ? { amount: step.amount } : {}) });
+    if (card && onSelf) next = queueEvent(next, { trigger: "progressPlacedOnSelf", seat: null, cardId: step.targetId, amount: step.amount });
+    if (heard && card && inPlay(card.zone)) next = queueEvent(next, { trigger: "progressPlaced", seat: reads ? (step.seat ?? null) : null, cardId: step.targetId, ...(amounts ? { amount: step.amount } : {}) });
   }
   return next;
 }

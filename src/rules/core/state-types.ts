@@ -132,7 +132,9 @@ export type CardInstance = {
   // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideInPlay with keepDamage.
   keepsDamage?: true;
   // An enemy attached to a character as an attachment (Wraith of Carn Dûm, 101157:A:1): it has no enemy text while it lies there, hears no leaving of play, and returns to the staging area as an enemy when its host leaves play (families/angmar/reanimate/attached.ts).
-  asAttachment?: true;
+  asAttachment?: true | "discard";
+  // A player card lying faceup on an enemy as an attachment with no title and no game text, taken from the top of a deck (Nameless Thing, families/nameless): its printed cost is its only active part. Set only by AttachDeckTop, and cleared once the card has left the enemy.
+  nameless?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
@@ -147,7 +149,7 @@ export type CardInstance = {
   carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
   // leaves play (emce.evil-creatures-deck). Absent on every other card.
-  deck?: "evilCreatures" | "smaug";
+  deck?: "evilCreatures" | "balrog" | "smaug";
 };
 
 export type Seat = {
@@ -307,6 +309,8 @@ export type ScenarioState = {
   // Stage 2B has created a staging area and a quest stage for each seat (`Seat.staging`, `Seat.stage`; families/breaking/areas.ts). Absent
   // in every other game and until then.
   separate?: true;
+  // The heroes a card shuffled into their owners' decks (Lost and Alone, 04124:A:1): each is put into play when its owner draws it, and its seat is not out of heroes while it waits (families/deck/hero.ts). Absent in every game that shuffles none.
+  heroesInDeck?: readonly string[];
   // The areas are isolated outside Escape from Mount Gram too: set while a player of Fog on the Barrow-downs is trapped at a stage of his own, so "each player", "the first player", "in play" and a player card's Doomed read the area (`isolatedAreas`, families/breaking/areas.ts). Dropped when the areas combine into one. Absent otherwise.
   isolated?: true;
   // Only on a seat's view of the state (families/breaking/areas.ts viewOf): the seat it is the view of. mergeView drops it.
@@ -387,7 +391,11 @@ export type ScenarioState = {
   sideQuests?: true;
   // The game has a card that asks whether progress was placed on a side quest this round ("if no progress was placed on Lie Low this round", 10081:A:1): the engine notes each placement as `progressPlacedHere` (families/angmar/progress.ts). Set at the start (markProgressNoted), absent in every other game.
   progressNoted?: true;
+  // The codes of the cards whose Forced effect hears `progressWouldBePlaced` (Twisting Passage, 04092:A:1): progress that would be placed on one of them in play waits for that effect (families/long-dark/hold.ts). Set at the start, absent in every other game.
+  progressHeldBy?: readonly string[];
   pendingStrike: PendingStrike | null;
+  // The seats whose threat was below 1 when the combat phase began, kept only in a game with an enemy that is considered engaged by threat (Durin's Bane, families/south/watcher.ts noteBelowThreat): an attack by it on such a seat is dealt no shadow card.
+  belowThreat?: readonly number[];
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
   // The cards in play that hear their own leaving by any route (`exitedPlay`); settle announces one once it is out of play (families/island/hand.ts). Kept only in a game with such a card.
@@ -398,6 +406,10 @@ export type ScenarioState = {
   // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
   // damage then waits for those Responses before it destroys the character (settle keeps it current).
   holdLethal?: true;
+  // The codes of the enemies dealt whose own Forced effect hears the damage dealt to them ("Before Patrol Leader is dealt damage, ...", 03014:A:1): the damage step offers them `damageDealt` like a character's. Absent in every other game (families/encounter/patrol.ts).
+  enemyDamageHeard?: readonly string[];
+  // The picks that span seats name the owner on each row of their sheet, as in the side quest games: a Setup line has the first player pick a hero of any player (Entering the Mines, 03064:A:1; families/encounter/seated.ts). Absent in every other game.
+  seatedRows?: true;
   // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests/setup.ts).
   playerSetup?: true;
   // The loot decks (The Burglar's Turn, 22024): the cards each seat chose at deckbuilding (`lootPlan`, codes), and the ids of the

@@ -21,15 +21,15 @@ export const NIGHTMARE_DECKS: readonly NightmareDeckDef[] = [
   { set: "The Hills of Emyn Muil Nightmare", prefix: "9007", folder: "01 - Nightmare Core Set & Shadows of Mirkwood/02 - Nightmare Shadows of Mirkwood/04 - The Hills of Emyn Muil", scenario: "the-hills-of-emyn-muil" },
   { set: "The Dead Marshes Nightmare", prefix: "9008", folder: "01 - Nightmare Core Set & Shadows of Mirkwood/02 - Nightmare Shadows of Mirkwood/05 - The Dead Marshes", scenario: "the-dead-marshes" },
   { set: "Return to Mirkwood Nightmare", prefix: "9009", folder: "01 - Nightmare Core Set & Shadows of Mirkwood/02 - Nightmare Shadows of Mirkwood/06 - Return to Mirkwood", scenario: "return-to-mirkwood" },
-  { set: "Into the Pit Nightmare", prefix: "9010", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/01 - Nightmare Khazad Dûm/01 - Into the Pit" },
-  { set: "The Seventh Level Nightmare", prefix: "9011", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/01 - Nightmare Khazad Dûm/02 - The Seventh Level" },
-  { set: "Flight from Moria Nightmare", prefix: "9012", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/01 - Nightmare Khazad Dûm/03 - Flight from Moria" },
-  { set: "The Redhorn Gate Nightmare", prefix: "9013", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/01 - The Redhorn Gate" },
-  { set: "Road to Rivendell Nightmare", prefix: "9014", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/02 - Road to Rivendell" },
-  { set: "The Watcher in the Water Nightmare", prefix: "9015", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/03 - The Watcher in the Water" },
-  { set: "The Long Dark Nightmare", prefix: "9016", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/04 - The Long Dark" },
-  { set: "Foundations of Stone Nightmare", prefix: "9017", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/05 - Foundations of Stone" },
-  { set: "Shadow and Flame Nightmare", prefix: "9018", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/06 - Shadow and Flame" },
+  { set: "Into the Pit Nightmare", prefix: "9010", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/01 - Nightmare Khazad Dûm/01 - Into the Pit", scenario: "into-the-pit" },
+  { set: "The Seventh Level Nightmare", prefix: "9011", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/01 - Nightmare Khazad Dûm/02 - The Seventh Level", scenario: "the-seventh-level" },
+  { set: "Flight from Moria Nightmare", prefix: "9012", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/01 - Nightmare Khazad Dûm/03 - Flight from Moria", scenario: "flight-from-moria" },
+  { set: "The Redhorn Gate Nightmare", prefix: "9013", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/01 - The Redhorn Gate", scenario: "the-redhorn-gate" },
+  { set: "Road to Rivendell Nightmare", prefix: "9014", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/02 - Road to Rivendell", scenario: "road-to-rivendell" },
+  { set: "The Watcher in the Water Nightmare", prefix: "9015", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/03 - The Watcher in the Water", scenario: "the-watcher-in-the-water" },
+  { set: "The Long Dark Nightmare", prefix: "9016", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/04 - The Long Dark", scenario: "the-long-dark" },
+  { set: "Foundations of Stone Nightmare", prefix: "9017", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/05 - Foundations of Stone", scenario: "foundations-of-stone" },
+  { set: "Shadow and Flame Nightmare", prefix: "9018", folder: "02 - Nightmare Khazad Dûm & Dwarrowdelf/02 - Nightmare Dwarrowdelf/06 - Shadow and Flame", scenario: "shadow-and-flame" },
   { set: "Peril in Pelargir Nightmare", prefix: "9019", folder: "03 - Nightmare Heirs of Númenor & Against the Shadow/01 - Nightmare Heirs of Númenor/01 - Peril in Pelargir" },
   { set: "Into Ithilien Nightmare", prefix: "9020", folder: "03 - Nightmare Heirs of Númenor & Against the Shadow/01 - Nightmare Heirs of Númenor/02 - Into Ithilien" },
   { set: "The Siege of Cair Andros Nightmare", prefix: "9021", folder: "03 - Nightmare Heirs of Númenor & Against the Shadow/01 - Nightmare Heirs of Númenor/03 - The Siege of Cair Andros" },
@@ -111,3 +111,15 @@ export function nightmareCode(deck: Pick<NightmareDeckDef, "prefix">, number: nu
   if (!Number.isInteger(number) || number < 1 || number > 99) throw new Error(`nightmare-defs: collector number ${number} is not 1 to 99`);
   return `${deck.prefix}${String(number).padStart(2, "0")}`;
 }
+
+// A Nightmare card whose printed set icon is the scenario's set-aside encounter set (the Data task put every card in the
+// `encounter` pile; the scan's icon decides): it is shuffled into that set, not into the standard deck. Foundations of Stone:
+// 901702 and 901703 bear the Goblins of the Deep icon, 901704 to 901708 the Foundations of Stone icon (set aside at Setup,
+// `encounterDeck2`; scans .cache/scans/9017*.A.jpg, docs/brief.md, Foundations of Stone).
+export const NIGHTMARE_CARD_PILES: Readonly<Record<string, "encounterDeck2">> = {
+  "901704": "encounterDeck2",
+  "901705": "encounterDeck2",
+  "901706": "encounterDeck2",
+  "901707": "encounterDeck2",
+  "901708": "encounterDeck2",
+};

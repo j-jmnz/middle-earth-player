@@ -189,7 +189,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ClaimWhenFree"), host: z.string().min(1).optional() }),
   // "The first player loses control of Urdug, then attach Urdug to a location in the staging area as a guarded objective" (19044:A:1): the card in play with this code goes back to the staging area, controlled by no one, guarded by the last picked card (a location in the staging area). Nothing happens when no such card is
   // in play or nothing is picked.
-  z.strictObject({ verb: z.literal("GuardReturnedBy"), code, ...when }),
+  // `returns: "firstPlayer"` (an ally, "attaches her to Goblin Gate", 901402:B:1): the guard may be the active location too, and once nothing guards the card (the guard left play) it rejoins the first player's play area, as the ControlledBy constant it holds says (the flag `guardedAlly`,
+  // read by the play family's sweep). Its damage, tokens and attachments stay on it, and it stays in play.
+  z.strictObject({ verb: z.literal("GuardReturnedBy"), code, returns: z.literal("firstPlayer").optional(), ...when }),
   // Resolution: "Each player chooses a location in the staging area and adds a copy of it to the campaign pool. Players must choose different locations, if able" (12184:B:4): each player in turn, the first player first, chooses a location (by title) in the staging area that no earlier player chose, unless
   // every title is taken; a copy of each joins the Campaign Pool's encounter cards (never more than one collection holds). A burden location (Abandoned Ruin) is not offered: it joins the pool as a burden. Run by the Resolution (rules/setup/resolution.ts).
   z.strictObject({ verb: z.literal("ChooseStagedLocationForPool"), ...when }),
@@ -222,13 +224,28 @@ const VERBS = [
   // stage of the deck (rules/families/quest/order.ts). Run alone it does nothing.
   z.strictObject({ verb: z.literal("FlipAtQuestPhase") }),
   // "At the beginning of the quest phase" the current quest card shows side B (emce.gundabad-quest-deck). A stage that already shows side B changes nothing.
-  z.strictObject({ verb: z.literal("FlipCurrentQuest"), ...when }),
+  // With `resolve` the stage's side B is revealed now: its When Revealed effects resolve as the stage turns over (Flight from Moria's stage 2s are flipped at the beginning of the staging step, 03070:A:1; dwd.creating-the-quest-deck), the actor the first player.
+  z.strictObject({ verb: z.literal("FlipCurrentQuest"), resolve: z.literal(true).optional(), ...when }),
   // "The players may bypass this stage" (19135:B:3; emce.bypassing): the source stage loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving. Nothing happens
   // when the quest deck holds no other stage. A bypassed stage is not defeated: the Forced effects of "when this stage is defeated" do not hear it.
   z.strictObject({ verb: z.literal("BypassStage"), ...when }),
   // "Search the quest deck for a quest card and make it the current main quest. Then, flip it over. Shuffle the rest of the quest deck" (19124:A:1): the actor chooses a stage of the quest deck, it becomes the current quest in place of the stage now current (which goes back into
   // the quest deck with no progress, side A up, as a bypassed stage does), it is revealed and shows side B at once, and the quest deck is shuffled.
   z.strictObject({ verb: z.literal("SearchQuestDeck"), ...when }),
+  // Flight from Moria (dwarrowdelf part 3; dwd.creating-the-quest-deck, dwd.bypassing-a-quest-card; ledger lines 03026:A:1, 03074:B:1, 03075:B:3, 03070:B:1, 03071:B:1).
+  // "Shuffle the current quest card into the quest deck, then reveal a new quest card" (03026:A:1): the source of the stage now current is not it: the current stage loses its progress, returns to the quest deck with side A up (shuffled in, or at the bottom with `bottom`, 03075:B:3)
+  // and the top stage of the quest deck is revealed side A, its When Revealed effects resolving. The stage is not defeated and not bypassed: nothing that hears a defeat or a bypass is told. With `bottom` and no other stage in the quest deck nothing happens.
+  z.strictObject({ verb: z.literal("RevealNewStage"), bottom: z.literal(true).optional(), ...when }),
+  // "Reveal the top 2 cards of the quest deck. Choose 1 to become the active quest (flipped to side 2B) and put the other on the bottom of the quest deck" (03074:B:1): the actor chooses one of the top `count` stages (the only one without asking); it takes the place of the source stage
+  // and is flipped at once, its When Revealed effects resolving; the others go to the bottom of the quest deck, side A up. The stage replaced is set aside until the record's next instruction adds it to the victory display.
+  z.strictObject({ verb: z.literal("ChooseStageToFlip"), count: z.number().int().min(1), ...when }),
+  // "If Heading Up is in the player's victory display at the end of any quest phase, shuffle Heading Up back into the quest deck" (03070:B:1): the card with this code in the victory display goes into the quest deck, side A up, and the quest deck is shuffled. Nothing happens when it is not there.
+  z.strictObject({ verb: z.literal("ShuffleStageFromVictory"), code, ...when }),
+  // "Each player discards 1 card from the top of the encounter deck. If the card is a treachery card, the discarding player is eliminated from the game" (03075:B:2): each living player in turn order discards the top card of the encounter deck (a deck that ran out is reset first,
+  // rr.running-out-of-cards); the card is discarded, not revealed, and a card of `type` eliminates the player who discarded it before the next player discards.
+  z.strictObject({ verb: z.literal("DiscardTopEliminating"), type: z.literal("treachery"), ...when }),
+  // "If this attack destroys a character, add this card to the victory display" (901209:A:3): run by an AfterAttack, whose source is the attacking enemy, so the shadow card is found among the shadow cards the enemy holds, by its `code`.
+  z.strictObject({ verb: z.literal("AddShadowToVictory"), code, ...when }),
   // "Flip Wormsbane to its Reforged side" (19122:A:3): the card in play with the code `code` shows its other side `into`, staying where it lies with its tokens and attachments (the old side is kept as the card's other side).
   // With `attachTo: "picked"` it then moves to the hero last picked, leaving the card it was attached to.
   // With `entersPlay` the new side enters play: it hears "After X enters play" ("After Savage Counter-attack enters play", 09072:A:1; mec112.gollum-smeagol).
@@ -263,6 +280,9 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // About no card: the players bypassed the current stage (emce.bypassing, dwd.bypassing-a-quest-card): announced once for each living seat, as the stage has gone to the quest deck and before the next stage's When Revealed effects resolve ("Forced: When a quest card is bypassed", 901205:A:2).
+  // Use `eventSeat: "you"` for the player the listener is engaged with.
+  "stageBypassed",
   // About a side quest: it became the current quest at the beginning of the quest phase ("After Draw Her Fire becomes the current quest", 19066:A:2; emce.side-quests-in-play).
   "becameCurrentQuest",
   // About a location: its Discover keyword was just resolved (emce.discover). The event's amount is 1 when a Hazard card was revealed by it, else 0 ("After resolving the Discover keyword on Hidden Staircase", 19103:A:3).
@@ -311,6 +331,22 @@ const FLAGS = [
   "treacheryRevealed",
   // On a card in play: resource tokens cannot be placed on it ("resources cannot be placed on The Heroes' Defense", 19161:A:2). Read by PlaceResourceTokens (families/nightmare/dungeon.ts).
   "noResourcesPlaced",
+  // On the table, while the source is in play: each bypass costs every player this much threat, a raise that may eliminate him ("As an additional cost to bypass a quest card, each player must raise his threat by 2", 901207:A:1). The amounts of every card held add up.
+  "bypassThreat",
+  // On the table: a stage bypassed is shuffled into the quest deck with the rest, and the top of it is revealed (901201:A:2, Nightmare Flight from Moria); the bypassed stage can come back.
+  "bypassShuffles",
+  // On a character: it cannot exhaust, so it cannot commit to the quest, attack or defend, and a cost that exhausts it fails ("Attached hero cannot exhaust or ready", 03027:A:1). Read where a character exhausts (rules/interpret/constants.ts).
+  "cannotExhaust",
+  // On an enemy: a character that attacks it with the ranged keyword deals no damage to it, and a character that attacks it another way does ("Immune to ranged damage", 03042:A:1; dwd.immune-to-ranged-damage). Read where combat damage is dealt (rules/combat/).
+  "immuneToRangedDamage",
+  // On the table, until the modifier ends: a character committed to the quest does not count its Willpower, in the quest total and in what sums the Willpower of committed characters, unless it holds `countsWillpower` ("Each questing character not chosen does not count
+  // its Willpower until the end of the turn", 03073:B:1). Read by committedWillpower (rules/quest/quest.ts).
+  "ignoresWillpower",
+  // On a character: it counts its Willpower while the table holds `ignoresWillpower` (the character a player chose, 03073:B:1).
+  "countsWillpower",
+  // On the table: the Refresh Action of Abandoned Tools can be used once each round while Escape from Darkness is the current quest (901201:A:3), and the use made this round (engine use).
+  "refreshOnce",
+  "refreshUsed",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

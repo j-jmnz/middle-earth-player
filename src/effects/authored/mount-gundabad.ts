@@ -45,7 +45,7 @@ const sideA = (code: string): Effect[] => [
   { id: `${code}:forced:1`, cardCode: code, lines: [`${code}:A:2`], timing: "forced", trigger: "beginningOfPhase", condition: { kind: "phase", is: "Quest" }, instructions: [{ verb: "FlipCurrentQuest" }] },
 ];
 // "At the end of the combat phase, the players may bypass this stage." The first player answers for the group; with no other stage in the quest deck there is nothing to bypass to.
-const mayBypass = (id: string, code: string, line: string): Effect => ({
+export const mayBypass = (id: string, code: string, line: string): Effect => ({
   id,
   cardCode: code,
   lines: [line],
@@ -55,7 +55,7 @@ const mayBypass = (id: string, code: string, line: string): Effect => ({
   instructions: [{ verb: "Choose", who: "firstPlayer", options: [{ id: "bypass", requires: { kind: "questDeck" }, instructions: [{ verb: "BypassStage" }] }, { id: "stay", instructions: [] }] }],
 });
 // "Forced: When this stage is defeated, ...": the record of one stage's defeat.
-const whenDefeated = (id: string, code: string, line: string, instructions: Instruction[]): Effect => ({ id, cardCode: code, lines: [line], timing: "forced", ...DEFEATED, instructions });
+export const whenDefeated = (id: string, code: string, line: string, instructions: Instruction[]): Effect => ({ id, cardCode: code, lines: [line], timing: "forced", ...DEFEATED, instructions });
 
 // "The first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck" (19134:B:1, 19140:B:2): the stage names LookAtStages, so advancing from it asks first (families/quest/order.ts), in a frame of this record.
 const LOOK_AT_STAGES = (id: string, code: string, line: string): Effect => whenDefeated(id, code, line, [{ verb: "LookAtStages", count: 2, bottom: true }]);

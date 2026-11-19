@@ -2,7 +2,7 @@
 //
 // AssignDamage: "each player assigns X damage among characters he controls". The first call queues one assignment for each player
 // in player order; each assignment places one damage at a time on the card its player chooses (one candidate is taken without
-// asking) and queues itself again with one damage fewer.
+// asking) and queues itself again with one damage fewer; with `single` the chosen card takes all of it at once.
 import type { Condition, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -35,6 +35,8 @@ export function assignDamage(state: ScenarioState, instruction: Assign, focus: F
   if (options.length === 0) return state;
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
   if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null, cause }, options) : state;
+  // `single`: the one card chosen takes all that is left (04072:A:3 "assigns 3 damage to 1 character").
+  if (instruction.single === true) return placeDamage(state, chosen, instruction.left, ctx.cards, steps, "framework", cause);
   const dealt = placeDamage(state, chosen, 1, ctx.cards, steps, "framework", cause);
   if (instruction.left <= 1) return dealt;
   return queueFront(dealt, [{ instruction: { ...instruction, left: instruction.left - 1 }, seat: focus.seat, chosen: null, cause }]);

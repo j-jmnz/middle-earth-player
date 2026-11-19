@@ -44,6 +44,17 @@ export type StartInput = {
   modeCard?: ModeCard;
 };
 
+// A Nightmare quest card takes a removed stage's place: the stages in the order the quest deck deals them, each code once, a printed stage keeping its record.
+function stagesInDeckOrder(input: StartInput, definition: ScenarioDefinition, effects: readonly Effect[]): ScenarioDefinition["stages"] {
+  const known = new Map(definition.stages.map((stage) => [stage.code, stage]));
+  return [...new Set(questDeckCodes(input.scenario, input.difficulty, input.seatCount))].map((code) => known.get(code) ?? stageOf(code, effects));
+}
+
+// The printed stages, then the Nightmare quest cards after the last one.
+function stagesWithNightmareLast(input: StartInput, definition: ScenarioDefinition, effects: readonly Effect[]): ScenarioDefinition["stages"] {
+  return [...definition.stages, ...(input.scenario.nightmare?.questCards ?? []).map((code) => stageOf(code, effects))];
+}
+
 // The scenario's piles, the campaign card's Setup records (Campaign Mode only) and the campaign's prelude become the engine's start.
 // Printed order: the campaign card's Setup first, then the quest card's. Each prelude card (The One Ring) goes on the
 // Ring-bearer first; the first player's Ring-bearer is the host, so the loadout decides who carries it. The campaign
@@ -116,7 +127,13 @@ export function buildStart(start: StartInput): StartScenario {
   const piles = removedCaves.length > 0 && dealtDecks.cavesDeck ? { ...dealtDecks, cavesDeck: withoutCards(dealtDecks.cavesDeck, removedCaves) } : dealtDecks;
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/brief.md, Nightmare).
   // Its quest cards (a stage after the last printed one) follow the printed stages in the quest deck.
-  if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard, stages: [...definition.stages, ...(input.scenario.nightmare?.questCards ?? []).map((code) => stageOf(code, effects))] };
+  // A Nightmare quest card that takes the place of a stage the setup card removes (Goblin Ambush for Goblin Patrol, 901001:B:3) stands at that stage's place in the order the stages advance in, not after the last one.
+  if (input.difficulty === "Nightmare") {
+    const nightmare = input.scenario.nightmare;
+    const replaces = nightmare?.removed?.some((removed) => removed.pile === "quest") === true && (nightmare.questCards ?? []).length > 0;
+    const stages = replaces ? stagesInDeckOrder(input, definition, effects) : stagesWithNightmareLast(input, definition, effects);
+    definition = { ...definition, nightmareCard: nightmare?.setupCard, stages };
+  }
   return {
     seatCount: input.seatCount,
     seed: input.seed,

@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "32beb5dbf32a388f6c0f5838e0b4b42c7755d6125aa37ab46a7f43622da84ffb"
+        "value": "0b8d1c27b5794f46919c3d18b0984f302f0721aeab15842594aa50f7578a33c3"
       },
-      "fetchedAt": "2026-11-16T12:48:39.139Z",
+      "fetchedAt": "2026-11-17T14:50:17.745Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -451,6 +451,60 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Fate-of-Wilderland",
           "sha256": "f2e1a88d1924552af62c8662c901f06ae16c1fef4cd26a34130dd1b56d6098a9",
           "bytes": 11229
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Into-the-Pit.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Into-the-Pit",
+          "sha256": "ae584a9611170416ce84433d02ff4bd00baf63e7db678bfda3069fede06ac8d8",
+          "bytes": 14122
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Seventh-Level.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Seventh-Level",
+          "sha256": "6513b2107229a98bf816b65019cb2eea2c52934f338cc0f9c02cdffa014be69b",
+          "bytes": 9006
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Flight-from-Moria.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Flight-from-Moria",
+          "sha256": "ea73cecbda3eb0ae4bbc86ddd51d755a73d2818edaef6d56c2c2e5540c2b1997",
+          "bytes": 30119
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Redhorn-Gate.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Redhorn-Gate",
+          "sha256": "cd9fc1897e48a3d99d191ba8167113d5bbecb4cba4dffaca76100ab353a1a6c3",
+          "bytes": 11153
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Road-to-Rivendell.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Road-to-Rivendell",
+          "sha256": "4fa4727ee11f31ee17f1d153cd488bb468826a98e5f3ee8b01a9673c3e7917d0",
+          "bytes": 14524
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Watcher-in-the-Water.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Watcher-in-the-Water",
+          "sha256": "1734d0ea2122ab6ea7bbd146e3786f6203496fb558b506ccd4a3d219997ec93f",
+          "bytes": 10061
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Long-Dark.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Long-Dark",
+          "sha256": "077aad3bcbbd9d569f46aa05118054a8c9367f32048a7802cf2073676f1bb616",
+          "bytes": 11486
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Foundations-of-Stone.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Foundations-of-Stone",
+          "sha256": "1d2f742ae8cdc6138f557d30c4618715333a1bcdde500b47fe9b2f555832eef7",
+          "bytes": 23305
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Shadow-and-Flame.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Shadow-and-Flame",
+          "sha256": "28b4a36f20bd70bda56dc55ca747f8bb82f78586093361fcb13ee07ec3544c66",
+          "bytes": 13081
         }
       ]
     },
@@ -5365,7 +5419,7 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "a78ba78031a143b6958cccca27b716e80853d24fd0a8aeeb87f81b99849b7208"
+        "value": "74577e7b93c8d8de2a5f8b0eaeb0f96b653d990f3b69ffe4a3f96f615afa3ad1"
       },
       "fetchedAt": "2026-11-18T15:28:25.928Z",
       "files": [
@@ -7734,10 +7788,22 @@
           "bytes": 3071325
         },
         {
+          "path": "pictures/03064.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1A-nt7XuJirkyVlbaVdruaEx_aKEbsd5i&export=download&confirm=t",
+          "sha256": "23b7994214054909551ecef00aee48a7f4e73aac74979be7b4fc235ff645fe5b",
+          "bytes": 2915239
+        },
+        {
           "path": "pictures/03065.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=19xtgND21qnbn22jaBoU8hshZgI32Jwgp&export=download&confirm=t",
           "sha256": "dd145846b8a5298c2012e4c2135923423cb94b9ee38db410dd792c6a119da3e6",
           "bytes": 3061475
+        },
+        {
+          "path": "pictures/03065.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=19w3CDxFN3s3kQi5csLbo9oSSBN964MdH&export=download&confirm=t",
+          "sha256": "1e99b812a2511304892230d1d22b835dcbbddc980f87eb43518d2e0337aaf2dc",
+          "bytes": 3023210
         },
         {
           "path": "pictures/03066.A.jpg",
@@ -7746,10 +7812,22 @@
           "bytes": 2885746
         },
         {
+          "path": "pictures/03066.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=19tG8107Fkg2PvoftOPuPIpDka9Jvq1EG&export=download&confirm=t",
+          "sha256": "804ec7684fb928c918059e3a5e29d1b6b5803757e32f02567eae1add7065015e",
+          "bytes": 2834240
+        },
+        {
           "path": "pictures/03067.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1AdXxWzP_CPEqIOFhCm82YflCHNWoMP-p&export=download&confirm=t",
           "sha256": "3f537955833038c83dea007b71a7bbff72d5a9cdaafc383d3b75b4927a4dad98",
           "bytes": 3164074
+        },
+        {
+          "path": "pictures/03067.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1AcnF6UFnb7at8r94ywExyqSihsevAC6b&export=download&confirm=t",
+          "sha256": "f1b72d238c57fd62dca66ebe25908f3814e2e73e31f92223cfaba5ab4a8341a5",
+          "bytes": 2967951
         },
         {
           "path": "pictures/03068.A.jpg",
@@ -7758,10 +7836,22 @@
           "bytes": 3095703
         },
         {
+          "path": "pictures/03068.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1AEVS7wBG3LwlJh7Lp3sH_CUt4J14HWZm&export=download&confirm=t",
+          "sha256": "5690a9393ffc253726a1e20f4cc3a4f56478e93c1441463c6e0ff1013e6325f1",
+          "bytes": 2853964
+        },
+        {
           "path": "pictures/03069.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1A3Yy9hbbsFOA0KUIGbXN0sn8oJp2e2E6&export=download&confirm=t",
           "sha256": "8c3b4ca4bc9cc2eb0b8b292d7242ffbd1a216b4e5cc266ca552d7cde6c99d6b6",
           "bytes": 2928970
+        },
+        {
+          "path": "pictures/03069.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1AmKU9OEViGi_UGIunzXyttIebvz5r4fc&export=download&confirm=t",
+          "sha256": "abbdfa170fe1e74789044d2328419ae3e79780eccb56730ba11125a9555ee84f",
+          "bytes": 2764812
         },
         {
           "path": "pictures/03070.A.jpg",
@@ -7770,8 +7860,20 @@
           "bytes": 2936690
         },
         {
+          "path": "pictures/03070.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1AgnbjUMzoczJkQGKuoKzYsO_gcvPdKIg&export=download&confirm=t",
+          "sha256": "3ba6888cd4e5bc19c943df67e375bd786b18779a90fe57e8de280acff028ff1e",
+          "bytes": 2967778
+        },
+        {
           "path": "pictures/03071.A.jpg",
           "url": "https://images.cardgame.tools/lotr/MEC08-71-front-Quest-Search_for_an_Exit-Heading_Up-A-Flight_from_Moria.jpg",
+          "sha256": "897302e228e9553ea16d31017fbcf797894439fd7cd329112475938b0f7c47d9",
+          "bytes": 965574
+        },
+        {
+          "path": "pictures/03071.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC08-71-back-Quest-Search_for_an_Exit-Heading_Up-A-Flight_from_Moria.jpg",
           "sha256": "897302e228e9553ea16d31017fbcf797894439fd7cd329112475938b0f7c47d9",
           "bytes": 965574
         },
@@ -7782,10 +7884,22 @@
           "bytes": 975681
         },
         {
+          "path": "pictures/03072.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC08-72-back-Quest-Search_for_an_Exit-A_Wrong_Turn-A-Flight_from_Moria.jpg",
+          "sha256": "ecb3e47ba12ba7d87d81a2b90617f47f4bce93c41810593c3d874aa35bd8be73",
+          "bytes": 946898
+        },
+        {
           "path": "pictures/03073.A.jpg",
           "url": "https://images.cardgame.tools/lotr/MEC08-73-front-Quest-Search_for_an_Exit-Narrow_Paths-A-Flight_from_Moria.jpg",
           "sha256": "135f8c1d30b8d24731bc30adcc731da18bc3884f6c5dc7f6efaa1b9833cb575f",
           "bytes": 975681
+        },
+        {
+          "path": "pictures/03073.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC08-73-back-Quest-Search_for_an_Exit-Narrow_Paths-A-Flight_from_Moria.jpg",
+          "sha256": "a03c62ec5fd241b1962e31edaa29afb23267b61c3b076b25df979dbfd8469dae",
+          "bytes": 945607
         },
         {
           "path": "pictures/03074.A.jpg",
@@ -7794,16 +7908,34 @@
           "bytes": 975681
         },
         {
+          "path": "pictures/03074.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC08-74-back-Quest-Search_for_an_Exit-Hasty_Council-A-Flight_from_Moria.jpg",
+          "sha256": "b45876f417c94de180608f31e1e0fd6849461aa3325150ef372ef4c75c469216",
+          "bytes": 978347
+        },
+        {
           "path": "pictures/03075.A.jpg",
           "url": "https://images.cardgame.tools/lotr/MEC08-75-front-Quest-Search_for_an_Exit-Blocked_By_Shadow-A-Flight_from_Moria.jpg",
           "sha256": "135f8c1d30b8d24731bc30adcc731da18bc3884f6c5dc7f6efaa1b9833cb575f",
           "bytes": 975681
         },
         {
+          "path": "pictures/03075.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC08-75-back-Quest-Search_for_an_Exit-Blocked_By_Shadow-A-Flight_from_Moria.jpg",
+          "sha256": "6ad568a442ae815b8fcd9fe24d8beaf13aa8dec4e70c63864f80ccf66851cb5b",
+          "bytes": 999540
+        },
+        {
           "path": "pictures/03076.A.jpg",
           "url": "https://images.cardgame.tools/lotr/MEC08-76-front-Quest-Search_for_an_Exit-Escape_from_Darkness-A-Flight_from_Moria.jpg",
           "sha256": "135f8c1d30b8d24731bc30adcc731da18bc3884f6c5dc7f6efaa1b9833cb575f",
           "bytes": 975681
+        },
+        {
+          "path": "pictures/03076.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC08-76-back-Quest-Search_for_an_Exit-Escape_from_Darkness-A-Flight_from_Moria.jpg",
+          "sha256": "2b440903c7f9059b531e51954b65fedf93814bda496b0bf40c1c24f553b4897d",
+          "bytes": 903410
         },
         {
           "path": "pictures/04001.A.jpg",
@@ -7848,6 +7980,12 @@
           "bytes": 3587948
         },
         {
+          "path": "pictures/040076.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1LoQhH_7BjXhYCtvkhclu5GC8kYiTOkV0&export=download&confirm=t",
+          "sha256": "f9086c8d6a5925d283e88dbbe3e098002d0555a56177a3fb2d7848b14bd20b9c",
+          "bytes": 4396341
+        },
+        {
           "path": "pictures/04008.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1IeTEe-8ilJiR6n5X4Hm0BGk7-XRImpFQ&export=download&confirm=t",
           "sha256": "d54cc166edc5c68933a26978a8f6ca3443b7316c3f42148c14abca63366e2753",
@@ -7872,16 +8010,34 @@
           "bytes": 2930033
         },
         {
+          "path": "pictures/04011.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IuARuDYhT1bEFjgCEAJBQrbohLNtEylA&export=download&confirm=t",
+          "sha256": "7f901c4dbc519b16fd1cbb7611a2a4ce6de28f425e190f00eb6c9e6ea0febf86",
+          "bytes": 2739111
+        },
+        {
           "path": "pictures/04012.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1It04pHAVwTxLJOW13TxA26jb3kOT6pVH&export=download&confirm=t",
           "sha256": "64353aabdeb70fa7d3e523e353c50407e4a0033c22c39147a215ade2cf0ce0ef",
           "bytes": 3025662
         },
         {
+          "path": "pictures/04012.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IrBdRx4dhMNpAYiORZqpgD7q1CVH6wVA&export=download&confirm=t",
+          "sha256": "6dac33d1b57817dbd6f3a3357675d6ea7f0e3d422203bbfd30a9be878c11fabc",
+          "bytes": 2926867
+        },
+        {
           "path": "pictures/04013.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1JF4T8Ol3noi8dzSii6fzfyakDBnNhCxY&export=download&confirm=t",
           "sha256": "fbf652b9986888a2370febc439590cdfe0b2bae9d9d0739451eb934cd7152e0e",
           "bytes": 3031366
+        },
+        {
+          "path": "pictures/04013.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JAbdqAiJDHzXiNQSJbwJdvpzJCmzMPps&export=download&confirm=t",
+          "sha256": "747eb05a243a6a6d3ffc8afb1458d8c3fb3fc4aeac486c6024be759ff8fed446",
+          "bytes": 2981796
         },
         {
           "path": "pictures/04014.A.jpg",
@@ -8034,16 +8190,34 @@
           "bytes": 3118881
         },
         {
+          "path": "pictures/04038.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Kr5u9jTLsT-ikc-rpMeqjdZQzKzhtvtN&export=download&confirm=t",
+          "sha256": "69e3943363967ca47864cfa715c5581c5df32a831c6b7d2b03f51397056675cb",
+          "bytes": 2975365
+        },
+        {
           "path": "pictures/04039.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1Kqqts2oQGmC0u-jDDl4HbLcTk3cPwwHp&export=download&confirm=t",
           "sha256": "7e157b3a3a2f4349f1ebfeb9247a5d8fac05c37f8c773cffae89441b126ef3fd",
           "bytes": 3684428
         },
         {
+          "path": "pictures/04039.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KkNPfSnDOa9uDHkYoCPz0wpZrHun_oiD&export=download&confirm=t",
+          "sha256": "999a9b133a86d4e5129ee9b5a07e6b65593dd7415955e386779c8f6c04ecb7c0",
+          "bytes": 3775437
+        },
+        {
           "path": "pictures/04040.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1LE3kYZS3tlUR9gYucLDUkabPCagm7yRJ&export=download&confirm=t",
           "sha256": "ba9391717f304ec966d68107938bb20b9d52cb5ea4266e20fffc0f246b16828b",
           "bytes": 2953427
+        },
+        {
+          "path": "pictures/04040.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1LE3ND0r4VXMdelPpXmGRyqYja5-qIrdR&export=download&confirm=t",
+          "sha256": "d7be074262cce920792ce799c349d19b580d3604f57a83d1b9a67e854eea43eb",
+          "bytes": 2846810
         },
         {
           "path": "pictures/04041.A.jpg",
@@ -8184,10 +8358,22 @@
           "bytes": 2927799
         },
         {
+          "path": "pictures/04063.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MrFsuklfFqxs0k_k835yrwSfE9kLFanU&export=download&confirm=t",
+          "sha256": "d96c6f467fbf27124cf915e341e64fd72d24295aa910b22645d3b5b5008257cb",
+          "bytes": 3023505
+        },
+        {
           "path": "pictures/04064.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1MnBkPtaRSgx4jqYrHO6qwF9i52Aat2Aj&export=download&confirm=t",
           "sha256": "4d559b8211b343fa6385706d7d1b9088d555a096d57f70c853236f3f430d2d75",
           "bytes": 3255274
+        },
+        {
+          "path": "pictures/04064.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MmTtpfMf9edzsWG7Zld42RsoausUS_Ge&export=download&confirm=t",
+          "sha256": "43694399a445e56316b7c062a584ab52f897e673a613a026fd098dd140f179bc",
+          "bytes": 3162959
         },
         {
           "path": "pictures/04065.A.jpg",
@@ -8322,10 +8508,22 @@
           "bytes": 3065941
         },
         {
+          "path": "pictures/04086.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Sm1t4FHk_LMS4hWR7LvEsCJCO7OUyFzx&export=download&confirm=t",
+          "sha256": "80c795e1b08461387cd900bd916becbbe5d0356545ba42f62be358fcbb50b433",
+          "bytes": 3221624
+        },
+        {
           "path": "pictures/04087.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1ShyjrHkO-XWfyvRcaSNMQyA5gYVVPTda&export=download&confirm=t",
           "sha256": "ecbe5eef663875ae649c849e09f112aeb95d21a77aa83aec8b703f93856286b8",
           "bytes": 3054988
+        },
+        {
+          "path": "pictures/04087.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ScOUarUMioAJyGJxhRbSK7p17u6koxQ1&export=download&confirm=t",
+          "sha256": "ebb6ee52f6bf28e751fdd53da1dbe394e3b04cb101a99ea359d4aa90dae0abc5",
+          "bytes": 3046890
         },
         {
           "path": "pictures/04088.A.jpg",
@@ -8472,10 +8670,22 @@
           "bytes": 3305127
         },
         {
+          "path": "pictures/04111.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1U0QVwX4vzl0j8SQ4k7MBOP21FEb7U8P4&export=download&confirm=t",
+          "sha256": "6c683a982cbad75a71e38ef7b4f8cdd838be5eff00a4e89dcbd9044c9f529c80",
+          "bytes": 3037992
+        },
+        {
           "path": "pictures/04112.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1UUdSVsqF_pt6xttBreW6rYbqZk1SkzkS&export=download&confirm=t",
           "sha256": "836ae14a8a0cbeba6aec3557cf70293c01ae46ca4050bd6778d31dfacefe9ef3",
           "bytes": 3031174
+        },
+        {
+          "path": "pictures/04112.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UTacVE8N7n-p-EtUQfTN4KIEPv2I1cyR&export=download&confirm=t",
+          "sha256": "f50f6214e8b94f980f6b3c4d6ed51c6324dd9be4b9fff572c6e8bb7aef966029",
+          "bytes": 2887429
         },
         {
           "path": "pictures/04113.A.jpg",
@@ -8484,10 +8694,22 @@
           "bytes": 3277397
         },
         {
+          "path": "pictures/04113.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UQgwfv5qTobVxZ0yzO82-Lj-fbR4GGEI&export=download&confirm=t",
+          "sha256": "d3d4dfd32368e774edbdfcde5020b8837290457b962b3ea8d2c5a942c2bded17",
+          "bytes": 3266839
+        },
+        {
           "path": "pictures/04114.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1UQWjeMI2Ytm07ZeALU-G_XPSz9zk27nm&export=download&confirm=t",
           "sha256": "59ff1ff25cffeb29ec9b9c45ea49ee4421e116f82789369b0b4f00d0be71dc27",
           "bytes": 2881406
+        },
+        {
+          "path": "pictures/04114.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UzeRXB6GyzRxn2pGbg7wnkqnL6o5Vim_&export=download&confirm=t",
+          "sha256": "61e3e8f9f4b7f89567f4c9aeb1af39a12651e1e08cfe89cf065d12d47e4ba835",
+          "bytes": 3080774
         },
         {
           "path": "pictures/04115.A.jpg",
@@ -8496,10 +8718,22 @@
           "bytes": 46537
         },
         {
+          "path": "pictures/04115.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC13-115-back-Quest-Below_the_Mines-The_Endless_Caves-A-Foundations_of_Stone.jpg",
+          "sha256": "3463d53142d34bcd279bdfadeb096475fdec8c19067271f9fb738394ede2f75a",
+          "bytes": 51858
+        },
+        {
           "path": "pictures/04116.A.jpg",
           "url": "https://images.cardgame.tools/lotr/MEC13-116-front-Quest-Below_the_Mines-The_Shivering_Bank-A-Foundations_of_Stone.jpg",
           "sha256": "1a3fccb27e7edcceebd472b8b954d9592fb080e8ccca60d885b7d0cbc00b5b81",
           "bytes": 46537
+        },
+        {
+          "path": "pictures/04116.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC13-116-back-Quest-Below_the_Mines-The_Shivering_Bank-A-Foundations_of_Stone.jpg",
+          "sha256": "47b048e4622a24ed3736c0db3f0441a1635b395aa09d2740523d4e0af17c2f65",
+          "bytes": 57522
         },
         {
           "path": "pictures/04117.A.jpg",
@@ -8508,10 +8742,22 @@
           "bytes": 46537
         },
         {
+          "path": "pictures/04117.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC13-117-back-Quest-Below_the_Mines-Old_One_Lair-A-Foundations_of_Stone.jpg",
+          "sha256": "29da7fda5388a8edd3e4817bb69b41628b5045cdd4e3282b4b1ddce27b35be3b",
+          "bytes": 51337
+        },
+        {
           "path": "pictures/04118.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1UZ9FHWgsyY9k0L0hTDrxlKmaJW8keGSa&export=download&confirm=t",
           "sha256": "7eeac3259fce099feb4d7d8376f1cc899f89a5354e11f7b9d8ed6c012cd5a38d",
           "bytes": 2977789
+        },
+        {
+          "path": "pictures/04118.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VMdl6kCjiuMRl-Jmtl_qoZ_vNZnv-JTc&export=download&confirm=t",
+          "sha256": "219849d0663a45b625f48794d396d033a90e80a1158619bd44e8f9a2f526ea5e",
+          "bytes": 3040724
         },
         {
           "path": "pictures/04119.A.jpg",
@@ -8634,16 +8880,34 @@
           "bytes": 3244304
         },
         {
+          "path": "pictures/04138.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1FL0SG50YOUWNqIYz-XDn12qacaHw8IqY&export=download&confirm=t",
+          "sha256": "4f815e1194c11c2e0f8f0a2511d4073e68ab8769954a8f90eb985921997c1cc0",
+          "bytes": 3105499
+        },
+        {
           "path": "pictures/04139.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1FJg2QLq896r0Z5xC6rSYli8OTlhy8HpK&export=download&confirm=t",
           "sha256": "33448daa3cacb2a2e5f95bb7864528ead09f759ec0c154d3be49e3e4dcf70c8e",
           "bytes": 3000731
         },
         {
+          "path": "pictures/04139.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1FH9cb9EcRWWUv3qwyUDFeJbiM-3yVZkD&export=download&confirm=t",
+          "sha256": "609153747f2b55fc3c30b3a20488122968ff34e00888ff59e2401e7873b4d35d",
+          "bytes": 3089205
+        },
+        {
           "path": "pictures/04140.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1GUxT0W1-p2rwU10aIC36cH3hdoLoSncj&export=download&confirm=t",
           "sha256": "73aa8c177f3eaeea90fbbf3023acbbd00742b52127112499acb4bfc65e3775dc",
           "bytes": 3184104
+        },
+        {
+          "path": "pictures/04140.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1GR8_Xq3jXPatWltm2ekAhfdmD_1kG5tv&export=download&confirm=t",
+          "sha256": "6349a7207d311baf512c1a672cb540d9888544cfa39c0ea2f47e4535e42e5c1b",
+          "bytes": 3312297
         },
         {
           "path": "pictures/04141.A.jpg",
@@ -27275,9 +27539,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "03192704f343c4b8dca58ae34a653ed049e5be6d47c148f4265f3f7874f6e65a"
+        "value": "5c535203baa7b6af96cecca46e385c5cf28a3a84aa773b544fafc816b9d3fed7"
       },
-      "fetchedAt": "2026-11-17T01:13:18.877Z",
+      "fetchedAt": "2026-11-17T13:50:12.692Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -27506,6 +27770,42 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec_communitydecklists_theswordsofthenoldor-compressed.pdf",
           "sha256": "f8ba37508167224152585f5f74a6051c787cbedfe2648230a03589dac08a15c6",
           "bytes": 9131141
+        },
+        {
+          "path": "pdf/mec08_khazad-dum_rules_insert.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC08.pdf",
+          "sha256": "19d3d466f740a35c62021463876943d1cfc013fc282fc35bed819aa8e64ea685",
+          "bytes": 1431643
+        },
+        {
+          "path": "pdf/mec10_road_to_rivendell_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC10.pdf",
+          "sha256": "bcfecb41eb90412e363ad7044e4b85876cae948e6101c4c622db72e9bb65b33e",
+          "bytes": 1015749
+        },
+        {
+          "path": "pdf/mec11_the_watcher_in_the_water_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC11.pdf",
+          "sha256": "6c91bb51bcbe60f7703a0297f37d6f14801c80148ecc7dcfee9695757ee87ecb",
+          "bytes": 1089673
+        },
+        {
+          "path": "pdf/mec12_the_long_dark_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC12.pdf",
+          "sha256": "cf97f9a8b7b27586c72c8e897863de9b13ab9a60dc187523fc95fd86d7ee05a3",
+          "bytes": 1031579
+        },
+        {
+          "path": "pdf/mec13_foundations_of_stone_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC13.pdf",
+          "sha256": "615f309779c1975649d7323c5be7b9ad95424577ec87f9bb59608873fe424503",
+          "bytes": 956458
+        },
+        {
+          "path": "pdf/mec14_shadow_and_flame_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC14.pdf",
+          "sha256": "752af536482b2a4774452ee999edd1e9ad2b98c9d3d7a53bdbbf54b3c7a7a55b",
+          "bytes": 1484601
         }
       ]
     },
@@ -27514,7 +27814,7 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "393ec0c64cbde95baacff0a255d6abf06f34f1f857c678c25b867edc3d9098c4"
+        "value": "4882114bb7880b017ba86cde2bc28dd57815bc9565c6f93289a48be0f2f28358"
       },
       "fetchedAt": "2026-11-18T15:20:02.260Z",
       "files": [
@@ -29125,6 +29425,1152 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Return-to-Mirkwood/Attercop-Attercop.jpg",
           "sha256": "3d6ea29a178ee2c43ec1d2ee9b5061b085b7d50103fbf675519211c908273ad0",
           "bytes": 127869
+        },
+        {
+          "path": "scans/03014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Patrol-Leader.jpg",
+          "sha256": "7c1a8216438fcbb0ca9a0910d0fae6786b023e8d63216815cf5fdb67c9de55d8",
+          "bytes": 147804
+        },
+        {
+          "path": "scans/03015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Signs-of-Conflict.jpg",
+          "sha256": "c21543c24b7bf130e5e7c102287a1a46a84f8b8b6072b96c447dc9c6c66da673",
+          "bytes": 159078
+        },
+        {
+          "path": "scans/03016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/East-gate.jpg",
+          "sha256": "ad78fb8b9d490756899a4a929f75a2623a91c79ed53ab87ba790f96f31a45e59",
+          "bytes": 152400
+        },
+        {
+          "path": "scans/03017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/First-Hall.jpg",
+          "sha256": "56729810ea6b00f5ffa5d1fe9daaf8ef176994505b6c6ac7df6c7b98459f7bbd",
+          "bytes": 139515
+        },
+        {
+          "path": "scans/03018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Bridge-of-Khazad-dûm.jpg",
+          "sha256": "0d4f3c3f77d402fb97f4f21203ca05b9db3a256c3ab1c72506a993b7c19d25bb",
+          "bytes": 143927
+        },
+        {
+          "path": "scans/03019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Stairs-of-Náin.jpg",
+          "sha256": "fc9e1f5aad9799a1b5f114f13c6e06ac57f1340887785c11400767dd251643c3",
+          "bytes": 132293
+        },
+        {
+          "path": "scans/03020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Cave-troll.jpg",
+          "sha256": "a7a65c446e48672cc6f4c24ee43db095c201cf8aefb716b65689722f7d17d496",
+          "bytes": 144780
+        },
+        {
+          "path": "scans/03021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Orc-Horn-Blower.jpg",
+          "sha256": "e608ca41e04972bbefa3168bbfb2484ef3df6320d90adcbb83adc57aecfeefe2",
+          "bytes": 143888
+        },
+        {
+          "path": "scans/03022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Hidden-Threat.jpg",
+          "sha256": "3587fab470d4fc6b856e8a4f70d09ae2c0bf45e88f7f06a0754f073f90e49032",
+          "bytes": 139309
+        },
+        {
+          "path": "scans/03023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Upper-Hall.jpg",
+          "sha256": "961259130e882047f64ca6dd7785e4ea388b1935db937e5452d802cda03d672a",
+          "bytes": 145566
+        },
+        {
+          "path": "scans/03024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Book-of-Mazarbul.jpg",
+          "sha256": "9bf34b32f3843d61264bdc978aaa4bbe5ebb2b724ed3e5173c462cddd97e4fe6",
+          "bytes": 142182
+        },
+        {
+          "path": "scans/03025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/The-Nameless-Fear.jpg",
+          "sha256": "62e7a21eb7d6fa8ba34a34e91f885f79235d6e79b68d4b24762a43e47e0ff665",
+          "bytes": 141093
+        },
+        {
+          "path": "scans/03026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/New-Devilry.jpg",
+          "sha256": "0433906161e57a1b2a7e7ec6a6fbf1732d166fbdcaf8d515ef4464dabe78d1ec",
+          "bytes": 137072
+        },
+        {
+          "path": "scans/03027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Shadow-of-Fear.jpg",
+          "sha256": "c53829df66799b6559334cc41c6cd7115e256671a25b222dccb17e99728ffd84",
+          "bytes": 152907
+        },
+        {
+          "path": "scans/03028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Foe-Beyond.jpg",
+          "sha256": "f98c41ca6ac7427be71a89247c70742bec5d25ff575b5efec1d8b8ebef83a30d",
+          "bytes": 147656
+        },
+        {
+          "path": "scans/03029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Abandoned-Tools.jpg",
+          "sha256": "e613720e1f0da5c82ab1c36c268dfa9620b2b6ecd406d508d49076daffdcb7f8",
+          "bytes": 142537
+        },
+        {
+          "path": "scans/03030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Chieftain-of-the-Pit.jpg",
+          "sha256": "851643c14f3387b08a0e3a6417946c73e6f5cef179ddfe6b6eec81cb3621823d",
+          "bytes": 150335
+        },
+        {
+          "path": "scans/03031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Spearman.jpg",
+          "sha256": "5213b40d18e14fc37ff4c2e5e773809ea3ed1dba2a325a8bb17dcb880be05498",
+          "bytes": 132913
+        },
+        {
+          "path": "scans/03032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Archer.jpg",
+          "sha256": "d9a41c01d800d9ecb224880ab8b6b20edd0b46340c0919f1f21aee4f6be5ea5d",
+          "bytes": 146959
+        },
+        {
+          "path": "scans/03033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Undisturbed-Bones.jpg",
+          "sha256": "befcf734f0011208ba4ce73c3e77dbd088f5f0616a2b4d8834fdc0fac6b05bde",
+          "bytes": 147335
+        },
+        {
+          "path": "scans/03034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Plundered-Armoury.jpg",
+          "sha256": "b8d4e4e23b3941a997555f0fe0554f6380d2c2a8ac45d9e9d83cd4359349d8e6",
+          "bytes": 145404
+        },
+        {
+          "path": "scans/03035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Follower.jpg",
+          "sha256": "a3d6731b2b6c5e6ec63f357ec76645976d88c648ecaf2a56469049a1457c749e",
+          "bytes": 145062
+        },
+        {
+          "path": "scans/03036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Branching-Paths.jpg",
+          "sha256": "47ebf9c678db1fc085581dbe82fad907b3f9b091e96fc5ceccb30c3442e44d24",
+          "bytes": 157509
+        },
+        {
+          "path": "scans/03037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Lightless-Passage.jpg",
+          "sha256": "eb09553035fe5f504871d9831469c20489a032877b765656bf6c27eab78a6e7f",
+          "bytes": 142091
+        },
+        {
+          "path": "scans/03038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Zigil-Mineshaft.jpg",
+          "sha256": "e77a8af19e4c872c0f57ed012692666fb0ce12b0a2ed154ec8174133ba0ec8f9",
+          "bytes": 140744
+        },
+        {
+          "path": "scans/03039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Many-Roads.jpg",
+          "sha256": "58a1134f523b894473d1070e2452cf42871c714d50d44127de38640bba4b482d",
+          "bytes": 146292
+        },
+        {
+          "path": "scans/03040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Burning-Low.jpg",
+          "sha256": "a96cb5987331b75db4d280aaf52605eae4519a45c7d31a26ad381f19a445420d",
+          "bytes": 147267
+        },
+        {
+          "path": "scans/03041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Cave-Torch.jpg",
+          "sha256": "1b2d9631f7559ecec649c755439efb5c7ae738a75f4433d3c638fc5275a3fd67",
+          "bytes": 131795
+        },
+        {
+          "path": "scans/03042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Great-Cave-troll.jpg",
+          "sha256": "885776525a415f4db65f1bb9376c4fa5ff5ff1a3f205e95db2de2c022165bc73",
+          "bytes": 142915
+        },
+        {
+          "path": "scans/03043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Orc-Drummer.jpg",
+          "sha256": "01cee258820863198ab21a31b6a6e830acd4c21f31aff975a2ee056ce7ac450b",
+          "bytes": 141829
+        },
+        {
+          "path": "scans/03044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Stray-Goblin.jpg",
+          "sha256": "840f6ef7408ddfa70d363abf71584edc1b734008a7fc1c7994aaf1717618df4e",
+          "bytes": 145117
+        },
+        {
+          "path": "scans/03045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Chance-Encounter.jpg",
+          "sha256": "ddf160517682113d2ec88c4605a40916713fce08ed14b9e1d1f61bc8c22e27aa",
+          "bytes": 159645
+        },
+        {
+          "path": "scans/03046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Massing-in-the-Deep.jpg",
+          "sha256": "fc412a420ab4493bce3702604bfc9383e62ab57da6a7ec6a9cd45cbc359954c5",
+          "bytes": 141738
+        },
+        {
+          "path": "scans/03047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/The-Mountains'-Roots.jpg",
+          "sha256": "c219bedd3815940fe93145b7317dff8556afed906282834bda13166299d4a1d0",
+          "bytes": 146207
+        },
+        {
+          "path": "scans/03048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Cave-In.jpg",
+          "sha256": "b189d8cfbc7aa3a2425ca78f819c2e6a19937e26500fa128b20da71ac17470da",
+          "bytes": 138088
+        },
+        {
+          "path": "scans/03049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Crumbling-Ruin.jpg",
+          "sha256": "8dac170647d6946a42a33a8b3bf688e94c95d319721cb09fe7117ee0c198a283",
+          "bytes": 138848
+        },
+        {
+          "path": "scans/03050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Dark-and-Dreadful.jpg",
+          "sha256": "2d18c83e5db0dd8e8e16c882f1b08e33ba61838378f385e4fc0a73dffbc4fdec",
+          "bytes": 138284
+        },
+        {
+          "path": "scans/03051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Sudden-Pitfall.jpg",
+          "sha256": "2e56dbf141deba78e9c887467481ac7ea1025f5d30f48e72291ecb35d8e1d168",
+          "bytes": 136565
+        },
+        {
+          "path": "scans/03052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Dreadful-Gap.jpg",
+          "sha256": "29267e0627ec72c0bddf6d56b914944081eb742ac7b97e541dfccfd3f1fe7a37",
+          "bytes": 142323
+        },
+        {
+          "path": "scans/03053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Fouled-Well.jpg",
+          "sha256": "7c55de12680caebf2da7195b516d8e69e4d4626424eb7690aaab95e8021a13d8",
+          "bytes": 146667
+        },
+        {
+          "path": "scans/03054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Black-Uruks.jpg",
+          "sha256": "3753b28b49007c37653f5b90b5bf6bfa598aaadaa785fc339114e15516f5b717",
+          "bytes": 143903
+        },
+        {
+          "path": "scans/03055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Mountain-Warg.jpg",
+          "sha256": "71ded46fdbd0ee03a255ccf3affaafd91b955c3f055f003ce47f11c59c1a04ff",
+          "bytes": 149011
+        },
+        {
+          "path": "scans/03056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Bitter-Wind.jpg",
+          "sha256": "077896bd8e97c66495d4070f7e09cf915c7cced6301102c66a616f539341227f",
+          "bytes": 135490
+        },
+        {
+          "path": "scans/03057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Knees-of-the-Mountain.jpg",
+          "sha256": "39b312432f675e31ed4153a9106468d5c4b94b3699f352f460e0b7f8cc582c56",
+          "bytes": 134829
+        },
+        {
+          "path": "scans/03058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Turbulent-Waters.jpg",
+          "sha256": "45212acb922028bc38ff081a93c94d1f2971437b46f023e2a2619cb63459caf3",
+          "bytes": 144966
+        },
+        {
+          "path": "scans/03059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Warg-Lair.jpg",
+          "sha256": "c4b9837aa6a11e1f5f6a7fab3ff4a2409759bd097e826b4129ecc7f9a6dbcd6f",
+          "bytes": 155418
+        },
+        {
+          "path": "scans/03060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Scout.jpg",
+          "sha256": "c133b2783f17c5a4e96b18926f51ff37e1a78d95a8656f619e03933cded1e04d",
+          "bytes": 132312
+        },
+        {
+          "path": "scans/03061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Swordsman.jpg",
+          "sha256": "4c410e54d6eaa74834065034aa5c7d77da3188f558b7dfc60c213cc28a97c10a",
+          "bytes": 141666
+        },
+        {
+          "path": "scans/03062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Watchful-Eyes.jpg",
+          "sha256": "146ff2582339b2847da1105d07e9d4e131c5de042c1a6c2e14f4689275dd6087",
+          "bytes": 139976
+        },
+        {
+          "path": "scans/03063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Tunnels.jpg",
+          "sha256": "2578019833381b6df171e70a64b1397727d4dae8b7b481a4aaa396814781fd0e",
+          "bytes": 145453
+        },
+        {
+          "path": "scans/03064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Entering-the-Mines-1A.jpg",
+          "sha256": "30fef5461e54cce3e3b9af6b287c16c9dbb44fec09e7b019c1f8eb448ce36cbd",
+          "bytes": 145650
+        },
+        {
+          "path": "scans/03064.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Entering-the-Mines-1B.jpg",
+          "sha256": "1b8533b72bb909e8ab9f2e8f9ece2d340326168f453a8e20b2ba94843ea6135f",
+          "bytes": 121345
+        },
+        {
+          "path": "scans/03065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Patrol-2A.jpg",
+          "sha256": "5139001920696c67326c569f3dab08a73f984ae3b77e0df68ce416bb2c57772e",
+          "bytes": 127411
+        },
+        {
+          "path": "scans/03065.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Goblin-Patrol-2B.jpg",
+          "sha256": "721bf9b466a1fd6928cc5ccba25062ba0f9e1c73080fafd4bdcdc6d440eefa6d",
+          "bytes": 130102
+        },
+        {
+          "path": "scans/03066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Way-Up-3A.jpg",
+          "sha256": "10c23ca611b64920c596fb924dc36f71f095dc447caba8c959b2ed2d11ac054d",
+          "bytes": 123245
+        },
+        {
+          "path": "scans/03066.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Way-Up-3B.jpg",
+          "sha256": "55b5256ab73c082b20ba7cada417658b9373b6a038f1258f235fa501d566452a",
+          "bytes": 115615
+        },
+        {
+          "path": "scans/03067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-the-Chamber-1A.jpg",
+          "sha256": "958253ce6e38261acb2cc6a7aa067fcfdb07c2e60acbdc0a6aad17fe6363d709",
+          "bytes": 146861
+        },
+        {
+          "path": "scans/03067.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-the-Chamber-1B.jpg",
+          "sha256": "0e4d9301fe08053ea5031df0cb016df95bee759b4372467d971d6c7dd698ffbd",
+          "bytes": 128678
+        },
+        {
+          "path": "scans/03068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/The-Fate-of-Balin-2A.jpg",
+          "sha256": "2a1114ce8054859a3cef81c17a6a7be327c269c03b23f35adcb7b76d7564accc",
+          "bytes": 131330
+        },
+        {
+          "path": "scans/03068.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/The-Fate-of-Balin-2B.jpg",
+          "sha256": "5426140cb1aee1fc877234b12cdca3b1283f40165cf0e38a5365c0c57ceb2d58",
+          "bytes": 123046
+        },
+        {
+          "path": "scans/03069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Presence-in-the-Dark-1A.jpg",
+          "sha256": "2e0850fc66753f995da2929f9c3a32acdfb76e5c5810d50990f64f5e291568b4",
+          "bytes": 116263
+        },
+        {
+          "path": "scans/03069.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/A-Presence-in-the-Dark-1B.jpg",
+          "sha256": "02d0c4c6b253a1168d6a241917e7d444b499e16d182bd256748d65ae501dabd9",
+          "bytes": 108076
+        },
+        {
+          "path": "scans/03070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Heading-Down-2A.jpg",
+          "sha256": "162da2750fc726f820d84eec0e2d7066228acea4384cf546e614b0041e46cd24",
+          "bytes": 119044
+        },
+        {
+          "path": "scans/03070.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Heading-Down-2B.jpg",
+          "sha256": "318f471ee77f9e5933e6e78e3e7672840e998984b0d697af6fdfccd0074e3d67",
+          "bytes": 120502
+        },
+        {
+          "path": "scans/03071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Heading-Up-2A.jpg",
+          "sha256": "a935dba584303b8b37c8fd3e02d27e465336f074febb7ce3d98512b867349700",
+          "bytes": 119044
+        },
+        {
+          "path": "scans/03071.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Heading-Up-2B.jpg",
+          "sha256": "acd202ae5c445e2b390aad572a48702c6ea76455a6fcc39f9b352fff9340432a",
+          "bytes": 123645
+        },
+        {
+          "path": "scans/03072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-A-Wrong-Turn-2A.jpg",
+          "sha256": "e348448a2ae870b67d69c192d2efb3f2cec030c4a2221681f4ca01cfc7e8068a",
+          "bytes": 119044
+        },
+        {
+          "path": "scans/03072.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-A-Wrong-Turn-2B.jpg",
+          "sha256": "2b06ff2b5cbe76ec95155ebf9a14fecac6a2fbbde04b44c7c9b93a024dcdfc7c",
+          "bytes": 120398
+        },
+        {
+          "path": "scans/03073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Narrow-Paths-2A.jpg",
+          "sha256": "a3d4336f05a4febd728e3bc90c27e0aca1bf3524ee9d150f6c70974069ff44c4",
+          "bytes": 119044
+        },
+        {
+          "path": "scans/03073.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Narrow-Paths-2B.jpg",
+          "sha256": "003a6f6169297946b079761b838f29e3b1da69cc38c6a6ed90b8a530e74acc30",
+          "bytes": 147600
+        },
+        {
+          "path": "scans/03074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Hasty-Council-2A.jpg",
+          "sha256": "b6686bbfd71fcfaf21a7abb9e91d55439250c8754b6e5052901a694f31896975",
+          "bytes": 119044
+        },
+        {
+          "path": "scans/03074.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Hasty-Council-2B.jpg",
+          "sha256": "aa0378c8273d144b80facb8b55c4ab419d6e36ffa5ba0e3512b9c78dcde52bf6",
+          "bytes": 114813
+        },
+        {
+          "path": "scans/03075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Blocked-By-Shadow-2A.jpg",
+          "sha256": "8ef3dd58b8dcf275d76294161dc9affbae53d46442756ac4219aa3bdd4142584",
+          "bytes": 119044
+        },
+        {
+          "path": "scans/03075.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Blocked-By-Shadow-2B.jpg",
+          "sha256": "ce031a283058bb840312400bdbecbcd9df5069867ac00da5f4c1d604203ad989",
+          "bytes": 141426
+        },
+        {
+          "path": "scans/03076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Escape-from-Darkness-2A.jpg",
+          "sha256": "b0e46f26717e22f5f79723a28386d41de8fed8383c5b809573f04e5042aafcdd",
+          "bytes": 119044
+        },
+        {
+          "path": "scans/03076.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Khazad-dum/Search-for-an-Exit-Escape-from-Darkness-2B.jpg",
+          "sha256": "ae7a90a709e080e2d3974312f06c370f3cb86ca8d261920ca33875285e48eb62",
+          "bytes": 135014
+        },
+        {
+          "path": "scans/040076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Wrapped.jpg",
+          "sha256": "18c5a70d6da2802d55a9b429f0a3283210ddc513887000088acf9a7cbb87c137",
+          "bytes": 156141
+        },
+        {
+          "path": "scans/04011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Up-the-Pass-1A.jpg",
+          "sha256": "cd70505def5966c33a717cde8e1f9053d075acaeb9a491d884aa25a8f5b79a4f",
+          "bytes": 142591
+        },
+        {
+          "path": "scans/04011.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Up-the-Pass-1B.jpg",
+          "sha256": "862c4ec1a2427ae037c87a27c764bece3ec27cb44865f1ac07c652ce868c983a",
+          "bytes": 136874
+        },
+        {
+          "path": "scans/04012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Snowdrifts-2A.jpg",
+          "sha256": "817f15f8253bb78ec1662c502545a20de700eb792d641eead46089cd83cb7a9e",
+          "bytes": 142849
+        },
+        {
+          "path": "scans/04012.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Snowdrifts-2B.jpg",
+          "sha256": "257cbe229e99cabca445dd986ff75a6cfb450da18b4e93f72b90033f79050e8d",
+          "bytes": 128616
+        },
+        {
+          "path": "scans/04013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/The-Mountains'-Peaks-3A.jpg",
+          "sha256": "b3a1915c66951bb10ee1a9f4a683fb47c8378eddf121163b3a043fdafb057c66",
+          "bytes": 145273
+        },
+        {
+          "path": "scans/04013.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/The-Mountains'-Peaks-3B.jpg",
+          "sha256": "7464ea43b63a9a4da81f0b46e3615b972ae04ea092ac91f609d9f5a75a3546b7",
+          "bytes": 149142
+        },
+        {
+          "path": "scans/04014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Arwen-Undómiel.jpg",
+          "sha256": "7b9c74a2e983ae136adcbc11b54519efd1a9a9c5db59ef9ee53bee193dd08b08",
+          "bytes": 145480
+        },
+        {
+          "path": "scans/04015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Caradhras.jpg",
+          "sha256": "b4fb2ae8b8662dc218d99a0da64c5f5507713ff8a0b6287e90f4e0b501b08adb",
+          "bytes": 138555
+        },
+        {
+          "path": "scans/04016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Fanuidhol.jpg",
+          "sha256": "e6c303f2b1c2574e58de90202b91d78c2f92ea66ad6a472a81fada81937985ad",
+          "bytes": 141328
+        },
+        {
+          "path": "scans/04017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Celebdil.jpg",
+          "sha256": "ec9863d24322993300e9c10a8645674503bf5e7dea36f0ad64e4312260f3845f",
+          "bytes": 139570
+        },
+        {
+          "path": "scans/04018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/The-Dimrill-Stair.jpg",
+          "sha256": "af113b6314aa53638cfd313b259794aed009f1c5c52af5349380fbe1bb0097f8",
+          "bytes": 139463
+        },
+        {
+          "path": "scans/04019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Rocky-Crags.jpg",
+          "sha256": "8dd42004633e0b2df87c448384930c5d5434908964b1d272861a83cc64093d8e",
+          "bytes": 135207
+        },
+        {
+          "path": "scans/04020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Fell-Voices.jpg",
+          "sha256": "57387b0f05b6261b623c7856962c859a908c3935a7152440762d591a76b42bf8",
+          "bytes": 143736
+        },
+        {
+          "path": "scans/04021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Fallen-Stones.jpg",
+          "sha256": "aa04189816cface7a0cb0569d58795a894204766320cc05012a04ad89eeb66d3",
+          "bytes": 155687
+        },
+        {
+          "path": "scans/04022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Snowstorm.jpg",
+          "sha256": "c65958371e2246478a4722afc08cab88a3ad84ad8b0715ef116d52ea5cd4d80d",
+          "bytes": 141688
+        },
+        {
+          "path": "scans/04023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Freezing-Cold.jpg",
+          "sha256": "8f645b9524bcceeb81ab47865b5a5bf94d8bd9e99972d7102498eeb5ab88099d",
+          "bytes": 147539
+        },
+        {
+          "path": "scans/04024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Avalanche.jpg",
+          "sha256": "389e6a38b5d8ba402fbc3d9875a1c7f0e4503a5cbf059030c68848eb4b985fb8",
+          "bytes": 134691
+        },
+        {
+          "path": "scans/04025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Mountain-Goblin.jpg",
+          "sha256": "c58a74e866bd2edbcaca576987abdf611d223b703d4a85e7663fd83cbb312c0a",
+          "bytes": 142072
+        },
+        {
+          "path": "scans/04026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Mountain-Troll.jpg",
+          "sha256": "54cdfac57659592245803e59d7d322a7db1241b248e372e104e2d2372d5be47d",
+          "bytes": 141009
+        },
+        {
+          "path": "scans/04027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Redhorn-Gate/Snow-Warg.jpg",
+          "sha256": "922b3fe562a9d5585ca0a55920d38b5e4e4405e0dd7ca450207b192a60be2781",
+          "bytes": 963587
+        },
+        {
+          "path": "scans/04038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Along-the-Misty-Mountains-1A.jpg",
+          "sha256": "0c0997420d38ad4a80fb67a85841142cdcae8e8f158f43424944ca60d10516ad",
+          "bytes": 137754
+        },
+        {
+          "path": "scans/04038.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Along-the-Misty-Mountains-1B.jpg",
+          "sha256": "e167a91c264a7a4762883d8d2f838eee23c89d1cfb709606a41a73135aef63c2",
+          "bytes": 124423
+        },
+        {
+          "path": "scans/04039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Orc-Outpost-2A.jpg",
+          "sha256": "fd53900b76ffd23569c621c5ed48a9320dc148b663f05aeefbd112d406a309cf",
+          "bytes": 148724
+        },
+        {
+          "path": "scans/04039.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Orc-Outpost-2B.jpg",
+          "sha256": "4de085480aa197b8fa45f26841e21985fab1d13bd75222becd384d706c1fee37",
+          "bytes": 128192
+        },
+        {
+          "path": "scans/04040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Approaching-Rivendell-3A.jpg",
+          "sha256": "9eff5dc923088f3195ecb726eb31d4d8c2ecbf6c89a73dbdbc83e91dd31478c2",
+          "bytes": 123927
+        },
+        {
+          "path": "scans/04040.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Approaching-Rivendell-3B.jpg",
+          "sha256": "7215fe817f246caf2acb4ef180477d034238d38e0c0f428e92976b81c91884f8",
+          "bytes": 115841
+        },
+        {
+          "path": "scans/04041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Arwen-Undómiel.jpg",
+          "sha256": "d77f9a3bde82ed11ee990896656beefc15ffb528a44c04e7056558b1e9161714",
+          "bytes": 146139
+        },
+        {
+          "path": "scans/04042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Ruined-Road.jpg",
+          "sha256": "60a070f1a4e94fcc4dbc0503cd1a1df8e6a665641b69b62e65c3cb20e8bed027",
+          "bytes": 144076
+        },
+        {
+          "path": "scans/04043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Goblin-Gate.jpg",
+          "sha256": "81cd9bd3a640096bcb745c89830d2a507eba4f5dbee4715a5dc641c6cf2e72eb",
+          "bytes": 155443
+        },
+        {
+          "path": "scans/04044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Pathless-Country.jpg",
+          "sha256": "2c22a3d792ebecf579a64b9cf2420042b1c64d43f7123f72e09b3932776bf036",
+          "bytes": 137900
+        },
+        {
+          "path": "scans/04045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Barren-Hills.jpg",
+          "sha256": "8940917c35c71bffa9aec7b981ab91a22614c611fb068472dd7d92eae1e336df",
+          "bytes": 133809
+        },
+        {
+          "path": "scans/04046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Sleeping-Sentry.jpg",
+          "sha256": "6f1b6a501e0b96b903138233f5c8712abc583d889129d5acd6d13fee6295cc75",
+          "bytes": 128269
+        },
+        {
+          "path": "scans/04047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Followed-by-Night.jpg",
+          "sha256": "b8019e6a080ae04325eeebff20d98b56328903553861bade0857ce30d6807b78",
+          "bytes": 140358
+        },
+        {
+          "path": "scans/04048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Orc-Ambush.jpg",
+          "sha256": "e1edcbbe77027b6266c0c1c763aa7b4f5951808d9e063c45ada37614982daafd",
+          "bytes": 141097
+        },
+        {
+          "path": "scans/04049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Goblin-Taskmaster.jpg",
+          "sha256": "eb712b4dc76f7443754ab6bb2c67cc8a977724f83c4faad73f17638d16400d61",
+          "bytes": 144841
+        },
+        {
+          "path": "scans/04050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Orc-Raiders.jpg",
+          "sha256": "9547a71a812c8849a8f69f95a1bd03f5fff04dd540a927a5c7333abd83f1731e",
+          "bytes": 143197
+        },
+        {
+          "path": "scans/04051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Crebain.jpg",
+          "sha256": "b7eb5e5ca73c63f5450e1af1872dcf5f2e0ead1af25bcc42d39b2fb0f8038a8d",
+          "bytes": 136043
+        },
+        {
+          "path": "scans/04052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Wild-Bear.jpg",
+          "sha256": "c3399bd5cd5ecfa3b4991dafee808253736f3c5849c5b266da9b074fb0137c3c",
+          "bytes": 134915
+        },
+        {
+          "path": "scans/04063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/To-the-West-door-1A.jpg",
+          "sha256": "2be14619bb06cbda9b1eb941f50cc590d3988e917951d074e92c87788cb502fe",
+          "bytes": 131752
+        },
+        {
+          "path": "scans/04063.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/To-the-West-door-1B.jpg",
+          "sha256": "7fa59ca65d82c8b284c1e06b73e13b25fa8fd9c6c2fa4655ddcf851ec8862987",
+          "bytes": 135589
+        },
+        {
+          "path": "scans/04064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/The-Seething-Lake-2A.jpg",
+          "sha256": "54dabea33f9620875fe57506a0b56376d479f1a1d4fbf996dee062a5c2b95745",
+          "bytes": 145623
+        },
+        {
+          "path": "scans/04064.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/The-Seething-Lake-2B.jpg",
+          "sha256": "bb1ade9f6e5db3be70324f8c89a3379f8846a9f5683a3527b1a943da530fd26c",
+          "bytes": 133961
+        },
+        {
+          "path": "scans/04065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Doors-of-Durin.jpg",
+          "sha256": "ae43767339ffb654eea51d85ba59c248673fecc75cd31dc678d47408337e1dd6",
+          "bytes": 145213
+        },
+        {
+          "path": "scans/04066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Stair-Falls.jpg",
+          "sha256": "b60cf6f70c305794074048467b36d957fef60089bda04d2bf5b0bc539c35cac7",
+          "bytes": 128788
+        },
+        {
+          "path": "scans/04067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Perilous-Swamp.jpg",
+          "sha256": "22cf90c3996989fb3162d40199aefb766ce1c2fbbddee8deecde8e536962805d",
+          "bytes": 143790
+        },
+        {
+          "path": "scans/04068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Makeshift-Passage.jpg",
+          "sha256": "67ec82b77aba377fbaccb675754fe843a8c00a853c3a1f3c0b5ea7f4bab6ba6e",
+          "bytes": 148678
+        },
+        {
+          "path": "scans/04069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Stagnant-Creek.jpg",
+          "sha256": "2c969a554acb0c01787b82c9e35d5bc4ef6ce99925f71af96ab109ebb83cdaa3",
+          "bytes": 145528
+        },
+        {
+          "path": "scans/04070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Ill-Purpose.jpg",
+          "sha256": "a574250e5a9fd275547d962bad307e3e5d0db29c0793c3b417d3fe191afad48a",
+          "bytes": 152705
+        },
+        {
+          "path": "scans/04071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Disturbed-Waters.jpg",
+          "sha256": "8bb2b5fd48af735289288d4820a5c8cdfa65c5b50b8e4a0726fd919e4c7a67c0",
+          "bytes": 141426
+        },
+        {
+          "path": "scans/04072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/The-Watcher.jpg",
+          "sha256": "9d38ec2fe8a48625b6560563cda6a90b17a4a93b9b7ba3d03e0b502d1e7fdf14",
+          "bytes": 143960
+        },
+        {
+          "path": "scans/04073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Grasping-Tentacle.jpg",
+          "sha256": "6e51d11c6cb17b9295ec7e1993fa2a00896df5b0743a218468e481f1d021e119",
+          "bytes": 147846
+        },
+        {
+          "path": "scans/04074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Thrashing-Tentacle.jpg",
+          "sha256": "edc39586f99bcff4baae99ab84ca2a626e1075a61fca60b18d8993e0899c8a3f",
+          "bytes": 145360
+        },
+        {
+          "path": "scans/04075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Watcher-in-the-Water/Striking-Tentacle.jpg",
+          "sha256": "706012db596f30b2cea645dd410852cd5b72f51ae6f531c158c7f750b7affc7f",
+          "bytes": 138195
+        },
+        {
+          "path": "scans/04086.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Journey-in-the-Black-Pit-1A.jpg",
+          "sha256": "94782662a96522f63abdf969b056adee3bef6fba7b3606d6a07a6995eee44d1a",
+          "bytes": 148678
+        },
+        {
+          "path": "scans/04086.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Journey-in-the-Black-Pit-1B.jpg",
+          "sha256": "f1f544129ae7e75f0e21f8f7e2da7d1e729df33e89ea3a73ba92c0d76886ee30",
+          "bytes": 160708
+        },
+        {
+          "path": "scans/04087.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Continuing-Eastward-2A.jpg",
+          "sha256": "ef0c742cace2a5ba045fde0267a2f3b60efd7245f49996570bc48f6a1b7924eb",
+          "bytes": 144148
+        },
+        {
+          "path": "scans/04087.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Continuing-Eastward-2B.jpg",
+          "sha256": "7e770119294f7be226eae708f06a0db755ea9e177f086c67853ae29fce8329aa",
+          "bytes": 140409
+        },
+        {
+          "path": "scans/04088.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Durin's-Greaves.jpg",
+          "sha256": "0e30d2c2f0869ee7759764e9458b2bbdb29f51442a91c2381ee8125cee7d6c72",
+          "bytes": 132475
+        },
+        {
+          "path": "scans/04089.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Abandoned-Mine.jpg",
+          "sha256": "7fa608f6945bc11f0518dc9bf1be6ad5529ec0293064eee54aede9e29ec71232",
+          "bytes": 140423
+        },
+        {
+          "path": "scans/04090.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Dwarven-Forge.jpg",
+          "sha256": "70af17e68501d890e5deffb8c415dc12408fdd4c9f53fcc262c154ead870ec5d",
+          "bytes": 141945
+        },
+        {
+          "path": "scans/04091.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Silent-Caverns.jpg",
+          "sha256": "bc83cd03d5d88c63815f5c566df89aa0697e53a502393cba7e23a25811390f1f",
+          "bytes": 137731
+        },
+        {
+          "path": "scans/04092.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Twisting-Passage.jpg",
+          "sha256": "4d224abff2768a10527a5aa1e78a005618905ac71073e612249994298e7d5d82",
+          "bytes": 152992
+        },
+        {
+          "path": "scans/04093.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Fatigue.jpg",
+          "sha256": "885ea59ad69b10090a9d1cc94cf1f0988ea8c07d9325647d6a0b8cbab6d955a3",
+          "bytes": 144344
+        },
+        {
+          "path": "scans/04094.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Foul-Air.jpg",
+          "sha256": "eb849338f3d25201d44250273d5b22ea92cb40c572f2c28ff9b85f2a4c55358d",
+          "bytes": 149026
+        },
+        {
+          "path": "scans/04095.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Gathering-Ground.jpg",
+          "sha256": "fc5a52e6b2d4724c11b9b6e3bee66b6d28c6ab42eace1475f7b728cc1c260fce",
+          "bytes": 160582
+        },
+        {
+          "path": "scans/04096.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Vast-and-Intricate.jpg",
+          "sha256": "7106a3bb9a2bd64f2d0bcbf703dc1869cf55a76ce3b34d93ec3e832c00e47bda",
+          "bytes": 156981
+        },
+        {
+          "path": "scans/04097.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Cave-Spider.jpg",
+          "sha256": "df939c5dd42eecb7d2affc9ca81f9cf78a733f5f320e049ae5390d6089d13dc8",
+          "bytes": 151051
+        },
+        {
+          "path": "scans/04098.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Goblin-Sneak.jpg",
+          "sha256": "7bac4437d3187ce5cd41dbacffad0b244a9d6a4cfc5c710f8936de68ed3c1577",
+          "bytes": 148467
+        },
+        {
+          "path": "scans/04099.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Goblin-Warlord.jpg",
+          "sha256": "ed010d246802dee488c41f1b7405a2f404ace88c2b9e5f1ba9d9b36c188eac53",
+          "bytes": 145464
+        },
+        {
+          "path": "scans/04100.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Rock-Adder.jpg",
+          "sha256": "a769e4c5017f2255b42b7fe9ec08c404a6dfdb73b7f84a01f4cb1062bee3afd9",
+          "bytes": 145732
+        },
+        {
+          "path": "scans/04111.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/The-Dripping-Walls-1A.jpg",
+          "sha256": "299feb2bc3726ef6b26a048c79c1ae5904f476ee989d33d775a029dac15561b1",
+          "bytes": 154010
+        },
+        {
+          "path": "scans/04111.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/The-Dripping-Walls-1B.jpg",
+          "sha256": "2571c5b92d96f0732a425959ebd3422d47a320519d74386b738068f651ac5bac",
+          "bytes": 130543
+        },
+        {
+          "path": "scans/04112.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/The-Water's-Edge-2A.jpg",
+          "sha256": "7046bac833f0ca60b1917f168323d7277ef7e08b95e1a89e494ad9b45a2ee0ba",
+          "bytes": 138443
+        },
+        {
+          "path": "scans/04112.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/The-Water's-Edge-2B.jpg",
+          "sha256": "330d81f21a91d1c7ca8a5591a3f114767dfcf038359b42f26a6df974717f91d0",
+          "bytes": 127950
+        },
+        {
+          "path": "scans/04113.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Washed-Away-3A.jpg",
+          "sha256": "fbd12ac61d95da56bd95645b0757485a543dc7e7dba43abc7c46a8219d7b3b8b",
+          "bytes": 145715
+        },
+        {
+          "path": "scans/04113.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Washed-Away-3B.jpg",
+          "sha256": "e4cce533ac5f3c92ce51677313f63010b1d1f4517b4afef3ca65a8139b886bcc",
+          "bytes": 151848
+        },
+        {
+          "path": "scans/04114.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-Sheltered-Rocks-4A.jpg",
+          "sha256": "24c3a7bbe88ac66773ec280a50627428e0303d5b1dbb9d007b5920655613c65e",
+          "bytes": 124242
+        },
+        {
+          "path": "scans/04114.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-Sheltered-Rocks-4B.jpg",
+          "sha256": "848eb237b83ff31764a759ac8adac38f69462b6d36b8cab796aa3f6a72cdee38",
+          "bytes": 141703
+        },
+        {
+          "path": "scans/04115.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-The-Endless-Caves-4A.jpg",
+          "sha256": "24c3a7bbe88ac66773ec280a50627428e0303d5b1dbb9d007b5920655613c65e",
+          "bytes": 124242
+        },
+        {
+          "path": "scans/04115.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-The-Endless-Caves-4B.jpg",
+          "sha256": "3c4c646f236930223856f31404b3cdb0cc913a4414e19f6e1081f1a3fdbbe72e",
+          "bytes": 141065
+        },
+        {
+          "path": "scans/04116.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-The-Shivering-Bank-4A.jpg",
+          "sha256": "24c3a7bbe88ac66773ec280a50627428e0303d5b1dbb9d007b5920655613c65e",
+          "bytes": 124242
+        },
+        {
+          "path": "scans/04116.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-The-Shivering-Bank-4B.jpg",
+          "sha256": "1a9a8b6896172d4c2e066f7e4bdd8246a5853b1f06e6e071e5ecef15bcedf561",
+          "bytes": 139889
+        },
+        {
+          "path": "scans/04117.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-Old-One-Lair-4A.jpg",
+          "sha256": "24c3a7bbe88ac66773ec280a50627428e0303d5b1dbb9d007b5920655613c65e",
+          "bytes": 124242
+        },
+        {
+          "path": "scans/04117.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Below-the-Mines-Old-One-Lair-4B.jpg",
+          "sha256": "f165fd74a22283c61173e97f09656f2c0200d6a260ce39766939db92cb1c414c",
+          "bytes": 139778
+        },
+        {
+          "path": "scans/04118.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Out-of-the-Depths-5A.jpg",
+          "sha256": "e9b863f956bf86f9673ff82f71413e542a9d911508d3135a1ed6f1ee607ca012",
+          "bytes": 141982
+        },
+        {
+          "path": "scans/04118.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Out-of-the-Depths-5B.jpg",
+          "sha256": "4f457090bd7e74f1e8d2ba265ccb18ebea3b5b2d5b41443e5aacd2f81039ed02",
+          "bytes": 149382
+        },
+        {
+          "path": "scans/04119.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Durin's-Axe.jpg",
+          "sha256": "75172647f613da5ea7ce53d864031a3fdb958ba0355dac0bb25c881bbda2410a",
+          "bytes": 134155
+        },
+        {
+          "path": "scans/04120.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Durin's-Helm.jpg",
+          "sha256": "abc1720c3c8c53a43623bff84ff5c0d3366dc83e0a9942b1c88248b7c20905d3",
+          "bytes": 131894
+        },
+        {
+          "path": "scans/04121.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Drowned-Treasury.jpg",
+          "sha256": "b52cd2a461143d84d707c6ff057c5abb2aa7b552a6a28bd943221c925f559b6a",
+          "bytes": 145264
+        },
+        {
+          "path": "scans/04122.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Mithril-Lode.jpg",
+          "sha256": "6845c1537629adc4c8a07e6c7f882466237d22862b2b429054cb18e293477b7b",
+          "bytes": 147123
+        },
+        {
+          "path": "scans/04123.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Deep-Deep-Dark.jpg",
+          "sha256": "7639b5cf36044af3a86ddd9df7f02f83c146aa89cb14ffd09b87881c63566ddf",
+          "bytes": 145353
+        },
+        {
+          "path": "scans/04124.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Lost-and-Alone.jpg",
+          "sha256": "616e99cf45563912aad1a9c1787b6f7b6ca62936d79da86d258acc68fa1c3e09",
+          "bytes": 148283
+        },
+        {
+          "path": "scans/04125.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Nameless-Thing.jpg",
+          "sha256": "7401cca7d89844f4bb4dd02c7ee5c3b43af8dc3c5459acf1650ed5f4838fef7e",
+          "bytes": 145089
+        },
+        {
+          "path": "scans/04126.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Elder-Nameless-Thing.jpg",
+          "sha256": "ce4ba73e188e7f216a5e785f0dc1b0d2a35b8191933e7b47831b954e0cfe9251",
+          "bytes": 149940
+        },
+        {
+          "path": "scans/04127.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Foundations-of-Stone/Moria-Bats.jpg",
+          "sha256": "74f8fec9de1814a11fe1665d846b8d417e1480ac210caf18ca1c62dedf37ca11",
+          "bytes": 132212
+        },
+        {
+          "path": "scans/04138.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Nearing-the-Gate-1A.jpg",
+          "sha256": "691cc4169dcfe44e08b7d46f4b480483fc37149f3d16360e366bf8b1ca4fe223",
+          "bytes": 152291
+        },
+        {
+          "path": "scans/04138.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Nearing-the-Gate-1B.jpg",
+          "sha256": "1485a067810bc154c11e3137f2ce67ea771ea4e66bcef090b700902bd16674dc",
+          "bytes": 141368
+        },
+        {
+          "path": "scans/04139.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/The-Rear-Guard-2A.jpg",
+          "sha256": "b77e5b67403597e8a61105ea8005c1b67fbc551d31844885cc7c93f60393bb3a",
+          "bytes": 145112
+        },
+        {
+          "path": "scans/04139.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/The-Rear-Guard-2B.jpg",
+          "sha256": "a38c65f22a647b39555f179624cefc73949233544e496b8a5eaaa68e003c562d",
+          "bytes": 148148
+        },
+        {
+          "path": "scans/04140.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Last-Lord-of-Moria-3A.jpg",
+          "sha256": "67ef7a4f3b6336ace4e5a241ff1a45bd7ed92422377030b180982172090a21b5",
+          "bytes": 152967
+        },
+        {
+          "path": "scans/04140.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Last-Lord-of-Moria-3B.jpg",
+          "sha256": "cd6383a69c529bf1854ced21b9a81017f3895ca47e1a90907264dafca6658e19",
+          "bytes": 156021
+        },
+        {
+          "path": "scans/04141.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Dark-Pit.jpg",
+          "sha256": "e59ff261e47dd943e5d2031fb1f1d847e0fbd532db78c242cbfc3bfc6305c838",
+          "bytes": 150803
+        },
+        {
+          "path": "scans/04142.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Second-Hall.jpg",
+          "sha256": "2eebd134107652f11552987012b79024a3598924a98350bdd9d983a8ddfccb79",
+          "bytes": 141138
+        },
+        {
+          "path": "scans/04143.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Second-Deep.jpg",
+          "sha256": "cb6c26e209596fc40289dda76c9978fecfddd9df186a6cb9d33b7ffd0621056a",
+          "bytes": 146671
+        },
+        {
+          "path": "scans/04144.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Fires-in-the-Deep.jpg",
+          "sha256": "ab31699ae777aefb2259f853657729b5cccaab40fd32a7301e635df13939943c",
+          "bytes": 173158
+        },
+        {
+          "path": "scans/04145.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Counter-Spell.jpg",
+          "sha256": "04f6b2a98b279e4a75f61673140dec364ad64131c15595f907a4b7319c3f2268",
+          "bytes": 168507
+        },
+        {
+          "path": "scans/04146.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Inner-Flame.jpg",
+          "sha256": "b6cdda6d0ddc52cd77a65adcb6aa776dc7998166d8e35ac0ca67feb1a84f0aca",
+          "bytes": 152400
+        },
+        {
+          "path": "scans/04147.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Inner-Shadow.jpg",
+          "sha256": "9e6312c26bb6daa00b8cfebfbde6678e765afd6281648d62645657d9fb19da8b",
+          "bytes": 148742
+        },
+        {
+          "path": "scans/04148.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Whip-Lash.jpg",
+          "sha256": "bb7c69382312509938bef07028a2bf5353b6faad3296831fcb3702d32a07ed99",
+          "bytes": 151640
+        },
+        {
+          "path": "scans/04149.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Leaping-Flame.jpg",
+          "sha256": "fb007849dd0b3c29572f77ab700f0e9cb3c9af978454190ea226fe50b030eacc",
+          "bytes": 150591
+        },
+        {
+          "path": "scans/04150.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Durin's-Bane.jpg",
+          "sha256": "776001c5702871d5bc6a355f2dcbbc97c4260353ec7247c07737f73ed5ec7e2a",
+          "bytes": 173403
+        },
+        {
+          "path": "scans/04151.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Ranging-Goblin.jpg",
+          "sha256": "b34cd814a4630fe302cc48e3b6e90b902ebc698cce0884bc19386f90b4b1eff2",
+          "bytes": 151433
+        },
+        {
+          "path": "scans/04152.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Fiery-Sword.jpg",
+          "sha256": "f8a6517060f49430d9fec7e8c08cd881028909fd82c4ede96b736b7f0f7284b9",
+          "bytes": 156927
+        },
+        {
+          "path": "scans/04153.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Many-Thonged-Whip.jpg",
+          "sha256": "1e85ffcfd135cda77070af7138e8bf31d94cd398d833507d14024531ff66b703",
+          "bytes": 169296
         },
         {
           "path": "scans/09016.A.jpg",
@@ -38803,6 +40249,558 @@
           "url": "https://drive.usercontent.google.com/download?id=1UQFKodGMfsSCVg8Lp-jFwbpXQtWmuV7Q&export=download&confirm=t",
           "sha256": "870ea7efbc880f96511d692355e8332f166ae00b1720d5e75feb520d5672d198",
           "bytes": 3719607
+        },
+        {
+          "path": "scans/901001.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VTML9krJtdh1DwBDG5-A_puVqrl6kOTx&export=download&confirm=t",
+          "sha256": "cc9d1bb6bec472f4daa7c0495218d66e275147f5d37ee9dcbbbfb8fda3ff6d7c",
+          "bytes": 4228004
+        },
+        {
+          "path": "scans/901001.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Fu459pZFYEQC4xkXFbbJfZZaUxN_6I9b&export=download&confirm=t",
+          "sha256": "bba15e06d9c7004172c82bff87ee93a63a9841031cb8837060b011c9a961477d",
+          "bytes": 4480882
+        },
+        {
+          "path": "scans/901002.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1bvMpr_k3UO33luqu2yRYIM4o2w3bsaYb&export=download&confirm=t",
+          "sha256": "b1a3793995d35eb7239de4aa07d3f27281ea96993c8b8ed7e14ef5a5b1eaee7a",
+          "bytes": 3400571
+        },
+        {
+          "path": "scans/901002.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1YKPd0iBTUQZ8ZpQK_aaTGnAR1cqbADVZ&export=download&confirm=t",
+          "sha256": "82114ef22305c139311adf90ecf47c40434d1f978195f625f38fd4f2d4a1d994",
+          "bytes": 3283408
+        },
+        {
+          "path": "scans/901003.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WjOm4RV9nzdEGDNwMUJl2ts11_iVOgod&export=download&confirm=t",
+          "sha256": "b8e244efe41ab7998634508ec00fa9ddff2e450497ca1015b2017a69b029a147",
+          "bytes": 3442089
+        },
+        {
+          "path": "scans/901004.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Nzk7SVQ8Pv9gVhHP3EWEci9Oz6Tc_JtL&export=download&confirm=t",
+          "sha256": "2fee0e086a52b1e21165030fc472248edc188006f47ff0cffa078b8ea220a516",
+          "bytes": 3388178
+        },
+        {
+          "path": "scans/901005.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HoWFBk2EJofr1qcctjY2DcrChD1Cf36g&export=download&confirm=t",
+          "sha256": "94702c0b7a0a9ba3abdec5bdcaa6b781bbeeed36b01bb2ed994f8fcc58c57070",
+          "bytes": 3470250
+        },
+        {
+          "path": "scans/901006.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1gk876Z7e9OTBEplnZPMPXAHn0XWVnZgd&export=download&confirm=t",
+          "sha256": "5ca83264ab1a156dffd323b7b675250d4aca3a8741202d0a3a90ddcd9ae89a0e",
+          "bytes": 4060649
+        },
+        {
+          "path": "scans/901007.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1M296RyVgKuIQhizGZkJ-3a9a8FTk7wKP&export=download&confirm=t",
+          "sha256": "1f38b0f288a76ca9e994253faef43220cb881707b8d84a84391086335a1aa520",
+          "bytes": 4071860
+        },
+        {
+          "path": "scans/901008.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1fj1b9lKam_sP7Rs74mV-qHbo4rifEI2e&export=download&confirm=t",
+          "sha256": "4914135efd0dd60aa2fb67953039d89e5a58d9afa0f862b634a1715f47ab2c92",
+          "bytes": 3590298
+        },
+        {
+          "path": "scans/901101.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-Jb9NJtj-OEXlvQ7VgeyZFoNMF5RowDa&export=download&confirm=t",
+          "sha256": "87b4baf8f69dfd6ffae3bc48d3fc493bc5401b97f351cd7b5ae2d47420f9b516",
+          "bytes": 4346304
+        },
+        {
+          "path": "scans/901101.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ycQEXFgVXx-zhaQ53Oly6OSfIUUNrzsZ&export=download&confirm=t",
+          "sha256": "14cdcccdb88173ca4c96ea8ad8b2d6acaeb5d11d2f0dc2d28925271057330331",
+          "bytes": 4987676
+        },
+        {
+          "path": "scans/901102.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Uuxlt2A5OkCgEGRsdJCHhepHP5huvcTK&export=download&confirm=t",
+          "sha256": "54e3a98dd08b8b9f9c2118bfb3572cc7bc2c7bce950cc50d94fe6726d694bce9",
+          "bytes": 3672499
+        },
+        {
+          "path": "scans/901103.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1vHlDY_9cQ94JTjJbyht-K80E1jqWKG48&export=download&confirm=t",
+          "sha256": "adedc2a2e3db6178555e27b67aa16563eadbf1c906c80d1acbd1717cce2232db",
+          "bytes": 4007223
+        },
+        {
+          "path": "scans/901104.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=18KTBuWXUwhpbOSpvUBQIrP-qLenIaFmV&export=download&confirm=t",
+          "sha256": "6147bdc9c9c102bc89ca5267e2d5be094a263c152cab11cca997d1c44661a76c",
+          "bytes": 3563768
+        },
+        {
+          "path": "scans/901105.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ogfIIiOgSoEuWnCPkf4w3KBlIYFthFYH&export=download&confirm=t",
+          "sha256": "c2ebc9a87e555ae1c86a0d737f71088b91ddf8925997f05609ff83e081dd53bf",
+          "bytes": 3504241
+        },
+        {
+          "path": "scans/901106.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1n-6-w0St5NqrEv5mxCSCsDhgLCBjORql&export=download&confirm=t",
+          "sha256": "ea332f904da5d9fa01a8e8606864b00f2e9b4a417197a758d43f8ab21cb848ab",
+          "bytes": 3418797
+        },
+        {
+          "path": "scans/901107.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1eDY-bFSHVkQ576Jwj_mAA1snnJjYiq9p&export=download&confirm=t",
+          "sha256": "de3a34a5c77f52a9d39d6c153d03256788c75e84218285c9c188b88ee87b2bb1",
+          "bytes": 4111940
+        },
+        {
+          "path": "scans/901108.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=12LFJ0atP_-CtDJhjBrnLUg7fEdgEt88D&export=download&confirm=t",
+          "sha256": "7d62901561dbfeeef040b14be0e668f7162fca4994a99974d218a4d1e88075e9",
+          "bytes": 4202879
+        },
+        {
+          "path": "scans/901109.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10ibhsyAjbmnIQeLwQwGjcx7jp6fAlGc8&export=download&confirm=t",
+          "sha256": "6cae83b3abfa31030fc8f6b8155b48174ca1c74112cc8898e55e3f6614bbab38",
+          "bytes": 3837109
+        },
+        {
+          "path": "scans/901110.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1YwyFO67Tkqnr_FIF9JlQo3ykykHXhfV-&export=download&confirm=t",
+          "sha256": "b85d52abe60d540890441526bf77160f12d696b04d760d19adfbb659e5598900",
+          "bytes": 4002629
+        },
+        {
+          "path": "scans/901201.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=16wVyCFrNuOq6x1AFVpZSpiwfzKuAX2Ws&export=download&confirm=t",
+          "sha256": "34d401593a212532a3dece341280a829f433c93f2ddd7190e3b3384d5ba19cdf",
+          "bytes": 4283937
+        },
+        {
+          "path": "scans/901201.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1cHRGm9h0UcibJaGw9gIbn2mVsMI9F9lo&export=download&confirm=t",
+          "sha256": "9e0f1200ee097ff1463a55ae7b688249bab65601d6f1653d1e760b2714ff2081",
+          "bytes": 4623278
+        },
+        {
+          "path": "scans/901202.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1c0G1eAYAL9nYaulcByMA8D8U64m0VeTd&export=download&confirm=t",
+          "sha256": "2d013bfc4fad409ed36cd1e5db553c4d6efb83048d469ed6ec4a2ef8aec9d8c3",
+          "bytes": 3694318
+        },
+        {
+          "path": "scans/901202.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1J2gtioG4dD6WxPC7XP6DZTbYq_od_Rkm&export=download&confirm=t",
+          "sha256": "60296c1955527827d1982f072db917c56480f6cf8947684c3e00082e1ec5d0ca",
+          "bytes": 3820387
+        },
+        {
+          "path": "scans/901203.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1c0G1eAYAL9nYaulcByMA8D8U64m0VeTd&export=download&confirm=t",
+          "sha256": "2d013bfc4fad409ed36cd1e5db553c4d6efb83048d469ed6ec4a2ef8aec9d8c3",
+          "bytes": 3694318
+        },
+        {
+          "path": "scans/901203.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=16FyNH7GqhmB4IpnMAycU3zn3N3h3EllX&export=download&confirm=t",
+          "sha256": "a33b3e8d54789ad78bcaf683f4ab6f81eee60f425b6c990a312c4f0374e654fb",
+          "bytes": 3886460
+        },
+        {
+          "path": "scans/901204.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1c0G1eAYAL9nYaulcByMA8D8U64m0VeTd&export=download&confirm=t",
+          "sha256": "2d013bfc4fad409ed36cd1e5db553c4d6efb83048d469ed6ec4a2ef8aec9d8c3",
+          "bytes": 3694318
+        },
+        {
+          "path": "scans/901204.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1wuEqfvG-liAilrjnAqfLsrJXooXwe78D&export=download&confirm=t",
+          "sha256": "8d0d9f9c0e761cfe9bac90a9b08a8357457dd33f83a01d429d9d2e9c6aa8edb3",
+          "bytes": 3797092
+        },
+        {
+          "path": "scans/901205.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1s_mfFtQ4v2IxBEYlMPOfMukfzaGXblO8&export=download&confirm=t",
+          "sha256": "a36c6f8b9417bbefe126e41a0b234eaef9249edb7f6235ea6e0e4d1b1edb1ff5",
+          "bytes": 3359320
+        },
+        {
+          "path": "scans/901206.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-beLWVO6uzbei5TrPhnYe40lw3XeX6Ik&export=download&confirm=t",
+          "sha256": "7489a50606ff5ffdc44b93bbbbbc3eba9ebd2b106efab70da3b9ec13d634e7ff",
+          "bytes": 3384816
+        },
+        {
+          "path": "scans/901207.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1QBUKVhShBUFIhi3LI9Jz0RaCS7zYUnAv&export=download&confirm=t",
+          "sha256": "115abd748b868edc5cc9389106858203de3e3c235920e6e78e2e63d8c07b64bb",
+          "bytes": 4295597
+        },
+        {
+          "path": "scans/901208.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=16sp16fUg6OuYMDTDD4sg5mhazA3o8Cuq&export=download&confirm=t",
+          "sha256": "f983aaa3fd9cfc6ad3f8a694e4938d20113a240d5e8da4cc9447301bff55d32e",
+          "bytes": 3916666
+        },
+        {
+          "path": "scans/901209.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1dyZWIhDJpsygVd85wj4NAAm4Kv9YzEBK&export=download&confirm=t",
+          "sha256": "e32883c2a23642b591a52fa4a5cc3a9361f49f17f7eb4e3851506433a32fe776",
+          "bytes": 3823220
+        },
+        {
+          "path": "scans/901301.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1QcTCDD11SEIqV10IOkFkaKBLv09uxHzQ&export=download&confirm=t",
+          "sha256": "7c78c8c23d848133300ba5b98396625590380857156a61b0b8db53ab57593b2b",
+          "bytes": 4972086
+        },
+        {
+          "path": "scans/901301.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ipEcUsXS3JHUUpvyuPoVdhtoQFdUBQV3&export=download&confirm=t",
+          "sha256": "29f8e3652e5f67b2deb46744d1e0d60529c383f1481e8bfb528e8358c841ae47",
+          "bytes": 3978625
+        },
+        {
+          "path": "scans/901302.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10dk3KnR6cexwOg5IdyZYmFYaackwFQ9V&export=download&confirm=t",
+          "sha256": "7dd31c8d9b9b01b5f67c1dd9e465a7b036938634fe21432bf1879288330f59e9",
+          "bytes": 3371718
+        },
+        {
+          "path": "scans/901303.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1lHfxbfAlVQPXDWL-ufl_2vVJbcQH0FKx&export=download&confirm=t",
+          "sha256": "759c33025c39faaae1af83977a3ee6b3ad02b1f12246d70a9429bda42ade8724",
+          "bytes": 3817734
+        },
+        {
+          "path": "scans/901304.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1mtYfSCesasClxtkUKLHZnrEjUeMppTP-&export=download&confirm=t",
+          "sha256": "403cd985724164e874c4482c74c9b7f42c3799242e99728ada1ed21a18c480fd",
+          "bytes": 3652724
+        },
+        {
+          "path": "scans/901305.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=18PzBxJ8-b-4YbQhFvTi-_QNOUuo7mzMv&export=download&confirm=t",
+          "sha256": "b2c510c9f044317a9bb5210c4480d41aa3d4b9c389e5ca6cd5b1eda54929bf50",
+          "bytes": 4765537
+        },
+        {
+          "path": "scans/901306.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1FdxhzmXJvgZPw86he75g5gZVUAV-E-sq&export=download&confirm=t",
+          "sha256": "3c7ed985752de4e6181ccbb9606979e9f9f9e51d918cadaf8ff666fb2680a0f3",
+          "bytes": 4443563
+        },
+        {
+          "path": "scans/901307.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=123lO9EOqoCopbAQw04izLjlnoi9dHDy1&export=download&confirm=t",
+          "sha256": "f09d54d3508f2e73bfca24666b52481fe9e78b702c9a602125e10dc115862670",
+          "bytes": 3732225
+        },
+        {
+          "path": "scans/901308.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1XwIM-Zb0gbTE-Pz-A1qfI4NW9Xn168KW&export=download&confirm=t",
+          "sha256": "e530f873d79cfca171102e56c0d552efa42595540e9f1e1e5f6a3627d708a060",
+          "bytes": 3991922
+        },
+        {
+          "path": "scans/901401.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1BB5UPFswVnEhmE-GffE_LAu8BD-oTFwl&export=download&confirm=t",
+          "sha256": "fd504838cd62a963f17a9dca658cb360afdeb1c0cef9b2f9bd976341d997ed34",
+          "bytes": 4321602
+        },
+        {
+          "path": "scans/901401.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1M1OHecV2fGA3i8lpuFywmSZdksQdALKs&export=download&confirm=t",
+          "sha256": "d6ec63313cd555cdce53db6307dce4713fc6484afa85131e156288e339c85523",
+          "bytes": 4638288
+        },
+        {
+          "path": "scans/901402.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=153bVGKHXTFuB5gyf0xWaR3sM_JPxC5sn&export=download&confirm=t",
+          "sha256": "a4d8ab4ba82ab51c188ccb4687a41a1806ea8fea137d2daee065aa7a446eb48a",
+          "bytes": 4178686
+        },
+        {
+          "path": "scans/901402.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1L-NYs1hmnG9wXqtGVfl3yPrltmANb2P4&export=download&confirm=t",
+          "sha256": "0a48b65ea9cf86e4172b9d72d64a1a4c4dccd63369d8d0dce08e477cd179a500",
+          "bytes": 4132935
+        },
+        {
+          "path": "scans/901403.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1WVz-a1MLV7iPb9-niFhA0AW3vSNzZEub&export=download&confirm=t",
+          "sha256": "823ae7bd71bb05e4a192c2120ab19c3f89f0422af1ae13f8b8a12c8c0e463be8",
+          "bytes": 3699652
+        },
+        {
+          "path": "scans/901404.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1k1u8Ai_K0Dkmx4Q2fU56Bt4FXiv6sv3e&export=download&confirm=t",
+          "sha256": "727c921bfb8d4a2a4af8316b0231e93698e269994f31d38307e358f17168cf98",
+          "bytes": 3627837
+        },
+        {
+          "path": "scans/901405.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1slzdJk9TpVLGW3-CT75eD7LrpsH0r5nm&export=download&confirm=t",
+          "sha256": "54fee19fc2c7df2072c0e90c6172a658c27477891ec7dfa5229a902a219e55ad",
+          "bytes": 3545977
+        },
+        {
+          "path": "scans/901406.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1qcx8KcL1sfSPZS4zw1b9nrwbyxaxX1T8&export=download&confirm=t",
+          "sha256": "272263fc879dadaef8d083e9a1e2fd29e0aeba5c3a5771585702670fe2531119",
+          "bytes": 3677419
+        },
+        {
+          "path": "scans/901407.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Ug5Q_OqksGMa7Xn7YvbOfvj_Qm2oiwaN&export=download&confirm=t",
+          "sha256": "b3bcadd05e6cb62208dffcae66d1f90412986860412ba0e6ad23188987378b87",
+          "bytes": 4026201
+        },
+        {
+          "path": "scans/901408.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MS5fLqwj8AdZktrEEhQcIyxbWowqi6kY&export=download&confirm=t",
+          "sha256": "573502737da8b8d2aa6f7246354190f2c4d827b658b296426db157b23d7db3d2",
+          "bytes": 4290484
+        },
+        {
+          "path": "scans/901409.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1264qrz2A9oajQtrw7AaTEs9yalkFqrSt&export=download&confirm=t",
+          "sha256": "8c1d1c0b2332fb19dc9676a826f58ca7499f990077d20755758030f2f3d64030",
+          "bytes": 3856744
+        },
+        {
+          "path": "scans/901501.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HsdOS5zOvKNSOCQZwgzuJWcqq-LDp_vf&export=download&confirm=t",
+          "sha256": "2d888e73b31836f0c1196fcad897b74403f0d10dea4785083c0d6bb4ffeba22b",
+          "bytes": 4964530
+        },
+        {
+          "path": "scans/901501.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TvuJYb0N_Ycw8CTj8IcouOLp8MWDcC5q&export=download&confirm=t",
+          "sha256": "5f41c85c903a9cab9593cad13834d707bda47eb0b3af6be1efc7f135e5f83b11",
+          "bytes": 3776005
+        },
+        {
+          "path": "scans/901502.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1iA0rx-XMYnAeaAT6OhW7jRfEu4G51IJ5&export=download&confirm=t",
+          "sha256": "4d79994cf0baca28f96c545b5d6628a19a6c908d3f3972ecf78b1e5b5d328312",
+          "bytes": 3783072
+        },
+        {
+          "path": "scans/901503.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1t0R158qiCIhaKqK48Navrx56Yjix37oA&export=download&confirm=t",
+          "sha256": "b2c01b5ea094e86a7140582b5836bd1e78a66c20f0692384528b2e5b6154c9eb",
+          "bytes": 4098003
+        },
+        {
+          "path": "scans/901504.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1u25ORTJS0Gtwzs0xVE4Jk4x5HkyTa2RH&export=download&confirm=t",
+          "sha256": "100d39fa0e751237236a6e771ceee178a8f1e764242df6caffdb7140d89e486b",
+          "bytes": 4362151
+        },
+        {
+          "path": "scans/901505.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jTjJ0jb_syg30F1Npdz2-Ux23lX_HbDo&export=download&confirm=t",
+          "sha256": "c7b9dc69f9278ffc561b2f6a52d01a8f37c03ebd66103e97a7351b385f0425b2",
+          "bytes": 5000562
+        },
+        {
+          "path": "scans/901506.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Y4XVHffUHgLyiOnQSirMrOeMs8UZQR7R&export=download&confirm=t",
+          "sha256": "d8b27281e335f49b984fcad2df56c7f49ede46d18eb75159400f3eec4fcd5373",
+          "bytes": 4520791
+        },
+        {
+          "path": "scans/901507.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13BbGRlViP3jCWvlIYGCN7d3VJ2MmO4Ui&export=download&confirm=t",
+          "sha256": "904f6345414697ad7693c23ffd12cfe6364aa3221f5cf337525ebeab4efd2c16",
+          "bytes": 3999333
+        },
+        {
+          "path": "scans/901508.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Y-4shW30Vc-VhX5i3gYskohRd2zN-LDD&export=download&confirm=t",
+          "sha256": "f8c2442d67f4af3d6df53884f6df6efbbcb44dc59879c4474e68b2dadfb65f0f",
+          "bytes": 4236875
+        },
+        {
+          "path": "scans/901601.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1iCR8u6QldhzlQ62GM5ggK2vREWiVxqwT&export=download&confirm=t",
+          "sha256": "c03815e4ff9390a7dd9e522096e27f852ba76f532a291ef81a9751f213229c13",
+          "bytes": 4145815
+        },
+        {
+          "path": "scans/901601.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HH81GpwKeUCMRY7-Pf5BdRHlAIAV6u9U&export=download&confirm=t",
+          "sha256": "81afe0521a9ae058da668cfb47b0167ec66cd337eff7c4bab4fa5e50423afef0",
+          "bytes": 4276483
+        },
+        {
+          "path": "scans/901602.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=14uLIdwEF6GrfEdGEc5zduwtAbw79I2iE&export=download&confirm=t",
+          "sha256": "f7ebe7808642f8c8ec18fd30805f671d12053d1d30040c14fc76d9ba26251d05",
+          "bytes": 3625214
+        },
+        {
+          "path": "scans/901603.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_C2iNCUu1K7mxhdkj7ItMcEGhLXXezAJ&export=download&confirm=t",
+          "sha256": "e33da0f0d0e78f32ce8302827312919454630eebb214b64229f700d119bd8845",
+          "bytes": 3503279
+        },
+        {
+          "path": "scans/901604.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11SYNh_YVYJST17gqNLX5mOsy7vGlN8k_&export=download&confirm=t",
+          "sha256": "24133b57b7e5ebc5cdb0459b382370f1bf6f53672e5dad6e2269087000410225",
+          "bytes": 3523601
+        },
+        {
+          "path": "scans/901605.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11UpjHBnGQfUOcF8mAVW8258J_jOoQiw8&export=download&confirm=t",
+          "sha256": "0f4e449621419d6355e8b877607350ee0059c34154a2ab6333435ba56fc1d932",
+          "bytes": 4417593
+        },
+        {
+          "path": "scans/901606.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1X1XHoRyprd3u_d3-Z55t0g5ZLxxbXnmz&export=download&confirm=t",
+          "sha256": "fc6231505ab69a986042b810b17a8fde64ee60745ccb862133719bb7a7cf8c80",
+          "bytes": 4087798
+        },
+        {
+          "path": "scans/901607.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1PIFvDnTuuFOWhBcsUKwWDClFTlg2h5LA&export=download&confirm=t",
+          "sha256": "871fa53e31a5e512a3aa2fd220a103e822e3b030f011940b280bcf0ffb444078",
+          "bytes": 3572847
+        },
+        {
+          "path": "scans/901608.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13tdOwG0In3AMeuuxZJuMTQl0sVX_21Eb&export=download&confirm=t",
+          "sha256": "c1fc1d83b947db93976119d23105240ce512c51e7a04950e103a2a36ef8efc80",
+          "bytes": 3353116
+        },
+        {
+          "path": "scans/901701.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1qSB0Z8e6lmnjV5C7vxSFuIFQK7rCbG3T&export=download&confirm=t",
+          "sha256": "80aa4d68f85eeec66808fac046fabb3259828e7ec3defbaf6933d8df1323464d",
+          "bytes": 4206994
+        },
+        {
+          "path": "scans/901701.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1vrGE5XYeFFD-5tY4K5Pv8sEBfmdxkb8M&export=download&confirm=t",
+          "sha256": "55cb65720cd2babf763d912e3699ccc5bdea17b5de8bce99ce58b597a03c5ffd",
+          "bytes": 4676232
+        },
+        {
+          "path": "scans/901702.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1OfgBcT9WKn4VLak6bUJm7MI8E2XYvPvj&export=download&confirm=t",
+          "sha256": "99387392e0356fd5d945012af451286453d5bbb52bc0018901d79f5bace27701",
+          "bytes": 3583783
+        },
+        {
+          "path": "scans/901703.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13AOT-YAHYF7GxCugIh89gcQpAwIjhIAX&export=download&confirm=t",
+          "sha256": "121c86912e2e0daf25fc6805f7593e0925e87353270f8c1f78af66f15e5c49eb",
+          "bytes": 3664951
+        },
+        {
+          "path": "scans/901704.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1qzjGh8nbMyqMJ879yH8ljNlhWIdS5tBN&export=download&confirm=t",
+          "sha256": "a8519a6a8543120bdc625faed3092990f76016712fc4d86586a9bf1ba541c8e6",
+          "bytes": 3627109
+        },
+        {
+          "path": "scans/901705.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=15hJTf_a1lKy0ESwLGHx1P52bLOZM6dHP&export=download&confirm=t",
+          "sha256": "57450e1a54085a769a883b86918f17d0352ce473ff54cdd7fa291082d4c43ad0",
+          "bytes": 3674571
+        },
+        {
+          "path": "scans/901706.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1To9U3CpLSQfhBW97UnXqurz9ABl28A_u&export=download&confirm=t",
+          "sha256": "e1c11798b5271bed6ac29302724e21d2ff07c14b06281db6f1b77e1828a4ebef",
+          "bytes": 4280842
+        },
+        {
+          "path": "scans/901707.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1baS7PC13zW5VgvW6PTTNG-S65a8i7Kjl&export=download&confirm=t",
+          "sha256": "e53b9dd5fba721b849fae21bfa2ce42ce30a3813c9583a9b560ee72a5a493d68",
+          "bytes": 4083367
+        },
+        {
+          "path": "scans/901708.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1iPWxq1ZyCfqYzwK1A69yTOp_nd6tjmDJ&export=download&confirm=t",
+          "sha256": "ecd6a0a3d86fc0f2589413862c0637dac5981927443569d3714b9257859eb0ae",
+          "bytes": 4257978
+        },
+        {
+          "path": "scans/901801.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jPvFeQnNYrRYnzaIDjtBhhMn0RntM9vD&export=download&confirm=t",
+          "sha256": "ce29634197eb1d533a5f825360fd933fccbf389dbb05293ef5b20349953af317",
+          "bytes": 4858804
+        },
+        {
+          "path": "scans/901801.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1FcGAx4BXc3SMPRvsPx3mQl-J4eUtuMJF&export=download&confirm=t",
+          "sha256": "7a369ad5e0979751b086ff90108c213ad21243407a139982f3727d0ef1690e43",
+          "bytes": 4827917
+        },
+        {
+          "path": "scans/901802.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1E6Txl-NfAg0YNznbX26LjxlhutpAN9Pa&export=download&confirm=t",
+          "sha256": "7f4fc0041a8d8d062cfe0429ecdb2cb909eafcceb797967ecd04c85607548ffb",
+          "bytes": 3825526
+        },
+        {
+          "path": "scans/901803.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1k-CpdqyBF_nvLPqBrKJixGBYeiQP2d-6&export=download&confirm=t",
+          "sha256": "8eef26d842079d5d9cc93363740f66eeeac51c71cc2aca2fb5ac4c92a7d596f9",
+          "bytes": 3799748
+        },
+        {
+          "path": "scans/901804.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Yav-B86tmImA99LxlR3wEk_43aJnit7Y&export=download&confirm=t",
+          "sha256": "ccf793ec6655138db97f546b85f7f9e64ab174c480dd98518b107411d56d5b6e",
+          "bytes": 4204685
+        },
+        {
+          "path": "scans/901805.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1_1sVRg6xmPWwwssCDxW_L2xVDJ888my0&export=download&confirm=t",
+          "sha256": "8b4b29131881fb37a9699c6f0d702b5c65f5241a1c0bde57e3179087821c1061",
+          "bytes": 4008286
+        },
+        {
+          "path": "scans/901806.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1N9IkRbEXafchYymL43DlvzyqMje3t2rC&export=download&confirm=t",
+          "sha256": "4449fb017f2f4638b2f6998a0844cacfdae21d325f5189a96f96677ffe3b4f85",
+          "bytes": 3914979
+        },
+        {
+          "path": "scans/901807.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=18I9Q-MD4hQjJDedFZRrIm3UHLTKD_Pjd&export=download&confirm=t",
+          "sha256": "537829c2dc7f0b9d849445860ffe5bfcc741e7b15fd5191d64597b7abccb39d4",
+          "bytes": 3734467
+        },
+        {
+          "path": "scans/901808.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1FUFFni1fWSCKIzpeCb4jcM0Zm0ahwFDQ&export=download&confirm=t",
+          "sha256": "f13c3eb158a1e33e17812f9f5b83f8aa7ed8e9c3695c4f1badd9b44ec6c721f0",
+          "bytes": 3850514
+        },
+        {
+          "path": "scans/901809.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1P_FharV8diJctccHMqoJ7rYM1FTbh0Yf&export=download&confirm=t",
+          "sha256": "67374e2329912d5a5186ed2958d89d4beffbe4d26e8a2d3f100e6cf88f0c4c0e",
+          "bytes": 4712854
+        },
+        {
+          "path": "scans/901810.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TlSV60rCwL2YTkp7VNUbd2t3E6cU2lgv&export=download&confirm=t",
+          "sha256": "22f1b067501c770bca1edee04cb9dd30da751fdcecd9eeee33f4876a65d2c67b",
+          "bytes": 4678464
         },
         {
           "path": "scans/906101.A.jpg",

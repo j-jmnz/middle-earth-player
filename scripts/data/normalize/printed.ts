@@ -90,10 +90,13 @@ export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: C
     const sea = a && LEDGER_KEYWORD_PACKS.has(a.printing) ? { keywords: { ...(card.keywords ?? {}), ...ledgerKeywords(a), ...(card.type === "quest" && b ? ledgerKeywords(b) : {}), ...(card.type === "location" && b ? uncharted(b) : {}) } } : {};
     // The Sauron's Eye icons an encounter card prints (mec113.fortitude-tests) come from the ledger in any pack.
     const eyes = a?.eyeIcons ? { keywords: { ...(sea.keywords ?? card.keywords ?? {}), eyeIcons: a.eyeIcons } } : {};
+    // PASS (dwd.locate-test) is a line of its own on the scan that Hall of Beorn leaves out: the card has the keyword in any pack.
+    const passes = a?.lines.some((line) => line.trim() === "PASS.") ? { keywords: { ...(eyes.keywords ?? sea.keywords ?? card.keywords ?? {}), pass: true } } : {};
     return {
       ...card,
       ...sea,
       ...eyes,
+      ...passes,
       text: front.text,
       shadowText: front.shadow,
       back,

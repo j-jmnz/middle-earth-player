@@ -3,7 +3,7 @@ import type { When } from "../asks-conditions.ts";
 
 // The choice words of The Battle of Lake-town (standalone-scenarios part 2), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-battle-of-lake-town --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-battle-of-lake-town` prints each sentence.
-// The choices the engine makes for the Smaug deck and Burn (where Smaug is revealed, each player's Burn share, the progress stage 2B discards, the split of progress on two active locations) and the keep rows of the two cancel offers hold no record of their own: src/play/words/scenarios/smaug.ts words them.
+// The choices the engine makes for the Smaug deck and Burn (where Smaug is revealed, each player's Burn share, the progress stage 2B discards, the split of progress on two active locations) and the keep rows of the two cancel offers hold no record of their own: src/play/words/scenarios/standalone-scenarios/smaug.ts words them.
 // Each player answers for himself (the cancel offers from the first player on, Dire Magnificence in turn), so the sentences are owned.
 
 // The player controls one hero only: discarding it eliminates him, and the game is lost when he is the last player.

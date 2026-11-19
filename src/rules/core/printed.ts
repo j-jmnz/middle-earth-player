@@ -42,6 +42,8 @@ export type Keywords = {
   surge: boolean;
   hide: number | null;
   doomed: number | null;
+  // Regenerate X (dwd.regenerate): healed from the enemy itself after the first player token passes in the Refresh phase (families/encounter/regenerate.ts).
+  regenerate: number | null;
   peril: boolean;
   archery: number | null;
   immuneToPlayerCardEffects: boolean;
@@ -76,6 +78,12 @@ export type Keywords = {
   spectral: boolean;
   // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
   dire: boolean;
+  // PASS (dwd.locate-test): the card passes a locate test it is discarded for (families/long-dark/).
+  pass: boolean;
+  // Ambush (dwd.ambush): the enemy makes the players engagement checks against it when it enters play (families/encounter/ambush.ts).
+  ambush: boolean;
+  // The enemy prints X for its Attack and its hit points (rr.attachment-cards): a record sets them (families/nameless).
+  statsX: boolean;
 };
 
 // A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
@@ -122,6 +130,7 @@ const EMPTY_KEYWORDS: Keywords = {
   surge: false,
   hide: null,
   doomed: null,
+  regenerate: null,
   peril: false,
   archery: null,
   immuneToPlayerCardEffects: false,
@@ -146,6 +155,9 @@ const EMPTY_KEYWORDS: Keywords = {
   phantom: false,
   spectral: false,
   dire: false,
+  pass: false,
+  ambush: false,
+  statsX: false,
 };
 
 // The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable), or a location's side B that prints a Threat.
@@ -393,7 +405,8 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
     willpower: card.willpower,
     attack: card.attack,
     defense: card.defense,
-    health: card.health,
+    // An enemy that prints X for its hit points (`statsX`) has 0 until a record sets them, so the damage rule reads them as a number.
+    health: card.health ?? (keywords.statsX === true ? 0 : null),
     questPoints: card.questPoints,
     questPointsX: keywords.questPointsX === true,
     victory: card.victory,
@@ -411,6 +424,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       surge: keywords.surge === true,
       hide: keywords.hide ?? null,
       doomed: keywords.doomed ?? null,
+      regenerate: keywords.regenerate ?? null,
       peril: keywords.peril === true,
       archery: keywords.archery ?? null,
       immuneToPlayerCardEffects: keywords.immune === true,
@@ -434,6 +448,9 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       phantom: keywords.phantom === true,
       spectral: keywords.spectral === true,
       dire: keywords.dire === true,
+      pass: keywords.pass === true,
+      ambush: keywords.ambush === true,
+      statsX: keywords.statsX === true,
     },
   });
 }

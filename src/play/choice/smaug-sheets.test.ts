@@ -1,5 +1,5 @@
 // Rules: docs/brief.md (The Battle of Lake-town), rr.first-player, rr.damage (data/rules/entries.json); ledger lines 50201:A:1, 50202:B:2, 50205:A:2, 50210:A:1.
-// The Lake-town engine's own choices on the live sheet (words/scenarios/smaug.ts): where the first player reveals Smaug, the Burn question of each player (exhaust a character, its share, done) and stage 2B's discard of progress. Each opens as the engine opens it; the sheet says the number, the player,
+// The Lake-town engine's own choices on the live sheet (words/scenarios/standalone-scenarios/smaug.ts): where the first player reveals Smaug, the Burn question of each player (exhaust a character, its share, done) and stage 2B's discard of progress. Each opens as the engine opens it; the sheet says the number, the player,
 // and arms the row that destroys a character or would put Lake-town at its limit.
 import { describe, expect, it } from "vitest";
 

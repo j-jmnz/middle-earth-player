@@ -1,0 +1,18 @@
+{
+  "id": "dwarrowdelf",
+  "name": "Dwarrowdelf",
+  "scenarios": [
+    "into-the-pit",
+    "the-seventh-level",
+    "flight-from-moria",
+    "the-redhorn-gate",
+    "road-to-rivendell",
+    "the-watcher-in-the-water",
+    "the-long-dark",
+    "foundations-of-stone",
+    "shadow-and-flame"
+  ],
+  "kind": "cycle",
+  "starterDecks": [],
+  "saga": false
+}

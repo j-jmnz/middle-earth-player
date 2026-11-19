@@ -29,7 +29,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10039:A:2 (front): When Revealed: Search the encounter deck for 1 copy of Prison Cell, reveal it, and add it to your staging area. Then, capture an additional 2 cards from the top of your captured deck underneath that copy of Prison Cell.
   10039:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player searches the encounter deck and discard pile for a card, reveals it and adds it to the staging area [also {"code":"10046","deckOnly":true}]
+    - the acting player searches the encounter deck (not its discard pile) for the card with code 10046, a a card, reveals it and adds it to the staging area
     - [json CaptureFromDeck {"verb":"CaptureFromDeck","amount":2,"end":"top","under":{"code":"10046"}}]
 
 10039:B:1 (back): Any time players would place progress tokens on this quest, rescue an equal number of captured cards at random from underneath it instead. (Progress is placed on the active location before triggering this effect.)
@@ -39,7 +39,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10039:B:2 (back): Forced: If there are no captured cards underneath Gornákh's Dungeons, join another player at the beginning of the travel phase. If you cannot join another player, all players advance to stage 3A together.
   10039:forced:1: Forced when a phase begins
     only if all of: (it is the Travel phase) and ([json condition {"kind":"captured","is":"noneUnderSelf"}])
-    - [json JoinAnotherPlayer {"verb":"JoinAnotherPlayer","advanceTo":"10040"}]
+    - the player whose stage this is joins another player: his staging cards move to that player's area, his active location is discarded and he shares that area and stage from then on; with no other area every player advances together to the stage with code 10040
 
 ## 10040 Flight from Mount Gram
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -360,4 +360,4 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
     - the event's other card is added to the victory display
 
-(rendered pieces: 154 by template, 49 as JSON)
+(rendered pieces: 156 by template, 47 as JSON)

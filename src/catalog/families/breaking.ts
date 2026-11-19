@@ -29,6 +29,13 @@ const VERBS = [
   // area and advances to a different stage 3A", 142062:B:1; mec109.multiple-staging-areas). Nothing happens when the code is not in the quest deck.
   // `reveal`: the stage is revealed for the seat as it becomes its stage: its When Revealed effects resolve ("advances to a different stage 2A", 10038:B:1; families/captured/).
   z.strictObject({ verb: z.literal("StartSeparateStage"), code: z.string().min(1), reveal: z.literal(true).optional(), ...when }),
+  // "Each player draws a random stage 4 quest card" (04113:B:1): the acting seat's stage is one of the quest deck's cards with these codes, drawn at random (the game's seed) from those still in the deck, so each seat gets a different one while any is left; as StartSeparateStage
+  // makes it, side B up, with the seat's own staging area, revealed for the seat (its When Revealed effects resolve). The areas work as Escape from Mount Gram's do (mec108.create-staging-area: the first player of an area, "each player" of an encounter card, and a limit used once each round, are the area's). Nothing happens when none is left.
+  z.strictObject({ verb: z.literal("StartRandomSeparateStage"), codes: z.array(z.string().min(1)).min(1), ...when }),
+  // "Remove all other stage 4 quest cards from the game" (04113:B:1): every card of the quest deck with one of these codes leaves the game.
+  z.strictObject({ verb: z.literal("RemoveUnusedStages"), codes: z.array(z.string().min(1)).min(1), ...when }),
+  // "that player chooses and adds it to a different player's staging area" (901703:A:2): the source enemy, engaged with a player, becomes a card of the staging area of another player (a player who is the head of another area; with two seats the other one). The player picked first (a Pick of a player of a different area, a record's own step) is the one it goes to; with no other area, players who share an area (not separate, or joined) send it to that shared area as a staging card, and with one player it stays engaged.
+  z.strictObject({ verb: z.literal("MoveToOtherPlayerArea"), ...when }),
   // "In player order, each player moves 1 encounter card from this staging area to theirs" until none are left (142062:B:1): each living seat in turn
   // picks one card of the shared staging area (the first player's choice when a seat has several; the last one is taken without asking), until it holds
   // none, and the card goes to that seat's own staging area. Entering an area is not a reveal.
@@ -118,6 +125,8 @@ const FLAGS = [
   // On "table", while a card holds it: the encounter phase is skipped, with its optional engagements and engagement checks ("Skip the encounter phase",
   // 142061:B:1; rules/engine/machine.ts). The combat phase still follows.
   "skipEncounter",
+  // On a location in a staging area: it adds its Threat to the total Threat in every other staging area, once for each area ("it contributes its Threat to the total Threat in each other player's staging area", 901707:A:1; quest/quest.ts stagingThreatSources).
+  "threatInOtherAreas",
   // On a stage: it stays in play, with its staging area, when the player at it is eliminated (parked until a player is at it again), not discarded with the player's area ("Forced: After a player is eliminated (at any stage)", 148003:B:2; rules/families/breaking/barrow.ts).
   "staysInPlay",
 ] as const;

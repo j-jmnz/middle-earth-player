@@ -27,6 +27,8 @@ export const amountExprSchema = z.strictObject({
   // With `stat`: read it from the card in play with this title instead of `of` ("Add Bilbo Baggins' total Willpower").
   ofNamed: z.string().min(1).optional(),
   printed: z.boolean().optional(),
+  // With `stat: hitPoints`: the hit points the card has left, its hit points less its damage and at least 0 (damage can pass the hit points of an indestructible enemy, FAQ 3.057: "the remaining hit points of Durin's Bane", 04141:A:1). Read by the flame family.
+  remaining: z.literal(true).optional(),
   // The X the event was played for, or the X an earlier instruction fixed (the discarded card's cost).
   x: z.literal(true).optional(),
   // The stage number of the current quest card: its place in the quest deck, counting from 1 ("X is the stage number of the quest", 41027:A:1).
@@ -46,12 +48,18 @@ export const amountExprSchema = z.strictObject({
   dealt: z.literal(true).optional(),
   // The total Threat of all cards in the staging area now, modifiers and the active location's effects read as they are (the staging step's total, rr.staging-area; "raises his threat by the total Threat of all cards in the staging area", 02047:A:1).
   stagingThreat: z.literal(true).optional(),
+  // The damage the player attack the effect answers (`enemyAttacked`) would deal its enemy: the attackers' total Attack less the enemy's Defense, 0 at the least ("deal the damage from the attack to 1 character", 04074:A:1). Read by the encounter family.
+  attackDamage: z.literal(true).optional(),
   // The damage an attack sent on past its defender (excessToShip), read by the effect the attack leaves for its end ("deal that much damage", 11055:A:2).
   excess: z.literal(true).optional(),
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
   // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc/amounts.ts.
   facedown: z.literal(true).optional(),
   resourcesAboveCopies: z.literal(true).optional(),
+  // The Victory points of the cards in the victory display added up, read live ("X is the number of victory points in the victory display", 03025:A:3; dwd.the-nameless-fear). Read by src/rules/families/misc/amounts.ts.
+  victoryPoints: z.literal(true).optional(),
+  // The quest points the active location still needs: its quest points less its progress, 0 with no active location or when it is full ("where X is the active location's remaining quest points", 901302:A:2). Read by src/rules/families/misc/amounts.ts.
+  remainingQuestPoints: z.literal("activeLocation").optional(),
   // The amount comes out negative ("gets -1 Willpower for each damaged hero you control"): the value read, below 0.
   negative: z.literal(true).optional(),
   // A scalable card's level, read from the Campaign Log (dcce.scalable-upgradable): the level of the source card. `halved`: half of the value read, rounded up ("half the level of Galdor's
@@ -111,12 +119,16 @@ export const amountExprSchema = z.strictObject({
   // 145021:A:1). Read by the grey-company family (src/rules/families/grey-company/amounts.ts).
   highestThreat: z.literal(true).optional(),
   playersAtThreat: z.number().int().positive().optional(),
-  // With `stat`: the stat of every card that matches the pick, added up, read live ("X is the total Threat of each engaged enemy", 146026:A:1). Read by the black-gate family.
+  // With `stat`: the stat of every card that matches the pick, added up, read live ("X is the total Threat of each engaged enemy", 146026:A:1); with `cost` the printed costs (a card with none counts 0), as the words of 901701:A:2 say them. Read by the black-gate family.
   totalOf: pickSchema.optional(),
   // The damage tokens on the cards that match, added up ("equal to the total damage on each Ship objective he controls", 12148:A:1; read by the sea family, src/rules/families/sea/swap.ts).
   damageOn: pickSchema.optional(),
   // The total printed cost of the allies in the staging area ("X is the total cost of all allies in the staging area", 145074:B:1; a card with no printed cost counts 0). Read by the pelennor family.
   stagedAlliesCost: z.literal(true).optional(),
+  // The total printed cost of all the cards attached to the source, those from the top of a deck and any a player attached (a card with no printed cost, a hero or an X cost, counts 0), or this number when nothing is attached ("X is the printed cost of all attached cards on this card. If there are no cards attached, X is 3", 04125:A:2; rr.attachment-cards). Read by the nameless family.
+  // The players who share the acting player's staging area: every living player before stages are separate, those at his own area after ("if there is more than one player at this staging area", 901707:A:2; mec109.multiple-staging-areas). Read by the breaking family.
+  playersAtStage: z.literal(true).optional(),
+  namelessCost: z.number().int().min(0).optional(),
   // The damage that destroys Minas Tirith: its hit points less its damage, plus what the active City Wall can still take first (mec113.minas-tirith, 145046:A:1); a number no damage reaches while Minas Tirith is not in play. Read by the pelennor family.
   minasTirithLeft: z.literal(true).optional(),
   // A count the earlier Resolution recorded in the Campaign Log's notes ("X is the number recorded in the campaign log", 145078:A:1), 0 when none is recorded or the game has no log. Read by the campaign family.

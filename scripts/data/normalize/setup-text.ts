@@ -2,8 +2,7 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import { readAngmarAwakened } from "./setup-angmar-awakened.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
 import { readReturnOfTheKing } from "./setup-return-of-the-king.ts";
-import { readShadowsOfMirkwood } from "./setup-shadows-of-mirkwood.ts";
-import { readStandaloneScenarios } from "./setup-standalone-scenarios.ts";
+import { readCycles } from "./setup-cycles.ts";
 import { readTwoTowers } from "./setup-two-towers.ts";
 import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
@@ -37,7 +36,7 @@ export type SetupClause =
   // "Attach 1 encounter card to each objective card."
   | { kind: "attachEncounterToObjectives"; count: number }
   // "Put Mendor into play."
-  | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" | "engagedFirstPlayer" | "guardian" }
+  | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" | "engagedFirstPlayer" | "guardian" | "firstPlayer" }
   // "Attach X to a hero of the first player's choice." / "The first player attaches X to one of his heroes."
   // `anyPlayer`: "Attach Wormsbane to a hero, Broken side face-up" names no player.
   | { kind: "attachChosen"; codes: string[]; who: "firstPlayer" | "anyPlayer" }
@@ -69,7 +68,7 @@ export type SetupStep =
   | "prepareIslandMap" // dcce.island-map
   | "prepareStormcallerArea" // dcce.stormcallers-area
   | "prepareFleet" // dcce.prepare-your-fleet
-  | "shuffleStageTwos" // the quest deck's stage 2 cards in random order
+  | "shuffleStageTwos" // the quest deck's stage 2 cards in random order (Dream-chaser; Flight from Moria's "Prepare the quest deck", dwd.creating-the-quest-deck)
   | "damageTrade" // "its controller may deal N damage to it to ..."
   | "threatTrade" // "raise their threat by N to attach X to a hero"
   | "addFromDeck" // locations from the top of the Uncharted or Grotto deck to the staging area
@@ -145,8 +144,8 @@ export type SetupStep =
   | "reanimateTopCard" // "Each player reanimates the top card of his deck": mec108.reanimated-dead
   | "heroesBeginDamaged" // "Each hero begins the game with damage on them equal to the amount noted for them in the Campaign Log"
   | "chooseItemBoons" // "Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play": `codes` the excluded boon
-  // Shadows of Mirkwood (sotm.*, scripts/data/normalize/setup-shadows-of-mirkwood.ts).
-  | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck": `count` cards, `players` for each player
+  // The cycles (scripts/data/normalize/setup-cycles.ts).
+  | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck" (Shadows of Mirkwood), "... 1 copy of A Foe Beyond per player ..." (Dwarrowdelf): `count` cards, `players` for each player
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 
@@ -344,7 +343,7 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readShadowsOfMirkwood(sentence, names) ?? readStandaloneScenarios(sentence, names);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readCycles(sentence, names);
     if (campaignStep) {
       clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {

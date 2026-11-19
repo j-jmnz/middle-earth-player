@@ -49,8 +49,9 @@ const placementSchema = z
 // taken from the pile it was in), with the deck's own cards (`cards`, the copies printed) shuffled in. A Nightmare card takes the
 // Setup slot of a removed card of its title (`pile`, `perPlayer`). The setup card is placed next to the quest deck, side A faceup,
 // and its lines stay active all game.
-// In the order a removal takes from them: the encounter deck, then the piles the quest's Setup fills from it.
-export const NIGHTMARE_PILES = ["encounter", "staging", "activeLocation", "setAside", "attached"] as const;
+// In the order a removal takes from them: the encounter deck, then the piles the quest's Setup fills from it. `encounterDeck2` is an encounter set the Setup sets aside (Foundations of Stone's),
+// which the removal list also thins; `quest` is a stage the removal list takes out of the quest deck (Road to Rivendell's "Orc Outpost (quest stage 2)"), which the Nightmare deck's own quest card replaces.
+export const NIGHTMARE_PILES = ["encounter", "staging", "activeLocation", "setAside", "attached", "encounterDeck2", "quest"] as const;
 const nightmareSchema = z.strictObject({
   setupCard: z.string().min(1),
   removed: z.array(z.strictObject({ code: z.string().min(1), copies: z.number().int().positive(), pile: z.enum(NIGHTMARE_PILES) })),
@@ -258,15 +259,22 @@ export function encounterCodes(data: AnyScenarioData, difficulty: Difficulty = "
 
 // The quest deck: each stage once, and a stage printed in several copies ("a different stage 2A" for each player, 10038:B:1) once for each seat, never more than
 // the copies the box holds. Every stage the box prints once is dealt once, so a scenario without such a stage deals `data.stages` unchanged.
-// The Nightmare deck's quest cards (`nightmare.questCards`) follow the stages on Nightmare: a stage 3 after the last printed one (Grimbeorn's Folly, 900511).
+// The Nightmare deck's quest cards (`nightmare.questCards`) take the place of the stages its setup card removes from the quest deck (`nightmare.removed` with the pile `quest`: Into the Pit's Goblin Patrol
+// leaves and Goblin Ambush takes its place, 901001:B:3 and 901001:B:11, "in stage order"): the first takes the first removed stage's place and so on. The ones left follow the stages: a stage 3 after the last printed one (Grimbeorn's Folly, 900511).
 export function questDeckCodes(data: AnyScenarioData, difficulty: Difficulty = "Normal", seatCount = 1): string[] {
   const placements = placementsAt(data, difficulty);
+  const nightmare = difficulty === "Nightmare" ? data.nightmare : undefined;
+  const added = nightmare?.questCards ?? [];
+  const printed = new Set(data.cards.filter((card) => card.pile === "quest").map((card) => card.code));
+  let taken = 0;
   const stages = data.stages.flatMap((code) => {
-    const printed = placements.find((card) => card.pile === "quest" && card.code === code);
-    const copies = printed ? Math.max(1, Math.min(copiesAt(printed, difficulty), seatCount)) : 1;
+    const placed = placements.find((card) => card.pile === "quest" && card.code === code);
+    // A stage the setup card removes: the next Nightmare quest card, when it has one, stands in its place.
+    if (!placed && nightmare && printed.has(code)) return taken < added.length ? [added[taken++] as string] : [];
+    const copies = placed ? Math.max(1, Math.min(copiesAt(placed, difficulty), seatCount)) : 1;
     return Array.from({ length: copies }, () => code);
   });
-  return difficulty === "Nightmare" ? [...stages, ...(data.nightmare?.questCards ?? [])] : stages;
+  return [...stages, ...added.slice(taken)];
 }
 
 const SETUP_VERB = {
@@ -386,14 +394,14 @@ export function campaignScenario<T extends AnyScenarioData>(data: T): T {
 // A stage that names LookAtStages (11016:B:3) carries the number of stages it looks at as its `look`.
 // A stage that names CatchUpWins (12013:B:3) carries the Stormcaller's stage number that makes its defeat a win as its `catchUp`.
 // A stage that names AdvanceToRandomStage (19048:B:2) carries the stages it proceeds to, in a random order, as its `randomNext`.
-// A stage that names FlipAtQuestPhase (19135:A:2) is a stage of a quest deck (`deck`): it is not flipped when revealed.
+// A stage that names FlipAtQuestPhase (19135:A:2), or flips with its When Revealed resolving (FlipCurrentQuest `resolve`, 03070:A:1), is a stage of a quest deck (`deck`): it is not flipped when revealed.
 export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true; different?: true }; deck?: true } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
   const random = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceToRandomStage");
   const randomNext = random?.verb === "AdvanceToRandomStage" ? { codes: random.codes, ...(random.otherwise != null ? { otherwise: random.otherwise } : {}), ...(random.remove ? { remove: true as const } : {}), ...(random.different ? { different: true as const } : {}) } : undefined;
-  const deck = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).some((instruction) => instruction.verb === "FlipAtQuestPhase");
+  const deck = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).some((instruction) => instruction.verb === "FlipAtQuestPhase" || (instruction.verb === "FlipCurrentQuest" && instruction.resolve === true));
   return { code, ...(randomNext ? { randomNext } : {}), ...(deck ? { deck: true as const } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
 }
 

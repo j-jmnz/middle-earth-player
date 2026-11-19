@@ -186,7 +186,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
       * option "hill":
         - deal 3 damage to the current quest stage
       * option "attack":
-        - [json ImmediateAttackBy {"verb":"ImmediateAttackBy"}]
+        - the card the answered event was about (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
 
 19075:A:2 (shadow): Shadow: If this attack destroys a character, deal 3 damage to Hrogar's Hill.
   19075:shadow:1: Shadow
@@ -324,4 +324,4 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19083:constant:2: Constant
     - this card: stat loseAtDamage quest points of this card, while this card is in play
 
-(rendered pieces: 195 by template, 14 as JSON)
+(rendered pieces: 196 by template, 13 as JSON)

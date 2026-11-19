@@ -127,6 +127,13 @@ const TRIGGERS = [
 // `healCapPerEffect` (on the card): no heal effect takes more than this much damage off it ("Wilyador cannot be healed of more than 5 wounds by a single effect", 02064:A:3). `healReducedToOne` (on the host, from an attachment): a heal
 // of the host by a card effect other than an Athelas heal takes off 1 damage, and then the attachment is discarded ("the amount of damage healed is reduced to 1. Then, discard Noxious Supplies", 900608:A:2).
 // `returnsWithoutActive` (on an enemy): while no location is the active location, an engaged holder goes back to the staging area at once, whatever engaged it ("If there is no active location, return ~ to the staging area", 900702:A:2; the settle sweep, families/play/sweep.ts).
-const FLAGS = ["heroType", "threatCeiling", "cannotTriggerEffects", "healCapPerEffect", "healReducedToOne", "returnsWithoutActive"] as const;
+// `discardAtZeroWillpower` (on a character): it is discarded from play as soon as its current Willpower is 0 ("Characters are discarded from play if their Willpower is ever 0", 04013:B:2, a constant on the stage with every character as holder; "characters defending this attack ... are discarded
+// if their Willpower is 0", 04022:A:2, set until the end of the phase by the Shadow); a state the settle sweep keeps true (families/play/sweep.ts), not an event. `noWillpowerGain` (on "table"): no character gains Willpower from a player card effect, whatever its printed Willpower: a modifier that raises
+// Willpower and comes from a player card is not counted, a reduction still is ("While Frozen Silverlode is in the staging area, characters cannot gain Willpower from player card effects", 901306:A:1; core/keywords.ts, modifiedStat).
+const FLAGS = [
+  "heroType", "threatCeiling", "cannotTriggerEffects", "healCapPerEffect", "healReducedToOne", "returnsWithoutActive", "discardAtZeroWillpower", "noWillpowerGain", "guardedAlly",
+  // On "table", while a card holds it: a player cannot commit more allies to the quest than the number of heroes he is also committing ("Each player cannot commit more allies to the quest than the number of heroes he is also committing to the quest", 04118:B:2; families/play/commit-limit.ts).
+  "commitAlliesLimitByHeroes",
+] as const;
 
 export const manifest = { name: "play", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

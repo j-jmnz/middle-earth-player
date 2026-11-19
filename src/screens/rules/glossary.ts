@@ -27,14 +27,20 @@ const DOC_NAMES: Readonly<Record<string, string>> = {
   tdm: "The Dead Marshes rules",
   rtm: "Return to Mirkwood rules",
   // Rulesheets the app does not carry as books: their rules open in the Rules tab, with no page to turn to.
+  kd: "Khazad-dûm rules insert",
   trg: "The Redhorn Gate rules",
+  rtr: "Road to Rivendell rules",
+  witw: "The Watcher in the Water rules",
+  tld: "The Long Dark rules",
+  fos: "Foundations of Stone rules",
+  saf: "Shadow and Flame rules",
   bts: "Beneath the Sands rules",
 };
 
 // A decklist, a scenario's setup or one scenario's stage is read on its own screen (deck import, briefing), not looked up.
 function inGlossary(entry: RuleEntry): boolean {
   if (!(entry.doc in DOC_NAMES)) return false;
-  return !/^(decklist\.|mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-|emce\.setup-|mec108\.(campaign-)?setup-|mec11[23]\.setup-|sotm\.setup-)/.test(entry.id);
+  return !/^(decklist\.|mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-|emce\.setup-|mec108\.(campaign-)?setup-|mec11[23]\.setup-|(?:sotm|dwd)\.setup-)/.test(entry.id);
 }
 
 // A title's words without what opens it: an FAQ entry number ("(1.11) Limitations on Attacks"), a framework step number

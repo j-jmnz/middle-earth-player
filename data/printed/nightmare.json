@@ -3714,6 +3714,2203 @@
    "readBy": "Claude Code, read from the Nightmare proxy picture",
    "confirmedBy": null,
    "notes": "Card prints the comma before 'or'; Hall of Beorn has none."
+  },
+  {
+   "code": "901001",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1VTML9krJtdh1DwBDG5-A_puVqrl6kOTx&export=download&confirm=t",
+    "sha256": "cc9d1bb6bec472f4daa7c0495218d66e275147f5d37ee9dcbbbfb8fda3ff6d7c"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Forced: After Cave Torch exhausts, place 1 damage token on this card. Then, if there are 5 or more damage tokens on this card, remove Cave Torch from the game."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901001",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Fu459pZFYEQC4xkXFbbJfZZaUxN_6I9b&export=download&confirm=t",
+    "sha256": "bba15e06d9c7004172c82bff87ee93a63a9841031cb8837060b011c9a961477d"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for the Into the Pit scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter and quest deck:",
+    "1x Goblin Patrol",
+    "2x Stairs of Náin",
+    "2x Goblin Follower",
+    "2x Crumbling Ruin",
+    "3x Cave In",
+    "2x Fouled Well",
+    "2x Goblin Tunnels",
+    "5x Goblin Swordsman",
+    "Add the new quest card in this Nightmare Deck to the normal quest deck, in stage order. Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Into the Pit encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/into-the-pit.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901002",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1bvMpr_k3UO33luqu2yRYIM4o2w3bsaYb&export=download&confirm=t",
+    "sha256": "b1a3793995d35eb7239de4aa07d3f27281ea96993c8b8ed7e14ef5a5b1eaee7a"
+   },
+   "lines": [
+    "When Revealed: The first player must search the encounter deck and discard pile for X Orc enemies and add them to the staging area, where X is 1 plus the number of players in the game. One of these choices must be Patrol Sentry and one must be Patrol Leader, if able."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901002",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1YKPd0iBTUQZ8ZpQK_aaTGnAR1cqbADVZ&export=download&confirm=t",
+    "sha256": "82114ef22305c139311adf90ecf47c40434d1f978195f625f38fd4f2d4a1d994"
+   },
+   "lines": [
+    "X is 1 plus the number of players in the game.",
+    "Forced: After an enemy is defeated, place 1 progress on this stage.",
+    "Progress cannot be placed on Goblin Ambush except by the above effect."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901003",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1WjOm4RV9nzdEGDNwMUJl2ts11_iVOgod&export=download&confirm=t",
+    "sha256": "b8e244efe41ab7998634508ec00fa9ddff2e450497ca1015b2017a69b029a147"
+   },
+   "lines": [
+    "Forced: After Cave Torch exhausts, Patrol Sentry makes an immediate attack against the engaged player, if able.",
+    "Shadow: Add Patrol Sentry to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901004",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Nzk7SVQ8Pv9gVhHP3EWEci9Oz6Tc_JtL&export=download&confirm=t",
+    "sha256": "2fee0e086a52b1e21165030fc472248edc188006f47ff0cffa078b8ea220a516"
+   },
+   "lines": [
+    "Cannot be optionally engaged.",
+    "If the active location is a Dark location, Goblin Lurker gets +3 Attack and -40 engagement cost.",
+    "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if the active location is a Dark location.)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901005",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1HoWFBk2EJofr1qcctjY2DcrChD1Cf36g&export=download&confirm=t",
+    "sha256": "94702c0b7a0a9ba3abdec5bdcaa6b781bbeeed36b01bb2ed994f8fcc58c57070"
+   },
+   "lines": [
+    "Surge.",
+    "Shadow Dweller does not make engagement checks while Cave Torch is in play.",
+    "Shadow: Shuffle Shadow Dweller back into the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901006",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1gk876Z7e9OTBEplnZPMPXAHn0XWVnZgd&export=download&confirm=t",
+    "sha256": "5ca83264ab1a156dffd323b7b675250d4aca3a8741202d0a3a90ddcd9ae89a0e"
+   },
+   "lines": [
+    "X is the number of Dark locations in play.",
+    "When Revealed: Remove all progress from each Dark location in play.",
+    "Shadow: Attacking enemy gets +1 Attack for each Dark location in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901007",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1M296RyVgKuIQhizGZkJ-3a9a8FTk7wKP&export=download&confirm=t",
+    "sha256": "1f38b0f288a76ca9e994253faef43220cb881707b8d84a84391086335a1aa520"
+   },
+   "lines": [
+    "Doomed 1.",
+    "Each Dark location in play gets +2 quest points.",
+    "While Cave Torch is ready, progress cannot be placed on Narrow Fissure."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901008",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1fj1b9lKam_sP7Rs74mV-qHbo4rifEI2e&export=download&confirm=t",
+    "sha256": "4914135efd0dd60aa2fb67953039d89e5a58d9afa0f862b634a1715f47ab2c92"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Attach to a non-Dark location in play. (Counts as a Condition attachment with the text: \"Attached location gains the Dark trait and gets +3 quest points.\")",
+    "Shadow: Attacking enemy gets +3 Defense this phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901101",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1-Jb9NJtj-OEXlvQ7VgeyZFoNMF5RowDa&export=download&confirm=t",
+    "sha256": "87b4baf8f69dfd6ffae3bc48d3fc493bc5401b97f351cd7b5ae2d47420f9b516"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Setup: Set Overseer Maurûl and Chamber of Records aside, out of play.",
+    "Forced: When stage 2B is revealed, make Chamber of Records the active location (returning any currently active location to the staging area) and add Overseer Maurûl to the staging area. Then, shuffle all copies of Balin's Doom in the encounter discard pile back into the encounter deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901101",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1ycQEXFgVXx-zhaQ53Oly6OSfIUUNrzsZ&export=download&confirm=t",
+    "sha256": "14cdcccdb88173ca4c96ea8ad8b2d6acaeb5d11d2f0dc2d28925271057330331"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for The Seventh Level scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "2x Plundered Armoury",
+    "2x Hidden Threat",
+    "2x Upper Hall",
+    "2x Goblin Scout",
+    "2x Goblin Swordsman",
+    "2x Goblin Spearman",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Seventh Level encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.",
+    "\"Does not stack\"",
+    "Some cards have passive abilities with the text \"This ability does not stack with...\" While two or more effects that do not stack with one another are active, only one of them will affect the game state."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-seventh-level.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The rule of \"does not stack\", printed on the setup card and implemented by the doesNotStack flag of 901105:A:1 and 901108:A:1."
+    },
+    {
+     "line": 12,
+     "reason": "The rule of \"does not stack\", printed on the setup card and implemented by the doesNotStack flag of 901105:A:1 and 901108:A:1."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901102",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Uuxlt2A5OkCgEGRsdJCHhepHP5huvcTK&export=download&confirm=t",
+    "sha256": "54e3a98dd08b8b9f9c2118bfb3572cc7bc2c7bce950cc50d94fe6726d694bce9"
+   },
+   "lines": [
+    "Overseer Maurûl gets +X Threat, +X Attack, and +X Defense, where X is the highest number of resources on a Goblin enemy in play.",
+    "The players cannot win the game unless Overseer Maurûl is in the victory display."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901103",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1vHlDY_9cQ94JTjJbyht-K80E1jqWKG48&export=download&confirm=t",
+    "sha256": "adedc2a2e3db6178555e27b67aa16563eadbf1c906c80d1acbd1717cce2232db"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "Each Goblin enemy with at least 1 resource on it is immune to player events.",
+    "Forced: When a Goblin enemy engages a player, add 2 resources to that enemy."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901104",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=18KTBuWXUwhpbOSpvUBQIrP-qLenIaFmV&export=download&confirm=t",
+    "sha256": "6147bdc9c9c102bc89ca5267e2d5be094a263c152cab11cca997d1c44661a76c"
+   },
+   "lines": [
+    "When Revealed: Add 1 resource to each Goblin enemy in play.",
+    "Forced: When a Goblin enemy with at least 1 resource on it is dealt any amount of damage, remove 1 resource from that enemy and cancel all damage just dealt to it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901105",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1ogfIIiOgSoEuWnCPkf4w3KBlIYFthFYH&export=download&confirm=t",
+    "sha256": "c2ebc9a87e555ae1c86a0d737f71088b91ddf8925997f05609ff83e081dd53bf"
+   },
+   "lines": [
+    "Each Goblin enemy gets +1 Attack for each resource on it. This ability does not stack with other copies of Goblin Skirmisher.",
+    "Shadow: Deal X damage to defending character. X is the number of resources on attacking enemy."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901106",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1n-6-w0St5NqrEv5mxCSCsDhgLCBjORql&export=download&confirm=t",
+    "sha256": "ea332f904da5d9fa01a8e8606864b00f2e9b4a417197a758d43f8ab21cb848ab"
+   },
+   "lines": [
+    "When Revealed: Add 2 resources to Pit Goblin.",
+    "Shadow: If attacking enemy is a Goblin, add 1 resource to it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901107",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1eDY-bFSHVkQ576Jwj_mAA1snnJjYiq9p&export=download&confirm=t",
+    "sha256": "de3a34a5c77f52a9d39d6c153d03256788c75e84218285c9c188b88ee87b2bb1"
+   },
+   "lines": [
+    "Forced: When a Goblin enemy enters play, add 1 resource to that enemy if Deep-Mines is in the staging area.",
+    "Shadow: Attacking enemy gets +1 Attack. Then, if attacking enemy is a Goblin, deal it another shadow card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901108",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=12LFJ0atP_-CtDJhjBrnLUg7fEdgEt88D&export=download&confirm=t",
+    "sha256": "7d62901561dbfeeef040b14be0e668f7162fca4994a99974d218a4d1e88075e9"
+   },
+   "lines": [
+    "Each Goblin enemy gets +1 Threat for each resource on it. This ability does not stack with other copies of Western Hall.",
+    "Travel: Add 1 resource to each Goblin enemy in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901109",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=10ibhsyAjbmnIQeLwQwGjcx7jp6fAlGc8&export=download&confirm=t",
+    "sha256": "6cae83b3abfa31030fc8f6b8155b48174ca1c74112cc8898e55e3f6614bbab38"
+   },
+   "lines": [
+    "Surge. Doomed 1.",
+    "When Revealed: Add 1 resource to each Goblin enemy in play.",
+    "Shadow: If attacking enemy is a Goblin, add 1 resource to it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901110",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1YwyFO67Tkqnr_FIF9JlQo3ykykHXhfV-&export=download&confirm=t",
+    "sha256": "b85d52abe60d540890441526bf77160f12d696b04d760d19adfbb659e5598900"
+   },
+   "lines": [
+    "When Revealed: Reveal the top X cards of the encounter deck, adding all enemies to the staging area. Discard the other revealed cards without resolving them. X is 2 plus the number of players not engaged with a Goblin enemy."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901201",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=16wVyCFrNuOq6x1AFVpZSpiwfzKuAX2Ws&export=download&confirm=t",
+    "sha256": "34d401593a212532a3dece341280a829f433c93f2ddd7190e3b3384d5ba19cdf"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "When a quest card is bypassed, shuffle it into the quest deck instead of placing it on the bottom.",
+    "While the Escape from Darkness quest card is in play, the Refresh Action on Abandoned Tools can only be triggered once each round."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901201",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1cHRGm9h0UcibJaGw9gIbn2mVsMI9F9lo&export=download&confirm=t",
+    "sha256": "9e0f1200ee097ff1463a55ae7b688249bab65601d6f1653d1e760b2714ff2081"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for the Flight from Moria scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter and quest deck:",
+    "1x Blocked by Shadow",
+    "1x New Devilry",
+    "3x Stray Goblin",
+    "2x The Mountains' Roots",
+    "3x Chance Encounter",
+    "2x Goblin Archer",
+    "1x Goblin Spearman",
+    "2x Plundered Armoury",
+    "3x Cave In",
+    "2x Dark and Dreadful",
+    "Shuffle the new stage 2 quest cards in this Nightmare Deck into the quest deck along with the rest of the scenario's stage 2 quest cards, leaving stage 1A on top of the quest deck. Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Flight from Moria encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 14,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/flight-from-moria.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901202",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1c0G1eAYAL9nYaulcByMA8D8U64m0VeTd&export=download&confirm=t",
+    "sha256": "2d013bfc4fad409ed36cd1e5db553c4d6efb83048d469ed6ec4a2ef8aec9d8c3"
+   },
+   "lines": [
+    "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901202",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1J2gtioG4dD6WxPC7XP6DZTbYq_od_Rkm&export=download&confirm=t",
+    "sha256": "60296c1955527827d1982f072db917c56480f6cf8947684c3e00082e1ec5d0ca"
+   },
+   "lines": [
+    "Forced: At the end of the round, shuffle the discard pile into the encounter deck and discard the top 5 cards. Resolve the \"when revealed\" effects of each copy of A Foe Beyond discarded by this effect.",
+    "No more than 1 progress can be placed on this stage each round.",
+    "If the players defeat this stage, they win the game.",
+    "Players may bypass this quest card at the end of the combat phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901203",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1c0G1eAYAL9nYaulcByMA8D8U64m0VeTd&export=download&confirm=t",
+    "sha256": "2d013bfc4fad409ed36cd1e5db553c4d6efb83048d469ed6ec4a2ef8aec9d8c3"
+   },
+   "lines": [
+    "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901203",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=16FyNH7GqhmB4IpnMAycU3zn3N3h3EllX&export=download&confirm=t",
+    "sha256": "a33b3e8d54789ad78bcaf683f4ab6f81eee60f425b6c990a312c4f0374e654fb"
+   },
+   "lines": [
+    "The Nameless Fear attacks each player in turn order during the combat phase (deal and discard a new shadow card for each attack). Characters are eligible to attack The Nameless Fear while it is in the staging area.",
+    "If The Nameless Fear has 10 or more damage on it, remove all damage from it and advance to the next stage.",
+    "Players may bypass this quest card at the end of the combat phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901204",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1c0G1eAYAL9nYaulcByMA8D8U64m0VeTd&export=download&confirm=t",
+    "sha256": "2d013bfc4fad409ed36cd1e5db553c4d6efb83048d469ed6ec4a2ef8aec9d8c3"
+   },
+   "lines": [
+    "While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901204",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1wuEqfvG-liAilrjnAqfLsrJXooXwe78D&export=download&confirm=t",
+    "sha256": "8d0d9f9c0e761cfe9bac90a9b08a8357457dd33f83a01d429d9d2e9c6aa8edb3"
+   },
+   "lines": [
+    "When Revealed: Deal 1 damage to each questing character.",
+    "Players may bypass this quest card at the end of the combat phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901205",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1s_mfFtQ4v2IxBEYlMPOfMukfzaGXblO8&export=download&confirm=t",
+    "sha256": "a36c6f8b9417bbefe126e41a0b234eaef9249edb7f6235ea6e0e4d1b1edb1ff5"
+   },
+   "lines": [
+    "Surge.",
+    "While you are engaged with Swarming Goblins, it gains: \"Forced: When a quest card is bypassed, search the encounter discard pile for a copy of Goblin Spearman and put it into play engaged with you.\""
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901206",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1-beLWVO6uzbei5TrPhnYe40lw3XeX6Ik&export=download&confirm=t",
+    "sha256": "7489a50606ff5ffdc44b93bbbbbc3eba9ebd2b106efab70da3b9ec13d634e7ff"
+   },
+   "lines": [
+    "X is the number of victory points in the victory display.",
+    "Shadow: Attacking enemy gets +X Attack. X is the number of victory points in the victory display."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901207",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1QBUKVhShBUFIhi3LI9Jz0RaCS7zYUnAv&export=download&confirm=t",
+    "sha256": "115abd748b868edc5cc9389106858203de3e3c235920e6e78e2e63d8c07b64bb"
+   },
+   "lines": [
+    "As an additional cost to bypass a quest card, each player must raise his threat by 2.",
+    "Shadow: If the defending character is a hero, discard all resources in its resource pool. Deal attacking enemy another shadow card for each resource discarded in this way."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901208",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=16sp16fUg6OuYMDTDD4sg5mhazA3o8Cuq&export=download&confirm=t",
+    "sha256": "f983aaa3fd9cfc6ad3f8a694e4938d20113a240d5e8da4cc9447301bff55d32e"
+   },
+   "lines": [
+    "When Revealed: Choose and remove characters from the quest until the total Willpower of characters removed from the quest is equal to or higher than The Nameless Fear's Threat.",
+    "Shadow: Discard each attachment you control with a cost less than The Nameless Fear's Threat."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901209",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1dyZWIhDJpsygVd85wj4NAAm4Kv9YzEBK&export=download&confirm=t",
+    "sha256": "e32883c2a23642b591a52fa4a5cc3a9361f49f17f7eb4e3851506433a32fe776"
+   },
+   "lines": [
+    "Surge. Doomed 1.",
+    "When Revealed: Add this card to the victory display.",
+    "Shadow: If this attack destroys a character, add this card to the victory display."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901301",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1QcTCDD11SEIqV10IOkFkaKBLv09uxHzQ&export=download&confirm=t",
+    "sha256": "7c78c8c23d848133300ba5b98396625590380857156a61b0b8db53ab57593b2b"
+   },
+   "lines": [
+    "You are playing in Nightmare mode.",
+    "Setup: Remove all copies of Blinding Blizzard from the encounter deck and set them aside, out of play. During this game, player cards in the victory display do not count their victory points.",
+    "Forced: When stage 2b is revealed, shuffle each set aside copy of Blinding Blizzard into the encounter deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901301",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1ipEcUsXS3JHUUpvyuPoVdhtoQFdUBQV3&export=download&confirm=t",
+    "sha256": "29f8e3652e5f67b2deb46744d1e0d60529c383f1481e8bfb528e8358c841ae47"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for The Redhorn Gate scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "1x Black Uruks",
+    "3x Mountain Warg",
+    "1x Knees of the Mountain",
+    "2x Turbulent Waters",
+    "2x Warg Lair",
+    "1x The Dimrill Stair",
+    "2x Fell Voices",
+    "2x Fallen Stones",
+    "3x Mountain Goblin",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Redhorn Gate encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-redhorn-gate.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901302",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=10dk3KnR6cexwOg5IdyZYmFYaackwFQ9V&export=download&confirm=t",
+    "sha256": "7dd31c8d9b9b01b5f67c1dd9e465a7b036938634fe21432bf1879288330f59e9"
+   },
+   "lines": [
+    "Surge.",
+    "Forced: After engaging Wolfpelt Goblin, the engaged player must deal X damage to 1 character he controls, where X is the active location's remaining quest points. Then, remove 2 progress from the active location, if able."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901303",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1lHfxbfAlVQPXDWL-ufl_2vVJbcQH0FKx&export=download&confirm=t",
+    "sha256": "759c33025c39faaae1af83977a3ee6b3ad02b1f12246d70a9429bda42ade8724"
+   },
+   "lines": [
+    "While attacking, Silvertine Marauder gets +2 Attack if the defending character has less than 2 Willpower.",
+    "Shadow: Attacking enemy gets +2 Attack if the defending character has less than 2 Willpower."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901304",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1mtYfSCesasClxtkUKLHZnrEjUeMppTP-&export=download&confirm=t",
+    "sha256": "403cd985724164e874c4482c74c9b7f42c3799242e99728ada1ed21a18c480fd"
+   },
+   "lines": [
+    "While Snow-Giant is in the staging area, it attacks the first player during the combat phase, as if it were engaged.",
+    "Forced: After Snow-Giant engages you, discard the ally you control with the highest Willpower."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901305",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=18PzBxJ8-b-4YbQhFvTi-_QNOUuo7mzMv&export=download&confirm=t",
+    "sha256": "b2c510c9f044317a9bb5210c4480d41aa3d4b9c389e5ca6cd5b1eda54929bf50"
+   },
+   "lines": [
+    "X is the number of Snow cards in the staging area.",
+    "Travel: Search the encounter deck and discard pile for 1 copy of Freezing Cold and reveal it to travel here. Shuffle the encounter deck.",
+    "Shadow: Defending character gets -1 Willpower. Deal the attacking enemy 1 additional shadow card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901306",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1FdxhzmXJvgZPw86he75g5gZVUAV-E-sq&export=download&confirm=t",
+    "sha256": "3c7ed985752de4e6181ccbb9606979e9f9f9e51d918cadaf8ff666fb2680a0f3"
+   },
+   "lines": [
+    "While Frozen Silverlode is in the staging area, characters cannot gain Willpower from player card effects.",
+    "Shadow: Defending character gets -1 Willpower. Deal the attacking enemy 1 additional shadow card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901307",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=123lO9EOqoCopbAQw04izLjlnoi9dHDy1&export=download&confirm=t",
+    "sha256": "f09d54d3508f2e73bfca24666b52481fe9e78b702c9a602125e10dc115862670"
+   },
+   "lines": [
+    "While Blinding Blizzard is in play, heroes do not collect resources during the resource phase.",
+    "When Revealed: Add Blinding Blizzard to the staging area. Progress that would be placed on the current quest or on Snow locations are instead placed on Blinding Blizzard. When the 5th progress is placed on Blinding Blizzard, discard it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901308",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1XwIM-Zb0gbTE-Pz-A1qfI4NW9Xn168KW&export=download&confirm=t",
+    "sha256": "e530f873d79cfca171102e56c0d552efa42595540e9f1e1e5f6a3627d708a060"
+   },
+   "lines": [
+    "When Revealed: Return all Snow cards in the encounter discard pile to the top of the encounter deck, in random order. Reveal the top card of the encounter deck (reveal the top 2 cards instead if there are 3 or 4 players in the game)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901401",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1BB5UPFswVnEhmE-GffE_LAu8BD-oTFwl&export=download&confirm=t",
+    "sha256": "fd504838cd62a963f17a9dca658cb360afdeb1c0cef9b2f9bd976341d997ed34"
+   },
+   "lines": [
+    "You are playing in Nightmare mode.",
+    "Forced: When an enemy with the ambush keyword engages a player during the quest phase, it contributes its Threat to the total Threat in the staging area until the end of the phase."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901401",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1M1OHecV2fGA3i8lpuFywmSZdksQdALKs&export=download&confirm=t",
+    "sha256": "d6ec63313cd555cdce53db6307dce4713fc6484afa85131e156288e339c85523"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for the Road to Rivendell scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter and quest deck:",
+    "1x Orc Outpost (quest stage 2)",
+    "2x Ruined Road",
+    "2x Barren Hills",
+    "1x Goblin Taskmaster",
+    "4x Black Uruks",
+    "3x Mountain Warg",
+    "3x Bitter Wind",
+    "2x Warg Lair",
+    "5x Goblin Spearman",
+    "2x Goblin Archer",
+    "2x Plundered Armoury",
+    "Add the new quest card in this Nightmare Deck to the normal quest deck, in stage order. Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Road to Rivendell encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 14,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 15,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/road-to-rivendell.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901402",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=153bVGKHXTFuB5gyf0xWaR3sM_JPxC5sn&export=download&confirm=t",
+    "sha256": "a4d8ab4ba82ab51c188ccb4687a41a1806ea8fea137d2daee065aa7a446eb48a"
+   },
+   "lines": [
+    "When Revealed: Search the encounter deck, discard pile and victory display for Goblin Gate and add it to the staging area, if able. Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until X enemies have been discarded, where X is the number of players in the game. Reveal all enemies discarded by this effect."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901402",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1L-NYs1hmnG9wXqtGVfl3yPrltmANb2P4&export=download&confirm=t",
+    "sha256": "0a48b65ea9cf86e4172b9d72d64a1a4c4dccd63369d8d0dce08e477cd179a500"
+   },
+   "lines": [
+    "When Revealed: The first player loses control of Arwen Undómiel and attaches her to Goblin Gate (she is now guarded by Goblin Gate). While she is guarded, the first player cannot gain control of Arwen Undómiel.",
+    "Goblin Gate gets +1 quest point for each enemy engaged with a player.",
+    "Progress cannot be placed on this stage unless the players control Arwen Undómiel."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901403",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1WVz-a1MLV7iPb9-niFhA0AW3vSNzZEub&export=download&confirm=t",
+    "sha256": "823ae7bd71bb05e4a192c2120ab19c3f89f0422af1ae13f8b8a12c8c0e463be8"
+   },
+   "lines": [
+    "Ambush.",
+    "Forced: When Uruk Elf-stalker attacks and destroys a character, deal 1 damage to Arwen Undómiel.",
+    "Shadow: Attacking enemy gets +2 Attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901404",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1k1u8Ai_K0Dkmx4Q2fU56Bt4FXiv6sv3e&export=download&confirm=t",
+    "sha256": "727c921bfb8d4a2a4af8316b0231e93698e269994f31d38307e358f17168cf98"
+   },
+   "lines": [
+    "Ambush.",
+    "Forced: After Goblin Trapper engages a player, that player must exhaust a character he controls.",
+    "Shadow: Add Goblin Trapper to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901405",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1slzdJk9TpVLGW3-CT75eD7LrpsH0r5nm&export=download&confirm=t",
+    "sha256": "54fee19fc2c7df2072c0e90c6172a658c27477891ec7dfa5229a902a219e55ad"
+   },
+   "lines": [
+    "Ambush.",
+    "Forced: After Raiding Party engages a player, each player discards the top card of the encounter deck, starting with the first player. Each player who discards an enemy with the ambush keyword must make an engagement check against that enemy."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901406",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1qcx8KcL1sfSPZS4zw1b9nrwbyxaxX1T8&export=download&confirm=t",
+    "sha256": "272263fc879dadaef8d083e9a1e2fd29e0aeba5c3a5771585702670fe2531119"
+   },
+   "lines": [
+    "Surge.",
+    "While Vicious Trackers is engaged with a player, that player is considered to have +20 threat for the purposes of engagement checks only."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901407",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Ug5Q_OqksGMa7Xn7YvbOfvj_Qm2oiwaN&export=download&confirm=t",
+    "sha256": "b3bcadd05e6cb62208dffcae66d1f90412986860412ba0e6ad23188987378b87"
+   },
+   "lines": [
+    "Forced: When an enemy with the ambush keyword engages a player, Treacherous Bluffs gets +2 Threat until the end of the phase.",
+    "Shadow: Excess damage dealt by this attack must be assigned to Arwen Undómiel."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901408",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1MS5fLqwj8AdZktrEEhQcIyxbWowqi6kY&export=download&confirm=t",
+    "sha256": "573502737da8b8d2aa6f7246354190f2c4d827b658b296426db157b23d7db3d2"
+   },
+   "lines": [
+    "While Concealed Woods is the active location, the first enemy with the ambush keyword revealed from the encounter deck each round gains surge.",
+    "Shadow: Attacking enemy gets +2 Attack if engaged with the first player."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901409",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1264qrz2A9oajQtrw7AaTEs9yalkFqrSt&export=download&confirm=t",
+    "sha256": "8c1d1c0b2332fb19dc9676a826f58ca7499f990077d20755758030f2f3d64030"
+   },
+   "lines": [
+    "When Revealed: Return each engaged enemy with the ambush keyword to the staging area. Each player makes engagement checks against each enemy in the staging area, as if it were the encounter phase. If there are no enemies with the ambush keyword in play, Tumultuous Assault gains surge."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901501",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1HsdOS5zOvKNSOCQZwgzuJWcqq-LDp_vf&export=download&confirm=t",
+    "sha256": "2d888e73b31836f0c1196fcad897b74403f0d10dea4785083c0d6bb4ffeba22b"
+   },
+   "lines": [
+    "You are playing in Nightmare mode.",
+    "While Doors of Durin is in play, The Watcher cannot be engaged.",
+    "Forced: When a Tentacle enemy is destroyed, deal 1 damage to The Watcher if it is in play.",
+    "The players cannot win the game unless both Doors of Durin and The Watcher are in the victory display."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901501",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1TvuJYb0N_Ycw8CTj8IcouOLp8MWDcC5q&export=download&confirm=t",
+    "sha256": "5f41c85c903a9cab9593cad13834d707bda47eb0b3af6be1efc7f135e5f83b11"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for The Watcher in the Water scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "1x The Watcher",
+    "2x Makeshift Passage",
+    "4x Black Uruks",
+    "3x Mountain Warg",
+    "2x Warg Lair",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Watcher in the Water encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-watcher-in-the-water.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901502",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1iA0rx-XMYnAeaAT6OhW7jRfEu4G51IJ5&export=download&confirm=t",
+    "sha256": "4d79994cf0baca28f96c545b5d6628a19a6c908d3f3972ecf78b1e5b5d328312"
+   },
+   "lines": [
+    "While The Watcher is in the staging area, it cannot be damaged by player card effects.",
+    "If The Watcher is in the staging area at the end of the combat phase, each player must deal 3 damage to 1 character he controls."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901503",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1t0R158qiCIhaKqK48Navrx56Yjix37oA&export=download&confirm=t",
+    "sha256": "b2c01b5ea094e86a7140582b5836bd1e78a66c20f0692384528b2e5b6154c9eb"
+   },
+   "lines": [
+    "Forced: When Writhing Tentacle engages a player, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, Writhing Tentacle makes an immediate attack, then attaches to the defending character as a Tentacle attachment with the text: \"Attached character cannot commit to the quest.\""
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901504",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1u25ORTJS0Gtwzs0xVE4Jk4x5HkyTa2RH&export=download&confirm=t",
+    "sha256": "100d39fa0e751237236a6e771ceee178a8f1e764242df6caffdb7140d89e486b"
+   },
+   "lines": [
+    "Forced: After resolving an attack made by Choking Tentacle, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, attach Choking Tentacle to a character the defending player controls as a Tentacle attachment with the text: \"Forced: After attached character readies, deal it 1 damage.\""
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901505",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1jTjJ0jb_syg30F1Npdz2-Ux23lX_HbDo&export=download&confirm=t",
+    "sha256": "c7b9dc69f9278ffc561b2f6a52d01a8f37c03ebd66103e97a7351b385f0425b2"
+   },
+   "lines": [
+    "While Banks of Sirannon is in the staging area, each Tentacle enemy gets +2 Defense.",
+    "Shadow: For each point of damage dealt by this attack, the defending player must discard a random card from his hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901506",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Y4XVHffUHgLyiOnQSirMrOeMs8UZQR7R&export=download&confirm=t",
+    "sha256": "d8b27281e335f49b984fcad2df56c7f49ede46d18eb75159400f3eec4fcd5373"
+   },
+   "lines": [
+    "Forced: After a player looks at one or more cards in the encounter deck, shuffle the encounter deck.",
+    "Travel: Reveal the topmost Tentacle enemy in the encounter discard pile to travel here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901507",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=13BbGRlViP3jCWvlIYGCN7d3VJ2MmO4Ui&export=download&confirm=t",
+    "sha256": "904f6345414697ad7693c23ffd12cfe6364aa3221f5cf337525ebeab4efd2c16"
+   },
+   "lines": [
+    "When Revealed: Deal 3 damage to each character with a Tentacle attachment. If no characters were damaged by this effect, Pulled Under gains surge.",
+    "Shadow: If the defending character has a Tentacle attachment, discard that character."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901508",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Y-4shW30Vc-VhX5i3gYskohRd2zN-LDD&export=download&confirm=t",
+    "sha256": "f8c2442d67f4af3d6df53884f6df6efbbcb44dc59879c4474e68b2dadfb65f0f"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Shuffle X Tentacle enemies from the encounter discard pile into the encounter deck. Heal X damage from The Watcher, if it is in play. X is the number of players in the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901601",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1iCR8u6QldhzlQ62GM5ggK2vREWiVxqwT&export=download&confirm=t",
+    "sha256": "c03815e4ff9390a7dd9e522096e27f852ba76f532a291ef81a9751f213229c13"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Durin's Greaves gains surge.",
+    "Lost: The first player must choose and discard an ally in play."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901601",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1HH81GpwKeUCMRY7-Pf5BdRHlAIAV6u9U&export=download&confirm=t",
+    "sha256": "81afe0521a9ae058da668cfb47b0167ec66cd337eff7c4bab4fa5e50423afef0"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for The Long Dark scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "4x Goblin Follower",
+    "1x Branching Paths",
+    "3x Burning Low",
+    "2x Stray Goblin",
+    "2x Chance Encounter",
+    "2x The Mountains' Roots",
+    "1x Abandoned Mine",
+    "2x Fatigue",
+    "4x Goblin Sneak",
+    "3x Rock Adder",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Long Dark encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 14,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/the-long-dark.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901602",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=14uLIdwEF6GrfEdGEc5zduwtAbw79I2iE&export=download&confirm=t",
+    "sha256": "f7ebe7808642f8c8ec18fd30805f671d12053d1d30040c14fc76d9ba26251d05"
+   },
+   "lines": [
+    "Forced: When Goblin Stalker attacks, deal it 1 additional shadow card.",
+    "Forced: When Goblin Stalker is dealt a shadow card with \"PASS\" printed in its text box, it gets +2 Attack until the end of the phase.",
+    "PASS."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901603",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1_C2iNCUu1K7mxhdkj7ItMcEGhLXXezAJ&export=download&confirm=t",
+    "sha256": "e33da0f0d0e78f32ce8302827312919454630eebb214b64229f700d119bd8845"
+   },
+   "lines": [
+    "Forced: If Trapdoor Spider damages a character, discard that character from play.",
+    "Lost: Trapdoor Spider engages the last player and makes an immediate attack.",
+    "PASS."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901604",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=11SYNh_YVYJST17gqNLX5mOsy7vGlN8k_&export=download&confirm=t",
+    "sha256": "24133b57b7e5ebc5cdb0459b382370f1bf6f53672e5dad6e2269087000410225"
+   },
+   "lines": [
+    "While Sentinel of the Deep is engaged with a player, that player cannot draw cards from card effects.",
+    "Shadow: Defending player must choose and trigger 1 \"Lost:\" effect in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901605",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=11UpjHBnGQfUOcF8mAVW8258J_jOoQiw8&export=download&confirm=t",
+    "sha256": "0f4e449621419d6355e8b877607350ee0059c34154a2ab6333435ba56fc1d932"
+   },
+   "lines": [
+    "Travel: The first player must make a locate test to travel here. If this test is failed, return Eastern Mines to the staging area and trigger all \"Lost:\" effects in play.",
+    "Shadow: Defending player must choose and trigger 1 \"Lost:\" effect in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901606",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1X1XHoRyprd3u_d3-Z55t0g5ZLxxbXnmz&export=download&confirm=t",
+    "sha256": "fc6231505ab69a986042b810b17a8fde64ee60745ccb862133719bb7a7cf8c80"
+   },
+   "lines": [
+    "For each point of progress that is placed on Bottomless Chasm, the players must choose and discard 1 card from a player's hand, if able.",
+    "Shadow: If this attack destroys a character, the defending player discards all of the cards in his hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901607",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1PIFvDnTuuFOWhBcsUKwWDClFTlg2h5LA&export=download&confirm=t",
+    "sha256": "871fa53e31a5e512a3aa2fd220a103e822e3b030f011940b280bcf0ffb444078"
+   },
+   "lines": [
+    "When Revealed: Starting with the first player, each player must choose and trigger a different \"Lost:\" effect in play.",
+    "Shadow: Make a locate test. If this test is failed, return attacking enemy to the staging area after this attack and trigger all \"Lost:\" effects in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901608",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=13tdOwG0In3AMeuuxZJuMTQl0sVX_21Eb&export=download&confirm=t",
+    "sha256": "c1fc1d83b947db93976119d23105240ce512c51e7a04950e103a2a36ef8efc80"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Attach to a hero. (Counts as a Condition attachment with the text: \"Lost: Discard attached hero.\")",
+    "Shadow: If you have no cards in your hand, discard defending character from play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901701",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1qSB0Z8e6lmnjV5C7vxSFuIFQK7rCbG3T&export=download&confirm=t",
+    "sha256": "80aa4d68f85eeec66808fac046fabb3259828e7ec3defbaf6933d8df1323464d"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Forced: When stage 3b is revealed, discard all Mount and Artifact cards from play. Each player must also discard allies he controls until the total printed cost of allies he controls is 6 or less."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901701",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1vrGE5XYeFFD-5tY4K5Pv8sEBfmdxkb8M&export=download&confirm=t",
+    "sha256": "55cb65720cd2babf763d912e3699ccc5bdea17b5de8bce99ce58b597a03c5ffd"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for the Foundations of Stone scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "3x Goblin Scout",
+    "2x Goblin Swordsman",
+    "1x Goblin Follower",
+    "3x Burning Low",
+    "1x Branching Paths",
+    "1x Many Roads",
+    "3x Cave In",
+    "3x Drowned Treasury",
+    "1x Mitril Lode",
+    "4x Moria Bats",
+    "During setup, players are instructed to set the Foundations of Stone encounter set aside, out of play. Shuffle the encounter cards in this Nightmare Deck with the Goblins of the Deep encounter set icon into the standard encounter deck. Then, shuffle the encounter cards in this Nightmare Deck with the Foundations of Stone encounter set icon into the remainder of the set aside Foundations of Stone encounter set.",
+    "Finally, flip this card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 12,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 13,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    },
+    {
+     "line": 14,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/foundations-of-stone.json `nightmare` (scripts/data/normalize/nightmare.ts, NIGHTMARE_CARD_PILES for the set icons)."
+    }
+   ],
+   "misprints": [
+    {
+     "line": 11,
+     "printed": "1x Mitril Lode"
+    }
+   ],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901702",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1OfgBcT9WKn4VLak6bUJm7MI8E2XYvPvj&export=download&confirm=t",
+    "sha256": "99387392e0356fd5d945012af451286453d5bbb52bc0018901d79f5bace27701"
+   },
+   "lines": [
+    "Mithril Seeker gets +1 Attack for each resource on it.",
+    "Forced: When Mithril Seeker attacks, move 1 resource from each of the defending player's heroes to Mithril Seeker."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901703",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=13AOT-YAHYF7GxCugIh89gcQpAwIjhIAX&export=download&confirm=t",
+    "sha256": "121c86912e2e0daf25fc6805f7593e0925e87353270f8c1f78af66f15e5c49eb"
+   },
+   "lines": [
+    "When Revealed: Each player at this stage shuffles the card in his hand with the highest printed cost back into his deck.",
+    "Forced: At the end of the combat phase, if Giant Cave Centipede is engaged with a player, that player chooses and adds it to a different player's staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901704",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1qzjGh8nbMyqMJ879yH8ljNlhWIdS5tBN&export=download&confirm=t",
+    "sha256": "a8519a6a8543120bdc625faed3092990f76016712fc4d86586a9bf1ba541c8e6"
+   },
+   "lines": [
+    "Forced: When Unspeakable Thing engages a player or attacks a player, attach the top card of that player's deck to it.",
+    "X is the printed cost of all attached cards on this card. If there are no cards attached, X is 5."
+   ],
+   "inert": [],
+   "misprints": [
+    {
+     "line": 1,
+     "printed": "Forced: When Unspeakable Thing enages a player or attacks a player, attach the top card of that player's deck to it."
+    }
+   ],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901705",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=15hJTf_a1lKy0ESwLGHx1P52bLOZM6dHP&export=download&confirm=t",
+    "sha256": "57450e1a54085a769a883b86918f17d0352ce473ff54cdd7fa291082d4c43ad0"
+   },
+   "lines": [
+    "Forced: When Primeval Thing enters play, attach cards from the top of the first player's deck to it until the total printed cost of all attached cards is 6 or higher.",
+    "X is the printed cost of all attached cards on this card. If there are no cards attached, X is 6."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901706",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1To9U3CpLSQfhBW97UnXqurz9ABl28A_u&export=download&confirm=t",
+    "sha256": "e1c11798b5271bed6ac29302724e21d2ff07c14b06281db6f1b77e1828a4ebef"
+   },
+   "lines": [
+    "While Nest of Horrors is in the staging area, it gains: \"Forced: When one or more cards are attached to a Nameless enemy from the top of a player's deck, attach an additional card from the top of that player's deck.\"",
+    "Travel: Each player at this stage discards the top card of the encounter deck to travel here. Reveal each Nameless enemy discarded by this effect."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901707",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1baS7PC13zW5VgvW6PTTNG-S65a8i7Kjl&export=download&confirm=t",
+    "sha256": "e53b9dd5fba721b849fae21bfa2ce42ce30a3813c9583a9b560ee72a5a493d68"
+   },
+   "lines": [
+    "While Shivering River is in the staging area, it contributes its Threat to the total Threat in each other player's staging area.",
+    "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if there is more than one player at this staging area.)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901708",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1iPWxq1ZyCfqYzwK1A69yTOp_nd6tjmDJ&export=download&confirm=t",
+    "sha256": "ecd6a0a3d86fc0f2589413862c0637dac5981927443569d3714b9257859eb0ae"
+   },
+   "lines": [
+    "When Revealed: Each player must either discard his hand, or raise his threat by the number of cards in his hand. If no cards were discarded by this effect, Chill of the Roots gains surge.",
+    "Shadow: If attacking enemy is Nameless, attach the top card of the defending player's deck to it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901801",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1jPvFeQnNYrRYnzaIDjtBhhMn0RntM9vD&export=download&confirm=t",
+    "sha256": "ce29634197eb1d533a5f825360fd933fccbf389dbb05293ef5b20349953af317"
+   },
+   "lines": [
+    "You are playing Nightmare mode.",
+    "Setup: Shuffle the 10 encounter cards with the Attack trait into a separate \"Balrog deck.\"",
+    "When Durin's Bane would be dealt a shadow card, deal it from the Balrog deck instead of the encounter deck. Shadow cards dealt from the Balrog deck are discarded into a separate Balrog discard pile.",
+    "At the beginning of each combat phase (or if the Balrog deck runs out of cards), shuffle the Balrog discard pile back into the Balrog deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Nightmare mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901801",
+   "side": "B",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1FcGAx4BXc3SMPRvsPx3mQl-J4eUtuMJF&export=download&confirm=t",
+    "sha256": "7a369ad5e0979751b086ff90108c213ad21243407a139982f3727d0ef1690e43"
+   },
+   "lines": [
+    "Begin with the standard quest deck and encounter deck for the Shadow and Flame scenario.",
+    "Remove the following cards, in the specified quantities, from the standard encounter deck:",
+    "3x Goblin Scout",
+    "2x Goblin Tunnels",
+    "3x Stray Goblin",
+    "3x The Mountains' Roots",
+    "3x Ranging Goblin",
+    "1x Fiery Sword",
+    "1x Many Thonged Whip",
+    "Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Shadow and Flame encounter deck.",
+    "Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.",
+    "Play Tip: This scenario contains 10 treachery cards with the Attack trait that have only a \"shadow\" effect, and no \"when revealed\" effect. These cards are never revealed from the encounter deck and are only ever dealt as shadow cards to Durin's Bane."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 2,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 3,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 4,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 5,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 6,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 7,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 8,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 9,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 10,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 11,
+     "reason": "The Nightmare recipe: applied by the build to data/scenarios/shadow-and-flame.json `nightmare` (scripts/data/normalize/nightmare.ts)."
+    },
+    {
+     "line": 12,
+     "reason": "Play Tip: reminder that the Attack cards are only dealt as shadow cards to Durin's Bane. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901802",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1E6Txl-NfAg0YNznbX26LjxlhutpAN9Pa&export=download&confirm=t",
+    "sha256": "7f4fc0041a8d8d062cfe0429ecdb2cb909eafcceb797967ecd04c85607548ffb"
+   },
+   "lines": [
+    "Shadow: For each excess point of combat damage dealt by this attack (damage that is dealt beyond the remaining hit points of the character damaged by this attack) you must damage another character you control. Exhaust all characters damaged from this effect."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901803",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1k-CpdqyBF_nvLPqBrKJixGBYeiQP2d-6&export=download&confirm=t",
+    "sha256": "8eef26d842079d5d9cc93363740f66eeeac51c71cc2aca2fb5ac4c92a7d596f9"
+   },
+   "lines": [
+    "Shadow: For each point of damage dealt by this attack, heal 1 damage from Durin's Bane."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901804",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1Yav-B86tmImA99LxlR3wEk_43aJnit7Y&export=download&confirm=t",
+    "sha256": "ccf793ec6655138db97f546b85f7f9e64ab174c480dd98518b107411d56d5b6e"
+   },
+   "lines": [
+    "Shadow: Discard all cards attached to the defending character and deal it 1 damage. Cannot be canceled."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901805",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1_1sVRg6xmPWwwssCDxW_L2xVDJ888my0&export=download&confirm=t",
+    "sha256": "8b4b29131881fb37a9699c6f0d702b5c65f5241a1c0bde57e3179087821c1061"
+   },
+   "lines": [
+    "Shadow: If this attack destroys a character, Durin's Bane makes an additional attack against the defending player after this one."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901806",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1N9IkRbEXafchYymL43DlvzyqMje3t2rC&export=download&confirm=t",
+    "sha256": "4449fb017f2f4638b2f6998a0844cacfdae21d325f5189a96f96677ffe3b4f85"
+   },
+   "lines": [
+    "Shadow: Deal Durin's Bane 3 additional shadow cards from the encounter deck (not the Balrog deck)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901807",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=18I9Q-MD4hQjJDedFZRrIm3UHLTKD_Pjd&export=download&confirm=t",
+    "sha256": "537829c2dc7f0b9d849445860ffe5bfcc741e7b15fd5191d64597b7abccb39d4"
+   },
+   "lines": [
+    "Forced: While Durin's Bane has no damage, Servant of Flame gets +2 Attack and +2 Defense.",
+    "Shadow: Search the encounter deck for a treachery card with the Shadow or Flame trait and reveal it, if able. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901808",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1FUFFni1fWSCKIzpeCb4jcM0Zm0ahwFDQ&export=download&confirm=t",
+    "sha256": "f13c3eb158a1e33e17812f9f5b83f8aa7ed8e9c3695c4f1badd9b44ec6c721f0"
+   },
+   "lines": [
+    "Each enemy gets -20 engagement cost.",
+    "Shadow: If this attack destroys a character, attacking enemy cannot take damage this round."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901809",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1P_FharV8diJctccHMqoJ7rYM1FTbh0Yf&export=download&confirm=t",
+    "sha256": "67374e2329912d5a5186ed2958d89d4beffbe4d26e8a2d3f100e6cf88f0c4c0e"
+   },
+   "lines": [
+    "Progress cannot be placed on Fiery Depths while it is in the staging area.",
+    "Travel: Each player must move 1 damage from Durin's Bane to a hero to travel here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
+  },
+  {
+   "code": "901810",
+   "side": "A",
+   "printing": "Nightmare",
+   "scan": {
+    "url": "https://drive.usercontent.google.com/download?id=1TlSV60rCwL2YTkp7VNUbd2t3E6cU2lgv&export=download&confirm=t",
+    "sha256": "22f1b067501c770bca1edee04cb9dd30da751fdcecd9eeee33f4876a65d2c67b"
+   },
+   "lines": [
+    "While Crumbling Stairs is in the staging area, event cards cost 1 additional matching resource to play from hand.",
+    "Shadow: If this attack destroys a character, the defending player must discard all event cards in his hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code, read from the Nightmare proxy picture",
+   "confirmedBy": null
   }
  ]
 }

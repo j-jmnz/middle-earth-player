@@ -2,6 +2,7 @@
 import type { Amount, PickSpec } from "../../../catalog/boundary.ts";
 
 import { modifiedStat } from "../../core/keywords.ts";
+import { printedOf } from "../../core/printed.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { tiedExtreme } from "../../interpret/tied-extreme.ts";
@@ -28,9 +29,10 @@ export function highestThreatOf(state: ScenarioState, found: readonly string[], 
 
 const STATS = new Set(["willpower", "attack", "defense", "threat", "hitPoints", "engagementCost", "questPoints"]);
 
-/** The amount `totalOf` with `stat`: the stat of every card that matches the pick, as the table shows it now, added up ("the total Threat of each engaged enemy", 146026:A:1). Null when the amount is not the family's. */
+/** The amount `totalOf` with `stat`: the stat of every card that matches the pick, as the table shows it now, added up ("the total Threat of each engaged enemy", 146026:A:1); with `cost` the printed costs (a card with none counts 0), which Washed Away!'s Nightmare discard says (901701:A:2). Null when the amount is not the family's. */
 export function totalOfStat(state: ScenarioState, amount: Exclude<Amount, number>, scope: AmountScope, ctx: ReduceContext): number | null {
-  if (!amount.totalOf || amount.stat == null || !STATS.has(amount.stat)) return null;
+  if (!amount.totalOf || amount.stat == null || !(STATS.has(amount.stat) || amount.stat === "cost")) return null;
+  if (amount.stat === "cost") return pickCandidates(state, amount.totalOf, scope.actor, [], scope.sourceId ?? null, ctx, undefined, undefined, true).reduce((total, id) => total + (printedOf(ctx.cards, state.cards[id]?.code ?? "").cost ?? 0), 0);
   const stat = amount.stat as "willpower" | "attack" | "defense" | "threat" | "hitPoints" | "engagementCost" | "questPoints";
   return pickCandidates(state, amount.totalOf, scope.actor, [], scope.sourceId ?? null, ctx, undefined, undefined, true).reduce((total, id) => {
     const card = state.cards[id];

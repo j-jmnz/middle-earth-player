@@ -17,7 +17,7 @@ import { livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { manifest as catalog } from "../../../catalog/families/breaking.ts";
-import { areaOf, mergeView, viewOf } from "./areas.ts";
+import { areaOf, mergeView, sharing, viewOf } from "./areas.ts";
 import { returnToSharedStage, splitOff } from "./barrow.ts";
 import { allAtStageHolds, eventFrozen } from "./conditions.ts";
 import { noteSkippedStage, questCardDefeatedHeard } from "../quest/branch.ts";
@@ -41,6 +41,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return placeDiscardUnderDeck(state);
     case "StartSeparateStage":
       return startSeparateStage(state, instruction.code, focus.seat, instruction.reveal === true ? { ctx, steps } : undefined);
+    case "StartRandomSeparateStage":
+      return startRandomSeparateStage(state, instruction.codes, focus.seat, ctx, steps);
+    case "RemoveUnusedStages":
+      return removeUnusedStages(state, instruction.codes);
     case "AdvanceToStage":
       return advanceToStage(state, instruction.code, ctx, steps);
     case "SplitToOwnStage":
@@ -152,6 +156,25 @@ function startSeparateStage(state: ScenarioState, code: string, seat: number, re
   return afterProgress(started, before, reveal.ctx, reveal.steps);
 }
 
+// StartRandomSeparateStage (04113:B:1): one of the stage cards still in the quest deck, chosen with the game's seed, is the seat's stage, revealed for it. The areas of a game that does this follow the rules of Escape from Mount Gram's (the empty `capture` mark: the first player of an area, "each player" at the
+// area, a limit used once for each area; mec108.create-staging-area, dwd.creating-a-staging-area).
+function startRandomSeparateStage(state: ScenarioState, codes: readonly string[], seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const left = state.questDeck.filter((id) => codes.includes(state.cards[id]?.code ?? ""));
+  if (left.length === 0) return state;
+  const shuffled = shuffleIds(left, state.seed, state.seedCursor);
+  const chosen = state.cards[shuffled.ids[0] ?? ""]?.code;
+  if (!chosen) return state;
+  const marked: ScenarioState = { ...state, seedCursor: shuffled.cursor, capture: state.capture ?? { x: {}, everyArea: [], here: [], instead: [] } };
+  return startSeparateStage(marked, chosen, seat, { ctx, steps });
+}
+
+// RemoveUnusedStages (04113:B:1): the quest deck's cards with these codes leave the game.
+function removeUnusedStages(state: ScenarioState, codes: readonly string[]): ScenarioState {
+  let next = state;
+  for (const id of state.questDeck) if (codes.includes(state.cards[id]?.code ?? "")) next = moveCard(next, id, { zone: "removed" });
+  return next;
+}
+
 // MovePickedToOwnStaging (142062:B:1): the last picked card, in the shared staging area, goes to the acting seat's staging area.
 function movePickedToOwnStaging(state: ScenarioState, seat: number): ScenarioState {
   const id = lastPicked(state);
@@ -173,4 +196,4 @@ function discardSharedStage(state: ScenarioState): ScenarioState {
   return next;
 }
 
-export const manifest: RulesFamily = { name: "breaking", condition: (state, found, scope) => allAtStageHolds(state, found, scope.sourceId), play: (state, cardId, ctx, how) => how.putting !== true && eventFrozen(state, cardId, how.seat, ctx.cards), playReason: (state, cardId, ctx) => (eventFrozen(state, cardId, undefined, ctx.cards) ? "Players cannot trigger Action or Response effects until the end of the round" : null), verbs: ["SplitToOwnStage", "ReturnToSharedStage", "CancelRevealed", "RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };
+export const manifest: RulesFamily = { name: "breaking", amount: (state, amount, scope) => (amount.playersAtStage ? sharing(state, scope.actor).length : null), condition: (state, found, scope) => allAtStageHolds(state, found, scope.sourceId), play: (state, cardId, ctx, how) => how.putting !== true && eventFrozen(state, cardId, how.seat, ctx.cards), playReason: (state, cardId, ctx) => (eventFrozen(state, cardId, undefined, ctx.cards) ? "Players cannot trigger Action or Response effects until the end of the round" : null), verbs: ["SplitToOwnStage", "ReturnToSharedStage", "CancelRevealed", "RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "StartRandomSeparateStage", "RemoveUnusedStages", "MoveToOtherPlayerArea", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };

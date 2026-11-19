@@ -115,11 +115,11 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50306:A:2 (front): While The Stone of Erech is that active location, characters with less than 2 Willpower cannot ready.
   50306:constant:2: Constant
     only if this card is the active location
-    - each character (any player controls) [also {"maxWillpower":1}]: stat cannotReady 1, while this card is in play
+    - each character (any player controls) with a current Willpower of 1 or less: stat cannotReady 1, while this card is in play
 
 50306:A:3 (front): Travel: Exhaust each character with less than 2 Willpower.
   50306:travel:1: Travel
-    - exhaust each character (any player controls) [also {"maxWillpower":1}]
+    - exhaust each character (any player controls) with a current Willpower of 1 or less
 
 ## 50307 Tarlang's Neck
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
@@ -204,7 +204,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50313:A:2 (front): When Revealed: Return the topmost Undead enemy in the encounter discard pile to the staging area.
   50313:whenRevealed:1: When revealed
-    - return the topmost 1 Undead enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+    - return the topmost 1 Undead enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
 
 ## 50314 Whisperer
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -296,7 +296,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50319:A:2 (shadow): Shadow: If defending character has 0 Willpower, deal 2 damage to that character.
   50319:shadow:1: Shadow
-    - if the defender is a character (any player controls) [also {"maxWillpower":0}]: deal 2 damage to the defender
+    - if the defender is a character (any player controls) with a current Willpower of 0 or less: deal 2 damage to the defender
 
 ## 50320 Shadow of Dwimorberg
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -386,7 +386,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50325:A:1 (front): When Revealed: The first player attaches Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attached character's text box as if it was blank (except for Traits.)'
   50325:whenRevealed:1: When revealed
-    - attach this card to a hero the first player controls (any number of copies may be attached to one hero) (the first player chooses it; with none this card is discarded)
+    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card is discarded)
   50325:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   50325:constant:2: Constant
@@ -401,9 +401,9 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50326:A:1 (front): When Revealed: Deal 1 damage to each character with less than 2 Willpower (Dusk. less than 3 Willpower instead. Midnight. less than 4 Willpower instead).
   50326:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the Night objective in play is Dusk or Midnight): deal 1 damage to each character (any player controls) [also {"maxWillpower":1}]
-    - then, if the Night objective in play is Dusk (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to each character (any player controls) [also {"maxWillpower":2}]
-    - then, if the Night objective in play is Midnight (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to each character (any player controls) [also {"maxWillpower":3}]
+    - if not (the Night objective in play is Dusk or Midnight): deal 1 damage to each character (any player controls) with a current Willpower of 1 or less
+    - then, if the Night objective in play is Dusk (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to each character (any player controls) with a current Willpower of 2 or less
+    - then, if the Night objective in play is Midnight (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to each character (any player controls) with a current Willpower of 3 or less
 
 ## 50327 The Gloaming
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -415,4 +415,4 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50327:whenRevealed:1: When revealed
     - place 1 progress on the Night objective in play (nothing with none); a Night objective at its limit then gives way to the next
 
-(rendered pieces: 227 by template, 8 as JSON)
+(rendered pieces: 233 by template, 2 as JSON)

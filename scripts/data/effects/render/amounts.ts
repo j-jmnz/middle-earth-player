@@ -30,11 +30,16 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
     return { text: `the number of ${expr.distinct === true ? "different " : ""}${pick(expr.count, ctx)}`, read };
   }
   if (typeof expr.stat === "string") {
-    take("stat", "of", "ofNamed", "printed");
+    take("stat", "of", "ofNamed", "printed", "remaining");
     const whose = typeof expr.ofNamed === "string" ? `"${expr.ofNamed}"` : cardRef(expr.of ?? "self");
-    return { text: `${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}`, read };
+    // `remaining` (hit points): what the card has left, its hit points less its damage and at least 0.
+    return { text: `${expr.remaining === true ? "remaining " : ""}${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}${expr.remaining === true ? " (its hit points less its damage, at least 0)" : ""}`, read };
   }
   if (expr.players === true) return { text: "the number of players", read: ["players"] };
+  if (expr.remainingQuestPoints === "activeLocation") return { text: "the quest points the active location still needs (its quest points less its progress; 0 with no active location)", read: ["remainingQuestPoints"] };
+  if (expr.victoryPoints === true) return { text: "the Victory points of the cards in the victory display added up (read live)", read: ["victoryPoints"] };
+  if (typeof expr.namelessCost === "number") return { text: `the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or ${expr.namelessCost} when none is attached`, read: ["namelessCost"] };
+  if (expr.playersAtStage === true) return { text: "the number of players at the acting player's staging area (every player before the areas are separate)", read: ["playersAtStage"] };
   if (expr.stagingThreat === true) return { text: "the total Threat of all cards in the staging area now", read: ["stagingThreat"] };
   if (typeof expr.pile === "string") return { text: `the number of cards left in the ${expr.pile === "harad" ? "Harad" : str(expr.pile)} deck`, read: ["pile"] };
   if (expr.highestThreat === true) return { text: "the highest threat among the living players", read: ["highestThreat"] };
@@ -48,11 +53,13 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.discarded === "cost") return { text: "the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0)", read: ["discarded"] };
   if (expr.discarded === "types") return { text: "the number of different card types among the cards this effect has discarded from decks, all the players' together", read: ["discarded"] };
   if (expr.discardedThreat === true) return { text: "the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)", read: ["discardedThreat"] };
+  if (isObj(expr.discardedMatching)) return { text: `the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are ${pick(expr.discardedMatching, ctx)}`, read: ["discardedMatching"] };
   if (expr.destroyedWillpower === true) return { text: "the Willpower the destroyed character had in play (last known)", read: ["destroyedWillpower"] };
   if (expr.x === true) return { text: "X", read: ["x"] };
   if (expr.stage === true) return { text: "the stage number of the quest", read: ["stage"] };
   if (typeof expr.threat === "string") return { text: expr.threat === "tens" ? "the tens digit of your threat" : "your threat", read: ["threat"] };
   if (expr.hand === true) return { text: "the cards in your hand", read: ["hand"] };
+  if (expr.attackDamage === true) return { text: "the damage the player attack this effect answers would deal this enemy: the attackers' total Attack less this enemy's Defense (0 at the least)", read: ["attackDamage"] };
   if (expr.dealt === true) return { text: "the damage just dealt", read: ["dealt"] };
   if (isObj(expr.resourcesOn)) return { text: `the resource tokens on ${pick(expr.resourcesOn, ctx)}${expr.max === true ? " (the most on any one)" : ""}`, read: ["resourcesOn", "max"] };
   if (isObj(expr.damageOn)) return { text: `the damage tokens on ${pick(expr.damageOn, ctx)}`, read: ["damageOn"] };

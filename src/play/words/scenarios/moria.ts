@@ -15,6 +15,11 @@ export function moriaWords(instruction: Instruction, names: Names): string | nul
       return `discard it to deal damage equal to its threat cost to ${names.code(instruction.code)}, which then loses all keywords`;
     case "AttachToSubject":
       return "attach it to that hero";
+    // Flight from Moria's quest deck (src/catalog/families/wilderland.ts): Blocked by Shadow's two branches (03075:B:2, 03075:B:3) and New Devilry (03026:A:1).
+    case "DiscardTopEliminating":
+      return "each player discards the top encounter card and is eliminated if it is a treachery";
+    case "RevealNewStage":
+      return instruction.bottom ? "put this stage on the bottom of the quest deck and reveal the next one" : "shuffle this stage into the quest deck and reveal the top one";
     default:
       return null;
   }

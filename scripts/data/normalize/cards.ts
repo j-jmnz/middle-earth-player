@@ -110,6 +110,8 @@ function keywordsOf(card: HobCard, dragn: DragnRow, report: BuildReport): { keyw
   for (const token of parsed.unknown) report.unknownKeywords[token] = (report.unknownKeywords[token] ?? 0) + 1;
   // A location or a built quest stage that prints X for its quest points (the number stays null; a record sets the value).
   if (locationPrintsX(card) || stagePrintsX(card)) parsed.keywords.questPointsX = true;
+  // An enemy that prints X for its hit points (the Nameless things of Foundations of Stone and its Nightmare deck): a record sets its Attack and hit points.
+  if (card.CardType === "Enemy" && card.Front.Stats.HitPoints === "X") parsed.keywords.statsX = true;
   return { keywords: parsed.keywords, victory };
 }
 

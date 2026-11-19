@@ -55,6 +55,13 @@ No phase is open.
 - `marksText` (`src/play/canvas/table-canvas-views.ts`) and `secondSlotLine` (`src/play/words/scenarios/sea.ts`) lost their last screen with the web list table; delete them in a change that may touch the phone bundle.
 
 ### Fixtures
+- `flame-won` is not committed: no seed in 100 wins Shadow and Flame with the saved decklists (they cannot damage Durin's Bane enough for Dark Pit to discard it).
+- `stone-won` is not committed: no seed in 100 wins Foundations of Stone with the saved decklists.
+- `rivendell-won` is not committed: no seed in 500 wins Road to Rivendell with the saved decklists.
+- `gate-won` is not committed: no seed in 500 wins The Redhorn Gate with the saved decklists.
+- `frommoria-won` is not committed: no seed in 400 wins Flight from Moria with the saved decklists (heroes destroyed by round 3).
+- `level-won` is not committed: no seed in 500 wins The Seventh Level with the saved decklists (their heroes are gone by round 3).
+- `pit-won` is not committed: no seed in 500 wins Into the Pit with the saved decklists (their heroes are destroyed by round 3 or 4).
 - `town-won` is not committed: no seed in 100 wins The Battle of Lake-town with the saved decklists.
 - `osgiliath-won` is not committed: no seed in 1200 wins The Massing at Osgiliath with the saved decklists (their heroes fall by round 2 to 4).
 - `erech-won` is not committed: no seed in 500 wins The Stone of Erech with the saved decklists.
@@ -302,6 +309,34 @@ No phase is open.
 - Renderer gaps, The Black Gate Opens (behaviour proven by spec rows): a self-only travel bar reads "any location" (146024:A:1), the cancelling seat shown as "the acting player" (146031:A:2), a subjectless leave-play trigger shown as any card (146028:A:1), the Embassy, `totalOf`, `mostPerPlayer`, `PlaceUnderSelf`, `ReturnUnderToStaging`, `SearchMove`, `EngageNextPlayer`, `RemoveFromQuest`, `DealShadowTo`, `TakeControl`, `AssignDamage` and the campaign verbs printed as JSON, and `firstPlayerReveals`, `raiseThreatIfDestroys` and `endsInDefeat` as bare names (146025 to 146041, 146072 to 146074).
 - Renderer gaps, Mount Doom (behaviour proven by spec rows): `firstPlayerTens`, `stageProgress`, `mostPerPlayer`, `DiscardUntil`, `MoveEncounterCard`, `AssignDamage`, `SearchMove`, `TravelTo`, `LimitEntries`, `UncancelableWhenRevealed`, `ChooseOption`, `EndCampaign` and the campaign verbs print as JSON, `other` as a bare flag (146043 to 146057, 146075:A:1, 146076, 146078:B:1, 146079).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
+
+### Rules and engine (Dwarrowdelf)
+- Refuse an effect's CommitToQuest for a character that cannot quest in every game (today only games dealing Freezing Cold 04023), and have Hobbit Pony 10007, Grappling Hook 11005, Windfola 12116 and Late Adventurer 131017 check the character can quest. Needs an `ENGINE_VERSION` change and moves replays of the games with 08112 and The Road to Isengard.
+- Expanded `DiscardFromHand` picks (Cave Spider 04097, Saruman's Voice 143080) read the generic "Choose a card to discard.": asks entries keyed on `DiscardFromHand` are not read, and the sheet does not count the picks left.
+- Foundations of Stone's commit-limit refusal and note wording is agent wording, not user-confirmed.
+- Readings not user-confirmed (`docs/brief.md`, Dwarrowdelf): Wrapped!'s code 040076, and The Long Dark and Foundations of Stone dealing the encounter sets their load lists give where the rulesheets swap Hazards of the Pit and Deeps of Moria.
+- Burning Low (03040:A:1) reads Dark once, when it resolves: a location that turns Dark later in the phase does not get the +2 (agent recommendation; re-reading needs effects in `modifiedStat`).
+- With two Blinding Blizzards (901307) the first in staging takes the progress, with no first-player choice between them; Blinding Blizzard's progress readout ("3 / 5") does not warm near 5 (agent recommendation, `docs/brief.md`, The Redhorn Gate).
+- Foundations of Stone: the Giant Cave Centipede's area pick with 3 or more separate areas is written but untested (the scene kit builds 1 or 2 seats).
+- Shadow and Flame readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Shadow and Flame); its two readings from A Long-extended Party's Semi-official Errata and FAQ (3.026, 3.057) rest on a fan FAQ, not an FFG ruling. Not user-confirmed.
+- Foundations of Stone readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Foundations of Stone). Not user-confirmed.
+- The Long Dark readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Long Dark). Not user-confirmed.
+- The Watcher in the Water readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Watcher in the Water). Not user-confirmed.
+- Road to Rivendell readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Road to Rivendell). Not user-confirmed.
+- The Redhorn Gate readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Redhorn Gate). Not user-confirmed.
+- Flight from Moria readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Flight from Moria). Not user-confirmed.
+- The pinned FAQ (`lotr_faq_19.pdf`) entries 1.21, 1.29, 1.45, 1.47, 1.53 and 1.54 have no `faq.*` span yet, so Flight from Moria's readings cite the PDF.
+- The Seventh Level readings settled only by community discussion or recommended are marked so in `docs/brief.md` (The Seventh Level). Not user-confirmed.
+- The Caves of Nibin-Dûm reads "attach Cave Torch to a hero of his choice" (41004:A:1) as the first player's own hero; the Dwarrowdelf cards with the same phrase read any player's hero, as the Khazad-dûm insert says of Cave Torch. Not reconciled: changing the Caves moves its goldens.
+- Into the Pit readings settled only by community discussion or recommended are marked so in `docs/brief.md` (Into the Pit). Not user-confirmed.
+- Renderer gaps, Shadow and Flame (behaviour proven by spec rows): `engagedWithThreatening`, `shadowsFromBalrog` and `excessExhausts` have no gloss; the Balrog deck's refill when empty and an after-attack "this card" that means the attacking enemy are not said (04150:A:2, 901801:A:3, 901801:A:4, 901802:A:1, 901808:A:2).
+- Renderer gaps, Foundations of Stone (behaviour proven by spec rows): `commitAlliesLimitByHeroes`, `onlyRangedCombat` and `threatInOtherAreas` show as stats; progress placed on the acting player's own stage once areas are separate reads "the main quest stage" (04118:B:2, 04122:A:2, 04127:A:1, 901707:A:1).
+- Renderer gaps, The Watcher in the Water (behaviour proven by spec rows): `progressToQuest` and a per-round `progressCap` show as stats; a constant that ends when its condition card leaves play reads "until the end of the game" (04065:A:1, 04067:A:1, 901501:A:2).
+- Renderer gaps, Road to Rivendell (behaviour proven by spec rows): the final-stage win and a Response scoped to travel to its own card are not said (04040:B:3, 04042:A:1).
+- Renderer gaps, The Redhorn Gate (behaviour proven by spec rows): a Shadow's "you" as the defending player, the final-stage win, and a set-aside of every copy are not said (03056:A:2, 04013:B:4, 901301:A:2).
+- Renderer gaps, Flight from Moria (behaviour proven by spec rows): `BypassStage`, `ShuffleStages`, `questDeck`, `inVictory`, `ActAs` and `AddSourceToVictory` print as JSON (unchanged from Mount Gundabad); `bypassShuffles`, `bypassThreat`, `ignoresWillpower` and `noQuestProgress` show as stats; immunity to player card effects only, Restricted, a stage added to the victory display on advance, a per-round progress cap, an Action any player may use, the bypass heard by every engaged copy, and X as the characters an attack destroyed are not said (03025:A:1, 03029:A:1, 03069, 03070:B:2 and the other bypass lines, 03073:B:1, 03076:B:3, 901201:A:2, 901202:B:2, 901205:A:2, 901207:A:1, 901209:A:3).
+- Renderer gaps, The Seventh Level (behaviour proven by spec rows): `excessToDamage` shows as a stat; `inVictory` and a hosted `PutIntoPlay` print as JSON; the Book's claim from another hero and its return when detached, the Spearman's own attack, the first player's character in a Forced someone else acts, a stage bar on an enemy, and the empty-discard shuffle are not said (03020:A:1, 03024:A:2, 03031:A:1, 03032:A:3, 03034:A:2, 901101:A:3, 901102:A:2).
+- Renderer gaps, Into the Pit (behaviour proven by spec rows): `BottomOtherLooked`, `xReachesRemaining`, `inVictory`, `ShuffleSelfIntoEncounterDeck` and `GrantTrait` print as JSON; `optionalEngageThreat` shows as a stat; a before-damage Forced, a revealed-enemy replacement, an immune location left out of a count, a refused travel, Restricted, and a `noQuestProgress` exception are not said (03014:A:1, 03036:A:2, 03041:A:1, 03048:A:1, 03049:A:1, 03052:A:1, 03060:A:1, 03064:B:2, 03065:B:2, 901002:B:3, 901005:A:3, 901008:A:2).
 
 ### Rules and engine (Shadows of Mirkwood)
 - The rulesheets of The Hunt for Gollum and Conflict at the Carrock (MEC02, MEC03) have no text layer, so their rules have no span in `data/rules`; `docs/brief.md` (The Hunt for Gollum, Conflict at the Carrock) cites the PDFs.

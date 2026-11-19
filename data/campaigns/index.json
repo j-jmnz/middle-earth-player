@@ -90,6 +90,16 @@
     "position": 1
   },
   {
+    "id": "dwarrowdelf",
+    "name": "Dwarrowdelf",
+    "scenarioCount": 9,
+    "playable": true,
+    "kind": "cycle",
+    "box": null,
+    "released": "2012-01-06",
+    "position": 3
+  },
+  {
     "id": "standalone-scenarios",
     "name": "Standalone scenarios",
     "scenarioCount": 5,
@@ -98,16 +108,6 @@
     "box": null,
     "released": "2011-09-21",
     "position": 2
-  },
-  {
-    "id": "dwarrowdelf",
-    "name": "Dwarrowdelf",
-    "scenarioCount": 9,
-    "playable": false,
-    "kind": "cycle",
-    "box": null,
-    "released": "2012-01-06",
-    "position": 3
   },
   {
     "id": "the-hobbit",

@@ -26,7 +26,7 @@ import { unchartedBranchWords, unchartedPickWords } from "./scenarios/uncharted.
 import { islandPickWords } from "./scenarios/island.ts";
 import { angmarPickWords } from "./scenarios/angmar/angmar.ts";
 import { aflameBranchWords, aflamePickWords, type BranchNow } from "./scenarios/aflame.ts";
-import { smaugBranchWords } from "./scenarios/smaug.ts";
+import { smaugBranchWords } from "./scenarios/standalone-scenarios/smaug.ts";
 import { stormcallerBranchWords } from "./scenarios/stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
 import { wilderlandBranchWords } from "./scenarios/wilderland.ts";

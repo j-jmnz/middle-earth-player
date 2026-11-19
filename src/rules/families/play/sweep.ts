@@ -3,7 +3,7 @@
 // Rules the play family's constants keep true at all times, checked by settle (machine.ts) with the other sweeps: an ally that
 // gained the hero card type sits among its controller's heroes and functions as a hero ("Attached character loses the ally card
 // type and gains the hero card type", rr.card-types); a card the first player controls follows the token ("The first player
-// gains control of attached ally"); a card that must be discarded at a stat ("Discard Denethor if his Willpower is 0 or less").
+// gains control of attached ally"); a card that must be discarded at a stat ("Discard Denethor if his Willpower is 0 or less"); a character at 0 Willpower while discardAtZeroWillpower holds on it (The Mountains' Peaks).
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { constantInstructions } from "../../interpret/constant-records.ts";
@@ -14,11 +14,12 @@ import { destroyCard, modifiedStat } from "../../core/keywords.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import { printedOf } from "../../core/printed.ts";
+import { isCharacterType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { giveControl } from "./control.ts";
+import { freeOfEncounters } from "../objectives/free.ts";
 import { lastPlayer } from "../sea/players.ts";
 
 type Codes = { swept: ReadonlySet<string>; hero: ReadonlySet<string>; returning: ReadonlySet<string> };
@@ -85,6 +86,20 @@ function returnWithoutActive(state: ScenarioState, ctx: ReduceContext, codes: Re
   return next;
 }
 
+// "Characters are discarded from play if their Willpower is ever 0" (04013:B:2, a constant on the stage), "characters defending this attack ... are discarded if their Willpower is 0" (04022:A:2, until the end of the phase): a state the settle sweep keeps true
+// whatever changed the Willpower (a modifier, a counter, a character that commits to the quest). A character in play with the flag and a current Willpower of 0 is discarded from play, not destroyed by damage; its attachments go with it.
+function discardAtZero(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  if (!gameReads(state, ctx, '"stat":"discardAtZeroWillpower"')) return state;
+  const synced = syncConstants(state, ctx);
+  if (!synced.modifiers.some((modifier) => modifier.stat === "discardAtZeroWillpower")) return state;
+  let next = synced;
+  for (const card of Object.values(synced.cards)) {
+    if (card.controller == null || (card.zone !== "play" && card.zone !== "heroes") || !isCharacterType(printedOf(ctx.cards, card.code))) continue;
+    if (flagged(next, card.id, "discardAtZeroWillpower") && modifiedStat(next, card, "willpower", ctx.cards) <= 0) next = destroyCard(next, card.id, ctx.cards, steps);
+  }
+  return next === synced ? state : next;
+}
+
 export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.lost) return state;
   const codes = sweptCodes(ctx);
@@ -92,6 +107,8 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
   // A seat that waited for an ally to gain the hero card type and has no hero after all is eliminated now.
   if (next.heroSavers?.some((seat) => (next.seats[seat]?.heroes.length ?? 1) === 0)) next = eliminateEmpties(next, steps, true);
   next = heroSavers(next, codes.hero);
+  const zeroed = discardAtZero(next, ctx, steps);
+  if (zeroed !== next) return zeroed;
   if (codes.returning.size > 0) {
     const returned = returnWithoutActive(next, ctx, codes.returning);
     if (returned !== next) return returned;
@@ -111,9 +128,14 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
       const id = instruction.card === "host" ? source.host : source.id;
       const holder = instruction.who === "lastPlayer" ? lastPlayer(next) : next.firstPlayer;
       const held = id ? next.cards[id] : undefined;
+      // An ally a guard held in the staging area (Arwen under Goblin Gate, 901402:B:1, `guardedAlly`) rejoins the first player's play area once nothing guards her: nobody controls her until then.
+      if (id && held?.zone === "staging" && flagged(next, id, "guardedAlly")) {
+        if (!freeOfEncounters(next, id)) continue;
+        next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up" });
+        next = { ...next, modifiers: next.modifiers.filter((modifier) => !(modifier.instanceId === id && modifier.stat === "guardedAlly")) };
       // An objective ally in the staging area joins the first player's play area, faceup and ready, and stays with that player when the first player token moves on: "joins the first player" is one change of
       // control, not a rule that follows the token (Grimbeorn the Old, 02037:A:2; docs/brief.md, Conflict at the Carrock).
-      if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
+      } else if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
       else if (id && (instruction.intoPlay !== true || instruction.follows === true) && held?.controller !== holder) next = giveControl(next, id, holder, ctx.cards);
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {
       next = destroyCard(next, source.id, ctx.cards, steps);

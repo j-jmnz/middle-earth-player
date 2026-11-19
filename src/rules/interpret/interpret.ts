@@ -22,11 +22,14 @@ import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
 import { readyNamedCard, seatBarred } from "./restrictions.ts";
 import { withFrame } from "../windows/windows.ts";
 import { moveCard, turnedUp } from "../core/zones.ts";
+import { refillDeck } from "../core/decks.ts";
+import { DECKS } from "../core/piles.ts";
 import { shadowFace } from "../families/defense/shadow.ts";
 import { drawCards } from "../families/dungeon/deck.ts";
 import { withView } from "../families/breaking/areas.ts";
 import { isBreakingVerb } from "../families/breaking/index.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
+import { heroDrawn } from "../families/deck/hero.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
 import { playerSource } from "../families/quest/threat.ts";
 import { queueHeard } from "../families/quest/events.ts";
@@ -123,6 +126,8 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
     case "Travel": {
       const locationId = instruction.to === "self" ? focus.sourceId : stagingLocations(state, ctx.cards, focus.seat)[0];
       if (!locationId) return state;
+      // The active location is immune to card effects (East-gate, dwd.immune-to-card-effects): nothing returns it to the staging area, so the travel cannot happen and the card stays where it is.
+      if (state.activeLocation != null && flagged(state, state.activeLocation, "immuneToCardEffects")) return state;
       const traveled = travelNow(state, locationId, ctx, steps);
       // A player the cost of the travel eliminated (a threat raise to 50 earlier in the effect) travels nowhere: this instruction changes nothing, later instructions of the effect still run and the game goes on (rr.player-elimination).
       return traveled ?? (state.seats[focus.seat]?.eliminated ? state : { ...state, failure: "Travel was refused" });
@@ -181,7 +186,8 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false, byPlayerCard = false, framework = false): ScenarioState {
   if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0 || (!framework && (seatBarred(state, ctx, seat, "draw") || (state.modifiers.length > 0 && flagged(state, `seat:${seat}`, "noCardDraw"))))) return state;
   const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback, bottom));
-  return announceEnteredHand(state, announceDraw(state, drawn, seat, ctx, byPlayerCard), seat, ctx);
+  // A hero a card shuffled into the deck is put into play as it is drawn (families/deck/hero.ts).
+  return heroDrawn(announceEnteredHand(state, announceDraw(state, drawn, seat, ctx, byPlayerCard), seat, ctx), seat);
 }
 
 function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause, bottom: boolean): ScenarioState {
@@ -232,18 +238,20 @@ export function dealOneShadow(state: ScenarioState, enemyId: string, steps: Engi
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
-export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
+// An enemy that holds `shadowsFromBalrog` is dealt from the Balrog deck, which is refilled from its discard pile when it is empty (901801:A:3, A:4); `fromEncounter` deals from the encounter deck whatever the enemy holds ("from the encounter deck (not the Balrog deck)", 901806:A:1).
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, fromEncounter = false): ScenarioState {
+  const balrog = !fromEncounter && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
   // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
-  const state = refillEncounterDeck(given, steps, ctx);
+  const state = balrog ? refillDeck(given, DECKS.balrog) : refillEncounterDeck(given, steps, ctx);
   const enemy = state.cards[enemyId];
-  const top = state.encounterDeck[0];
+  const top = balrog ? state.piles?.balrogDeck?.[0] : state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).
   if (!enemy || !top || flagged(state, enemyId, "noShadowDealt")) return state;
   // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).
   const face = shadowFace(state, enemyId);
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
   // The enemy hears that it was dealt the card (Thaurdir's stage 1B, the Werewolf of Angmar, 10125:B:3, 10131:A:2).
-  return queueHeard(updateCard(moved, top, { face }), ctx, { trigger: "shadowDealtTo", seat: null, cardId: enemyId, subject: enemyId });
+  return queueHeard(updateCard(moved, top, { face }), ctx, { trigger: "shadowDealtTo", seat: null, cardId: enemyId, subject: enemyId, other: top });
 }
 
 function dealInstructionDamage(

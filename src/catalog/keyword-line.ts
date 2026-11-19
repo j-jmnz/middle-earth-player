@@ -9,6 +9,7 @@ export type KeywordResult = { keywords: PrintedKeywords; unknown: string[] };
 
 export const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   surge: "surge",
+  ambush: "ambush",
   peril: "peril",
   indestructible: "indestructible",
   permanent: "permanent",
@@ -23,6 +24,8 @@ export const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   phantom: "phantom",
   spectral: "spectral",
   dire: "dire",
+  // PASS (dwd.locate-test): a card that prints it passes a locate test it is discarded for (src/rules/families/long-dark/).
+  pass: "pass",
 };
 
 export const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
@@ -33,6 +36,7 @@ export const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
   secrecy: "secrecy",
   boarding: "boarding",
   aflame: "aflame",
+  regenerate: "regenerate",
   burn: "burn",
 };
 

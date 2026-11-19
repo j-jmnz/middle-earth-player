@@ -39,7 +39,7 @@ export function announceExits(state: ScenarioState, ctx: ReduceContext): Scenari
   }
   for (const card of Object.values(state.cards)) {
     // An enemy lying on a character as an attachment (Wraith of Carn Dûm) hears no leaving of play as the enemy it was (families/angmar/reanimate/attached.ts).
-    if (inPlay(card.zone) && card.asAttachment !== true && !watched.includes(card.id) && listens(state, card, "exitedPlay", ctx)) now.push(card.id);
+    if (inPlay(card.zone) && card.asAttachment == null && !watched.includes(card.id) && listens(state, card, "exitedPlay", ctx)) now.push(card.id);
   }
   const same = now.length === watched.length && now.every((id, at) => id === watched[at]);
   return same ? next : { ...next, exitWatch: now };

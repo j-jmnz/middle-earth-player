@@ -269,6 +269,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return "skip the quest phase this round";
     case "RemoveProgressFromQuest":
       return `remove ${amountWords(instruction.amount)} progress from the quest`;
+    case "RemoveAllProgress":
+      return instruction.pick ? "remove all progress from each matching card in play" : "remove all progress from it";
     case "MoveProgress":
       return instruction.all ? "move all its progress" : `move ${amountWords(instruction.amount)} progress`;
     case "CommitToQuest":

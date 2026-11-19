@@ -1,6 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { NIGHTMARE_PILES, type NightmareData, type Placement } from "../../../src/catalog/scenario-data.ts";
-import { isNightmareCard, nightmareDeckOf, nightmareDeckOfCode } from "../nightmare-defs.ts";
+import { isNightmareCard, nightmareDeckOf, nightmareDeckOfCode, NIGHTMARE_CARD_PILES } from "../nightmare-defs.ts";
 import { sameName, titleKey } from "./names.ts";
 
 // A built scenario's Nightmare deck (docs/brief.md, Nightmare). The setup card's side B prints the recipe: "Begin with the
@@ -28,14 +28,21 @@ export function removalLines(text: string | null): { name: string; copies: numbe
   return out;
 }
 
-type Named = Pick<Card, "code" | "name">;
+type Named = Pick<Card, "code" | "name"> & Partial<Pick<Card, "type" | "printings">>;
 type Slots = NightmareData["cards"];
 
 // The scenario's one card a removal line names: the exact title, else the one near title (a printed typo, "Striken Dumb").
-function resolveRemoval(name: string, dealt: readonly string[], byCode: ReadonlyMap<string, Named>): string[] {
+function resolveRemoval(printed: string, dealt: readonly string[], byCode: ReadonlyMap<string, Named>): string[] {
+  // A stage the list takes out of the quest deck is printed "Orc Outpost (quest stage 2)", or by its side B title where the stage 2 cards share their side A title (Flight from Moria's
+  // "Blocked by Shadow": Hall of Beorn's slug of the quest card, Search-for-an-Exit-Blocked-By-Shadow-KD, keeps the side B title).
+  const name = printed.replace(/\s*\(quest stage \d+\)$/i, "");
   const key = titleKey(name);
   const exact = dealt.filter((code) => titleKey(byCode.get(code)?.name ?? "") === key);
-  return exact.length > 0 ? exact : dealt.filter((code) => sameName(titleKey(byCode.get(code)?.name ?? ""), key));
+  if (exact.length > 0) return exact;
+  const near = dealt.filter((code) => sameName(titleKey(byCode.get(code)?.name ?? ""), key));
+  if (near.length > 0) return near;
+  const slug = key.replace(/\s+/g, "-");
+  return dealt.filter((code) => byCode.get(code)?.type === "quest" && (byCode.get(code)?.printings ?? []).some((item) => titleKey((item.hobSlug ?? "").replace(/-[A-Za-z]+$/, "").replaceAll("-", " ")).endsWith(titleKey(slug.replaceAll("-", " ")))));
 }
 
 // The removed copies come out of the encounter deck first, then out of the piles the quest's Setup fills from it (NIGHTMARE_PILES
@@ -83,7 +90,7 @@ export function nightmareOf(scenarioId: string, placed: readonly Placement[], ca
   if (lines.length === 0) problem(`setup card ${setupCard.code} prints no removal list`);
   const slots: Slots = own
     .filter((card) => card.type !== "nightmare" && card.type !== "quest" && card.quantity > 0)
-    .map((card) => ({ code: card.code, copies: card.quantity, pile: "encounter" as const }));
+    .map((card) => ({ code: card.code, copies: card.quantity, pile: NIGHTMARE_CARD_PILES[card.code] ?? ("encounter" as const) }));
   for (const line of lines) {
     const named = resolveRemoval(line.name, dealt, byCode);
     const code = named[0];

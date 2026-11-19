@@ -1,0 +1,359 @@
+Scenario piles that place cards with no record (quest: 03069 A Presence in the Dark; quest: 03070 Search for an Exit; quest: 03071 Search for an Exit; quest: 03072 Search for an Exit; quest: 03073 Search for an Exit; quest: 03074 Search for an Exit; quest: 03075 Search for an Exit; quest: 03076 Search for an Exit; staging: 03025 The Nameless Fear; setAside: 03028 A Foe Beyond)
+
+## 03025 The Nameless Fear
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+03025:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+03025:A:2 (front): The Nameless Fear cannot engage or be engaged.
+  03025:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat noEngagementChecks 1, while this card is in play
+
+03025:A:3 (front): X is the number of victory points in the victory display.
+  03025:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the Victory points of the cards in the victory display added up (read live), while this card is in play
+    - this card: stat attack the Victory points of the cards in the victory display added up (read live), while this card is in play
+    - this card: stat defense the Victory points of the cards in the victory display added up (read live), while this card is in play
+
+## 03026 New Devilry
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03026:A:1 (front): When Revealed: If the players are not on stage 1, shuffle the current quest card into the quest deck, then reveal a new quest card. Otherwise, New Devilry gains surge.
+  03026:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the players are on stage 1): the current stage is shuffled into the quest deck with no progress, side A up, and the top stage of the quest deck is revealed side A (it can be the stage just shuffled in; not flipped, not a bypass, not defeated)
+    - then, if the players are on stage 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+03026:A:2 (shadow): Shadow: If this attack is undefended, raise your threat by The Nameless Fear's Threat.
+  03026:shadow:1: Shadow
+    - if the attack has no defender: raise threat by threat of "The Nameless Fear" (the acting player)
+
+## 03027 Shadow of Fear
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03027:A:1 (front): When Revealed: The first player attaches Shadow of Fear to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Attached hero cannot exhaust or ready and its text box is treated as if it were blank. Action: Pay 3 resources from attached hero's pool to discard this card.")
+  03027:whenRevealed:1: When revealed
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
+  03027:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - this attachment may be attached to a hero (limit 1 of it per host)
+    - its host: stat cannotExhaust 1, while this card is in play
+    - its host: stat cannotReady 1, while this card is in play
+    - its host: stat blankText (its text box is blank) 1, while this card is in play
+  03027:action:1: Action (cost: pay 3 resource(s) from the host's pool; any player may use it)
+    - discard this card
+
+## 03028 A Foe Beyond
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+03028:A:1 (front): When Revealed: The last player deals damage equal to The Nameless Fear's Attack to a hero he controls. This effect cannot be canceled.
+  03028:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    - for each player, first player first:
+      - if the actor is the last player (to the first player's right; the only player of a solo game): choose hero (you control)
+      - then, if the actor is the last player (to the first player's right; the only player of a solo game) (checked when this step runs, after the steps above; not tied to whether they did anything): deal attack of "The Nameless Fear" damage to the picked card (no ability that cancels damage can cancel it; moving it to another card still can)
+
+03028:A:2 (shadow): Shadow: Deal damage equal to The Nameless Fear's Attack to the defending character.
+  03028:shadow:1: Shadow
+    - if not (the attack has no defender): deal attack of "The Nameless Fear" damage to the defender
+
+## 03029 Abandoned Tools
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03029:A:1 (front): Guarded. Restricted.
+  03029:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+
+03029:A:2 (front): Action: Exhaust a hero to claim this objective if it has no encounters attached. Then, attach Abandoned Tools to that hero. (If detached, return Abandoned Tools to the staging area.)
+  03029:action:1: Action (any player may use it)
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) that can exhaust (not held by a rule that stops it exhausting) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control) that can exhaust (not held by a rule that stops it exhausting)
+    - exhaust the picked card
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+
+## 03042 Great Cave-troll
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03042:A:1 (front): Immune to ranged damage.
+  03042:constant:1: Constant
+    - this card: stat immuneToRangedDamage 1, while this card is in play
+
+03042:A:2 (front): No attachments can be played on Great Cave-troll.
+  03042:constant:2: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+## 03043 Orc Drummer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03043:A:1 (front): While Orc Drummer is in the staging area, each enemy gets +X Threat. X is the number of players in the game.
+  03043:constant:1: Constant
+    only if this card is in the staging area
+    - each enemy (any player controls) or in the staging area: stat threat the number of players, while this card is in play
+
+## 03044 Stray Goblin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03044:A:1 (front): X is the number of players in the game.
+  03044:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the number of players, while this card is in play
+    - this card: stat attack the number of players, while this card is in play
+
+03044:A:2 (shadow): Shadow: Attacking enemy gets +X Attack. X is the number of players in the game.
+  03044:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of players, until the end of the attack
+
+## 03045 Chance Encounter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03045:A:1 (front): When Revealed: Put the top enemy in the encounter discard pile into play, engaged with the first player. If this effect put no enemies into play, Chance Encounter gains surge.
+  03045:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the encounter discard pile holds a enemy): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - the rest of the effect is carried out by the first player
+    - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
+    - then, if the encounter discard pile holds a enemy (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+03045:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if engaged with the first player.)
+  03045:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the actor holds the first player token): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the actor holds the first player token (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 03046 Massing in the Deep
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03046:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+03046:A:2 (front): When Revealed: Reveal X additional cards from the encounter deck and add them to the staging area. X is the number of players in the game.
+  03046:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+03046:A:3 (shadow): Shadow: Attacking enemy gets +X Attack. X is the number of players in the game.
+  03046:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of players, until the end of the attack
+
+## 03047 The Mountains' Roots
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03047:A:1 (front): X is the number of players in the game.
+  03047:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the number of players, while this card is in play
+    - this card: stat questPoints the number of players, while this card is in play
+
+03047:A:2 (shadow): Shadow: Attacking enemy gets +X Attack. X is the number of players in the game.
+  03047:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of players, until the end of the attack
+
+## 03069 A Presence in the Dark
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03069:A:1 (front): Setup: Prepare the quest deck. Add The Nameless Fear to the staging area. Remove all copies of A Foe Beyond from the encounter deck. Then, shuffle 1 copy of A Foe Beyond per player back into the encounter deck.
+  03069:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShuffleStages {"verb":"ShuffleStages","codes":["03070","03071","03072","03073","03074","03075","03076","901202","901203","901204"]}]
+    - for each player, first player first:
+      - one set-aside copy of the card with code 03028 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter deck
+
+03069:B:1 (back): When Revealed: Reveal 1 encounter card per player, and add it to the staging area. Then, add A Presence in the Dark to your victory display.
+  03069:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+    - advance to the next quest stage
+
+## 03070 Search for an Exit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03070:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  03070:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+03070:B:1 (back): Forced: If Heading Up is in the player's victory display at the end of any quest phase, shuffle Heading Up back into the quest deck.
+  03070:forced:2: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (the card with code 03071 is in the victory display)
+    - the card with code 03071 leaves the victory display for the quest deck, side A up, and the quest deck is shuffled (nothing if it is not in the victory display)
+
+03070:B:2 (back): Players may bypass this quest card at the end of the combat phase.
+  03070:forced:3: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 03071 Search for an Exit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03071:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  03071:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+03071:B:1 (back): Forced: If Heading Down is in the player's victory display at the end of any quest phase, shuffle Heading Down back into the quest deck.
+  03071:forced:2: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (the card with code 03070 is in the victory display)
+    - the card with code 03070 leaves the victory display for the quest deck, side A up, and the quest deck is shuffled (nothing if it is not in the victory display)
+
+03071:B:2 (back): Players may bypass this quest card at the end of the combat phase.
+  03071:forced:3: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 03072 Search for an Exit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03072:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  03072:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+03072:B:1 (back): When Revealed: Reveal 1 encounter card per player, and add it to the staging area.
+  03072:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+03072:B:2 (back): Players may bypass this quest card at the end of the combat phase.
+  03072:forced:2: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 03073 Search for an Exit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03073:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  03073:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+03073:B:1 (back): When Revealed: Each player chooses 1 questing character he controls. Each questing character not chosen does not count its Willpower until the end of the turn.
+  03073:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat ignoresWillpower 1, until the end of the round
+    - for each player, first player first:
+      - if there is a character (you control) committed to the quest to choose: choose character (you control) committed to the quest
+      - then, if there is a character (you control) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat countsWillpower 1, until the end of the round
+
+03073:B:2 (back): Forced: After placing the 1st progress token on Narrow Paths, search the encounter deck and discard pile for Abandoned Tools and add it to the staging area, if able.
+  03073:forced:2: Forced on the event progressPlaced (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (X is less than progress of this card): the acting player finds one card with code 03029 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - then, if not (X is less than progress of this card) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
+
+03073:B:3 (back): Players may bypass this quest card at the end of the combat phase.
+  03073:forced:3: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 03074 Search for an Exit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03074:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  03074:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+03074:B:1 (back): When Revealed: Shuffle all copies of A Foe Beyond from the encounter discard pile back into the encounter deck. Reveal the top 2 cards of the quest deck. Choose 1 to become the active quest (flipped to side 2B) and put the other on the bottom of the quest deck. Then, add Hasty Council to your victory display.
+  03074:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle every copy of A Foe Beyond in the encounter discard pile into the encounter deck
+    - the acting player looks at the top 2 stage(s) of the quest deck and chooses 1: it becomes the current quest at once, flipped to side B with its When Revealed effects resolving, and the others go to the bottom of the quest deck side A up; the stage this replaces is set aside for the next step to add to the victory display
+    - this card is added to the victory display (the players' own, the group's)
+
+## 03075 Search for an Exit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03075:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  03075:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+03075:B:1 (back): When Revealed: The first player chooses 1 of the following:
+  03075:whenRevealed:1: When revealed (record also names 03075:B:2, 03075:B:3)
+    - the first player chooses one of:
+      * option "discard":
+        - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards
+      * option "next" (only if [json condition {"kind":"questDeck"}]):
+        - the current stage goes to the bottom of the quest deck with no progress, side A up, and the next stage is revealed side A (not flipped, not a bypass, not defeated); nothing with no other stage in the deck
+
+03075:B:2 (back): • Each player discards 1 card from the top of the encounter deck. If the card is a treachery card, the discarding player is eliminated from the game.
+  03075:whenRevealed:1: When revealed (record also names 03075:B:1, 03075:B:3)
+    - the first player chooses one of:
+      * option "discard":
+        - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards
+      * option "next" (only if [json condition {"kind":"questDeck"}]):
+        - the current stage goes to the bottom of the quest deck with no progress, side A up, and the next stage is revealed side A (not flipped, not a bypass, not defeated); nothing with no other stage in the deck
+
+03075:B:3 (back): • Reveals the next quest card, putting Blocked by Shadow on the bottom of the quest deck.
+  03075:whenRevealed:1: When revealed (record also names 03075:B:1, 03075:B:2)
+    - the first player chooses one of:
+      * option "discard":
+        - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards
+      * option "next" (only if [json condition {"kind":"questDeck"}]):
+        - the current stage goes to the bottom of the quest deck with no progress, side A up, and the next stage is revealed side A (not flipped, not a bypass, not defeated); nothing with no other stage in the deck
+
+03075:B:4 (back): Players may bypass this quest card at the end of the combat phase.
+  03075:forced:2: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+03075:B:5 (back): If the players defeat this stage, they escape and win the game.
+  03075:forced:3: Forced on the event questCardDefeated (heard about this card)
+    - the players win the game
+
+## 03076 Search for an Exit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+03076:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  03076:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+03076:B:1 (back): Abandoned Tools gains: "Refresh Action: Exhaust attached hero to put a progress token on Escape from Darkness."
+  03076:action:1: Action
+    only if all of: (it is the Refresh phase) and (there is a ready hero (any player controls) that can exhaust (not held by a rule that stops it exhausting), with an attachment named "Abandoned Tools" to choose) and (the table does not hold the flag refreshOnce)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (any player controls) that can exhaust (not held by a rule that stops it exhausting), with an attachment named "Abandoned Tools"
+    - exhaust the picked card
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
+    - the table: stat refreshUsed 1, until the end of the round
+  03076:action:2: Action
+    only if all of: (it is the Refresh phase) and (there is a ready hero (any player controls) that can exhaust (not held by a rule that stops it exhausting), with an attachment named "Abandoned Tools" to choose) and (the table holds the flag refreshOnce) and (the table does not hold the flag refreshUsed)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (any player controls) that can exhaust (not held by a rule that stops it exhausting), with an attachment named "Abandoned Tools"
+    - exhaust the picked card
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
+    - the table: stat refreshUsed 1, until the end of the round
+
+03076:B:2 (back): Players may bypass this quest card at the end of the combat phase.
+  03076:forced:2: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+03076:B:3 (back): Progress tokens cannot be placed on Escape from Darkness except by Abandoned Tools.
+  03076:constant:1: Constant
+    - the table: stat noQuestProgress 1, while this card is in play
+
+03076:B:4 (back): If the players defeat this stage, they escape and win the game.
+  03076:forced:3: Forced on the event questCardDefeated (heard about this card)
+    - the players win the game
+
+(rendered pieces: 240 by template, 16 as JSON)

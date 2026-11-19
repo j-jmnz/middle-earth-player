@@ -14,8 +14,8 @@ const VERBS = [
   // A location already active goes back to the staging area, unless a second active location slot is free (ExtraActiveLocation).
   z.strictObject({ verb: z.literal("MakeSetAsideActive"), code: z.string().min(1), ...when }),
   // Each player (`eachSeat`) assigns `amount` damage among the cards that match `pick` from their side, one damage at a time on the card
-  // they choose ("each player assigns X damage among characters he controls", 142029:A:2). `left` and `of` are engine use: the damage still to go, and the damage to assign in all.
-  verbFlags(z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), left: z.number().int().min(0).optional(), of: z.number().int().min(1).optional(), ...when }), { runsInFrame: true }),
+  // they choose ("each player assigns X damage among characters he controls", 142029:A:2). `single`: the player chooses one card and it takes all of the damage ("assigns 3 damage to 1 character he controls", 04072:A:3). `left` and `of` are engine use: the damage still to go, and the damage to assign in all.
+  verbFlags(z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), single: z.literal(true).optional(), left: z.number().int().min(0).optional(), of: z.number().int().min(1).optional(), ...when }), { runsInFrame: true }),
   // The actor discards each card that matches `pick` (from their side) to its owner's discard pile ("discard each ally he controls",
   // 142037:A:1).
   z.strictObject({ verb: z.literal("DiscardEach"), pick: pickSchema, ...when }),
@@ -90,6 +90,9 @@ const FLAGS = [
   // attack against each player in the combat phase, in player order; each player may attack it; it adds no Threat to the staging
   // area (rr.engaged) (142024:A:2).
   "engagedWithAll",
+  // On an enemy in the staging area: as `engagedWithAll`, but it is considered engaged only with each player whose threat is 1 or greater, read live: it attacks each of them once in the combat phase and only they declare attackers against it; a player whose threat was below 1 when the combat phase began and is raised during it is attacked
+  // with no shadow card dealt (Durin's Bane, 04150:A:2, dwd.durins-bane).
+  "engagedWithThreatening",
   // On a location: at most this much progress can be placed on it each round (142036:A:1), and the progress placed on it this round
   // (engine use).
   "progressCap",

@@ -53,8 +53,8 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 00005:A:1 (front): When Revealed: Move the top Scout enemy from the encounter discard pile to the staging area. (Top 2 Scout enemies instead if the players have crossed the Anduin.)
   00005:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the players are on stage 4): return the topmost 1 Scout enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)
-    - then, if the players are on stage 4 (checked when this step runs, after the steps above; not tied to whether they did anything): return the topmost 2 Scout enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+    - if not (the players are on stage 4): return the topmost 1 Scout enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
+    - then, if the players are on stage 4 (checked when this step runs, after the steps above; not tied to whether they did anything): return the topmost 2 Scout enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
 
 00005:A:2 (shadow): Shadow: If this attack is undefended, attacking enemy gets +2 Attack if it is a Scout.
   00005:shadow:1: Shadow
@@ -173,7 +173,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
     - exhaust this card
-    - then, if it is the Quest phase (checked when this step runs, after the steps above; not tied to whether they did anything): this card is committed to the quest (it counts as committing, so a "when a character commits" effect hears it)
+    - then, if it is the Quest phase (checked when this step runs, after the steps above; not tied to whether they did anything): this card is committed to the quest without exhausting (it counts as committing, so a "when a character commits" effect hears it; a character that cannot quest stays out)
     - this card gains surge (one more encounter card is revealed when it has been resolved)
 
 00015:A:2 (shadow): Shadow: Deal 2 damage to attacking enemy. The defending player may exhaust a character he controls to take control of Ranger of Ithilien.

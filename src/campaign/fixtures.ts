@@ -59,6 +59,15 @@ import rhosgobelFixtures from "./fixtures/a-journey-to-rhosgobel.json";
 import muilFixtures from "./fixtures/the-hills-of-emyn-muil.json";
 import deadmarshesFixtures from "./fixtures/the-dead-marshes.json";
 import returnmirkwoodFixtures from "./fixtures/return-to-mirkwood.json";
+import pitFixtures from "./fixtures/into-the-pit.json";
+import levelFixtures from "./fixtures/the-seventh-level.json";
+import frommoriaFixtures from "./fixtures/flight-from-moria.json";
+import gateFixtures from "./fixtures/the-redhorn-gate.json";
+import rivendellFixtures from "./fixtures/road-to-rivendell.json";
+import waterFixtures from "./fixtures/the-watcher-in-the-water.json";
+import darkFixtures from "./fixtures/the-long-dark.json";
+import stoneFixtures from "./fixtures/foundations-of-stone.json";
+import flameFixtures from "./fixtures/shadow-and-flame.json";
 import osgiliathFixtures from "./fixtures/the-massing-at-osgiliath.json";
 import townFixtures from "./fixtures/the-battle-of-lake-town.json";
 import erechFixtures from "./fixtures/the-stone-of-erech.json";
@@ -141,6 +150,15 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-hills-of-emyn-muil": muilFixtures,
   "the-dead-marshes": deadmarshesFixtures,
   "return-to-mirkwood": returnmirkwoodFixtures,
+  "into-the-pit": pitFixtures,
+  "the-seventh-level": levelFixtures,
+  "flight-from-moria": frommoriaFixtures,
+  "the-redhorn-gate": gateFixtures,
+  "road-to-rivendell": rivendellFixtures,
+  "the-watcher-in-the-water": waterFixtures,
+  "the-long-dark": darkFixtures,
+  "foundations-of-stone": stoneFixtures,
+  "shadow-and-flame": flameFixtures,
   "the-massing-at-osgiliath": osgiliathFixtures,
   "the-battle-of-lake-town": townFixtures,
   "the-stone-of-erech": erechFixtures,

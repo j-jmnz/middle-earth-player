@@ -14,7 +14,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the acting player chooses one of:
       * option "use" (only if threat of the top card of the encounter discard pile is less than willpower of its host):
         - this card is removed from the Campaign Pool
-        - [json AddSourceToVictory {"verb":"AddSourceToVictory"}]
+        - this card is added to the victory display (the players' own, the group's)
         - choose player (any player controls)
         - [json RevealFewer {"verb":"RevealFewer","amount":1,"min":0,"who":"picked"}]
       * option "skip":
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 248 by template, 10 as JSON)
+(rendered pieces: 249 by template, 9 as JSON)

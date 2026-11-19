@@ -1,0 +1,219 @@
+Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; quest: 04139 The Rear Guard; quest: 04140 Last Lord of Moria; staging: 04150 Durin's Bane; setAside: 04141 Dark Pit)
+
+## 04138 Nearing the Gate
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04138:A:1 (front): Setup: Remove Dark Pit from the encounter deck and place it aside, out of play. Add Durin's Bane to the staging area. Shuffle the encounter deck.
+  04138:setup:1: Setup
+    - shuffle the encounter deck
+
+04138:B:1 (back): When Revealed: Reduce each player's threat to 0. Reveal X cards from the encounter deck, where X is one less than the number of players in the game, and add them to the staging area.
+  04138:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player's threat becomes 0
+    - the acting player reveals the number of players - 1 encounter cards, one after the other, each in a staging of its own
+
+## 04139 The Rear Guard
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04139:B:1 (back): Forced: If at least 1 hero committed to the quest this round, place 4 progress tokens on The Rear Guard (bypassing any active location) at the end of the quest phase.
+  04139:forced:1: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (a hero of any player was committed to the quest this round (a hero committed when the commit step ended still counts after a card removes it from the quest))
+    - 4 progress is placed on the main quest stage (a quest effect: a full stage advances)
+
+04139:B:2 (back): If Durin's Bane has 0 hit points, advance to the next stage of the scenario immediately.
+  04139:constant:1: Constant
+    only if not (the card with code 04150 in play has damage below its hit points (any hit points remaining))
+    - this card: stat advanceNow (once nothing is resolving the quest advances to the next stage at once) 1, while this card is in play
+
+## 04140 Last Lord of Moria
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04140:B:1 (back): When Revealed: Durin's Bane makes an immediate attack on the first player. Add Dark Pit to the staging area.
+  04140:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
+    - the picked enemy attacks the first player now, from the staging area
+    - one set-aside card with code 04141 joins the staging area (it is not revealed)
+
+04140:B:2 (back): Players cannot win the game while Durin's Bane is in play. If Durin's Bane leaves play by the effect on Dark Pit, the players have won the game.
+  04140:constant:1: Constant
+    only if the card with code 04150 is in play
+    - the players cannot defeat this stage while this holds
+  04140:constant:2: Constant
+    only if the card with code 04150 is not in play
+    - the players win the game
+
+## 04141 Dark Pit
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+04141:A:1 (front): While Dark Pit is the active location, it gains: "Refresh Action: Exhaust X characters (maximum 3) you control to discard the top X cards of your deck. If all discarded cards have a higher combined printed cost than the remaining hit points of Durin's Bane, discard Durin's Bane from play."
+  04141:action:1: Action (any player may use it)
+    only if all of: (it is the Refresh phase) and (this card is the active location)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each ready character (you control) (up to 3 chosen):
+      - exhaust the picked card
+    - the top X card(s) of the acting player's deck go to their discard pile
+    - then, if remaining hit points of "Durin's Bane" (its hit points less its damage, at least 0) is less than the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the card in play titled "Durin's Bane" is discarded from play, although it cannot leave the staging area (the discard supersedes that text)
+
+## 04142 Second Hall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04142:A:1 (front): While Second Hall is the active location, it gains: "Forced: After a character leaves play, reveal 1 card from the encounter deck and add it to the staging area."
+  04142:forced:1: Forced after a card leaves play (heard about character (any player controls))
+    only if this card is the active location
+    - the acting player reveals an encounter card
+
+## 04143 Second Deep
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04143:A:1 (front): While Durin's Bane has no damage on it, progress tokens cannot be placed on Second Deep.
+  04143:constant:1: Constant
+    only if the number of undamaged enemy (any player controls) or in the staging area, named "Durin's Bane" is at least 1
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+## 04144 Fires in the Deep
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04144:A:1 (front): When Revealed: Each player must discard 1 ally he controls, if able. If Fires in the Deep discarded no allies, it gains surge.
+  04144:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a ally (any player controls) to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - for each player, first player first:
+      - choose ally (you control)
+      - discard the picked card
+
+04144:A:2 (shadow): Shadow: The defending player discards 1 ally he controls, if able.
+  04144:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control)
+    - discard the picked card
+
+## 04145 Counter-Spell
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04145:A:1 (front): When Revealed: Attach Counter-spell to Durin's Bane. (Counts as a Condition attachment with the text: "Forced: When a player plays an event, discard the top card of the encounter deck. If that card is a treachery card, cancel the effects of the event, discard the event player's hand, and discard Counter-spell from play.")
+  04145:whenRevealed:1: When revealed
+    - attach this card to an enemy in play with the trait Balrog
+  04145:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  04145:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck
+    - then, if 0 is less than the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the effects of the event just played are canceled (it is still played, its cost paid, and it goes to its owner's discard pile)
+    - then, if 0 is less than the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the player the event is about discards all the cards in their hand
+    - then, if 0 is less than the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
+
+## 04146 Inner Flame
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04146:A:1 (front): When Revealed: Durin's Bane gets +3 Attack until the end of the round. The first player may remove 1 questing hero he controls from the quest to cancel this effect.
+  04146:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "remove" (only if there is a hero (you control) committed to the quest, chosen by the first player to choose):
+        - choose hero (you control) committed to the quest, chosen by the first player
+        - the last picked character is removed from the quest (it stays exhausted)
+      * option "keep":
+        - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
+        - the picked card: stat attack 3, until the end of the round
+
+04146:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, it gets +3 Attack.
+  04146:shadow:1: Shadow
+    - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the attacking enemy: stat attack 3, until the end of the attack
+
+## 04147 Inner Shadow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04147:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+04147:A:2 (front): When Revealed: Heal 5 damage from Durin's Bane, if able. The first player may remove 1 questing hero he controls from the quest to cancel this effect.
+  04147:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "remove" (only if there is a hero (you control) committed to the quest, chosen by the first player to choose):
+        - choose hero (you control) committed to the quest, chosen by the first player
+        - the last picked character is removed from the quest (it stays exhausted)
+      * option "keep":
+        - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
+        - heal 5 damage from the picked card
+
+## 04148 Whip Lash
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04148:A:1 (front): When Revealed: Each player must discard 1 attachment he controls, if able.
+  04148:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose attachment (you control) that a player controls (not an encounter attachment)
+      - discard the picked card
+
+04148:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, the defending player discards all attachments he controls.
+  04148:shadow:1: Shadow
+    - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the acting player discards each attachment (you control) that a player controls (not an encounter attachment)
+
+## 04149 Leaping Flame
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04149:A:1 (front): When Revealed: Durin's Bane makes an immediate attack against the first player (deal and resolve a shadow card).
+  04149:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
+    - the picked enemy attacks the first player now, from the staging area
+
+04149:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, it gets +3 Attack.
+  04149:shadow:1: Shadow
+    - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the attacking enemy: stat attack 3, until the end of the attack
+
+## 04150 Durin's Bane
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+04150:A:1 (front): Regenerate 3. Indestructible. Players cannot play attachments on Durin's Bane.
+  (the keyword part is owned by the card's keywords; the records cover: Players cannot play attachments on Durin's Bane.)
+  04150:constant:1: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+04150:A:2 (front): Durin's Bane cannot leave the staging area, is considered to be engaged with each player whose threat is 1 or greater, and attacks each of those players in turn during the combat phase (deal and discard a new shadow card each attack).
+  04150:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat engagedWithThreatening 1, while this card is in play
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+
+## 04151 Ranging Goblin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04151:A:1 (front): When Revealed: Each player must deal 1 damage to a hero he controls.
+  04151:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose hero (you control)
+      - deal 1 damage to the picked card
+
+04151:A:2 (front): Forced: After a character leaves play, shuffle Ranging Goblin and the top card in the encounter discard pile back into the encounter deck.
+  04151:forced:1: Forced after a card leaves play (heard about character (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter discard pile is shuffled into the encounter deck
+    - this card is shuffled into the encounter deck
+
+## 04152 Fiery Sword
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04152:A:1 (front): When Revealed: Attach Fiery Sword to Durin's Bane as a Weapon attachment with the text: "Attached enemy gets +3 Attack."
+  04152:whenRevealed:1: When revealed
+    - attach this card to an enemy in play with the trait Balrog
+  04152:constant:1: Constant
+    - this card counts as a Weapon attachment while it is attached
+  04152:constant:2: Constant
+    - its host: stat attack 3, while this card is in play
+
+## 04153 Many Thonged Whip
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04153:A:1 (front): When Revealed: Attach Many Thonged Whip to Durin's Bane as a Weapon attachment with the text: "Forced: When Durin's Bane attacks, the defending player must discard 1 card at random from his hand."
+  04153:whenRevealed:1: When revealed
+    - attach this card to an enemy in play with the trait Balrog
+  04153:constant:1: Constant
+    - this card counts as a Weapon attachment while it is attached
+  04153:forced:1: Forced when this enemy attacks, before the defender is declared (heard about the host)
+    - the acting player discards 1 random card(s) from hand
+
+(rendered pieces: 153 by template, 0 as JSON)

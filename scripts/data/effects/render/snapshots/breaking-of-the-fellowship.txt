@@ -46,7 +46,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
         * option "142066":
           - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142066"}]
     - [json DealOutStaging {"verb":"DealOutStaging"}]
-    - [json DiscardSharedStage {"verb":"DiscardSharedStage"}]
+    - the shared quest stage goes to the set-aside pile, and each living player, first player first, hears that it was discarded for his own stage
 
 ## 142063 Searching the Woods
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -93,7 +93,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
   142064:response:1: Response after the players quest successfully (event happened to the controller)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls)
-    - for each hero (any player controls) [also {"controlledBy":"picked"}]:
+    - for each hero (any player controls) controlled by the player picked last:
       - ready the picked card
 
 ## 142065 The Seat of Amon Hen
@@ -159,7 +159,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142067:B:2 (back): Response: After an enemy is revealed at this stage, raise your threat by X to engage that enemy. X is that enemy's Threat. Each player (at any stage) may trigger this ability once per round.
   142067:response:1: Response after a card is revealed (heard about enemy (any player controls); event happened to the controller; limit once per round for each player; any player may use it; only when the encounter deck revealed it)
-    only if the card the event is about is a enemy (any player controls) [also {"inStaging":true}]
+    only if the card the event is about is a enemy (any player controls) that is in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by threat of the card the event is about (the acting player)
     - engage the card the event is about
@@ -226,7 +226,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142071:A:2 (front): Uruk-hai Tracker gets +2 Attack against characters with 2 or fewer printed hit points.
   142071:constant:1: Constant
-    - if [json condition {"kind":"versusDefender","maxHitPoints":2}]: this card: stat attack 2, while this card is in play
+    - if the card holding this stat is an enemy attacking a declared defender with 2 or fewer printed hit points: this card: stat attack 2, while this card is in play
 
 142071:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   142071:shadow:1: Shadow
@@ -372,7 +372,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142081:A:1 (front): When Revealed: Remove all damage from each enemy at this stage. Each enemy at this stage gets +1 Threat, +1 Attack, and +1 Defense until the end of the round.
   142081:whenRevealed:1: When revealed
-    - for each enemy (any player controls) or in the staging area [also {"atStage":true}]:
+    - for each enemy (any player controls) or in the staging area, at the acting player's staging area (every area before they are separate):
       - heal all damage from the picked card
       - the picked card: stat threat 1, until the end of the round
       - the picked card: stat attack 1, until the end of the round
@@ -387,7 +387,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142082:A:1 (front): When Revealed: Until the end of the round, add 1 to the archery total at this stage for each ally currently at this stage.
   142082:whenRevealed:1: When revealed
-    - actorSeat: stat archeryBonus the number of ally (any player controls) [also {"atStage":true}], until the end of the round
+    - actorSeat: stat archeryBonus the number of ally (any player controls) at the acting player's staging area (every area before they are separate), until the end of the round
 
 142082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has fewer printed hit points than the attacking enemy).
   142082:shadow:1: Shadow
@@ -426,11 +426,11 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142090:A:2 (front): When Revealed: Attach to a hero you control. (Counts as a Condition attachment with the text: "Forced: After a character you control is destroyed, raise your threat by 2.")
   142090:whenRevealed:1: When revealed
-    - attach this card to a hero
+    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
   142090:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
-  142090:forced:1: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])
+  142090:forced:1: Forced on the event characterDestroyed (heard about character (any player controls) controlled by the player who controls this card's host)
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 199 by template, 47 as JSON)
+(rendered pieces: 206 by template, 40 as JSON)

@@ -5,10 +5,10 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { releaseAttachments } from "../../core/keywords.ts";
+import { raiseThreat, releaseAttachments } from "../../core/keywords.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
@@ -16,6 +16,8 @@ import { enforceRestricted } from "../../player/attach.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectsOf } from "../../windows/listen.ts";
+import { fireForced } from "../../windows/triggers.ts";
+import { listenerInPlay } from "../nightmare/guards.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
 import { backIntoQuestDeck } from "./random-stage.ts";
@@ -59,25 +61,55 @@ export function flipCurrentQuest(state: ScenarioState): ScenarioState {
   return id && stage && stage.face === "A" ? updateCard(state, id, { face: "B" }) : state;
 }
 
-// The current stage leaves the quest for the bottom of the quest deck with no progress, side A up (emce.bypassing), and `nextId` is revealed in its place: its When Revealed effects resolve. The stage is not defeated, so nothing that hears a defeat is told (stageLeft `bypassed`).
-function replaceCurrent(state: ScenarioState, nextId: string, how: { readonly flipped: boolean }, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+// How a stage leaves the quest for another: `flipped` the stage that arrives shows side B at once; `shuffle` the stage that left is shuffled into the quest deck, which is shuffled, and the top stage arrives (that stage may be the one that left: 901201:A:2, 03026:A:1);
+// `leaves` where the stage goes, the bottom of the quest deck by default or set aside (the stage Hasty Council replaces goes to the victory display next, 03074:B:1).
+export type Replace = { readonly flipped: boolean; readonly shuffle?: true; readonly leaves?: "setAside" };
+
+// The current stage leaves the quest with no progress, side A up (emce.bypassing), and `nextId` is revealed in its place: its When Revealed effects resolve. The stage is not defeated, so nothing that hears a defeat is told (stageLeft `bypassed`). With `how.shuffle` the next stage is the top of the shuffled quest deck.
+export function replaceCurrent(state: ScenarioState, nextId: string, how: Replace, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const currentId = state.questStage;
   const current = currentId ? state.cards[currentId] : undefined;
-  if (!currentId || !current || currentId === nextId) return state;
+  if (!currentId || !current || (currentId === nextId && !how.shuffle)) return state;
   const before = steps.length;
   const cause = currentCause(steps, UNATTRIBUTED);
   let next = backIntoQuestDeck(releaseAttachments(state, currentId, ctx.cards, steps), currentId, cause, steps);
-  next = moveCard(next, nextId, { zone: "questStage" });
-  next = updateCard(next, nextId, { face: how.flipped ? "B" : arrivalFace(next, next.cards[nextId]?.code) });
-  next = { ...next, stageLeft: { to: nextId, from: currentId, bypassed: true } };
-  steps.push({ kind: "advance", cardId: nextId });
+  if (how.leaves) next = moveCard(next, currentId, { zone: how.leaves });
+  if (how.shuffle) next = shuffleDeck(next);
+  const arriving = how.shuffle ? (next.questDeck[0] ?? currentId) : nextId;
+  next = moveCard(next, arriving, { zone: "questStage" });
+  next = updateCard(next, arriving, { face: how.flipped ? "B" : arrivalFace(next, next.cards[arriving]?.code) });
+  next = { ...next, stageLeft: { to: arriving, from: currentId, bypassed: true } };
+  steps.push({ kind: "advance", cardId: arriving });
   return afterProgress(next, before, ctx, steps);
 }
 
-/** BypassStage: the source stage is bypassed (emce.bypassing). With no other stage in the quest deck nothing happens: there is no next stage 2A to reveal. */
+/**
+ * BypassStage: the source stage is bypassed (emce.bypassing). With no other stage in the quest deck nothing happens: there is no next stage 2A to reveal. Each player first pays the threat a card in play charges for a bypass (901207:A:1; a raise that eliminates him still lets the bypass happen),
+ * and the Nightmare setup card shuffles the stage in and reveals the top of the deck (901201:A:2). The Forced effects that hear a bypass (901205:A:2) resolve before the next stage's When Revealed effects.
+ */
 export function bypassStage(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const top = state.questDeck[0];
-  return focus.sourceId != null && focus.sourceId === state.questStage && top != null ? replaceCurrent(state, top, { flipped: false }, ctx, steps) : state;
+  if (focus.sourceId == null || focus.sourceId !== state.questStage || top == null) return state;
+  const paid = payBypassThreat(state, steps);
+  if (paid.lost || paid.failure) return paid;
+  const shuffles = flagged(paid, "table", "bypassShuffles");
+  return announceBypassed(replaceCurrent(paid, top, shuffles ? { flipped: false, shuffle: true } : { flipped: false }, ctx, steps), ctx, steps);
+}
+
+// "As an additional cost to bypass a quest card, each player must raise his threat by 2" (901207:A:1): each copy in play adds its amount (the `bypassThreat` the table holds).
+function payBypassThreat(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+  const cost = heldAmount(state, "table", "bypassThreat");
+  let next = state;
+  if (cost > 0) for (const seat of livingSeats(state)) next = raiseThreat(next, seat, cost, steps, currentCause(steps, UNATTRIBUTED));
+  return next;
+}
+
+// The stage has gone to the quest deck, and a Forced effect that hears "a quest card is bypassed" (901205:A:2) resolves for each seat, the first player's first, below the new stage's When Revealed frames pushed already.
+function announceBypassed(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  if (!listenerInPlay(state, "stageBypassed", ctx.effects)) return state;
+  let next = state;
+  for (const seat of [...livingSeats(state)].reverse()) next = fireForced(next, { trigger: "stageBypassed", seat }, ctx, steps);
+  return next;
 }
 
 /** Whether a stage can be bypassed now: the quest deck holds another stage to reveal. */
@@ -100,7 +132,7 @@ export function searchQuestDeck(state: ScenarioState, instruction: Verb<"SearchQ
   return shuffleDeck(replaceCurrent(state, chosen, { flipped: true }, ctx, steps));
 }
 
-function shuffleDeck(state: ScenarioState): ScenarioState {
+export function shuffleDeck(state: ScenarioState): ScenarioState {
   const rolled = shuffleIds(state.questDeck, state.seed, state.seedCursor);
   return { ...state, questDeck: rolled.ids, seedCursor: rolled.cursor };
 }

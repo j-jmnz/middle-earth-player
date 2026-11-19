@@ -2,17 +2,17 @@
 // The choices the Lake-town engine asks that no record holds (src/rules/families/smaug/): where the first player reveals the next Smaug, each player's turn to take Burn damage on a character (exhaust one, how much of the pool it takes, or done), how many progress tokens stage 2B
 // discards to heal Lake-town, and how Fisherman's Dock's two active locations divide the progress. The keep row of the Shadow cancel offers (50209, 50210) is worded here too, since it says whether another player is asked next. Each sentence says the number, the side of the table and the
 // player; the Burn rows name the player (two-handed), and a row that loses the game, or destroys the character, is armed. Pure.
-import type { Instruction } from "../../../catalog/boundary.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
-import { lakeTownDamage, lakeTownLimit, smaugInPlay, turnOrder } from "../../../rules/families/smaug/cards.ts";
-import { readyCharacters, room } from "../../../rules/families/smaug/burn.ts";
-import { questPointsOf } from "../../../rules/quest/quest.ts";
-import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
-import { pileOf } from "../../../rules/core/piles.ts";
-import { damageOutcome } from "../../store/foresight.ts";
+import type { Instruction } from "../../../../catalog/boundary.ts";
+import type { ScenarioState } from "../../../../rules/core/state.ts";
+import { lakeTownDamage, lakeTownLimit, smaugInPlay, turnOrder } from "../../../../rules/families/smaug/cards.ts";
+import { readyCharacters, room } from "../../../../rules/families/smaug/burn.ts";
+import { questPointsOf } from "../../../../rules/quest/quest.ts";
+import type { ReduceContext } from "../../../../rules/interpret/interpret.ts";
+import { pileOf } from "../../../../rules/core/piles.ts";
+import { damageOutcome } from "../../../store/foresight.ts";
 
-import type { ChoiceNames } from "../choice.ts";
-import { seatSays } from "../seat.ts";
+import type { ChoiceNames } from "../../choice.ts";
+import { seatSays } from "../../seat.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
 type Burn = Extract<Instruction, { verb: "ResolveBurn" }>;

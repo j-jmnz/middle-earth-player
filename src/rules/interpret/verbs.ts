@@ -13,6 +13,7 @@ import { destroyAndAnnounce, destroyCard, isEncounterCardEffect, modifiedStat, p
 import { eliminateEmpties } from "../core/eliminate.ts";
 import { lastPicked, otherSeat, seatsFor } from "./player-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { queueFront } from "../families/play/refs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { engageEnemy, engageWith, stagingEnemies } from "../quest/quest.ts";
@@ -123,7 +124,7 @@ export function runExtraVerb(
       return afterProgress(placed, before, ctx, steps);
     }
     case "DiscardUntilEnemies":
-      return discardUntilEnemies(state, Math.max(0, instruction.perPlayer * livingSeats(state).length - (instruction.less ?? 0)), ctx, steps, instruction.to, instruction.cardType, instruction.trait);
+      return discardUntilEnemies(state, Math.max(instruction.atLeast ?? 0, instruction.perPlayer * livingSeats(state).length - (instruction.less ?? 0)), ctx, steps, instruction.to, instruction.cardType, instruction.trait, focus.seat, instruction.returnOthers === true);
     case "ShuffleSelfIntoEncounterDeck": {
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
@@ -314,15 +315,24 @@ function committedHeroes(state: ScenarioState, seat: number, exceptSphere: strin
 // Cards come off the top of the encounter deck into its discard pile until `count` enemies (locations, with `cardType`) are among them, or the deck is
 // empty (rr.effects: as many as there are). Each of those enemies is then put into play engaged with the first player
 // (141045:A:2): it has engaged that player (rr.engaged), "cannot be engaged" or not (engageWith). Locations are added to the staging area (146077:A:1).
-function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[], to?: "staging", cardType?: "location", trait?: string): ScenarioState {
+function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[], to?: "staging" | "reveal", cardType?: "location", trait?: string, seat?: number, returnOthers = false): ScenarioState {
   let next = state;
   const enemies: string[] = [];
+  const discarded: string[] = [];
   while (enemies.length < count) {
     const top = next.encounterDeck[0];
     if (!top) break;
     next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: turnedUp(next, top) });
+    discarded.push(top);
     if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === (cardType ?? "enemy") && (trait == null || hasTrait(next, top, trait, ctx))) enemies.push(top);
   }
+  // The cards that did not count go back into the deck, shuffled in (04086:B:1); the counted ones stay for the move below.
+  if (returnOthers) {
+    for (const id of discarded) if (!enemies.includes(id)) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+    next = shuffleEncounterDeck(next);
+  }
+  // Each revealed in full, the first now and the rest as it ends (901402:A:1).
+  if (to === "reveal") return enemies.length > 0 ? queueFront(next, [{ instruction: { verb: "RevealEnemies", ids: enemies }, seat: seat ?? next.firstPlayer, chosen: null }]) : next;
   // Engaged with the first player, or added to the staging area (They Are Coming!, 142056:A:2).
   for (const id of enemies) next = to === "staging" ? moveEncounter(next, id, "staging", next.firstPlayer, ctx, steps) : engageWith(next, next.firstPlayer, id, steps);
   return next;

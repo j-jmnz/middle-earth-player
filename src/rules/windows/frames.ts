@@ -206,7 +206,9 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // (ltp.revealed-treachery, rr.treachery-cards, rr.step-3-3). A treachery whose text attached it (a Condition) has
       // left the staging area and stays where its text put it. A canceled treachery is discarded too (rr.cancel). Peril
       // covers that card's staging only, so the lock ends before surge (mec109.peril, rr.surge).
-      const resolved = (printed.type === "treachery" || discardsAfterReveal(printed)) && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
+      // A treachery that holds progressRedirect (Blinding Blizzard, 901307:A:2: "Add Blinding Blizzard to the staging area") stays in the staging area.
+      const stays = printed.type === "treachery" && flagged(state, id, "progressRedirect");
+      const resolved = (printed.type === "treachery" || discardsAfterReveal(printed)) && state.cards[id]?.zone === "staging" && !stays ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
       const unlocked = frame.peril && resolved.perilSeat === seat ? { ...resolved, perilSeat: null } : resolved;
       // A card still in play has entered play (rr.staging, step 3): "After a location enters play" (04060:A:1).
       const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });

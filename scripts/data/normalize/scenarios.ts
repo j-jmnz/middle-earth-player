@@ -242,7 +242,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       const stormcallerStages = new Set([...normal.placements.keys()].filter((key) => key.endsWith("\u0000stormcallerQuests")).map((key) => key.split("\u0000")[0] ?? ""));
       stages = questCodes.filter((code) => !stormcallerStages.has(code));
       const deckStages = [...normal.placements.keys()].filter((key) => key.endsWith("\u0000quest")).map((key) => key.split("\u0000")[0] ?? "");
-      if (JSON.stringify(stages) !== JSON.stringify(deckStages)) local.push(`${id}: quest stages disagree: Hall of Beorn ${stages.join(",")} / DragnCards ${deckStages.join(",")}`);
+      // The variants of one stage (Flight from Moria's seven stage 2 cards, Foundations of Stone's four stage 4 cards) are dealt in no printed order, so the load list may list them in another order than Hall of Beorn's.
+      const stageNumber = (code: string) => Number.parseInt(byCode.get(code)?.stage ?? "", 10);
+      const sameStages = JSON.stringify(stages) === JSON.stringify(deckStages) || (stages.length === deckStages.length && [...stages].sort().join() === [...deckStages].sort().join() && stages.every((code, at) => stageNumber(code) === stageNumber(deckStages[at] ?? "")));
+      if (!sameStages) local.push(`${id}: quest stages disagree: Hall of Beorn ${stages.join(",")} / DragnCards ${deckStages.join(",")}`);
     } else {
       // No load list: Hall of Beorn's counts are the pile, and the quest card's printed Setup moves cards out of the deck.
       normal = fromSetup("Normal");
@@ -429,7 +432,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       // A stage that says "There can be 2 active locations", or a dealt card that grants the slot (Fisherman's Dock: "There are now 2 active locations").
       secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))) || /There are now 2 active locations/.test(everything),
       // A stage that creates a staging area for each player (Breaking of the Fellowship, Escape from Mount Gram), or a dealt card that sends a player to a staging area of his own (Great Barrow, 148007).
-      perSeatStaging: stages.some((code) => /creates? (?:his|their) own staging area/.test(textOf(code))) || /create your own staging area/.test(everything),
+      perSeatStaging: stages.some((code) => /creates? (?:his|their|your) own staging area/i.test(textOf(code))) || /create your own staging area/.test(everything),
     };
 
     // DragnCards' decks, where a deck of the same cards exists (copy counts only, not piles).

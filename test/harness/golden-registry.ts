@@ -55,6 +55,15 @@ import * as rhosgobel from "../scenarios/a-journey-to-rhosgobel/game.ts";
 import * as muil from "../scenarios/the-hills-of-emyn-muil/game.ts";
 import * as deadmarshes from "../scenarios/the-dead-marshes/game.ts";
 import * as returnmirkwood from "../scenarios/return-to-mirkwood/game.ts";
+import * as pit from "../scenarios/into-the-pit/game.ts";
+import * as level from "../scenarios/the-seventh-level/game.ts";
+import * as frommoria from "../scenarios/flight-from-moria/game.ts";
+import * as gate from "../scenarios/the-redhorn-gate/game.ts";
+import * as rivendell from "../scenarios/road-to-rivendell/game.ts";
+import * as water from "../scenarios/the-watcher-in-the-water/game.ts";
+import * as dark from "../scenarios/the-long-dark/game.ts";
+import * as stone from "../scenarios/foundations-of-stone/game.ts";
+import * as flame from "../scenarios/shadow-and-flame/game.ts";
 import * as osgiliath from "../scenarios/the-massing-at-osgiliath/game.ts";
 import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
 import * as erech from "../scenarios/the-stone-of-erech/game.ts";
@@ -141,6 +150,15 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-hills-of-emyn-muil", "The Hills of Emyn Muil", muil.MUIL_GOLDENS, muil.muilWorld, muil.playGolden),
   entry("the-dead-marshes", "The Dead Marshes", deadmarshes.DEADMARSHES_GOLDENS, deadmarshes.deadmarshesWorld, deadmarshes.playGolden),
   entry("return-to-mirkwood", "Return to Mirkwood", returnmirkwood.RETURNMIRKWOOD_GOLDENS, returnmirkwood.returnmirkwoodWorld, returnmirkwood.playGolden),
+  entry("into-the-pit", "Into the Pit", pit.PIT_GOLDENS, pit.pitWorld, pit.playGolden),
+  entry("the-seventh-level", "The Seventh Level", level.LEVEL_GOLDENS, level.levelWorld, level.playGolden),
+  entry("flight-from-moria", "Flight from Moria", frommoria.FROMMORIA_GOLDENS, frommoria.frommoriaWorld, frommoria.playGolden),
+  entry("the-redhorn-gate", "The Redhorn Gate", gate.GATE_GOLDENS, gate.gateWorld, gate.playGolden),
+  entry("road-to-rivendell", "Road to Rivendell", rivendell.RIVENDELL_GOLDENS, rivendell.rivendellWorld, rivendell.playGolden),
+  entry("the-watcher-in-the-water", "The Watcher in the Water", water.WATER_GOLDENS, water.waterWorld, water.playGolden),
+  entry("the-long-dark", "The Long Dark", dark.DARK_GOLDENS, dark.darkWorld, dark.playGolden),
+  entry("foundations-of-stone", "Foundations of Stone", stone.STONE_GOLDENS, stone.stoneWorld, stone.playGolden),
+  entry("shadow-and-flame", "Shadow and Flame", flame.FLAME_GOLDENS, flame.flameWorld, flame.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

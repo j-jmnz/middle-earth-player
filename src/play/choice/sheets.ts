@@ -20,7 +20,7 @@ import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/scenarios/grapple.ts";
 import { isBoonCode } from "../words/scenarios/angmar/angmar-table.ts";
-import { smaugChooseNote } from "../words/scenarios/smaug.ts";
+import { smaugChooseNote } from "../words/scenarios/standalone-scenarios/smaug.ts";
 import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/scenarios/wilderland.ts";
 import { embassyPairCards } from "../readouts/black-gate.ts";
 import { branchCaution, discardCaution } from "./wilderland-sheets.ts";

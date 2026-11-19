@@ -13,13 +13,14 @@ import { countMatching, pickCandidates } from "./pick.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { guardsTitled } from "../families/objectives/pick.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
+import { joiningStages } from "../families/captured/join.ts";
 import { guardedSafeLocation } from "../families/angmar/safe.ts";
 import { flightDefenseBarred } from "../families/attack/flight.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; exceptSelf?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; exceptSelf?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true; engagedPlayer?: true };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -37,7 +38,7 @@ export function restricted(state: ScenarioState, ctx: ReduceContext, what: Restr
 }
 
 function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict["what"]): Restriction[] {
-  const found: Restriction[] = [];
+  const found: Restriction[] = what === "advance" ? joiningStages(state, ctx) : [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb !== "Restrict" || instruction.what !== what) continue;
     // Once stages are separate "cannot defeat this stage" binds that stage only: another seat's stage does not hold this one back (148003:B:3 at stage 3B, 148004 at a trapped player's stage).
@@ -57,6 +58,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.unlessControls ? { unlessControls: instruction.unlessControls } : {}),
       ...(instruction.guardian ? { guardian: true as const } : {}),
       ...(instruction.exceptAlone ? { exceptAlone: true as const } : {}),
+      ...(instruction.engagedPlayer ? { engagedPlayer: true as const } : {}),
     });
   }
   return found;
@@ -165,7 +167,9 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       // "Exhaust a Ship objective to travel here" (12128:A:2): the card to exhaust is picked, so the cost cannot be paid without one.
       if (instruction.verb === "Exhaust" && instruction.target?.kind === "picked") {
         const pick = instructions.find((other) => other.verb === "Pick");
-        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
+        // "The first player must exhaust 2 characters to travel here" (04066:A:1): one ready card for each exhaust of the cost.
+        const needed = instructions.filter((other) => other.verb === "Exhaust" && other.target?.kind === "picked").length;
+        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length < needed;
       }
       // "The first player must discard 1 event card from his hand to travel here" (02088:A:1): the card discarded is picked, so the cost cannot be paid without one.
       if (instruction.verb === "DiscardPicked") {
@@ -243,6 +247,7 @@ export function seatBarred(state: ScenarioState, ctx: ReduceContext, seat: numbe
   return restricted(state, ctx, what).some(
     (rule) =>
       (rule.unlessControls != null && countMatching(state, rule.unlessControls, seat, rule.sourceId, ctx) === 0) ||
-      (rule.guardian === true && guardianSeat(state) === seat && !(rule.exceptAlone === true && livingSeats(state).length === 1)),
+      (rule.guardian === true && guardianSeat(state) === seat && !(rule.exceptAlone === true && livingSeats(state).length === 1)) ||
+      (rule.engagedPlayer === true && state.cards[rule.sourceId]?.zone === "engaged" && state.cards[rule.sourceId]?.controller === seat),
   );
 }

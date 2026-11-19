@@ -5,6 +5,7 @@
 // `mirkwood-paths` (parts 4 and 5, tdom.mirkwood-paths) and `the-dark-of-mirkwood` (parts 1 and 2, tdom.mini-campaign).
 
 import type { Pile } from "../../src/catalog/scenario-data.ts";
+import { CYCLE_DEFS } from "./cycle-defs.ts";
 
 export type ScenarioDef = {
   // The file name: data/scenarios/<id>.json.
@@ -115,6 +116,14 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Hills of Emyn Muil", packs: ["HoEM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Dead Marshes", packs: ["TDM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
   { name: "Return to Mirkwood", packs: ["RtM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
+  // Dwarrowdelf: the Khazad-dûm deluxe expansion (three scenarios) and the six Adventure Packs, whose cards are Hall of Beorn's alone like the first cycle's.
+  { name: "Khazad-dûm", packs: ["KD"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Redhorn Gate", packs: ["TRG"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Road to Rivendell", packs: ["RtR"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Watcher in the Water", packs: ["WitW"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Long Dark", packs: ["TLD"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Foundations of Stone", packs: ["FoS"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Shadow and Flame", packs: ["SaF"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
   // Standalone scenarios: each official scenario printed on its own, Hall of Beorn's cards of it alone. Hall of Beorn lists the event scenarios of 2011 to 2017 under the year (`scenarioProduct`).
   { name: "The Massing at Osgiliath", packs: ["TMaO"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2011" },
   { name: "The Battle of Lake-town", packs: ["TBoLT"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2012" },
@@ -230,13 +239,6 @@ function sagaScenario(doc: string, id: string, product: string, extra: Partial<S
 }
 const twoTowers = (id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => sagaScenario("mec112", id, product, extra);
 const returnOfTheKing = (id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => sagaScenario("mec113", id, product, extra);
-
-// A Shadows of Mirkwood scenario: its Adventure Pack, and the DragnCards decks (Q01.<n+3> / E01.<n+3>: the 2011 core decks are Q01.1 to Q01.3). The rulesheet of an Adventure Pack
-// (`sotm.setup-<id>`) prints its encounter sets; The Hunt for Gollum's and Conflict at the Carrock's rulesheets are outlines with no text layer, so those two have no `setupSpan`.
-// The piles are checked against the quest card's printed Setup.
-function cycleScenario(n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef {
-  return { id, product, deck: { normal: `Q01.${n + 3}`, easy: `E01.${n + 3}` }, ...extra };
-}
 
 // The three saga boxes of The Lord of the Rings, in book order. Every list keeps them together, placed by the Fellowship's release
 // (scripts/data/normalize/campaigns.ts, positions).
@@ -395,48 +397,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     ledger: "the-return-of-the-king",
     ownTitles: true,
   },
-  {
-    id: "shadows-of-mirkwood",
-    name: "Shadows of Mirkwood",
-    kind: "cycle",
-    released: "2011-07-22",
-    products: ["The Hunt for Gollum", "Conflict at the Carrock", "A Journey to Rhosgobel", "The Hills of Emyn Muil", "The Dead Marshes", "Return to Mirkwood"],
-    scenarios: [
-      cycleScenario(1, "the-hunt-for-gollum", "The Hunt for Gollum"),
-      cycleScenario(2, "conflict-at-the-carrock", "Conflict at the Carrock"),
-      // DragnCards loads Wilyador in player 1's play area; the printed Setup adds him to the staging area (the first player then gains control of him, his own text).
-      cycleScenario(3, "a-journey-to-rhosgobel", "A Journey to Rhosgobel", { setupSpan: "sotm.setup-a-journey-to-rhosgobel", groups: { player1Play1: "staging" } }),
-      cycleScenario(4, "the-hills-of-emyn-muil", "The Hills of Emyn Muil", { setupSpan: "sotm.setup-the-hills-of-emyn-muil" }),
-      cycleScenario(5, "the-dead-marshes", "The Dead Marshes", { setupSpan: "sotm.setup-the-dead-marshes" }),
-      cycleScenario(6, "return-to-mirkwood", "Return to Mirkwood", { setupSpan: "sotm.setup-return-to-mirkwood" }),
-    ],
-    saga: false,
-    ledger: "shadows-of-mirkwood",
-  },
-  {
-    // The scenarios printed on their own (RingsDB's cycle 50 packs that are not A Long-extended Party's): one product line each as it is built. The index counts the built ones.
-    id: "standalone-scenarios",
-    name: "Standalone scenarios",
-    kind: "cycle",
-    released: "2011-09-21",
-    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs"],
-    scenarios: [
-      // DragnCards' deck Q99.01 has no Easy twin: Hall of Beorn's Easy counts equal the Normal ones, so Easy loads the same deck.
-      { id: "the-massing-at-osgiliath", product: "The Massing at Osgiliath", deck: { normal: "Q99.01", easy: "Q99.01" } },
-      // DragnCards' deck Q99.02 has no Easy twin either; its sharedEncounterDeck2 is the Smaug deck.
-      { id: "the-battle-of-lake-town", product: "The Battle of Lake-town", deck: { normal: "Q99.02", easy: "Q99.02" }, groups: { sharedEncounterDeck2: "setAside" } },
-      // DragnCards' deck Q99.03 has no Easy twin either.
-      { id: "the-stone-of-erech", product: "The Stone of Erech", deck: { normal: "Q99.03", easy: "Q99.03" } },
-      // DragnCards' deck Q99.04 has no Easy twin either.
-      { id: "the-old-forest", product: "The Old Forest", deck: { normal: "Q99.04", easy: "Q99.04" } },
-      // DragnCards' deck Q99.05 has no Easy twin either.
-      { id: "fog-on-the-barrow-downs", product: "Fog on the Barrow-downs", deck: { normal: "Q99.05", easy: "Q99.05" } },
-    ],
-    // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
-    later: ["2015", "2016", "2017", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
-    saga: false,
-    ledger: "standalone-scenarios",
-  },
+  ...CYCLE_DEFS,
 ];
 
 // The packs of the products built from Hall of Beorn alone (no twin pack): their boons and burdens have a pool file of their own.

@@ -73,10 +73,10 @@ function seatOfCard(game: ScenarioState, id: string): number | null {
 /**
  * The row of a card in a pick of Intruders in Chetwood whose options belong to more than one player (Borders of Bree-land's enemy, Angmar Orc's ally): the owner is named on each row, "Angmar Orc \u00b7 engaged with Player 2",
  * "Gimli \u00b7 Player 1's ally". An attachment names the card it lies on and whose that is, so two of one name read apart ("A Fell Dread \u00b7 on Aragorn, Player 2's hero", "Possession \u00b7 on Reanimated Dead, Player 1's card", "... on Orc Archer, enemy engaged with Player 1");
- * one lying on a card no seat owns has no label. Undefined for any other row, and in a game with one seat or none of the side quest rules.
+ * one lying on a card no seat owns has no label. Undefined for any other row, and in a game with one seat or none of the side quest rules (or of the Setup line that has the first player pick among every player's heroes, `seatedRows`).
  */
 export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
-  if (game.sideQuests !== true || game.seatCount < 2) return undefined;
+  if ((game.sideQuests !== true && game.seatedRows !== true) || game.seatCount < 2) return undefined;
   const seat = seatOfCard(game, id);
   if (seat == null || seat < 0) return undefined;
   const seats = new Set(options.map((other) => seatOfCard(game, other)).filter((other) => other != null && other >= 0));

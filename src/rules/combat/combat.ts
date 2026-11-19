@@ -24,9 +24,9 @@ import { markDefender, moreDefenders, staysReadyToDefend } from "../families/def
 import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
-import { countsDefense, struck } from "../families/attack/strike.ts";
+import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
 import { attackStatAgainst } from "../families/attack/spectral.ts";
-import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
+import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -94,7 +94,7 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
 // Each seat's enemies in player order, the highest engagement cost first (rr.step-6-2). Equal costs keep the order
 // they engaged in.
 export function dealShadows(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
+  let next = noteBelowThreat(state);
   for (const seat of livingSeats(next)) {
     const cost = (id: string) => {
       const instance = next.cards[id];
@@ -138,7 +138,7 @@ export function beginEnemyAttack(
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   // An attack an effect makes from the staging area was dealt its shadow card already (attackFromStaging).
-  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps, ctx) : state;
+  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps, ctx, seat) : state;
   const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {
@@ -184,6 +184,8 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   const printed = printedOf(cards, instance.code);
   if (!isCharacterType(printed) || instance.host != null) return false;
   if (flagged(state, defenderId, "cannotDefend")) return false;
+  // A character that cannot exhaust (Shadow of Fear, 03027:A:1) defends only where it stays ready.
+  if (flagged(state, defenderId, "cannotExhaust") && !flagged(state, defenderId, "noExhaustDefend")) return false;
   // A ship-enemy's attack is defended only by a ship-objective, and a ship-objective defends only against one (dcce.ship-enemies).
   if (familyDefenseReason(state, printed, cards, defenderId)) return false;
   if (instance.controller === attackedSeat) return true;
@@ -249,6 +251,8 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed) || attacker.host != null) return false;
+  // A character that cannot exhaust (Shadow of Fear, 03027:A:1) attacks only where it stays ready.
+  if (flagged(state, attackerId, "cannotExhaust") && !flagged(state, attackerId, "noExhaustAttack")) return false;
   // A ship-objective attacks only ship-enemies (dcce.ship-objectives), and only Ship objectives can be declared as attackers against Raider Flagship (12124:A:3).
   if (familyAttackReason(state, enemyId, printed, printedOf(cards, enemy.code), attackerId)) return false;
   // "Only Eagle characters or characters with ranged can attack ... Mirkwood Flock" (02070:A:1), "cannot be attacked by characters with the ranged keyword" (900606:A:2).
@@ -264,6 +268,13 @@ export function canAttack(
     if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
     return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
+  // An enemy in the staging area that is considered engaged with each player whose threat is 1 or greater (Durin's Bane, 04150:A:2): such a player declares attackers against it, with their own characters and ranged characters of the others (rr.ranged).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithThreatening")) {
+    if (flagged(state, attackerId, "cannotAttack") || !engagedWithThreatening(state, enemyId, seat)) return false;
+    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
+  }
+  // Goblin Archer (03032:A:2): in the staging area it is attacked by characters with ranged, of any player, in the combat phase.
+  if (enemy.zone === "staging" && flagged(state, enemyId, "attackableByRanged")) return !flagged(state, attackerId, "cannotAttack") && state.phase === "Combat" && hasKeyword(state, attackerId, "ranged", cards);
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack/targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");
@@ -379,10 +390,13 @@ export function strikeEnemy(
 // The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.
 export function attackStrength(state: ScenarioState, attackerIds: readonly string[], enemyId: string, cards: Cards): number {
   let attack = 0;
+  // "Immune to ranged damage" (Great Cave-troll, 03042:A:1; dwd.immune-to-ranged-damage): a character that takes part through the ranged keyword deals it no damage, a ranged character that attacks it another way does.
+  const strike = flagged(state, enemyId, "immuneToRangedDamage") && state.pendingStrike?.enemyId === enemyId ? state.pendingStrike : undefined;
   // Against a Spectral enemy a character's Willpower is its attack strength (families/attack/spectral.ts).
   const stat = attackStatAgainst(state, enemyId, cards);
   for (const attackerId of attackerIds) {
     const attacker = state.cards[attackerId];
+    if (attacker && strike && rangedAttack(strike, attacker)) continue;
     if (attacker) attack += modifiedStat(state, attacker, stat, cards, enemyId);
   }
   return attack;

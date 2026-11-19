@@ -23,20 +23,22 @@ import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
-import { activeFor, sharedStaging, sharing } from "../families/breaking/areas.ts";
+import { activeFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { heldAmount, inPlay, livingSeats } from "../core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats } from "../core/state.ts";
 import { canDeclareDefender, isDefending } from "../families/defense/defenders.ts";
 import { facedownShadow } from "../families/defense/shadow.ts";
 import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
 import { aflamePickMatches, lowestAflame } from "../families/aflame/pick.ts";
 import { lowestOf } from "../families/harad/pick.ts";
 import { highestAttack } from "../families/sea/ramming.ts";
+import { tiedExtreme } from "./tied-extreme.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
 import { embassyPool, highestThreatOf } from "../families/black-gate/pick.ts";
+import { highestThreatPlusRemaining } from "../families/long-dark/pick.ts";
 import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 
@@ -61,6 +63,7 @@ function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[]
   if (spec.control === "you") return [asking];
   // "At this stage": the chooser's own once stages are separate (mec109.multiple-staging-areas).
   if (spec.atStage && state.separate) return sharing(state, asking);
+  if (spec.otherArea === true && state.separate) return livingSeats(state).filter((seat) => headOf(state, seat) !== headOf(state, asking));
   if (spec.control === "other") return livingSeats(state).filter((seat) => seat !== asking);
   return livingSeats(state);
 }
@@ -127,7 +130,10 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       if (instance.host == null || (instance.zone !== "play" && instance.zone !== "attached")) continue;
       // A boon guarded on an enemy is held for its owner, not an attachment any player controls (146069:B:1).
       if (instance.held === true) continue;
-      // An encounter attachment (a Condition) has no controller: any player's filter sees it.
+      // A player card lying on a Nameless enemy is no attachment a player controls (rr.attachment-cards).
+      if (instance.nameless === true) continue;
+      // An encounter attachment (a Condition) has no controller: any player's filter sees it, `controlled` leaves it out (Whip Lash, 04148:A:1).
+      if (spec.controlled && instance.controller == null) continue;
       if (instance.controller != null && !seats.includes(instance.controller)) continue;
       raw.push(instance.id);
     }
@@ -160,6 +166,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (spec.control === "any") raw.push(...stagingFor(state, spec, asking), ...(state.separate ? activeFor(state, asking, spec.stagingArea === "any").slice(0, 1) : [state.activeLocation].filter((id): id is string => id != null)));
   } else {
     for (const index of seats) raw.push(...characters(state, index, ctx.cards));
+    // An ally a guard holds in the staging area (Arwen under Goblin Gate, 901402:B:1) is an ally in play that no player controls: any player's filter sees it, `controlled` leaves it out.
+    if (spec.control !== "you" && !spec.controlled && state.modifiers.length > 0) raw.push(...state.staging.filter((id) => flagged(state, id, "guardedAlly")));
   }
   if (spec.captive === "include" && spec.control !== "you") raw.push(...captiveIds(state, "include", ctx.cards));
   return raw;
@@ -190,6 +198,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "location" && printed.objectiveLocation && type === "objective" && instance.zone !== "staging") || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
   }
+  if (spec.affectable && immuneToSource(state, id, at.sourceId, ctx)) return false;
   if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
   if (spec.traits && !spec.traits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
   if (spec.notTraits && spec.notTraits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
@@ -245,6 +254,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // Every defender of the attack in progress, the extra ones too (rr.multiple-defenders).
   if (spec.defending && !isDefending(state, id)) return false;
   if (spec.canDefend && !canDeclareDefender(state, id, ctx.cards)) return false;
+  if (spec.canExhaust && (instance.exhausted || flagged(state, id, "cannotExhaust"))) return false;
   if (spec.facedownShadow && !facedownShadow(state, id)) return false;
   if (spec.attackingEnemy != null && (state.pendingAttack?.enemyId === id) !== spec.attackingEnemy) return false;
   if (spec.hasAttachment) {
@@ -289,6 +299,7 @@ function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<Pic
   const type = cardTypeOf(host, printedOf(ctx.cards, host.code));
   if (on.type === "hero" ? type !== "hero" : type !== "hero" && type !== "ally") return false;
   if (on.minWillpower != null && modifiedStat(state, host, "willpower", ctx.cards) < on.minWillpower) return false;
+  if (on.committed != null && host.committed !== on.committed) return false;
   return on.control === "any" || (on.control === "you") === (host.controller === asking);
 }
 
@@ -358,8 +369,12 @@ export function pickCandidates(
   if (spec.lowestThreat) return lowestOf(state, found, "threat", ctx);
   // "The highest threat encounter card remaining" (families/black-gate/pick.ts).
   if (spec.highestThreat) return highestThreatOf(state, found, ctx);
+  // "The location with the highest combined threat and remaining quest points" (families/long-dark/pick.ts).
+  if (spec.highestThreatPlusRemaining) return highestThreatPlusRemaining(state, found, ctx);
   // "The highest cost attachment you control" (families/costs/pick.ts).
   if (spec.highestCost) return highestCost(state, found, ctx);
+  // "The ally you control with the highest Willpower" (901304:A:2).
+  if (spec.highestWillpower) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "willpower", ctx.cards) : 0), "highest");
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
   return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }

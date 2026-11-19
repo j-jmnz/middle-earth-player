@@ -379,7 +379,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - up to 1 resource token(s) come off the card with code 145072 in play
     - [json ReturnSetAsideHero {"verb":"ReturnSetAsideHero","code":"145001","when":{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}}]
-    - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}}]
+    - then, if resources of this card is less than 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
 
 ## 145073 The Garrison of Gondor
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -388,14 +388,14 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145073:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses one of:
-      * option "rohan" (only if there is a hero (any player controls) chosen by the first player [also {"attachable":"145014"}] to choose):
-        - choose hero (any player controls) chosen by the first player [also {"attachable":"145014"}]
-        - [json AttachSetAside {"verb":"AttachSetAside","code":"145014"}]
+      * option "rohan" (only if there is a hero (any player controls) that the card with code 145014 can be attached to, chosen by the first player to choose):
+        - choose hero (any player controls) that the card with code 145014 can be attached to, chosen by the first player
+        - the set-aside copy of the card with code 145014 is attached to the last picked hero
       * option "none":
     - the first player chooses one of:
-      * option "gondor" (only if there is a hero (any player controls) chosen by the first player, with no attachment named "Esquire of Rohan" [also {"attachable":"145015"}] to choose):
-        - choose hero (any player controls) chosen by the first player, with no attachment named "Esquire of Rohan" [also {"attachable":"145015"}]
-        - [json AttachSetAside {"verb":"AttachSetAside","code":"145015"}]
+      * option "gondor" (only if there is a hero (any player controls) that the card with code 145015 can be attached to, chosen by the first player, with no attachment named "Esquire of Rohan" to choose):
+        - choose hero (any player controls) that the card with code 145015 can be attached to, chosen by the first player, with no attachment named "Esquire of Rohan"
+        - the set-aside copy of the card with code 145015 is attached to the last picked hero
       * option "none":
 
 145073:B:1 (back): Skip the quest phase and combat phase.
@@ -513,7 +513,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145077:B:3 (back): This stage cannot be defeated unless Aragorn is in play and The Witch-king is in the victory display. If the players defeat this stage, they win the game.
   145077:constant:2: Constant
-    only if any of: (the card with code 145001 is not in play) or ([json condition {"kind":"inVictory","code":"145080","is":false}])
+    only if any of: (the card with code 145001 is not in play) or (the card with code 145080 is not in the victory display)
     - the players cannot defeat this stage while this holds
 
 ## 145078 The Battle of the Pelennor Fields
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 310 by template, 42 as JSON)
+(rendered pieces: 320 by template, 34 as JSON)

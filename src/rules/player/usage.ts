@@ -14,7 +14,7 @@ import { addToVictory } from "../families/sidequests/victory.ts";
 import { eventPlayReason } from "../families/costs/play.ts";
 import { printedOf, type Sphere } from "../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
-import { inPlay, updateCard } from "../core/state.ts";
+import { flagged, inPlay, updateCard } from "../core/state.ts";
 import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
@@ -108,10 +108,10 @@ export function costSphere(cost: Extract<Cost, { kind: "resources" }>, source: C
 function payable(state: ScenarioState, cost: Cost, source: CardInstance, seat: number, ctx: ReduceContext): boolean {
   switch (cost.kind) {
     case "exhaustSelf":
-      return !source.exhausted;
+      return !source.exhausted && !flagged(state, source.id, "cannotExhaust");
     case "exhaustHost": {
       const host = source.host ? state.cards[source.host] : undefined;
-      return host != null && !host.exhausted;
+      return host != null && !host.exhausted && !flagged(state, host.id, "cannotExhaust");
     }
     case "exhaustCode":
       return Object.values(state.cards).some((card) => card.code === cost.code && inPlay(card.zone) && !card.exhausted && (card.controller ?? seat) === seat);

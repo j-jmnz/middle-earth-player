@@ -332,7 +332,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141070:A:2 (front): When Revealed: Attach to a Nazgûl enemy in play, if able. (Counts as a Weapon attachment with the text: "Limit 1 per enemy. Attached enemy gets +1 Attack and cannot take non-combat damage.")
   141070:whenRevealed:1: When revealed
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"enemy","trait":"Nazgûl"}}]
+    - attach this card to an enemy in play with the trait Nazgûl
   141070:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - its host: stat attack 1, while this card is in play
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 243 by template, 33 as JSON)
+(rendered pieces: 244 by template, 32 as JSON)
