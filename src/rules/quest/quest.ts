@@ -13,7 +13,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import { hasQuestPoints, isLocationCard, printedOf, type PrintedCard } from "../core/printed.ts";
-import type { CardInstance, Modifier, ScenarioState } from "../core/state.ts";
+import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, livingSeats, updateCard, updateCards, withMode } from "../core/state.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
@@ -25,14 +25,13 @@ import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts"
 import { branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
-import { rescueRandom } from "../families/captured/rescue.ts";
-import { oweDiscards } from "../families/breaking/progress.ts";
 import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
 import { absorbProgress } from "../families/angmar/sponge.ts";
 import { currentSideQuest, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
+import { replaceStageProgress } from "./progress-replaced.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -188,14 +187,6 @@ function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], c
   return advanceStage(state, cards, steps, canAdvance);
 }
 
-// The flags of a quest stage that replace the progress placed on it, tried in this order: the removal of damage from locations in play (families/aflame.ts, 11037:B:1), progress the players place on a location in the staging area instead (families/island.ts, 12067:B:2) and,
-// for progress from questing successfully only (a player card's is placed as usual), damage among the enemies in play (families/pelennor, 145076:B:1).
-const PROGRESS_REPLACED: readonly { flag: Modifier["stat"]; questingOnly: boolean }[] = [
-  { flag: "progressHeals", questingOnly: false },
-  { flag: "progressToStaging", questingOnly: false },
-  { flag: "progressAsDamage", questingOnly: true },
-];
-
 // Progress on the quest goes on the active location first, up to its quest points, and the rest on the current quest card
 // (rr.active-location). A full quest card advances when `canAdvance` allows it (rr.quest-advancement); progress beyond its
 // quest points is lost: "Additional progress tokens earned against the quest do not carry over to the next stage."
@@ -215,24 +206,8 @@ export function placeQuestProgress(
   let remaining = placedOn.remaining;
   if (remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps, questing));
   const onSide = currentSideQuest(next) != null; // the progress goes on the side quest, so the stage's replacements below read none (mec108.side-quests-in-play)
-  // Progress a stage turns into discards from the encounter deck (families/breaking/progress.ts).
-  if (remaining > 0 && !onSide && next.questStage && flagged(next, next.questStage, "progressDiscards")) {
-    next = oweDiscards(next, remaining);
-    remaining = 0;
-  }
-  // Progress a stage turns into rescued captured cards, at random, instead of progress on it (families/captured/rescue.ts, 10039:B:1).
-  if (remaining > 0 && !onSide && next.questStage && flagged(next, next.questStage, "progressRescues")) {
-    next = rescueRandom(next, next.questStage, remaining);
-    remaining = 0;
-  }
-  // Progress a stage turns into an event its record hears (progressReplaced, with the amount) instead of progress on it.
-  const stage = next.questStage;
-  if (remaining > 0 && !onSide && stage && PROGRESS_REPLACED.some((one) => (!one.questingOnly || questing) && flagged(next, stage, one.flag))) {
-    next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: stage, amount: remaining });
-    remaining = 0;
-  }
-  // Assault (mec113.assault): no progress is placed on the stage by questing or by a player card effect; the active location above took its share as usual.
-  if (remaining > 0 && !onSide && next.questStage && flagged(next, next.questStage, "assault")) remaining = 0;
+  // The stage's own replacements: discards, rescues, an event its record hears, Assault (quest/progress-replaced.ts).
+  if (remaining > 0 && !onSide) ({ state: next, remaining } = replaceStageProgress(next, remaining, questing));
   // A side quest that is the current quest takes it instead of the main quest card; what it cannot take is discarded (emce.side-quests-in-play, families/wilderland/night-quest.ts).
   if (remaining > 0 && onSide) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
   // The main quest card takes none while barred as the current quest with no side quest chosen (10094:B:3).
