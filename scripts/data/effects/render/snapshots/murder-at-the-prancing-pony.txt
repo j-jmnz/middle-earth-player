@@ -37,7 +37,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     - a random card of the Investigation deck, chosen with the game's seed, is removed from the game without being looked at (no step names it)
 
 50702:B:2 (back): Forced: After the players place progress on this stage from questing successfully, the first player must choose: either reveal an encounter card and remain at this stage, or make the accusation (see rules) and advance to stage 3A.
-  50702:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+  50702:forced:2: Forced once, after a quest that succeeded has placed progress on the stage itself
     - the first player chooses one of:
       * option "reveal":
         - the first player reveals an encounter card
@@ -55,7 +55,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
   50703:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - if another player is still in the game: the acting player finds one Brigand enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+      - if not (the actor holds the first player token): the acting player finds one Brigand enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 50703:B:1 (back): Ignore the Investigate keyword when the active location is explored.
@@ -70,7 +70,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50703:B:3 (back): While at least 1 Hideout location is in play, Suspect enemies cannot take damage. If there are no Suspect enemies in play, the players win the game.
   50703:constant:2: Constant
-    only if the number of Hideout location (any player controls) is at least 1
+    only if the number of Hideout location (any player controls) or in the staging area is at least 1
     - each Suspect enemy (any player controls) or in the staging area: stat cannotTakeDamage 1, while this card is in play
   50703:constant:3: Constant
     only if there is no Suspect enemy in play (in the staging area or engaged)
@@ -328,10 +328,10 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50720:A:2 (front): Response: After triggering the Investigate keyword on Village Stable, if the looked at card is a Suspect or a Hideout, add Village Stable to the victory display to add that card to the staging area.
   50720:response:1: Response on the event investigated (heard about this card)
-    only if the top card of the Investigation deck (the card the keyword just showed) has the Trait Suspect and Hideout
+    only if the top card of the Investigation deck (the card the keyword just showed) has one of the Traits Suspect or Hideout
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card is added to the victory display (the players' own, the group's)
-    - the top card of the Investigation deck (the card the keyword just showed) is added to the staging area faceup if it has the Trait Suspect and Hideout
+    - the top card of the Investigation deck (the card the keyword just showed) is added to the staging area faceup if it has one of the Traits Suspect or Hideout
 
 50720:A:3 (front): Travel: Each player discards 1 random card from his hand to travel here.
   50720:travel:1: Travel
@@ -365,8 +365,8 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (the acting player)
     - then, if [json condition {"kind":"resources","min":1}] (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player looks at the bottom card of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
+    - then, if [json condition {"kind":"resources","min":1}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
     - [json SpendResources {"verb":"SpendResources","amount":1}]
-    - discard this card
 
 ## 50723 Lawless Ruffian
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -411,7 +411,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
         - raise threat by 2 (the acting player)
       * option "return":
         - when the attack in progress ends:
-          - return the attacking enemy to the staging area
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
 ## 50726 Hired Muscle
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -465,9 +465,10 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
   50728:shadow:1: Shadow
     - the acting player chooses one of:
       * option "threat":
-        - raise threat by 2 (the acting player)
+        - when the attack in progress ends:
+          - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 2 (the acting player)
       * option "shuffle":
-        - this card is shuffled into the Investigation deck, facedown
+        - once the attack ends, if it destroyed a character, this shadow card is shuffled into the Investigation deck, facedown
 
 ## 50729 Deadly Accusations
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -480,4 +481,4 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
   50729:shadow:1: Shadow
     - the attacking enemy: stat attack the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed), until the end of the attack
 
-(rendered pieces: 254 by template, 8 as JSON)
+(rendered pieces: 257 by template, 9 as JSON)
