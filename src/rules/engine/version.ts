@@ -34,6 +34,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 30, scenarios: ["mount-gundabad"], note: "Dagnir and the other cards that count quest cards in the victory display count player side quests too." },
   { version: 30, scenarios: "all", note: "A card that attaches to a quest card in play, like The Long Defeat, can attach to a side quest." },
   { version: 30, scenarios: ["lost-in-mirkwood", "across-the-ettenmoors", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "An Objective-Location counts as a location for cards that look for a location: it can be chosen as the active location, and exploring or travelling to it triggers them." },
+  { version: 30, scenarios: ["breaking-of-the-fellowship"], note: "When the players have separate staging areas, a Trap played into the staging area goes into your own area and attaches only to an enemy that enters that area." },
 ];
 
 export const ENGINE_VERSION = 30;
