@@ -92,7 +92,7 @@ export type RulesFamily = {
   /** Every verb `run` answers, so a test can check them against the verbs the catalog side declares. */
   readonly verbs: readonly Instruction["verb"][];
   readonly run: Runner;
-  /** Optional hooks into the core; each is called through RULES_FAMILIES (src/rules/interpret/family-hooks.ts), in list order unless the hook says otherwise. */
+  /** Optional hooks into the core; each is called through rulesFamilies() (src/rules/interpret/family-hooks.ts), in list order unless the hook says otherwise. */
   readonly settle?: SettleHooks;
   readonly travel?: TravelHooks;
   readonly pick?: PickHook;

@@ -31,11 +31,11 @@ export type CardType =
   | "campaign"
   // The Nightmare setup card, next to the quest deck on Nightmare (zone `nightmare`): its side A's lines stay active all game.
   | "nightmare"
-  // A player card played in the planning phase into its player's quest area (families/sidequests/play.ts), and a contract
+  // A player card played in the planning phase into the staging area (families/sidequests/play.ts), and a contract
   // card that begins the game in its player's play area (families/sidequests/contract.ts).
   | "player-side-quest"
   | "contract"
-  // An encounter side quest (Fire in the Night, emce.side-quests): a quest card with an encounter card back. It is revealed into the staging area and may be the current quest (families/wilderland/night-quest.ts).
+  // An encounter side quest (Fire in the Night, emce.side-quests): a quest card with an encounter card back. It is revealed into the staging area and may be the current quest, as a player side quest in play may (families/sidequests/play.ts) (families/wilderland/night-quest.ts).
   | "encounter-side-quest";
 
 export type Keywords = {
@@ -335,6 +335,22 @@ export function isCharacterType(printed: PrintedCard): boolean {
 export function fromEncounterDeck(printed: PrintedCard): boolean {
   if (printed.backType != null) return printed.backType === "encounter";
   return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure" || printed.type === "player-side-quest" || printed.type === "contract");
+}
+
+// A card the scenario owns (rr.ownership-and-control: "The scenario is considered to be the owner of the encounter deck and each encounter card"): an encounter card of an encounter set. An objective ally with no encounter set (Mendor, Gwaihir)
+// is a campaign card a player adds to their deck, so a player owns it.
+export function scenarioOwned(printed: PrintedCard): boolean {
+  return fromEncounterDeck(printed) && printed.encounterSet != null && printed.encounterSet !== "";
+}
+
+// A quest card (mec108.side-quests: "Side quests are a new type of quest card"): a quest stage, an encounter side quest or a player side quest.
+export function isQuestCardType(type: CardType): boolean {
+  return type === "quest" || isSideQuestType(type);
+}
+
+// A side quest, encounter or player (mec108.side-quests).
+export function isSideQuestType(type: CardType): boolean {
+  return type === "encounter-side-quest" || type === "player-side-quest";
 }
 
 // A treasure is a player card ("Treasure is a new type of player card", emce.treasure).

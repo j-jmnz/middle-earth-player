@@ -13,9 +13,9 @@ import { familyAmount, familyAttached, familyAttackReason, familyDefenseReason, 
 import { resolveAmount } from "./amounts.ts";
 import { holds } from "./conditions.ts";
 import { matchesPick } from "./pick.ts";
-import { RULES_FAMILIES, SETTLE_ORDER } from "../families/index.ts";
+import { rulesFamilies, SETTLE_ORDER } from "../families/index.ts";
 
-// Each hook point of RulesFamily, with a synthetic family handed to the dispatch in place of RULES_FAMILIES.
+// Each hook point of RulesFamily, with a synthetic family handed to the dispatch in place of rulesFamilies().
 const state = blankScenario({ seatCount: 1, seed: 4, definition: fixtureDefinition(["stage"]) });
 const ctx = { effects: [], cards: new Map() };
 const scope = { actor: 0, sourceId: null, returned: 0 };
@@ -43,7 +43,7 @@ describe("settle hooks", () => {
   });
 
   it("keep the order the core's chain had, the captives' rescue last", () => {
-    const names = (phase: "before" | "after" | "sweep") => RULES_FAMILIES.filter((candidate) => candidate.settle?.[phase]).map((candidate) => candidate.name);
+    const names = (phase: "before" | "after" | "sweep") => rulesFamilies().filter((candidate) => candidate.settle?.[phase]).map((candidate) => candidate.name);
     for (const phase of ["before", "after", "sweep"] as const) {
       expect([...names(phase)].sort()).toEqual([...SETTLE_ORDER[phase]].sort());
       expect(settleHooks(phase)).toHaveLength(SETTLE_ORDER[phase].length);

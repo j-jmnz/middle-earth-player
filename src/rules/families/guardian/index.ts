@@ -12,12 +12,12 @@ import { undefendedHolders } from "./combat.ts";
 import { guardBarsPlay, guardBarsPlayReason } from "./hand.ts";
 import { guardianCanChange } from "./seats.ts";
 
-export function run(state: ScenarioState, instruction: Instruction, focus: Focus, _ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
+export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "GuardGollum":
       return guardGollum(state, instruction.code, focus);
     case "ChangeGuardian":
-      return changeGuardian(state, steps);
+      return changeGuardian(state, ctx.cards);
     default:
       return null;
   }

@@ -81,13 +81,13 @@ export type LostmirkGolden = { name: string; seatCount: 1 | 2; seed: number; dif
 // The pinned games: wins (true solo and two-handed, Normal and Easy, Melanwar joining the pool and the guidance line, a treasure discovered, the quest through Carried Away and through Truly Lost to Escape from Taur-nu-fuin) and losses (the
 // threat reaching 50, the first player's elimination taking Haldan with it, every hero dead), each on a fixed seed.
 export const LOSTMIRK_GOLDENS: readonly LostmirkGolden[] = [
-  { name: "true solo, won, Melanwar joins the pool, a treasure discovered, a hero carried away", seatCount: 1, seed: 16, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "true solo, won, hands under the locations, a treasure discovered", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "true solo, won, no treasure discovered", seatCount: 1, seed: 20, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, Melanwar joins the pool, a treasure discovered, a hero carried away", seatCount: 1, seed: 1039, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, hands under the locations, a treasure discovered", seatCount: 1, seed: 13, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, no treasure discovered", seatCount: 1, seed: 17, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, won, after Journey Up the Anduin (Turayn in the pool)", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "true solo, Easy, won, the guidance line", seatCount: 1, seed: 18, difficulty: "Easy", decks: "strong", outcome: "won", policy: { resolve: "last" } },
-  { name: "two-handed, won, Melanwar joins the pool, a treasure discovered", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed, Easy, won, the guidance line", seatCount: 2, seed: 44, difficulty: "Easy", decks: "strong", outcome: "won", policy: { resolve: "last" } },
+  { name: "true solo, Easy, won, the guidance line", seatCount: 1, seed: 6511, difficulty: "Easy", decks: "strong", outcome: "won", policy: { resolve: "last" } },
+  { name: "two-handed, won, Melanwar joins the pool, a treasure discovered", seatCount: 2, seed: 16, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, Easy, won, the guidance line", seatCount: 2, seed: 193, difficulty: "Easy", decks: "strong", outcome: "won", policy: { resolve: "last" } },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, brittle, lost with every hero dead", seatCount: 1, seed: 3, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, weak, lost: the first player's threat takes Haldan out of play", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "Haldan left play" },

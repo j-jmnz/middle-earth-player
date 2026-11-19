@@ -5,6 +5,7 @@ import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds } from "../player/attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "../combat/combat.ts";
+import { hostOf } from "./amounts.ts";
 import { countsAsAttachment, hasTrait } from "./conditions.ts";
 import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
@@ -21,7 +22,7 @@ import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
-import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "../core/printed.ts";
+import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
 import { activeFor, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
@@ -185,7 +186,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const base = printed.type === "ally" && instance.host != null && instance.zone !== "heroes" ? "attachment" : cardTypeOf(instance, printed);
     // An objective ally with printed combat stats (Mendor, 01135) a player controls is an ally in play (isAllyLike), and still an objective card.
     const type = base === "objective" && instance.zone === "play" && instance.host == null && isAllyLike(printed) ? "ally" : base;
-    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
+    // An Objective-Location counts as a location as the active location, travelled to, explored or in the victory display, and stays an objective in the staging area (docs/brief.md, Ered Mithrin): revealing one is no "revealed location".
+    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "location" && printed.objectiveLocation && type === "objective" && instance.zone !== "staging") || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
   }
   if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
@@ -198,7 +200,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.nonNeutral && (printed.sphere == null || printed.sphere === "neutral")) return false;
   if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
   if (spec.cardType && printed.type !== spec.cardType) return false;
-  if (spec.sideQuest && printed.type !== "player-side-quest" && printed.type !== "encounter-side-quest") return false;
+  if (spec.questCardType && !isQuestCardType(printed.type)) return false;
+  if (spec.sideQuest && !isSideQuestType(printed.type)) return false;
   if (spec.notCardType && printed.type === spec.notCardType) return false;
   if (spec.committed != null && instance.committed !== spec.committed) return false;
   if (spec.participating && !(at.participants ?? []).includes(id)) return false;
@@ -211,9 +214,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs/pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
-  if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
+  if (spec.notHost && at.sourceId != null && hostOf(state, at.sourceId) === id) return false;
   if (spec.engagedThisRound && heldAmount(state, id, "engagedThisRound") <= 0) return false;
-  if (spec.isHost && (at.sourceId == null || state.cards[at.sourceId]?.host !== id)) return false;
+  if (spec.isHost && (at.sourceId == null || hostOf(state, at.sourceId) !== id)) return false;
   if (spec.active && !activeFor(state, asking, spec.stagingArea === "any").includes(id)) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments/pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
@@ -364,9 +367,10 @@ export function pickCandidates(
 // The cards attached to the source, to the source's host, to the active location, or to the defending character.
 function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLocation" | "defender", sourceId: string | null): string[] {
   const source = sourceId ? state.cards[sourceId] : undefined;
+  const hostId = hostOf(state, sourceId);
   const defender = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? state.cards[state.pendingAttack.defenderId] : undefined;
   const holder =
-    where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
+    where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : hostId ? state.cards[hostId] : undefined;
   return holder ? holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed")) : [];
 }
 

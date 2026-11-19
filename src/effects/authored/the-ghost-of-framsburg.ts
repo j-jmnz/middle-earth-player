@@ -7,6 +7,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for The Ghost of Framsburg (Ered Mithrin part 7, campaign card 12189): the Loot objectives, the locations with the Discover keyword, the encounter cards no template reads, Fram's Shade, the three quest stages and the campaign card. Ashen Brazier (12190),
 // Gundabad Hunter (12191) and Gundabad Stalker (12192) are in pool/EMCE.ts. Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
+// A Loot objective's text claims it "if unattached", so it stays in play unattached until the claim: it carries `returnsToStagingArea` (families/objectives/claimed.ts; docs/brief.md, Ered Mithrin, agent recommendation).
 // A Loot objective enters play only through the Discover keyword of the active location, which attaches it to the location as a guarded objective (emce.discover, emce.loot); once nothing guards it the first player claims it (`ClaimWhenFree`) and attaches it to a hero.
 // "The Loot objectives the players control" is a count of the claimed ones (`lootKeyword`, `controlled`). The Discover keyword is a Forced effect of the location when it becomes the active location; the Response of Crypt Key adjusts its value before it resolves (families/wilderland/discover.ts).
 // Rules: emce.discover, emce.loot, emce.setup-the-ghost-of-framsburg, emce.guarded-x, emce.treasure, emce.campaign-pool-encounter, emce.immune, rr.guarded, rr.first-player, rr.travel (data/rules/entries.json).
@@ -28,7 +29,7 @@ const discoverKeyword = (code: string, line: string, amount: Extract<Instruction
 // The Loot keyword and the claim of the objective once it is free (19094 to 19096, and Ashen Brazier in pool/EMCE.ts).
 const lootRecords = (code: string): Effect[] => [
   { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "Loot" }] },
-  { id: `${code}:constant:2`, cardCode: code, lines: [`${code}:A:2`], timing: "constant", instructions: [{ verb: "ClaimWhenFree" }] },
+  { id: `${code}:constant:2`, cardCode: code, lines: [`${code}:A:2`], timing: "constant", instructions: [{ verb: "ClaimWhenFree" }, { verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
 ];
 // True while the players control fewer than `min` Loot objectives: what a stage or The Cursed Tomb restricts (travel, advance) on.
 const FEWER_LOOT_THAN = (min: number): Condition => ({ kind: "not", condition: { kind: "count", pick: LOOT, min } });

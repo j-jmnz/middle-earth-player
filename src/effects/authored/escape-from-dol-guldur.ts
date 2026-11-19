@@ -11,6 +11,8 @@ const CLAIMED = {"type":"objective","control":"any","attached":true} as const;
 const ON_HERO = {"kind":"matches","card":"host","pick":{"type":"hero","control":"any"}} as const;
 // "Counts as an attachment" (Item is the trait the objectives print).
 const COUNTS_AS = {"verb":"CountsAs","cardType":"attachment","trait":"Item"} as const;
+// "If detached, return <card> to the staging area."
+const RETURNS_TO_STAGING = {"verb":"ModifyStat","stat":"returnsToStagingArea","amount":1,"until":"whileSourceInPlay","target":"self"} as const;
 const GROUP_ALLY_LIMIT = {"verb":"LimitPlays","cardType":"ally","max":1} as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
@@ -69,7 +71,7 @@ function objective(code: string, _line: string, own: readonly Effect[]): Effect[
   return [
     {"id":`${code}:whenRevealed:1`,"cardCode":code,"lines":[`${code}:A:1`],"timing":"whenRevealed","instructions":[{"verb":"GuardObjective"}]},
     {"id":`${code}:action:1`,"cardCode":code,"lines":[`${code}:A:2`],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"sourceIn","zone":"staging"},{"kind":"freeOfEncounters"}]},"cost":{"kind":"raiseThreat","amount":2},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you"}},{"verb":"ClaimObjective"}]},
-    {"id":`${code}:constant:1`,"cardCode":code,"lines":[`${code}:A:2`],"timing":"constant","instructions":[COUNTS_AS]},
+    {"id":`${code}:constant:1`,"cardCode":code,"lines":[`${code}:A:2`],"timing":"constant","instructions":[COUNTS_AS,RETURNS_TO_STAGING]},
     ...own,
   ];
 }

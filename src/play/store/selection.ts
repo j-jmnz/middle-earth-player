@@ -62,7 +62,8 @@ export function dropTargets(game: ScenarioState, ctx: ReduceContext, legal: read
     const printed = printedOf(ctx.cards, instance.code);
     // A Trap or a Guarded card is played into the staging area: the zone is its target (src/rules/families/attachments/play.ts).
     if (printed.type === "attachment") return legalTargets(game, { type: "PlayCard", cardId }, ctx).flatMap((id) => hostTarget(game, id) ?? []);
-    return [{ kind: "zone", zone: "play" }];
+    // A player side quest goes to the staging area when it is played (mec108.side-quests-in-play): the staging zone is its target.
+    return [{ kind: "zone", zone: printed.type === "player-side-quest" ? "staging" : "play" }];
   }
   if (questCommitDrag(game, legal) && legalTargets(game, { type: "Commit" }, ctx).includes(cardId)) return [{ kind: "zone", zone: "questStage" }];
   if (has(legal, "Travel") && legalTargets(game, { type: "Travel" }, ctx).includes(cardId)) return [{ kind: "zone", zone: "activeLocation" }];
@@ -88,8 +89,9 @@ export function dropOutcome(game: ScenarioState, ctx: ReduceContext, legal: read
 // The host a drop names: a card, the staging area, or the acting seat's play area for an attachment played there unattached; an ally or an event dropped on the play area takes none.
 function playHost(game: ScenarioState, ctx: ReduceContext, cardId: string, target: DropTarget): string | null {
   if (target.kind === "card") return target.cardId;
-  if (target.zone === "staging") return "staging";
   const printed = printedOf(ctx.cards, game.cards[cardId]?.code ?? "");
+  // A player side quest dropped on the staging area is played with no host: the engine puts it there itself.
+  if (target.zone === "staging") return printed.type === "player-side-quest" ? null : "staging";
   return target.zone === "play" && printed.type === "attachment" ? `seat:${game.activeSeat}` : null;
 }
 

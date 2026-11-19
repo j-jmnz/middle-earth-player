@@ -95,7 +95,7 @@ export const amountExprSchema = z.strictObject({
   discardedThreat: z.literal(true).optional(),
   // The Willpower the character the attack destroyed had in play, kept when the attack damaged it ("raise your threat by the destroyed character's Willpower", 10107:A:2); 0 when none was kept. Read by the angmar family.
   destroyedWillpower: z.literal(true).optional(),
-  // The number of quest cards in play: the main quest card, the encounter side quests in the staging area and the player side quests in the quest areas, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
+  // The number of quest cards in play: the main quest card, the side quests in the staging area, encounter and player, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
   questCards: z.literal(true).optional(),
   // Every shadow card dealt to an enemy in play, the staging area's and the engaged ones, added up ("where X is the number of shadow cards in play", 10126:A:1). Read by the angmar family.
   shadowCardsInPlay: z.literal(true).optional(),
