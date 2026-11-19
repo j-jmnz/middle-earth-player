@@ -1,5 +1,6 @@
 # The Discord issue bot's Worker (docs/discord-issues.md). Deploy from this folder: npx wrangler deploy.
-# Secrets (wrangler secret put): DISCORD_PUBLIC_KEY, DISCORD_APPLICATION_ID, DISCORD_BOT_TOKEN, GITHUB_TOKEN.
+# Secrets (wrangler secret put): DISCORD_PUBLIC_KEY, DISCORD_APPLICATION_ID, DISCORD_BOT_TOKEN, GITHUB_TOKEN,
+# GITHUB_WEBHOOK_SECRET.
 name = "middle-earth-issues"
 main = "worker.ts"
 compatibility_date = "2025-09-01"

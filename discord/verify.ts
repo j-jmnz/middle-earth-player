@@ -2,7 +2,8 @@
 // followed by the raw body. A request that fails the check is answered 401, which is also what Discord's own test of the
 // endpoint URL expects (docs/discord-issues.md, Create the Discord application).
 
-function bytesOfHex(hex: string): Uint8Array<ArrayBuffer> | null {
+/** The bytes a hex string spells, or null when it is not hex. */
+export function bytesOfHex(hex: string): Uint8Array<ArrayBuffer> | null {
   if (!/^(?:[0-9a-f]{2})+$/i.test(hex)) return null;
   const bytes = new Uint8Array(hex.length / 2);
   for (let i = 0; i < bytes.length; i++) bytes[i] = Number.parseInt(hex.slice(i * 2, i * 2 + 2), 16);

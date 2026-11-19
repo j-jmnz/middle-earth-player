@@ -1,10 +1,12 @@
-// The Worker's bindings: the four secrets set with `wrangler secret put` and the repository named in wrangler.toml
+// The Worker's bindings: the five secrets set with `wrangler secret put` and the repository named in wrangler.toml
 // (docs/discord-issues.md, Deploy the Worker).
 export interface Env {
   DISCORD_PUBLIC_KEY: string;
   DISCORD_APPLICATION_ID: string;
   DISCORD_BOT_TOKEN: string;
   GITHUB_TOKEN: string;
+  /** The secret the repository's webhook signs its deliveries with. */
+  GITHUB_WEBHOOK_SECRET: string;
   /** `owner/name` of the repository the issues go to. */
   GITHUB_REPO: string;
 }
@@ -36,4 +38,22 @@ export async function editReply(env: Env, interactionToken: string, content: str
     body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
   });
   if (!response.ok) throw new Error(`Discord edit of the reply answered ${response.status}: ${await response.text()}`);
+}
+
+/** A GitHub REST call with the bot's token. Returns the parsed JSON, or null on a 404. */
+export async function github<T>(env: Env, method: string, route: string, body?: unknown): Promise<T | null> {
+  const response = await fetch(`https://api.github.com${route}`, {
+    method,
+    headers: {
+      authorization: `Bearer ${env.GITHUB_TOKEN}`,
+      accept: "application/vnd.github+json",
+      "content-type": "application/json",
+      "user-agent": "middle-earth-player-discord-issues",
+      "x-github-api-version": "2022-11-28",
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`GitHub answered ${response.status}: ${await response.text()}`);
+  return (await response.json()) as T;
 }

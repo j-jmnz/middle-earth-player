@@ -1,7 +1,7 @@
 // The form a moderator checks before the issue is made, and the issue itself. The three kinds are the issue templates'
 // labels (.github/ISSUE_TEMPLATE): bug, rules and accessibility.
-import type { Env } from "./env.ts";
-import { TEXT_MAX, type Report } from "./source.ts";
+import { github, type Env } from "./env.ts";
+import { sourceMarker, TEXT_MAX, type Report, type SourceRef } from "./source.ts";
 
 export const KINDS = [
   { value: "bug", label: "App bug", description: "A crash, a layout problem or anything else that is not a rules question" },
@@ -71,30 +71,19 @@ export function readForm(components: Component[]): FormValues | null {
   return title && body && kind ? { title, kind, body } : null;
 }
 
-/** The issue text: the moderator's edit of the report, its attachments, and where it came from. */
-export function issueBody(values: FormValues, report: Report | null, filedBy: string): string {
+/** The issue text: the moderator's edit of the report, its attachments, where it came from, and the marker that issue updates follow. */
+export function issueBody(values: FormValues, report: Report | null, filedBy: string, source: SourceRef): string {
   const files = report?.attachments ?? [];
   const attachments = files.length
     ? ["", "### Attachments", "", ...files.map((file) => `- [${file.name}](${file.url})`), "", "_Discord attachment links expire after about a day. Save a screenshot into this issue to keep it._"]
     : [];
   const from = report ? `Reported on Discord by **${report.author}** ([message](${report.link})).` : "Reported on Discord.";
-  return [values.body, ...attachments, "", "---", `${from} Filed by **${filedBy}** with the Discord issue bot.`].join("\n");
+  return [values.body, ...attachments, "", "---", `${from} Filed by **${filedBy}** with the Discord issue bot.`, sourceMarker(source)].join("\n");
 }
 
 /** Creates the issue and returns its number and page. */
 export async function createIssue(env: Env, values: FormValues, body: string): Promise<{ number: number; url: string }> {
-  const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/issues`, {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${env.GITHUB_TOKEN}`,
-      accept: "application/vnd.github+json",
-      "content-type": "application/json",
-      "user-agent": "middle-earth-player-discord-issues",
-      "x-github-api-version": "2022-11-28",
-    },
-    body: JSON.stringify({ title: values.title, body, labels: [values.kind] }),
-  });
-  if (!response.ok) throw new Error(`GitHub answered ${response.status}: ${await response.text()}`);
-  const issue = (await response.json()) as { number: number; html_url: string };
+  const issue = await github<{ number: number; html_url: string }>(env, "POST", `/repos/${env.GITHUB_REPO}/issues`, { title: values.title, body, labels: [values.kind] });
+  if (!issue) throw new Error(`GitHub answered 404: no repository ${env.GITHUB_REPO}, or the token cannot see it`);
   return { number: issue.number, url: issue.html_url };
 }

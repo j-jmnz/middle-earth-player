@@ -14,13 +14,27 @@ Both commands open the same form: a title, the type and the report text. The typ
 3. Replies to the report (or posts in the thread) with the issue link.
 4. Tells you, in a message only you see, that it created the issue or why it could not.
 
+## Issue updates
+
+After that, the bot posts each change of the issue beside the report: as a reply to the report message, or as a message in the thread.
+
+| GitHub event | Message in Discord |
+| --- | --- |
+| Issue closed as completed | The issue is fixed, and the fix comes in the next release. |
+| Issue closed as not planned, or as a duplicate | The issue is closed, and why. |
+| Issue reopened | The issue is open again. |
+| A person comments on the issue | Who commented, the comment's first 600 characters as a quote, and a link. Comments from bots are not posted. |
+| A release is published | For each issue that the release notes close (`closes #n`), the version that has the fix. A prerelease posts nothing. |
+
+The bot's messages do not ping anyone. The bot only follows issues that it made: each one keeps its Discord place in a hidden comment at the end of the issue body (`<!-- discord issue:… -->`). Do not delete that line when you edit the issue. If the report message or thread is deleted, the bot skips the update.
+
 Discord attachment links expire after about a day. To keep a screenshot, open the issue and drag the picture into a comment.
 
 The issue is public. The reporter's Discord display name and text go into it. Say this in the bug channel's rules.
 
 ## How it works
 
-Discord sends each command to the Worker's URL (the Interactions Endpoint URL). The Worker checks Discord's Ed25519 signature (`discord/verify.ts`), reads the report through the Discord API as the bot (`discord/source.ts`), answers with the form, and on submit creates the issue through the GitHub API (`discord/issue.ts`). `discord/worker.ts` routes the interactions. The Worker needs no server that runs all the time and no database. `discord/commands.json` holds the two command definitions that you register with Discord. `discord/worker.test.ts` tests the bot with `pnpm vitest run discord`.
+Discord sends each command to the Worker's URL (the Interactions Endpoint URL). The Worker checks Discord's Ed25519 signature (`discord/verify.ts`), reads the report through the Discord API as the bot (`discord/source.ts`), answers with the form, and on submit creates the issue through the GitHub API (`discord/issue.ts`). `discord/worker.ts` routes the interactions. GitHub's webhook calls the Worker at `/github`; `discord/github.ts` checks GitHub's signature and posts the issue updates. The Worker needs no server that runs all the time and no database. `discord/commands.json` holds the two command definitions that you register with Discord. `discord/worker.test.ts` and `discord/github.test.ts` test the bot with `pnpm vitest run discord`.
 
 ## Set it up
 
@@ -74,6 +88,8 @@ Run these commands on your computer, in a clone of this repository.
    npx wrangler secret put GITHUB_TOKEN
    ```
 
+   The fifth secret, `GITHUB_WEBHOOK_SECRET`, is in Connect GitHub to the Worker.
+
    The secrets stay in Cloudflare. Do not write them in `wrangler.toml` or commit them.
 
 ### Connect Discord to the Worker
@@ -81,9 +97,27 @@ Run these commands on your computer, in a clone of this repository.
 1. In the Developer Portal, on **General Information**, paste the Worker's URL into **Interactions Endpoint URL** and select **Save Changes**.
 2. Discord sends a test request to the URL. If Discord shows an error, the public key secret is wrong or the Worker did not deploy: see Find a problem.
 
+### Connect GitHub to the Worker
+
+This step turns on Issue updates.
+
+1. Make a random secret and copy it:
+
+   ```sh
+   openssl rand -hex 32
+   ```
+
+2. In the `discord` folder, run `npx wrangler secret put GITHUB_WEBHOOK_SECRET` and paste the secret.
+3. On GitHub, open the repository's **Settings → Webhooks → Add webhook** and fill in:
+   - **Payload URL**: the Worker's URL with `/github` at the end, for example `https://middle-earth-issues.<your-subdomain>.workers.dev/github`.
+   - **Content type**: `application/json`. The bot cannot read the other type.
+   - **Secret**: the same secret.
+   - **Which events**: **Let me select individual events**. Select **Issues**, **Issue comments** and **Releases**, and clear **Pushes**.
+4. Select **Add webhook**. GitHub sends a test delivery. Under **Recent Deliveries**, it must show a green tick and the answer `Nothing to post.`
+
 ### Register the commands
 
-Run this in the `discord` folder. `read -s` keeps the token out of your shell history:
+Run this in the `discord` folder. `read -s` keeps the token out of your shell history. This is the bash form; in zsh (the macOS default) the first line is `read -s "BOT_TOKEN?Bot token: "; echo`:
 
 ```sh
 read -s -p "Bot token: " BOT_TOKEN; echo
@@ -125,6 +159,7 @@ The commands are for members with the **Manage Messages** permission (`default_m
 - **"I cannot read that report".** The bot cannot see the channel, or **Message Content Intent** is off.
 - **"GitHub answered 401" or "403".** The GitHub token expired or has no Issues write permission for this repository.
 - **"GitHub answered 422".** The title is not valid, or a label is missing: the repository must have the labels `bug`, `rules` and `accessibility`.
+- **No issue update in Discord.** On GitHub, open **Settings → Webhooks**, select the webhook and read **Recent Deliveries**. `401` means that `GITHUB_WEBHOOK_SECRET` and the webhook's secret are different. `500` shows the error: for example, the bot cannot post in that channel. `Nothing to post.` means that the bot did not make that issue, the marker line was deleted, or the event is not one in Issue updates. You can send a failed delivery again with **Redeliver**.
 - **"I could not post the link in the channel".** The bot has no Send Messages permission (or Send Messages in Threads) in that channel. The issue was still created.
 
 ## Change it

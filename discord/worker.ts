@@ -1,9 +1,11 @@
 // The Discord issue bot: a Cloudflare Worker that Discord calls at its Interactions Endpoint URL. A moderator runs
 // /issue in a thread, or Apps > Create GitHub issue on a message; the bot answers with a form filled from the report,
-// and on submit it creates the issue in GITHUB_REPO and links it in the channel (docs/discord-issues.md).
-import { discord, editReply, type Context, type Env } from "./env.ts";
+// and on submit it creates the issue in GITHUB_REPO and links it in the channel. GitHub's webhook calls /github, and the
+// bot posts each issue update beside the report (docs/discord-issues.md).
+import { editReply, type Context, type Env } from "./env.ts";
+import { handleGitHub } from "./github.ts";
 import { createIssue, issueBody, issueForm, readForm } from "./issue.ts";
-import { loadReport, nameOf, sourceFromId, sourceToId, type SourceRef } from "./source.ts";
+import { loadReport, nameOf, postAt, sourceFromId, sourceToId, type SourceRef } from "./source.ts";
 import { verifyDiscordRequest } from "./verify.ts";
 
 // Interaction and response types (https://discord.com/developers/docs/interactions/receiving-and-responding).
@@ -72,7 +74,7 @@ async function fileIssue(env: Env, interaction: Interaction, source: SourceRef, 
   try {
     const report = await loadReport(env, interaction.guild_id!, source);
     const filedBy = interaction.member ? nameOf(interaction.member.user) : "a moderator";
-    const issue = await createIssue(env, values, issueBody(values, report, filedBy));
+    const issue = await createIssue(env, values, issueBody(values, report, filedBy, source));
     const link = `Created issue [#${issue.number}](<${issue.url}>): ${values.title}`;
     const posted = await postLink(env, source, link);
     await editReply(env, interaction.token, posted ? `${link}. I posted the link in the channel.` : `${link}. I could not post the link in the channel.`);
@@ -81,12 +83,10 @@ async function fileIssue(env: Env, interaction: Interaction, source: SourceRef, 
   }
 }
 
-// The issue link as a reply to the report message, or as a message in the thread.
+// The issue link beside the report. A channel the bot cannot post in still keeps the issue.
 async function postLink(env: Env, source: SourceRef, content: string): Promise<boolean> {
-  const channelId = source.kind === "message" ? source.channelId : source.threadId;
-  const reference = source.kind === "message" ? { message_reference: { message_id: source.messageId, fail_if_not_exists: false } } : {};
   try {
-    await discord(env, "POST", `/channels/${channelId}/messages`, { content, ...reference, allowed_mentions: { parse: [] } });
+    await postAt(env, source, content);
     return true;
   } catch {
     return false;
@@ -104,6 +104,7 @@ function submitForm(env: Env, interaction: Interaction, context: Context): Respo
 export default {
   async fetch(request: Request, env: Env, context: Context): Promise<Response> {
     if (request.method !== "POST") return new Response("The Discord issue bot answers Discord interactions only.", { status: 405 });
+    if (new URL(request.url).pathname === "/github") return handleGitHub(request, env);
     const body = await request.text();
     const signed = await verifyDiscordRequest(env.DISCORD_PUBLIC_KEY, request.headers.get("x-signature-ed25519"), request.headers.get("x-signature-timestamp"), body);
     if (!signed) return new Response("Bad request signature.", { status: 401 });
