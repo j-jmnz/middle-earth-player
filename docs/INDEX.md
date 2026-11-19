@@ -202,7 +202,7 @@ Read the sections your task touches.
   - 183–220 Components (~1.8K) ← 9
   - 221–235 Screen reader (~970) ← 8
   - 236–250 Icons (~480) ← 7
-  - 251–269 Card art (~750) ← 2
+  - 251–269 Card art (~780) ← 2
   - 270–285 Tablets (~630) ← 15
   - 286–504 Screens (~21.8K)
     - 290–295 Splash (~210) ← 3
