@@ -1,5 +1,5 @@
 // Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest and Fog on the Barrow-downs: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs and The Ruins of Belegost: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -20,19 +20,20 @@ const lakeTown = loadAnyScenario("the-battle-of-lake-town");
 const stone = loadAnyScenario("the-stone-of-erech");
 const forest = loadAnyScenario("the-old-forest");
 const fog = loadAnyScenario("fog-on-the-barrow-downs");
+const ruins = loadAnyScenario("the-ruins-of-belegost");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 5, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 6, playable: true, box: null })]);
   });
 });
 
@@ -209,5 +210,41 @@ describe("Fog on the Barrow-downs", () => {
     for (const key of [...sides, keyOf("148020", "A"), keyOf("148020", "B"), keyOf("148021", "A")]) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
     expect(ledger.byKey.get(keyOf("148007", "A"))?.lines[0]).toBe("Peril. Immune to player card effects. The players cannot travel here.");
     expect(ledger.byKey.get(keyOf("148013", "A"))?.lines[0]).toBe("While Dark-wight is engaged with a player, that player's heroes cannot gain resources from card effects.");
+  });
+});
+
+describe("The Ruins of Belegost", () => {
+  it("has codes 506 and the collector number, which Hall of Beorn's 00001 to 00030 would share with The Massing at Osgiliath's (overrides.productCodes), and its own Easy deck", () => {
+    expect(ruins).toMatchObject({ id: "the-ruins-of-belegost", name: "The Ruins of Belegost", number: 6, stages: ["50601", "50602", "50603", "50604", "50605", "50606", "50607"] });
+    expect(ruins.campaignCard).toBeUndefined();
+    expect(ruins.campaignPlaced).toEqual([]);
+    expect(ruins.source).toMatchObject({ dragnNormal: "Q99.06", dragnEasy: "E99.06" });
+    expect(ruins.nightmare).toBeUndefined();
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TRoB"));
+    expect(own.map((card) => card.code)).toEqual(Array.from({ length: 30 }, (_, at) => `506${String(at + 1).padStart(2, "0")}`));
+    expect(byCode.get("01004")?.printings.some((printing) => printing.pack === "TRoB")).toBe(false);
+    expect(byCode.get("50615")?.name).toBe("Naurlhûg");
+  });
+
+  it("deals the 31 titles of the encounter deck plus the Abandoned Mines the players do not stage (4 less 1 for each player) on Normal and the 6 fewer Hall of Beorn's Easy counts remove on Easy, the nine set-aside cards (Lurker, Naurlhûg, its Lair, the Sword and the five other Loot objectives) set aside (50601:A:1)", () => {
+    for (const seats of [1, 2, 3, 4]) {
+      expect(encounterCodes(ruins, "Normal", seats), `${seats} seats`).toHaveLength(35 - seats);
+      expect(encounterCodes(ruins, "Easy", seats), `${seats} seats`).toHaveLength(29 - seats);
+    }
+    for (const difficulty of ["Normal", "Easy"] as const) {
+      expect(setupInstructions(ruins, difficulty).filter((step) => step.verb === "SetAside").map((step) => step.code).sort(), difficulty).toEqual(["50609", "50610", "50611", "50612", "50613", "50614", "50615", "50616", "50621"]);
+    }
+    expect(setupInstructions(ruins).filter((step) => step.verb === "AddToStaging").map((step) => ("code" in step ? step.code : "")).filter((code) => code !== "50622")).toEqual(["50608"]);
+  });
+
+  it("has every printed side read from its scan, the Setup and the stage lines as printed (Hall of Beorn has typos) and Lurker of the Depths with its three lines", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("506")).flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(37);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("50601", "B"))?.lines[0]).toBe("The players cannot advance unless they control at least 1 Loot objective.");
+    expect(ledger.byKey.get(keyOf("50608", "A"))?.lines[0]).toMatch(/place 1 resource on Stalking the Ruins/);
+    expect(ledger.byKey.get(keyOf("50616", "A"))?.lines).toHaveLength(3);
+    expect(ledger.byKey.get(keyOf("50615", "A"))?.misprints).toHaveLength(1);
   });
 });

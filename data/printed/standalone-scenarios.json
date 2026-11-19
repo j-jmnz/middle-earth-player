@@ -2354,6 +2354,664 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "50601",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Ruins-of-the-First-Age-1A.jpg",
+        "sha256": "629e9b0efae3b4dab741600b17a6b04ddf46d6aed57eddbdf6563d18c4616866"
+      },
+      "lines": [
+        "Setup: Add Stalking the Ruins and 1 copy of Abandoned Mine per player to the staging area. Set Lurker of the Depths, Naurlhûg, Naurlhûg's Lair, and Sword of Belegost aside, out of play. Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins (without looking). Shuffle the others into the encounter deck (without looking at them)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50601",
+      "side": "B",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Ruins-of-the-First-Age-1B.jpg",
+        "sha256": "6dc92bf9e8e4e725ec57e738696da4aa1f01a6a2405b6d6a1ddf1c5b063ec4f2"
+      },
+      "lines": [
+        "The players cannot advance unless they control at least 1 Loot objective.",
+        "Forced: At the beginning of the travel phase, if there are no locations in play, return the topmost location in the encounter discard pile to the staging area.",
+        "Forced: When this stage is defeated, if Keys of Belegost is attached to a hero, advance to stage 2C. Otherwise, advance to stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50602",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Ancient-Evils-Disturbed-2A.jpg",
+        "sha256": "1fd0b5acef6500b8601f4487ee2dfd00136ec4796f0ae3c26b26455fe0206855"
+      },
+      "lines": [
+        "When Revealed: Add Lurker of the Depths to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50602",
+      "side": "B",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Ancient-Evils-Disturbed-2B.jpg",
+        "sha256": "58c96bd59bc09fc8ffec7a6100614bcf6ab5dac81747d93ec6290c9b56651354"
+      },
+      "lines": [
+        "The players cannot advance unless they control at least 2 Loot objectives and Lurker of the Depths is in the victory display.",
+        "Forced: When this stage is defeated, if Book of Aulë's Children is attached to a hero, advance to stage 3C. Otherwise, advance to stage 3A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50603",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Deeper-into-the-Past-C-2C.jpg",
+        "sha256": "9362f4f45d4212a10fe4b0b4c4c26ee1ce1f4bfd5e91447a5e777b777c1bab8d"
+      },
+      "lines": [
+        "When Revealed: Shuffle Lurker of the Depths and the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until a location is discarded. Add the discarded location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50603",
+      "side": "B",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Deeper-into-the-Past-C-2D.jpg",
+        "sha256": "fc29dbc398ec926ad31fab176caa8ccc194daefaa0d764d5d91643c87659f75f"
+      },
+      "lines": [
+        "The players cannot advance unless they control at least 2 Loot objectives and there are at least 3 resources here.",
+        "Forced: After the active location is explored, place 1 resource here.",
+        "Forced: When this stage is defeated, if Book of Aulë's Children is attached to a hero, advance to stage 3E. Otherwise, advance to stage 3C."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50604",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Servants-of-Morgoth-3A.jpg",
+        "sha256": "775414ba839dcd8f45b32143d0764b62e8bb29a55ad3124f54ea832a3d7d5bb0"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50604",
+      "side": "B",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Servants-of-Morgoth-3B.jpg",
+        "sha256": "e0a5135f6a1aaaf274e9aee2da6d42a3e8b514ab60298d0617bef6615e875649"
+      },
+      "lines": [
+        "The first Hazard card revealed each round gains surge.",
+        "During the travel phase, the players must travel to a location, if able.",
+        "Forced: When this stage is defeated, if Dwarven Torch is attached to a hero, advance to stage 4A. Otherwise, advance to stage 3C."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50605",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Roots-of-Ered-Luin-C-3C.jpg",
+        "sha256": "e86e741c4505ee20880bca6c06412053aa078388fdb4a3de0052147fdb96e1a0"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50605",
+      "side": "B",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Roots-of-Ered-Luin-C-3D.jpg",
+        "sha256": "853a005ab72ef12d00b5dfbbe0d2522255328346d2d43ce57ac1113642520f86"
+      },
+      "lines": [
+        "The Discover value of the active location is increased by 1.",
+        "During the travel phase, the players must travel to a location, if able.",
+        "Forced: When this stage is defeated, if Map of Ered Luin is attached to a hero advance to stage 4A. Otherwise, advance to stage 3E."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50606",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Mines-of-Belegost-E-3E.jpg",
+        "sha256": "4b782c49f921cbd83f346ef8424f8110ad3695d21b8f1d88e51be4ed482caf4b"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50606",
+      "side": "B",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Mines-of-Belegost-E-3F.jpg",
+        "sha256": "ac044865d90ffaed995f1474f2a3fb7cb574f752b0444ba6052ead0b6621be75"
+      },
+      "lines": [
+        "During the travel phase, the players must travel to a location, if able.",
+        "Forced: After resolving the Discover keyword, if no Hazard card was revealed by that effect, reveal the top card of the encounter deck.",
+        "Forced: When this stage is defeated, if Blue Mountain Gem is attached to a hero advance to stage 4A. Otherwise, advance to stage 3A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50607",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Beast-of-Belegost-4A.jpg",
+        "sha256": "1ede506dcb7f5ec18163e63c2873574304b142a5a00eeda1ffb7da0cc94849fb"
+      },
+      "lines": [
+        "When Revealed: Add Naurlhûg and Naurlhûg's Lair to the staging area. Shuffle Sword of Belegost, and the encounter discard pile into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50607",
+      "side": "B",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Beast-of-Belegost-4B.jpg",
+        "sha256": "025027119ee63b259dae181c8f30cc9ed2474ef6fc7b1abba27ccf8da76a9faa"
+      },
+      "lines": [
+        "While Naurlhûg's Lair is in the victory display, Naurlhûg loses the text: \"Cannot take damage.\"",
+        "Forced: After Naurlhûg attacks, if it was dealt a shadow card with no shadow effect, it engages the next player. Then, it makes an immediate attack. Do not deal it a shadow card for this attack.",
+        "When Naurlhûg is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50608",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Stalking-the-Ruins.jpg",
+        "sha256": "b1f0a1f377c9656b8e89db9ddffe3d801d1c13805ad711cbe9941dcf53649926"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, place 1 resource on Stalking the Ruins. Then, if there are at least 3 resources here, add or return Naurlhûg to the staging area.",
+        "Forced: When the players advance to a new quest stage, discard all tokens from Stalking the Ruins. Then, set Naurlhûg aside, out of play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50609",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Sword-of-Belegost.jpg",
+        "sha256": "306ca4d192bfe3e1d6591bd77cc34a89f2196fc251f9a1e9de1ad10eabf6c5ce"
+      },
+      "lines": [
+        "Loot. Restricted.",
+        "If unattached, the first player claims Sword of Belegost and attaches it to a hero he controls.",
+        "Attached hero gets +4 Attack.",
+        "Response: Exhaust Sword of Belegost to cancel a shadow effect just triggered."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50610",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Map-of-Ered-Luin.jpg",
+        "sha256": "df0299ab0296ca63de212379cbd58d3258c42900517574143a9a6d146fd5be11"
+      },
+      "lines": [
+        "Loot.",
+        "If unattached, the first player claims Map of Ered Luin and attaches it to a hero he controls.",
+        "Action: Exhaust Map of Ered Luin to choose a non-unique location. That location gets -2 Threat until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50611",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Keys-of-Belegost.jpg",
+        "sha256": "deda7d682977da75ce6110c2f6878a8bc9cd2c7ea1f4f69f98365c69fe5f07e8"
+      },
+      "lines": [
+        "Loot.",
+        "If unattached, the first player claims Keys of Belegost and attaches it to a hero he controls.",
+        "Action: Exhaust Keys of Belegost to choose a hero. Add 1 resource to that hero's pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50612",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Book-of-Aulë's-Children.jpg",
+        "sha256": "bd463cac0e990679f9acf98050c529b4199371952680f07d51d10263c26e3c94"
+      },
+      "lines": [
+        "Loot.",
+        "If unattached, the first player claims Book of Aulë's Children and attaches it to a hero he controls.",
+        "Action: Exhaust Book of Aulë's Children to choose a player. That player draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50613",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Dwarven-Torch.jpg",
+        "sha256": "fe0bf367c63866d36df8a41c8b2d047368222cf73a24b02d62456cd2e6938b17"
+      },
+      "lines": [
+        "Loot.",
+        "If unattached, the first player claims Dwarven Torch and attaches it to a hero he controls.",
+        "Action: Exhaust Dwarven Torch to choose a non-unique enemy. That enemy gets -1 Attack and -1 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50614",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Blue-Mountain-Gem.jpg",
+        "sha256": "5589296f4cec969ca50b83282bacfd951bb58b7c63fb4786c66b775740efc237"
+      },
+      "lines": [
+        "Loot.",
+        "If unattached, the first player claims Blue Mountain Gem and attaches it to a hero he controls.",
+        "Action: Exhaust Blue Mountain Gem to choose a player. Reduce that player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50615",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Naurlhûg.jpg",
+        "sha256": "08a6f066964801330771d6edaa4d1f1705faf6400ea3cdff0794d239ec72f32c"
+      },
+      "lines": [
+        "Immune to player card effects. Cannot take damage.",
+        "X is the number of resources on Stalking the Ruins.",
+        "Forced: When Naurlhûg makes an attack, the defending player assigns X damage among characters he controls."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 3,
+          "printed": "Forced: When Naurlhûg makes an attack, the defending player assigns X damage among characters he controls"
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50616",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Lurker-of-the-Depths.jpg",
+        "sha256": "1db62c61718c53551c47cf974aeefb7be1e19a3e5a16b56bcf35a2b9df6e1a5d"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Lurker of the Depths cannot be engaged or take more than 4 damage each round.",
+        "While Lurker of the Depths is in the staging area, it is considered to be engaged with each player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50617",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Nameless-Cave-Dweller.jpg",
+        "sha256": "acd9ac3f3a9bacd49d1470e5ed89c335024d8db533aad7023eb883d540b8fce0"
+      },
+      "lines": [
+        "Cannot have player card attachments.",
+        "X is 1 more than the Discover value on the active location.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you control a Loot objective)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50618",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Old-Stone-Troll.jpg",
+        "sha256": "975d4e1184107f85e486f4ce1cdce09cfe21715d921dccbb2ae870599fcd6f5d"
+      },
+      "lines": [
+        "Cannot have player card attachments.",
+        "Old Stone Troll gets -10 engagement cost for each Loot objective attached to a hero.",
+        "Only the engaged player can declare attackers against Old Stone Troll."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50619",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Orc-of-Ered-Luin.jpg",
+        "sha256": "b67f1111fe346c9f59d1d4a9b85e270e147f1a9eb7b7e797943e9d96578234d6"
+      },
+      "lines": [
+        "When Revealed: Orc of Ered Luin makes an immediate attack against each player that controls at least 1 Loot objective (in turn order).",
+        "Shadow: After this attack, attacking enemy engages the next player, then makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50620",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Blue-Mountain-Goblin.jpg",
+        "sha256": "3cd315ef248befb2eac242076b4af5c8c48e799631b9c63f7e9d61b5169b31c7"
+      },
+      "lines": [
+        "While a Loot objective is attached to a hero, Blue Mountain Goblin gains surge.",
+        "Shadow: If you control a Loot objective, put Blue Mountain Goblin into play engaged with you and deal it a shadow card."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "While a Loot objective is attached to a hero, Blue Mountain Goblins gains surge."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50621",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Naurlhûg's-Lair.jpg",
+        "sha256": "928d4b014447d5df5efa23cd9afb284e5f302332819b7dd55e5023dda3773403"
+      },
+      "lines": [
+        "Discover 5.",
+        "Immune to player card effects.",
+        "Forced: When Naurlhûg's Lair is explored, add the Loot objective from underneath Stalking the Ruins to the staging area faceup.",
+        "Travel: Place X resources on Stalking the Ruins, where X is the number of players."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50622",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Abandoned-Mine.jpg",
+        "sha256": "ebe0efffb8b52661ce8e0e248ac4e072a5a705131a00132bf92ad1e1c9b545b1"
+      },
+      "lines": [
+        "Discover 2.",
+        "While Abandoned Mine is in the staging area, progress cannot be placed on locations in the staging area not named Abandoned Mine.",
+        "Forced: When resolving the Discover keyword on Abandoned Mine, look at X additional cards where X is the number of players in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50623",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Flooded-Hall.jpg",
+        "sha256": "6dbf52f1181d4cd4793c63d9d6d58334bae6bff64f4d75e8da6de1d54db79e57"
+      },
+      "lines": [
+        "Discover 4.",
+        "While Flooded Hall is in the staging area, increase the cost to play each ally by 1.",
+        "Forced: When resolving the Discover keyword on Flooded Hall, the first player reveals an additional looked at Hazard card for each other player in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50624",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Darkened-Tunnel.jpg",
+        "sha256": "2a222b4250c293e5dc38aebad60336ce3c4b34d6d16199d56978e0190406e41c"
+      },
+      "lines": [
+        "Discover 2.",
+        "While Darkened Tunnel is in the staging area, it gains: \"Forced: After a 'when revealed' effect is canceled, discard the top card of the encounter deck. If the discarded card has the Hazard trait, resolve its staging as if it was just revealed from the encounter deck.\"",
+        "Travel: Place 1 resource on Stalking the Ruins."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50625",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Sunken-Treasury.jpg",
+        "sha256": "d5af6108e552e1c4b040681753bde820b4b8b9488ca939fbf5c54625891f9a50"
+      },
+      "lines": [
+        "Discover 3.",
+        "Sunken Treasury gets +1 Threat for each Loot objective attached to a hero.",
+        "Travel: Each player discards 1 random card from his hand.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50626",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Secret-Chamber.jpg",
+        "sha256": "e8e0966d4b137e6cd3f161ac1429c42e752664225434e4ad12384474697679cd"
+      },
+      "lines": [
+        "Discover 3.",
+        "Response: After the players travel to Secret Chamber, if no Loot objective is attached to Secret Chamber, search the encounter discard pile for a Loot objective and attach it to Secret Chamber as a guarded objective.",
+        "Travel: Raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50627",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Echoes-in-the-Dark.jpg",
+        "sha256": "2a4de77666ff31951d5d3ea2e30d18ea1860ec24e965940f88318f3211ddfd83"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Add 1 to the total Threat in the staging area for each character controlled by the first player until the end of the phase.",
+        "Shadow: Discard 1 random card from your hand. If the discarded card is an event, attacking enemy gets +2 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50628",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Spawn-of-Thangorodrim.jpg",
+        "sha256": "1f7f33534d88ee56372750273bbfcb7ef26b36ffcca1818ec094f7c23e4958b6"
+      },
+      "lines": [
+        "When Revealed: If Naurlhûg is in play, it makes an immediate attack against the first player. If Naurlhûg is not in play, place 1 resource on Stalking the Ruins. Then, if there are at least 3 resources on Stalking the Ruins, add Naurlhûg to the staging area.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50629",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Concealed-Spikes.jpg",
+        "sha256": "bd84cd735562b7b29a4bb29c8b1e5ff7842795249a7ef1395e86391e0894f9ec"
+      },
+      "lines": [
+        "When Revealed: Each player assigns X damage among characters he controls. X is 1 more than the Discover value on the active location.",
+        "Shadow: Assign X damage among characters you control. X is the number of attachments you control. You may discard the highest cost attachment you control to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50630",
+      "side": "A",
+      "printing": "TRoB",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Covered-Pit.jpg",
+        "sha256": "ac465f3a89e5ad908cf1d77e5dc902e9a5495c3c08947c29dbbca916886c07ae"
+      },
+      "lines": [
+        "When Revealed: Each player discards an ally he controls.",
+        "Shadow: If attacking enemy is non-unique, attach a Loot objective you control to it as a guarded objective. If this attack destroys a character, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

@@ -45,6 +45,18 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 || names.without(match[1] ?? "").replace(/\bThe\b|\s/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];
   }
+  // The Ruins of Belegost (50601): "Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins (without looking). Shuffle the others into the
+  // encounter deck (without looking at them)": the Loot objectives of the set other than the Sword of Belegost, which the line before sets aside. The load list sets all five aside;
+  // the first step hides one under Stalking the Ruins and the second shuffles the other four into the encounter deck.
+  if ((match = /^Randomly select 1 of the (\d+) remaining Loot objectives and place it facedown underneath (.+?) \(without looking\)$/.exec(sentence))) {
+    const loot = names.cards.filter((card) => card.type === "objective" && card.encounterSet === "The Ruins of Belegost" && /^Loot\b/.test(card.text ?? "") && card.name !== "Sword of Belegost");
+    const under = names.codesOf(match[2] ?? "");
+    return loot.length !== Number(match[1]) || under.length === 0 ? null : [{ kind: "step", step: "hideLoot", codes: loot.map((card) => card.code), to: under }];
+  }
+  if (/^Shuffle the others into the encounter deck \(without looking at them\)$/.test(sentence)) {
+    const loot = names.cards.filter((card) => card.type === "objective" && card.encounterSet === "The Ruins of Belegost" && /^Loot\b/.test(card.text ?? "") && card.name !== "Sword of Belegost");
+    return loot.length === 0 ? null : [{ kind: "step", step: "shuffleOthersIn", codes: loot.map((card) => card.code) }];
+  }
   // "Shuffle any unused Scoutcards back into the encounter deck" (the card prints "Scoutcards"): the copies not staged stay in the encounter deck.
   if (/^Shuffle any unused Scout ?cards back into the encounter deck$/.test(sentence)) return [{ kind: "shuffleEncounterDeck" }];
   return null;

@@ -7,7 +7,7 @@
         "kind": "git",
         "value": "629db897de0c5a82a72610ff76e22dc01f59a4ac"
       },
-      "fetchedAt": "2026-10-26T00:33:38.812Z",
+      "fetchedAt": "2026-11-19T20:14:22.763Z",
       "files": [
         {
           "path": "raw/dragncards/cardDb.tsv",
@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "0b8d1c27b5794f46919c3d18b0984f302f0721aeab15842594aa50f7578a33c3"
+        "value": "872458e7c19764d4cde8c6491ffc3f8a626e3e9c7aa513c9df359d9444cc1e3f"
       },
-      "fetchedAt": "2026-11-17T14:50:17.745Z",
+      "fetchedAt": "2026-11-19T20:14:20.171Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -291,6 +291,60 @@
           "bytes": 14590
         },
         {
+          "path": "raw/hallofbeorn/Scenarios/Into-the-Pit.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Into-the-Pit",
+          "sha256": "ae584a9611170416ce84433d02ff4bd00baf63e7db678bfda3069fede06ac8d8",
+          "bytes": 14122
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Seventh-Level.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Seventh-Level",
+          "sha256": "6513b2107229a98bf816b65019cb2eea2c52934f338cc0f9c02cdffa014be69b",
+          "bytes": 9006
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Flight-from-Moria.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Flight-from-Moria",
+          "sha256": "ea73cecbda3eb0ae4bbc86ddd51d755a73d2818edaef6d56c2c2e5540c2b1997",
+          "bytes": 30119
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Redhorn-Gate.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Redhorn-Gate",
+          "sha256": "cd9fc1897e48a3d99d191ba8167113d5bbecb4cba4dffaca76100ab353a1a6c3",
+          "bytes": 11153
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Road-to-Rivendell.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Road-to-Rivendell",
+          "sha256": "4fa4727ee11f31ee17f1d153cd488bb468826a98e5f3ee8b01a9673c3e7917d0",
+          "bytes": 14524
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Watcher-in-the-Water.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Watcher-in-the-Water",
+          "sha256": "1734d0ea2122ab6ea7bbd146e3786f6203496fb558b506ccd4a3d219997ec93f",
+          "bytes": 10061
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Long-Dark.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Long-Dark",
+          "sha256": "077aad3bcbbd9d569f46aa05118054a8c9367f32048a7802cf2073676f1bb616",
+          "bytes": 11486
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Foundations-of-Stone.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Foundations-of-Stone",
+          "sha256": "1d2f742ae8cdc6138f557d30c4618715333a1bcdde500b47fe9b2f555832eef7",
+          "bytes": 23305
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Shadow-and-Flame.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Shadow-and-Flame",
+          "sha256": "28b4a36f20bd70bda56dc55ca747f8bb82f78586093361fcb13ee07ec3544c66",
+          "bytes": 13081
+        },
+        {
           "path": "raw/hallofbeorn/Scenarios/Intruders-in-Chetwood.json",
           "url": "https://hallofbeorn.com/Export/Scenarios/Intruders-in-Chetwood",
           "sha256": "4f70de48d948fc92d1492b59dc3f4b50dde9737c5d0eed0667edf8ea2855ddc6",
@@ -453,58 +507,40 @@
           "bytes": 11229
         },
         {
-          "path": "raw/hallofbeorn/Scenarios/Into-the-Pit.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/Into-the-Pit",
-          "sha256": "ae584a9611170416ce84433d02ff4bd00baf63e7db678bfda3069fede06ac8d8",
-          "bytes": 14122
+          "path": "raw/hallofbeorn/Scenarios/The-Massing-at-Osgiliath.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Massing-at-Osgiliath",
+          "sha256": "bc2ac83b5eb1b3712d1484a1a4b13fbabb4e7dc93b2831485763a0f66f3ff6a2",
+          "bytes": 11322
         },
         {
-          "path": "raw/hallofbeorn/Scenarios/The-Seventh-Level.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Seventh-Level",
-          "sha256": "6513b2107229a98bf816b65019cb2eea2c52934f338cc0f9c02cdffa014be69b",
-          "bytes": 9006
+          "path": "raw/hallofbeorn/Scenarios/The-Battle-of-Lake-town.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Battle-of-Lake-town",
+          "sha256": "5466ee6e248674d7ba8fc4577fc264912cb7dd3f5ac43a74747693b18d266373",
+          "bytes": 10840
         },
         {
-          "path": "raw/hallofbeorn/Scenarios/Flight-from-Moria.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/Flight-from-Moria",
-          "sha256": "ea73cecbda3eb0ae4bbc86ddd51d755a73d2818edaef6d56c2c2e5540c2b1997",
-          "bytes": 30119
+          "path": "raw/hallofbeorn/Scenarios/The-Stone-of-Erech.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Stone-of-Erech",
+          "sha256": "56add3eb8f0cdf28742510056e6ad809eb44b7cd014e13fb85c5b7a82807ad62",
+          "bytes": 11011
         },
         {
-          "path": "raw/hallofbeorn/Scenarios/The-Redhorn-Gate.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Redhorn-Gate",
-          "sha256": "cd9fc1897e48a3d99d191ba8167113d5bbecb4cba4dffaca76100ab353a1a6c3",
-          "bytes": 11153
+          "path": "raw/hallofbeorn/Scenarios/The-Old-Forest.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Old-Forest",
+          "sha256": "816b9ec6df3e64211799c6a381d1f77df35c2d6ed867662c802703173fd2f8bc",
+          "bytes": 14799
         },
         {
-          "path": "raw/hallofbeorn/Scenarios/Road-to-Rivendell.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/Road-to-Rivendell",
-          "sha256": "4fa4727ee11f31ee17f1d153cd488bb468826a98e5f3ee8b01a9673c3e7917d0",
-          "bytes": 14524
+          "path": "raw/hallofbeorn/Scenarios/The-Ruins-of-Belegost.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Ruins-of-Belegost",
+          "sha256": "8dcb3ed3ecf9347b0eebc97966d5fc0e97a45795c5a4b497a4ae6019fc28e5cf",
+          "bytes": 20937
         },
         {
-          "path": "raw/hallofbeorn/Scenarios/The-Watcher-in-the-Water.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Watcher-in-the-Water",
-          "sha256": "1734d0ea2122ab6ea7bbd146e3786f6203496fb558b506ccd4a3d219997ec93f",
-          "bytes": 10061
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/The-Long-Dark.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Long-Dark",
-          "sha256": "077aad3bcbbd9d569f46aa05118054a8c9367f32048a7802cf2073676f1bb616",
-          "bytes": 11486
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/Foundations-of-Stone.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/Foundations-of-Stone",
-          "sha256": "1d2f742ae8cdc6138f557d30c4618715333a1bcdde500b47fe9b2f555832eef7",
-          "bytes": 23305
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/Shadow-and-Flame.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/Shadow-and-Flame",
-          "sha256": "28b4a36f20bd70bda56dc55ca747f8bb82f78586093361fcb13ee07ec3544c66",
-          "bytes": 13081
+          "path": "raw/hallofbeorn/Scenarios/Fog-on-the-Barrow-downs.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs",
+          "sha256": "11469da3529bb0f7d60ab6de7bf5b3b34a4be1e4a77f117e66cf47474b3b0546",
+          "bytes": 11639
         }
       ]
     },
@@ -27814,9 +27850,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "4882114bb7880b017ba86cde2bc28dd57815bc9565c6f93289a48be0f2f28358"
+        "value": "7d0f89073b529bd9e0d51b77a321ae55b9c9d7165c0a0887b7c1e89ba72cf317"
       },
-      "fetchedAt": "2026-11-18T15:20:02.260Z",
+      "fetchedAt": "2026-11-19T20:26:57.108Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -39691,6 +39727,228 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Stone-of-Erech/The-Gloaming.jpg",
           "sha256": "cf9106e68de1e5188f3b17ca41fb998411831bc3c48fe33e73abb118a7a75369",
           "bytes": 117195
+        },
+        {
+          "path": "scans/50601.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Ruins-of-the-First-Age-1A.jpg",
+          "sha256": "629e9b0efae3b4dab741600b17a6b04ddf46d6aed57eddbdf6563d18c4616866",
+          "bytes": 132307
+        },
+        {
+          "path": "scans/50601.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Ruins-of-the-First-Age-1B.jpg",
+          "sha256": "6dc92bf9e8e4e725ec57e738696da4aa1f01a6a2405b6d6a1ddf1c5b063ec4f2",
+          "bytes": 126437
+        },
+        {
+          "path": "scans/50602.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Ancient-Evils-Disturbed-2A.jpg",
+          "sha256": "1fd0b5acef6500b8601f4487ee2dfd00136ec4796f0ae3c26b26455fe0206855",
+          "bytes": 133888
+        },
+        {
+          "path": "scans/50602.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Ancient-Evils-Disturbed-2B.jpg",
+          "sha256": "58c96bd59bc09fc8ffec7a6100614bcf6ab5dac81747d93ec6290c9b56651354",
+          "bytes": 135304
+        },
+        {
+          "path": "scans/50603.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Deeper-into-the-Past-C-2C.jpg",
+          "sha256": "9362f4f45d4212a10fe4b0b4c4c26ee1ce1f4bfd5e91447a5e777b777c1bab8d",
+          "bytes": 145351
+        },
+        {
+          "path": "scans/50603.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Deeper-into-the-Past-C-2D.jpg",
+          "sha256": "fc29dbc398ec926ad31fab176caa8ccc194daefaa0d764d5d91643c87659f75f",
+          "bytes": 146458
+        },
+        {
+          "path": "scans/50604.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Servants-of-Morgoth-3A.jpg",
+          "sha256": "775414ba839dcd8f45b32143d0764b62e8bb29a55ad3124f54ea832a3d7d5bb0",
+          "bytes": 120059
+        },
+        {
+          "path": "scans/50604.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Servants-of-Morgoth-3B.jpg",
+          "sha256": "e0a5135f6a1aaaf274e9aee2da6d42a3e8b514ab60298d0617bef6615e875649",
+          "bytes": 115742
+        },
+        {
+          "path": "scans/50605.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Roots-of-Ered-Luin-C-3C.jpg",
+          "sha256": "e86e741c4505ee20880bca6c06412053aa078388fdb4a3de0052147fdb96e1a0",
+          "bytes": 126934
+        },
+        {
+          "path": "scans/50605.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Roots-of-Ered-Luin-C-3D.jpg",
+          "sha256": "853a005ab72ef12d00b5dfbbe0d2522255328346d2d43ce57ac1113642520f86",
+          "bytes": 128489
+        },
+        {
+          "path": "scans/50606.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Mines-of-Belegost-E-3E.jpg",
+          "sha256": "4b782c49f921cbd83f346ef8424f8110ad3695d21b8f1d88e51be4ed482caf4b",
+          "bytes": 140811
+        },
+        {
+          "path": "scans/50606.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Mines-of-Belegost-E-3F.jpg",
+          "sha256": "ac044865d90ffaed995f1474f2a3fb7cb574f752b0444ba6052ead0b6621be75",
+          "bytes": 133936
+        },
+        {
+          "path": "scans/50607.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Beast-of-Belegost-4A.jpg",
+          "sha256": "1ede506dcb7f5ec18163e63c2873574304b142a5a00eeda1ffb7da0cc94849fb",
+          "bytes": 141911
+        },
+        {
+          "path": "scans/50607.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/The-Beast-of-Belegost-4B.jpg",
+          "sha256": "025027119ee63b259dae181c8f30cc9ed2474ef6fc7b1abba27ccf8da76a9faa",
+          "bytes": 138282
+        },
+        {
+          "path": "scans/50608.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Stalking-the-Ruins.jpg",
+          "sha256": "b1f0a1f377c9656b8e89db9ddffe3d801d1c13805ad711cbe9941dcf53649926",
+          "bytes": 131874
+        },
+        {
+          "path": "scans/50609.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Sword-of-Belegost.jpg",
+          "sha256": "306ca4d192bfe3e1d6591bd77cc34a89f2196fc251f9a1e9de1ad10eabf6c5ce",
+          "bytes": 135795
+        },
+        {
+          "path": "scans/50610.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Map-of-Ered-Luin.jpg",
+          "sha256": "df0299ab0296ca63de212379cbd58d3258c42900517574143a9a6d146fd5be11",
+          "bytes": 132389
+        },
+        {
+          "path": "scans/50611.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Keys-of-Belegost.jpg",
+          "sha256": "deda7d682977da75ce6110c2f6878a8bc9cd2c7ea1f4f69f98365c69fe5f07e8",
+          "bytes": 145155
+        },
+        {
+          "path": "scans/50612.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Book-of-Aulë's-Children.jpg",
+          "sha256": "bd463cac0e990679f9acf98050c529b4199371952680f07d51d10263c26e3c94",
+          "bytes": 131306
+        },
+        {
+          "path": "scans/50613.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Dwarven-Torch.jpg",
+          "sha256": "fe0bf367c63866d36df8a41c8b2d047368222cf73a24b02d62456cd2e6938b17",
+          "bytes": 138818
+        },
+        {
+          "path": "scans/50614.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Blue-Mountain-Gem.jpg",
+          "sha256": "5589296f4cec969ca50b83282bacfd951bb58b7c63fb4786c66b775740efc237",
+          "bytes": 142365
+        },
+        {
+          "path": "scans/50615.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Naurlhûg.jpg",
+          "sha256": "08a6f066964801330771d6edaa4d1f1705faf6400ea3cdff0794d239ec72f32c",
+          "bytes": 135772
+        },
+        {
+          "path": "scans/50616.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Lurker-of-the-Depths.jpg",
+          "sha256": "1db62c61718c53551c47cf974aeefb7be1e19a3e5a16b56bcf35a2b9df6e1a5d",
+          "bytes": 140594
+        },
+        {
+          "path": "scans/50617.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Nameless-Cave-Dweller.jpg",
+          "sha256": "acd9ac3f3a9bacd49d1470e5ed89c335024d8db533aad7023eb883d540b8fce0",
+          "bytes": 122373
+        },
+        {
+          "path": "scans/50618.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Old-Stone-Troll.jpg",
+          "sha256": "975d4e1184107f85e486f4ce1cdce09cfe21715d921dccbb2ae870599fcd6f5d",
+          "bytes": 132139
+        },
+        {
+          "path": "scans/50619.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Orc-of-Ered-Luin.jpg",
+          "sha256": "b67f1111fe346c9f59d1d4a9b85e270e147f1a9eb7b7e797943e9d96578234d6",
+          "bytes": 131570
+        },
+        {
+          "path": "scans/50620.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Blue-Mountain-Goblin.jpg",
+          "sha256": "3cd315ef248befb2eac242076b4af5c8c48e799631b9c63f7e9d61b5169b31c7",
+          "bytes": 128288
+        },
+        {
+          "path": "scans/50621.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Naurlhûg's-Lair.jpg",
+          "sha256": "928d4b014447d5df5efa23cd9afb284e5f302332819b7dd55e5023dda3773403",
+          "bytes": 126545
+        },
+        {
+          "path": "scans/50622.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Abandoned-Mine.jpg",
+          "sha256": "ebe0efffb8b52661ce8e0e248ac4e072a5a705131a00132bf92ad1e1c9b545b1",
+          "bytes": 135869
+        },
+        {
+          "path": "scans/50623.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Flooded-Hall.jpg",
+          "sha256": "6dbf52f1181d4cd4793c63d9d6d58334bae6bff64f4d75e8da6de1d54db79e57",
+          "bytes": 128333
+        },
+        {
+          "path": "scans/50624.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Darkened-Tunnel.jpg",
+          "sha256": "2a222b4250c293e5dc38aebad60336ce3c4b34d6d16199d56978e0190406e41c",
+          "bytes": 136808
+        },
+        {
+          "path": "scans/50625.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Sunken-Treasury.jpg",
+          "sha256": "d5af6108e552e1c4b040681753bde820b4b8b9488ca939fbf5c54625891f9a50",
+          "bytes": 127608
+        },
+        {
+          "path": "scans/50626.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Secret-Chamber.jpg",
+          "sha256": "e8e0966d4b137e6cd3f161ac1429c42e752664225434e4ad12384474697679cd",
+          "bytes": 131343
+        },
+        {
+          "path": "scans/50627.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Echoes-in-the-Dark.jpg",
+          "sha256": "2a4de77666ff31951d5d3ea2e30d18ea1860ec24e965940f88318f3211ddfd83",
+          "bytes": 127288
+        },
+        {
+          "path": "scans/50628.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Spawn-of-Thangorodrim.jpg",
+          "sha256": "1f7f33534d88ee56372750273bbfcb7ef26b36ffcca1818ec094f7c23e4958b6",
+          "bytes": 139518
+        },
+        {
+          "path": "scans/50629.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Concealed-Spikes.jpg",
+          "sha256": "bd84cd735562b7b29a4bb29c8b1e5ff7842795249a7ef1395e86391e0894f9ec",
+          "bytes": 135861
+        },
+        {
+          "path": "scans/50630.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Ruins-of-Belegost/Covered-Pit.jpg",
+          "sha256": "ac465f3a89e5ad908cf1d77e5dc902e9a5495c3c08947c29dbbca916886c07ae",
+          "bytes": 132113
         },
         {
           "path": "scans/900101.A.jpg",

@@ -130,6 +130,9 @@ export type SetupStep =
   | "buildOrcDeck" // "Create the Orc deck (see insert) and set it next to the quest deck": mec108.orc-deck
   // The Battle of Lake-town: each quoted from the stage 1A card Setup.
   | "buildSmaugDeck" // "Shuffle all copies of Smaug into a separate Smaug Deck": `codes` the three Smaug titles
+  // The Ruins of Belegost: each quoted from the stage 1A card Setup (50601).
+  | "hideLoot" // "Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins": `codes` the five, `to` Stalking the Ruins
+  | "shuffleOthersIn" // "Shuffle the others into the encounter deck": `codes` the five Loot objectives
   | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"
   | "addToStartingHand" // "Each player adds 1 copy of Determination to their starting hand"
   | "shuffleHandIntoDeck" // "Each player shuffles his starting hand into his deck"

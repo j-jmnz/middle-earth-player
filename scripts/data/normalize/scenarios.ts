@@ -178,8 +178,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         let other = sided ? resolve(line.databaseId, "b", sided) : null;
         const name = (sided ? sideRow(line.databaseId, "a") : raw.dragn.get(line.databaseId))?.name ?? line.databaseId;
         if (!card) {
-          // The scenario overview card has no game text and no catalog row.
-          if (name !== hob.Title) local.push(`${deck.label}: no card for "${name}" (${line.databaseId})`);
+          // The scenario overview card has no game text and no catalog row; a Rules card (The Ruins of Belegost's Discover and Loot keyword card) is a reminder, not a card the scenario deals.
+          if (name !== hob.Title && raw.dragn.get(line.databaseId)?.type !== "Rules") local.push(`${deck.label}: no card for "${name}" (${line.databaseId})`);
           continue;
         }
         if (card.type === "campaign" || raw.dragn.get(line.databaseId)?.type === "Campaign") continue;

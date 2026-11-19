@@ -6,11 +6,11 @@
     "the-battle-of-lake-town",
     "the-stone-of-erech",
     "the-old-forest",
-    "fog-on-the-barrow-downs"
+    "fog-on-the-barrow-downs",
+    "the-ruins-of-belegost"
   ],
   "kind": "cycle",
   "later": [
-    "The Ruins of Belegost",
     "Murder at the Prancing Pony",
     "The Siege of Annúminas",
     "Attack on Dol Guldur",

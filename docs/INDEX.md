@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~276.9K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~278.4K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -152,24 +152,25 @@ Read the sections your task touches.
     - 2017–2044 The Long Dark (~4.8K) ← 4
     - 2045–2076 Foundations of Stone (~4.3K) ← 3
     - 2077–2107 Shadow and Flame (~4.1K) ← 4
-  - 2108–2246 Standalone scenarios (~18.1K) ← 1
+  - 2108–2257 Standalone scenarios (~19.6K) ← 1
     - 2112–2135 The Massing at Osgiliath (~2.5K) ← 1
     - 2136–2158 The Battle of Lake-town (~4.0K) ← 36
     - 2159–2175 The Stone of Erech (~2.2K) ← 20
     - 2176–2210 The Old Forest (~4.1K) ← 10
     - 2211–2246 Fog on the Barrow-downs (~5.0K) ← 9
-  - 2247–2255 Nightmare (~410) ← 22
-  - 2256–2298 Deckbuilding (~2.5K) ← 1
-  - 2299–2378 Effects (~4.1K)
-    - 2301–2359 Three layers (~2.4K) ← 10
-    - 2360–2370 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 2371–2374 Window stack (~100)
-    - 2375–2378 Coverage test (~270)
-  - 2379–2402 Data sources (~750) ← 3
-  - 2403–2421 Card images (~1.4K) ← 9
-  - 2422–2449 Persistence and shipping (~3.2K) ← 10
-  - 2450–2492 Screens (~5.9K) ← 2
-    - 2477–2492 Table screen (~1.8K) ← 3
+    - 2247–2257 The Ruins of Belegost (~1.5K)
+  - 2258–2266 Nightmare (~410) ← 22
+  - 2267–2309 Deckbuilding (~2.5K) ← 1
+  - 2310–2389 Effects (~4.1K)
+    - 2312–2370 Three layers (~2.4K) ← 10
+    - 2371–2381 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 2382–2385 Window stack (~100)
+    - 2386–2389 Coverage test (~270)
+  - 2390–2413 Data sources (~750) ← 3
+  - 2414–2432 Card images (~1.4K) ← 9
+  - 2433–2460 Persistence and shipping (~3.2K) ← 10
+  - 2461–2503 Screens (~5.9K) ← 2
+    - 2488–2503 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~66.6K tok)
   - 5–8 Overview (~170) ← 1
   - 9–27 Top bar (~4.7K) ← 5

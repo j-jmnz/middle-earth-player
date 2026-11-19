@@ -2066,6 +2066,12 @@
   ],
   "productCodes": [
     {
+      "set": "The Ruins of Belegost",
+      "prefix": "506",
+      "reason": "Hall of Beorn numbers The Ruins of Belegost's cards 00001 to 00030 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of TRoB. A code must name one card, so the earlier standalone packs keep their codes and the Ruins' are 506 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 6 for the pack's position in it (50601 Ruins of the First Age, 50630 Covered Pit). Gimli (01004), the product's player card, is RingsDB's Core Set hero and keeps his code.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Ruins of Belegost, Number, RingsDbCardId); ringsdb.com packs (TRoB, cycle 50, position 6; no cards listed)"
+    },
+    {
       "set": "The Stone of Erech",
       "prefix": "503",
       "reason": "Hall of Beorn numbers The Stone of Erech's cards 00001 to 00027 (RingsDbCardId), which are the codes of The Massing at Osgiliath's and The Battle of Lake-town's 00001 to 00019 and 00024, and RingsDB lists no card of TSoE. A code must name one card, so the earlier two keep their codes and the Stone's are 503 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 3 for the pack's position in it (50301 The Disappearance, 50327 The Gloaming).",
