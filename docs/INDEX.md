@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~3.2K tok)
+- `CLAUDE.md` — Claude Code (~3.3K tok)
   - 7–26 Data (~1.3K)
   - 27–46 Commands (~1.3K)
   - 47–50 Agents (~180)
@@ -231,13 +231,13 @@ Read the sections your task touches.
     - 493–500 Booklet (~540) ← 2
     - 501–504 Database (~110)
   - 505–524 States (~620)
-- `docs/development.md` — Development (~4.0K tok)
+- `docs/development.md` — Development (~4.3K tok)
   - 5–14 In a browser (~170)
   - 15–32 Checking a screen in a browser (~700) ← 3
-  - 33–49 Reading a game as text (~520) ← 3
-  - 50–57 On a desktop (~210) ← 1
-  - 58–78 On a phone (~350)
-  - 79–129 Commands (~2.0K) ← 4
+  - 33–52 Reading a game as text (~760) ← 4
+  - 53–60 On a desktop (~210) ← 1
+  - 61–81 On a phone (~350)
+  - 82–132 Commands (~2.0K) ← 4
 - `docs/releasing.md` — Releasing (~4.4K tok)
   - 5–19 Start a release (~290) ← 1
   - 20–35 Jobs (~1.8K) ← 4

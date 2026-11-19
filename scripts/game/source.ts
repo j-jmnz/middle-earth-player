@@ -12,6 +12,7 @@ import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { worldFor, worldForStandalone } from "../../test/harness/fixture-world.ts";
+import { cardSmokeSource, encounterSource } from "./smoke-source.ts";
 import { GOLDEN_REGISTRY, type GoldenGame } from "../../test/harness/golden-registry.ts";
 
 const SCENARIOS = path.resolve(import.meta.dirname, "..", "..", "src", "campaign", "scenarios");
@@ -61,12 +62,18 @@ async function goldenSource(scenarioId: string, which: string): Promise<GameSour
   return { label: `golden ${scenarioId} ${index + 1} "${golden.name}"${pinned ? "" : " (not in golden.json: the game played now)"}`, ctx, opening: startScenario(played.start, ctx), intents, played, pinned: pinned?.state };
 }
 
-/** The game a source names: a fixture name, or `<scenario-id>/<golden name or 1-based number>`. */
+/**
+ * The game a source names: a fixture name, `<scenario-id>/<golden name or 1-based number>`, or a smoke run (`encounter:<scenario-id>:<game>`,
+ * `smoke:<code>[:<seed>[:<deal>]]`, scripts/game/smoke-source.ts).
+ */
 export async function loadSource(name: string): Promise<GameSource> {
   if (isFixtureName(name)) return fixtureSource(name);
+  const [kind, first = "", second, third] = name.split(":");
+  if (kind === "encounter" && first) return encounterSource(first, second ?? "0");
+  if (kind === "smoke" && first) return cardSmokeSource(first, second, third);
   const slash = name.indexOf("/");
   if (slash > 0) return goldenSource(name.slice(0, slash), name.slice(slash + 1));
-  throw new Error(`${name} is neither a fixture nor <scenario-id>/<golden>; \`pnpm game list\` lists both`);
+  throw new Error(`${name} is not a fixture, <scenario-id>/<golden>, encounter:<scenario-id>:<game> or smoke:<code>; \`pnpm game list\` lists the fixtures and goldens`);
 }
 
 /** Every source `loadSource` reads, one per line: the committed fixtures, then each scenario's goldens by number and name. */

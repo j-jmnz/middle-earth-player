@@ -14,7 +14,10 @@
       "Bash(pnpm test changed)",
       "Bash(pnpm typecheck)",
       "Bash(pnpm exec tsc --noEmit)",
-      "Bash(pnpm assets catalog)"
+      "Bash(pnpm assets catalog)",
+      "Bash(pnpm browser shot *)",
+      "Bash(pnpm browser run *)",
+      "Bash(pnpm game *)"
     ]
   },
   "hooks": {
