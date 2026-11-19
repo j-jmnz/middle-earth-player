@@ -72,7 +72,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~217.4K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~217.6K tok)
   - 17–41 Sections (~520)
   - 42–53 Product (~740) ← 2
   - 54–67 Non-goals (~610)
@@ -105,7 +105,7 @@ Read the sections your task touches.
     - 623–637 The Oath (~2.4K)
     - 638–655 The Caves of Nibin-Dûm (~2.4K)
   - 656–714 Dream-chaser (~16.2K) ← 4
-  - 715–742 Ered Mithrin (~16.4K) ← 7
+  - 715–742 Ered Mithrin (~16.5K) ← 7
   - 743–1303 Angmar Awakened (~69.4K) ← 6
     - 766–800 Intruders in Chetwood (~3.5K)
     - 801–831 The Weather Hills (~3.9K)
