@@ -38,6 +38,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 30, scenarios: ["a-journey-to-rhosgobel", "deadmens-dike", "intruders-in-chetwood", "raid-on-the-grey-havens", "return-to-mirkwood", "shelobs-lair", "temple-of-the-deceived", "the-drowned-ruins", "the-fate-of-numenor", "the-passage-of-the-marshes", "the-siege-of-gondor", "the-thing-in-the-depths", "the-treachery-of-rhudaur"], note: "An objective ally whose control changes (Iârion, Amarthiúl) is never a player's card, so no later exit puts it in a player's discard pile or hand." },
   { version: 30, scenarios: ["across-the-ettenmoors", "intruders-in-chetwood", "the-wastes-of-eriador"], note: "The hands under Lost in the Wilderness stay there when it leaves play without being defeated, instead of going to the discard pile." },
   { version: 30, scenarios: ["a-journey-to-rhosgobel", "the-treachery-of-rhudaur", "roam-across-rhovanion", "the-ghost-of-framsburg", "a-storm-on-cobas-haven"], note: "A claimed objective that prints no return to the staging area, like Athelas and the Clues of Rhudaur, goes to the encounter discard pile when its hero leaves play." },
+  { version: 30, scenarios: ["escape-from-mount-gram"], note: "Loot the Dungeons, which the campaign card adds at the start, is now in every player's staging area, so it counts as a quest card and takes progress." },
 ];
 
 export const ENGINE_VERSION = 30;
