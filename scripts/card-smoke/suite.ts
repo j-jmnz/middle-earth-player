@@ -2,8 +2,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
+import { legalIntents } from "../../src/rules/engine/reduce.ts";
 
-import { formatProblem, smokeCard, smokeCodes, smokeWorld, type SmokeWorld } from "./run.ts";
+import { formatProblem, smokeCard, smokeCodes, smokeSource, smokeWorld, type SmokeWorld } from "./run.ts";
 
 // Every player card with an effect record, smoked in a real game (scripts/card-smoke/run.ts): no throw, no refused intent, no
 // state.failure. Whether a copy gets played depends on the starter table: a card that asks for heroes, traits or targets
@@ -34,6 +35,15 @@ export function smokeShard(shard: number): void {
         expect(summary.problems).toHaveLength(1);
         expect(summary.problems[0]?.intent).toEqual({ type: "Trigger", cardId: expect.any(String), effectId: broken.id });
         expect(summary.problems[0]?.message).toContain("Unimplemented instruction NoSuchVerb");
+        // The table the failing intent was sent on, which `pnpm game show smoke:<code>` opens: the Trigger is offered there.
+        const before = summary.problems[0]?.before;
+        expect(before && legalIntents(before, { ...world.ctx, effects: [...EFFECTS, broken] }).some((offer) => offer.type === "Trigger" && offer.effectId === broken.id)).toBe(true);
+      });
+
+      it("names the pnpm game source that opens a card's run, with its seeds when they are not the defaults", () => {
+        expect(smokeSource("141002")).toBe("smoke:141002");
+        expect(smokeSource("141002", 5)).toBe("smoke:141002:5");
+        expect(smokeSource("141002", undefined, 9)).toMatch(/^smoke:141002:\d+:9$/);
       });
 
       it("smokes at least every starter card with a record", () => {

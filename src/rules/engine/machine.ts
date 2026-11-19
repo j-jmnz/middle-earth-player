@@ -155,7 +155,7 @@ export function applyIntent(
     }
     case "Commit":
       // The first player commits characters to the Sailing test, not to the quest (families/sea/sailing.ts).
-      return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, steps, intent.sideQuestId);
+      return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, steps);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
     case "CommitFortitude":
@@ -434,12 +434,11 @@ function chooseEnemy(
   return { ...engaged, window: null, engagement: { ordinal: cursor.ordinal + 1, engagedThisPass: true } };
 }
 
-function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[], sideQuestId?: string): ScenarioState {
+function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const id of cardIds) {
-    // "Does not exhaust to commit to a quest" (a flag) leaves the character ready. A side quest takes it instead of the current
-    // quest (families/sidequests/quest.ts).
-    next = updateCard(next, id, { committed: true, exhausted: !flagged(next, id, "noExhaustQuest"), questTo: sideQuestId });
+    // "Does not exhaust to commit to a quest" (a flag) leaves the character ready.
+    next = updateCard(next, id, { committed: true, exhausted: !flagged(next, id, "noExhaustQuest") });
     steps.push({ kind: "commit", cardId: id });
     // One commit is one occurrence: its characters' Responses share a window (rr.triggering-condition).
     next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id, occurrence: `commit:${state.round}:${state.activeSeat}` });

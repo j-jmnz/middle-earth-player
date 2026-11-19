@@ -24,8 +24,8 @@ const VERBS = [
   // The actor places every card of their hand facedown underneath the source, an encounter side quest ("Each player places all cards in his hand facedown underneath Lost in the Wilderness", 09051:A:1). The cards stay their player's and are out of play; ReturnFacedownToHands gives
   // them back. An empty hand puts nothing.
   z.strictObject({ verb: z.literal("PlaceHandUnderSelf"), ...when }),
-  // The first player chooses a quest card other than the current quest to be the current quest until the end of the phase: the main quest card or an encounter side quest in the staging area ("choose a different quest card in play to be the current quest", 09049:A:2;
-  // mec108.side-quests-in-play). A player side quest in a quest area cannot be the current quest. Nothing is chosen when there is only the current one.
+  // The first player chooses a quest card other than the current quest to be the current quest until the end of the phase: the main quest card or a side quest in the staging area, encounter or player ("choose a different quest card in play to be the current quest", 09049:A:2;
+  // mec108.side-quests-in-play). Nothing is chosen when there is only the current one.
   z.strictObject({ verb: z.literal("ChooseCurrentQuest"), ...when }),
   // Campaign Setup: a copy of the card from the supply is put into play attached to the card in play with this title ("Attach Iârion's Pendant to Iârion", 10156:A:2). It resolves after the quest card's Setup, which puts the host into play; with no such host nothing is attached.
   verbFlags(z.strictObject({ verb: z.literal("AttachNewTo"), code, to: z.string().min(1) }), { setupRole: "afterSetup" }),

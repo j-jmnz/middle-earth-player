@@ -68,6 +68,10 @@ export const pickSchema = z.strictObject({
   sharesTrait: z.enum(["self", "host", "other", "activeLocation", "attackingEnemy"]).optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
   cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "encounter-side-quest", "treasure", "quest"]).optional(),
+  // A side quest of either kind, a player side quest or an encounter side quest ("for each side quest in the victory display", 17117:A:2): the rules call both side quests (mec108.side-quests).
+  sideQuest: z.literal(true).optional(),
+  // A quest card of any kind, in any zone: a quest stage, an encounter side quest or a player side quest ("quest cards in the victory display", 19125:A:1; mec108.side-quests).
+  questCardType: z.literal(true).optional(),
   // A number, or the X of a scalable card: its level in the Campaign Log (`halved`: half of it rounded up) plus 1 for each copy the campaign card's Setup let the players choose
   // ("Put an ally with cost X or less in your discard pile into play", 11201:A:5; dcce.scalable-upgradable). Read by src/rules/interpret/pick.ts.
   maxCost: z.union([z.number().int().min(0), z.strictObject({ level: z.literal(true), halved: z.literal(true).optional(), plusChosen: z.literal(true).optional() })]).optional(),
@@ -282,7 +286,7 @@ export const pickSchema = z.strictObject({
   // Captured cards (Escape from Mount Gram, read by the captured family): the cards a pick starts from are `underSelf` the cards captured underneath the source (any owner's; one the owner cannot put into play is left out), `rescued` the cards the last rescue
   // put into hands that are still there (10044:A:2), `hosts` the encounter cards in play in the asking player's staging area (the staged cards, the active location and the enemies engaged with a player there; 10051:A:1).
   captured: z.enum(["underSelf", "rescued", "hosts"]).optional(),
-  // With `type: card`: only the quest cards in play the asking player can name: their current quest stage, the encounter side quests in their staging area and the player side quests in the quest areas ("a quest card in play", 10176:A:1).
+  // With `type: card`: only the quest cards in play the asking player can name: their current quest stage, the side quests in their staging area, encounter and player ("a quest card in play", 10176:A:1).
   questCard: z.literal(true).optional(),
   // The black-gate family's filters (src/rules/families/black-gate/pick.ts). `embassy`: a card of the Embassy from the Dark Tower's faceup row that is not paired yet, the player cards placed in front of the players (`player`) or the encounter cards placed faceup (`encounter`, 146072:B:1).
   // `highestThreat`: of the cards that matched, those with the highest current Threat, a card with none counting 0 ("the highest threat encounter card remaining"); every one when tied, and the chooser decides.

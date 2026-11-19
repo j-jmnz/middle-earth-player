@@ -121,13 +121,11 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
         const card = game.cards[id];
         return card != null && card.host == null && !fighting.has(id);
       });
-      // The seat's player side quest stands first in its row: its quest area (families/sidequests/play.ts).
-      const quest = owner.questStage && game.cards[owner.questStage] ? [owner.questStage] : [];
       // Then its ships, the Dream-chaser before any other (dcce.ship-objectives), then its heroes and the rest.
       const ships = facts ? shipsFirst(game, here, facts) : [];
       const rest = facts ? here.filter((id) => !ships.includes(id)) : here;
       // The hero this seat's player holds as the prisoner is still in play: facedown beside the seat's cards, with Mendor under it.
-      return [...quest, ...ships, ...rest, ...prisonersOfSeat(game, seat)];
+      return [...ships, ...rest, ...prisonersOfSeat(game, seat)];
     }
     case "hand":
       return owner?.hand ?? NONE;

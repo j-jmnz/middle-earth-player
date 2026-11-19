@@ -351,10 +351,6 @@ export function dockFor(
       const count = choice.ids.length;
       if (sheet.commit && count > 0) {
         primary = { label: `Commit ${count}`, action: { kind: "intent", intent: { type: "Commit", cardIds: [...choice.ids] } }, arm: false, testID: "table-commit" };
-        // The same characters to a player side quest instead of the current quest.
-        for (const quest of sheet.sideQuests ?? []) {
-          secondary.push({ label: `To ${quest.label}`, action: { kind: "intent", intent: { type: "Commit", cardIds: [...choice.ids], sideQuestId: quest.id } }, arm: false, testID: `table-commit-side-${quest.id}` });
-        }
       } else if (sheet.mustCommit != null) {
         // A hero must commit (A Fell Dread): Pass is not legal, so the primary waits for a pick and says who.
         primary = { label: "Commit", action: { kind: "clear" }, arm: false, testID: "table-commit" };

@@ -45,7 +45,7 @@ export function restoredState(stored: StoredState): ScenarioState {
 
 // Every zone a card can lie in. A zone the engine adds is a type error here until it is listed.
 const ZONES: Readonly<Record<ZoneName, true>> = {
-  deck: true, hand: true, discard: true, heroes: true, play: true, engaged: true, seatStaging: true, seatQuest: true, staging: true, activeLocation: true,
+  deck: true, hand: true, discard: true, heroes: true, play: true, engaged: true, seatStaging: true, staging: true, activeLocation: true,
   secondActiveLocation: true, questDeck: true, questStage: true, encounterDeck: true, encounterDiscard: true, burdenDeck: true, corsairDeck: true,
   corsairDiscard: true, unchartedDeck: true, stormcallerArea: true, islandMap: true, cavesDeck: true, evilCreaturesDeck: true, evilCreaturesDiscard: true,
   smaugDeck: true, smaugDiscard: true, spidersDeck: true, orcsDeck: true, sideQuestDeck: true, haradDeck: true, greatSpiderDeck: true, angmarOrcDeck: true, victory: true, setAside: true, removed: true, shadow: true, attached: true,

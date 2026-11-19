@@ -30,6 +30,8 @@ export type AmountScope = {
   picked?: readonly string[];
   subject?: string | null;
   other?: string | null;
+  // The host the source lost to its own cost (EffectData.host): "attached hero" after "Discard Cram".
+  host?: string;
   x?: number;
   dealt?: number;
   excess?: number;
@@ -47,6 +49,7 @@ export function frameScope(state: ScenarioState, actor: number, sourceId: string
     ...(data.picked ? { picked: data.picked } : {}),
     ...(data.subject ? { subject: data.subject } : {}),
     ...(data.other ? { other: data.other } : {}),
+    ...(data.host ? { host: data.host } : {}),
     ...(data.x != null ? { x: data.x } : {}),
     ...(data.dealt != null ? { dealt: data.dealt } : {}),
     ...(data.excess != null ? { excess: data.excess } : {}),
@@ -54,14 +57,23 @@ export function frameScope(state: ScenarioState, actor: number, sourceId: string
   };
 }
 
+// The card the source is attached to, or the host its own cost took away while its effect resolves (EffectData.host: "attached hero" after
+// "Discard Cram"). Every read of a source's host that an effect can make after its cost goes through here or refCard.
+export function hostOf(state: ScenarioState, sourceId: string | null | undefined): string | null {
+  if (!sourceId) return null;
+  const own = state.cards[sourceId]?.host;
+  if (own) return own;
+  const frame = topFrame(state);
+  return frame?.data?.kind === "effect" && frame.cardId === sourceId ? (frame.data.host ?? null) : null;
+}
+
 // The card a reference names now, or null.
 export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope): string | null {
-  const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
   switch (ref) {
     case "self":
       return scope.sourceId;
     case "host":
-      return source?.host ?? null;
+      return hostOf(state, scope.sourceId);
     case "picked":
       return scope.picked?.at(-1) || null;
     case "subject":

@@ -1,4 +1,4 @@
-// How the core calls the hooks of the mechanic families (docs/architecture.md, Mechanic families): each function walks a family list, RULES_FAMILIES by
+// How the core calls the hooks of the mechanic families (docs/architecture.md, Mechanic families): each function walks a family list, rulesFamilies() by
 // default (registered by families/index.ts; withFamilies swaps it for a test). A hook returns a new state or the same object, never a changed one.
 import type { Amount, Condition, Instruction, PickSpec } from "../../catalog/boundary.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -12,10 +12,10 @@ import type { PickContext } from "./pick.ts";
 
 export type SettlePhase = keyof SettleHooks;
 
-// The family list the core's calls walk: RULES_FAMILIES, or the one withFamilies sets for a test.
+// The family list the core's calls walk: rulesFamilies(), or the one withFamilies sets for a test.
 let scoped: readonly RulesFamily[] | null = null;
-let registry: { readonly families: readonly RulesFamily[]; readonly order: Order } | null = null;
-const active = (): readonly RulesFamily[] => scoped ?? loaded().families;
+let registry: { readonly families: () => readonly RulesFamily[]; readonly order: Order } | null = null;
+const active = (): readonly RulesFamily[] => scoped ?? loaded().families();
 const loaded = () => {
   if (!registry) throw new Error("the mechanic families are not loaded: src/rules/families/index.ts registers them");
   return registry;
@@ -25,12 +25,12 @@ const loaded = () => {
  * Called once by src/rules/families/index.ts with its lists. The core's hook calls cannot import that file: it imports every family, and the core is
  * imported by them, so a module that reached the core first would read the lists before they exist.
  */
-export function registerFamilies(families: readonly RulesFamily[], order: Order): void {
+export function registerFamilies(families: () => readonly RulesFamily[], order: Order): void {
   registry = { families, order };
 }
 const NONE: readonly string[] = [];
 
-/** Runs `fn` with the core's hook calls walking `families` instead of RULES_FAMILIES, then restores the list (for tests of the core's call sites). */
+/** Runs `fn` with the core's hook calls walking `families` instead of rulesFamilies(), then restores the list (for tests of the core's call sites). */
 export function withFamilies<T>(families: readonly RulesFamily[], fn: () => T): T {
   const before = scoped;
   scoped = families;

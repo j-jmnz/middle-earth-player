@@ -1,5 +1,5 @@
 // Rules: mec108.side-quests, mec108.side-quests-in-play, rr.the-word-choose, rr.first-player, faq.side-quest-current-quest-text (data/rules/entries.json); ledger lines 09016:A:1, 09047:A:1, 09047:A:2, 09048:A:1, 09048:A:2, 09049:A:2, 09050:A:1, 09050:A:2, 09023:A:2, 09019:A:2.
-// The quest cards in play, and the current quest chosen among them. The main quest card is a quest card in play, and so is each encounter side quest in the staging area and each player side quest in a quest area; the text on each is active (faq.side-quest-current-quest-text).
+// The quest cards in play, and the current quest chosen among them. The main quest card is a quest card in play, and so is each side quest in the staging area, encounter or player; the text on each is active (faq.side-quest-current-quest-text).
 // A quest card in the victory display or a discard pile is not in play.
 import type { Amount, Condition, Instruction } from "../../../catalog/boundary.ts";
 
@@ -19,12 +19,12 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** The quest cards in play for the seat now (the pool of `questCardPool`: the stage of its area, the encounter side quests in its staging area and the player side quests in the quest areas). Never fewer than 1 (a game whose quest deck is done has still its last stage in play). */
+/** The quest cards in play for the seat now (the pool of `questCardPool`: the stage of its area, the side quests in its staging area, encounter and player). Never fewer than 1 (a game whose quest deck is done has still its last stage in play). */
 export function questCardsInPlay(state: ScenarioState, seat: number, ctx: ReduceContext): number {
   return Math.max(1, questCardPool(state, seat, ctx).length);
 }
 
-/** The cards that may be the current quest: the main quest card (not in the quest phase while it cannot be chosen, 10094:B:3) and the encounter side quests in the staging area. A player side quest never is. */
+/** The cards that may be the current quest: the main quest card (not in the quest phase while it cannot be chosen, 10094:B:3) and the side quests, encounter and player, in the staging area. */
 function choosable(state: ScenarioState, ctx: ReduceContext): string[] {
   return [...(state.questStage && !mainQuestBarred(state) ? [state.questStage] : []), ...stagedSideQuests(state, ctx)];
 }
@@ -41,7 +41,7 @@ export function setCurrentQuest(state: ScenarioState, id: string, ctx: ReduceCon
 }
 
 /**
- * ChooseCurrentQuest: the first player chooses a quest card other than the current quest to be the current quest until the end of the phase (09049:A:2): the main quest card or an encounter side quest in the staging area. A single card is taken without asking, none leaves
+ * ChooseCurrentQuest: the first player chooses a quest card other than the current quest to be the current quest until the end of the phase (09049:A:2): the main quest card or a side quest in the staging area. A single card is taken without asking, none leaves
  * the quest as it is. Run outside an effect frame, which cannot ask, it takes the first card.
  */
 export function chooseCurrentQuest(state: ScenarioState, instruction: Verb<"ChooseCurrentQuest">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

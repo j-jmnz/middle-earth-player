@@ -44,6 +44,9 @@ const FLAGS = [
   "returnsToEncounterDeck",
   // On a claimed objective: when it is detached (its hero leaves play, a card discards it) it is discarded to the encounter discard pile instead of returning to the staging area ("If detached, discard The Old Thrush", 50208:A:2).
   "discardedWhenDetached",
+  // On a claimed objective: when the hero it is attached to leaves play, or it is discarded, the objective returns to the staging area ("If detached, return Gandalf's Map to the staging area", 01108:A:2). A claimed objective
+  // without it counts as an attachment and is discarded with its host (Athelas 02063, the Rhudaur Clues). Read where a card is sent away (families/objectives/claimed.ts).
+  "returnsToStagingArea",
 ] as const;
 
 export const manifest = { name: "objectives", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

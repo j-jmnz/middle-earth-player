@@ -82,6 +82,13 @@ export type LayoutTable = { state: ScenarioState; ctx: ReduceContext; hero: stri
 type Loaded = { data: AnyScenarioData; dealt: AnyScenarioData; campaign: CampaignData; cards: ReadonlyMap<string, PrintedCard> };
 const LOADED = new Map<string, Loaded>();
 
+// Every card of data/cards by code, read once.
+let byCode: ReadonlyMap<string, ReturnType<typeof loadCards>[number]> | null = null;
+function cardsByCode(): ReadonlyMap<string, ReturnType<typeof loadCards>[number]> {
+  byCode ??= new Map(loadCards().map((card) => [card.code, card]));
+  return byCode;
+}
+
 // The saga hero or the attachments the first player starts the scenario with (The One Ring in The Passage of the Marshes), so a layout can place them.
 const sagaStartCodes = (data: AnyScenarioData): string[] => (data.sagaStart ? ("hero" in data.sagaStart ? [data.sagaStart.hero] : [...data.sagaStart.attached]) : []);
 
@@ -94,10 +101,9 @@ function loadedWorld(scenarioId: string): Loaded {
   if (!campaign) throw new Error(`no campaign plays ${scenarioId}`);
   const dealt = campaignScenario(data);
   const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, ...(dealt.campaignCard !== undefined ? [dealt.campaignCard] : []), ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data), ...(data.nightmare ? [data.nightmare.setupCard, ...data.nightmare.cards.map((card) => card.code), ...(data.nightmare.questCards ?? [])] : [])]);
-  const byCode = new Map(loadCards().map((card) => [card.code, card]));
   const cards = new Map<string, PrintedCard>();
   for (const code of codes) {
-    const card = byCode.get(code);
+    const card = cardsByCode().get(code);
     if (!card) throw new Error(`data/cards has no card ${code}`);
     cards.set(code, printedFromCard(card));
   }
@@ -115,9 +121,10 @@ export function printedIn(scenarioId: string, code: string): PrintedCard | undef
 
 /**
  * A table built from a layout, with no scene file: the scenario's codes are read from data/scenarios/<scenarioId>.json and data/cards.
- * `effects` are the records the table runs (the authored ones by default); the do-nothing Action for the filler event is added to them.
+ * `effects` are the records the table runs (the authored ones by default); the do-nothing Action for the filler event is added to them. `extra` names
+ * other cards of data/cards the layout places (a player card in the hand, `pnpm game scene`), added to this table's cards only.
  */
-export function tableFromLayout(scenarioId: string, layout: Layout = {}, options: { effects?: readonly Effect[] } = {}): LayoutTable {
+export function tableFromLayout(scenarioId: string, layout: Layout = {}, options: { effects?: readonly Effect[]; extra?: readonly string[] } = {}): LayoutTable {
   const world = loadedWorld(scenarioId);
   const effects = options.effects ?? EFFECTS;
   // A layout that names a Nightmare quest card as its stage (Grimbeorn's Folly) has it after the printed stages, as the Nightmare deal does (src/campaign/start.ts).
@@ -125,6 +132,11 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   const nightmareStages = world.dealt.nightmare?.questCards ?? [];
   const definition = layout.stage != null && nightmareStages.includes(layout.stage) ? { ...printedDefinition, stages: [...printedDefinition.stages, ...nightmareStages.map((code) => stageOf(code, effects))] } : printedDefinition;
   const cards = new Map(world.cards);
+  for (const code of options.extra ?? []) {
+    const card = cardsByCode().get(code);
+    if (!card) throw new Error(`data/cards has no card ${code}`);
+    if (!cards.has(code)) cards.set(code, printedFromCard(card));
+  }
   const ctx: ReduceContext = { effects: [...effects, fillerRecord("filler")], cards };
   const stages = definition.stages.map((stage) => stage.code);
   const stage = layout.stage ?? stages[0] ?? "";

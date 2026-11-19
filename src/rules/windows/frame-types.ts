@@ -108,6 +108,8 @@ export type EffectData = {
   // names (the enemy a character defends against).
   subject?: string;
   other?: string;
+  // The card the source was attached to when its own cost took it out of play ("Discard Cram to ready attached hero", 131011:A:2): "attached hero" still names it.
+  host?: string;
   // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
@@ -268,7 +270,7 @@ export type PendingAttack = {
   damaged?: boolean;
   // Forced effects "when this enemy attacks" (141069:A:2) are resolving: the defense window opens once they are done.
   defenseWaits?: boolean;
-  // The additional shadow card (141069:A:2) whose cancel Responses were offered last.
+  // The additional shadow card (141069:A:2) turned face up whose cancel Responses are open; cleared once it resolves.
   extraOffered?: string;
   // A shadow card whose effect asks a player (a Pick or a Choose, 141071:A:2) is resolving in its own frame. The attack
   // goes on when it pops.

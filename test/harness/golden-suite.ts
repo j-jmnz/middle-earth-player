@@ -19,6 +19,7 @@ import { ENGINE_VERSION } from "../../src/rules/engine/version.ts";
 
 import { causeProblems, NUMBER_STEPS } from "./cause-check.ts";
 import type { CampaignGoldenBase, PlayedGame } from "./game-kit.ts";
+import { goldensMovedHint } from "./golden-moved.ts";
 import { nextPartId, nextPartStatus, nextStepKind } from "./next-part.ts";
 import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 
@@ -154,7 +155,7 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         // The checks are the digest of the table after each intent (src/campaign/digest.ts): they move only when a change reaches this scenario's games.
         return { ...golden, intents: played?.intents, state: played?.state, checks: played ? checksOf(played, worlds.get(golden.decks)!.ctx) : undefined };
       });
-      await expect(JSON.stringify(out)).toMatchFileSnapshot(spec.file);
+      await expect(JSON.stringify(out)).toMatchFileSnapshot(spec.file, goldensMovedHint(spec.file, spec.scenario.id, out));
       // A later part reads these states back from golden.json in place of playing the games again (test/harness/golden-state.ts).
       for (const golden of spec.goldens) expect(JSON.parse(JSON.stringify(game(golden).state)), golden.name).toEqual(game(golden).state);
     });

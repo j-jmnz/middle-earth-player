@@ -62,8 +62,7 @@ export type PlayerIntent =
   // The players give the scenario up from the table menu: the game is lost, whatever window is open.
   | { type: "Resign" }
   | { type: "PlayCard"; cardId: string; payments: readonly Payment[]; hostId?: string }
-  // `sideQuestId`: the characters quest on that side quest in a quest area instead of the current quest.
-  | { type: "Commit"; cardIds: readonly string[]; sideQuestId?: string }
+  | { type: "Commit"; cardIds: readonly string[] }
   | { type: "CommitHide"; cardIds: readonly string[] }
   | { type: "CommitFortitude"; cardIds: readonly string[] }
   | { type: "CommitEscape"; cardIds: readonly string[] }

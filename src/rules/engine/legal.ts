@@ -25,7 +25,6 @@ import { optionalEnemies, stagingLocations } from "../quest/quest.ts";
 import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, travelProgressReason, seatBarred } from "../interpret/restrictions.ts";
 import { flagged, modifierActive, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
-import { sideQuestReason } from "../families/sidequests/quest.ts";
 import { familyAttackReason, familyDefenseReason, familyMayTravel, familyTravelReach, familyTravelSecond } from "../interpret/family-hooks.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploring } from "../families/island/map.ts";
@@ -90,7 +89,7 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
 export function legalTargets(state: ScenarioState, selection: Selection, ctx: ReduceContext): readonly string[] {
   switch (selection.type) {
     case "PlayCard":
-      return attachmentTargets(state, state.cards[selection.cardId]?.code, ctx);
+      return attachmentTargets(state, selection.cardId, ctx);
     case "Commit":
       return askingToCommit(state) ? sailingCommitters(state, ctx) : committers(state, state.activeSeat, ctx);
     case "CommitHide":
@@ -293,7 +292,7 @@ function commitReason(
   for (const id of intent.cardIds) {
     if (!legal.has(id)) return "That character cannot commit";
   }
-  return intent.sideQuestId ? sideQuestReason(state, intent.sideQuestId) : null;
+  return null;
 }
 
 function travelReason(

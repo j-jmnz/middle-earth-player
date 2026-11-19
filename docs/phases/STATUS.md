@@ -23,6 +23,15 @@ No phase is open.
 ### Reviews
 - Review fixes not re-reviewed: the round engine, the starter effects, the campaign shell, scenario 1's table, A Knife in the Dark, the card frames' ux fix, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest and Fog on the Barrow-downs. `/ux` not run on Flight to the Ford; `/reviewer` and `/ux` not run on The Ring Goes South.
 
+### Readings (not user-confirmed)
+- Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
+- A claimed treasure is not an attachment for card effects (`recommended`, docs/brief.md, Ered Mithrin).
+- A played player side quest goes to the staging area: The Lost Realm text read from a transcription; no official PDF is pinned in data/sources.json (docs/brief.md).
+- East Road Ranger 10008:A:1: "committed to a side quest" means committed while a side quest is the current quest (`recommended`).
+
+### Engine code
+- The leave-play loss is checked in loseWhenLeftPlay and still in destroyCard and releaseAttachments: foresight.ts reads `lost` from the latter two, so they stay until foresight uses loseWhenLeftPlay.
+
 ### Cards tab views
 - `pnpm data sync pictures` has not run since every card got a picture check: Google Drive's quota refused it (2026-11-18). Re-run it, then check that no pin moved to a smaller picture.
 - The Messenger of the King heroes keep RingsDB's pictures (about 430×600): no larger source was found (agent recommendation, not user-confirmed).
@@ -128,8 +137,11 @@ No phase is open.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
 ### Rules and engine (Angmar Awakened)
+- Objective allies (Wilyador, Iârion, Amarthiúl, Captain Sahír, Na'asiyah): a player card that returns one to "its owner's hand" puts it in the encounter discard pile, and the players lose when it leaves play (agent recommendation; no ruling found, `docs/brief.md`, A Journey to Rhosgobel). Not user-confirmed.
 - Angmar Awakened data: Easy counts of Angmar Captain (09045, 1) and Angmar Marauder (09044, 2) in Escape from Mount Gram and Ruins of Arnor (09056, 2) in The Treachery of Rhudaur follow Hall of Beorn against DragnCards' E05 decks; no printed icon check. Not user-confirmed.
 - Angmar Awakened data: `MEC108_CHANGED` is empty because no scan shows the MEC108 printing of the 155 reprinted encounter cards; a rewording cannot be found until one is read. Not user-confirmed.
+- Claimed objectives with no printed return (Athelas, the Clues of Rhudaur) go to the encounter discard pile with their hero (semi-official FAQ 1.23, community; `docs/brief.md`, A Journey to Rhosgobel). Not user-confirmed.
+- Claimed objectives whose text claims them "if unattached" (Ashen Brazier, Loot objectives, Durin's Key, Urdug's Horn) return to the staging area when detached (agent recommendation, no source; `docs/brief.md`, Ered Mithrin). Not user-confirmed.
 - Angmar Awakened data: the Prison Cell, Savage Trollspawn and Amarthiúl (Wastes) piles follow each quest's Setup over DragnCards' load layout (agent recommendation). Not user-confirmed.
 - Angmar Awakened campaign cards: Iârion's Pendant at 10166:B:1 goes to the player the first player names, as the Ered Mithrin boon-ally ruling (agent recommendation; no ruling found). Not user-confirmed.
 - Angmar Awakened campaign cards: "add the Mysterious Omens side quest to the Campaign Log" (10159:A:2) adds it to the Campaign Pool (agent recommendation). Not user-confirmed.
@@ -204,14 +216,14 @@ No phase is open.
 - The Treachery of Rhudaur: each Clue's boon (10184:B:1) goes into its controller's deck as well as the pool (agent recommendation). Not user-confirmed.
 - Renderer gaps, The Treachery of Rhudaur (behaviour proven by tests): unclaimed side quests counted by 10094:B:4, Ghostly Ruins' unpayable Travel (10103:A:2), the main quest barred from Centuries of Sorrow's choice and Haunting Fog with no current quest (10105:A:2, 10108:A:1), Amarthiúl as an ally and the shared limit (10113), the boon into the deck (10184:B:1), "Restricted." on 10185 to 10187.
 - `modifiedStat` (`src/rules/core/keywords.ts`) reads traits with no effect list, so a trait an effect grants is not seen by stat conditions such as `defendingAgainst` (the condition path sees it).
-- Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
+- Intruders in Chetwood: quest cards in play are the main quest, the staged side quests, encounter and player, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
 - Intruders in Chetwood: Time counters come off after the end-of-refresh Forced effects. Not user-confirmed.
 - Intruders in Chetwood: Outlying Homestead (09020:A:2) bars threat reduction by player card effects only. Not user-confirmed.
 - Intruders in Chetwood: Sudden Assault (09021:A:1) attacks first and searches for an Orc War Party only if no attack was made. Not user-confirmed.
 - Intruders in Chetwood: Angmar Orc's ally choice (09043:A:1) may take Iârion; the first player chooses. Not user-confirmed.
-- Intruders in Chetwood: Pressing Needs (09049:A:2): search-and-reveal a side quest or make a different quest card current; player side quests not eligible. Not user-confirmed.
+- Intruders in Chetwood: Pressing Needs (09049:A:2): search-and-reveal a side quest or make a different quest card current; a staged player side quest is eligible. Not user-confirmed.
 - Intruders in Chetwood: Weight of Responsibility (09050) counts quest cards when it resolves. Not user-confirmed.
 - Intruders in Chetwood: Stop the War Party's Setup (09068:A:1): each player searches for one location with a different title. Not user-confirmed.
 - Intruders in Chetwood: Protect the Innocent (10158:A:1) takes 1 damage per attack that damages a character. Not user-confirmed.
@@ -253,7 +265,6 @@ No phase is open.
 - Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
 - Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
-- A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
 - `items-baseline` collapsed on Android in the path; it is still in `card-pool.tsx` and `log/[saveId].tsx`.
 - Why the path screen was laid out taller than the window on Android is not known. The action bar's overrun measure stays for screens that keep a bar.
 - Web only: opening Cards, Import or a deck first can raise "error during concurrent rendering" (expo-sqlite "Sync operation timeout"; React recovers). Rows ending in a stepper warn "nested button".

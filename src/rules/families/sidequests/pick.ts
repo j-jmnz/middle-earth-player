@@ -1,7 +1,7 @@
 // Rules: rr.traits, rr.in-play-and-out-of-play (data/rules/entries.json).
 //
 // The sidequests family's pick filters (effect-schema-pick.ts): a Trait shared with the active location or the attacking enemy,
-// the same title as another card, the quest a character is committed to.
+// the same title as another card, whether a character is committed to a side quest (the current quest) or to the main quest.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 import { grantedTraits } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -9,6 +9,7 @@ import type { PickContext } from "../../interpret/pick.ts";
 import { printedOf } from "../../core/printed.ts";
 import { restrictedAttachments } from "../../interpret/restrictions.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { currentSideQuest } from "../wilderland/night-quest.ts";
 
 function traitsOf(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
   const instance = state.cards[id];
@@ -48,7 +49,8 @@ export function sidequestsPickMatches(state: ScenarioState, id: string, spec: Pi
   if (spec.committedTo) {
     const instance = state.cards[id];
     if (!instance?.committed) return false;
-    if ((instance.questTo != null) !== (spec.committedTo === "sideQuest")) return false;
+    // The characters commit to the current quest: a side quest chosen for the phase, or else the main quest (mec108.side-quests-in-play).
+    if ((currentSideQuest(state) != null) !== (spec.committedTo === "sideQuest")) return false;
   }
   return true;
 }

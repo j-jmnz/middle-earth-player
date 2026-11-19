@@ -16,7 +16,6 @@ export function emptySeat(eliminated: boolean): Seat {
     play: [],
     engaged: [],
     staging: [],
-    questStage: null,
     eliminated,
   };
 }
@@ -228,7 +227,6 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "activeLocation" ||
     zone === "secondActiveLocation" || zone === "stormcallerArea" || zone === "islandMap" ||
     zone === "questStage" ||
-    zone === "seatQuest" ||
     zone === "attached" ||
     zone === "campaign" ||
     zone === "nightmare" ||

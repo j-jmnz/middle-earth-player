@@ -81,7 +81,7 @@ describe("Roam Across Rhovanion in the ered-mithrin campaign", { timeout: 60_000
     expect(log.campaignPool.some((card) => ["12180", "12181", "12182", "12183"].includes(card.code))).toBe(true);
     expect(log.allyLines ?? []).toEqual([]);
     expect(log.treasures?.length).toBeGreaterThanOrEqual(3);
-    expect(poolEncounterCopies(log.encounterPool ?? {})).toContain("01089");
+    expect(poolEncounterCopies(log.encounterPool ?? {})).toContain("01095");
     // The checklist reads the same log as the game does.
     const facts = wilderlandFacts(log, campaign.id);
     expect(facts.treasures).toEqual(log.treasures);

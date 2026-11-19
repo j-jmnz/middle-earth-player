@@ -12,7 +12,7 @@ import { applyMulliganTrigger, mulliganTriggerReason } from "../families/deck/pl
 import { textBlank } from "../families/attachments/hold.ts";
 import { printedOf } from "../core/printed.ts";
 import { flagged, inPlay, type ScenarioState } from "../core/state.ts";
-import { payUsage, usable, usageReason } from "./usage.ts";
+import { hostLostToCost, payUsage, usable, usageReason } from "./usage.ts";
 import { announcePlayerAbility } from "../families/deck/pressure.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
@@ -103,6 +103,7 @@ export function applyTrigger(
       blockCancel: null,
       cause: effectCause(effect),
       resume: { window: state.window, seat },
+      ...hostLostToCost(state, paid, intent.cardId),
     },
     steps,
   );

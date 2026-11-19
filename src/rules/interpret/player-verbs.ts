@@ -17,9 +17,9 @@ import type { ReduceContext } from "./interpret.ts";
 import { lowerThreatByEffect, playerSource } from "../families/quest/threat.ts";
 import { destroyCard, placeDamage } from "../core/keywords.ts";
 import { stagingLocations } from "../quest/quest.ts";
-import type { ScenarioState } from "../core/state.ts";
+import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
-import { printedOf, type PrintedCard } from "../core/printed.ts";
+import { printedOf, scenarioOwned, type PrintedCard } from "../core/printed.ts";
 import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
@@ -29,6 +29,7 @@ import { healBlocked } from "../families/burden/life.ts";
 import { healDamage } from "../families/dreamchaser/heal-cap.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { addToVictory } from "../families/sidequests/victory.ts";
+import { placeSideQuest } from "../families/sidequests/play.ts";
 import { isQuestSource } from "../families/wilderland/night-quest.ts";
 import { announceCanceled } from "../families/nightmare/index.ts";
 
@@ -90,7 +91,7 @@ export function runPlayerVerb(
         return state.cards[id] ? readyCard(state, id, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
       }
       if (instruction.target === "host") {
-        const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
+        const hostId = refCard(state, "host", frameScope(state, focus.seat, focus.sourceId));
         return hostId && state.cards[hostId] && !readyBarred(state, hostId, byPlayerCards(state, focus.sourceId, ctx)) ? updateCard(state, hostId, readyPatch(state, hostId)) : state;
       }
       if (instruction.target !== "allCharacters") return null;
@@ -120,7 +121,9 @@ export function runPlayerVerb(
     }
     case "PutOnDeck": {
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
-      return putOnDeck(state, id, instruction.position);
+      const target = state.cards[id];
+      // The scenario owns an encounter card (rr.ownership-and-control): it has no deck of a player to go to.
+      return target && inPlay(target.zone) && scenarioOwned(printedOf(ctx.cards, target.code)) ? toEncounterDiscard(state, target) : putOnDeck(state, id, instruction.position);
     }
     case "MoveResources": {
       const list = pickedList(state);
@@ -248,6 +251,8 @@ export function runPlayerVerb(
       const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
       // An ally taken from another player's discard pile is put into play under the new controller and stays its owner's card.
       const owner = card.controller != null && card.controller !== seat && card.owner == null ? { owner: card.controller } : {};
+      // A player side quest put into play lies in the staging area, as one played does (families/sidequests/play.ts).
+      if (printedOf(ctx.cards, card.code).type === "player-side-quest") return queueEvent(updateCard(placeSideQuest(state, id, seat), id, { exhausted: false, ...owner }), { trigger: "enteredPlay", seat, cardId: id });
       const entered = updateCard(moveCard(state, id, { zone: "play", seat }), id, { exhausted: false, ...owner });
       return queueEvent(entered, { trigger: "enteredPlay", seat, cardId: id });
     }
@@ -255,7 +260,8 @@ export function runPlayerVerb(
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
       const card = state.cards[id];
       if (!card || !inPlay(card.zone) || card.controller == null) return state;
-      const returned = moveCard(state, id, { zone: "hand", seat: card.owner ?? card.controller });
+      // The scenario owns an encounter card (an objective-ally: Wilyador, Iârion), so it has no hand to return to: it leaves play into the encounter discard pile, the area the scenario owns (rr.ownership-and-control).
+      const returned = scenarioOwned(printedOf(ctx.cards, card.code)) ? toEncounterDiscard(state, card) : moveCard(state, id, { zone: "hand", seat: card.owner ?? card.controller });
       return queueEvent(returned, { trigger: "allyLeftPlay", seat: card.controller, subject: id });
     }
     case "ShuffleSelfIntoDeck": {
@@ -336,6 +342,11 @@ export function exhaustCard(state: ScenarioState, id: string): ScenarioState {
   const card = state.cards[id];
   if (!card || card.exhausted) return state;
   return queueEvent(updateCard(state, id, { exhausted: true }), { trigger: "exhausted", seat: card.controller, cardId: id });
+}
+
+// A card of the scenario that a player effect takes out of play by "return" goes to the encounter discard pile, whoever controls it.
+function toEncounterDiscard(state: ScenarioState, card: CardInstance): ScenarioState {
+  return updateCard(moveCard(state, card.id, { zone: "encounterDiscard" }), card.id, { owner: undefined });
 }
 
 // A player card goes on top or at the bottom of its owner's deck, or is shuffled in. Only a player card has a deck to go to.

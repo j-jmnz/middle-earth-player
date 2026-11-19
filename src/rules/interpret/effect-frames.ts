@@ -51,6 +51,8 @@ export type EffectSpec = {
   // The card the answered event was about, and the other card it names.
   subject?: string;
   other?: string;
+  // The host the source lost to its own cost (EffectData.host).
+  host?: string;
   // The damage the answered event dealt, and the card whose destruction waits while the effect resolves.
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip).
@@ -89,6 +91,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.picked ? { picked: spec.picked } : {}),
     ...(spec.subject ? { subject: spec.subject } : {}),
     ...(spec.other ? { other: spec.other } : {}),
+    ...(spec.host ? { host: spec.host } : {}),
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
     ...(spec.excess != null ? { excess: spec.excess } : {}),
     ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),

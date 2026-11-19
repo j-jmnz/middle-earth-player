@@ -43,7 +43,6 @@ export type ZoneName =
   | "play"
   | "engaged"
   | "seatStaging"
-  | "seatQuest"
   | "staging"
   | "activeLocation"
   | "secondActiveLocation"
@@ -98,9 +97,6 @@ export type CardInstance = {
   host: string | null;
   attachments: readonly string[];
   committed: boolean;
-  // The side quest a committed character quests on instead of the current quest (families/sidequests/quest.ts). Absent for the
-  // current quest.
-  questTo?: string;
   shadowId: string | null;
   // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
   // when there are none.
@@ -165,8 +161,6 @@ export type Seat = {
   // This seat's own staging area, once stage 2B has created the separate areas (`ScenarioState.separate`): the ids of its encounter cards, a
   // subset of `ScenarioState.staging`, which keeps every staging card in any area (families/breaking/areas.ts).
   staging: readonly string[];
-  // The seat's player side quest (zone seatQuest), not a stage of the scenario's quest.
-  questStage: string | null;
   // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null, unless a stage no player is at is parked in it (Fog on the Barrow-downs, `parkedStage`).
   // Absent in every other game (families/breaking/areas.ts).
   stage?: string;

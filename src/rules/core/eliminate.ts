@@ -21,9 +21,23 @@ export function markLoss(state: ScenarioState, reason: string): ScenarioState {
   return { ...state, lost: true, lossReason: reason };
 }
 
+// "If X leaves play, the players lose the game" (printed `leavesPlayLoses`, or the flag `lossOnLeavingPlay` a card gives its host) holds however X leaves play: destroyed, discarded, eliminated with its controller,
+// or returned to a hand or a deck. `before` and `after` are the state either side of one intent, the flag is read from `before` (its modifier ends with the card), and a won scenario loses nothing. A card removed from the game by a stage's own text is not
+// one that left play for a player's effect: stage 2A of Breaking of the Fellowship removes the Ring-bearer with The One Ring's text blank (families/breaking/index.ts removeRingBearer), so the removed zone never loses.
+export function loseWhenLeftPlay(before: ScenarioState, after: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
+  if (after.lost || after.stageCleared) return after;
+  for (const was of Object.values(before.cards)) {
+    const now = after.cards[was.id];
+    if (!inPlay(was.zone) || now === was || (now && (inPlay(now.zone) || now.zone === "removed"))) continue;
+    const printed = printedOf(cards, was.code);
+    if (printed.leavesPlayLoses || flagged(before, was.id, "lossOnLeavingPlay")) return markLoss(after, `${printed.name} left play`);
+  }
+  return after;
+}
+
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
-// owners' discard piles, and the enemies engaged with it return to the staging area with their damage. An attack on
-// that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
+// owners' discard piles (a player side quest in the staging area is one it controls, and goes to its owner's pile, not the encounter discard pile), and the enemies engaged with it
+// return to the staging area with their damage. An attack on that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
 // faq.first-player-elimination). Nothing is cleared once the game is lost. With `ctx`, an enemy that returns to the staging area queues "returnedToStaging" in a game whose records name it (146017:A:1).
 export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, ctx?: ReduceContext): ScenarioState {
   if (state.lost) return state;
@@ -34,7 +48,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     const seat = next.seats[index];
     if (!seat?.eliminated) continue;
     const controlled = Object.values(next.cards).filter(
-      (card) => !(heir != null && isGollum(card.code)) && card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging" && card.zone !== "questStage",
+      (card) => !(heir != null && isGollum(card.code)) && card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "questStage" && (card.zone !== "staging" || !fromEncounterDeck(printedOf(cards, card.code))),
     );
     const smeagol = heir == null ? undefined : Object.values(next.cards).find((card) => card.code === SMEAGOL && card.controller === index && card.zone === "play");
     if (controlled.length === 0 && seat.engaged.length === 0 && !smeagol) continue;

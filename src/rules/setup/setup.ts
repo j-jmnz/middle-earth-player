@@ -221,6 +221,8 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     );
     if (next.failure || next.lost) return next;
   }
+  // The quest card's Setup can deal a card that reads progress on a side quest (Lie Low, shuffled in by Into the Ettenmoors, 10064:A:1): the game notes it now.
+  next = markProgressNoted(next, ctx);
   if (next.questStage) next = timeOnReveal(updateCard(next, next.questStage, { face: "B" }), next.questStage, ctx);
   // A pool card's Setup that waited for a host the quest card's Setup puts into play, and the campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup), go down first, so they resolve after it.
   next = attachPending(next, ctx, steps);

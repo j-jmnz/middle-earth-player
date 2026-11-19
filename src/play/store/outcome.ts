@@ -20,6 +20,7 @@ import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scena
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { BACK_TITLE, TRAPPED_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
+import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).
@@ -339,12 +340,12 @@ function listed(ids: readonly string[], card: (cardId: string) => string): strin
 }
 
 /** The player's choice in words, for the banner after Undo ("Frodo Baggins committed to the quest"). `before` is the state the intent was sent in: a Commit sent while the first player was asked what to commit to a Sailing test is the test's. */
-export function intentWords(intent: PlayerIntent, card: (cardId: string) => string, before?: ScenarioState): string {
+export function intentWords(intent: PlayerIntent, card: (cardId: string) => string, before?: ScenarioState, into?: (cardId: string) => PlayInto): string {
   switch (intent.type) {
     case "Pass":
       return "Passed";
     case "PlayCard":
-      return intent.hostId ? `Played ${card(intent.cardId)} on ${card(intent.hostId)}` : `Played ${card(intent.cardId)}`;
+      return intent.hostId ? playWords(card(intent.cardId), hostName(card, intent.hostId), intent.hostId, into?.(intent.cardId), before?.seatCount ?? 1, true) : `Played ${card(intent.cardId)}`;
     case "Commit":
       return `${listed(intent.cardIds, card)} committed to the ${before && askingToCommit(before) ? "Sailing test" : "quest"}`;
     case "CommitHide":

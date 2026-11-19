@@ -24,8 +24,8 @@ const taken = (flag: (typeof COUNCIL)[number]) => ({ verb: "ModifyStat", stat: f
 // The first player chooses a player (rr.first-player): "The first player chooses a player to take control of ~."
 const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
 const encounterKeyword = (code: string, line: string, n: number): Effect => ({ id: `${code}:constant:${n}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "EncounterKeyword" }] });
-// Each side quest in the victory display.
-const SIDE_QUESTS_IN_VICTORY = { type: "card", control: "any", from: "victory", cardType: "player-side-quest" } as const;
+// Each side quest in the victory display, a player side quest or an encounter side quest (mec108.side-quests).
+const SIDE_QUESTS_IN_VICTORY = { type: "card", control: "any", from: "victory", sideQuest: true } as const;
 const SIDE_QUEST_IN_VICTORY = { kind: "count", pick: SIDE_QUESTS_IN_VICTORY, min: 1 } as const;
 // "Response: When/After this stage is defeated, ...": the side quest hears it from the victory display or its owner's discard pile.
 const defeated = { timing: "response", trigger: "questDefeated", subject: "self" } as const;
@@ -42,7 +42,7 @@ export const RECORDS: readonly Effect[] = [
       {
         verb: "ForEachPlayer",
         order: "firstFirst",
-        instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck" } }, { verb: "MovePicked", to: "hand" }, { verb: "ShuffleDeck" }],
+        instructions: [{ verb: "Choose", who: "actor", options: [{ id: "search", instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck" } }, { verb: "MovePicked", to: "hand" }] }, { id: "decline", instructions: [] }] }, { verb: "ShuffleDeck" }],
       },
     ],
   },
@@ -63,9 +63,8 @@ export const RECORDS: readonly Effect[] = [
   },
   // Double Back: "Response: When this stage is defeated, reduce each player's threat by 5."
   { id: "10034:response:1", cardCode: "10034", lines: ["10034:A:2"], ...defeated, instructions: [{ verb: "LowerThreat", amount: 5, who: "eachSeat" }] },
-  // Delay the Enemy: "Battle." (the characters committed to it quest with their Attack), "Response: When this stage is defeated, each
+  // Delay the Enemy: "Battle." (a keyword: the characters committed while it is the current quest count their Attack, hon.battle), "Response: When this stage is defeated, each
   // player may choose and discard a non-unique enemy engaged with him."
-  { id: "10058:constant:2", cardCode: "10058", lines: ["10058:A:1"], timing: "constant", instructions: [{ verb: "QuestsWith", stat: "attack" }] },
   {
     id: "10058:response:1",
     cardCode: "10058",
@@ -75,7 +74,7 @@ export const RECORDS: readonly Effect[] = [
       {
         verb: "ForEachPlayer",
         order: "firstFirst",
-        instructions: [{ verb: "Pick", pick: { type: "enemy", control: "you", engaged: "you", nonUnique: true } }, { verb: "Discard", target: { kind: "picked" } }],
+        instructions: [{ verb: "Choose", who: "actor", options: [{ id: "discard", requires: { kind: "canPick", pick: { type: "enemy", control: "you", engaged: "you", nonUnique: true } }, instructions: [{ verb: "Pick", pick: { type: "enemy", control: "you", engaged: "you", nonUnique: true } }, { verb: "Discard", target: { kind: "picked" } }] }, { id: "decline", instructions: [] }] }],
       },
     ],
   },
@@ -91,9 +90,7 @@ export const RECORDS: readonly Effect[] = [
         verb: "ForEachPlayer",
         order: "firstFirst",
         instructions: [
-          { verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 10, cardType: "ally", intoPlay: true } },
-          { verb: "MovePicked", to: "play" },
-          { verb: "ShuffleDeck", when: { kind: "matches", card: "picked", pick: { type: "ally", control: "you" } } },
+          { verb: "Choose", who: "actor", options: [{ id: "search", instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 10, cardType: "ally", intoPlay: true } }, { verb: "MovePicked", to: "play" }, { verb: "ShuffleDeck" }] }, { id: "decline", instructions: [] }] },
         ],
       },
     ],

@@ -56,9 +56,13 @@ export type { Focus };
 
 // The mechanic families' rules, in play order: where two runners could answer one verb, the first in this list does (docs/architecture.md, Mechanic families).
 // The order is the catalog list's (src/catalog/families/index.ts).
-export const RULES_FAMILIES: readonly RulesFamily[] = [
-  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian, smaug, erech,
-];
+let listed: readonly RulesFamily[] | null = null;
+// Built on first use, not when this module runs: a family reached first (a test that imports one) pulls in the core, which pulls in this file while that family is still loading, and a list built here would hold its manifest as undefined.
+export function rulesFamilies(): readonly RulesFamily[] {
+  return (listed ??= [
+    attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian, smaug, erech,
+  ]);
+}
 
 // The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle), in this order.
 // Every family with a hook for the phase is listed (settleHooks throws on one that is not). The order is the one the core's chain had when it called the families by name, and it is not the list's.
@@ -71,7 +75,7 @@ export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonl
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */
 export function runFamilyVerb(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
-  for (const family of RULES_FAMILIES) {
+  for (const family of rulesFamilies()) {
     const next = family.run(state, instruction, focus, ctx, steps);
     if (next) return next;
   }
@@ -79,4 +83,4 @@ export function runFamilyVerb(state: ScenarioState, instruction: Instruction, fo
 }
 
 // The core's hook calls (interpret/family-hooks.ts) walk these lists.
-registerFamilies(RULES_FAMILIES, SETTLE_ORDER);
+registerFamilies(rulesFamilies, SETTLE_ORDER);

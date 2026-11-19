@@ -12,8 +12,8 @@ import { copyLine, withCopies } from "./reprint.ts";
 const DAGNIR_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Dagnir"] };
 // Dagnir wherever he is in play: the holder of a lasting effect a side quest or a location gives him.
 const DAGNIR: PickSpec = { type: "card", control: "any", names: ["Dagnir"], engagedEnemies: true };
-// "the side quests in the victory display" and X, "1 more than" their number (19074, 19079, 19082).
-const SIDE_QUESTS_IN_VICTORY: PickSpec = { type: "card", control: "any", from: "victory", cardType: "encounter-side-quest" };
+// "the side quests in the victory display" and X, "1 more than" their number (19074, 19079, 19082): encounter and player side quests alike (emce.side-quests).
+const SIDE_QUESTS_IN_VICTORY: PickSpec = { type: "card", control: "any", from: "victory", sideQuest: true };
 const X = { count: SIDE_QUESTS_IN_VICTORY, plus: 1 };
 // "While at least 3 side quests are in the victory display": 2 is less than their number.
 const THREE_SIDE_QUESTS: Condition = { kind: "less", left: 2, right: { count: SIDE_QUESTS_IN_VICTORY } };

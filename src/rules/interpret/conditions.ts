@@ -7,7 +7,7 @@ import { islandHolds } from "../families/island/pick.ts";
 import { DIRE_VALOUR_SHIFT } from "../families/black-gate/dire.ts";
 import type { Condition } from "../../catalog/boundary.ts";
 
-import { resolveAmount, type AmountScope } from "./amounts.ts";
+import { hostOf, resolveAmount, type AmountScope } from "./amounts.ts";
 import { questSucceeded } from "../families/costs/pay.ts";
 import { discardedCost } from "../families/uncharted/cards.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
@@ -78,12 +78,11 @@ export type Scope = {
 
 // The card a `matches` condition reads.
 function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "matches" }>["card"], scope: Scope): string | null {
-  const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
   switch (card) {
     case "self":
       return scope.sourceId;
     case "host":
-      return source?.host ?? null;
+      return hostOf(state, scope.sourceId);
     case "subject":
       return scope.subject ?? null;
     case "other":
@@ -232,8 +231,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);
     }
     case "hostNamed": {
-      const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
-      const host = source?.host ? state.cards[source.host] : undefined;
+      const hostId = hostOf(state, scope.sourceId);
+      const host = hostId ? state.cards[hostId] : undefined;
       return host != null && printedOf(ctx.cards, host.code).name === condition.name;
     }
     case "subjectExplored": {
@@ -321,8 +320,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return questHasKeywords(state, ctx) === condition.is;
     // The attack family's conditions (families/attack/strike.ts, families/attack/events.ts).
     case "attacking": {
-      const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
-      const id = scope.holderId ?? (condition.card === "host" ? source?.host : condition.card === "subject" ? scope.subject : scope.sourceId);
+      const id = scope.holderId ?? (condition.card === "host" ? hostOf(state, scope.sourceId) : condition.card === "subject" ? scope.subject : scope.sourceId);
       return attackingHolds(state, condition, id ? state.cards[id] : undefined, ctx, scope.against);
     }
     case "engagedThisRound":
@@ -396,7 +394,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
         }) === condition.is
       );
     case "hostActive": {
-      const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
+      const host = hostOf(state, scope.sourceId);
       return host != null && (host === state.activeLocation || host === state.secondActiveLocation);
     }
     case "shadowBlank":
