@@ -1,9 +1,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../../rules/core/test-fixture.ts";
-import { printedOf } from "../../rules/core/printed.ts";
+import { printedFromCard, printedOf } from "../../rules/core/printed.ts";
 import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext } from "../../rules/engine/reduce.ts";
+import { loadCards } from "../../../scripts/data/load-cards.ts";
+import { tableFromLayout } from "../../../test/harness/layout.ts";
+import { moveCard } from "../../rules/core/zones.ts";
 import { nextIntent } from "../../../test/harness/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../../test/scenarios/a-shadow-of-the-past/game.ts";
 
@@ -243,5 +246,27 @@ describe("zoneSpeech", () => {
     expect(zoneSpeech("hand", 3, 0, duo.state)).toBe("Your hand, 3 cards");
     expect(zoneSpeech("hand", 3, 1, duo.state)).toBe("Player 2's hand, 3 cards");
     expect(zoneSpeech("engaged", 1, 1, duo.state)).toBe("Engaged with player 2, 1 enemy");
+  });
+
+  it("names the owner of a player side quest in the staging area at a table of two seats", () => {
+    const t = tableFromLayout("passage-through-mirkwood", { phase: "Planning", heroResources: 3, hand: ["09014"] });
+    const sideQuest = loadCards().find((card) => card.code === "09014");
+    if (sideQuest) t.cards.set("09014", printedFromCard(sideQuest));
+    const sctx = t.ctx;
+    const base = { state: t.state, id: Object.values(t.state.cards).find((card) => card.code === "09014")?.id ?? "" };
+    const placed = updateCard(moveCard({ ...base.state, seatCount: 2 }, base.id, { zone: "staging", area: 1 }), base.id, { controller: 1, face: "up" });
+    const deps: CardSpeechDeps = {
+      nameOf: (key) => printedOf(sctx.cards, pictureCode(key)).name,
+      inactive: () => false,
+      facts: { typeOf: (code) => sctx.cards.get(code)?.type ?? null, shipRank: () => null },
+      info: (game, seat, cardId) => slotNumbers(game, sctx, cardId, seat),
+      highlight: NO_HIGHLIGHT,
+      cards: sctx.cards,
+      sheet: windowSheet(placed, sctx, legalIntents(placed, sctx), names),
+      peeking: true,
+    };
+    expect(cardSpeech(placed, 0, base.id, deps).label).toContain("controlled by player 2");
+    expect(cardSpeech(placed, 1, base.id, deps).label).toContain("controlled by player 2");
+    expect(cardSpeech({ ...placed, seatCount: 1 }, 0, base.id, deps).label).not.toContain("controlled by");
   });
 });
