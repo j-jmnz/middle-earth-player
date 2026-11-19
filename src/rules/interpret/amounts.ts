@@ -72,7 +72,7 @@ export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope):
     case "self":
       return scope.sourceId;
     case "host":
-      return hostOf(state, scope.sourceId) ?? scope.host ?? null;
+      return hostOf(state, scope.sourceId);
     case "picked":
       return scope.picked?.at(-1) || null;
     case "subject":

@@ -30,9 +30,10 @@ export function giveControl(state: ScenarioState, id: string, seat: number, card
   if (!card || !inPlay(card.zone) || card.controller == null || card.controller === seat || state.seats[seat]?.eliminated) return state;
   if (card.zone !== "heroes" && card.zone !== "play") return state;
   const moving = [id, ...card.attachments.filter((other) => state.cards[other]?.zone === "play")];
-  const owners = new Map(moving.map((other): [string, number] => {
+  // The owner a moved card keeps: none for the scenario's card, so `updateCard` clears the field.
+  const owners = new Map(moving.map((other): [string, number | undefined] => {
     const held = state.cards[other];
-    return [other, !held || scenarioOwned(printedOf(cards, held.code)) ? seat : (held.owner ?? held.controller ?? seat)];
+    return [other, !held || scenarioOwned(printedOf(cards, held.code)) ? undefined : (held.owner ?? held.controller ?? undefined)];
   }));
   let next = moveCard(state, id, { zone: card.zone, seat });
   if (card.host) next = attachTo(next, id, card.host);
