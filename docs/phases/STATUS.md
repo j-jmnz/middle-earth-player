@@ -25,6 +25,12 @@ No phase is open.
 
 ### Readings (not user-confirmed)
 - Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
+- A claimed treasure is not an attachment for card effects (`recommended`, docs/brief.md, Ered Mithrin).
+- A played player side quest goes to the staging area: The Lost Realm text read from a transcription; no official PDF is pinned in data/sources.json (docs/brief.md).
+- East Road Ranger 10008:A:1: "committed to a side quest" means committed while a side quest is the current quest (`recommended`).
+
+### Engine code
+- The leave-play loss is checked in loseWhenLeftPlay and still in destroyCard and releaseAttachments: foresight.ts reads `lost` from the latter two, so they stay until foresight uses loseWhenLeftPlay.
 
 ### Cards tab views
 - `pnpm data sync pictures` has not run since every card got a picture check: Google Drive's quota refused it (2026-11-18). Re-run it, then check that no pin moved to a smaller picture.
