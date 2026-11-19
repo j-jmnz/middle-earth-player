@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 
 import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
+import { legalTargets } from "../../engine/reduce.ts";
+import { rejectionReason } from "../../engine/legal.ts";
 import { settle } from "../../engine/machine.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { setCurrentQuest } from "./quest.ts";
@@ -133,5 +135,15 @@ describe("Stalwart", () => {
     const played = send({ state: action.state, steps: [] }, { type: "PlayCard", cardId: dropped.id, payments: [], hostId: hero }, t.ctx);
     expect(played.state.cards[dropped.id]?.host).toBe(hero);
     expect(played.state.modifiers.some((modifier) => modifier.stat === "attachmentFromDiscard")).toBe(false);
+  });
+
+  it("10165:A:4 offers only the hero the permission belongs to as a host, and every host offered is accepted", () => {
+    const t = built({ phase: "Planning", attached: [{ code: "10165", to: "dh1" }] });
+    const hero = idOf(t.state, "dh1");
+    const dropped = spawn(t.state, "attachment", { zone: "discard", seat: 0 });
+    const action = resolveRecords(dropped.state, t.ctx, "10165", "action", idOf(dropped.state, "10165"), undefined, false);
+    const targets = legalTargets(action.state, { type: "PlayCard", cardId: dropped.id }, t.ctx);
+    expect(targets).toEqual([hero]);
+    for (const hostId of targets) expect(rejectionReason(action.state, { type: "PlayCard", cardId: dropped.id, payments: [], hostId }, t.ctx)).toBeNull();
   });
 });

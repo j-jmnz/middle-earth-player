@@ -15,6 +15,8 @@ import { cardSize, HAND_SHOW, handCardSize, tableLayout } from "../layout/layout
 import { hitSlot } from "../layout/hits.ts";
 import { inspectTargets, onTableFor, pileSelector, PILES, threatSelector, zoneSelector, type PileId, type PileView, type ZoneId } from "./selectors.ts";
 import { draggableIds, dropOutcome, dropRects, dropTargets, targetFromKey, targetKey } from "./selection.ts";
+import { intentWords } from "./outcome.ts";
+import { playSheet } from "../choice/bar-sheets.ts";
 import { createTableStore, nextRoundSteps } from "./store.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { attachmentCtx, put as putCard, seat as seatTable } from "../../rules/families/attachments/fixture.ts";
@@ -170,6 +172,17 @@ describe("drops", () => {
     const legal = legalIntents(trap.state, trapCtx);
     expect(dropTargets(trap.state, trapCtx, legal, trap.id)).toEqual([{ kind: "zone", zone: "play" }]);
     expect(dropOutcome(trap.state, trapCtx, legal, trap.id, { kind: "zone", zone: "play" })).toEqual({ kind: "play", cardId: trap.id, hostId: "seat:0" });
+  });
+
+  it("a host that is not a card is named in words: the confirm sheet and the Undo banner (Sting on the staging area, a Trap in your play area)", () => {
+    const sctx = attachmentCtx(EFFECTS);
+    const sting = putCard(seatTable().state, "19117", "hand");
+    const names = { card: (id: string) => (id === sting.id ? "Sting" : id), line: () => null };
+    const legal = legalIntents(sting.state, sctx);
+    expect(dropOutcome(sting.state, sctx, legal, sting.id, { kind: "zone", zone: "staging" })).toEqual({ kind: "play", cardId: sting.id, hostId: "staging" });
+    expect(playSheet(sting.state, sctx, legal, names, sting.id, "staging")?.title).toBe("Attach Sting to the staging area");
+    expect(intentWords({ type: "PlayCard", cardId: sting.id, payments: [], hostId: "staging" }, names.card)).toBe("Played Sting on the staging area");
+    expect(intentWords({ type: "PlayCard", cardId: sting.id, payments: [], hostId: "seat:0" }, names.card)).toBe("Played Sting on Player 1");
   });
 
   it("a character dropped on the quest stage joins the commit being built, not the quest", () => {
