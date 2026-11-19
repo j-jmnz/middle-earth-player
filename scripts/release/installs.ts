@@ -5,8 +5,8 @@ import { fileURLToPath } from "node:url";
 import { requiredFlag as flag } from "../args.ts";
 import { runScript, type Log } from "../log.ts";
 
-// The README's installs badge (docs/releasing.md, Jobs): the download count of every installer on every release, written as a
-// shields.io endpoint file that the release workflow puts on the `stats` branch after each release. Only the files a player
+// The README's installs badge (docs/releasing.md, Installs count): the download count of every installer on every release, written as a
+// shields.io endpoint file that .github/scripts/publish-installs.sh puts on the `stats` branch. Only the files a player
 // installs count: the APK, the IPA and the desktop installers and zip. The `.sha256` files, `source.json` (SideStore and
 // AltStore fetch it on every update check) and the certificate fingerprint do not.
 // Usage: gh api --paginate --slurp repos/<owner>/<repo>/releases > releases.json

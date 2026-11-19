@@ -244,16 +244,17 @@ Read the sections your task touches.
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
   - 82–133 Commands (~2.0K) ← 4
-- `docs/releasing.md` — Releasing (~4.6K tok)
+- `docs/releasing.md` — Releasing (~4.7K tok)
   - 5–19 Start a release (~290) ← 1
-  - 20–35 Jobs (~2.0K) ← 6
-  - 36–60 Caches (~760)
-  - 61–95 Signing (~980) ← 2
-    - 65–68 Desktop signing (optional) (~220) ← 1
-    - 69–82 Android key (~250) ← 1
-    - 83–95 TestFlight (optional) (~420) ← 1
-  - 96–99 Installing (~90)
-  - 100–110 Troubleshooting (~390)
+  - 20–35 Jobs (~1.9K) ← 4
+  - 36–39 Installs count (~180) ← 2
+  - 40–64 Caches (~760)
+  - 65–99 Signing (~980) ← 2
+    - 69–72 Desktop signing (optional) (~220) ← 1
+    - 73–86 Android key (~250) ← 1
+    - 87–99 TestFlight (optional) (~420) ← 1
+  - 100–103 Installing (~90)
+  - 104–114 Troubleshooting (~390)
 
 ## Agent procedures
 
@@ -347,7 +348,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/game`: development.md, Reading a game as text (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
-- `scripts/release`: releasing.md, Jobs (4); .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Branches (1)
+- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Installs count (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/showcase`: design-system.md, Color (1)
 - `scripts/tools`: .claude/rules/code-standards.md, Test cost (4); agents/agent-brief.md, Scenario procedure (4); architecture.md, Modules (1); design-system-table.md, Choice tray (1); development.md, Commands (1)
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (32); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (5); brief.md, The Battle of Lake-town (3); brief.md, The Old Forest (3); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); brief.md, Fog on the Barrow-downs (2); brief.md, The Stone of Erech (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)

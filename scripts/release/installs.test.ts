@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { badgeOf, installsOf, shortCount } from "./installs.ts";
 
-describe("the README's installs badge (docs/releasing.md, Jobs)", () => {
+describe("the README's installs badge (docs/releasing.md, Installs count)", () => {
   const asset = (name: string, download_count: number) => ({ name, download_count });
 
   it("counts the installers of every release and every page, and nothing else", () => {
