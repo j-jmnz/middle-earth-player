@@ -110,37 +110,40 @@ export const MOTION = {
   toastIn: tween(160, null),
   toastOut: tween(120, null),
   // The combat spotlight, one attack (docs/design-system-table.md, Spotlight): the dark comes in and the cards arc to the center
-  // (enter), the attack value and the gauge pop and a shadow card flips (read), the attacker draws back and glows (charge), strikes (lunge),
-  // everything holds at the hit (stop), the target takes it (impact, with burstStep and burstFly inside it), the cards and the
-  // result stay (hold) and both go back (return). A destroyed target burns inside the return (burn). The eight beats add up to `spotlight`.
-  spotlightEnter: tween(350, "outCubic"),
+  // (enter), the attack value, the gauge and the matchup line pop and a shadow card flips (read), the attacker draws back and glows
+  // (charge), strikes (lunge), everything holds at the hit (stop), the target takes the hit (impact), the gauge counts it one step at a
+  // time (count, with shieldStep, burstStep and burstFly inside it), the cards and the result stay (hold) and both go back (return). A
+  // destroyed target burns inside the return (burn). The nine beats add up to `spotlight` (hit, then count: user decision, 2026-11-19).
+  spotlightEnter: tween(300, "outCubic"),
   spotlightRead: tween(300, "outCubic"),
-  spotlightCharge: tween(350, "outQuad"),
+  spotlightCharge: tween(250, "outQuad"),
   spotlightLunge: tween(120, "inCubic"),
   spotlightStop: tween(100, null),
-  spotlightImpact: tween(480, "linear"),
-  // After the impact the cards, the gauge and the result stay so they can be read (user request, 2026-10-30).
-  spotlightHold: tween(1000, null),
+  spotlightImpact: tween(280, "linear"),
+  spotlightCount: tween(800, "linear"),
+  // After the count the cards, the gauge and the result stay so they can be read (user request, 2026-10-30).
+  spotlightHold: tween(550, null),
   spotlightReturn: tween(500, "inCubic"),
   spotlightBurn: tween(450, "inQuad"),
   // Several attacks in one state: the dark is already in, so the second and later attacks come in over a swap (no flight from the
-  // slots) with a shorter read and charge, and only the last goes back. Swap, readAgain, chargeAgain, lunge, stop, impact and
-  // hold add up to `SPOTLIGHT_AGAIN`.
+  // slots) with a shorter read and charge, and only the last goes back. Swap, readAgain, chargeAgain, lunge, stop, impact, count
+  // and hold add up to `SPOTLIGHT_AGAIN`.
   spotlightSwap: tween(200, "outCubic"),
   spotlightReadAgain: tween(100, "outCubic"),
   spotlightChargeAgain: tween(200, "outQuad"),
-  // Inside the impact: the flash and the shockwave ring, the sparks and the trauma shake, the damage number's rise and settle, the
-  // damage tokens' step and flight, the result word and the attacker's recoil, the shadow card's flip and glint, and the gap between
-  // the afterimages of the lunge.
+  // Inside the impact: the flash and the shockwave ring, the sparks and the trauma shake and the attacker's recoil. Inside the count:
+  // the gap between two breaking shields, the damage tokens' step and flight, the gauge coming forward (focus), and the result's
+  // pop, rise and settle. Then the shadow card's flip and glint, and the gap between the afterimages of the lunge.
   spotlightFlash: tween(160, "outQuad"),
   spotlightRing: tween(360, "outCubic"),
   spotlightSparks: tween(450, "outCubic"),
   spotlightShake: tween(420, "linear"),
-  spotlightNumberRise: tween(140, "outCubic"),
-  spotlightNumberSettle: spring(260, 0.5),
-  spotlightBurstStep: tween(90, null),
+  spotlightResultRise: tween(140, "outCubic"),
+  spotlightResultSettle: spring(260, 0.5),
+  spotlightShieldStep: tween(130, null),
+  spotlightBurstStep: tween(150, null),
   spotlightBurstFly: tween(220, "outCubic"),
-  spotlightResult: tween(160, "outCubic"),
+  spotlightFocus: tween(150, "outCubic"),
   spotlightRecoil: spring(320, 0.5),
   spotlightFlip: tween(300, "outCubic"),
   spotlightGlint: tween(260, "linear"),
@@ -170,15 +173,15 @@ export const MOTION = {
   splashFade: tween(380, "inQuad"),
 } as const;
 
-/** The eight beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
-export const SPOTLIGHT_BEATS = ["spotlightEnter", "spotlightRead", "spotlightCharge", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightHold", "spotlightReturn"] as const;
+/** The nine beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
+export const SPOTLIGHT_BEATS = ["spotlightEnter", "spotlightRead", "spotlightCharge", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightCount", "spotlightHold", "spotlightReturn"] as const;
 
 /** The beats of an attack that follows another in the same state, which add up to `SPOTLIGHT_AGAIN` (ms, unscaled): it swaps in, and does not go back unless it is the last. */
-export const SPOTLIGHT_AGAIN_BEATS = ["spotlightSwap", "spotlightReadAgain", "spotlightChargeAgain", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightHold"] as const;
-export const SPOTLIGHT_AGAIN = 2200;
+export const SPOTLIGHT_AGAIN_BEATS = ["spotlightSwap", "spotlightReadAgain", "spotlightChargeAgain", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightCount", "spotlightHold"] as const;
+export const SPOTLIGHT_AGAIN = 2350;
 
-/** The tokens that may pass 500 ms (a title sweep across the canvas, the combat spotlight's hold and its whole run, phase 24, the life of its ash, and half of the splash ring's breath, which loops and holds nothing up). */
-export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightHold", "spotlightAsh", "splashBreath"];
+/** The tokens that may pass 500 ms (a title sweep across the canvas, the combat spotlight's hold, its count and its whole run, phase 24, the life of its ash, and half of the splash ring's breath, which loops and holds nothing up). */
+export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightHold", "spotlightCount", "spotlightAsh", "splashBreath"];
 
 /** The longest a token runs, apart from LONG_TOKENS. */
 export const MAX_TOKEN_MS = 500;

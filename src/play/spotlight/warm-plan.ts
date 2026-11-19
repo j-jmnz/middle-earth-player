@@ -5,6 +5,7 @@
 // blocked. The cards carry the code `WARM_CODE`, which the layer maps to a card back. Pure, so a test reads it.
 import type { Clash } from "../store/clash.ts";
 import { spotlightSpan } from "./beats.ts";
+import { gaugeOf } from "./gauge.ts";
 import type { ClashPlan, SpotCard, SpotlightPlan } from "./plan.ts";
 import { SPOT } from "./shape.ts";
 import { stageOf, type StageArea } from "./stage.ts";
@@ -21,6 +22,8 @@ function clashOf(area: StageArea, index: number, total: number, clash: Clash): C
   const attackers = clash.attackers.slice(0, SPOT.fan).map((id) => spot(id, area));
   const shadow = clash.shadow ? spot(clash.shadow, area) : null;
   const before = 0;
+  const stage = stageOf(area, CARD, clash.attackers.length, shadow != null);
+  const gauge = gaugeOf(stage.gauge, { attack: clash.attack, defense: clash.defense, hitPoints: clash.hitPoints, undefended: clash.undefended, before, damage: clash.damage });
   return {
     clash,
     enemyAttack: index % 2 === 0,
@@ -28,11 +31,12 @@ function clashOf(area: StageArea, index: number, total: number, clash: Clash): C
     more: clash.attackers.length - attackers.length,
     target: spot(clash.target, area),
     shadow,
-    stage: stageOf(area, CARD, clash.attackers.length, shadow != null),
-    shape: { damage: clash.damage, destroyed: clash.destroyed, shadow: shadow != null, first: index === 0, last: index === total - 1 },
+    stage,
+    shape: { damage: clash.damage, destroyed: clash.destroyed, shadow: shadow != null, first: index === 0, last: index === total - 1, steps: gauge.steps },
     seed: index,
     before,
     after: before + clash.damage,
+    gauge,
   };
 }
 

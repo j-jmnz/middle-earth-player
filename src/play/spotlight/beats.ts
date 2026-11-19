@@ -5,23 +5,26 @@
 // shape of each effect. `t` is ms since the attack's run began and `k` the motion scale (Quick 0.6), so every length passes
 // through the scale: a gate or a timer is not in here.
 //
-// One attack, at Normal (ms), when it is the only one (or the first of several, then without the last row):
+// One attack, at Normal (ms), when it is the only one (or the first of several, then without the last row). The hit comes first and
+// the count after it, one change at a time (user decision, 2026-11-19):
 //   0    enter   the dark comes in, the cards arc from their slots to the center and overshoot, the black fog rolls in
-//   350  read    the attack value and the gauge pop in; a turned shadow card flips in 3D with a glint
-//   650  charge  the attacker draws back and tilts, a rim glow builds, embers converge, the camera pushes in
-//   1000 lunge   a fast strike with three fading afterimages
-//   1120 stop    hit stop: everything holds; the flash peaks and the impact haptic plays
-//   1220 impact  ring, sparks, shake, knock-back and tint, the damage number and the tokens (each lights a heart of the gauge as it
-//                lands, and the result word follows the last); or deflection, recoil, the shields that held and "Blocked"
-//   1700 hold    the cards, the gauge and the result stay so they can be read
+//   300  read    the attack value, the gauge and the matchup line pop in; a turned shadow card flips in 3D with a glint
+//   600  charge  the attacker draws back and tilts, a rim glow builds, embers converge, the camera pushes in
+//   850  lunge   a fast strike with three fading afterimages; the matchup line fades
+//   970  stop    hit stop: everything holds; the flash peaks and the impact haptic plays
+//   1070 impact  ring, sparks, shake, knock-back and tint; or deflection and recoil
+//   1350 count   the cards dim and the gauge comes forward; the shields the attack reaches break one by one, then the points a card
+//                effect took away, then the damage tokens fly one by one, each lighting its heart as it lands (a light haptic each);
+//                the result follows the last (or the shields that held flare, and "Blocked")
+//   2150 hold    the cards, the gauge and the result stay so they can be read
 //   2700 return  both go back and the dark lifts; a destroyed target burns instead, with ash
 //   3200
-// A kill holds longer (a boss stop): 160 ms, the extra 60 taken from the impact, so the return and the run keep their times.
+// A kill holds longer (a boss stop): 160 ms, the extra 60 taken from the impact, so the count, the return and the run keep their times.
 // Several attacks in one state play under one dark: the second and later swap in over 200 ms (no flight from the slots, a read of
-// 100 ms and a charge of 200), the one before them fades out in the same 200 ms, and only the last goes back. Three attacks run 7600 ms.
+// 100 ms and a charge of 200), the one before them fades out in the same 200 ms, and only the last goes back. Three attacks run 7900 ms.
 import { clamp01, ease, length, popScale, springStep, scaledSpring } from "../motion/curves.ts";
 import { MOTION, type Tween } from "../../ui/motion-tokens.ts";
-import { cameraPush, flashAt, numberAt, ringAt, shakeAt, traumaStart } from "./fx.ts";
+import { cameraPush, flashAt, resultPop, ringAt, shakeAt, traumaStart } from "./fx.ts";
 import { SPOT } from "./shape.ts";
 import { tokenPopScale } from "../motion/token-fx.ts";
 
@@ -35,8 +38,12 @@ function curve(token: Tween, x: number): number {
   return ease(token.easing ?? "linear", x);
 }
 
-/** Where an attack stands among the attacks of its state: the first enters, the last goes back. A kill (`destroyed`) holds longer at the hit. */
-export type Place = { first: boolean; last: boolean; destroyed?: boolean };
+/**
+ * Where an attack stands among the attacks of its state: the first enters, the last goes back. A kill (`destroyed`) holds longer at
+ * the hit. `steps` is how many marks the count breaks before the tokens fly: the shields the attack reaches and the points a card
+ * effect took away (spotlight/gauge.ts, stepsOf).
+ */
+export type Place = { first: boolean; last: boolean; destroyed?: boolean; steps?: number };
 
 /** How long the impact lasts at a scale: the token's, less the extra hit stop of a kill. */
 function impactLength(k: number, destroyed: boolean): number {
@@ -49,7 +56,7 @@ function impactLength(k: number, destroyed: boolean): number {
  * The beats of one attack at a scale: each one's length and where it starts, in ms. `intro` is the first attack's enter or a later
  * one's swap, `ret` is 0 unless it is the last, `end` is the attack's own length, and `exit` is how long it fades out into the next attack.
  */
-export type Beats = { intro: number; read: number; charge: number; lunge: number; stop: number; impact: number; hold: number; ret: number; readAt: number; chargeAt: number; lungeAt: number; stopAt: number; impactAt: number; retAt: number; end: number; exit: number };
+export type Beats = { intro: number; read: number; charge: number; lunge: number; stop: number; impact: number; count: number; hold: number; ret: number; readAt: number; chargeAt: number; lungeAt: number; stopAt: number; impactAt: number; countAt: number; holdAt: number; retAt: number; end: number; exit: number };
 
 export function beatsAt(k: number, place: Place = { first: true, last: true }): Beats {
   "worklet";
@@ -59,6 +66,7 @@ export function beatsAt(k: number, place: Place = { first: true, last: true }): 
   const lunge = length(MOTION.spotlightLunge, k);
   const stop = length(place.destroyed ? MOTION.spotlightStopKill : MOTION.spotlightStop, k);
   const impact = impactLength(k, place.destroyed === true);
+  const count = length(MOTION.spotlightCount, k);
   const hold = length(MOTION.spotlightHold, k);
   const ret = place.last ? length(MOTION.spotlightReturn, k) : 0;
   const readAt = intro;
@@ -66,8 +74,10 @@ export function beatsAt(k: number, place: Place = { first: true, last: true }): 
   const lungeAt = chargeAt + charge;
   const stopAt = lungeAt + lunge;
   const impactAt = stopAt + stop;
-  const retAt = impactAt + impact + hold;
-  return { intro, read, charge, lunge, stop, impact, hold, ret, readAt, chargeAt, lungeAt, stopAt, impactAt, retAt, end: retAt + ret, exit: place.last ? 0 : length(MOTION.spotlightSwap, k) };
+  const countAt = impactAt + impact;
+  const holdAt = countAt + count;
+  const retAt = holdAt + hold;
+  return { intro, read, charge, lunge, stop, impact, count, hold, ret, readAt, chargeAt, lungeAt, stopAt, impactAt, countAt, holdAt, retAt, end: retAt + ret, exit: place.last ? 0 : length(MOTION.spotlightSwap, k) };
 }
 
 function placeOf(index: number, count: number): Place {
@@ -83,7 +93,7 @@ export function runStart(index: number, count: number, k: number): number {
   return at;
 }
 
-/** How long `count` attacks run one after another at a scale, in ms: a lone attack is 3200 at Normal, each later one 2200, and the last of them also goes back. */
+/** How long `count` attacks run one after another at a scale, in ms: a lone attack is 3200 at Normal, each later one 2350, and the last of them also goes back. */
 export function spotlightRun(count: number, k: number): number {
   return Math.ceil(runStart(count - 1, count, k) + beatsAt(k, placeOf(count - 1, count)).end);
 }
@@ -105,13 +115,27 @@ export function hitTime(index: number, count: number, k: number): number {
   return runStart(index, count, k) + beatsAt(k, placeOf(index, count)).stopAt;
 }
 
+/**
+ * The ms, from the start of the whole run at a scale, at which each damage token of the attacks lands in its target's corner (a light
+ * haptic each): at most `SPOT.embers` an attack, as many as light hearts' sparks.
+ */
+export function landTimes(shapes: readonly ClashShape[], k: number): number[] {
+  return shapes.flatMap((shape, index) => {
+    const start = runStart(index, shapes.length, k);
+    return Array.from({ length: Math.min(shape.damage, SPOT.embers) }, (_, token) => start + tokenLandAt(token, shape.damage, k, shape));
+  });
+}
+
 /** The ms at which the last attack begins to go back. */
 export function leaveTime(count: number, k: number): number {
   return runStart(count - 1, count, k) + beatsAt(k, placeOf(count - 1, count)).retAt;
 }
 
-/** What one attack needs to know to be drawn: the damage placed, whether the target is destroyed, a turned shadow card, and its place among the attacks. */
-export type ClashShape = { damage: number; destroyed: boolean; shadow: boolean; first: boolean; last: boolean };
+/**
+ * What one attack needs to know to be drawn: the damage placed, whether the target is destroyed, a turned shadow card, its place
+ * among the attacks, and the marks the count breaks before the tokens fly (`steps`, spotlight/gauge.ts, stepsOf; 0 when absent).
+ */
+export type ClashShape = { damage: number; destroyed: boolean; shadow: boolean; first: boolean; last: boolean; steps?: number };
 
 /**
  * The pose of one attack at a time. Lengths here are shares (of a stroke, a card, the burn) or logical points (the shake), never
@@ -129,8 +153,10 @@ export type Frame = {
   // The scale of the attack value and of the gauge: they pop in; the shields that held a blocked attack bounce (`badgeD` is theirs).
   badgeA: number;
   badgeD: number;
-  // The attack has struck (from the impact on): the gauge shows the shields it broke.
-  struck: boolean;
+  // The matchup line between the cards (0..1): in over the read, out over the lunge.
+  matchup: number;
+  // The count's focus (0..1): the cards dim and the gauge comes forward, in at the count and out into the hold.
+  focus: number;
   // The attacker's pose, as `strikeOffset` reads it: how far it has drawn back (0..1), how far it has lunged (0..1), and how far
   // the block threw it back (0..1, a spring); and its tilt in radians.
   back: number;
@@ -158,11 +184,9 @@ export type Frame = {
   shakeX: number;
   shakeY: number;
   shakeTurn: number;
-  // The damage number: its scale, opacity, and how far it has drifted up (0..1).
-  number: { scale: number; alpha: number; rise: number };
-  // The caption's result word ("1 damage", "Blocked", "Destroyed"; 0..1, spotlight/fx.ts, resultLook): it comes in at the impact
-  // when the attack was blocked, else as the last damage token lands.
-  result: number;
+  // The result in the middle of the stage ("−1", "Blocked", "Destroyed"): its pop and opacity (spotlight/fx.ts, resultPop). It comes in
+  // as the last damage token lands, or after the last shield breaks when the attack was blocked.
+  result: { scale: number; alpha: number };
   // The shadow card's flip about its vertical axis (0 the back, pi the face) and the glint's sweep across it (0..1, 0 when off).
   flipAngle: number;
   glint: number;
@@ -173,30 +197,64 @@ export type Frame = {
   pop: number;
 };
 
-/** The ms between two damage tokens leaving the point of contact at a scale: 90, less when many would not land by the end of the impact (shorter on a kill). */
-export function burstGap(count: number, k: number, destroyed = false): number {
+/** The ms between two marks the count breaks at a scale: 130, less when many would not break within 0.4 of the count. */
+export function stepGap(steps: number, k: number): number {
+  "worklet";
+  if (steps < 2) return 0;
+  return Math.min(length(MOTION.spotlightShieldStep, k), (0.4 * length(MOTION.spotlightCount, k)) / (steps - 1));
+}
+
+/** How long the breaking takes from the count's start, ms at a scale: until a step after the last mark breaks; 0 with none. */
+function stepsLength(steps: number, k: number): number {
+  "worklet";
+  return steps > 0 ? (steps - 1) * stepGap(steps, k) + length(MOTION.spotlightShieldStep, k) : 0;
+}
+
+/**
+ * The ms between two damage tokens leaving the point of contact at a scale: 150, less when many would not land before the count's
+ * last step (`steps` marks break first). Never under 1 ms.
+ */
+export function burstGap(count: number, k: number, steps = 0): number {
   "worklet";
   if (count < 2) return 0;
-  return Math.max(1, Math.min(length(MOTION.spotlightBurstStep, k), (impactLength(k, destroyed) - length(MOTION.spotlightBurstFly, k)) / (count - 1)));
+  const room = length(MOTION.spotlightCount, k) - length(MOTION.spotlightShieldStep, k) - stepsLength(steps, k) - length(MOTION.spotlightBurstFly, k);
+  return Math.max(1, Math.min(length(MOTION.spotlightBurstStep, k), room / (count - 1)));
 }
 
-// When damage token `index` of `count` lands, ms into the attack. Declared before the worklets that call it: the worklet transform
-// makes each one a constant that captures what it calls, so a callee declared later is not there yet.
-function tokenLandOf(index: number, count: number, destroyed: boolean, b: Beats, k: number): number {
+// When damage token `index` of `count` leaves the point of contact, ms into the attack. Declared before the worklets that call it: the
+// worklet transform makes each one a constant that captures what it calls, so a callee declared later is not there yet.
+function tokenStartOf(index: number, count: number, steps: number, b: Beats, k: number): number {
   "worklet";
-  return b.impactAt + index * burstGap(count, k, destroyed) + length(MOTION.spotlightBurstFly, k);
+  return b.countAt + stepsLength(steps, k) + index * burstGap(count, k, steps);
 }
 
-/** When the last damage token lands, ms into the attack; 0 when there is no damage. */
-function landAt(damage: number, destroyed: boolean, b: Beats, k: number): number {
+function tokenLandOf(index: number, count: number, steps: number, b: Beats, k: number): number {
   "worklet";
-  return damage > 0 ? tokenLandOf(damage - 1, damage, destroyed, b, k) : 0;
+  return tokenStartOf(index, count, steps, b, k) + length(MOTION.spotlightBurstFly, k);
+}
+
+/** When mark `index` of `steps` breaks in the count (a shield the attack reaches, then a point a card effect took away), ms into its attack. */
+export function stepAt(index: number, steps: number, k: number, place: Place = { first: true, last: true }): number {
+  "worklet";
+  return beatsAt(k, place).countAt + index * stepGap(steps, k);
+}
+
+/** When the shields that held a blocked attack flare, ms into its attack: a step after the last mark broke. */
+export function heldAt(k: number, place: Place = { first: true, last: true }): number {
+  "worklet";
+  return beatsAt(k, place).countAt + stepsLength(place.steps ?? 0, k);
 }
 
 /** When damage token `index` of `count` lands in the target's corner, ms into its attack at a scale: the gauge lights its heart then. */
 export function tokenLandAt(index: number, count: number, k: number, place: Place = { first: true, last: true }): number {
   "worklet";
-  return tokenLandOf(index, count, place.destroyed === true, beatsAt(k, place), k);
+  return tokenLandOf(index, count, place.steps ?? 0, beatsAt(k, place), k);
+}
+
+/** When the last damage token lands, ms into the attack; 0 when there is no damage. */
+function landAt(damage: number, steps: number, b: Beats, k: number): number {
+  "worklet";
+  return damage > 0 ? tokenLandOf(damage - 1, damage, steps, b, k) : 0;
 }
 
 // A spring kick `hit` ms after the impact: 0 before it, a short ramp to the peak, then back to 0 on the recoil spring.
@@ -223,7 +281,10 @@ export function frameAt(shape: ClashShape, t: number, k: number, seed = 0): Fram
   // What goes with the cards as they go back: the attack value, the gauge, the number and the result fade out over the first half of the return.
   const halfOut = goes ? 1 - clamp01((t - b.retAt) / (b.ret / 2)) : 1;
 
-  const bounce = blocked && hit > 0 ? popScale(hit, k, SPOT.bounce, MOTION.spotlightNumberRise, 0, MOTION.spotlightNumberSettle) : 1;
+  const steps = shape.steps ?? 0;
+  const held = b.countAt + stepsLength(steps, k);
+  const flare = t - held;
+  const bounce = blocked && flare > 0 ? popScale(flare, k, SPOT.bounce, MOTION.spotlightResultRise, 0, MOTION.spotlightResultSettle) : 1;
   const badgeA = Math.max(0, ease("outBack", (t - b.readAt) / b.read)) * halfOut;
   const badgeD = badgeA * bounce;
 
@@ -241,20 +302,27 @@ export function frameAt(shape: ClashShape, t: number, k: number, seed = 0): Fram
   // The clocks of the feet bank's fog and the charge hold through the hit stop and carry on from where they stood.
   const running = t - clamp01((t - b.stopAt) / b.stop) * b.stop;
   const shaken = shakeAt(traumaStart(shape.damage, shape.destroyed), hit, k, seed);
-  const num = shape.damage > 0 ? numberAt(hit, k) : { scale: 0, alpha: 0, rise: 0 };
+
   // A destroyed target burns for the burn token on the last attack; on an earlier one it burns as fast as the next attack swaps in.
   const burnLength = shape.last ? length(MOTION.spotlightBurn, k) : b.exit;
-  const lands = landAt(shape.damage, shape.destroyed, b, k);
+  const lands = landAt(shape.damage, steps, b, k);
   const landed = shape.damage > 0 && t >= lands;
-  const firstLand = shape.damage > 0 ? tokenLandOf(0, shape.damage, shape.destroyed, b, k) : -1;
-  const resultAt = blocked ? hit : t - lands;
+  const firstLand = shape.damage > 0 ? tokenLandOf(0, shape.damage, steps, b, k) : -1;
+  // The result comes in as the last token lands, or as the shields that held flare; it fades with the rest over the return.
+  const shownResult = resultPop(blocked ? flare : t - lands, k);
+  // The matchup line: in over the read, out over the lunge.
+  const matchup = clamp01((t - b.readAt) / b.read) * (1 - clamp01((t - b.lungeAt) / b.lunge));
+  // The focus: in over its token from the count, out over it from the hold.
+  const focusLength = length(MOTION.spotlightFocus, k);
+  const focus = curve(MOTION.spotlightFocus, (t - b.countAt) / focusLength) * (1 - curve(MOTION.spotlightFocus, (t - b.holdAt) / focusLength));
   return {
     flyAttackers,
     flyTarget,
     fade,
     badgeA,
     badgeD,
-    struck: hit > 0,
+    matchup,
+    focus,
     back: build * (1 - out),
     strike: lunged * (1 - out),
     recoil: blocked ? kicked : 0,
@@ -273,13 +341,12 @@ export function frameAt(shape: ClashShape, t: number, k: number, seed = 0): Fram
     shakeX: shaken.x,
     shakeY: shaken.y,
     shakeTurn: shaken.turn,
-    number: { scale: num.scale, alpha: num.alpha * halfOut, rise: num.rise },
-    result: resultAt > 0 ? clamp01(resultAt / length(MOTION.spotlightResult, k)) * halfOut : 0,
+    result: { scale: shownResult.scale, alpha: shownResult.alpha * halfOut },
     flipAngle: shape.shadow ? Math.PI * curve(MOTION.spotlightFlip, (t - b.readAt) / flipLength) : 0,
     glint: shape.shadow && glintAt > 0 && glintAt < 1 ? glintAt : 0,
     dissolve: shape.destroyed && t >= b.retAt ? curve(MOTION.spotlightBurn, (t - b.retAt) / burnLength) : 0,
     landed,
-    pop: landed ? tokenPopScale(t - landAt(shape.damage, shape.destroyed, b, k), k) : 1,
+    pop: landed ? tokenPopScale(t - lands, k) : 1,
   };
 }
 
@@ -300,7 +367,7 @@ export function trailAt(shape: ClashShape, t: number, k: number, j: number): { b
 export function burstAt(index: number, count: number, t: number, k: number, place: Place = { first: true, last: true }): { u: number; flying: boolean } {
   "worklet";
   const b = beatsAt(k, place);
-  const start = b.impactAt + index * burstGap(count, k, place.destroyed === true);
+  const start = tokenStartOf(index, count, place.steps ?? 0, b, k);
   const fly = length(MOTION.spotlightBurstFly, k);
   const x = (t - start) / fly;
   return { u: curve(MOTION.spotlightBurstFly, x), flying: x >= 0 && x < 1 };

@@ -62,15 +62,12 @@ describe("the stage", () => {
     const right = stage.target.x + stage.target.w;
     expect(Math.abs(left + right - PHONE.width)).toBeLessThanOrEqual(2);
     expect(Math.abs(stage.target.y + stage.target.h / 2 - 0.47 * PHONE.height)).toBeLessThanOrEqual(1);
-    // The attack value and the gauge straddle the cards' feet, the gauge may reach 25 pt past each side of the target, the caption is
-    // under it; the point of contact is on the target's near edge, the number is at its center.
+    // The attack value straddles the attackers' feet; the matchup line and the result stand over the gap between the cards at their
+    // middle height, the gauge 0.29 of a card's height under them, as wide as 1.6 cards; the point of contact is on the target's near edge.
     expect(stage.badgeA.cy).toBe(stage.target.y + stage.target.h);
-    expect(stage.gauge.cy).toBe(stage.target.y + stage.target.h);
-    expect(stage.gauge.cx).toBeCloseTo(stage.target.x + stage.target.w / 2, 6);
-    expect(stage.gauge.room).toBe(stage.target.w + 50);
-    expect(stage.caption).toEqual({ cx: stage.gauge.cx, cy: stage.gauge.cy + SPOT.captionGap, right: PHONE.width - 8 });
+    expect(stage.focus).toEqual({ cx: stage.target.x - stage.gap / 2, cy: stage.target.y + stage.target.h / 2 });
+    expect(stage.gauge).toEqual({ cx: stage.focus.cx, cy: stage.focus.cy + Math.round(0.29 * stage.target.h), room: 1.6 * stage.target.w });
     expect(stage.contact.x).toBe(stage.target.x);
-    expect(stage.number).toEqual({ cx: stage.target.x + stage.target.w / 2, cy: stage.target.y + stage.target.h / 2 });
     expect(stage.corner.cx).toBeGreaterThan(stage.target.x + stage.target.w / 2);
     expect(stage.corner.cy).toBeLessThan(stage.target.y + stage.target.h / 2);
     expect(stage.drawBack).toBeGreaterThan(0);
@@ -132,10 +129,10 @@ describe("the stage", () => {
           const left = Math.min(...rects.map((rect) => rect.x));
           const right = Math.max(...rects.map((rect) => rect.x + rect.w));
           expect(right - left, key).toBeLessThanOrEqual(screen.width - 2 * 47 - 32 + 1);
-          // The note stands under the top inset and the cards clear it; the caption clears the bottom inset.
+          // The note stands under the top inset and the cards clear it; the attack value at the feet clears the bottom inset.
           expect(stage.note.cy - stage.note.h / 2, key).toBeGreaterThanOrEqual(safe.top);
           expect(stage.note.cy + stage.note.h / 2, key).toBeLessThan(stage.target.y);
-          expect(stage.caption.cy + SPOT.captionHalf, key).toBeLessThanOrEqual(screen.height - safe.bottom);
+          expect(stage.badgeA.cy + SPOT.footRoom, key).toBeLessThanOrEqual(screen.height - safe.bottom);
           expect(stage.note.cx).toBe(screen.width / 2);
         }
       }
@@ -145,11 +142,11 @@ describe("the stage", () => {
     expect(stageOf(area(844, 390), card, 1, false).target.h).toBe(234);
   });
 
-  it("shrinks a tall card when the caption would reach the bottom inset or the note the cards", () => {
+  it("shrinks a tall card when the attack value would reach the bottom inset or the note the cards", () => {
     const flat = stageOf(area(844, 390), card, 1, false);
-    const inset = stageOf(area(844, 390, { top: 0, right: 0, bottom: 34, left: 0 }), card, 1, false);
+    const inset = stageOf(area(844, 390, { top: 0, right: 0, bottom: 80, left: 0 }), card, 1, false);
     expect(inset.target.h).toBeLessThan(flat.target.h);
-    expect(inset.caption.cy + SPOT.captionHalf).toBeLessThanOrEqual(390 - 34);
+    expect(inset.badgeA.cy + SPOT.footRoom).toBeLessThanOrEqual(390 - 80);
     const notch = stageOf(area(844, 390, { top: 60, right: 0, bottom: 0, left: 0 }), card, 1, false);
     expect(notch.target.h).toBeLessThan(flat.target.h);
     expect(notch.note.cy + notch.note.h / 2).toBeLessThan(notch.target.y);
@@ -231,7 +228,9 @@ describe("the plan for a real state", () => {
     expect(plan.clashes[0]?.enemyAttack).toBe(false);
     expect(plan.clashes[0]?.attackers.map((spot) => spot.id)).toEqual(clashes[0]?.attackers);
     expect(plan.clashes[0]?.stage.attackers).toHaveLength(2);
-    expect(plan.clashes[0]?.shape).toEqual({ damage: clashes[0]?.damage, destroyed: true, shadow: false, first: true, last: true });
+    expect(plan.clashes[0]?.shape).toEqual({ damage: clashes[0]?.damage, destroyed: true, shadow: false, first: true, last: true, steps: plan.clashes[0]?.gauge.steps });
+    // The gauge is laid out once with the stage, from the engine's numbers.
+    expect(plan.clashes[0]?.gauge.cx).toBe(plan.clashes[0]?.stage.gauge.cx);
   });
 
   it("counts two attacks on one target up in turn, ending on the state's own count", () => {

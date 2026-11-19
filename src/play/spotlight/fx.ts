@@ -1,5 +1,5 @@
-// The combat spotlight's effect curves (docs/design-system-table.md, Spotlight): the flash, the shockwave ring, the result word, the
-// trauma shake (Eiserloh's model), the damage number's pop and the camera push. Pure arithmetic on a time, worklet-safe (the
+// The combat spotlight's effect curves (docs/design-system-table.md, Spotlight): the flash, the shockwave ring, the trauma shake
+// (Eiserloh's model), the result's pop and the camera push. Pure arithmetic on a time, worklet-safe (the
 // functions marked "worklet" run on the UI thread; in Node the directive is an unused string); spotlight/beats.ts reads them into a
 // frame. Lengths are logical points (the layer multiplies by the UI scale) or shares of a card's height.
 import { clamp01, ease, length, popScale } from "../motion/curves.ts";
@@ -47,13 +47,6 @@ export function ringAt(u: number): { r: number; alpha: number } {
   return { r: FX.ringStart + FX.ringGrow * ease("outCubic", u), alpha: 0.9 * fall * Math.sqrt(fall) };
 }
 
-/** The caption's result word at progress `p` (0..1, the frame's `result`): it settles from 1.2 down to 1 as it fades in. */
-export function resultLook(p: number): { scale: number; alpha: number } {
-  "worklet";
-  const x = clamp01(p);
-  return { scale: 1 + 0.2 * (1 - ease("outCubic", x)), alpha: Math.min(1, x * 1.6) };
-}
-
 /** The trauma an attack starts with: 0.55 plus 0.12 for each damage (at most 1), 1 on a kill, 0.35 when it was blocked. */
 export function traumaStart(damage: number, destroyed: boolean): number {
   "worklet";
@@ -96,16 +89,12 @@ export function shakeAt(start: number, hit: number, k: number, seed: number): { 
   return { x: FX.shakeMax * power * wobble(sec, seed, 0), y: FX.shakeMax * power * wobble(sec, seed, 1), turn: FX.shakeTurn * power * wobble(sec, seed, 2) };
 }
 
-/** The damage number `hit` ms after the impact (scaled by `k`): it pops in on `popScale` (to 1.4, then a spring settle), fades in, and drifts up. */
-export function numberAt(hit: number, k: number): { scale: number; alpha: number; rise: number } {
+/** The result `at` ms after it comes in (scaled by `k`): it pops in on `popScale` (to 1.3, then a spring settle) as it fades in. */
+export function resultPop(at: number, k: number): { scale: number; alpha: number } {
   "worklet";
-  if (hit <= 0) return { scale: 0, alpha: 0, rise: 0 };
-  const alpha = clamp01(hit / length(MOTION.spotlightNumberRise, k));
-  return {
-    scale: popScale(hit, k, SPOT.numberPeak, MOTION.spotlightNumberRise, 0, MOTION.spotlightNumberSettle) * (0.6 + 0.4 * alpha),
-    alpha,
-    rise: ease("outCubic", hit / length(MOTION.spotlightImpact, k)),
-  };
+  if (at <= 0) return { scale: 0, alpha: 0 };
+  const alpha = clamp01(at / length(MOTION.spotlightResultRise, k));
+  return { scale: popScale(at, k, SPOT.resultPeak, MOTION.spotlightResultRise, 0, MOTION.spotlightResultSettle) * (0.6 + 0.4 * alpha), alpha };
 }
 
 /** The camera's push-in `x` (0..1) of the way through the charge: 1 at 0, 1.06 at 1. */

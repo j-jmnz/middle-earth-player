@@ -4,21 +4,24 @@
 // and strikes with afterimages, the stage freezes for the hit stop and then shakes, flashes and sparks, and both go back (a destroyed
 // target burns away instead). The plan (spotlight/plan.ts) says who stands where; the beats are arithmetic on one clock
 // (spotlight/beats.ts) that the UI thread evaluates, so nothing draws or redraws unless it plays. The stage is the group that shakes and
-// pushes in; the words and numbers (spotlight/hud.native.tsx: the attack value, the gauge of shields and hearts, the caption) push in with
-// it about the same pivot but do not shake. Every number is the engine's: it reads the clash, never works one out. The layer always draws with the dark theme's tokens.
+// pushes in; the words and numbers (spotlight/hud.native.tsx: the attack value, the matchup line and the result; spotlight/gauge.native.tsx:
+// the gauge of shields and hearts) push in with it about the same pivot but do not shake. During the count a night veil dims the stage
+// under them. Every number is the engine's: it reads the clash, never works one out. The layer always draws with the dark theme's tokens.
 import { Group, vec, type SkImage, type SkRuntimeEffect } from "@shopify/react-native-skia";
-import { useDerivedValue, type SharedValue } from "react-native-reanimated";
+import { useMemo } from "react";
+import { useAnimatedReaction, useDerivedValue, type SharedValue } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import type { BackImages, Fonts } from "../canvas/pieces.native.tsx";
 import type { IconName } from "../../ui/icon-map.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { rgbOf, type Emitters } from "./atlas.ts";
-import { burstGap, darkAt, frameAt, punchAt, spotlightRun, windowOf, type Frame } from "./beats.ts";
+import { burstGap, darkAt, frameAt, landTimes, punchAt, spotlightRun, windowOf, type Frame } from "./beats.ts";
 import { BurnLayer } from "./burn.native.tsx";
 import { FeetFog, FogDark } from "./fog.native.tsx";
 import { Flash, Glint, Pool, RimGlow, Ring } from "./fx.native.tsx";
-import { gaugeOf } from "./gauge.ts";
-import { AttackValue, Caption, Chip, DamageNumber, GaugeView, Note } from "./hud.native.tsx";
+import { GaugeView } from "./gauge.native.tsx";
+import { AttackValue, Chip, FocusVeil, Matchup, Note, Result } from "./hud.native.tsx";
 import { emberPer } from "./particles.ts";
 import { Particles } from "./particles.native.tsx";
 import { BurstToken, Corner, FlyingCard, StageCard, Tint, Trail, Veil } from "./pieces.native.tsx";
@@ -27,6 +30,7 @@ import { SPOT } from "./shape.ts";
 import type { SpotFonts } from "../canvas/table-fonts.native.ts";
 import type { ThemeName } from "../../ui/theme.ts";
 import type { TableTokens } from "../../ui/tokens.ts";
+import { tickToken } from "../../ui/haptics.ts";
 
 // The sparks leave the point of contact turned a little up from the target's side.
 const SPARK_DIR = -0.3;
@@ -56,7 +60,7 @@ type Common = {
 // Attack `index` of `total`, in its own window of the run: it draws only inside it, so the next one waits its turn (and swaps in as it leaves).
 function ClashView({ plan, index, total, now, dark, punch, ...common }: Common & { plan: ClashPlan; index: number; total: number; now: SharedValue<number>; dark: SharedValue<number>; punch: SharedValue<number>; area: SpotlightPlan["area"] }) {
   const { k, images, damage, backs, fonts, nameOf, sphereOf, t, s, texture, burn, area } = common;
-  const { pill, count, word, number, result, caption, note } = common.spotFonts;
+  const { pill, count, word, result, matchup, note } = common.spotFonts;
   const { stage, shape, clash } = plan;
   const run = windowOf(index, total, k);
   const local = useDerivedValue(() => now.get() - run.start);
@@ -78,16 +82,18 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
   const moreOpacity = useDerivedValue(() => Math.min(1, frame.get().badgeA));
   const blocked = shape.damage === 0;
   const rim = plan.enemyAttack ? t.threat : t.accent;
-  // The caption's result word: the damage placed, "Blocked", or "Destroyed".
-  const damageWord = { text: `${shape.damage} damage`, color: t.threat };
+  // The result in the middle of the stage: the damage placed ("−1"), "Blocked", or "Destroyed".
+  const damageWord = { text: `\u2212${shape.damage}`, color: t.threat };
   const endWord = shape.destroyed ? { text: "Destroyed", color: t.threat } : damageWord;
   const outcome = blocked ? { text: "Blocked", color: t.accent } : endWord;
   const front = stage.attackers[stage.attackers.length - 1] ?? stage.target;
   const burns = shape.destroyed && burn != null;
-  // The gauge under the target, and where the sparks of its lit hearts rise from, a token's gap apart (at Normal speed).
-  const gauge = gaugeOf(stage.gauge, { attack: clash.attack, defense: clash.defense, hitPoints: clash.hitPoints, undefended: clash.undefended, before: plan.before, damage: shape.damage }, s);
-  const sparks = gauge.sparks;
-  const ember = sparks.length > 0 ? { x: sparks[0] ?? gauge.cx, y: gauge.cy - gauge.size / 2, size: stage.cardH, xs: sparks, gap: burstGap(shape.damage, 1, shape.destroyed), per: emberPer(sparks.length) } : null;
+  // The gauge, and where the sparks of its lit hearts rise from, a token's gap apart (at Normal speed): the hearts light during the
+  // count, when the gauge has come forward, so their places are taken at its full focus scale.
+  const gauge = plan.gauge;
+  const grown = 1 + SPOT.gaugeFocus;
+  const sparks = gauge.sparks.map((x) => gauge.cx + (x - gauge.cx) * grown);
+  const ember = sparks.length > 0 ? { x: sparks[0] ?? gauge.cx, y: gauge.cy - (gauge.size / 2) * grown, size: stage.cardH, xs: sparks, gap: burstGap(shape.damage, 1, shape.steps ?? 0), per: emberPer(sparks.length) } : null;
   const emitters: Emitters = {
     seed: plan.seed,
     burnMs: (shape.last ? MOTION.spotlightBurn : MOTION.spotlightSwap).ms,
@@ -156,11 +162,12 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
         <Ring x={stage.contact.x} y={stage.contact.y} cardH={stage.cardH} frame={frame} s={s} />
         <Flash cx={hit.cx} cy={hit.cy} cardH={stage.cardH} frame={frame} />
       </Group>
+      <FocusVeil width={area.width} height={area.height} frame={frame} t={t} />
       <Group transform={camera} origin={pivot}>
         {pill ? <AttackValue at={stage.badgeA} color={rim} text={String(clash.attack)} font={pill} frame={frame} t={t} s={s} /> : null}
         {count && word ? <GaugeView gauge={gauge} damage={shape.damage} place={shape} now={local} k={k} fonts={{ number: count, word: note ?? word }} frame={frame} t={t} s={s} /> : null}
-        {count && caption && result ? <Caption at={stage.caption} attack={clash.attack} defense={clash.defense} undefended={clash.undefended} rim={rim} result={outcome} fonts={{ number: count, word: caption, result }} frame={frame} t={t} s={s} /> : null}
-        {number && !blocked ? <DamageNumber at={stage.number} text={`\u2212${shape.damage}`} font={number} destroyed={shape.destroyed} frame={frame} cardH={stage.cardH} t={t} s={s} /> : null}
+        {pill && matchup ? <Matchup at={stage.focus} attack={clash.attack} defense={clash.defense} undefended={clash.undefended} rim={rim} fonts={{ number: pill, word: matchup }} frame={frame} t={t} s={s} /> : null}
+        {result ? <Result at={stage.focus} text={outcome.text} color={outcome.color} font={result} frame={frame} t={t} s={s} /> : null}
         {word && stage.more ? <Chip at={stage.more} text={`+${plan.more}`} font={word} t={t} s={s} opacity={moreOpacity} /> : null}
       </Group>
       {note ? <Note at={stage.note} index={index} total={total} font={note} t={t} s={s} opacity={dark} /> : null}
@@ -182,6 +189,17 @@ export function Spotlight({ plan, progress, ...common }: Common & { plan: Spotli
   const now = useDerivedValue(() => progress.get() * total);
   const dark = useDerivedValue(() => darkAt(now.get(), k, clashes.length));
   const punch = useDerivedValue(() => punchAt(now.get(), k, clashes.length));
+  // A light tick as each damage token lands in the count, on the run's clock (the strike's own tick is the clock hook's,
+  // use-spotlight.ts). A skip jumps the clock to its end, past every one of them, and plays none; the warm plan (seq -1) plays none.
+  const tokens = useMemo(() => (plan.seq >= 0 ? landTimes(clashes.map((clash) => clash.shape), k) : []), [plan.seq, clashes, k]);
+  useAnimatedReaction(
+    () => now.get(),
+    (at, was) => {
+      if (was == null || at <= was || at >= total) return;
+      for (const land of tokens) if (was < land && at >= land) scheduleOnRN(tickToken);
+    },
+    [tokens, total],
+  );
   const first = clashes[0]?.stage;
   return (
     <Group>

@@ -1,16 +1,21 @@
-// The gauge under the combat spotlight's target (docs/design-system-table.md, Spotlight): one shield glyph for each point of the
-// target's defense, then one heart glyph for each of its hit points, on a patch of smoke straddling the card's foot. The attack breaks
-// shields from the left; the hearts already lost before the attack are dark; each heart this attack fills lights red as its damage
-// token lands in the target's corner (the token that lights it is `token`, in landing order). An undefended hero shows a struck-out
-// shield instead. A row too long for the room it has turns its hearts, then its shields, into one glyph and a count.
+// The combat spotlight's gauge (docs/design-system-table.md, Spotlight): one shield glyph for each point of the target's defense, then
+// one heart glyph for each of its hit points, on a patch of smoke in the middle of the stage under the result. In the count the attack
+// breaks shields from the left, one step at a time; then the points a card effect took away show as struck-out attack marks (the
+// attack less the defense is more than the damage placed); then each heart this attack fills lights red as its damage token lands in
+// the target's corner (the token that lights it is `token`, in landing order). The hearts already lost before the attack are dark. An
+// undefended hero shows a struck-out shield instead of shields. A row too long for the room it has turns its hearts, then its shields,
+// into one glyph and a count.
 // Pure: the layer draws what this returns, a Vitest reads it. Every number is the engine's (clash.ts, plan.ts): the attack, the
 // defense, the target's hit points as the strike found them, its damage before the attack and the damage the attack placed.
 import { SPOT } from "./shape.ts";
 
 export type GaugeInput = { attack: number; defense: number; hitPoints: number; undefended: boolean; before: number; damage: number };
 
-/** A shield glyph's centre, whether the attack breaks it, and whether it held a blocked attack. */
-export type GaugeShield = { x: number; breaks: boolean; holds: boolean };
+/** A shield glyph's centre, whether the attack breaks it (at count step `step`; -1 when it does not), and whether it held a blocked attack. */
+export type GaugeShield = { x: number; breaks: boolean; holds: boolean; step: number };
+
+/** A point of the attack a card effect took away: a struck-out attack glyph at this centre, shown at count step `step`. */
+export type GaugeAbsorbed = { x: number; step: number };
 
 /** A heart glyph's centre and what it shows: lost before the attack, filled by it (lit when token `token` lands), or still whole. */
 export type GaugeHeart = { x: number; was: "lost" | "fresh" | "whole"; token: number };
@@ -32,19 +37,29 @@ export type Gauge = {
   mark: number | null;
   shields: GaugeShield[];
   shieldCount: GaugeCount | null;
+  absorbed: GaugeAbsorbed[];
   // The faint dot between the shields and the hearts; null with no shields.
   dot: number | null;
   hearts: GaugeHeart[];
   heartCount: GaugeCount | null;
   // Where each lit heart's sparks rise from, in landing order (a counted row: its one heart, once for each token).
   sparks: number[];
+  // How many marks the count breaks before the tokens fly (beats.ts, Place.steps): the shields broken (one for a counted row), then
+  // the absorbed points.
+  steps: number;
 };
+
+/** The points of the attack a card effect took away: the attack less the defense (all of it when undefended) less the damage placed, at least 0. */
+export function absorbedOf(input: GaugeInput): number {
+  const through = input.undefended ? input.attack : input.attack - input.defense;
+  return Math.max(0, through - Math.max(0, input.damage));
+}
 
 type Fit = { units: number; fixed: number };
 
 // The units (glyph steps) and fixed points (counts' words) a row takes.
-function fitOf(shields: number, hearts: number, mark: boolean, shieldCount: boolean, heartCount: boolean, s: number): Fit {
-  const shieldUnits = shields === 0 ? 0 : shieldCount ? 1 : shields;
+function fitOf(shields: number, absorbed: number, hearts: number, mark: boolean, shieldCount: boolean, heartCount: boolean, s: number): Fit {
+  const shieldUnits = (shields === 0 ? 0 : shieldCount ? 1 : shields) + absorbed;
   const heartUnits = heartCount ? 1 : hearts;
   const sep = shieldUnits > 0 && heartUnits > 0 ? SPOT.gaugeSep : 0;
   return { units: (mark ? SPOT.gaugeMark : 0) + shieldUnits + sep + heartUnits, fixed: ((shieldCount && shields > 0 ? 1 : 0) + (heartCount ? 1 : 0)) * SPOT.gaugeCount * s };
@@ -55,17 +70,18 @@ export function gaugeOf(at: { cx: number; cy: number; room: number }, input: Gau
   const shields = input.undefended ? 0 : Math.max(0, input.defense);
   const hearts = Math.max(1, input.hitPoints);
   const mark = input.undefended;
+  const absorbed = Math.min(absorbedOf(input), SPOT.gaugeAbsorbed);
   let shieldCount = shields > SPOT.gaugeShields;
   let heartCount = hearts > SPOT.gaugeHearts;
   const stepFor = (fit: Fit) => Math.min(SPOT.gaugeStep * s, (at.room - fit.fixed) / Math.max(1, fit.units));
-  let fit = fitOf(shields, hearts, mark, shieldCount, heartCount, s);
+  let fit = fitOf(shields, absorbed, hearts, mark, shieldCount, heartCount, s);
   if (stepFor(fit) < SPOT.gaugeMinStep * s && !heartCount) {
     heartCount = true;
-    fit = fitOf(shields, hearts, mark, shieldCount, heartCount, s);
+    fit = fitOf(shields, absorbed, hearts, mark, shieldCount, heartCount, s);
   }
   if (stepFor(fit) < SPOT.gaugeMinStep * s && !shieldCount && shields > 0) {
     shieldCount = true;
-    fit = fitOf(shields, hearts, mark, shieldCount, heartCount, s);
+    fit = fitOf(shields, absorbed, hearts, mark, shieldCount, heartCount, s);
   }
   const step = stepFor(fit);
   const size = Math.min(SPOT.gaugeGlyph * s, step * 0.8);
@@ -88,13 +104,21 @@ export function gaugeOf(at: { cx: number; cy: number; room: number }, input: Gau
     cursor += step + SPOT.gaugeCount * s;
   } else {
     for (let at = 0; at < shields; at += 1) {
-      shieldList.push({ x: centre(), breaks: at < broken, holds: blocked && at >= broken });
+      shieldList.push({ x: centre(), breaks: at < broken, holds: blocked && at >= broken, step: at < broken ? at : -1 });
       cursor += step;
     }
   }
-  // The dot sits halfway between the last shield's edge and the first heart's.
-  const dot = shields > 0 ? (cursor - (step - size) + cursor + SPOT.gaugeSep * step) / 2 : null;
-  if (shields > 0) cursor += SPOT.gaugeSep * step;
+  // The absorbed points follow the shields in the count: one step each, after the shields that broke.
+  const brokenSteps = shieldBox ? (broken > 0 ? 1 : 0) : broken;
+  const absorbedList: GaugeAbsorbed[] = [];
+  for (let at = 0; at < absorbed; at += 1) {
+    absorbedList.push({ x: centre(), step: brokenSteps + at });
+    cursor += step;
+  }
+  // The dot sits halfway between the last shield's (or absorbed mark's) edge and the first heart's.
+  const leftPart = shields + absorbed > 0;
+  const dot = leftPart ? (cursor - (step - size) + cursor + SPOT.gaugeSep * step) / 2 : null;
+  if (leftPart) cursor += SPOT.gaugeSep * step;
 
   // The hearts: the damage before the attack (at most every heart), then the damage it placed (at most what is left).
   const lost = Math.min(Math.max(0, input.before), hearts);
@@ -115,5 +139,5 @@ export function gaugeOf(at: { cx: number; cy: number; room: number }, input: Gau
       cursor += step;
     }
   }
-  return { cx: at.cx, cy: at.cy, size, step, width, mark: markX, shields: shieldList, shieldCount: shieldBox, dot, hearts: heartList, heartCount: heartBox, sparks };
+  return { cx: at.cx, cy: at.cy, size, step, width, mark: markX, shields: shieldList, shieldCount: shieldBox, absorbed: absorbedList, dot, hearts: heartList, heartCount: heartBox, sparks, steps: brokenSteps + absorbed };
 }

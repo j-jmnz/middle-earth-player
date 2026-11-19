@@ -16,11 +16,11 @@ const BARLOW = require("../../../assets/fonts/BarlowSemiCondensed-SemiBold.ttf")
 const BARLOW_BOLD = require("../../../assets/fonts/BarlowSemiCondensed-Bold.ttf") as number;
 
 /**
- * The spotlight's faces: the attack value (Marcellus SC 30), the damage count in the target's corner and the caption's and the gauge's
- * numbers (Marcellus SC 19), the "+n" (Marcellus SC 14), the damage number (Marcellus SC 46), the result word (Marcellus SC 22), the
- * caption's words (Barlow semibold 17) and the note (Barlow Bold 15).
+ * The spotlight's faces: the attack value and the matchup line's numbers (Marcellus SC 30), the damage count in the target's corner and
+ * the gauge's counts (Marcellus SC 19), the "+n" (Marcellus SC 14), the result (Marcellus SC 40), the matchup line's word (Barlow
+ * semibold 22) and the note (Barlow Bold 15).
  */
-export type SpotFonts = { pill: SkFont | null; count: SkFont | null; word: SkFont | null; number: SkFont | null; result: SkFont | null; caption: SkFont | null; note: SkFont | null };
+export type SpotFonts = { pill: SkFont | null; count: SkFont | null; word: SkFont | null; result: SkFont | null; matchup: SkFont | null; note: SkFont | null };
 
 /** The title file: Marcellus SC, or Barlow semibold under the Title face setting's Plain (display-prefs.ts). */
 export const titleFile = (plain: boolean): number => (plain ? BARLOW : MARCELLUS);
@@ -31,11 +31,10 @@ export function useSpotFonts(scale = 1, plain = false): SpotFonts {
   const pill = useSharedFont(title, SPOT.attackSize * scale);
   const count = useSharedFont(title, 19 * scale);
   const word = useSharedFont(title, 14 * scale);
-  const number = useSharedFont(title, SPOT.numberSize * scale);
   const result = useSharedFont(title, SPOT.resultSize * scale);
-  const caption = useSharedFont(BARLOW, 17 * scale);
+  const matchup = useSharedFont(BARLOW, SPOT.matchupWord * scale);
   const note = useSharedFont(BARLOW_BOLD, SPOT.noteSize * scale);
-  return useMemo(() => ({ pill, count, word, number, result, caption, note }), [pill, count, word, number, result, caption, note]);
+  return useMemo(() => ({ pill, count, word, result, matchup, note }), [pill, count, word, result, matchup, note]);
 }
 
 export function useTableFonts(scale = 1, plain = false): Fonts {

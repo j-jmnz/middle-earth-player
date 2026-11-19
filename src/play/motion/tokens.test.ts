@@ -44,14 +44,14 @@ describe("the tokens", () => {
     expect(MOTION.sweep.ms).toBe(900);
   });
 
-  it("let only the sweep, the whole spotlight run, the life of its ash and the splash breath pass 500 ms", () => {
-    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["splashBreath", "spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
-    expect([...LONG_TOKENS].sort()).toEqual(["splashBreath", "spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
+  it("let only the sweep, the whole spotlight run, its count and hold, the life of its ash and the splash breath pass 500 ms", () => {
+    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["splashBreath", "spotlight", "spotlightAsh", "spotlightCount", "spotlightHold", "sweep"]);
+    expect([...LONG_TOKENS].sort()).toEqual(["splashBreath", "spotlight", "spotlightAsh", "spotlightCount", "spotlightHold", "sweep"]);
   });
 
-  it("make a spotlight of 3200 ms at Normal and 1920 at Quick, each beat at most 500 ms apart from the hold", () => {
+  it("make a spotlight of 3200 ms at Normal and 1920 at Quick, each beat at most 500 ms apart from the count and the hold", () => {
     for (const name of SPOTLIGHT_BEATS) if (!LONG_TOKENS.includes(name)) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
-    // The eight beats, in order, are the run.
+    // The nine beats, in order, are the run.
     expect(SPOTLIGHT_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(MOTION.spotlight.ms);
     expect(MOTION.spotlight.ms).toBe(3200);
     expect(ms(MOTION.spotlight, motionScale("normal", false))).toBe(3200);
@@ -59,29 +59,31 @@ describe("the tokens", () => {
     expect(ms(MOTION.spotlight, motionScale("slow", false))).toBe(4800);
     // Reduced motion plays none.
     expect(ms(MOTION.spotlight, motionScale("normal", true))).toBe(0);
-    expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([350, 300, 350, 120, 100, 480, 1000, 500]);
-    // A later attack of the same state swaps in (200 ms) instead of entering, reads in 100 and charges in 200, then holds: 2200 ms in all.
+    expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([300, 300, 250, 120, 100, 280, 800, 550, 500]);
+    // A later attack of the same state swaps in (200 ms) instead of entering, reads in 100 and charges in 200, then counts and holds: 2350 ms in all.
     expect(SPOTLIGHT_AGAIN_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(SPOTLIGHT_AGAIN);
-    expect(SPOTLIGHT_AGAIN).toBe(2200);
+    expect(SPOTLIGHT_AGAIN).toBe(2350);
     expect([MOTION.spotlightSwap.ms, MOTION.spotlightReadAgain.ms, MOTION.spotlightChargeAgain.ms]).toEqual([200, 100, 200]);
     // The burn runs inside the return.
     expect(MOTION.spotlightBurn).toEqual({ ms: 450, easing: "inQuad" });
     expect(MOTION.spotlightBurn.ms).toBeLessThanOrEqual(MOTION.spotlightReturn.ms);
     // The sub-tokens, none past 500 ms.
-    for (const name of ["spotlightFlash", "spotlightRing", "spotlightSparks", "spotlightShake", "spotlightNumberRise", "spotlightNumberSettle", "spotlightBurstStep", "spotlightBurstFly", "spotlightResult", "spotlightRecoil", "spotlightFlip", "spotlightGlint", "spotlightTrailStep", "spotlightConverge", "spotlightEmber", "spotlightStopKill"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
+    for (const name of ["spotlightFlash", "spotlightRing", "spotlightSparks", "spotlightShake", "spotlightResultRise", "spotlightResultSettle", "spotlightShieldStep", "spotlightBurstStep", "spotlightBurstFly", "spotlightFocus", "spotlightRecoil", "spotlightFlip", "spotlightGlint", "spotlightTrailStep", "spotlightConverge", "spotlightEmber", "spotlightStopKill"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
     // A kill stops for 160 ms, the extra 60 coming out of the impact.
     expect(MOTION.spotlightStopKill.ms).toBe(160);
     expect(MOTION.spotlightStopKill.ms - MOTION.spotlightStop.ms).toBeLessThan(MOTION.spotlightImpact.ms);
     expect([MOTION.spotlightConverge.ms, MOTION.spotlightAsh.ms]).toEqual([500, 1100]);
     expect([MOTION.spotlightFlash.ms, MOTION.spotlightRing.ms, MOTION.spotlightSparks.ms, MOTION.spotlightShake.ms]).toEqual([160, 360, 450, 420]);
-    expect(MOTION.spotlightNumberRise.ms).toBe(140);
-    expect(MOTION.spotlightNumberSettle).toEqual({ ms: 260, zeta: 0.5 });
+    expect(MOTION.spotlightResultRise.ms).toBe(140);
+    expect(MOTION.spotlightResultSettle).toEqual({ ms: 260, zeta: 0.5 });
     expect(MOTION.spotlightRecoil).toEqual({ ms: 320, zeta: 0.5 });
-    expect([MOTION.spotlightResult.ms, MOTION.spotlightFlip.ms, MOTION.spotlightGlint.ms, MOTION.spotlightTrailStep.ms]).toEqual([160, 300, 260, 16]);
-    // The effects that play in the impact fit inside it: three tokens 90 ms apart, the last landing as the burst ends; the shake and the sparks run on.
-    expect(2 * MOTION.spotlightBurstStep.ms + MOTION.spotlightBurstFly.ms).toBeLessThanOrEqual(MOTION.spotlightImpact.ms);
+    expect([MOTION.spotlightFocus.ms, MOTION.spotlightFlip.ms, MOTION.spotlightGlint.ms, MOTION.spotlightTrailStep.ms]).toEqual([150, 300, 260, 16]);
+    // The count fits two shields 130 ms apart and three tokens 150 ms apart, the last landing inside it.
+    expect([MOTION.spotlightShieldStep.ms, MOTION.spotlightBurstStep.ms, MOTION.spotlightCount.ms]).toEqual([130, 150, 800]);
+    expect(2 * MOTION.spotlightShieldStep.ms + 2 * MOTION.spotlightBurstStep.ms + MOTION.spotlightBurstFly.ms).toBeLessThanOrEqual(MOTION.spotlightCount.ms);
     expect(MOTION.spotlightFlash.ms).toBeLessThan(MOTION.spotlightImpact.ms);
-    expect(MOTION.spotlightShake.ms).toBeLessThanOrEqual(MOTION.spotlightImpact.ms);
+    // The shake runs on into the start of the count: it moves the cards, not the gauge, and is faint by then.
+    expect(MOTION.spotlightShake.ms).toBeLessThanOrEqual(MOTION.spotlightImpact.ms + MOTION.spotlightCount.ms);
   });
 
   it("have dropped the tokens the redesign replaced", () => {

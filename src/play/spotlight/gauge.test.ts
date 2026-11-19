@@ -2,7 +2,7 @@
 // defense, hearts for the hit points, what the attack breaks and fills, and the count a long row turns into.
 import { describe, expect, it } from "vitest";
 
-import { gaugeOf, type GaugeInput } from "./gauge.ts";
+import { absorbedOf, gaugeOf, type GaugeInput } from "./gauge.ts";
 import { SPOT } from "./shape.ts";
 
 const AT = { cx: 500, cy: 300, room: 168 + 50 };
@@ -93,5 +93,42 @@ describe("the gauge", () => {
     expect(big.size).toBeCloseTo(base.size * 1.25, 6);
     expect(big.width).toBeCloseTo(base.width * 1.25, 6);
     expect(big.hearts[0]?.x).toBeCloseTo((base.hearts[0]?.x ?? 0) * 1.25, 6);
+  });
+});
+
+describe("the count's steps", () => {
+  it("numbers the shields the attack breaks in order, and counts them as the steps before the tokens fly", () => {
+    const gauge = gaugeOf(AT, HIT);
+    expect(gauge.shields.map((shield) => shield.step)).toEqual([0, 1]);
+    expect(gauge.steps).toBe(2);
+    const blocked = gaugeOf(AT, { ...HIT, attack: 2, defense: 3, damage: 0 });
+    expect(blocked.shields.map((shield) => shield.step)).toEqual([0, 1, -1]);
+    expect(blocked.steps).toBe(2);
+    // A counted row of shields breaks in one step.
+    const boss = gaugeOf(AT, { attack: 9, defense: 8, hitPoints: 25, undefended: false, before: 0, damage: 1 });
+    expect(boss.shieldCount).not.toBeNull();
+    expect(boss.steps).toBe(1);
+  });
+
+  it("shows what a card effect took away as struck-out attack marks after the shields, one step each, at most 4", () => {
+    // 4 against 2 placed 1 damage: one point was taken away.
+    const toughness = { ...HIT, attack: 4, defense: 2, damage: 1 };
+    expect(absorbedOf(toughness)).toBe(1);
+    const gauge = gaugeOf(AT, toughness);
+    expect(gauge.absorbed).toHaveLength(1);
+    expect(gauge.absorbed[0]?.step).toBe(2);
+    expect(gauge.steps).toBe(3);
+    expect(gauge.absorbed[0]?.x).toBeGreaterThan(gauge.shields[1]?.x ?? 0);
+    expect(gauge.absorbed[0]?.x).toBeLessThan(gauge.dot ?? 0);
+    // Undefended, the whole attack goes through: 5 placed 3.
+    expect(absorbedOf({ ...HIT, undefended: true, attack: 5, defense: 0, damage: 3 })).toBe(2);
+    // More damage than the attack less the defense (a card effect added some) takes nothing away; so does a plain hit or block.
+    expect(absorbedOf({ ...HIT, attack: 3, defense: 2, damage: 3 })).toBe(0);
+    expect(absorbedOf(HIT)).toBe(0);
+    expect(absorbedOf({ ...HIT, attack: 2, defense: 3, damage: 0 })).toBe(0);
+    // A prevented attack (all of it taken away) shows at most 4 marks.
+    const prevented = gaugeOf(AT, { ...HIT, attack: 9, defense: 1, damage: 0 });
+    expect(prevented.absorbed).toHaveLength(SPOT.gaugeAbsorbed);
+    expect(prevented.steps).toBe(1 + SPOT.gaugeAbsorbed);
   });
 });
