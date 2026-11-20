@@ -1,5 +1,5 @@
 // Rules: rr.search, rr.then, rr.reveal, rr.cancel, rr.forced, rr.travel, rr.explored, rr.victory, rr.quest-advancement, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json); docs/brief.md (The Woodland Realm).
-import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, lost, progressOn, quest, resolve, respond, resourcesOn, reveal, stat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, exhausted, flag, handCount, lost, progressOn, quest, resolve, respond, resourcesOn, reveal, stat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Woodland Realm (standalone-scenarios part 11): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
@@ -9,8 +9,6 @@ const MENDOR = "51111";
 const ADVANCING = { phase: "Quest", deck: ["f0"] } as const;
 // One card of each of the 14 sets, all of printed cost 0: the Setup keeps 7 of the sets and finds one of their cards.
 const ONE_PER_SET = ["51113", "51116", "51118", "51121", "51124", "51128", "51131", "51134", "51137", "51140", "51143", "51147", "51150", "51152"];
-// The top 5 cards a stage's When Revealed searches: a card of cost 3, one of cost 1, one of cost 2.
-const TOP = ["51112", "51123", "51127", "f0", "f0"];
 
 const ROWS: readonly Row[] = [
   // 51101 Captured by Spiders.
