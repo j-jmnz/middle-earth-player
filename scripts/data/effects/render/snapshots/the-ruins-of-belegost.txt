@@ -1,0 +1,581 @@
+Scenario piles that place cards with no record (quest: 50601 Ruins of the First Age; quest: 50602 Ancient Evils Disturbed; quest: 50603 Deeper into the Past; quest: 50604 The Servants of Morgoth; quest: 50605 The Roots of Ered Luin; quest: 50606 The Mines of Belegost; quest: 50607 The Beast of Belegost; staging: 50608 Stalking the Ruins; staging: 50622 Abandoned Mine; setAside: 50609 Sword of Belegost; setAside: 50610 Map of Ered Luin; setAside: 50611 Keys of Belegost; setAside: 50612 Book of Aulë's Children; setAside: 50613 Dwarven Torch; setAside: 50614 Blue Mountain Gem; setAside: 50615 Naurlhûg; setAside: 50616 Lurker of the Depths; setAside: 50621 Naurlhûg's Lair)
+
+## 50601 Ruins of the First Age
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50601:A:1 (front): Setup: Add Stalking the Ruins and 1 copy of Abandoned Mine per player to the staging area. Set Lurker of the Depths, Naurlhûg, Naurlhûg's Lair, and Sword of Belegost aside, out of play. Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins (without looking). Shuffle the others into the encounter deck (without looking at them).
+  50601:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - of the set-aside cards with codes 50610, 50611, 50612, 50613 and 50614 one, chosen with the game's seed, is placed facedown under the card in play with code 50608 (out of play); the others go facedown into the encounter deck, unseen (the next shuffle mixes them in)
+    - shuffle the encounter deck
+
+50601:B:1 (back): The players cannot advance unless they control at least 1 Loot objective.
+  50601:constant:1: Constant
+    only if not (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 1)
+    - the players cannot defeat this stage while this holds
+
+50601:B:2 (back): Forced: At the beginning of the travel phase, if there are no locations in play, return the topmost location in the encounter discard pile to the staging area.
+  50601:forced:1: Forced when a phase begins
+    only if all of: (it is the Travel phase) and (the number of location (any player controls) is at most 0)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the topmost location in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card goes to the staging area (it is not revealed)
+
+50601:B:3 (back): Forced: When this stage is defeated, if Keys of Belegost is attached to a hero, advance to stage 2C. Otherwise, advance to stage 2A.
+  50601:forced:2: Forced on the event questCardDefeated (heard about this card)
+    - when this stage is defeated, the quest advances to the quest card with code 50603 if the card with code 50611 is attached to a hero, otherwise to the quest card with code 50602 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
+
+## 50602 Ancient Evils Disturbed
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50602:A:1 (front): When Revealed: Add Lurker of the Depths to the staging area.
+  50602:whenRevealed:1: When revealed
+    - one set-aside card with code 50616 joins the staging area (it is not revealed)
+
+50602:B:1 (back): The players cannot advance unless they control at least 2 Loot objectives and Lurker of the Depths is in the victory display.
+  50602:constant:1: Constant
+    only if any of: (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at most 1) or (the card with code 50616 is not in the victory display)
+    - the players cannot defeat this stage while this holds
+
+50602:B:2 (back): Forced: When this stage is defeated, if Book of Aulë's Children is attached to a hero, advance to stage 3C. Otherwise, advance to stage 3A.
+  50602:forced:1: Forced on the event questCardDefeated (heard about this card)
+    - when this stage is defeated, the quest advances to the quest card with code 50605 if the card with code 50612 is attached to a hero, otherwise to the quest card with code 50604 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
+
+## 50603 Deeper into the Past
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50603:A:1 (front): When Revealed: Shuffle Lurker of the Depths and the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until a location is discarded. Add the discarded location to the staging area.
+  50603:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside copy of the card with code 50616 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card goes to the staging area (it is not revealed)
+
+50603:B:1 (back): The players cannot advance unless they control at least 2 Loot objectives and there are at least 3 resources here.
+  50603:constant:1: Constant
+    only if any of: (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at most 1) or (resources of this card is less than 3)
+    - the players cannot defeat this stage while this holds
+
+50603:B:2 (back): Forced: After the active location is explored, place 1 resource here.
+  50603:forced:1: Forced on the event activeExplored
+    - place 1 resource tokens on this card
+
+50603:B:3 (back): Forced: When this stage is defeated, if Book of Aulë's Children is attached to a hero, advance to stage 3E. Otherwise, advance to stage 3C.
+  50603:forced:2: Forced on the event questCardDefeated (heard about this card)
+    - when this stage is defeated, the quest advances to the quest card with code 50606 if the card with code 50612 is attached to a hero, otherwise to the quest card with code 50605 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
+
+## 50604 The Servants of Morgoth
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50604:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player.
+  50604:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+50604:B:1 (back): The first Hazard card revealed each round gains surge.
+  50604:constant:1: Constant
+    - the first Hazard card (of any type) revealed each round gains surge
+
+50604:B:2 (back): During the travel phase, the players must travel to a location, if able.
+  50604:constant:2: Constant
+    - the table: stat mustTravel 1, while this card is in play
+
+50604:B:3 (back): Forced: When this stage is defeated, if Dwarven Torch is attached to a hero, advance to stage 4A. Otherwise, advance to stage 3C.
+  50604:forced:1: Forced on the event questCardDefeated (heard about this card)
+    - when this stage is defeated, the quest advances to the quest card with code 50607 if the card with code 50613 is attached to a hero, otherwise to the quest card with code 50605 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
+
+## 50605 The Roots of Ered Luin
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50605:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player.
+  50605:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+50605:B:1 (back): The Discover value of the active location is increased by 1.
+  50605:constant:1: Constant
+    - each location (any player controls) that is the active location: stat discoverValue 1, while this card is in play
+
+50605:B:2 (back): During the travel phase, the players must travel to a location, if able.
+  50605:constant:2: Constant
+    - the table: stat mustTravel 1, while this card is in play
+
+50605:B:3 (back): Forced: When this stage is defeated, if Map of Ered Luin is attached to a hero advance to stage 4A. Otherwise, advance to stage 3E.
+  50605:forced:1: Forced on the event questCardDefeated (heard about this card)
+    - when this stage is defeated, the quest advances to the quest card with code 50607 if the card with code 50610 is attached to a hero, otherwise to the quest card with code 50606 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
+
+## 50606 The Mines of Belegost
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50606:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player.
+  50606:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+50606:B:1 (back): During the travel phase, the players must travel to a location, if able.
+  50606:constant:1: Constant
+    - the table: stat mustTravel 1, while this card is in play
+
+50606:B:2 (back): Forced: After resolving the Discover keyword, if no Hazard card was revealed by that effect, reveal the top card of the encounter deck.
+  50606:forced:1: Forced on the event discovered (heard about location (any player controls))
+    - if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)): the first player reveals an encounter card
+
+50606:B:3 (back): Forced: When this stage is defeated, if Blue Mountain Gem is attached to a hero advance to stage 4A. Otherwise, advance to stage 3A.
+  50606:forced:2: Forced on the event questCardDefeated (heard about this card)
+    - when this stage is defeated, the quest advances to the quest card with code 50607 if the card with code 50614 is attached to a hero, otherwise to the quest card with code 50604 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
+
+## 50607 The Beast of Belegost
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50607:A:1 (front): When Revealed: Add Naurlhûg and Naurlhûg's Lair to the staging area. Shuffle Sword of Belegost, and the encounter discard pile into the encounter deck.
+  50607:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 50615 joins the staging area (it is not revealed)
+    - one set-aside card with code 50621 joins the staging area (it is not revealed)
+    - one set-aside copy of the card with code 50609 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter discard pile into the encounter deck
+
+50607:B:1 (back): While Naurlhûg's Lair is in the victory display, Naurlhûg loses the text: "Cannot take damage."
+  50607:constant:1: Constant
+    only if the card with code 50621 is in the victory display
+    - each card (any player controls) named "Naurlhûg", (enemies engaged with a player included): stat losesNoDamage 1, while this card is in play
+
+50607:B:2 (back): Forced: After Naurlhûg attacks, if it was dealt a shadow card with no shadow effect, it engages the next player. Then, it makes an immediate attack. Do not deal it a shadow card for this attack.
+  50607:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about enemy (any player controls) named "Naurlhûg")
+    only if all of: (the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)) and (another player is still in the game)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy engages the next player [also {"target":"subject"}]
+    - this enemy attacks now, dealt no shadow card [also {"target":"subject"}]
+
+50607:B:3 (back): When Naurlhûg is defeated, the players win the game.
+  50607:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Naurlhûg")
+    - the players win the game
+
+## 50608 Stalking the Ruins
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+50608:A:1 (front): Forced: At the beginning of the quest phase, place 1 resource on Stalking the Ruins. Then, if there are at least 3 resources here, add or return Naurlhûg to the staging area.
+  50608:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - then, if the card with code 50608 in play holds at least 3 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): one set-aside card with code 50615 joins the staging area (it is not revealed)
+    - then, if the card with code 50608 in play holds at least 3 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) named "Naurlhûg", (enemies engaged with a player included)
+    - then, if the card with code 50608 in play holds at least 3 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+
+50608:A:2 (front): Forced: When the players advance to a new quest stage, discard all tokens from Stalking the Ruins. Then, set Naurlhûg aside, out of play.
+  50608:forced:2: Forced on the event stageRevealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - up to resources of this card resource token(s) come off the card with code 50608 in play
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50615"}]
+
+## 50609 Sword of Belegost
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50609:A:1 (front): Loot. Restricted.
+  50609:constant:2: Constant
+    - [json Loot {"verb":"Loot"}]
+
+50609:A:2 (front): If unattached, the first player claims Sword of Belegost and attaches it to a hero he controls.
+  50609:constant:3: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card counts as an attachment while it is attached
+
+50609:A:3 (front): Attached hero gets +4 Attack.
+  50609:constant:1: Constant
+    only if its host is a hero (any player controls)
+    - its host: stat attack 4, while this card is in play
+
+50609:A:4 (front): Response: Exhaust Sword of Belegost to cancel a shadow effect just triggered.
+  50609:response:1: Response on the event shadowPending (cost: exhaust this card)
+    - the effect being resolved is canceled: nothing after this resolves
+
+## 50610 Map of Ered Luin
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50610:A:1 (front): Loot.
+  50610:constant:1: Constant
+    - [json Loot {"verb":"Loot"}]
+
+50610:A:2 (front): If unattached, the first player claims Map of Ered Luin and attaches it to a hero he controls.
+  50610:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card counts as an attachment while it is attached
+
+50610:A:3 (front): Action: Exhaust Map of Ered Luin to choose a non-unique location. That location gets -2 Threat until the end of the phase.
+  50610:action:1: Action (cost: exhaust this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique location (any player controls)
+    - the picked card: stat threat -2, until the end of the phase
+
+## 50611 Keys of Belegost
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50611:A:1 (front): Loot.
+  50611:constant:1: Constant
+    - [json Loot {"verb":"Loot"}]
+
+50611:A:2 (front): If unattached, the first player claims Keys of Belegost and attaches it to a hero he controls.
+  50611:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card counts as an attachment while it is attached
+
+50611:A:3 (front): Action: Exhaust Keys of Belegost to choose a hero. Add 1 resource to that hero's pool.
+  50611:action:1: Action (cost: exhaust this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls)
+    - add 1 resources to the picked card
+
+## 50612 Book of Aulë's Children
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50612:A:1 (front): Loot.
+  50612:constant:1: Constant
+    - [json Loot {"verb":"Loot"}]
+
+50612:A:2 (front): If unattached, the first player claims Book of Aulë's Children and attaches it to a hero he controls.
+  50612:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card counts as an attachment while it is attached
+
+50612:A:3 (front): Action: Exhaust Book of Aulë's Children to choose a player. That player draws 1 card.
+  50612:action:1: Action (cost: exhaust this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls)
+    - the picked player draws 1 card(s)
+
+## 50613 Dwarven Torch
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50613:A:1 (front): Loot.
+  50613:constant:1: Constant
+    - [json Loot {"verb":"Loot"}]
+
+50613:A:2 (front): If unattached, the first player claims Dwarven Torch and attaches it to a hero he controls.
+  50613:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card counts as an attachment while it is attached
+
+50613:A:3 (front): Action: Exhaust Dwarven Torch to choose a non-unique enemy. That enemy gets -1 Attack and -1 Defense until the end of the phase.
+  50613:action:1: Action (cost: exhaust this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique enemy (any player controls) or in the staging area
+    - the picked card: stat attack -1, until the end of the phase
+    - the picked card: stat defense -1, until the end of the phase
+
+## 50614 Blue Mountain Gem
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50614:A:1 (front): Loot.
+  50614:constant:1: Constant
+    - [json Loot {"verb":"Loot"}]
+
+50614:A:2 (front): If unattached, the first player claims Blue Mountain Gem and attaches it to a hero he controls.
+  50614:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card counts as an attachment while it is attached
+
+50614:A:3 (front): Action: Exhaust Blue Mountain Gem to choose a player. Reduce that player's threat by 1.
+  50614:action:1: Action (cost: exhaust this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls)
+    - lower threat by 1 (the picked player)
+
+## 50615 Naurlhûg
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50615:A:1 (front): Immune to player card effects. Cannot take damage.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot take damage.)
+  50615:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat immuneToPlayerCards 1, while this card is in play
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+50615:A:2 (front): X is the number of resources on Stalking the Ruins.
+  50615:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card) (record also names 50615:A:3)
+    - the acting player assigns the resource tokens on card (any player controls) named "Stalking the Ruins" damage among the character (you control), one at a time
+
+50615:A:3 (front): Forced: When Naurlhûg makes an attack, the defending player assigns X damage among characters he controls.
+  50615:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card) (record also names 50615:A:2)
+    - the acting player assigns the resource tokens on card (any player controls) named "Stalking the Ruins" damage among the character (you control), one at a time
+
+## 50616 Lurker of the Depths
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50616:A:1 (front): Cannot have attachments.
+  50616:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+50616:A:2 (front): Lurker of the Depths cannot be engaged or take more than 4 damage each round.
+  50616:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat damageCap 4, while this card is in play
+
+50616:A:3 (front): While Lurker of the Depths is in the staging area, it is considered to be engaged with each player.
+  50616:constant:3: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat noThreatContribution 1, while this card is in play
+    - this card: stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
+
+## 50617 Nameless Cave Dweller
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50617:A:1 (front): Cannot have player card attachments.
+  50617:constant:1: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+50617:A:2 (front): X is 1 more than the Discover value on the active location.
+  50617:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat [json amount {"discoverValue":true,"plus":1}], while this card is in play
+    - this card: stat attack [json amount {"discoverValue":true,"plus":1}], while this card is in play
+    - this card: stat defense [json amount {"discoverValue":true,"plus":1}], while this card is in play
+
+50617:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you control a Loot objective).
+  50617:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of objective (you control) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 1: the attacking enemy: stat attack 2, until the end of the attack
+    - then, if not (the number of objective (you control) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 1) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 50618 Old Stone Troll
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50618:A:1 (front): Cannot have player card attachments.
+  50618:constant:1: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+50618:A:2 (front): Old Stone Troll gets -10 engagement cost for each Loot objective attached to a hero.
+  50618:constant:2: Constant
+    - this card: stat engagementCost minus (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] x 10), while this card is in play
+
+50618:A:3 (front): Only the engaged player can declare attackers against Old Stone Troll.
+  50618:constant:3: Constant
+    - this card: stat attackOnlyByEngaged 1, while this card is in play
+
+## 50619 Orc of Ered Luin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50619:A:1 (front): When Revealed: Orc of Ered Luin makes an immediate attack against each player that controls at least 1 Loot objective (in turn order).
+  50619:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - if the number of objective (you control) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 1: this card attacks the acting player now, from the staging area
+
+50619:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player, then makes an immediate attack.
+  50619:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
+
+## 50620 Blue Mountain Goblin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50620:A:1 (front): While a Loot objective is attached to a hero, Blue Mountain Goblin gains surge.
+  50620:constant:1: Constant
+    only if the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 1
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
+
+50620:A:2 (shadow): Shadow: If you control a Loot objective, put Blue Mountain Goblin into play engaged with you and deal it a shadow card.
+  50620:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json EngageShadowCard {"verb":"EngageShadowCard","when":{"kind":"count","pick":{"type":"objective","control":"you","controlled":true,"lootKeyword":true},"min":1}}]
+    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this card is dealt a shadow card
+
+## 50621 Naurlhûg's Lair
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50621:A:1 (front): Discover 5.
+  50621:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":5}]
+
+50621:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50621:A:3 (front): Forced: When Naurlhûg's Lair is explored, add the Loot objective from underneath Stalking the Ruins to the staging area faceup.
+  50621:forced:2: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - [json ReturnUnderToStaging {"verb":"ReturnUnderToStaging","from":"50608"}]
+
+50621:A:4 (front): Travel: Place X resources on Stalking the Ruins, where X is the number of players.
+  50621:travel:1: Travel
+    - place the number of players resource tokens on the card in play with code 50608 (when it is not in play, on the card that holds redirectResources, else nowhere)
+
+RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
+  50621:constant:2: Constant
+    - this card: stat immuneToPlayerCards 1, while this card is in play
+
+## 50622 Abandoned Mine
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+50622:A:1 (front): Discover 2.
+  50622:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":2}]
+
+50622:A:2 (front): While Abandoned Mine is in the staging area, progress cannot be placed on locations in the staging area not named Abandoned Mine.
+  50622:constant:2: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only, not named "Abandoned Mine": stat noProgressPlaced 1, while this card is in play
+
+50622:A:3 (front): Forced: When resolving the Discover keyword on Abandoned Mine, look at X additional cards where X is the number of players in the game.
+  50622:forced:2: Forced after this location becomes the active location (heard about this card)
+    - this card: stat discoverLooked (the Discover keyword of this location looks at this many cards more than its value, while it resolves) the number of players, until the end of the phase
+
+## 50623 Flooded Hall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50623:A:1 (front): Discover 4.
+  50623:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":4}]
+
+50623:A:2 (front): While Flooded Hall is in the staging area, increase the cost to play each ally by 1.
+  50623:constant:2: Constant
+    only if this card is in the staging area
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) of card type ally costs 1 more (every player's; several such cards stack)
+
+50623:A:3 (front): Forced: When resolving the Discover keyword on Flooded Hall, the first player reveals an additional looked at Hazard card for each other player in the game.
+  50623:forced:2: Forced after this location becomes the active location (heard about this card)
+    - this card: stat discoverHazards (the Discover keyword of this location reveals this many more of the looked-at Hazard cards, one at a time, at random) the number of players - 1, until the end of the phase
+
+## 50624 Darkened Tunnel
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50624:A:1 (front): Discover 2.
+  50624:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":2}]
+
+50624:A:2 (front): While Darkened Tunnel is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, discard the top card of the encounter deck. If the discarded card has the Hazard trait, resolve its staging as if it was just revealed from the encounter deck."
+  50624:forced:2: Forced on the event whenRevealedCanceled
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+    - the acting player reveals, in full, each Hazard card (of any type) among the cards this effect discarded that still lies in the encounter discard pile, one after another (its When Revealed resolves and it enters the staging area)
+
+50624:A:3 (front): Travel: Place 1 resource on Stalking the Ruins.
+  50624:travel:1: Travel
+    - place 1 resource tokens on the card in play with code 50608 (when it is not in play, on the card that holds redirectResources, else nowhere)
+
+## 50625 Sunken Treasury
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50625:A:1 (front): Discover 3.
+  50625:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":3}]
+
+50625:A:2 (front): Sunken Treasury gets +1 Threat for each Loot objective attached to a hero.
+  50625:constant:2: Constant
+    - this card: stat threat the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}], while this card is in play
+
+50625:A:3 (front): Travel: Each player discards 1 random card from his hand.
+  50625:travel:1: Travel
+    - each player discards 1 random card(s) from hand
+
+50625:A:4 (shadow): Shadow: Exhaust a character you control.
+  50625:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 50626 Secret Chamber
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50626:A:1 (front): Discover 3.
+  50626:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":3}]
+
+50626:A:2 (front): Response: After the players travel to Secret Chamber, if no Loot objective is attached to Secret Chamber, search the encounter discard pile for a Loot objective and attach it to Secret Chamber as a guarded objective.
+  50626:response:1: Response after the players travel (heard about this card)
+    only if not (the number of objective (any player controls) attached to this card [also {"lootKeyword":true}] is at least 1)
+    - [json AttachLootFromDiscard {"verb":"AttachLootFromDiscard","to":"self"}]
+
+50626:A:3 (front): Travel: Raise each player's threat by 2.
+  50626:travel:1: Travel
+    - raise threat by 2 (each player)
+
+## 50627 Echoes in the Dark
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50627:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50627:A:2 (front): When Revealed: Add 1 to the total Threat in the staging area for each character controlled by the first player until the end of the phase.
+  50627:whenRevealed:1: When revealed
+    - the total Threat in the staging area is the number of character (any player controls) [also {"controlledBy":"firstPlayer"}] higher until the end of the phase
+
+50627:A:3 (shadow): Shadow: Discard 1 random card from your hand. If the discarded card is an event, attacking enemy gets +2 Attack.
+  50627:shadow:1: Shadow
+    - repeat 1 times:
+      - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+      - then, if the picked card is a card (any player controls) of card type event that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 50628 Spawn of Thangorodrim
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50628:A:1 (front): When Revealed: If Naurlhûg is in play, it makes an immediate attack against the first player. If Naurlhûg is not in play, place 1 resource on Stalking the Ruins. Then, if there are at least 3 resources on Stalking the Ruins, add Naurlhûg to the staging area.
+  50628:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the card with code 50615 is in play: choose card (any player controls) named "Naurlhûg", (enemies engaged with a player included)
+    - then, if the card with code 50615 is in play (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
+    - then, if the card with code 50615 is not in play (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the card in play with code 50608 (when it is not in play, on the card that holds redirectResources, else nowhere)
+    - then, if the card with code 50608 in play holds at least 3 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): one set-aside card with code 50615 joins the staging area (it is not revealed)
+
+50628:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  50628:shadow:1: Shadow
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 50629 Concealed Spikes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50629:A:1 (front): When Revealed: Each player assigns X damage among characters he controls. X is 1 more than the Discover value on the active location.
+  50629:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player assigns [json amount {"discoverValue":true,"plus":1}] damage among the character (you control), one at a time
+
+50629:A:2 (shadow): Shadow: Assign X damage among characters you control. X is the number of attachments you control. You may discard the highest cost attachment you control to cancel this effect.
+  50629:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "damage":
+        - the acting player assigns the number of attachment (you control) damage among the character (you control), one at a time
+      * option "discard" (only if there is a attachment (you control) to choose):
+        - choose attachment (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
+        - discard the picked card
+
+## 50630 Covered Pit
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50630:A:1 (front): When Revealed: Each player discards an ally he controls.
+  50630:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose ally (you control)
+      - discard the picked card
+
+50630:A:2 (shadow): Shadow: If attacking enemy is non-unique, attach a Loot objective you control to it as a guarded objective. If this attack destroys a character, return attacking enemy to the staging area.
+  50630:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attacking enemy is a non-unique enemy (any player controls): choose objective (you control) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}]
+    - then, if the attacking enemy is a non-unique enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy becomes the guard of the picked card, attached to it in the staging area (an engaged guard stays engaged) (an objective a character holds is detached first, into the staging area faceup and unclaimed)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy to the staging area
+
+(rendered pieces: 320 by template, 40 as JSON)

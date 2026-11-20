@@ -15,8 +15,8 @@ const VERBS = [
   // looked at, which RevealDiscarded reads. An encounter deck with fewer cards discards fewer.
   z.strictObject({ verb: z.literal("DiscardEncounterPerPlayer"), ...when }),
   // "Reveal each Nameless enemy discarded by this effect" (901706:A:2): the actor reveals, in full, the next enemy with this trait among the cards the effect's DiscardEncounterPerPlayer discarded that still lie in the encounter discard pile (its When Revealed resolves and it enters the staging area); the
-  // verb is queued again while more of them are left.
-  z.strictObject({ verb: z.literal("RevealDiscarded"), trait: z.string().min(1), ...when }),
+  // verb is queued again while more of them are left. `anyType`: any card with the trait, not only an enemy ("If the discarded card has the Hazard trait, resolve its staging as if it was just revealed from the encounter deck", 50624:A:2).
+  z.strictObject({ verb: z.literal("RevealDiscarded"), trait: z.string().min(1), anyType: z.literal(true).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [

@@ -125,13 +125,25 @@ export type CardInstance = {
   heroSlot?: number;
   // A hero an enemy guards (Carried Away, 18074:A:1): in play, facedown under the guard (the captive zone), controlled by no one. Its owner stays in the game while it is held (families/wilderland/carried.ts); `owner` is the seat that gets it back.
   guardedHero?: true;
+  // A player card an encounter card holds faceup under it as a guarded objective (Carried Away's allies, a card under Necromancer's Pass, families/wizards-quest/held.ts): no copy of its title can be played or put into play while it lies there.
+  heldTitle?: true;
+  // With `heldTitle`: the title cannot be put into play either (Narrow Paths' guarded attachments, 51205:B:1: "cannot play or put into play").
+  heldPutting?: true;
+  // With `heldTitle`: the card returns to its owner's control in play, exhausted, when its holder leaves play (Goblin Dungeon's ally, 51340:A:1), not to the hand.
+  heldExhausted?: true;
+  // A card the encounter deck found and Hidden Threat placed facedown under the main quest (families/wizards-quest/hidden.ts, 51241:A:1): it is revealed after the next time the players quest successfully. The number is the order it was placed in.
+  hiddenAt?: number;
   // A Captive of The Uruk-hai (families/captives): a hero faceup in the captive zone under To Isengard! or an enemy, in play, controlled by nobody. `owner` is the seat it belongs to, `heroSlot` its place among that seat's heroes.
   captive?: true;
   // A player card an enemy holds, faceup: under it (Hobgoblin, 18050:A:2) or attached to it (a boon Shagrat guards, 146069:B:1). It returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set by GuardWithDeckTop and GuardWithSetAside.
   held?: true;
+  // With `held`: the card is discarded, not returned to the hand, when its holder leaves play (Nameless Thing, 51351:A:1). Set by GuardWithDeckTop `discards`.
+  heldDiscard?: true;
   // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideInPlay with keepDamage.
   keepsDamage?: true;
   // An enemy attached to a character as an attachment (Wraith of Carn Dûm, 101157:A:1): it has no enemy text while it lies there, hears no leaving of play, and returns to the staging area as an enemy when its host leaves play (families/angmar/reanimate/attached.ts).
+  // A card of the Investigation deck a look window has shown (families/investigation/look.ts): the Investigation List marks its name as checked off. The card stays facedown; nothing but the list reads it.
+  seen?: true;
   asAttachment?: true | "discard";
   // A player card lying faceup on an enemy as an attachment with no title and no game text, taken from the top of a deck (Nameless Thing, families/nameless): its printed cost is its only active part. Set only by AttachDeckTop, and cleared once the card has left the enemy.
   nameless?: true;
@@ -335,7 +347,7 @@ export type ScenarioState = {
   questEnded?: readonly number[];
   // Progress a stage 3B turned into cards to discard from the encounter deck, until the progress step is over (families/breaking/progress.ts).
   progressOwed?: readonly { seat: number; amount: number }[];
-  stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: { codes: readonly string[]; otherwise?: string; remove?: true; different?: true }; deck?: true }[];
+  stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: { codes: readonly string[]; otherwise?: string; remove?: true; different?: true }; attachedNext?: { code: string; then: string; otherwise: string }; deck?: true }[];
   // The part number of the scenario's campaign card, in a campaign with XP (the amount `part`), and the campaign Setup instructions that resolve once the
   // quest card's Setup is done (ScenarioDefinition.afterSetup).
   part?: number;
@@ -462,6 +474,10 @@ export type ScenarioState = {
   // The Embassy from the Dark Tower (146072:B:1, families/black-gate/embassy.ts): the player cards placed faceup in front of the players and the encounter cards placed faceup (all lie set aside, faceup, while the Embassy lasts), the pairs made in the order they were
   // paired, and how many pairs the running effect has taken (`at`: the pair it is on is `pairs[at - 1]`). Kept from EmbassyDeal to EmbassyEnd.
   embassy?: { readonly players: readonly string[]; readonly encounter: readonly string[]; readonly pairs: readonly { readonly player: string; readonly encounter: string }[]; readonly at: number };
+  // The Siege values of the enemies destroyed and the locations explored in `round` (TallySiege, families/wilderland/dolguldur.ts), for Dol Guldur's city strength. Kept only in a game with such a card; a tally of an earlier round counts as 0.
+  siegeTally?: { round: number; value: number };
+  // A card of the game holds a player card under it (HoldPickedUnder, families/wizards-quest/held.ts): the settle sweep that gives held cards back runs only then.
+  heldCards?: true;
   // The stage the quest left when it advanced to `to` past stages that were never played (AdvanceToStage, families/quest/branch.ts noteSkippedStage): "After a quest card is defeated" names it.
   stageLeft?: { to: string; from: string; bypassed?: true };
   // Escape from Mount Gram's captured cards (families/captured/): the Capture X each card prints by code, the codes that are "in each player's staging area" and the cards of those codes now in play (`here`), the rescue the running

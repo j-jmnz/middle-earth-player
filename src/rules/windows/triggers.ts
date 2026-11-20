@@ -54,9 +54,10 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
       found.push({ effect, instance });
     }
   }
-  // Oldest card first.
+  // An `early` effect first, then the oldest card first.
   return found.sort(
     (left, right) =>
+      Number(right.effect.early === true) - Number(left.effect.early === true) ||
       left.instance.enteredPlay - right.instance.enteredPlay ||
       left.instance.id.localeCompare(right.instance.id, undefined, { numeric: true }),
   );

@@ -44,7 +44,7 @@ export function encounterHolds(state: ScenarioState, condition: Extract<Conditio
     const card = state.cards[id];
     if (!card) return false;
     const printed = printedOf(ctx.cards, card.code);
-    return (condition.cardType == null || printed.type === condition.cardType) && (condition.aflame == null || printed.keywords.aflame != null) && (condition.trait == null || printed.traits.includes(condition.trait));
+    return (condition.cardType == null || printed.type === condition.cardType) && (condition.aflame == null || printed.keywords.aflame != null) && (condition.trait == null || printed.traits.includes(condition.trait)) && (condition.code == null || printed.code === condition.code);
   });
 }
 

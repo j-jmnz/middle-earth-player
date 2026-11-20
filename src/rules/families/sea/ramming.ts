@@ -12,6 +12,7 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import { tiedExtreme } from "../../interpret/tied-extreme.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { attackWith } from "../attack/immediate.ts";
+import type { Focus } from "../index.ts";
 
 /** Of the cards that matched, only those with the highest Attack as the table shows it; all of them when tied. */
 export function highestAttack(state: ScenarioState, found: readonly string[], ctx: ReduceContext): string[] {
@@ -22,10 +23,12 @@ export function highestAttack(state: ScenarioState, found: readonly string[], ct
 }
 
 /** AttackWithPicked: the last picked enemy, if it is engaged and may attack, makes an immediate attack. */
-export function attackWithPicked(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackWithPicked" }>, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function attackWithPicked(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackWithPicked" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = lastPicked(state);
   if (!enemy || !state.cards[enemy]) return state;
-  const begun = attackWith(state, enemy, ctx, steps);
+  // An enemy that stays in the staging area but is engaged with every player (the Dreadnaught) attacks the actor, or the first player.
+  const staged = state.cards[enemy]?.zone === "staging";
+  const begun = attackWith(state, enemy, ctx, steps, staged ? (instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat) : undefined, 0, instruction.counted === true);
   const attack = begun.pendingAttack;
   if (!attack || attack === state.pendingAttack || !instruction.raiseStagingThreat) return begun;
   const raise: Instruction = { verb: "RaiseStagingThreat", amount: { dealt: true }, until: instruction.raiseStagingThreat };

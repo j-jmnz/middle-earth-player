@@ -94,6 +94,11 @@ export const scenarioDataSchema = z
     source: z.strictObject({ dragnNormal: z.string().nullable(), dragnEasy: z.string().nullable(), hobSlug: z.string() }),
     // The Nightmare deck played with this scenario, where one is printed.
     nightmare: nightmareSchema.optional(),
+    // The code of the scenario's own mode card (The Siege of Annúminas' Standard Game Mode): its Setup runs before the quest card's, then it is flipped and kept beside the quest deck all game
+    // (`ScenarioDefinition.modeCard`). The Dream-chaser Hard/Expert Mode card is not this: a campaign with XP adds it (MODE_CARD_CODE).
+    modeCard: z.string().min(1).optional(),
+    // The mode card the app's Easy difficulty deals in its place (The Hunt for the Dreadnaught's Easy Mode, docs/brief.md, The Hunt for the Dreadnaught, reading 1): the Setup, the back and the game are as with `modeCard`.
+    easyModeCard: z.string().min(1).optional(),
   })
   .superRefine((data, context) => {
     const quest = data.cards.filter((card) => card.pile === "quest").map((card) => card.code);
@@ -377,8 +382,8 @@ export const MODE_CARD_CODE = "11217";
 // The cards a campaign game deals beyond the scenario's own piles, the one list every reader of "what a game deals" shares (the world the
 // briefing loads, the effect tooling, the coverage tests): the Campaign Expansion's reprint of each card (ScenarioData.reprints) and, in a
 // campaign with XP, the Hard/Expert Mode card.
-export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: Pick<ScenarioData, "reprints">): string[] {
-  return [...Object.values(scenario.reprints ?? {}), ...(campaign.xp ? [MODE_CARD_CODE] : [])];
+export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: Pick<ScenarioData, "reprints" | "modeCard" | "easyModeCard">): string[] {
+  return [...Object.values(scenario.reprints ?? {}), ...(scenario.modeCard != null ? [scenario.modeCard] : []), ...(scenario.easyModeCard != null ? [scenario.easyModeCard] : []), ...(campaign.xp ? [MODE_CARD_CODE] : [])];
 }
 
 // What a campaign game deals of a scenario that has reprints: the Campaign Expansion's reprint of each card in place of the original, in every
@@ -394,15 +399,18 @@ export function campaignScenario<T extends AnyScenarioData>(data: T): T {
 // A stage that names LookAtStages (11016:B:3) carries the number of stages it looks at as its `look`.
 // A stage that names CatchUpWins (12013:B:3) carries the Stormcaller's stage number that makes its defeat a win as its `catchUp`.
 // A stage that names AdvanceToRandomStage (19048:B:2) carries the stages it proceeds to, in a random order, as its `randomNext`.
+// A stage that names AdvanceIfAttached (50601:B:3) carries the Loot card its branch asks about and the two stages it leads to as its `attachedNext`.
 // A stage that names FlipAtQuestPhase (19135:A:2), or flips with its When Revealed resolving (FlipCurrentQuest `resolve`, 03070:A:1), is a stage of a quest deck (`deck`): it is not flipped when revealed.
-export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true; different?: true }; deck?: true } {
+export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true; different?: true }; attachedNext?: { code: string; then: string; otherwise: string }; deck?: true } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
   const random = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceToRandomStage");
   const randomNext = random?.verb === "AdvanceToRandomStage" ? { codes: random.codes, ...(random.otherwise != null ? { otherwise: random.otherwise } : {}), ...(random.remove ? { remove: true as const } : {}), ...(random.different ? { different: true as const } : {}) } : undefined;
+  const attached = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceIfAttached");
+  const attachedNext = attached?.verb === "AdvanceIfAttached" ? { code: attached.code, then: attached.then, otherwise: attached.otherwise } : undefined;
   const deck = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).some((instruction) => instruction.verb === "FlipAtQuestPhase" || (instruction.verb === "FlipCurrentQuest" && instruction.resolve === true));
-  return { code, ...(randomNext ? { randomNext } : {}), ...(deck ? { deck: true as const } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
+  return { code, ...(randomNext ? { randomNext } : {}), ...(attachedNext ? { attachedNext } : {}), ...(deck ? { deck: true as const } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
 }
 
 // The pursuit value at which the players lose, when a stage's Setup sets a pursuit tracker (mec112.pursuit, SetPursuit): the `min` of the pursuit condition on a LoseGame record of a card the scenario places. Undefined
@@ -456,6 +464,7 @@ export function scenarioDefinition(data: AnyScenarioData, campaign: CampaignData
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(data.life != null ? { life: data.life } : {}),
     ...(data.campaignCard !== undefined ? { campaignCard: data.campaignCard } : {}),
+    ...(data.modeCard != null ? { modeCard: { code: data.modeCard, side: "B" as const } } : {}),
     // The part of the campaign (the campaign card's "part number", dcce.gaining-xp): the scenario's place in the campaign, not its number in its product (Hall of Beorn numbers each Adventure Pack's scenario within the pack).
     // Ered Mithrin has no XP, but the burdens The King's Quest (part 3) adds to the pool read it too ("X is the campaign card's part number", 12172:A:1, 12173:A:1: emce.campaign-pool-encounter), so
     // its games from that part on hold it; the first two parts have no card that reads it, and their state is as it was.

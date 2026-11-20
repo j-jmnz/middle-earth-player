@@ -20,7 +20,10 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; exceptSelf?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true; engagedPlayer?: true };
+// The `exceptTrait` the template "Cannot have non-<X> attachments" reads from the printed phrase "non-objective player card attachments" (51012:A:1): a card kind, not a Trait.
+const OBJECTIVE_PLAYER_CARD = "objective player card";
+
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; withResources?: true; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; anyDefender?: true; exceptSelf?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true; engagedPlayer?: true };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -50,10 +53,12 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.guarding ? { guarding: instruction.guarding } : {}),
       ...(instruction.trait ? { trait: instruction.trait } : {}),
       ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}),
+      ...(instruction.withResources ? { withResources: true as const } : {}),
       ...(instruction.exceptBoon ? { exceptBoon: true as const } : {}),
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
       ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
+      ...(instruction.anyDefender ? { anyDefender: true as const } : {}),
       ...(instruction.exceptSelf ? { exceptSelf: true } : {}),
       ...(instruction.unlessControls ? { unlessControls: instruction.unlessControls } : {}),
       ...(instruction.guardian ? { guardian: true as const } : {}),
@@ -73,6 +78,8 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
   return restricted(state, ctx, "travel").some((rule) => {
     // Every location but the source (South Pier, 50217:A:2: "players cannot travel to other locations").
     if (rule.exceptSelf) return rule.sourceId !== locationId;
+    // Every location that holds a resource (A Fork in the Road, 51003:B:2).
+    if (rule.withResources) return (location?.resources ?? 0) > 0;
     // Every location with a trait (Grond's, 145044:A:1 and the Gate's kin).
     if (rule.trait != null) return printedOf(ctx.cards, location?.code ?? "").traits.includes(rule.trait);
     // A restriction on the location itself.
@@ -194,8 +201,11 @@ export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: 
   if (flagged(state, hostId, "noPlayerAttachments") && isPlayerType(printedOf(ctx.cards, attachmentCode))) return true;
   if (flagged(state, hostId, "cannotHaveTreachery") && printedOf(ctx.cards, attachmentCode).type === "treachery") return true;
   if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
+  const printed = printedOf(ctx.cards, attachmentCode);
+  // "Cannot have non-objective player card attachments" (51012:A:1): only a player card that is not an objective is barred; an encounter card, an objective and a Condition an encounter card makes may attach.
+  const playerCard = isPlayerType(printed) && printed.type !== "objective";
   return restricted(state, ctx, "attach").some(
-    (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)) && !(rule.exceptBoon === true && printedOf(ctx.cards, attachmentCode).campaignKind === "boon"),
+    (rule) => rule.sourceId === hostId && (rule.exceptTrait === OBJECTIVE_PLAYER_CARD ? playerCard : !(rule.exceptTrait != null && traits.includes(rule.exceptTrait))) && !(rule.exceptBoon === true && printed.campaignKind === "boon"),
   );
 }
 
@@ -208,14 +218,17 @@ export function defenseBlocked(state: ScenarioState, ctx: ReduceContext, defende
   if (!attack || !defender) return false;
   // "Only Eagle characters or characters with ranged can ... defend against Mirkwood Flock" (02070:A:1).
   if (flightDefenseBarred(state, attack.enemyId, defenderId, ctx.cards)) return true;
+  // A defender an effect removed from this attack cannot be declared again (51335:A:2).
+  if (attack.removedDefenders?.includes(defenderId)) return true;
   return restricted(state, ctx, "defend").some(
     (rule) =>
       rule.sourceId === attack.enemyId &&
-      (rule.belowSourceHitPoints
-        ? printedOf(ctx.cards, defender.code).type === "ally" && (printedOf(ctx.cards, defender.code).health ?? 0) < (printedOf(ctx.cards, state.cards[rule.sourceId]?.code ?? "").health ?? 0)
-        : rule.allies
-          ? printedOf(ctx.cards, defender.code).type === "ally"
-          : modifiedStat(state, defender, "willpower", ctx.cards) <= (rule.maxWillpower ?? 0)),
+      (rule.anyDefender === true ||
+        (rule.belowSourceHitPoints
+          ? printedOf(ctx.cards, defender.code).type === "ally" && (printedOf(ctx.cards, defender.code).health ?? 0) < (printedOf(ctx.cards, state.cards[rule.sourceId]?.code ?? "").health ?? 0)
+          : rule.allies
+            ? printedOf(ctx.cards, defender.code).type === "ally"
+            : modifiedStat(state, defender, "willpower", ctx.cards) <= (rule.maxWillpower ?? 0))),
   );
 }
 

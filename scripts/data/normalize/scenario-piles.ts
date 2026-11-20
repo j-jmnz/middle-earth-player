@@ -42,10 +42,10 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const own = printed?.text ?? "";
   // The Setup shuffles the set this card is printed in and places it under a card (Journey to the Cross-roads' Men of Harad).
   const setUnder = clausesOf(quest, "step").some((clause) => clause.step === "shuffleSetUnder" && facts.inSets(clause.asideSets ?? []));
-  const fleet = stepExists("prepareFleet") && /Fleet/.test(printed?.encounterSet ?? "");
+  const fleet = stepExists("prepareFleet") && (/Fleet/.test(printed?.encounterSet ?? "") || printed?.type === "ship-objective");
   switch (pile) {
     case "setAside":
-      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
+      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":

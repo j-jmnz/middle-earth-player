@@ -42,11 +42,11 @@ export function assignDamage(state: ScenarioState, instruction: Assign, focus: F
   return queueFront(dealt, [{ instruction: { ...instruction, left: instruction.left - 1 }, seat: focus.seat, chosen: null, cause }]);
 }
 
-// DiscardEach: each card that matches goes to its owner's discard pile, as DiscardPicked sends one. The effect counts the cards it discarded (the `noneDiscarded` condition).
+// DiscardEach: each card that matches goes to its owner's discard pile, as DiscardPicked sends one; with `different` in its filter the cards the effect has picked stay ("choose 1 card from your hand and discard the rest", 51129:A:1). The effect counts the cards it discarded (the `noneDiscarded` condition).
 export function discardEach(state: ScenarioState, instruction: Extract<Instruction, { verb: "DiscardEach" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   let next = state;
   let count = 0;
-  for (const id of pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx, undefined, undefined, false, { discards: true })) {
+  for (const id of pickCandidates(state, instruction.pick, focus.seat, effectData(state)?.picked ?? [], focus.sourceId, ctx, undefined, undefined, false, { discards: true })) {
     const card = next.cards[id];
     const seat = card?.owner ?? card?.controller;
     if (!card || seat == null) continue;

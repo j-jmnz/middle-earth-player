@@ -2,7 +2,9 @@
 // ("proceed to one of the 2 \"A Chosen Path\" stages, at random"); holdStage serves 02106:B:1 and 02106:B:2.
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { shuffleIds } from "../../core/seed.ts";
+import { cardTypeOf, printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { queueEvent } from "../../windows/queue.ts";
@@ -26,6 +28,24 @@ export function branchFrom(state: ScenarioState, currentCode: string): { state: 
   let next: ScenarioState = { ...state, seedCursor: rolled.cursor };
   for (const entry of stillThere) if (entry.code !== chosen) next = moveCard(next, entry.id, { zone: "removed" });
   return { state: next, code: chosen };
+}
+
+/**
+ * The stage the quest proceeds to from the stage `currentCode` when that stage names AdvanceIfAttached (50601:B:3): the stage `then` when the card with the named code is attached to a hero, else `otherwise`. A stage played before is in the set-aside pile: it comes back into the quest deck with no
+ * progress and side A up (the three stages 3A, 3C and 3E lead round). Null for a stage that names none, so every other quest is untouched; `id` is undefined when the stage is nowhere.
+ */
+export function attachedStageFrom(state: ScenarioState, currentCode: string, cards: ReadonlyMap<string, PrintedCard>): { state: ScenarioState; id: string | undefined } | null {
+  const named = state.stages.find((stage) => stage.code === currentCode)?.attachedNext;
+  if (!named) return null;
+  const attached = Object.values(state.cards).some((card) => {
+    const host = card.host ? state.cards[card.host] : undefined;
+    return card.code === named.code && (card.zone === "attached" || card.zone === "play") && host != null && cardTypeOf(host, printedOf(cards, host.code)) === "hero";
+  });
+  const code = attached ? named.then : named.otherwise;
+  const waiting = state.questDeck.find((id) => state.cards[id]?.code === code);
+  if (waiting) return { state, id: waiting };
+  const played = state.setAside.find((id) => state.cards[id]?.code === code);
+  return played ? { state: updateCard(moveCard(state, played, { zone: "questDeck" }), played, { progress: 0, face: "A" }), id: played } : { state, id: undefined };
 }
 
 // The quest stage's place in the quest: the stages a branch chooses between share one place (01120:B:1, "one of the 2 A Chosen

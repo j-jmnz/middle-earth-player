@@ -21,9 +21,9 @@ export function noteQuestPhase(state: ScenarioState, amount: number): ScenarioSt
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questProgressPhase", amount, until: "endOfRound" }] };
 }
 
-/** The `questProgressNoted` condition: some progress was placed on the current quest card this phase and noted (the table holds `trackQuestProgress`, or `noteQuestProgress` and the phase is the quest phase). */
-export function questProgressNoted(state: ScenarioState): boolean {
-  return state.modifiers.some((modifier) => modifier.stat === "questProgressPhase" && modifier.instanceId === "table");
+/** The `questProgressNoted` condition: some progress (at least `min`, when it is given) was placed on the current quest card this phase and noted (the table holds `trackQuestProgress`, or `noteQuestProgress` and the phase is the quest phase). */
+export function questProgressNoted(state: ScenarioState, min = 1): boolean {
+  return state.modifiers.filter((modifier) => modifier.stat === "questProgressPhase" && modifier.instanceId === "table").reduce((sum, modifier) => sum + modifier.amount, 0) >= min;
 }
 
 /** CancelPhaseProgress: the progress noted this phase comes off the current quest card (no more than it holds) and the note is cleared. */

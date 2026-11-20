@@ -1,0 +1,484 @@
+Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor; quest: 50701 Investigating the Crime; quest: 50702 Running out of Time; quest: 50703 Apprehending the Killer; activeLocation: 50715 The Prancing Pony; setAside: 50704 Bill Ferny's House; setAside: 50705 Staddle Hiding Hole; setAside: 50706 Combe Storehouse; setAside: 50707 Archet Trading Post; setAside: 50708 Chetwood Campsite; setAside: 50709 Todd the Troll; setAside: 50710 Susie the Spider; setAside: 50711 Wolf-pelt Jake; setAside: 50712 Johnny Goblin-fingers; setAside: 50713 Old Orc-eyes; setAside: 50714 Taken by Surprise)
+
+## 50701 Investigating the Crime
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50701:A:1 (front): Setup: Search the encounter deck for the 5 Suspect enemies and 5 Hideout locations. Randomly select 1 Suspect and 1 Hideout and set them aside out of play, facedown (without looking at them). Build the Investigation deck (see rules) and place it next to the quest deck. Make The Prancing Pony the active location and add 1 Ramshackle Manor to the staging area. Shuffle the encounter deck.
+  50701:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - of the set-aside cards with codes 50709, 50710, 50711, 50712 and 50713 one, and of those with codes 50704, 50705, 50706, 50707 and 50708 one, chosen with the game's seed, stay set aside out of play facedown; the others go into the Investigation deck facedown (no step names any of them)
+    - the set-aside cards with codes 50714 join the Investigation deck facedown, and the deck is shuffled with the game's seed
+
+50701:B:1 (back): No more than 4 progress can be placed on this stage each round.
+  50701:constant:1: Constant
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 4, while this card is in play
+
+50701:B:2 (back): Forced: At the beginning of the quest phase, each player must choose: either raise his threat by 2, or reveal an additional encounter card this phase.
+  50701:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat":
+          - raise threat by 2 (the acting player)
+        * option "reveal":
+          - reveal 1 additional encounter card(s) in the staging step this phase
+
+## 50702 Running out of Time
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50702:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top of the encounter deck until X locations are discarded. X is the number of players in the game. Add each discarded location to the staging area.
+  50702:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard cards from the top of the encounter deck until 1 location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area
+
+50702:B:1 (back): Forced: After the players quest unsuccessfully, choose 1 random card from the Investigation deck and remove it from the game (without looking at it).
+  50702:forced:1: Forced after the players quest unsuccessfully (event happened to the controller)
+    - a random card of the Investigation deck, chosen with the game's seed, is removed from the game without being looked at (no step names it)
+
+50702:B:2 (back): Forced: After the players place progress on this stage from questing successfully, the first player must choose: either reveal an encounter card and remain at this stage, or make the accusation (see rules) and advance to stage 3A.
+  50702:forced:2: Forced once, after a quest that succeeded has placed progress on the stage itself
+    - the first player chooses one of:
+      * option "reveal":
+        - the first player reveals an encounter card
+      * option "accuse":
+        - the acting player names one suspect (a Suspect or a Hideout), by title, of the cards with codes 50709, 50710, 50711, 50712 and 50713 (a card in play too)
+        - the acting player names one hideout (a Suspect or a Hideout), by title, of the cards with codes 50704, 50705, 50706, 50707 and 50708 (a card in play too)
+        - the facedown out-of-play Suspect and Hideout (the set-aside cards among 50709, 50710, 50711, 50712 and 50713 and 50704, 50705, 50706, 50707 and 50708) are turned faceup and added to the staging area; for each name that is not one of them, the Investigation deck is searched for that card and it is added to the staging area unless it is in play; X is 1 if either name was wrong, else 0
+        - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 3 (each player)
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50703"}]
+
+## 50703 Apprehending the Killer
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50703:A:1 (front): When Revealed: Each player besides the first player searches the encounter deck and discard pile for a Brigand enemy and adds it to the staging area. Shuffle the encounter deck.
+  50703:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player finds one Brigand enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+50703:B:1 (back): Ignore the Investigate keyword when the active location is explored.
+  50703:constant:1: Constant
+    - ignore the investigate keyword(s)
+
+50703:B:2 (back): Forced: At the beginning of the encounter phase, each suspect enemy in play engages the first player.
+  50703:forced:1: Forced when a phase begins
+    only if it is the Encounter phase
+    - for each Suspect enemy (any player controls) or in the staging area:
+      - engage the picked card
+
+50703:B:3 (back): While at least 1 Hideout location is in play, Suspect enemies cannot take damage. If there are no Suspect enemies in play, the players win the game.
+  50703:constant:2: Constant
+    only if the number of Hideout location (any player controls) or in the staging area is at least 1
+    - each Suspect enemy (any player controls) or in the staging area: stat cannotTakeDamage 1, while this card is in play
+  50703:constant:3: Constant
+    only if there is no Suspect enemy in play (in the staging area or engaged)
+    - the players win the game
+
+## 50704 Bill Ferny's House
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50704:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50704:A:2 (front): While Bill Ferny's House is in the victory display, each Suspect, and each shadow card dealt to a Suspect, is immune to player card effects.
+  50704:constant:1: Constant
+    only if this card is in the victory display
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Suspect enemy (any player controls) or in the staging area: stat immuneToPlayerCards 1, while this card is in play
+    - each Suspect enemy (any player controls) or in the staging area: stat shadowsImmune 1, while this card is in play
+
+50704:A:3 (front): Travel: Search the encounter deck, discard pile, and victory display for Bill Ferny and add him to the staging area. Shuffle the encounter deck.
+  50704:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 50721 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 50705 Staddle Hiding Hole
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50705:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50705:A:2 (front): While Staddle Hiding Hole is in the victory display, each player not engaged with a Suspect cannot declare attackers against that Suspect.
+  50705:constant:1: Constant
+    only if this card is in the victory display
+    - each Suspect enemy (any player controls) or in the staging area: stat attackOnlyByEngaged 1, while this card is in play
+
+50705:A:3 (front): Travel: Search the encounter deck and discard pile for a Greenway Footpad, reveal it, and add it to the staging area. Shuffle the encounter deck.
+  50705:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player searches the encounter deck and discard pile for the card with code 50724, a a card, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+## 50706 Combe Storehouse
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50706:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50706:A:2 (front): While Combe Storehouse is in the victory display, each Suspect gains: "Forced: After this enemy engages a player, it makes an immediate attack."
+  50706:forced:1: Forced after an enemy engages a player (heard about Suspect enemy (any player controls) or in the staging area; used from the victory display)
+    only if this card is in the victory display
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"target":"subject"}]
+
+50706:A:3 (front): Travel: Search the encounter deck and discard pile for a Lawless Ruffian and add it to the staging area. Shuffle the encounter deck.
+  50706:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 50723 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 50707 Archet Trading Post
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50707:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50707:A:2 (front): While Archet Trading Post is in the victory display, each Suspect cannot take more than 5 damage each round.
+  50707:constant:1: Constant
+    only if this card is in the victory display
+    - each Suspect enemy (any player controls) or in the staging area: stat damageCap 5, while this card is in play
+
+50707:A:3 (front): Travel: Search the encounter deck and discard pile for a Bree-land Informant and add it to the staging area. Shuffle the encounter deck.
+  50707:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 50722 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 50708 Chetwood Campsite
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50708:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50708:A:2 (front): While Chetwood Campsite is in the victory display, each Suspect gets +1 Threat, +1 Attack, and +1 Defense.
+  50708:constant:1: Constant
+    only if this card is in the victory display
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Suspect enemy (any player controls) or in the staging area: stat threat 1, while this card is in play
+    - each Suspect enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+    - each Suspect enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
+
+50708:A:3 (front): Travel: Search the encounter deck and discard pile for a Chetwood Outlaw and add it to the staging area. Shuffle the encounter deck.
+  50708:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 50725 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 50709 Todd the Troll
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50709:A:1 (front): Cannot have attachments.
+  50709:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+50709:A:2 (front): Excess combat damage dealt by Todd the Troll (damage dealt beyond the remaining hit points of the character damaged by this attack) must be assigned as an increase to your threat.
+  50709:constant:2: Constant
+    - this card: stat excessToThreat 1, while this card is in play
+
+## 50710 Susie the Spider
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50710:A:1 (front): Cannot have attachments.
+  50710:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+50710:A:2 (front): X is the number of Brigand enemies in play.
+  50710:constant:2: Constant
+    - this card: stat threat the number of Brigand enemy (any player controls) or in the staging area, while this card is in play
+
+50710:A:3 (front): While at least 1 other Brigand enemy is in play, Susie the Spider cannot take damage.
+  50710:constant:3: Constant
+    only if there is Brigand enemy in play (in the staging area or engaged, other than this card)
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+## 50711 Wolf-pelt Jake
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50711:A:1 (front): Cannot have attachments.
+  50711:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+50711:A:2 (front): Forced: After Wolf-pelt Jake attacks and destroys an ally, return him to the staging area.
+  50711:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls))
+    only if the event's other card is a enemy (any player controls) or in the staging area, that is this card itself
+    - return this card to the staging area
+
+## 50712 Johnny Goblin-fingers
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50712:A:1 (front): Cannot have attachments.
+  50712:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+50712:A:2 (front): Forced: When Johnny Goblin-fingers attacks, the defending player discards 1 random card from his hand and raises his threat by X, where X is the printed cost of the discarded card.
+  50712:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - the acting player discards 1 random card(s) from hand [also {"raiseByCost":true}]
+
+## 50713 Old Orc-eyes
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50713:A:1 (front): Cannot have attachments.
+  50713:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+50713:A:2 (front): Forced: After an attack resolves in which Old Orc-eyes was dealt a shadow card with no shadow effect, he makes an additional attack against you. Do not deal Old Orc-eyes a shadow card for this attack.
+  50713:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    - this enemy attacks now, dealt no shadow card [also {"target":"subject"}]
+
+## 50714 Taken by Surprise
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50714:A:1 (front): Forced: When a player looks at any number of cards from the Investigation deck, if Taken by Surprise is among the looked at cards, shuffle the encounter discard pile into the encounter deck and discard cards until an enemy is discarded. Put the discarded enemy into play engaged with the first player. Then remove Taken by Surprise from the game.
+  50714:forced:1: Forced on the event lookedAtInvestigationDeck (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+    - this card is removed from the game
+
+## 50715 The Prancing Pony
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+50715:A:1 (front): Forced: When The Prancing Pony is explored, the first player must choose: either look at the top 2 cards of the Investigation deck, or each player draws 2 cards.
+  50715:forced:1: Forced on the event locationExplored (heard about this card)
+    - the first player chooses one of:
+      * option "look":
+        - the acting player looks at the top 2 card(s) of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
+      * option "draw":
+        - [json DrawEach {"verb":"DrawEach","amount":2}]
+
+## 50716 Ramshackle Manor
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+50716:A:1 (front): Investigate 2.
+  50716:forced:1: Forced on the event activeExplored (heard about this card)
+    - the first player shuffles the Investigation deck and looks at the top 2 card(s) (more with the flag investigateLooked; fewer if the deck holds fewer); they stay on top in the same order; nothing happens while a card in play ignores the Investigate keyword
+
+50716:A:2 (front): When a player card effect reduces a player's threat by any amount, reduce that amount to 1.
+  50716:constant:2: Constant
+    - each player: stat threatReductionToOne 1, while this card is in play
+
+50716:A:3 (front): Travel: Raise each player's threat by 1 to travel here.
+  50716:travel:1: Travel
+    - raise threat by 1 (each player)
+
+## 50717 Dark Alley
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50717:A:1 (front): Investigate 3.
+  50717:forced:1: Forced on the event activeExplored (heard about this card)
+    - the first player shuffles the Investigation deck and looks at the top 3 card(s) (more with the flag investigateLooked; fewer if the deck holds fewer); they stay on top in the same order; nothing happens while a card in play ignores the Investigate keyword
+
+50717:A:2 (front): Enemies in the staging area cannot take damage.
+  50717:constant:2: Constant
+    - each enemy (any player controls) in the staging area only: stat cannotTakeDamage 1, while this card is in play
+
+50717:A:3 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards until an enemy is discarded. Add the discarded enemy to the staging area.
+  50717:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card goes to the staging area (it is not revealed)
+
+## 50718 Market Square
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50718:A:1 (front): Investigate 2.
+  50718:forced:1: Forced on the event activeExplored (heard about this card)
+    - the first player shuffles the Investigation deck and looks at the top 2 card(s) (more with the flag investigateLooked; fewer if the deck holds fewer); they stay on top in the same order; nothing happens while a card in play ignores the Investigate keyword
+
+50718:A:2 (front): Forced: After a player places any amount of progress on a location in the staging area, he raises his threat by 1.
+  50718:forced:2: Forced on the event progressPlaced (heard about location (any player controls) in the staging area only)
+    - raise threat by 1 (the player the event is about)
+
+50718:A:3 (front): Travel: Each player spends 1 resource to travel here.
+  50718:travel:1: Travel
+    - for each player, first player first:
+      - [json SpendResources {"verb":"SpendResources","amount":1}]
+
+## 50719 Old Warehouse
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50719:A:1 (front): Investigate 1.
+  50719:forced:1: Forced on the event activeExplored (heard about this card)
+    - the first player shuffles the Investigation deck and looks at the top 1 card(s) (more with the flag investigateLooked; fewer if the deck holds fewer); they stay on top in the same order; nothing happens while a card in play ignores the Investigate keyword
+
+50719:A:2 (front): Forced: When triggering the Investigate keyword on Old Warehouse, the first player must choose: either look at 2 additional cards, or reduce each player's threat by 3.
+  50719:forced:2: Forced on the event activeExplored (heard about this card)
+    only if not (a card in play says to ignore the Investigate keyword)
+    - the first player chooses one of:
+      * option "look":
+        - this card: stat investigateLooked (the Investigate keyword of this location looks at this many cards more than its value, while it resolves) 2, until the end of the phase
+      * option "reduce":
+        - lower threat by 3 (each player)
+
+50719:A:3 (front): Travel: Reveal the top card of the encounter deck to travel here.
+  50719:travel:1: Travel
+    - the acting player reveals an encounter card
+
+## 50720 Village Stable
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50720:A:1 (front): Investigate 1.
+  50720:forced:1: Forced on the event activeExplored (heard about this card)
+    - the first player shuffles the Investigation deck and looks at the top 1 card(s) (more with the flag investigateLooked; fewer if the deck holds fewer); they stay on top in the same order; nothing happens while a card in play ignores the Investigate keyword
+
+50720:A:2 (front): Response: After triggering the Investigate keyword on Village Stable, if the looked at card is a Suspect or a Hideout, add Village Stable to the victory display to add that card to the staging area.
+  50720:response:1: Response on the event investigated (heard about this card)
+    only if the top card of the Investigation deck (the card the keyword just showed) has one of the Traits Suspect or Hideout
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card is added to the victory display (the players' own, the group's)
+    - the top card of the Investigation deck (the card the keyword just showed) is added to the staging area faceup if it has one of the Traits Suspect or Hideout
+
+50720:A:3 (front): Travel: Each player discards 1 random card from his hand to travel here.
+  50720:travel:1: Travel
+    - each player discards 1 random card(s) from hand
+
+## 50721 Bill Ferny
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50721:A:1 (front): Cannot be optionally engaged.
+  50721:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+50721:A:2 (front): The first treachery revealed each round gains doomed 1 and its effects cannot be canceled.
+  50721:constant:2: Constant
+    - while this card is in play (under its condition), the When Revealed effects of the first treachery revealed each round cannot be canceled, and that treachery gains doomed 1 as it is revealed
+
+50721:A:3 (shadow): Shadow: Either raise your threat by 4, or this attack is considered undefended.
+  50721:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 4 (the acting player)
+      * option "undefended":
+        - this attack is considered undefended
+
+## 50722 Bree-land Informant
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50722:A:1 (front): Response: After Bree-land Informant makes an attack against you, if it was dealt a shadow card with no shadow effect, raise your threat by 1 and spend 1 resource to look at the bottom card of the Investigation deck. Then, discard Bree-land Informant.
+  50722:response:1: Response once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (the acting player)
+    - then, if [json condition {"kind":"resources","min":1}] (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player looks at the bottom card of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
+    - then, if [json condition {"kind":"resources","min":1}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
+    - [json SpendResources {"verb":"SpendResources","amount":1}]
+
+## 50723 Lawless Ruffian
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50723:A:1 (front): While engaged with a player with threat 35 or higher, Lawless Ruffian gets +2 Attack.
+  50723:constant:1: Constant
+    only if all of: (this card is engaged with the player) and (the actor's threat is at least 35)
+    - this card: stat attack 2, while this card is in play
+
+50723:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  50723:shadow:1: Shadow
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 50724 Greenway Footpad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50724:A:1 (front): When Revealed: Either raise each player's threat by 2 or Greenway Footpad makes an immediate attack against the first player.
+  50724:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 2 (each player)
+      * option "attack":
+        - this card attacks the first player now, from the staging area
+
+50724:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if your threat is 35 or higher).
+  50724:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the actor's threat is at least 35: the attacking enemy: stat attack 2, until the end of the attack
+    - then, if not (the actor's threat is at least 35) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 50725 Chetwood Outlaw
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50725:A:1 (front): Forced: After you optionally engage Chetwood Outlaw, raise your threat by 4.
+  50725:forced:1: Forced on the event optionallyEngaged (heard about this card)
+    - raise threat by 4 (the player the event is about)
+
+50725:A:2 (shadow): Shadow: Either raise your threat by 2, or return attacking enemy to the staging area after this attack.
+  50725:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 2 (the acting player)
+      * option "return":
+        - when the attack in progress ends:
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 50726 Hired Muscle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50726:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50726:A:2 (front): When Revealed: Attach to a Brigand enemy without a copy of Hired Muscle attached and return that enemy to the staging area. (Counts as a Condition attachment with the text: "Attached enemy gets +1 Threat, +1 Attack, +1 Defense and gains: 'Forced: When attached enemy is defeated, look at the bottom card of the Investigation deck.'")
+  50726:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Brigand enemy (any player controls) or in the staging area, with no attachment named "Hired Muscle"
+    - then, if there is a Brigand enemy (any player controls) or in the staging area, with no attachment named "Hired Muscle" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - then, if there is a Brigand enemy (any player controls) or in the staging area, with an attachment named "Hired Muscle" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+  50726:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  50726:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat threat 1, while this card is in play
+    - its host: stat attack 1, while this card is in play
+    - its host: stat defense 1, while this card is in play
+  50726:forced:1: Forced on the event hostDefeated
+    - the acting player looks at the bottom card of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
+
+## 50727 Smoke and Mirrors
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50727:A:1 (front): When Revealed: Discard the top X cards of the encounter deck, where X is 1 more than the Investigate value of the active location. Until the end of the phase, add the Threat of each card discarded by this effect to the total Threat in the staging area.
+  50727:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed) + 1 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+    - the total Threat in the staging area is the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) higher until the end of the phase
+
+50727:A:2 (shadow): Shadow: Discard an attachment you control.
+  50727:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 50728 Rising Body Count
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50728:A:1 (front): When Revealed: Either raise each player's threat by 2, or shuffle Rising Body Count into the Investigation deck.
+  50728:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 2 (each player)
+      * option "shuffle":
+        - this card is shuffled into the Investigation deck, facedown
+
+50728:A:2 (shadow): Shadow: If this attack destroys a character, either raise your threat by 2, or shuffle Rising Body Count into the Investigation deck.
+  50728:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "threat":
+        - when the attack in progress ends:
+          - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 2 (the acting player)
+      * option "shuffle":
+        - once the attack ends, if it destroyed a character, this shadow card is shuffled into the Investigation deck, facedown
+
+## 50729 Deadly Accusations
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50729:A:1 (front): When Revealed: Raise each player's threat by X, where X is 1 more than the Investigate value of the active location.
+  50729:whenRevealed:1: When revealed
+    - raise threat by the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed) + 1 (each player)
+
+50729:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the Investigate value of the active location.
+  50729:shadow:1: Shadow
+    - the attacking enemy: stat attack the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed), until the end of the attack
+
+(rendered pieces: 257 by template, 9 as JSON)

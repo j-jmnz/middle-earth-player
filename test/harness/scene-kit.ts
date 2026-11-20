@@ -44,8 +44,9 @@ export function codesIn(state: ScenarioState, zone: string): string[] {
 }
 
 /** A card of the staging area or another zone: a code, or a code with its tokens. */
-export type Entry = string | { code: string; damage?: number; resources?: number; progress?: number };
-export const entry = (item: Entry): { code: string; damage: number; resources: number; progress: number } => (typeof item === "string" ? { code: item, damage: 0, resources: 0, progress: 0 } : { code: item.code, damage: item.damage ?? 0, resources: item.resources ?? 0, progress: item.progress ?? 0 });
+export type Entry = string | { code: string; damage?: number; resources?: number; progress?: number; upgraded?: true };
+// `upgraded`: a ship-objective shows its Upgraded side, side B (The Hunt for the Dreadnaught's ships).
+export const entry = (item: Entry): { code: string; damage: number; resources: number; progress: number; upgraded: boolean } => (typeof item === "string" ? { code: item, damage: 0, resources: 0, progress: 0, upgraded: false } : { code: item.code, damage: item.damage ?? 0, resources: item.resources ?? 0, progress: item.progress ?? 0, upgraded: item.upgraded === true });
 
 /** An answer to the choices a resolving effect opens (the first option by default). */
 export function answer(run: Run, ctx: ReduceContext, pick: (state: ScenarioState) => string = (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")): Run {

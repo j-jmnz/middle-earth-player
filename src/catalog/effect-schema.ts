@@ -210,6 +210,8 @@ const forEachPlayerSchema = verbFlags(z.strictObject({
   // `otherThanGuardian`: each player but him, in player order ("reduce the threat of each player not guarding Gollum by 2", 02133:A:2).
   // `engaged`: only the player the source enemy is engaged with ("the engaged player chooses", 901703:A:2); nobody when it is not engaged.
   seats: z.enum(["guardian", "otherThanGuardian", "engaged"]).optional(),
+  // At most this many players, in the order the effect runs ("one different 0 cost location per player (limit 2)", 51048:A:1).
+  limit: z.number().int().positive().optional(),
   // An Each runs for the player acting: "deal 1 damage to each character controlled by the player guarding Gollum" is an Each of the characters he controls (02138:A:2).
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, eachSchema])),
 }), { runsInFrame: true });
@@ -322,6 +324,8 @@ export const effectSchema = z.strictObject({
   byEncounterDeck: z.literal(true).optional(),
   // A "revealed" event is not heard when the card was found in the encounter discard pile by a search ("revealed from the encounter deck" counts a search of the deck, 09016:A:3).
   notFromDiscard: z.literal(true).optional(),
+  // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/brief.md, Attack on Dol Guldur, reading 5).
+  early: z.literal(true).optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").
   uncancelable: conditionSchema.optional(),

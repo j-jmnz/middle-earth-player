@@ -8,7 +8,7 @@ import { ruleDoc } from "./ledger.ts";
 
 export type KeywordKey =
   | "surge" | "peril" | "indestructible" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
-  | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn";
+  | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn" | "pillage" | "massive";
 
 /** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. `text`: a keyword no rules span defines (Burn X) says its definition itself, with the source it comes from. */
 export type RuleWord = { word: string; rules: readonly string[]; text?: { paragraphs: readonly string[]; source: string } };
@@ -48,6 +48,23 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
         "Burn X: when a card says to resolve all burn damage, add up the Burn X of every location in play, in the staging area or active. Each player in turn, from the first player, may exhaust any number of ready characters he controls and assign any amount of that damage to them, each up to its remaining hit points. The damage nobody takes is placed on Lake-town.",
       ],
       source: "Quest Companion (community source)",
+    },
+  },
+  // Pillage X and Massive (The Hunt for the Dreadnaught): the Dream-chaser rules span none of them; the box rulebook defines them (docs/brief.md, The Hunt for the Dreadnaught, readings 17 and 21).
+  pillage: {
+    word: "Pillage",
+    rules: [],
+    text: {
+      paragraphs: ["Pillage X: after an attack by an enemy with Pillage X has resolved, defended or not, the attacked player discards the top X cards of their deck, one at a time (all of them when fewer remain). An attack that was canceled makes none."],
+      source: "RulesPal transcription of the box rulebook (community source)",
+    },
+  },
+  massive: {
+    word: "Massive",
+    rules: [],
+    text: {
+      paragraphs: ["Massive: the enemy stays in the staging area and is engaged with every player at once. Every player may attack it, no engagement check engages it, and in the combat phase it attacks each player in turn, once each, with a shadow card dealt for each attack."],
+      source: "RulesPal transcription of the box rulebook (community source)",
     },
   },
   // Spectral (The Stone of Erech): from RulesPal's transcription of the scenario's rulesheet, which data/rules does not hold (docs/brief.md, The Stone of Erech, Spectral).

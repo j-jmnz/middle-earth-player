@@ -81,6 +81,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return reattachSelf(state, instruction, focus);
     // Read when the scenario's definition is built (BranchStage, rules/families/quest/branch.ts); nothing to do when it runs.
     case "BranchStage":
+    case "AdvanceIfAttached":
       return state;
     case "ShuffleStages":
       return shuffleStages(state, instruction.codes);
@@ -188,4 +189,4 @@ function removeProgressUnpayable(state: ScenarioState, instruction: Instruction,
   return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < needed;
 }
 
-export const manifest: RulesFamily = { name: "quest", settle: { before: announceEliminated, sweep: resetSweep }, travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest", "RemoveAllProgress", "RemoveProgressEach", "PlaceProgressOnQuestCard"], run };
+export const manifest: RulesFamily = { name: "quest", settle: { before: announceEliminated, sweep: resetSweep }, travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "AdvanceIfAttached", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest", "RemoveAllProgress", "RemoveProgressEach", "PlaceProgressOnQuestCard"], run };

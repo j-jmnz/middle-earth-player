@@ -69,6 +69,15 @@ import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
 import * as erech from "../scenarios/the-stone-of-erech/game.ts";
 import * as forest from "../scenarios/the-old-forest/game.ts";
 import * as downs from "../scenarios/fog-on-the-barrow-downs/game.ts";
+import * as belegost from "../scenarios/the-ruins-of-belegost/game.ts";
+import * as pony from "../scenarios/murder-at-the-prancing-pony/game.ts";
+import * as annuminas from "../scenarios/the-siege-of-annuminas/game.ts";
+import * as guldur from "../scenarios/attack-on-dol-guldur/game.ts";
+import * as quest from "../scenarios/the-wizards-quest/game.ts";
+import * as woodland from "../scenarios/the-woodland-realm/game.ts";
+import * as mines from "../scenarios/the-mines-of-moria/game.ts";
+import * as khazad from "../scenarios/escape-from-khazad-dum/game.ts";
+import * as dreadnaught from "../scenarios/the-hunt-for-the-dreadnaught/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -164,4 +173,13 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),
   entry("the-old-forest", "The Old Forest", forest.FOREST_GOLDENS, forest.forestWorld, forest.playGolden),
   entry("fog-on-the-barrow-downs", "Fog on the Barrow-downs", downs.DOWNS_GOLDENS, downs.downsWorld, downs.playGolden),
+  entry("the-ruins-of-belegost", "The Ruins of Belegost", belegost.BELEGOST_GOLDENS, belegost.belegostWorld, belegost.playGolden),
+  entry("murder-at-the-prancing-pony", "Murder at the Prancing Pony", pony.PONY_GOLDENS, pony.ponyWorld, pony.playGolden),
+  entry("the-siege-of-annuminas", "The Siege of Annúminas", annuminas.ANNUMINAS_GOLDENS, annuminas.annuminasWorld, annuminas.playGolden),
+  entry("attack-on-dol-guldur", "Attack on Dol Guldur", guldur.GULDUR_GOLDENS, guldur.guldurWorld, guldur.playGolden),
+  entry("the-wizards-quest", "The Wizard's Quest", quest.QUEST_GOLDENS, quest.questWorld, quest.playGolden),
+  entry("the-woodland-realm", "The Woodland Realm", woodland.WOODLAND_GOLDENS, woodland.woodlandWorld, woodland.playGolden),
+  entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
+  entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
+  entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
 ];

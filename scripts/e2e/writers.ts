@@ -65,6 +65,15 @@ import { townFixtures } from "./standalone-scenarios/the-battle-of-lake-town.ts"
 import { erechFixtures } from "./standalone-scenarios/the-stone-of-erech.ts";
 import { forestFixtures } from "./standalone-scenarios/the-old-forest.ts";
 import { downsFixtures } from "./standalone-scenarios/fog-on-the-barrow-downs.ts";
+import { belegostFixtures } from "./standalone-scenarios/the-ruins-of-belegost.ts";
+import { ponyFixtures } from "./standalone-scenarios/murder-at-the-prancing-pony.ts";
+import { annuminasFixtures } from "./standalone-scenarios/the-siege-of-annuminas.ts";
+import { guldurFixtures } from "./standalone-scenarios/attack-on-dol-guldur.ts";
+import { questFixtures } from "./standalone-scenarios/the-wizards-quest.ts";
+import { woodlandFixtures } from "./standalone-scenarios/the-woodland-realm.ts";
+import { minesFixtures } from "./standalone-scenarios/the-mines-of-moria.ts";
+import { khazadFixtures } from "./standalone-scenarios/escape-from-khazad-dum.ts";
+import { dreadnaughtFixtures } from "./standalone-scenarios/the-hunt-for-the-dreadnaught.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -139,4 +148,13 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-stone-of-erech": () => erechFixtures(),
   "the-old-forest": () => forestFixtures(),
   "fog-on-the-barrow-downs": () => downsFixtures(),
+  "the-ruins-of-belegost": () => belegostFixtures(),
+  "murder-at-the-prancing-pony": () => ponyFixtures(),
+  "the-siege-of-annuminas": () => annuminasFixtures(),
+  "attack-on-dol-guldur": () => guldurFixtures(),
+  "the-wizards-quest": () => questFixtures(),
+  "the-woodland-realm": () => woodlandFixtures(),
+  "the-mines-of-moria": () => minesFixtures(),
+  "escape-from-khazad-dum": () => khazadFixtures(),
+  "the-hunt-for-the-dreadnaught": () => dreadnaughtFixtures(),
 };

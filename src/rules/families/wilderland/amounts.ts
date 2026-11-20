@@ -11,6 +11,7 @@ import { livingSeats, type ScenarioState } from "../../core/state.ts";
 import { cardsUnder } from "../../core/zones.ts";
 import { seatThreat } from "../play/hooks.ts";
 import { discoverValue } from "./discover.ts";
+import { siegeAmount } from "./dolguldur.ts";
 
 const printedCost = (state: ScenarioState, id: string | undefined, ctx: ReduceContext): number => {
   return id ? (printedOf(ctx.cards, state.cards[id]?.code ?? "").cost ?? 0) : 0;
@@ -18,6 +19,8 @@ const printedCost = (state: ScenarioState, id: string | undefined, ctx: ReduceCo
 
 /** `mostPerPlayer`: the most cards matching the pick that any one player controls, counted from each player's own side ("the player with the most characters"). `guardedCost`: the printed cost of the card the source guards (under it, or the player card it guards). `firstPlayerTens`: the tens digit of the first player's threat. `discoverValue`: the Discover value of the active location. `excessOf`: the damage the destroyed character took beyond its remaining hit points when it was dealt (the event's amount). Null for any other amount. */
 export function wilderlandAmount(state: ScenarioState, amount: Exclude<Amount, number>, scope: AmountScope, ctx: ReduceContext): number | null {
+  // "X is the total siege value of each location explored and each enemy destroyed this round" (50907:A:1).
+  if (amount.siegeTally) return siegeAmount(state, amount);
   if (amount.guardedCost) {
     const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
     if (!source) return 0;

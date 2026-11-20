@@ -17,7 +17,7 @@ import { declaredDefenders } from "../../rules/families/defense/defenders.ts";
 import { activeOf, areaOf, isSeparate, parkedStage, sharedStaging, stageOf, stagingOf } from "../../rules/families/breaking/areas.ts";
 
 import { threatRows } from "./foresight.ts";
-import { isDiscardPile, opensList, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId } from "./pile-ids.ts";
+import { isDiscardPile, opensList, pileIds, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId } from "./pile-ids.ts";
 import { areaGroup, areaRoleOf, type AreaRole } from "./stormcaller-table.ts";
 
 export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActiveLocation" | "engaged" | "play" | "hand";
@@ -25,7 +25,7 @@ export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActive
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
 // The piles, by name, live in pile-ids.ts and are read through here.
-export { isDiscardPile, opensList, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId };
+export { isDiscardPile, opensList, pileIds, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId };
 
 // How characters fight an engaged enemy in the attack in progress: defending it, hit by it undefended, or attacking it.
 export type FightKind = "defense" | "undefended" | "attack";
@@ -261,39 +261,6 @@ export function zoneSelector(zone: ZoneId, seat: number, facts?: ZoneFacts): (ga
 // A deck also carries the encounter cards attached to it (Iron Shackles, 01105:A:1), drawn under it. The victory display also carries
 // the two cards under its top, fanned behind it, and the Victory points its cards score (victoryPileSelector).
 export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null; attached?: readonly CardInstance[]; fan?: readonly CardInstance[]; points?: number };
-
-/** The cards of a pile, bottom first: the shown seat's deck or discard pile, the encounter pair, the second slot's piles. */
-export function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
-  switch (pile) {
-    case "deck":
-      return game.seats[seat]?.deck ?? NONE;
-    case "discard":
-      return game.seats[seat]?.discard ?? NONE;
-    case "encounterDeck":
-      return game.encounterDeck;
-    case "encounterDiscard":
-      return game.encounterDiscard;
-    case "corsairDeck":
-      return game.corsairDeck ?? NONE;
-    case "corsairDiscard":
-      return game.corsairDiscard ?? NONE;
-    case "unchartedDeck":
-    case "grottoDeck":
-      return game.uncharted?.deck ?? NONE;
-    case "evilCreaturesDeck":
-    case "evilCreaturesDiscard":
-    case "balrogDeck":
-    case "balrogDiscard":
-    case "cavesDeck":
-    case "haradDeck":
-    case "angmarOrcDeck":
-    case "smaugDeck":
-    case "smaugDiscard":
-      return game.piles?.[pile] ?? NONE;
-    case "victory":
-      return game.victory;
-  }
-}
 
 /** A memoized selector for one pile: the same view while the pile's list and its top card are the same objects. */
 export function pileSelector(pile: PileId, seat: number): (game: ScenarioState) => PileView {

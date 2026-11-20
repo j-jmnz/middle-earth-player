@@ -71,7 +71,7 @@ export function deckWords(instruction: Instruction): string | null {
     case "ShuffleDiscardIntoDeck":
       return verb.who === "picked" ? "shuffle that player's discard pile into their deck" : "shuffle your discard pile into your deck";
     case "ShuffleHandIntoDeck":
-      return "shuffle your hand into your deck";
+      return verb.keepPicked ? "shuffle the rest of your hand into your deck" : "shuffle your hand into your deck";
     case "DiscardFromDeck": {
       const amount = amountWords(verb.amount);
       return `discard the top ${amount === "1" ? "card" : `${amount} cards`} of your deck`;

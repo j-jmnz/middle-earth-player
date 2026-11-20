@@ -6,6 +6,7 @@ import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { inPlay } from "../../core/state.ts";
 import type { PrintedCard } from "../../core/printed.ts";
 import type { Destination } from "../../core/zones.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
 import type { SeaRoute, SeaState } from "./types.ts";
 
 /** The encounter set of the two double-sided cards that have no encounter card back (dcce.stormcaller-elite). */
@@ -18,9 +19,19 @@ export function isElite(printed: PrintedCard): boolean {
   return printed.encounterSet === ELITE_SET;
 }
 
+/** The trait the "Prepare the Corsair deck" of the game's mode card asks of the enemies it takes (`PrepareCorsairDeck` `trait`: The Hunt for the Dreadnaught, whose Sea Monster is a Creature enemy), or undefined where it takes every non-ship enemy (every game without such a mode card). */
+export function corsairTrait(effects: readonly Effect[], modeCode: string | undefined): string | undefined {
+  if (modeCode == null) return undefined;
+  for (const effect of effects) {
+    if (effect.cardCode !== modeCode) continue;
+    for (const instruction of effect.instructions) if (instruction.verb === "PrepareCorsairDeck" && instruction.trait != null) return instruction.trait;
+  }
+  return undefined;
+}
+
 /** The sea state of a new game: the routes of every card of the world that has one, or none when the world holds no ship and no Elite card (every
  * other game keeps a state without `sea`). */
-export function stampRoutes(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
+export function stampRoutes(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, trait?: string): ScenarioState {
   if (state.sea) return state;
   const routes: Record<string, SeaRoute> = {};
   let sea = false;
@@ -30,7 +41,7 @@ export function stampRoutes(state: ScenarioState, cards: ReadonlyMap<string, Pri
       sea = true;
       if (printed.type === "enemy") routes[printed.code] = "victory";
       else if (printed.type === "objective") routes[printed.code] = "removed";
-    } else if (printed.type === "enemy" && printed.ship == null) {
+    } else if (printed.type === "enemy" && printed.ship == null && (trait == null || printed.traits.includes(trait))) {
       routes[printed.code] = "corsair";
     }
   }

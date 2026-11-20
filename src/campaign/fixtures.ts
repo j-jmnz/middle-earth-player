@@ -73,6 +73,15 @@ import townFixtures from "./fixtures/the-battle-of-lake-town.json";
 import erechFixtures from "./fixtures/the-stone-of-erech.json";
 import forestFixtures from "./fixtures/the-old-forest.json";
 import downsFixtures from "./fixtures/fog-on-the-barrow-downs.json";
+import belegostFixtures from "./fixtures/the-ruins-of-belegost.json";
+import ponyFixtures from "./fixtures/murder-at-the-prancing-pony.json";
+import annuminasFixtures from "./fixtures/the-siege-of-annuminas.json";
+import guldurFixtures from "./fixtures/attack-on-dol-guldur.json";
+import questFixtures from "./fixtures/the-wizards-quest.json";
+import woodlandFixtures from "./fixtures/the-woodland-realm.json";
+import minesFixtures from "./fixtures/the-mines-of-moria.json";
+import khazadFixtures from "./fixtures/escape-from-khazad-dum.json";
+import dreadnaughtFixtures from "./fixtures/the-hunt-for-the-dreadnaught.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -164,6 +173,15 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-stone-of-erech": erechFixtures,
   "the-old-forest": forestFixtures,
   "fog-on-the-barrow-downs": downsFixtures,
+  "the-ruins-of-belegost": belegostFixtures,
+  "murder-at-the-prancing-pony": ponyFixtures,
+  "the-siege-of-annuminas": annuminasFixtures,
+  "attack-on-dol-guldur": guldurFixtures,
+  "the-wizards-quest": questFixtures,
+  "the-woodland-realm": woodlandFixtures,
+  "the-mines-of-moria": minesFixtures,
+  "escape-from-khazad-dum": khazadFixtures,
+  "the-hunt-for-the-dreadnaught": dreadnaughtFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

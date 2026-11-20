@@ -5,16 +5,25 @@ import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, modifierActive } from "../../core/state.ts";
 import { constantInstructions } from "../../interpret/constant-records.ts";
+import { markDoomed } from "../angmar/weather.ts";
+import { markSurge } from "../../interpret/verbs.ts";
 import { stageName } from "./gundabad.ts";
 import type { PlayHow } from "../../interpret/family-manifest.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 
-/** A treachery was revealed: the first of the round is marked (`firstTreachery`, on the card until the round ends), in a game with an UncancelableWhenRevealed `firstRevealedEachRound`. */
+/** A treachery was revealed: the first of the round is marked (`firstTreachery`, on the card until the round ends), in a game with an UncancelableWhenRevealed `firstRevealedEachRound`; a `doomed` and a `surge` on that verb are gained as it is revealed. */
 export function noteTreacheryReveal(state: ScenarioState, cardId: string, ctx: ReduceContext): ScenarioState {
   const card = state.cards[cardId];
   if (!card || printedOf(ctx.cards, card.code).type !== "treachery" || flagged(state, "table", "treacheryRevealed") || !gameReads(state, ctx, '"firstRevealedEachRound"')) return state;
   const mark = (instanceId: string, stat: "treacheryRevealed" | "firstTreachery") => ({ instanceId, sourceId: instanceId, stat, amount: 1, until: "endOfRound" as const });
-  return { ...state, modifiers: [...state.modifiers, mark("table", "treacheryRevealed"), mark(cardId, "firstTreachery")] };
+  const marked = { ...state, modifiers: [...state.modifiers, mark("table", "treacheryRevealed"), mark(cardId, "firstTreachery")] };
+  // "The first treachery revealed each round gains doomed 1" (50721:A:2): it gains Doomed on top of its printed Doomed as it is revealed, while the card that says so is in play.
+  const held = constantInstructions(marked, ctx);
+  const doomed = held.reduce((sum, { instruction }) => sum + (instruction.verb === "UncancelableWhenRevealed" && instruction.firstRevealedEachRound === true ? (instruction.doomed ?? 0) : 0), 0);
+  const doomedState = doomed > 0 ? markDoomed(marked, cardId, doomed) : marked;
+  // "The first treachery revealed each round gains surge" (51240:A:1): the card surges as it is revealed.
+  const surges = held.some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && instruction.firstRevealedEachRound === true && instruction.surge === true);
+  return surges ? markSurge(doomedState, cardId) : doomedState;
 }
 
 /** A LimitPlaysPerPhase or LimitPlaysPerRound that bars the card: the name of the card that holds it, the most cards a player plays in the phase or the round and the number the active player has played. */

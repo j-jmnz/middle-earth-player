@@ -46,7 +46,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RemoveUnusedStages":
       return removeUnusedStages(state, instruction.codes);
     case "AdvanceToStage":
-      return advanceToStage(state, instruction.code, ctx, steps);
+      return advanceToStage(state, instruction.code, ctx, steps, instruction.again === true);
     case "SplitToOwnStage":
       return splitToOwnStage(state, instruction.code, focus.seat, ctx, steps);
     case "ReturnToSharedStage":
@@ -73,8 +73,11 @@ export function isBreakingVerb(verb: string): boolean {
 
 // AdvanceToStage ("advance to stage 4A", 142063:B:2): runs on the acting seat's view, so the stage is that seat's. The stage left is defeated (its attachments are
 // released, rr.attachment-cards) and set aside, the new stage is side B up with no progress, and its When Revealed effects are pushed as frames for the seat.
-export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const nextId = state.questDeck.find((id) => state.cards[id]?.code === code);
+export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[], again = false): ScenarioState {
+  // With `again`, a stage the quest already left lies set aside and may come back to (Attack on Dol Guldur's four stage 3s), with no tokens left on it.
+  const fromDeck = state.questDeck.find((id) => state.cards[id]?.code === code);
+  const fromAside = fromDeck || !again ? undefined : state.setAside.find((id) => state.cards[id]?.code === code);
+  const nextId = fromDeck ?? fromAside;
   if (!nextId) return state;
   const before = steps.length;
   let next = state;
@@ -84,7 +87,7 @@ export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceCo
     next = moveCard(next, currentId, { zone: "setAside" });
   }
   // The seat controls its own stage once stages are separate: the Forced effects and Responses of a stage are about its own seat (mec109.multiple-staging-areas).
-  next = updateCard(moveCard(next, nextId, { zone: "questStage" }), nextId, { face: "B", ...(state.viewSeat != null ? { controller: state.viewSeat } : {}) });
+  next = updateCard(moveCard(next, nextId, { zone: "questStage" }), nextId, { face: "B", ...(fromAside ? { progress: 0, resources: 0, damage: 0 } : {}), ...(state.viewSeat != null ? { controller: state.viewSeat } : {}) });
   steps.push({ kind: "advance", cardId: nextId });
   // Only a game with a card that hears "after a quest card is defeated" keeps the stage it left (Lost in Mirkwood's letters), so every other game's state stays as it was.
   if (currentId && questCardDefeatedHeard(next, ctx)) next = noteSkippedStage(next, nextId, currentId);

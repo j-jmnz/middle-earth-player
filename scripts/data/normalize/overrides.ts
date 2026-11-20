@@ -7,7 +7,7 @@ const overridesSchema = z.object({
   cards: z.array(
     z.object({
       match: z.object({ code: z.string().optional(), name: z.string().optional(), set: z.string().optional(), number: z.number().optional() }),
-      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), encounterSet: z.string().optional(), name: z.string().optional(), imageUrls: z.array(z.string().url()).min(1).optional(), traits: z.array(z.string().min(1)).optional(), type: z.enum(["ship-enemy"]).optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), willpower: z.number().int().optional(), attack: z.number().int().optional(), defense: z.number().int().optional(), health: z.number().int().optional(), victory: z.number().int().nullable().optional(), questPoints: z.number().int().nullable().optional(), backType: z.enum(["player", "encounter"]).nullable().optional(), keywords: z.record(z.string(), z.unknown()).optional(), back: z.union([z.object({ willpower: z.number().int().optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), attack: z.number().int(), defense: z.number().int(), health: z.number().int(), victory: z.number().int().optional() }), z.object({ threat: z.number().int() })]).optional() }),
+      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), encounterSet: z.string().optional(), name: z.string().optional(), imageUrls: z.array(z.string().url()).min(1).optional(), traits: z.array(z.string().min(1)).optional(), type: z.enum(["ship-enemy", "enemy"]).optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), cost: z.number().int().optional(), willpower: z.number().int().optional(), attack: z.number().int().optional(), defense: z.number().int().optional(), health: z.number().int().optional(), victory: z.number().int().nullable().optional(), questPoints: z.number().int().nullable().optional(), backType: z.enum(["player", "encounter"]).nullable().optional(), keywords: z.record(z.string(), z.unknown()).optional(), back: z.union([z.object({ willpower: z.number().int().optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), attack: z.number().int(), defense: z.number().int(), health: z.number().int(), victory: z.number().int().optional() }), z.object({ threat: z.number().int(), attack: z.number().int(), defense: z.number().int(), victory: z.number().int().optional() }), z.object({ threat: z.number().int() })]).optional() }),
       reason: z.string().min(1),
       source: z.string().min(1),
     }),
@@ -22,6 +22,8 @@ const overridesSchema = z.object({
         code: z.string().min(1),
         from: z.enum(PILES).optional(),
         pile: z.enum([...PILES, "campaign"]),
+        // The code of the card's other side, where the load list holds only one side of a two-sided card (Escape from Khazad-dûm's Dark Pit, whose back is Durin's Bane).
+        back: z.string().min(1).optional(),
         reason: z.string().min(1),
         source: z.string().min(1),
       }),

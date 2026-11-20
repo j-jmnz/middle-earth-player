@@ -26,7 +26,7 @@ import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile
 // Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/writers.ts,
 // and the golden registry (test/harness/golden-registry.ts), whose two lines are written as comments because that registry's test fails
 // on an entry with no golden.json. Nothing else runs: the next commands are printed.
-// `--short` is the name the identifiers and fixture names start from (lower-case letters and digits, no hyphen; default: the id's last word, "ruins" for the-drowned-ruins).
+// `--short` is the name the identifiers and fixture names start from (lower-case letters and digits, no hyphen; default: the id's last word, "ruins" for the-drowned-ruins, unless `SHORT_OF` names another).
 // Every registry edit stays inside the object or array it changes (`insert`): a line follows the previous part's entry when that is in the block, else it goes before the block's closing line.
 
 export type Repo = {
@@ -59,8 +59,11 @@ function keyFor(name: string, code: string, used: Set<string>): string {
   return key;
 }
 
+// A scenario whose last word another scenario already uses (The Dread Realm owns "realm", Flight from Moria "moria", The Caves of Nibin-Dûm and The Battle of Carn Dûm "dum") starts from another word.
+const SHORT_OF: Readonly<Record<string, string>> = { "the-woodland-realm": "woodland", "the-mines-of-moria": "mines", "escape-from-khazad-dum": "khazad" };
+
 function defaultShort(id: string): string {
-  return id.split("-").at(-1) ?? id;
+  return SHORT_OF[id] ?? id.split("-").at(-1) ?? id;
 }
 
 /** The facts of the scenario: its data, the campaign that plays it and the part before it. */

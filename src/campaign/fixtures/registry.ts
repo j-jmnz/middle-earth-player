@@ -77,6 +77,15 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "the-stone-of-erech", kind: "standalone", names: ["erech-won", "erech-lost"] },
   { scenarioId: "the-old-forest", kind: "standalone", names: ["forest-won", "forest-lost"] },
   { scenarioId: "fog-on-the-barrow-downs", kind: "standalone", names: ["downs-won", "downs-lost"] },
+  { scenarioId: "the-ruins-of-belegost", kind: "standalone", names: ["belegost-won", "belegost-lost"] },
+  { scenarioId: "murder-at-the-prancing-pony", kind: "standalone", names: ["pony-won", "pony-lost"] },
+  { scenarioId: "the-siege-of-annuminas", kind: "standalone", names: ["annuminas-won", "annuminas-lost"] },
+  { scenarioId: "attack-on-dol-guldur", kind: "standalone", names: ["guldur-won", "guldur-lost"] },
+  { scenarioId: "the-wizards-quest", kind: "standalone", names: ["quest-won", "quest-lost"] },
+  { scenarioId: "the-woodland-realm", kind: "standalone", names: ["woodland-won", "woodland-lost"] },
+  { scenarioId: "the-mines-of-moria", kind: "standalone", names: ["mines-won", "mines-lost"] },
+  { scenarioId: "escape-from-khazad-dum", kind: "standalone", names: ["khazad-won", "khazad-lost"] },
+  { scenarioId: "the-hunt-for-the-dreadnaught", kind: "standalone", names: ["dreadnaught-won", "dreadnaught-lost"] },
 ] as const satisfies readonly { scenarioId: string; file?: string; kind?: "standalone"; names: readonly string[] }[];
 
 // The entries as plain data, for code that reads `kind` and `file` whichever entries carry them.

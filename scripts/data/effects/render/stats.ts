@@ -3,6 +3,8 @@ import { cardRef, renderAmount } from "./amounts.ts";
 import { ERECH_STAT_NOTES } from "./erech.ts";
 import { ESCAPE_STAT_NOTES } from "./escape.ts";
 import { FOG_STAT_NOTES } from "./fog.ts";
+import { RUINS_STAT_NOTES } from "./ruins.ts";
+import { INVESTIGATION_STAT_NOTES } from "./investigation.ts";
 import { guardianRestrict } from "./guardian.ts";
 import { isObj, str, type Ctx, type Obj } from "./kit.ts";
 import { longDarkRestrict } from "./long-dark.ts";
@@ -46,6 +48,8 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   ...SMAUG_STAT_NOTES,
   ...ERECH_STAT_NOTES,
   ...FOG_STAT_NOTES,
+  ...RUINS_STAT_NOTES,
+  ...INVESTIGATION_STAT_NOTES,
   questProgressCap: " (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count)",
   cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
   cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",
@@ -96,6 +100,7 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
     const engaged = longDarkRestrict(i);
     if (engaged) return engaged;
     if (i.what === "draw") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot draw cards through card effects (the framework's draws are not card effects)`, read: ["what", "unlessControls"] };
+    if (i.what === "travel" && i.withResources === true) return { text: "the players cannot travel to a location that holds resource tokens while this holds", read: ["what", "withResources"] };
     if (i.what === "travel" && i.exceptSelf === true) return { text: "the players cannot travel to any location but this one while this card is in play (a Travel Action is not traveling)", read: ["what", "exceptSelf"] };
     if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : typeof i.trait === "string" ? `locations with the trait ${i.trait}` : "any location"} while this holds`, read: ["what", "location", "guarding", "trait"] };
     return null;

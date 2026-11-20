@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
+import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, INVESTIGATION_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
 import type { Obj } from "./kit.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";
 
@@ -14,8 +14,10 @@ describe("effects render read fields, conditions", () => {
     namedFlag: [{ kind: "namedFlag", name: "A Card", stat: "blankText" }],
     flag: [{ kind: "flag", stat: "blankText", holder: "seat", is: false }, { kind: "flag", stat: "refreshOnce", holder: "table" }],
     canPick: [{ kind: "canPick", pick: { type: "hero", control: "you" } }],
+    optionTaken: [{ kind: "optionTaken", id: "penalty" }],
     attackedThisPhase: [{ kind: "attackedThisPhase", name: "A Card" }],
     phase: [{ kind: "phase", is: "combat" }],
+    phaseEnded: [{ kind: "phaseEnded", is: "Quest" }],
     hasEngaged: [{ kind: "hasEngaged", trait: "Orc" }],
     exhausted: [{ kind: "exhausted", code: "12345", is: true }],
     count: [{ kind: "count", pick: { type: "hero", control: "you" }, min: 1, max: 3 }],
@@ -41,7 +43,7 @@ describe("effects render read fields, conditions", () => {
     discardedHasShadowOrTentacle: [{ kind: "discardedHasShadowOrTentacle" }],
     firstLetterMatches: [{ kind: "firstLetterMatches" }],
     inVictory: [{ kind: "inVictory", code: "04065", is: true }, { kind: "inVictory", code: "04072", is: false }],
-    questProgressNoted: [{ kind: "questProgressNoted", is: true }, { kind: "questProgressNoted", is: false }],
+    questProgressNoted: [{ kind: "questProgressNoted", is: true, min: 10 }, { kind: "questProgressNoted", is: false }],
     currentQuestProgress: [{ kind: "currentQuestProgress", is: "some" }, { kind: "currentQuestProgress", is: "none" }],
     defendingAgainst: [{ kind: "defendingAgainst", trait: "Undead" }],
     versusDefender: [{ kind: "versusDefender", maxHitPoints: 2, maxWillpower: 1, ally: true }],
@@ -50,7 +52,7 @@ describe("effects render read fields, conditions", () => {
     safeActive: [{ kind: "safeActive", is: true }, { kind: "safeActive", is: false }],
     setAsideHas: [{ kind: "setAsideHas", code: "10183" }],
     searchable: [{ kind: "searchable", trait: "Troll", type: "enemy", code: "10074", deckOnly: true, victory: true }],
-    stageProgress: [{ kind: "stageProgress", min: 5 }],
+    stageProgress: [{ kind: "stageProgress", min: 5 }, { kind: "stageProgress", min: 5, perStartedPlayer: true }],
     victoryPoints: [{ kind: "victoryPoints", min: 20 }],
     firstTreachery: [{ kind: "firstTreachery" }],
     hitPointsLeft: [{ kind: "hitPointsLeft", code: "09033" }],
@@ -62,6 +64,7 @@ describe("effects render read fields, conditions", () => {
     ...ESCAPE_CONDITION_SAMPLES,
     ...ERECH_CONDITION_SAMPLES,
     ...FOG_CONDITION_SAMPLES,
+    ...INVESTIGATION_CONDITION_SAMPLES,
     ...GUARDIAN_CONDITION_SAMPLES,
     ...LONG_DARK_CONDITION_SAMPLES,
     lastFortitudePassed: [{ kind: "lastFortitudePassed" }],

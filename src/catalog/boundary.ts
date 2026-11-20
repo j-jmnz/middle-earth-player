@@ -61,6 +61,10 @@ export const printedKeywordsSchema = z.strictObject({
   // Battle / Siege on a quest card: committed characters count Attack / Defense instead of Willpower (hon.battle, hon.siege).
   battle: z.boolean().optional(),
   siege: z.boolean().optional(),
+  // The Siege value box an Attack on Dol Guldur card prints at its bottom right (docs/brief.md, Attack on Dol Guldur, reading 2): what a destroyed enemy or an explored location adds to the round's tally. A printed mark, not a quest-card flag.
+  siegeValue: z.number().int().positive().optional(),
+  // Pillage X on an enemy (docs/brief.md, The Hunt for the Dreadnaught, reading 21): after the enemy's attack on a player has resolved, that player discards the top X cards of their deck (src/rules/families/sea/pillage.ts). Not in any source's keyword list for the box: `overrides.cards` sets it from the scan.
+  pillage: z.number().int().positive().optional(),
   // Secrecy X: the card costs X less to play while its player's threat is 20 or less.
   secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).
@@ -159,6 +163,8 @@ const stageSchema = z.strictObject({
   catchUp: z.number().int().positive().optional(),
   // The stages defeating this one proceeds to in a random order, each played once: one of `codes` still in the quest deck, else `otherwise`; with `remove` the stage defeated leaves the game (AdvanceToRandomStage, 19048:B:2).
   randomNext: z.strictObject({ codes: z.array(z.string()).min(2), otherwise: z.string().optional(), remove: z.literal(true).optional(), different: z.literal(true).optional() }).optional(),
+  // The stage defeating this one proceeds to when the card with the code `code` is attached to a hero (`then`), else `otherwise`; a stage already played comes back (AdvanceIfAttached, 50601:B:3).
+  attachedNext: z.strictObject({ code: z.string(), then: z.string(), otherwise: z.string() }).optional(),
   // A stage 2 of a quest deck that is not flipped when it is revealed: it arrives side A up and shows side B from the beginning of the quest phase (FlipAtQuestPhase, 19135:A:2; emce.gundabad-quest-deck).
   deck: z.literal(true).optional(),
 });

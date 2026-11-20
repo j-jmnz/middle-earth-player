@@ -18,9 +18,9 @@ export function damageShield(state: ScenarioState, id: string, amount: number): 
  * The flag cancelsDamage, granted to the host by a constant of Dragon Scales (18059:A:2: "When attached enemy would take any amount of damage, cancel all of that damage. Then, discard Dragon Scales"): the damage that
  * would be placed on the card is canceled, and the card granting the flag goes to the encounter discard pile. The state after, or null when the card holds no such flag or no damage would be placed.
  */
-export function cancelAllDamage(state: ScenarioState, id: string, amount: number): ScenarioState | null {
+export function cancelAllDamage(state: ScenarioState, id: string, amount: number, stat: "cancelsDamage" | "cancelsLethalDamage" = "cancelsDamage"): ScenarioState | null {
   if (amount <= 0) return null;
-  const grant = state.modifiers.find((modifier) => modifier.stat === "cancelsDamage" && modifier.instanceId === id && modifierActive(state, modifier));
+  const grant = state.modifiers.find((modifier) => modifier.stat === stat && modifier.instanceId === id && modifierActive(state, modifier));
   const source = grant ? state.cards[grant.sourceId] : undefined;
   return source ? updateCard(moveCard(state, source.id, { zone: "encounterDiscard" }), source.id, { face: "up", controller: null, host: null }) : null;
 }

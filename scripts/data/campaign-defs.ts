@@ -19,8 +19,15 @@ export type ScenarioDef = {
   // for a box that has no load list of its own: the cross-check compares the built piles with them, copy counts only.
   crossCheck?: { normal: string; easy: string };
   // The DragnCards decks that load the scenario (`Q06.1`, `E06.1`), for a `load: "dragncards"` box whose decks are not the numbered
-  // `Q0C` list of the Fellowship boxes. The deck's label must be the scenario's title.
-  deck?: { normal: string; easy: string };
+  // `Q0C` list of the Fellowship boxes. The deck's label must be the scenario's title, or `label` where DragnCards prefixes the mode
+  // (The Siege of Annúminas' Q99.08 is "Standard The Siege of Annúminas", its Epic mode Q99.09).
+  deck?: { normal: string; easy: string; label?: string };
+  // The title of the mode card whose printed Setup runs before the quest card's (The Siege of Annúminas' "Standard Game Mode"): the build reads its Setup sentences with the quest card's.
+  modeCard?: string;
+  // The title of the mode card the Easy difficulty deals instead (The Hunt for the Dreadnaught's "Easy Mode"); its Setup is not read with the quest card's, the engine runs its records.
+  easyModeCard?: string;
+  // The encounter sets of a kit whose Hall of Beorn scenario file lists none of them (The Wizard's Quest: its quest card names one set, the 14 sets of its encounter cards are in the box): the sets the load list deals, in booklet order.
+  encounterSets?: readonly string[];
   // The product whose campaign card, boons and burdens the scenario deals when it is not `product` (the Dream-chaser Campaign Expansion
   // reprints the nine scenarios of seven boxes and holds every campaign card).
   campaignProduct?: string;
@@ -130,6 +137,15 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Stone of Erech", packs: ["TSoE"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2013" },
   { name: "The Old Forest", packs: ["TOF"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2014", scenarioTitle: "The Old Forest" },
   { name: "Fog on the Barrow-downs", packs: ["FotBd"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2014", scenarioTitle: "Fog on the Barrow-downs" },
+  { name: "The Ruins of Belegost", packs: ["TRoB"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2015", scenarioTitle: "The Ruins of Belegost" },
+  { name: "Murder at the Prancing Pony", packs: ["MatPP"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2015", scenarioTitle: "Murder at the Prancing Pony" },
+  { name: "The Siege of Annúminas", packs: ["TSoA"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2016", scenarioTitle: "The Siege of Annúminas" },
+  { name: "Attack on Dol Guldur", packs: ["AoDG"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2017", scenarioTitle: "Attack on Dol Guldur" },
+  { name: "The Wizard's Quest", packs: ["TWQ"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Woodland Realm", packs: ["TWR"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Mines of Moria", packs: ["TMoM"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Escape from Khazad-dûm", packs: ["EfKD"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Hunt for the Dreadnaught", packs: ["THftD"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
   { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },

@@ -60,6 +60,10 @@ const VERBS = [
   // scenario definition copies it onto the stage (`stages[i].branch`) and advanceStage (rules/quest/quest.ts) takes the branch, so running
   // it does nothing. A stage reached by a branch is the last one: defeating it wins the game.
   z.strictObject({ verb: z.literal("BranchStage"), codes: z.array(z.string().min(1)).min(2) }),
+  // On a quest card's Forced effect "When this stage is defeated, if Keys of Belegost is attached to a hero, advance to stage 2C. Otherwise, advance to stage 2A" (50601:B:3 to 50606:B:3): the stage's defeat proceeds to the quest card with the code `then` when the card with the
+  // code `code` (a Loot objective) is attached to a hero, else to the one with `otherwise`. The stage has no next stage in order. A stage the quest played before comes back from the set-aside pile with no progress (the branches of The Ruins of Belegost lead round). The scenario definition
+  // copies it onto the stage (`stages[i].attachedNext`) and advanceStage (rules/quest/quest.ts) takes it, so running it does nothing.
+  z.strictObject({ verb: z.literal("AdvanceIfAttached"), code: z.string().min(1), then: z.string().min(1), otherwise: z.string().min(1) }),
   // Setup: "Shuffle each stage 2 card in the quest deck so that their order is random, leaving stage 3 on the bottom" (11016:A:1). The quest cards
   // named by `codes` that are in the quest deck are put in a random order (the scenario's seed) on top of it, the others below them in the
   // order they were. A quest with such a deck advances in the order of its quest deck (LookAtStages).
@@ -94,6 +98,8 @@ const TRIGGERS = [
   // About the table, once: the quest resolved successfully and placed progress on the active location, on a card that takes it first or on the stage ("After placing progress as the result of questing successfully", 147002:B:2). Not about one placement: a quest that fills a location
   // and goes on to the stage still raises it once.
   "questProgressPlaced",
+  // About the table, once: the quest resolved successfully and placed progress on the current stage itself, not only on a location ("After the players place progress on this stage from questing successfully", 50702:B:2).
+  "questProgressPlacedOnStage",
   // About each character committed to the quest when it resolved: the quest succeeded ("After ~ quests successfully"), or it
   // resolved at all ("After resolving a quest to which ~ was committed").
   "questedSuccessfully",

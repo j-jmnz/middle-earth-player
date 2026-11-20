@@ -31,6 +31,10 @@ export const pickSchema = z.strictObject({
   // The cards "at this stage" (Breaking of the Fellowship, mec109.multiple-staging-areas): once stages are separate the chooser's own staging area, the enemies
   // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/interpret/pick.ts.
   atStage: z.literal(true).optional(),
+  // The cards "at another stage" than the chooser's (The Siege of Annúminas' stage 3B, 50805:B:2; docs/brief.md, The Siege of Annúminas, reading 9): a game with one stage, as the Standard Game Mode is, has no card at another stage, so the filter matches nothing. Read by src/rules/interpret/pick.ts.
+  atOtherStage: z.literal(true).optional(),
+  // With `type: player`: only a player who controls heroes holding this many resources in all, so that he can pay them ("Any player may spend 1 resource to take control of Dúnedain of Annúminas", 50818:A:2). Read by src/rules/families/wilderland/seat-pick.ts.
+  canSpendResources: z.number().int().positive().optional(),
   // With `type: player`: only a player whose staging area is a different one from the chooser's, once stages are separate ("a different player's staging area", 901703:A:2); with one staging area every other player. Read by src/rules/interpret/pick.ts.
   otherArea: z.literal(true).optional(),
   // A character whose printed hit points are fewer than those of the enemy making the attack in progress ("if the defending character has fewer printed hit
@@ -53,8 +57,9 @@ export const pickSchema = z.strictObject({
   // A hero with this printed resource icon ("each hero you control with a printed Spirit resource icon").
   printedIcon: sphereSchema.optional(),
   // `loot`: the loot cards of the chooser's that guard a location, under it (The Burglar's Turn, 22024).
+  // `encounterDiscard`: the encounter discard pile, the card discarded last first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1, docs/brief.md, The Woodland Realm, reading 3).
   // `encounterDeck`: with `looked`, the cards of the encounter deck the running effect looked at ("Look at the top 10 cards of the encounter deck, discard any number of them", 11202:A:5).
-  from: z.enum(["play", "hand", "discard", "deck", "victory", "loot", "encounterDeck"]).optional(),
+  from: z.enum(["play", "hand", "discard", "deck", "victory", "loot", "encounterDeck", "encounterDiscard"]).optional(),
   // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
   // From the discard pile: only its top cards, the last put there ("While the top card of your discard pile is an event").
   top: z.number().int().positive().optional(),
@@ -223,8 +228,8 @@ export const pickSchema = z.strictObject({
   // controls the source's host ("a character you control", on a Condition attached to a hero by an encounter card that no player controls,
   // 142087:A:2). `nonObjective`: not a card whose printed type is objective ("a non-objective attachment", 142052:A:2: the burden objectives that
   // count as attachments are left out).
-  // `actor`: controlled by the seat the effect picks for. `source`: controlled by the player the source (an enemy engaged with him) is controlled by, whoever picks ("a character the defending player controls", 901504:A:1, with `who: firstPlayer` choosing). `attackers`: controlled by a player whose character took part in the player attack the effect answers ("1 character an attacking player controls", 04074:A:1).
-  controlledBy: z.enum(["picked", "host", "actor", "attackers", "source"]).optional(),
+  // `actor`: controlled by the seat the effect picks for. `source`: controlled by the player the source (an enemy engaged with him) is controlled by, whoever picks ("a character the defending player controls", 901504:A:1, with `who: firstPlayer` choosing). `attackers`: controlled by a player whose character took part in the player attack the effect answers ("1 character an attacking player controls", 04074:A:1). `firstPlayer`: controlled by the first player, whoever the effect runs for ("each character controlled by the first player", 50627:A:2).
+  controlledBy: z.enum(["picked", "host", "actor", "attackers", "source", "firstPlayer"]).optional(),
   nonObjective: z.literal(true).optional(),
   // A card whose printed type is objective ("each hero and objective ally", 12081:A:2: Captain Sahír and Na'asiyah on their objective ally sides).
   objective: z.literal(true).optional(),
@@ -338,6 +343,14 @@ export const pickSchema = z.strictObject({
   highestAttack: z.literal(true).optional(),
   // Of the cards that match, only those with the highest current Willpower, as the table shows it ("discard the ally you control with the highest Willpower", 901304:A:2); every one of them when tied, and then the chooser decides. Read by src/rules/interpret/pick.ts.
   highestWillpower: z.literal(true).optional(),
+  // Of the cards that match, only those with the highest current engagement cost ("The enemy in the staging area with the highest engagement cost", 50926:A:2); every one of them when tied, and then the chooser decides.
+  highestEngagementCost: z.literal(true).optional(),
+  // Of the cards that match, only those with the lowest current engagement cost ("the lowest engagement cost enemy in the staging area", 51151:A:2); every one of them when tied, and then the chooser decides.
+  lowestEngagementCost: z.literal(true).optional(),
+  // With `type: card`: only an enemy or a location, among the encounter cards in play ("a non-unique enemy or location in play", 51033:A:1, docs/brief.md, The Wizard's Quest, reading 3). Read by src/rules/interpret/pick.ts.
+  enemyOrLocation: z.literal(true).optional(),
+  // "The opposing team chooses" (51004:B:1, 51013:A:1, 51017:A:1, 51030:A:1, 51033:A:1): the choice is the engine's, in the manner that gives the players the greatest challenge (docs/brief.md, The Wizard's Quest, reading 3). Of the cards that match (the fields above rank them) only the first stays, the order of seats and then of play breaking a tie, so nobody is asked. With `highestAttack` on enemies, the one with the highest Threat among those level on Attack stays (docs/brief.md, The Mines of Moria, reading 3: Denizen of the Deep).
+  challenge: z.literal(true).optional(),
   // Of the cards that match, only those with the lowest Attack or the lowest Threat, as the table shows it ("the lowest Attack Harad enemy engaged with you", 144036:A:2; "the lowest Threat Harad enemy in the staging area", 144038:A:2); every one of them
   // when tied, and then the chooser (the player who reveals) decides. Read by the harad family (src/rules/families/harad/pick.ts).
   lowestAttack: z.literal(true).optional(),

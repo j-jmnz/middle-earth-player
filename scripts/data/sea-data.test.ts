@@ -16,8 +16,8 @@ const ledger = loadLedger();
 const entries = ledger.entries.filter((entry) => cards.has(entry.code) && entry.printing !== "Nightmare");
 // A ship is a card with the Ship trait that is not a location (a ship location is a place, not a ship card); its type line, read from its scan, is
 // ship-enemy, ship-objective or (the two Nightmare enemies whose scans print ENEMY) enemy. Only the Dream-chaser boxes' and the Nightmare decks' ships
-// are read: The Hunt for the Dreadnaught's are listed in the Cards tab and never dealt, so no ledger reads them.
-const SEA_PACKS: ReadonlySet<string> = new Set([...PRODUCTS.filter((product) => product.home === "dream-chaser").flatMap((product) => product.packs), NIGHTMARE_PACK]);
+// are read, and The Hunt for the Dreadnaught's (THftD, a standalone scenario that prepares a fleet and a Corsair deck).
+const SEA_PACKS: ReadonlySet<string> = new Set([...PRODUCTS.filter((product) => product.home === "dream-chaser").flatMap((product) => product.packs), "THftD", NIGHTMARE_PACK]);
 const ships = [...cards.values()].filter((card) => card.traits.includes("Ship") && card.type !== "location" && card.printings.some((printing) => SEA_PACKS.has(printing.pack)));
 
 // "Stats: Engagement cost 35, Threat 2, Attack 5, Defense 2, Hit points 7; Victory 6." as the numbers it gives.
@@ -34,13 +34,14 @@ describe("the Dream-chaser ships", () => {
     expect(ships.length).toBeGreaterThan(20);
     for (const card of ships) {
       const wanted = card.type === "ship-objective" ? (["willpower", "attack", "defense", "health"] as const) : (["attack", "defense", "health", "threat", "engagementCost"] as const);
-      for (const stat of wanted) expect(card[stat], `${card.code} ${card.name} ${stat}`).not.toBeNull();
+      // The Dreadnaught prints no hit point number: its text gives the global value (15 per player among all groups), which its record reads.
+      for (const stat of wanted) if (!(card.code === "40013" && stat === "health")) expect(card[stat], `${card.code} ${card.name} ${stat}`).not.toBeNull();
     }
   });
 
   it("have the type their scan prints", () => {
-    for (const code of ["12151", "905304", "904903", "904904"]) expect(cards.get(code)?.type, code).toBe("ship-enemy");
-    for (const code of ["904605", "905402"]) expect(cards.get(code)?.type, code).toBe("enemy");
+    for (const code of ["12151", "905304", "904903", "904904", "40013", "40029"]) expect(cards.get(code)?.type, code).toBe("ship-enemy");
+    for (const code of ["904605", "905402", "40033"]) expect(cards.get(code)?.type, code).toBe("enemy");
     for (const code of ["110136", "11080", "12123"]) expect(cards.get(code)?.type, code).toBe("ship-objective");
   });
 

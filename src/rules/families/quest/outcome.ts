@@ -8,13 +8,14 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats } from "../../core/state.ts";
+import { revealHidden } from "../wizards-quest/hidden.ts";
 import { queueHeard } from "./events.ts";
 
 type Result = "success" | "failure" | "tie";
 
 // `bySeat`: once stages are separate, how each living seat's own quest resolves (mec109.multiple-staging-areas); `result` is then success when every living seat
-// succeeded, failure when each failed, and a tie otherwise. `placed`: the resolution placed progress, wherever it went (set by the resolution step once it has run, for the trigger the table hears once).
-export type QuestOutcome = { committed: readonly string[]; result: Result; bySeat?: Readonly<Record<number, Result>>; placed?: boolean };
+// succeeded, failure when each failed, and a tie otherwise. `placed`: the resolution placed progress, wherever it went; `placedOnStage`: some of it went on the stage (set by the resolution step once it has run, for the triggers the table hears once).
+export type QuestOutcome = { committed: readonly string[]; result: Result; bySeat?: Readonly<Record<number, Result>>; placed?: boolean; placedOnStage?: boolean };
 
 function resultOf(willpower: number, threat: number): Result {
   return willpower > threat ? "success" : willpower < threat ? "failure" : "tie";
@@ -42,6 +43,7 @@ export function afterQuestOutcome(state: ScenarioState, outcome: QuestOutcome, c
   let next = state;
   // The table hears once that a successful quest placed progress (`placed`: any of it, wherever it went), whatever is committed (147002:B:2).
   if (outcome.placed === true && outcome.result === "success") next = queueHeard(next, ctx, { trigger: "questProgressPlaced", seat: null });
+  if (outcome.placedOnStage === true && outcome.result === "success") next = queueHeard(next, ctx, { trigger: "questProgressPlacedOnStage", seat: null });
   for (const id of outcome.committed) {
     const card = next.cards[id];
     if (!card || !inPlay(card.zone)) continue;
@@ -50,6 +52,8 @@ export function afterQuestOutcome(state: ScenarioState, outcome: QuestOutcome, c
     const own = outcome.bySeat && card.controller != null ? outcome.bySeat[card.controller] : outcome.result;
     if (own === "success") next = queueHeard(next, ctx, { trigger: "questedSuccessfully", seat: card.controller, subject: id });
   }
+  // The cards Hidden Threat hid under the main quest are revealed after a successful quest (51241:A:1).
+  if (outcome.result === "success") next = revealHidden(next, ctx, steps);
   // And those waiting for the players to quest unsuccessfully (900307:A:1).
   const waiting = next.delayed.filter((entry) => entry.until === "questSucceeded" || entry.until === "questFailed");
   if (waiting.length === 0) return next;

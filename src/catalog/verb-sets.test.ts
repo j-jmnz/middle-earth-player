@@ -11,8 +11,8 @@ describe("verb flags", () => {
   });
 
   it("mark exactly the verbs that make a quest card's Setup run", () => {
-    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "DiscardUntilEnemies", "GuardGollum", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "PutNightObjective", "PutSetAsideInPlay", "SearchToStaging", "ShufflePile", "StageRandomGuardedPair", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
-    expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["AttachToDial", "PrepareCapturedDeck", "Reanimate", "RevealEncounter", "SearchMove", "ShuffleSetAsideIntoEncounterDeck"]);
+    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "BuildInvestigationDeck", "BuildQuickDeck", "ChooseQuestStage", "DiscardUntilAflame", "DiscardUntilEnemies", "GuardGollum", "HideRandomLoot", "HideSuspectAndHideout", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "PutNightObjective", "PutSetAsideInPlay", "SearchToStaging", "ShufflePile", "StageRandomGuardedPair", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
+    expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["AttachToDial", "HeroesGainResources", "PrepareCapturedDeck", "Reanimate", "RevealEncounter", "SearchMove", "ShuffleSetAsideIntoEncounterDeck"]);
     expect(sorted(setupRunVerbs("inChoose"))).toEqual(["ShuffleCopyIntoEachDeck"]);
     expect(sorted(setupRunVerbs("inEach"))).toEqual(["GuardObjective"]);
   });
@@ -32,6 +32,7 @@ describe("verb flags", () => {
   it("mark exactly the verbs that reach into the collection", () => {
     expect(sorted(collectionVerbs("hero"))).toEqual(["AttachCollectionHero", "SwapHero", "TakeHeroFromCollection"]);
     expect(sorted(collectionVerbs("card"))).toEqual(["TakeCardFromCollection"]);
+    expect(sorted(collectionVerbs("event"))).toEqual(["AddEventsToHand"]);
     expect(sorted(collectionVerbs("treasure"))).toEqual(["AttachRandomTreasure", "ChooseRandomTreasure", "ClaimRandomTreasure", "SearchGuardForTreasure"]);
   });
 });

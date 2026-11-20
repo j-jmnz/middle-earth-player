@@ -1,0 +1,762 @@
+Scenario piles that place cards with no record (quest: 51001 Radagast's Request; quest: 51003 Mirkwood Forest; quest: 51004 Mirkwood Forest; quest: 51005 Mirkwood Forest; quest: 51007 The Necromancer's Tower; quest: 51008 The Necromancer's Tower; quest: 51009 The Necromancer's Tower; staging: 51010 Rhosgobel)
+
+## 51001 Radagast's Request
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+51001:A:1 (front): Setup: Add Rhosgobel to the staging area. The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area. Shuffle the encounter deck.
+  51001:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the Quick-build: of the 14 encounter sets named (The Wizard's Quest 15, The Wizard's Quest 16, The Wizard's Quest 17, The Wizard's Quest 18, The Wizard's Quest 19, The Wizard's Quest 20, The Wizard's Quest 21, The Wizard's Quest 22, The Wizard's Quest 23, The Wizard's Quest 24, The Wizard's Quest 25, The Wizard's Quest 26, The Wizard's Quest 27 and The Wizard's Quest 28) that the encounter deck holds, 7 are picked with the game's seed and stay in the deck; the cards of the others lie set aside, out of play, all game
+    - the first player chooses one of the quest cards with codes 51003, 51004 and 51005 in the quest deck; the others lie set aside, out of play, and leave the quest's order
+    - the first player chooses one of the quest cards with codes 51007, 51008 and 51009 in the quest deck; the others lie set aside, out of play, and leave the quest's order
+    - for each player, first player first:
+      - the acting player finds one enemy or location with a printed cost of 0 or less in the encounter deck and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+    - shuffle the encounter deck
+
+51001:B:1 (back): Forced: When Rhosgobel is explored, flip it over and add Rider of Mirkwood to the staging area.
+  51001:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "Rhosgobel")
+    - [json FlipOver {"verb":"FlipOver","into":"51011","target":"subject"}]
+
+51001:B:2 (back): This stage cannot be defeated while Rhosgobel is in play.
+  51001:constant:1: Constant
+    only if the card with code 51010 is in play
+    - the players cannot defeat this stage while this holds
+
+## 51003 Mirkwood Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+51003:A:1 (front): When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled.
+  51003:whenRevealed:1: When revealed
+    - the opposing team searches the top 5 cards of the encounter deck for the card nearest the top that costs 1 or less (2 or less with two or more players), sets it aside, shuffles the encounter deck and reveals the card; its When Revealed effects cannot be canceled (with no such card, only the shuffle)
+
+51003:B:1 (back): When Revealed: The opposing team searches the encounter deck and discard pile for a location with cost 2 or less, adds it to the staging area, and places a resource on it. Shuffle the encounter deck.
+  51003:whenRevealed:2: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one location with a printed cost of 2 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
+    - place 1 resource tokens on the picked card
+    - shuffle the encounter deck
+
+51003:B:2 (back): The location with a resource on it is immune to player card effects and the players cannot travel to it while this stage has any quest points remaining. This stage cannot be defeated while the location with a resource on it is in play.
+  51003:constant:1: Constant
+    only if not (the current quest stage holds at least 5 progress)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each location (any player controls) with resources on it: stat immuneToPlayerCards 1, while this card is in play
+    - the players cannot travel to a location that holds resource tokens while this holds
+  51003:constant:2: Constant
+    only if there is a location (any player controls) with resources on it to choose
+    - the players cannot defeat this stage while this holds
+
+## 51004 Mirkwood Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+51004:A:1 (front): When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled.
+  51004:whenRevealed:1: When revealed
+    - the opposing team searches the top 5 cards of the encounter deck for the card nearest the top that costs 1 or less (2 or less with two or more players), sets it aside, shuffles the encounter deck and reveals the card; its When Revealed effects cannot be canceled (with no such card, only the shuffle)
+
+51004:B:1 (back): When Revealed: The opposing team chooses an ally controlled by each player and places them faceup under this stage as guarded objectives with blank text boxes.
+  51004:whenRevealed:2: When revealed
+    - for each player, first player first:
+      - choose ally (you control) (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
+      - the last picked card (an ally in play, or a card of a hand) lies faceup under this card, its owner's still and out of play (an ally in play loses its tokens and its attachments are discarded); no copy of its title can be played while it lies there; it returns to its owner's hand when this card leaves play
+
+51004:B:2 (back): Players cannot play or put into play any ally that shares a title with an ally guarded by this stage. When this stage is defeated, return each guarded ally to its owner's hand.
+  51004:constant:1: Constant
+    - no card with the title of a card held under this one can be played (the bar is the engine's, HoldPickedUnder holds the cards)
+  51004:forced:1: Forced on the event questCardDefeated (heard about this card)
+    - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
+
+## 51005 Mirkwood Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+51005:A:1 (front): When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled.
+  51005:whenRevealed:1: When revealed
+    - the opposing team searches the top 5 cards of the encounter deck for the card nearest the top that costs 1 or less (2 or less with two or more players), sets it aside, shuffles the encounter deck and reveals the card; its When Revealed effects cannot be canceled (with no such card, only the shuffle)
+
+51005:B:1 (back): This stage gets +5 quest points per player.
+  51005:constant:1: Constant
+    - this card: stat questPoints the number of players x 5, while this card is in play
+
+51005:B:2 (back): Forced: At the beginning of the quest phase, Rider of Mirkwood makes an immediate attack against the first player.
+  51005:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Rider of Mirkwood"
+    - the picked enemy attacks the first player now, from the staging area
+
+## 51007 The Necromancer's Tower
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+51007:A:1 (front): When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled.
+  51007:whenRevealed:1: When revealed
+    - the opposing team searches the top 5 cards of the encounter deck for the card nearest the top that costs 2 or less (3 or less with two or more players), sets it aside, shuffles the encounter deck and reveals the card; its When Revealed effects cannot be canceled (with no such card, only the shuffle)
+
+51007:B:1 (back): Forced: After the players have committed characters to the quest, discard cards from the top of the encounter deck until a treachery is discarded. Reveal that treachery.
+  51007:forced:1: Forced when the staging step begins, before the first card is revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is revealed in full (its keywords and When Revealed effects)
+
+51007:B:2 (back): If the players defeat this stage, they win the game.
+  51007:questResolution:1: Quest resolution
+    - the players win the game
+
+## 51008 The Necromancer's Tower
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+51008:A:1 (front): When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled.
+  51008:whenRevealed:1: When revealed
+    - the opposing team searches the top 5 cards of the encounter deck for the card nearest the top that costs 2 or less (3 or less with two or more players), sets it aside, shuffles the encounter deck and reveals the card; its When Revealed effects cannot be canceled (with no such card, only the shuffle)
+
+51008:B:1 (back): When Revealed: Shuffle the encounter discard pile into the encounter deck. Each player discards cards from the top of the encounter deck until he discards an enemy, adds that enemy to the staging area, and attaches a hero he controls to it as a guarded objective (discard all tokens from the chosen hero).
+  51008:whenRevealed:2: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - choose hero (you control)
+      - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+      - the picked card goes to the staging area (it is not revealed)
+      - [json CarryAwayHero {"verb":"CarryAwayHero","keepAttachments":true}]
+
+51008:B:2 (back): If there is an unguarded hero in the staging area, return it to its owner's control, exhausted. This stage cannot be defeated while there is a guarded objective in play. If the players defeat this stage, they win the game.
+  51008:forced:1: Forced after a card leaves play (heard about card (any player controls) [also {"guardsHero":true}])
+    - [json ReleaseGuardedHero {"verb":"ReleaseGuardedHero"}]
+  51008:constant:1: Constant
+    only if there is a enemy (any player controls) or in the staging area [also {"guardsHero":true}] to choose
+    - the players cannot defeat this stage while this holds
+  51008:questResolution:1: Quest resolution
+    - the players win the game
+
+## 51009 The Necromancer's Tower
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+51009:A:1 (front): When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled.
+  51009:whenRevealed:1: When revealed
+    - the opposing team searches the top 5 cards of the encounter deck for the card nearest the top that costs 2 or less (3 or less with two or more players), sets it aside, shuffles the encounter deck and reveals the card; its When Revealed effects cannot be canceled (with no such card, only the shuffle)
+
+51009:B:1 (back): Rider of Mirkwood's engagement cost is considered to be 0.
+  51009:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Rider of Mirkwood": stat engagementCost -50, while this card is in play
+
+51009:B:2 (back): The number of damage tokens on Rider of Mirkwood cannot exceed the number of progress tokens on this stage.
+  51009:constant:2: Constant
+    only if not (the current quest stage holds at least 1 progress)
+    - each enemy (any player controls) or in the staging area, named "Rider of Mirkwood": stat cannotTakeDamage 1, while this card is in play
+  51009:constant:3: Constant
+    only if the current quest stage holds at least 1 progress
+    - each enemy (any player controls) or in the staging area, named "Rider of Mirkwood": stat damageCeiling progress of this card, while this card is in play
+
+51009:B:3 (back): Players cannot defeat this stage while Rider of Mirkwood is in play. If the players defeat this stage, they win the game.
+  51009:constant:4: Constant
+    only if the card with code 51011 is in play
+    - the players cannot defeat this stage while this holds
+  51009:questResolution:1: Quest resolution
+    - the players win the game
+
+## 51010 Rhosgobel
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+51010:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+51010:A:2 (front): Response: After the players travel to Rhosgobel, add 1 resource to each hero's pool and each player draws 1 card.
+  51010:response:1: Response after the players travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each hero (any player controls):
+      - add 1 resources to the picked card
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+## 51011 Rider of Mirkwood
+
+51011:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+51011:A:2 (front): X is 1 more than the stage number of the main quest.
+  51011:constant:1: Constant
+    - this card: stat threat the stage number of the quest + 1, while this card is in play
+
+51011:A:3 (front): Cannot leave the staging area unless the players are at stage 3B.
+  51011:constant:2: Constant
+    only if not (the players are on stage 3)
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+
+## 51012 Nazgûl of Dol Guldur
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51012:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
+  51012:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+  51012:constant:2: Constant
+    - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
+
+51012:A:2 (front): Forced: After Nazgûl of Dol Guldur attacks you, either return it to the staging area or raise your threat by 3.
+  51012:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    - the acting player chooses one of:
+      * option "return":
+        - return this card to the staging area
+      * option "threat":
+        - raise threat by 3 (the acting player)
+
+## 51013 Necromancer's Pass
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51013:A:1 (front): When Revealed: The first player chooses a card in his hand. The opposing team looks at the first player's hand and chooses a different card to place faceup under Necromancer's Pass as a guarded objective. While Necromancer's Pass is guarding a card, copies of that card cannot be played. When Necromancer's Pass is explored, return the guarded card to its owner's hand.
+  51013:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (you control) in hand, chosen by the first player
+    - then, if not (the acting player (the defending player, in a Shadow effect) holds at most 1 cards in hand) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (you control) in hand, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides), chosen by the first player, other than the cards this effect already picked
+    - then, if not (the acting player (the defending player, in a Shadow effect) holds at most 1 cards in hand) (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card (an ally in play, or a card of a hand) lies faceup under this card, its owner's still and out of play (an ally in play loses its tokens and its attachments are discarded); no copy of its title can be played while it lies there; it returns to its owner's hand when this card leaves play
+    - no card with the title of a card held under this one can be played (the bar is the engine's, HoldPickedUnder holds the cards)
+
+## 51014 Pursued by Shadow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51014:A:1 (front): When Revealed: The highest Attack enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, Pursued by Shadow gains surge.
+  51014:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
+    - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+51014:A:2 (shadow): Shadow: If attacking enemy is unique, it makes an additional attack against you after this one.
+  51014:shadow:1: Shadow
+    - if the attacking enemy is a unique enemy (any player controls): when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 51015 Bane of Amon Lanc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51015:A:1 (front): Cannot have non-objective player card attachments.
+  51015:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+
+51015:A:2 (front): Forced: After Bane of Amon Lanc attacks and destroys an ally, the defending player discards 1 card from his hand for each excess point of damage dealt by this attack.
+  51015:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls); event happened to the controller)
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    - discard [json amount {"excessOf":"subject"}] cards from hand
+
+## 51016 Oak-wood Grove
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51016:A:1 (front): While Oak-wood Grove is in the staging area, progress cannot be placed on other locations in the staging area.
+  51016:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only, other than this card: stat noProgressPlaced 1, while this card is in play
+
+51016:A:2 (front): Travel: Each player exhausts a character.
+  51016:travel:1: Travel
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+
+## 51017 Smoking Blood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51017:A:1 (front): When Revealed: The opposing team attaches Smoking Blood to a Troll enemy. If they cannot, Smoking Blood gains surge. (Counts as a Condition attachment with the text: 'Limit 1 per enemy. Forced: When attached enemy is dealt enough damage to destroy it, cancel the damage and discard Smoking Blood instead.')
+  51017:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - attach this card to an enemy in play with the trait Troll (the opposing team attaches it, so nobody is asked: the enemy with the most hit points left)
+    - then, if not (there is a Troll enemy (any player controls) or in the staging area, with no attachment named "Smoking Blood" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+  51017:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - its host: stat cancelsLethalDamage 1, while this card is in play
+
+## 51018 Forest Flies
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51018:A:1 (front): Forced: When Forest Flies attacks, raise the defending player's threat by 1.
+  51018:forced:1: Forced on the event enemyAttacks (heard about this card)
+    - raise threat by 1 (the player the event is about)
+
+51018:A:2 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
+  51018:shadow:1: Shadow
+    - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
+
+## 51019 Twilight Hall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51019:A:1 (front): Cannot have attachments.
+  51019:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+51019:A:2 (front): Twilight Hall gets +1 Threat for each character controlled by the first player.
+  51019:constant:2: Constant
+    - this card: stat threat the number of character (any player controls) [also {"controlledBy":"firstPlayer"}], while this card is in play
+
+51019:A:3 (front): Forced: When Twilight Hall is explored, reveal 1 encounter card per player.
+  51019:forced:1: Forced on the event locationExplored (heard about this card)
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+## 51020 Swarming Mosquitoes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51020:A:1 (front): When Revealed: Each player deals X damage to a character he controls, where X is 1 more than the stage number of the main quest.
+  51020:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose character (you control)
+      - deal the stage number of the quest + 1 damage to the picked card
+
+51020:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has an attachment).
+  51020:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the defender is a character (any player controls) [also {"hasAttachment":{}}]): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) [also {"hasAttachment":{}}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 51021 Goblin Sniper
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51021:A:1 (front): Cannot be optionally engaged.
+  51021:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+51021:A:2 (front): Forced: At the end of the combat phase, each player deals 1 damage to a hero he controls.
+  51021:forced:1: Forced at the end of the phase
+    only if it is the Combat phase
+    - for each player, first player first:
+      - choose hero (you control)
+      - deal 1 damage to the picked card
+
+51021:A:3 (shadow): Shadow: Defending character does not count its Defense.
+  51021:shadow:1: Shadow
+    - the attacking enemy: stat defenseIgnored 1, until the end of the attack
+
+## 51022 Pine Slopes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51022:A:1 (front): When Revealed: Each Pine Slopes gets +2 Threat until the end of the phase.
+  51022:whenRevealed:1: When revealed
+    - each location (any player controls) named "Pine Slopes": stat threat 2, until the end of the phase
+
+51022:A:2 (front): Travel: Raise your threat by 1 for each Pine Slopes in the staging area.
+  51022:travel:1: Travel
+    - raise threat by the number of location (any player controls) in the staging area only, named "Pine Slopes" (the first player)
+
+## 51023 Under the Shadow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51023:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+51023:A:2 (front): When Revealed: Attach to the main quest. (Counts as a condition attachment with the text: 'Each player cannot play more than 1 card each phase.')
+  51023:whenRevealed:1: When revealed
+    - this card is attached to the main quest card (never a side quest) and leaves with it
+  51023:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - [json LimitPlaysPerPhase {"verb":"LimitPlaysPerPhase","max":1}]
+
+## 51024 Necromancer's Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51024:A:1 (front): Forced: After Necromancer's Warg engages you, deal 1 damage to a character you control.
+  51024:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal 1 damage to the picked card
+
+51024:A:2 (shadow): Shadow: If you are engaged with an Orc enemy and a Warg enemy, discard a character you control.
+  51024:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if all of: (there is a Orc enemy (any player controls) engaged with you to choose) and (there is a Warg enemy (any player controls) engaged with you to choose): choose character (you control)
+    - then, if all of: (there is a Orc enemy (any player controls) engaged with you to choose) and (there is a Warg enemy (any player controls) engaged with you to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 51025 Dol Guldur Beastmaster
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51025:A:1 (front): Forced: After Dol Guldur Beastmaster engages you, the opposing team searches the encounter deck and discard pile for a Necromancer's Warg and puts it into play engaged with you. Shuffle the encounter deck.
+  51025:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 51024 in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+## 51026 Watched Path
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51026:A:1 (front): Forced: When Watched Path is explored, discard the top card of the encounter deck. If the discarded card is an enemy, add it to the staging area.
+  51026:forced:1: Forced on the event locationExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 51027 Evil Storm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51027:A:1 (front): When Revealed: Each player deals 1 damage to a questing character he controls. Until the end of the phase, each damaged character gets -1 Willpower and cannot be healed.
+  51027:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose character (you control) committed to the quest
+      - deal 1 damage to the picked card
+    - damagedCharacters: stat willpower -1, until the end of the phase
+    - damagedCharacters: stat cannotBeHealed 1, until the end of the phase
+
+51027:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
+  51027:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+## 51028 Spider of Dol Guldur
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51028:A:1 (front): Forced: After Spider of Dol Guldur attacks and destroys an ally, return it to the staging area.
+  51028:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    - return this card to the staging area
+
+51028:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  51028:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 51029 Patch of Midnight
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51029:A:1 (front): Forced: At the beginning of the staging step, discard Patch of Midnight and reveal the top card of the encounter deck.
+  51029:forced:1: Forced when the staging step begins, before the first card is revealed
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard this card
+    - the acting player reveals an encounter card
+
+51029:A:2 (shadow): Shadow: If this attack destroys a character, reveal the top card of the encounter deck.
+  51029:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
+
+## 51030 Eyes in the Dark
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51030:A:1 (front): When Revealed: The opposing team chooses a questing character controlled by each player. Ready each chosen character and remove them from the quest.
+  51030:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose character (you control) committed to the quest, with the highest current Willpower of those (ties: the chooser decides), (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked)
+      - ready the picked card
+      - the last picked character is removed from the quest (it stays exhausted)
+
+51030:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 1.
+  51030:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 1 (each player)
+
+## 51031 Eastern Crows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51031:A:1 (front): While there is a copy of Eastern Crows in the discard pile, Eastern Crows gains surge.
+  51031:constant:1: Constant
+    only if the encounter discard pile holds a card with code 51031
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
+
+## 51032 The Sorcerer's Tower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51032:A:1 (front): While The Sorcerer's Tower is in the staging area, each treachery gains Doomed 1.
+  51032:constant:1: Constant
+    only if this card is in the staging area
+    - each treachery (any player controls) gains doomed 1 (each player raises their threat by that much more when one is played)
+
+51032:A:2 (front): Forced: When the Sorcerer's Tower is explored, shuffle the encounter discard pile into the encounter deck and discard cards from the top until a treachery is discarded. Resolve the 'when revealed' effects on that treachery.
+  51032:forced:1: Forced on the event locationExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is revealed in full (its keywords and When Revealed effects)
+
+## 51033 Power Sevenfold
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51033:A:1 (front): When Revealed: The opposing team chooses any number of non-unique encounter cards in play. Discard the chosen cards and reveal an equal number of cards from the top of the encounter deck.
+  51033:whenRevealed:1: When revealed
+    - for each card (any player controls) that is an enemy or a location, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the lowest Threat of those (ties: the chooser decides), (enemies engaged with a player included) [also {"unique":false}]:
+      - discard the picked card
+      - the acting player reveals an encounter card
+
+51033:A:2 (shadow): Shadow: Either reveal an encounter card, or treat this attack as undefended.
+  51033:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "reveal":
+        - the acting player reveals an encounter card
+      * option "undefended":
+        - this attack is considered undefended
+
+## 51035 Troll Cave
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51035:A:1 (front): Response: After the players travel to Troll Cave, each player draws 1 card.
+  51035:response:1: Response after the players travel
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+51035:A:2 (front): Travel: The opposing team searches the top 5 cards of the encounter deck for a Hill Troll and adds it to the staging area, if able. Shuffle the encounter deck.
+  51035:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card, among the top 5 cards of the encounter deck only with code 51034 in the encounter deck and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 51036 Befouled Equipment
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51036:A:1 (front): When Revealed: Attach to the character with the most attachments without Befouled Equipment attached. (Counts as a Condition attachment with the text: 'Forced: At the end of the round, discard an attachment from attached character. Befouled Equipment cannot be discarded this way unless it is the only attachment on attached character.')
+  51036:whenRevealed:1: When revealed
+    - attach this card to the character of any player with the most attachments, among those that carry no copy of this card (the first player chooses among those tied); with none this card is discarded
+  51036:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  51036:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) attached to this card's host, other than this card
+    - then, if there is a attachment (any player controls) attached to this card's host, other than this card to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if not (there is a attachment (any player controls) attached to this card's host, other than this card to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
+
+## 51037 Hunting Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51037:A:1 (front): Forced: After Hunting Warg engages a player, it makes an immediate attack. If Hunting Warg is dealt a shadow card with no shadow effect for this attack, it gets +2 Attack until the end of the phase.
+  51037:forced:1: Forced after an enemy engages a player (heard about this card)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded; when the shadow card dealt for it has no shadow effect the enemy gets +2 Attack for this attack
+
+## 51038 Hunter's Lookout
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51038:A:1 (front): While Hunter's Lookout is in the staging area, it gains: 'Forced: At the end of the round, raise each player's threat by 1 for each enemy in the staging area.'
+  51038:forced:1: Forced at the end of the round
+    only if this card is in the staging area
+    - raise threat by the number of enemy (any player controls) in the staging area only (each player)
+
+51038:A:2 (front): Travel: The highest Attack enemy in the staging area makes an immediate attack against the first player.
+  51038:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
+
+## 51039 Restless Hunters
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51039:A:1 (front): When Revealed: Return each engaged enemy to the staging area. If no enemies were returned this way, Restless Hunters gains surge.
+  51039:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return every enemy engaged with a player to the staging area
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+51039:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area.
+  51039:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 51040 Dol Guldur Orcs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51040:A:1 (front): When Revealed: Each player deals 1 damage to a character he controls.
+  51040:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose character (you control)
+      - deal 1 damage to the picked card
+
+51040:A:2 (shadow): Shadow: Defending character gets -1 Defense for each damage on it.
+  51040:shadow:1: Shadow
+    - the defender: stat defense minus (damage of the defender), until the end of the attack
+
+## 51041 The Shadow Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51041:A:1 (front): While The Shadow Road is in the staging area, it gains: 'Forced: After a player optionally engages an enemy, he deals 1 damage to a character he controls.'
+  51041:forced:1: Forced on the event optionallyEngaged
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal 1 damage to the picked card
+
+51041:A:2 (front): Travel: Each player deals 1 damage to a character he controls.
+  51041:travel:1: Travel
+    - for each player, first player first:
+      - choose character (you control)
+      - deal 1 damage to the picked card
+
+## 51042 The Necromancer's Reach
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51042:A:1 (front): When Revealed: Deal 1 damage to each exhausted character.
+  51042:whenRevealed:1: When revealed
+    - deal 1 damage to each exhausted character (any player controls)
+
+51042:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged).
+  51042:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 51043 Ravenous Spider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51043:A:1 (front): Forced: After Ravenous Spider attacks and destroys a character, the defending player exhausts a character he controls.
+  51043:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+51043:A:2 (shadow): Shadow: If this attack destroys a character, exhaust a character you control.
+  51043:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose ready character (you control)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+
+## 51044 Forest Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51044:A:1 (front): Forest Gate gets +1 Threat for each enemy in the staging area.
+  51044:constant:1: Constant
+    - this card: stat threat the number of enemy (any player controls) in the staging area only, while this card is in play
+
+51044:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each enemy engaged with you.
+  51044:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of enemy (any player controls) engaged with you, until the end of the attack
+
+## 51045 Nightfall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51045:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+51045:A:2 (front): When Revealed: Attach to the first player's threat dial. (Counts as a Condition attachment with the text: 'Forced: Raise your threat by an additional point during the refresh phase.')
+  51045:whenRevealed:1: When revealed
+    - this card attaches itself to the first player's threat dial (whoever reveals it; a dial that holds a copy takes another)
+  51045:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  51045:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    - raise threat by 1 (the acting player)
+
+## 51046 Venomous Spider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51046:A:1 (front): Forced: After Venomous Spider attacks and damages a character, that character cannot ready until the end of the round.
+  51046:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
+    only if the attacking enemy is a enemy (any player controls) that is this card itself
+    - the card the event is about: stat cannotReady 1, until the end of the round
+
+51046:A:2 (shadow): Shadow: Defending character cannot ready until the end of the round.
+  51046:shadow:1: Shadow
+    - the defender: stat cannotReady 1, until the end of the round
+
+## 51047 Pitch-dark Thicket
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51047:A:1 (front): While Pitch-dark Thicket is in the staging area, enemies in the staging area cannot take damage.
+  51047:constant:1: Constant
+    only if this card is in the staging area
+    - each enemy (any player controls) in the staging area only: stat cannotTakeDamage 1, while this card is in play
+
+51047:A:2 (shadow): Shadow: If attacking enemy was engaged this round, it cannot take damage until the end of the round.
+  51047:shadow:1: Shadow
+    - if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]: the attacking enemy: stat cannotTakeDamage 1, until the end of the round
+
+## 51048 Fastness of Mirkwood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51048:A:1 (front): When Revealed: The opposing team searches the encounter deck and discard pile for one different 0 cost location per player (limit 2) and adds them to the staging area. Shuffle the encounter deck.
+  51048:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player (at most 2 players), first player first:
+      - the acting player finds one location with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+    - shuffle the encounter deck
+
+51048:A:2 (shadow): Shadow: If this attack destroys a character, return the active location to the staging area.
+  51048:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the active location to the staging area
+
+## 51049 Dark Bats
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51049:A:1 (front): Forced: After Dark Bats attacks and damages a character, reveal the top card of the encounter deck. Then, discard Dark Bats.
+  51049:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
+    only if the attacking enemy is a enemy (any player controls) that is this card itself
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player reveals an encounter card
+    - discard this card
+
+51049:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card.
+  51049:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 51050 Forest Stream
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51050:A:1 (front): While Forest Stream is in the staging area, it gains: 'Forced: At the end of the round, remove 2 progress from the main quest.'
+  51050:forced:1: Forced at the end of the round
+    only if this card is in the staging area
+    - remove 2 progress from the current quest card (all of it when it holds less)
+
+51050:A:2 (front): Travel: Raise each player's threat by 2.
+  51050:travel:1: Travel
+    - raise threat by 2 (each player)
+
+## 51051 Treacherous Fog
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51051:A:1 (front): When Revealed: Until the end of the phase, each enemy and location in the staging area gets +2 Threat.
+  51051:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) in the staging area only: stat threat 2, until the end of the phase
+    - each location (any player controls) in the staging area only: stat threat 2, until the end of the phase
+
+51051:A:2 (shadow): Shadow: Each enemy engaged with you gets +1 Attack and +1 Defense until the end of the phase.
+  51051:shadow:1: Shadow
+    - for each enemy (any player controls) engaged with you:
+      - the picked card: stat attack 1, until the end of the phase
+      - the picked card: stat defense 1, until the end of the phase
+
+## 51052 Howling Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51052:A:1 (front): When Revealed: Discard the top card of the encounter deck. If that card has the Warg trait, reveal it and add it to the staging area.
+  51052:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+    - the acting player reveals, in full, each Warg card (of any type) among the cards this effect discarded that still lies in the encounter discard pile, one after another (its When Revealed resolves and it enters the staging area)
+
+51052:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Warg trait).
+  51052:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Warg enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Warg enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 51053 The Wargs' Glade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51053:A:1 (front): While The Wargs' Glade is in the staging area, the first Warg enemy revealed each round gains surge.
+  51053:constant:1: Constant
+    only if this card is in the staging area
+    - the first Warg enemy card revealed each round gains surge
+
+51053:A:2 (front): Forced: When The Wargs' Glade is explored, the opposing team searches the encounter deck and discard pile for a non-unique Warg enemy and adds it to the staging area. Shuffle the encounter deck.
+  51053:forced:1: Forced on the event locationExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one non-unique Warg enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
+    - shuffle the encounter deck
+
+## 51054 Weighed Down
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+51054:A:1 (front): When Revealed: Exhaust each character with an attachment. If no character is exhausted this way, Weighed Down gains surge.
+  51054:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a ready character (any player controls) [also {"hasAttachment":{}}] to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - for each ready character (any player controls) [also {"hasAttachment":{}}]:
+      - exhaust the picked card
+
+51054:A:2 (shadow): Shadow: Discard an attachment from the defending character.
+  51054:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) attached to the defending character
+    - discard the picked card
+
+(rendered pieces: 467 by template, 21 as JSON)

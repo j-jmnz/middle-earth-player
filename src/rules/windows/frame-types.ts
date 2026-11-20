@@ -98,6 +98,10 @@ export type EffectData = {
   looked?: readonly string[];
   // The seats that looked at cards of the encounter deck in this effect: the look is announced (`lookedAtEncounterDeck`) once the whole effect has resolved (families/encounter/looked.ts).
   lookedBy?: readonly number[];
+  // The cards of the Investigation deck this effect showed in a look window: each hears the look (`lookedAtInvestigationDeck`) once the whole effect has resolved (families/investigation/look.ts).
+  investigationLooked?: readonly string[];
+  // The codes the actor named in this effect (NameInvestigation, `suspect:<code>` and `hideout:<code>`), for the accusation that follows (families/investigation/accuse.ts).
+  named?: readonly string[];
   // The options a `different` Choose has taken in this effect (families/deck/choose.ts).
   options?: readonly string[];
   // The seat the event that offered this Response happened to.
@@ -110,6 +114,8 @@ export type EffectData = {
   // names (the enemy a character defends against).
   subject?: string;
   other?: string;
+  // The active location when a Travel effect began (absent: none): a Travel to itself that finds another location active was pre-empted by the effect itself (Dark-wood Grove reveals Giant Web, 51146:A:2; docs/brief.md, The Woodland Realm, reading 20).
+  activeAtStart?: string;
   // The card the source was attached to when its own cost took it out of play ("Discard Cram to ready attached hero", 131011:A:2): "attached hero" still names it.
   host?: string;
   // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
@@ -259,6 +265,8 @@ export type PendingAttack = {
   heroId?: string;
   // A shadow effect made the attack count as undefended.
   undefended?: boolean;
+  // Characters a shadow effect removed from this attack as its defender (RemoveDefender, 51335:A:2): none of them can be declared as a defender again for it.
+  removedDefenders?: readonly string[];
   // A shadow effect made the attack capture an ally it would damage instead (CaptureInsteadOfDamage, families/captured/).
   captures?: true;
   shadowResolved?: boolean;

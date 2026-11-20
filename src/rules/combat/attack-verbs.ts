@@ -28,16 +28,17 @@ export function runAttackVerb(state: ScenarioState, instruction: Instruction, fo
     case "AfterAttack":
       return attack ? { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), ...instruction.instructions], afterCause: currentCause(steps, UNATTRIBUTED) } } : state;
     case "EngageNextPlayer": {
-      const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-      if (!focus.sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
+      const enemyId = instruction.target === "subject" ? frameScope(state, focus.seat, focus.sourceId).subject : focus.sourceId;
+      const enemy = enemyId ? state.cards[enemyId] : undefined;
+      if (!enemyId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
       // With no other player there is no next player to engage (faq.next-player).
       const seats = livingSeats(state);
       const at = seats.indexOf(enemy.controller);
       const next = seats[(at + 1) % seats.length];
       if (next == null || next === enemy.controller) return state;
-      steps.push({ kind: "engage", seat: next, enemyId: focus.sourceId });
-      const moved = moveCard(state, focus.sourceId, { zone: "engaged", seat: next });
-      return instruction.announces ? queueEvent(moved, { trigger: "engaged", seat: next, subject: focus.sourceId }) : moved;
+      steps.push({ kind: "engage", seat: next, enemyId });
+      const moved = moveCard(state, enemyId, { zone: "engaged", seat: next });
+      return instruction.announces ? queueEvent(moved, { trigger: "engaged", seat: next, subject: enemyId }) : moved;
     }
     default:
       return state;

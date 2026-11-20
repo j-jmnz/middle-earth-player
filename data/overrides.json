@@ -1412,9 +1412,2330 @@
       },
       "reason": "Hall of Beorn spells the stage 3 quest card 'The Wiched Willow' in its title and slug and in the scan addresses, which answer 403. The card prints 'The Wicked Willow' (DragnCards' deck Q99.04 and RulesPal's transcription name it so), and the spelled-right addresses serve both sides.",
       "source": "hallofbeorn.com/Export/EncounterCards (Slug The-Wiched-Willow-TOF); s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3A.jpg; dragncards Q99.04"
+    },
+    {
+      "match": {
+        "code": "50914"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 4
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50915"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 3
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50916"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50917"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 1
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50918"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 1
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50919"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 1
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50920"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50921"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50922"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50923"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "51012"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 15",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51013"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 15",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51014"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 15",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51015"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 16",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51016"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 16",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51017"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 16",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51018"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 17",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51019"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 17",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51020"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 17",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51021"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 18",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51022"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 18",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51023"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 18",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51024"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 19",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51025"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 19",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51026"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 19",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51027"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 19",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51028"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 20",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51029"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 20",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51030"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 20",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51031"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 21",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51032"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 21",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51033"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 21",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51034"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 22",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51035"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 22",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51036"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 22",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51037"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 23",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51038"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 23",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51039"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 23",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51040"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 24",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51041"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 24",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51042"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 24",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51043"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 25",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51044"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 25",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51045"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 25",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51046"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 26",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51047"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 26",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51048"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 26",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51049"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 27",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51050"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 27",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51051"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 27",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51052"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 28",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51053"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 28",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51054"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 28",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51112"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 1",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51108"
+      },
+      "set": {
+        "keywords": {
+          "questPointsX": true
+        }
+      },
+      "reason": "To the Elvenking's Halls prints X for its quest points on side 3B (\"X is equal to the threat level of the player with the highest threat level.\"). Hall of Beorn lists no number, and the builder reads an X only for the Two Towers boxes, so the stage would have no quest points and never advance; the record 51108:constant:1 sets the value.",
+      "source": "scan 51108.B (data/printed/standalone-scenarios.json)"
+    },
+    {
+      "match": {
+        "code": "51113"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 1",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51114"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 1",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51115"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 2",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51116"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 2",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51117"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 2",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51118"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 3",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51119"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 3",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51120"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 3",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51121"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 4",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51122"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 4",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51123"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 4",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51124"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 5",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51125"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 5",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51126"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 5",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51127"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 6",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51128"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 6",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51129"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 6",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51130"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 7",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51131"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 7",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51132"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 7",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51133"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 8",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51134"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 8",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51135"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 8",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51136"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 9",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51137"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 9",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51138"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 9",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51139"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 10",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51140"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 10",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51141"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 10",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51142"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 11",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51143"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 11",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51144"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 11",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51145"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 12",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51146"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 12",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51147"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 12",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51148"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 13",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51149"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 13",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51150"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 13",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51151"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 14",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51152"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 14",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51153"
+      },
+      "set": {
+        "encounterSet": "The Woodland Realm 14",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51212"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 1",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51213"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 1",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51214"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 1",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51215"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 2",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51216"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 2",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51217"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 2",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51218"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 3",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51219"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 3",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51220"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 3",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51221"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 4",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51222"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 4",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51223"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 4",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51224"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 5",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51225"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 5",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51226"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 5",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51227"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 6",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51228"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 6",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51229"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 6",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51230"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 7",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51231"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 7",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51232"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 7",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51233"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 8",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51234"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 8",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51235"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 8",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51236"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 9",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51237"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 9",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51238"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 9",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51239"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 10",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51240"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 10",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51241"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 10",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51242"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 11",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51243"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 11",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51244"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 11",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51245"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 12",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51246"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 12",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51247"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 12",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51248"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 13",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51249"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 13",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51250"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 13",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51251"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 14",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51252"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 14",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51253"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 14",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51312"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 15",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51313"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 15",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51314"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 15",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51315"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 16",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51316"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 16",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51317"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 16",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51318"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 17",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51319"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 17",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51320"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 17",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51321"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 18",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51322"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 18",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51323"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 18",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51324"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 19",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51325"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 19",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51326"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 19",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51327"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 20",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51328"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 20",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51329"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 20",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51330"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 21",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51331"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 21",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51332"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 21",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51333"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 22",
+        "cost": 2
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51334"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 22",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51335"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 22",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51336"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 23",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51337"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 23",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51338"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 23",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51339"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 24",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51340"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 24",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51341"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 24",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51342"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 25",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51343"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 25",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51344"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 25",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51345"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 26",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51346"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 26",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51347"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 26",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51348"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 27",
+        "cost": 3
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51349"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 27",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51350"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 27",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51351"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 28",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51352"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 28",
+        "cost": 0
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51353"
+      },
+      "set": {
+        "encounterSet": "Escape from Khazad-dûm 28",
+        "cost": 1
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
+      "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "40033"
+      },
+      "set": {
+        "type": "enemy",
+        "engagementCost": 26,
+        "threat": 2,
+        "attack": 4,
+        "defense": 0,
+        "health": 11
+      },
+      "reason": "Hall of Beorn files The Hunt for the Dreadnaught's Sea Monster as a Ship-enemy and gives it no stat fields. The scan prints the type line ENEMY (Creature.) and DragnCards types it Enemy, so it is not a Ship: heroes can defend it, and its text lets Ship objectives attack and defend against it. The scan prints engagement cost 26, Threat 2, Attack 4, Defense 0 and 11 hit points (the ledger notes record the reading), so the engine needs them.",
+      "source": "scan 40033.A, dragncards cardDb (Enemy), data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40006"
+      },
+      "set": {
+        "willpower": 5,
+        "attack": 3,
+        "defense": 3,
+        "health": 13,
+        "back": {
+          "willpower": 6,
+          "attack": 4,
+          "defense": 4,
+          "health": 15
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 5, Attack 3, Defense 3 and 13 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40006.A and 40006.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40007"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 5,
+        "defense": 3,
+        "health": 15,
+        "back": {
+          "willpower": 3,
+          "attack": 6,
+          "defense": 4,
+          "health": 18
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 5, Defense 3 and 15 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40007.A and 40007.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40008"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 2,
+        "defense": 5,
+        "health": 16,
+        "back": {
+          "willpower": 4,
+          "attack": 3,
+          "defense": 6,
+          "health": 19
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 2, Defense 5 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40008.A and 40008.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40009"
+      },
+      "set": {
+        "willpower": 4,
+        "attack": 3,
+        "defense": 4,
+        "health": 14,
+        "back": {
+          "willpower": 5,
+          "attack": 4,
+          "defense": 5,
+          "health": 17
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 4, Attack 3, Defense 4 and 14 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40009.A and 40009.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40010"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 4,
+        "defense": 3,
+        "health": 17,
+        "back": {
+          "willpower": 4,
+          "attack": 5,
+          "defense": 4,
+          "health": 20
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 4, Defense 3 and 17 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40010.A and 40010.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40011"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 4,
+        "defense": 4,
+        "health": 18,
+        "back": {
+          "willpower": 4,
+          "attack": 5,
+          "defense": 5,
+          "health": 22
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 4, Defense 4 and 18 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40011.A and 40011.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40012"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 5,
+        "defense": 4,
+        "health": 10
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 5, Defense 4 and 10 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them.",
+      "source": "scan 40012.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40026"
+      },
+      "set": {
+        "engagementCost": 37,
+        "threat": 4,
+        "attack": 6,
+        "defense": 2,
+        "health": 10
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 37, Threat 4, Attack 6, Defense 2 and 10 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40026.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40027"
+      },
+      "set": {
+        "engagementCost": 24,
+        "threat": 1,
+        "attack": 2,
+        "defense": 2,
+        "health": 5
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 24, Threat 1, Attack 2, Defense 2 and 5 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40027.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40028"
+      },
+      "set": {
+        "engagementCost": 28,
+        "threat": 3,
+        "attack": 4,
+        "defense": 4,
+        "health": 6
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 28, Threat 3, Attack 4, Defense 4 and 6 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40028.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40029"
+      },
+      "set": {
+        "engagementCost": 44,
+        "threat": 3,
+        "attack": 8,
+        "defense": 4,
+        "health": 9
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 44, Threat 3, Attack 8, Defense 4 and 9 hit points and Victory 6 (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40029.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40030"
+      },
+      "set": {
+        "engagementCost": 28,
+        "threat": 4,
+        "attack": 4,
+        "defense": 3,
+        "health": 8
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 28, Threat 4, Attack 4, Defense 3 and 8 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40030.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40031"
+      },
+      "set": {
+        "engagementCost": 32,
+        "threat": 3,
+        "attack": 7,
+        "defense": 5,
+        "health": 5
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 32, Threat 3, Attack 7, Defense 5 and 5 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40031.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40032"
+      },
+      "set": {
+        "engagementCost": 33,
+        "threat": 3,
+        "attack": 5,
+        "defense": 2,
+        "health": 7
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 33, Threat 3, Attack 5, Defense 2 and 7 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40032.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40013"
+      },
+      "set": {
+        "engagementCost": 0,
+        "threat": 4,
+        "attack": 7,
+        "defense": 4,
+        "back": {
+          "threat": 3,
+          "attack": 5,
+          "defense": 3,
+          "victory": 99
+        },
+        "keywords": {
+          "immune": true,
+          "statsX": true
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the Dreadnaught has none. The scan of the Elite side prints engagement cost 0, Threat 4, Attack 7, Defense 4; the Damaged side (the `back` stats, read from DragnCards' picture of side B) Threat 3, Attack 5, Defense 3 and Victory 99. Neither side prints a hit point number: both print the global value `15 per player among all groups` in their text, so health stays unset and a record reads it. The Elite side's \"Archery 1 PerPlayer\" and \"Massive\" are records (`archeryPlayers`, `engagedWithAll`); the sources' keyword lists miss the Immune keyword of that line, so it is set here, and `statsX` marks the hit points a record sets (the printed card holds only the global value).",
+      "source": "scan 40013.A, picture 40013.B (dragncards), data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40004"
+      },
+      "set": {
+        "keywords": {
+          "questPointsX": true
+        }
+      },
+      "reason": "Stage 1B prints `*` for its quest points (\"This stage has a global quest point value of 8 per player among all groups\"): the number is set by a record, as the X quest points of the Journey Up the Anduin's Hills of Wilderland are.",
+      "source": "scan 40004.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40014"
+      },
+      "set": {
+        "keywords": {
+          "pillage": 8
+        }
+      },
+      "reason": "Captain of the Haven's line 1 prints \"Pillage 8.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/brief.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "source": "scan 40014.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40021"
+      },
+      "set": {
+        "keywords": {
+          "pillage": 2
+        }
+      },
+      "reason": "Corsair Plunderer's line 1 prints \"Pillage 2.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/brief.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "source": "scan 40021.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40022"
+      },
+      "set": {
+        "keywords": {
+          "pillage": 3
+        }
+      },
+      "reason": "Daring Buccaneer's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/brief.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "source": "scan 40022.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40023"
+      },
+      "set": {
+        "keywords": {
+          "pillage": 3
+        }
+      },
+      "reason": "Fierce Marauder's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/brief.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "source": "scan 40023.A, data/printed/standalone-scenarios.json"
     }
   ],
   "scenarioPiles": [
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50812",
+      "pile": "staging",
+      "reason": "DragnCards loads Annúminas set aside (Q99.08). The Standard Game Mode card (50801) prints \"Setup: ... Search the encounter deck for Annúminas, add it to the staging area, and set its city strength to 20.\", so it starts in the staging area.",
+      "source": "scan 50801.A; dragncards preBuiltDecks.json (Q99.08)"
+    },
     {
       "scenario": "mount-gundabad",
       "code": "19143",
@@ -1725,6 +4046,263 @@
       "pile": "activeLocation",
       "reason": "DragnCards loads Tarlang's Neck set aside (Q99.03). The quest card The Disappearance (50301) prints \"Setup: Make Tarlang's Neck the active location.\", so it is the active location at the start of the game.",
       "source": "dragncards preBuiltDecks.json (Q99.03); The Disappearance 50301 printed Setup"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51001",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: Radagast's Request is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51003",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: Mirkwood Forest (A Fork in the Road) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51004",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: Mirkwood Forest (Carried Away) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51005",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: Mirkwood Forest (A New Terror Abroad) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51007",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: The Necromancer's Tower (The Tower of Sorcery) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51008",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: The Necromancer's Tower (Dungeons of the Necromancer) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51009",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: The Necromancer's Tower (Return to Rhosgobel) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51010",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads Rhosgobel set aside (Q99.11). The quest card Radagast's Request (51001) prints \"Setup: Add Rhosgobel to the staging area.\", so it starts in the staging area.",
+      "source": "scan 51001.A; dragncards preBuiltDecks.json (Q99.11)"
+    },
+    {
+      "scenario": "the-woodland-realm",
+      "code": "51101",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.12 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Captured by Spiders is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.12); scan of the quest card"
+    },
+    {
+      "scenario": "the-woodland-realm",
+      "code": "51103",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.12 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: A Chosen Path (stage 2, Lost in the Dark) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.12); scan of the quest card"
+    },
+    {
+      "scenario": "the-woodland-realm",
+      "code": "51104",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.12 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: A Chosen Path (stage 2, \"Don't Leave the Path\") is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.12); scan of the quest card"
+    },
+    {
+      "scenario": "the-woodland-realm",
+      "code": "51105",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.12 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: A Chosen Path (stage 2, third choice) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.12); scan of the quest card"
+    },
+    {
+      "scenario": "the-woodland-realm",
+      "code": "51107",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.12 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: On the Trail (stage 3, first choice) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.12); scan of the quest card"
+    },
+    {
+      "scenario": "the-woodland-realm",
+      "code": "51108",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.12 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: On the Trail (stage 3, second choice) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.12); scan of the quest card"
+    },
+    {
+      "scenario": "the-woodland-realm",
+      "code": "51109",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.12 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: On the Trail (stage 3, third choice) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.12); scan of the quest card"
+    },
+    {
+      "scenario": "the-woodland-realm",
+      "code": "51110",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads Spider Den set aside (Q99.12). The quest card Captured by Spiders (51101) prints \"Setup: Add Spider Den to the staging area.\", so it starts in the staging area.",
+      "source": "scan 51101.A; dragncards preBuiltDecks.json (Q99.12)"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51201",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: To the West-door (stage 1) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51203",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Journey in the Black Pit (stage 2, A Presence in the Dark) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51204",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Journey in the Black Pit (stage 2, The Long Dark of Moria) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51205",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Journey in the Black Pit (stage 2, Narrow Paths) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51207",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Search for the Chamber (stage 3, Drums in the Deep) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51208",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Search for the Chamber (stage 3, The Fate of Balin) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51209",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Search for the Chamber (stage 3, Continuing Eastward) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51210",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads The Watcher set aside (Q99.13). The quest card To the West-door (51201) prints \"Setup: ... Add The Watcher to the staging area.\", so it starts in the staging area.",
+      "source": "scan 51201.A; dragncards preBuiltDecks.json (Q99.13)"
+    },
+    {
+      "scenario": "escape-from-khazad-dum",
+      "code": "51301",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.14 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Mines of Moria: Out of the Depths (stage 1) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.14); scan of the quest card"
+    },
+    {
+      "scenario": "escape-from-khazad-dum",
+      "code": "51303",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.14 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Mines of Moria: Search for an Exit (stage 2, Old One Lair) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.14); scan of the quest card"
+    },
+    {
+      "scenario": "escape-from-khazad-dum",
+      "code": "51304",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.14 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Mines of Moria: Search for an Exit (stage 2, A Wrong Turn) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.14); scan of the quest card"
+    },
+    {
+      "scenario": "escape-from-khazad-dum",
+      "code": "51305",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.14 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Mines of Moria: Search for an Exit (stage 2, A Way Up) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.14); scan of the quest card"
+    },
+    {
+      "scenario": "escape-from-khazad-dum",
+      "code": "51307",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.14 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Mines of Moria: Nearing the Gate (stage 3, The Bridge of Khazad-dûm) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.14); scan of the quest card"
+    },
+    {
+      "scenario": "escape-from-khazad-dum",
+      "code": "51308",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.14 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Mines of Moria: Nearing the Gate (stage 3, Last Lord of Moria) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.14); scan of the quest card"
+    },
+    {
+      "scenario": "escape-from-khazad-dum",
+      "code": "51309",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.14 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Mines of Moria: Nearing the Gate (stage 3, The Rear Guard) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.14); scan of the quest card"
+    },
+    {
+      "scenario": "escape-from-khazad-dum",
+      "code": "51310",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads Dark Pit set aside (Q99.14) and omits its back, Durin's Bane (the scans number them 1/2 and 2/2, as The Mines of Moria's Watcher and Chamber of Mazarbul; Hall of Beorn files them as two cards, #10 and #11). The quest card Out of the Depths (51301) prints \"Setup: Add Dark Pit to the staging area.\", so it starts in the staging area, and stage 1B flips it over to Durin's Bane. `back` names that side.",
+      "source": "scan 51301.A; dragncards preBuiltDecks.json (Q99.14)",
+      "back": "51311"
     }
   ],
   "scenarioRemovals": [
@@ -1740,6 +4318,55 @@
     }
   ],
   "scenarioEasy": [
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50714",
+      "easy": 1,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 1 for Taken by Surprise (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50717",
+      "easy": 1,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 1 for Dark Alley (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50718",
+      "easy": 2,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 2 for Market Square (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50724",
+      "easy": 2,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 2 for Greenway Footpad (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50725",
+      "easy": 2,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 2 for Chetwood Outlaw (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50727",
+      "easy": 1,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 1 for Smoke and Mirrors (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
+    {
+      "scenario": "murder-at-the-prancing-pony",
+      "code": "50729",
+      "easy": 1,
+      "reason": "Hall of Beorn's Scenarios export lists the Easy count of every card of the scenario as its Normal count and its card export gives Easy 0, while DragnCards' Easy deck (E99.07) and Hall of Beorn's scenario page agree on 1 for Deadly Accusations (Easy 40 cards against Normal 50: Dark Alley 1, Market Square 2, Greenway Footpad 2, Chetwood Outlaw 2, Smoke and Mirrors 1, Deadly Accusations 1, Taken by Surprise 1). The gold Easy mark is printed on individual copies, so the one pinned scan cannot show it; the two agreeing sources win. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/LotR/Scenarios/Murder-at-the-Prancing-Pony (Normal and Easy columns); data/raw/dragncards (E99.07, Q99.07); data/raw/hallofbeorn/Scenarios/Murder-at-the-Prancing-Pony.json (EasyQuantity equals NormalQuantity)"
+    },
     {
       "scenario": "the-ghost-of-framsburg",
       "code": "19099",
@@ -2066,6 +4693,54 @@
   ],
   "productCodes": [
     {
+      "set": "Escape from Khazad-dûm",
+      "prefix": "513",
+      "reason": "Hall of Beorn numbers Escape from Khazad-dûm's cards 00001 to 00053 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and of the core set's, and RingsDB lists no card of EfKD. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 513 and the two-digit collector number: 5 and 13 for the pack's position (13) in RingsDB's cycle 50, the Standalone scenarios, with the field's three-digit limit (51301 Out of the Depths, 51353 A Foe Beyond).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet Escape from Khazad-dûm, Number, RingsDbCardId); ringsdb.com packs (EfKD, cycle 50, position 13; no cards listed)"
+    },
+    {
+      "set": "The Mines of Moria",
+      "prefix": "512",
+      "reason": "Hall of Beorn numbers The Mines of Moria's cards 00001 to 00053 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and of the core set's, and RingsDB lists no card of TMoM. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 512 and the two-digit collector number: 5 and 12 for the pack's position (12) in RingsDB's cycle 50, the Standalone scenarios, with the field's three-digit limit (51201 To the West-door, 51253 Massing in the Deep).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Mines of Moria, Number, RingsDbCardId); ringsdb.com packs (TMoM, cycle 50, position 12; no cards listed)"
+    },
+    {
+      "set": "The Woodland Realm",
+      "prefix": "511",
+      "reason": "Hall of Beorn numbers The Woodland Realm's cards 00001 to 00053 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and of the core set's, and RingsDB lists no card of TWR. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 511 and the two-digit collector number: 5 and 11 for the pack's position (11) in RingsDB's cycle 50, the Standalone scenarios, with the field's three-digit limit (51101 Captured by Spiders, 51153 Wasted Provisions).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Woodland Realm, Number, RingsDbCardId); ringsdb.com packs (TWR, cycle 50, position 11; no cards listed)"
+    },
+    {
+      "set": "The Wizard's Quest",
+      "prefix": "510",
+      "reason": "Hall of Beorn numbers The Wizard's Quest's cards 00001 to 00054 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and of the core set's, and RingsDB lists no card of TWQ. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 510 and the two-digit collector number: 5 and 10 for the pack's position (10) in RingsDB's cycle 50, the Standalone scenarios, with the field's three-digit limit (51001 Radagast's Request, 51054 Weighed Down).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Wizard's Quest, Number, RingsDbCardId); ringsdb.com packs (TWQ, cycle 50, position 10; no cards listed)"
+    },
+    {
+      "set": "Attack on Dol Guldur",
+      "prefix": "509",
+      "reason": "Hall of Beorn numbers Attack on Dol Guldur's cards 00001 to 00032 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of AoDG. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 509 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 9 for the pack's position in it (50901 Assault on the Golden Wood, 50932 Epic Multiplayer Mode).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet Attack on Dol Guldur, Number, RingsDbCardId); ringsdb.com packs (AoDG, cycle 50, position 9; no cards listed)"
+    },
+    {
+      "set": "The Siege of Annúminas",
+      "prefix": "508",
+      "reason": "Hall of Beorn numbers The Siege of Annúminas's cards 00001 to 00032 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of TSoA. A code must name one card, so the earlier standalone packs keep their codes and the Siege's are 508 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 8 for the pack's position in it (50801 Standard Game Mode, 50832 Weary Warriors). Boromir (02095) and Faramir (06081), which Hall of Beorn tags with the product, are RingsDB's own cards and keep their codes.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Siege of Annúminas, Number, RingsDbCardId); ringsdb.com packs (TSoA, cycle 50, position 8; no cards listed)"
+    },
+    {
+      "set": "Murder at the Prancing Pony",
+      "prefix": "507",
+      "reason": "Hall of Beorn numbers Murder at the Prancing Pony's cards 00001 to 00029 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and others, and RingsDB lists no card of MatPP. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 507 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 7 for the pack's position in it (50701 Investigating the Crime, 50729 Deadly Accusations). Legolas (01005), the product's player card, is RingsDB's Core Set hero and keeps his code.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet Murder at the Prancing Pony, Number, RingsDbCardId); ringsdb.com packs (MatPP, cycle 50, position 7; no cards listed)"
+    },
+    {
+      "set": "The Ruins of Belegost",
+      "prefix": "506",
+      "reason": "Hall of Beorn numbers The Ruins of Belegost's cards 00001 to 00030 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of TRoB. A code must name one card, so the earlier standalone packs keep their codes and the Ruins' are 506 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 6 for the pack's position in it (50601 Ruins of the First Age, 50630 Covered Pit). Gimli (01004), the product's player card, is RingsDB's Core Set hero and keeps his code.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Ruins of Belegost, Number, RingsDbCardId); ringsdb.com packs (TRoB, cycle 50, position 6; no cards listed)"
+    },
+    {
       "set": "The Stone of Erech",
       "prefix": "503",
       "reason": "Hall of Beorn numbers The Stone of Erech's cards 00001 to 00027 (RingsDbCardId), which are the codes of The Massing at Osgiliath's and The Battle of Lake-town's 00001 to 00019 and 00024, and RingsDB lists no card of TSoE. A code must name one card, so the earlier two keep their codes and the Stone's are 503 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 3 for the pack's position in it (50301 The Disappearance, 50327 The Gloaming).",
@@ -2150,6 +4825,12 @@
   ],
   "dragnPackAliases": [
     {
+      "dragncards": "The Siege of Annuminas",
+      "pack": "TSoA",
+      "reason": "DragnCards spells the pack's name without the accent (\"The Siege of Annuminas\"); its rows' collector numbers (12 to 32) and names find the cards of TSoA, whose Hall of Beorn numbers they equal.",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); data/raw/ringsdb/packs.json"
+    },
+    {
       "dragncards": "The Battle of Lake-Town",
       "pack": "TBoLT",
       "reason": "DragnCards spells the pack \"The Battle of Lake-Town\" (capital T) where Hall of Beorn and the cards print \"The Battle of Lake-town\", so the row's pack does not name the product. Its collector numbers (1 to 24) and names are Hall of Beorn's own, so the row's number and name find the card in TBoLT.",
@@ -2166,6 +4847,12 @@
       "pack": "BoCD",
       "reason": "DragnCards spells the pack's name without the accent (\"The Battle of Carn Dum\"); its rows' collector numbers and names find the cards of BoCD.",
       "source": "data/raw/dragncards/cardDb.tsv (packName); data/raw/ringsdb/packs.json"
+    },
+    {
+      "dragncards": "Escape from Khazad-dum",
+      "pack": "EfKD",
+      "reason": "DragnCards spells the pack's name without the accent (\"Escape from Khazad-dum\"); its rows' collector numbers (1 to 53) and names find the cards of EfKD, whose Hall of Beorn numbers they equal.",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); data/raw/ringsdb/packs.json"
     }
   ],
   "dragnCardCodes": [
@@ -2288,6 +4975,54 @@
       "code": "03070",
       "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-Heading-Down-KD (#70) as Khazad-dûm #76, with side B 'Heading Down', so neither the title nor the collector number finds it; the name of its side B does.",
       "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 76, Search for an Exit / Heading Down); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-Heading-Down-KD)"
+    },
+    {
+      "dragncards": "The Wizard's Quest",
+      "number": 10,
+      "side": "a",
+      "code": "51010",
+      "reason": "DragnCards files Rhosgobel and the Rider of Mirkwood as one two-named card, collector number 10 (Rhosgobel, then Rider of Mirkwood). Hall of Beorn files them as two cards, #10 Rhosgobel and #11 Rider of Mirkwood. Side A is Rhosgobel.",
+      "source": "dragncards cardDb.tsv (The Wizard's Quest 10, both rows) and preBuiltDecks.json (Q99.11); hallofbeorn.com/Export/EncounterCards (Rhosgobel-TWQ, Rider-of-Mirkwood-TWQ)"
+    },
+    {
+      "dragncards": "The Wizard's Quest",
+      "number": 10,
+      "side": "b",
+      "code": "51011",
+      "reason": "The second name of the DragnCards card number 10 is the Rider of Mirkwood, which Hall of Beorn numbers 11. See the side A entry.",
+      "source": "dragncards cardDb.tsv (The Wizard's Quest 10); hallofbeorn.com/Export/EncounterCards (Rider-of-Mirkwood-TWQ)"
+    },
+    {
+      "dragncards": "The Woodland Realm",
+      "number": 10,
+      "side": "a",
+      "code": "51110",
+      "reason": "DragnCards files Spider Den and Mendor as one two-named card, collector number 10 (Spider Den, then Mendor). Hall of Beorn files them as two cards, #10 Spider Den and #11 Mendor. Side A is Spider Den.",
+      "source": "dragncards cardDb.tsv (The Woodland Realm 10); hallofbeorn.com/Export/EncounterCards (Spider-Den-TWR, Mendor-TWR); scan 51110.A"
+    },
+    {
+      "dragncards": "The Woodland Realm",
+      "number": 10,
+      "side": "b",
+      "code": "51111",
+      "reason": "The second name of the DragnCards card number 10 is Mendor, which Hall of Beorn numbers 11. See the side A entry.",
+      "source": "dragncards cardDb.tsv (The Woodland Realm 10); hallofbeorn.com/Export/EncounterCards (Mendor-TWR)"
+    },
+    {
+      "dragncards": "The Mines of Moria",
+      "number": 10,
+      "side": "a",
+      "code": "51210",
+      "reason": "DragnCards files The Watcher and Chamber of Mazarbul as one two-named card, collector number 10 (The Watcher, then Chamber of Mazarbul). Hall of Beorn files them as two cards, #10 The Watcher and #11 Chamber of Mazarbul. Side A is The Watcher.",
+      "source": "dragncards cardDb.tsv (The Mines of Moria 10); hallofbeorn.com/Export/EncounterCards (The-Watcher-TMoM, Chamber-of-Mazarbul-TMoM); scan 51210.A"
+    },
+    {
+      "dragncards": "The Mines of Moria",
+      "number": 10,
+      "side": "b",
+      "code": "51211",
+      "reason": "The second name of the DragnCards card number 10 is Chamber of Mazarbul, which Hall of Beorn numbers 11. See the side A entry.",
+      "source": "dragncards cardDb.tsv (The Mines of Moria 10); hallofbeorn.com/Export/EncounterCards (Chamber-of-Mazarbul-TMoM)"
     }
   ],
   "encounterSetAliases": [
@@ -2368,6 +5103,66 @@
   ],
   "scenarioExcluded": [
     {
+      "scenario": "attack-on-dol-guldur",
+      "code": "50931",
+      "reason": "Standard Game Mode is the mode card, not a card a pile deals: its Setup (Dol Guldur to the staging area with a threat dial for the city strength) and its back's lines run from beside the quest deck, as the Hard Mode card of Dream-chaser does. DragnCards loads it as a Campaign row and Hall of Beorn's scenario list counts it once, so the count check skips it.",
+      "source": "hallofbeorn.com/Export/Scenarios/Attack-on-Dol-Guldur (ScenarioCards); dragncards preBuiltDecks.json (Q99.10); scan 50931.A and 50931.B"
+    },
+    {
+      "scenario": "attack-on-dol-guldur",
+      "code": "50932",
+      "reason": "Epic Multiplayer Mode is the mode card of the Epic Multiplayer Mode of Attack on Dol Guldur, which the app does not play: it divides the players into three teams, each with its own staging area, quest deck and encounter deck. The app plays one table of one or two seats, so the Standard Game Mode is the scenario's mode. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/Attack-on-Dol-Guldur (ScenarioCards); dragncards preBuiltDecks.json (Q99.10); scan 50932.A and 50932.B"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50801",
+      "reason": "Standard Game Mode is the mode card, not a card a pile deals: its Setup (Annúminas to the staging area with city strength 20, the three quest decks) and its back's Forced effect run from beside the quest deck, as the Hard Mode card of Dream-chaser does. DragnCards loads it as a Campaign row and Hall of Beorn's scenario list counts it once, so the count check skips it.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (ScenarioCards); dragncards preBuiltDecks.json (Q99.08); scan 50801.A and 50801.B"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50802",
+      "reason": "Epic Multiplayer Mode is the mode card of the Epic Multiplayer Mode of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50806",
+      "reason": "Raise the Levee is stage 1C of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50807",
+      "reason": "Guard the Gate is stage 2C of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50808",
+      "reason": "Rescue the Captives is stage 3C of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50809",
+      "reason": "Delay the Enemy is stage 1E of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50810",
+      "reason": "Man the Walls is stage 2E of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50811",
+      "reason": "Stop the Attack is stage 3E of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
       "scenario": "the-siege-of-gondor",
       "code": "145072",
       "reason": "The Corsair Fleet is one physical card with two sides, Corsair and Gondor. Hall of Beorn's scenario list counts both sides as cards; DragnCards' Q0C.14 deals the Corsair side (145071) and the Setup of The Battle of the Pelennor Fields adds the Gondor side to the staging area, so The Siege of Gondor deals no Gondor side of its own.",
@@ -2408,6 +5203,24 @@
       "code": "146082",
       "reason": "The card belongs to epic multiplayer mode (mec113.epic-multiplayer-mode): the scenario's Hall of Beorn list counts it, but the DragnCards load list of the scenario holds none, and the Epic Multiplayer Mode campaign card's Setup (146080) deals it: \"Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area\".",
       "source": "hallofbeorn.com/Export/Scenarios (Mount-Doom); dragncards preBuiltDecks.json (Q0C.17, Q0C.18); scan 146080.A; scan 146082.A"
+    },
+    {
+      "scenario": "the-hunt-for-the-dreadnaught",
+      "code": "40002",
+      "reason": "Standard Mode is the mode card, not a card a pile deals: its Setup (prepare the fleet and the Corsair deck, set the unique enemies aside, two locations to the staging area) and its back (the 10-damage Quest Action, the elimination of a player with no ship-objective) run from beside the quest deck, as the Hard Mode card of Dream-chaser does. DragnCards loads it as a Campaign row in the set-aside group and Hall of Beorn's scenario list counts it once, so the count check skips it.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Hunt-for-the-Dreadnaught (ScenarioCards); dragncards preBuiltDecks.json (Q99.15); scan 40002.A and 40002.B"
+    },
+    {
+      "scenario": "the-hunt-for-the-dreadnaught",
+      "code": "40001",
+      "reason": "Easy Mode is the mode card of the easy difficulty of The Hunt for the Dreadnaught, which the app does not deal: the app deals the Standard Mode, the cooperative game of one or two seats on one table. Easy Mode removes two Black Sails and a Corsair Warship, makes Cobas Haven the active location and adds a card draw and the 10-damage Quest Action. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Hunt-for-the-Dreadnaught (ScenarioCards); dragncards preBuiltDecks.json (Q99.15); scan 40001.A and 40001.B"
+    },
+    {
+      "scenario": "the-hunt-for-the-dreadnaught",
+      "code": "40003",
+      "reason": "Hard Mode is the mode card of the hard difficulty of The Hunt for the Dreadnaught, which the app does not deal (the app deals the Standard Mode): it stages three Tolfalas Landing locations, limits threat reduction to 1 each round and raises a player's threat when a character is healed or readied by a player card effect. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Hunt-for-the-Dreadnaught (ScenarioCards); dragncards preBuiltDecks.json (Q99.15); scan 40003.A and 40003.B"
     }
   ],
   "hobRingsDbCodes": [

@@ -43,6 +43,8 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["bottom"], typeof pick.bottom === "number" ? `among the bottom ${pick.bottom}` : null);
   note(["staging"], pick.staging === true ? "or in the staging area" : null);
   note(["otherArea"], pick.otherArea === true ? "whose staging area is a different one from the chooser's (every other player while the areas are not separate)" : null);
+  note(["atOtherStage"], pick.atOtherStage === true ? "at another stage than the chooser's (none while the game has one stage)" : null);
+  note(["canSpendResources"], typeof pick.canSpendResources === "number" ? `who controls heroes holding ${pick.canSpendResources} resource${pick.canSpendResources === 1 ? "" : "s"} or more in all` : null);
   note(["atStage"], pick.atStage === true ? "at the acting player's staging area (every area before they are separate)" : null);
   note(["playerCard"], pick.playerCard === true ? "that is a player card" : pick.playerCard === false ? "that is an encounter card" : null);
   note(["stagingOnly"], pick.stagingOnly === true ? "in the staging area only" : null);
@@ -67,6 +69,10 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["exceptSphere"], typeof pick.exceptSphere === "string" ? `that is not a ${pick.exceptSphere} card` : null);
   note(["maxWillpower"], typeof pick.maxWillpower === "number" ? `with a current Willpower of ${pick.maxWillpower} or less` : null);
   note(["highestWillpower"], pick.highestWillpower === true ? "with the highest current Willpower of those (ties: the chooser decides)" : null);
+  note(["enemyOrLocation"], pick.enemyOrLocation === true ? "that is an enemy or a location" : null);
+  note(["challenge"], pick.challenge === true ? "(the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked)" : null);
+  note(["highestEngagementCost"], pick.highestEngagementCost === true ? "with the highest current engagement cost of those (ties: the chooser decides)" : null);
+  note(["lowestEngagementCost"], pick.lowestEngagementCost === true ? "with the lowest current engagement cost of those (ties: the chooser decides)" : null);
   note(["attachedTo"], typeof pick.attachedTo === "string" ? `attached to ${pick.attachedTo === "host" ? "this card's host" : pick.attachedTo === "source" ? "this card" : pick.attachedTo === "defender" ? "the defending character" : "the active location"}` : null);
   note(["lowestAttack"], pick.lowestAttack === true ? "with the lowest Attack of those (ties: the chooser decides)" : null);
   note(["minCost"], typeof pick.minCost === "number" ? `with a printed cost of at least ${pick.minCost} (a card with no printed cost never matches)` : null);

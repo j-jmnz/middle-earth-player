@@ -29,6 +29,7 @@ import { countsDefense, rangedAttack, struck } from "../families/attack/strike.t
 import { attackStatAgainst } from "../families/attack/spectral.ts";
 import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
+import { barredFromDreadnaught } from "../families/sea/dreadnaught.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -261,12 +262,19 @@ export function canAttack(
   // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
   if (flagged(state, enemyId, "cannotBeAttacked") || attackerLimitReached(state, enemyId)) return false;
   if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
+  // "Engaged player cannot attack the Dreadnaught" (40014:A:2).
+  if (barredFromDreadnaught(state, attackerId, enemyId, cards)) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
   // An enemy in the staging area that is considered engaged with the first player (the Balrog, 142044:A:2): only the first player declares
   // attackers against it, with their own characters and ranged characters of the others (rr.ranged).
   if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithFirst")) {
     if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
+    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
+  }
+  // The Dreadnaught (Massive): in the staging area but engaged with every player, so each player attacks it with their own characters, and ranged characters of the others join (rr.ranged).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "attackableEngagedWithAll")) {
+    if (flagged(state, attackerId, "cannotAttack") || state.phase !== "Combat") return false;
     return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
   // An enemy in the staging area that is considered engaged with each player whose threat is 1 or greater (Durin's Bane, 04150:A:2): such a player declares attackers against it, with their own characters and ranged characters of the others (rr.ranged).

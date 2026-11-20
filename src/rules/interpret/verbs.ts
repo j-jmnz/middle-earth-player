@@ -137,7 +137,11 @@ export function runExtraVerb(
         const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
         const living = livingSeats(state);
         const at = Math.max(0, living.indexOf(state.firstPlayer));
-        return [...living.slice(at), ...living.slice(0, at)].reduce((current, seat) => discardRandom(current, seat, amount, focus.sourceId, ctx), state);
+        const done = [...living.slice(at), ...living.slice(0, at)].reduce((current, seat) => discardRandom(current, seat, amount, focus.sourceId, ctx), state);
+        if (instruction.raiseStagingByCost !== true) return done;
+        // The cards that joined the discard piles are the ones discarded: their printed costs raise the staging area's total Threat for the phase (51238:A:1).
+        const total = living.reduce((sum, seat) => sum + (done.seats[seat]?.discard ?? []).slice(state.seats[seat]?.discard.length ?? 0).reduce((cost, id) => cost + (printedOf(ctx.cards, done.cards[id]?.code ?? "").cost ?? 0), 0), 0);
+        return total > 0 ? { ...done, modifiers: [...done.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "moreStagingThreat", amount: total, until: "endOfPhase" }] } : done;
       }
       const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
       const discarded = discardRandom(state, seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
@@ -168,7 +172,8 @@ export function runExtraVerb(
         for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = moveEncounter(next, id, "engaged", next.firstPlayer, ctx, steps);
         return next;
       }
-      for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: turnedUp(next, id) });
+      const host = instruction.from != null ? Object.values(state.cards).find((card) => card.code === instruction.from && inPlay(card.zone))?.id : focus.sourceId;
+      for (const id of host ? cardsUnder(state, host) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: turnedUp(next, id) });
       return next;
     }
     case "DamageAll":
@@ -387,7 +392,7 @@ export function questProgressMoved(
   state: ScenarioState,
   instruction: Extract<Instruction, { verb: "RemoveQuestProgress" | "PlaceQuestProgress" }>,
 ): number {
-  const amount = instruction.perPlayer * livingSeats(state).length;
+  const amount = instruction.perPlayer * (instruction.verb === "RemoveQuestProgress" && instruction.startedPlayers === true ? state.seatCount : livingSeats(state).length);
   if (instruction.verb === "PlaceQuestProgress") return amount;
   const stage = state.questStage ? state.cards[state.questStage] : undefined;
   return Math.max(0, Math.min(amount, stage?.progress ?? 0));

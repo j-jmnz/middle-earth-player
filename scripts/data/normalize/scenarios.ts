@@ -102,8 +102,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       problems.push(`${id}: DragnCards has no ${def.deck?.normal ?? "Q0C"} deck labelled "${hob.Title}"`);
       continue;
     }
-    if (def.deck && entry?.[1]?.label !== hob.Title) {
-      problems.push(`${id}: DragnCards ${def.deck.normal} is labelled "${entry?.[1]?.label ?? ""}", not "${hob.Title}"`);
+    const deckLabel = def.deck?.label ?? hob.Title;
+    if (def.deck && entry?.[1]?.label !== deckLabel) {
+      problems.push(`${id}: DragnCards ${def.deck.normal} is labelled "${entry?.[1]?.label ?? ""}", not "${deckLabel}"`);
       continue;
     }
     const [normalKey, normalDeck] = entry ?? [null, null];
@@ -146,7 +147,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // The Stormcaller's own stages (2C to 4C, `stormcallerQuests`) are listed with the others and leave `stages` once the load list is read.
     const questCodes = hob.QuestCards.flatMap((quest) => {
       const card = bySlug.get(quest.Slug);
-      return card && !isNightmareCard(card) ? [card.code] : [];
+      // A mode card (The Siege of Annúminas' Standard Game Mode) is listed with the quest cards but is no stage; a quest card the scenario never plays is excluded by an override (the Siege's Epic Multiplayer stages).
+      return card && card.type === "quest" && !isNightmareCard(card) && !overrides.scenarioExcluded.some((rule) => rule.scenario === id && rule.code === card.code) ? [card.code] : [];
     });
     for (const rule of overrides.scenarioStages) if (rule.scenario === id && !questCodes.includes(rule.code)) questCodes.push(rule.code);
     let stages = questCodes;
@@ -155,7 +157,15 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const questSetup = setupOf(byCode.get(stages[0] ?? "")?.text, false).setup;
     const campaignLines = setupOf(byCode.get(campaignCard ?? "")?.text, def.deck !== undefined || product.sagaStart === true);
     const campaignSetup = campaignLines.setup;
-    const quest: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
+    // A mode card's Setup (the Siege's Standard Game Mode: Annúminas to the staging area) runs before the quest card's: its sentences are read with the quest card's.
+    const modeCard = def.modeCard === undefined ? undefined : cards.find((card) => card.type === "campaign" && card.name === def.modeCard && card.printings.some((p) => cardPacks.includes(p.pack)));
+    const easyModeCard = def.easyModeCard === undefined ? undefined : cards.find((card) => card.type === "campaign" && card.name === def.easyModeCard && card.printings.some((p) => cardPacks.includes(p.pack)));
+    if (def.easyModeCard !== undefined && !easyModeCard) local.push(`${id}: no Easy mode card ${def.easyModeCard}`);
+    // The Hunt for the Dreadnaught's mode cards print the Setup as bulleted lines, which continue the "Setup:" line: the bullets are dropped, each line is one sentence.
+    const modeSetup = setupOf(modeCard?.text, true).setup?.replaceAll("• ", "") ?? null;
+    const modeParsed: ParsedSetup = modeSetup ? parseSetup(modeSetup, names) : { clauses: [], unread: [] };
+    const questParsed: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
+    const quest: ParsedSetup = { clauses: [...modeParsed.clauses, ...questParsed.clauses], unread: [...modeParsed.unread, ...questParsed.unread] };
     const camp: ParsedSetup = campaignSetup ? parseSetup(campaignSetup, names) : { clauses: [], unread: [] };
     for (const sentence of [...quest.unread, ...camp.unread]) local.push(`${id}: a Setup sentence no pattern reads: ${sentence}`);
     local.push(...burdenSetProblems(id, camp, cards, plain));
@@ -178,8 +188,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         let other = sided ? resolve(line.databaseId, "b", sided) : null;
         const name = (sided ? sideRow(line.databaseId, "a") : raw.dragn.get(line.databaseId))?.name ?? line.databaseId;
         if (!card) {
-          // The scenario overview card has no game text and no catalog row.
-          if (name !== hob.Title) local.push(`${deck.label}: no card for "${name}" (${line.databaseId})`);
+          // The scenario overview card has no game text and no catalog row; a Rules card (The Ruins of Belegost's Discover and Loot keyword card) is a reminder, not a card the scenario deals.
+          if (name !== hob.Title && raw.dragn.get(line.databaseId)?.type !== "Rules") local.push(`${deck.label}: no card for "${name}" (${line.databaseId})`);
           continue;
         }
         if (card.type === "campaign" || raw.dragn.get(line.databaseId)?.type === "Campaign") continue;
@@ -208,6 +218,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         const was = pile;
         const moved = overrides.scenarioPiles.find((rule) => rule.scenario === id && rule.code === card?.code && (rule.from === undefined || rule.from === was));
         if (moved) pile = moved.pile;
+        if (moved?.back !== undefined) other = byCode.get(moved.back) ?? null;
         if (pile === "campaign") {
           campaign.add(card.code);
           continue;
@@ -232,7 +243,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       }
       // "Players prepare their fleet" deals all six ship-objectives of The Dream-chaser's Fleet (dcce.prepare-your-fleet), set aside until
       // the players choose; the load list holds the four of the original box, so each ship it lacks (by name) is added, in both decks.
-      if (clausesOf(quest, "step").some((clause) => clause.step === "prepareFleet")) {
+      // (The Hunt for the Dreadnaught's fleet is its own six ship-objectives, which the load list holds.)
+      if (product.home === "dream-chaser" && clausesOf(quest, "step").some((clause) => clause.step === "prepareFleet")) {
         const dealt = new Set([...normal.placements.keys()].map((key) => byCode.get(key.split("\u0000")[0] ?? "")?.name));
         for (const ship of cards.filter((card) => card.type === "ship-objective" && canon(card.encounterSet ?? "") === canon("The Dream-chaser's Fleet") && !dealt.has(card.name))) {
           normal.placements.set(keyOf(ship.code, "setAside"), 1);
@@ -355,7 +367,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const booklet = bookletSetsOf(rule).filter((name) => !(def.deck && namesAnObjective(name)));
     const first = hob.QuestCards[0];
     const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign" || byCode.get(code)?.campaignKind != null;
-    let hobSets = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
+    let hobSets = def.encounterSets ? [...def.encounterSets] : [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
     if (def.setupSpan === undefined) {
       // No rules insert is pinned for this scenario (a cycle's Adventure Pack): Hall of Beorn's set list is the list, and the sets of the cards the load list deals must be exactly those.
       const dealtSets = new Set<string>();
@@ -472,6 +484,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         widgets,
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },
         ...(nightmare.data ? { nightmare: nightmare.data } : {}),
+        ...(modeCard ? { modeCard: modeCard.code } : {}),
+        ...(easyModeCard ? { easyModeCard: easyModeCard.code } : {}),
       }),
     );
   }

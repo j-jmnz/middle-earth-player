@@ -6,12 +6,14 @@ import { ESCAPE_CONDITIONS } from "./escape.ts";
 import { GUARDIAN_CONDITIONS } from "./guardian.ts";
 import { ERECH_CONDITIONS } from "./erech.ts";
 import { FOG_CONDITIONS } from "./fog.ts";
+import { INVESTIGATION_CONDITIONS } from "./investigation.ts";
 import { LONG_DARK_CONDITIONS } from "./long-dark.ts";
 
 export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
 export { ERECH_CONDITION_SAMPLES } from "./erech.ts";
 export { FOG_CONDITION_SAMPLES } from "./fog.ts";
+export { INVESTIGATION_CONDITION_SAMPLES } from "./investigation.ts";
 export { LONG_DARK_CONDITION_SAMPLES } from "./long-dark.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
@@ -40,6 +42,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...GUARDIAN_CONDITIONS,
   ...ERECH_CONDITIONS,
   ...FOG_CONDITIONS,
+  ...INVESTIGATION_CONDITIONS,
   ...LONG_DARK_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
@@ -49,11 +52,13 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   namedFlag: (c) => ({ text: `the card in play titled "${str(c.name)}" holds the flag ${str(c.stat)}`, read: ["name", "stat"] }),
   flag: (c) => ({ text: `${c.holder === "seat" ? "the actor's seat" : c.holder === "table" ? "the table" : "this card"} ${c.is === false ? "does not hold" : "holds"} the flag ${str(c.stat)}`, read: ["stat", "holder", "is"] }),
   canPick: (c, ctx) => ({ text: `there is a ${renderPick(c.pick, ctx)} to choose`, read: ["pick"] }),
+  optionTaken: (c) => ({ text: `the running effect took the option "${str(c.id)}" (a choice made earlier in it, or the stage picked at random)`, read: ["id"] }),
   attackedThisPhase: (c) => ({ text: `"${str(c.name)}" has resolved an attack this phase`, read: ["name"] }),
   lastFortitudeFailed: () => ({ text: "the last Fortitude test the running effect made was failed (false before it has made one)", read: [] }),
   lastFortitudePassed: () => ({ text: "the last Fortitude test the running effect made was passed (false before it has made one)", read: [] }),
   fortitudeFailed: (c) => ({ text: `${c.who === "any" ? "any player has" : "the actor has"} failed a Fortitude test this ${str(c.scope)}`, read: ["scope", "who"] }),
   hostControlledByActor: () => ({ text: "the card this one is attached to is controlled by the acting player", read: [] }),
+  phaseEnded: (c) => ({ text: `the ${str(c.is)} phase has just ended`, read: ["is"] }),
   phase: (c) => ({ text: `it is the ${str(c.is)} phase`, read: ["is"] }),
   hasEngaged: (c) => ({ text: `the actor has ${typeof c.trait === "string" ? `a ${c.trait} ` : "an "}enemy engaged`, read: ["trait"] }),
   exhausted: (c) => ({ text: `the card with code ${str(c.code)} in play is ${c.is === true ? "exhausted" : "ready"}`, read: ["code", "is"] }),
@@ -81,7 +86,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   canAttachToDial: (c) => ({ text: `a copy of the card with code ${str(c.code)} is set aside and the actor's threat dial holds none`, read: ["code"] }),
   pursuit: (c) => ({ text: `the pursuit value is ${range(c.min, c.max)}`, read: ["min", "max"] }),
   currentQuest: (c) => ({ text: c.is === "side" ? "the current quest is a side quest" : c.is === "self" ? "this card is the current quest" : "there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)", read: ["is"] }),
-  questProgressNoted: (c) => ({ text: c.is === false ? "no progress was placed on the current quest card this quest phase (the quest card itself; progress an active location took does not count)" : "progress was placed on the current quest card this quest phase (the quest card itself, the overflow of an explored active location included)", read: ["is"] }),
+  questProgressNoted: (c) => ({ text: typeof c.min === "number" ? `${c.is === false ? "fewer than " : ""}${c.min} or more progress was placed on the current quest card this quest phase in all (the quest card itself; progress an active location took does not count)` : c.is === false ? "no progress was placed on the current quest card this quest phase (the quest card itself; progress an active location took does not count)" : "progress was placed on the current quest card this quest phase (the quest card itself, the overflow of an explored active location included)", read: ["is", "min"] }),
   currentQuestProgress: (c) => ({ text: c.is === "some" ? "the current quest card holds 1 or more progress" : "the current quest card holds no progress (neither is true while there is no current quest)", read: ["is"] }),
   versusDefender: (c) => ({ text: `the card holding this stat is an enemy attacking a declared defender${c.ally === true ? " that is an ally" : ""}${typeof c.maxHitPoints === "number" ? ` with ${c.maxHitPoints} or fewer printed hit points` : ""}${typeof c.maxWillpower === "number" ? ` with a current Willpower of ${c.maxWillpower} or less (modifiers counted)` : ""}`, read: ["ally", "maxHitPoints", "maxWillpower"] }),
   defendingAgainst: (c) => ({ text: `the card holding this stat (its host, or this card itself) is the declared defender of the attack against a ${str(c.trait)} enemy`, read: ["trait"] }),
@@ -94,7 +99,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   searchable: (c) => ({ text: `the encounter deck or its discard pile holds ${withArticle(`${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.type === "string" ? (c.type === "encounter-side-quest" ? "side quest" : str(c.type)) : "card"}`)}${typeof c.code === "string" ? ` with code ${c.code}` : ""}${c.deckOnly === true ? " (the deck alone)" : ""}${c.victory === true ? " (the victory display too)" : ""}`, read: ["trait", "type", "code", "deckOnly", "victory"] }),
   firstTreachery: () => ({ text: "the card the event is about is the first treachery the encounter deck revealed this quest phase", read: [] }),
   victoryPoints: (c) => ({ text: `the victory display holds at least ${str(c.min)} Victory points`, read: ["min"] }),
-  stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress`, read: ["min"] }),
+  stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress${c.perStartedPlayer === true ? " for each player who started the game" : ""}`, read: ["min", "perStartedPlayer"] }),
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),

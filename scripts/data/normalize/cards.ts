@@ -35,6 +35,8 @@ const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> 
   // The Sands of Harad's objective heroes (Kahliel, Firyal, Yazan, Jubayr): listed in the Cards tab, not dealt.
   Objective_Hero: { type: "objective", typeName: "Objective Hero" },
   Campaign: { type: "campaign", typeName: "Campaign" },
+  // The mode cards of the standalone scenarios (The Siege of Annúminas' Standard Game Mode and Epic Multiplayer Mode, The Hunt for the Dreadnaught's Easy, Standard and Hard Mode): DragnCards types them Campaign.
+  GenCon_Setup: { type: "campaign", typeName: "Campaign" },
   Nightmare_Setup: { type: "nightmare", typeName: "Nightmare" },
   // Ered Mithrin: an objective that is also a location (The Old Ford), and the treasure a discovered campaign card becomes (emce.treasure).
   Objective_Location: { type: "objective", typeName: "Objective Location" },
@@ -435,13 +437,13 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const pictured = set?.imageUrls ? { ...named, printings: named.printings.map((printing, index) => (index === 0 ? { ...printing, imageUrls: set.imageUrls } : printing)) } : named;
     // A trait a source garbles (Hall of Beorn's "Nazg√l"): the printed traits, in print order.
     const traited = set?.traits ? { ...pictured, traits: set.traits } : pictured;
-    // A printed stat a source leaves out: Threat and engagement cost of a burden enemy (Hall of Beorn files its Threat icon as Willpower), and
+    // A printed stat a source leaves out: the cost box of a Wizard's Quest encounter card, Threat and engagement cost of a burden enemy (Hall of Beorn files its Threat icon as Willpower), and
     // the stats and Victory of a ship, which Hall of Beorn has no field for. A Victory printed as X (Wall of Trees), which Hall of Beorn files as the number 254, is `null` in the override: the card carries none and its records read X.
-    const printedStats = { ...traited, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health"]), ...(set?.victory !== undefined ? { victory: set.victory } : {}) };
+    const printedStats = { ...traited, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health"]), ...(set?.cost !== undefined ? { cost: String(set.cost) } : {}), ...(set?.victory !== undefined ? { victory: set.victory } : {}) };
     // A quest stage that prints no quest points, which Hall of Beorn fills with 0 (a stage with 0 would be completed as it is revealed): both sides carry none.
     const stated = set?.questPoints !== undefined ? { ...printedStats, questPoints: set.questPoints, back: printedStats.back ? { ...printedStats.back, questPoints: set.questPoints } : printedStats.back } : printedStats;
-    // A card type a source files wrongly: a ship-enemy that Hall of Beorn lists as an enemy (the scan prints SHIP-ENEMY).
-    const typed = set?.type === "ship-enemy" ? { ...stated, type: set.type, typeName: "Ship-enemy" } : stated;
+    // A card type a source files wrongly: a ship-enemy that Hall of Beorn lists as an enemy (the scan prints SHIP-ENEMY), or an enemy it lists as a ship-enemy (The Hunt for the Dreadnaught's Sea Monster).
+    const typed = set?.type === "ship-enemy" ? { ...stated, type: set.type, typeName: "Ship-enemy" } : set?.type === "enemy" ? { ...stated, type: set.type, typeName: "Enemy" } : stated;
     // The stats of the Upgraded side, side B, which Hall of Beorn has no fields for either (dcce.scalable-upgradable).
     const backed = set?.back && typed.back ? { ...typed, back: { ...typed.back, ...set.back } } : typed;
     const next = outOfScope(overrides, backed) ? { ...backed, deckLegal: false } : backed;

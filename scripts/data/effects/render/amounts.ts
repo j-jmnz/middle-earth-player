@@ -35,6 +35,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
     // `remaining` (hit points): what the card has left, its hit points less its damage and at least 0.
     return { text: `${expr.remaining === true ? "remaining " : ""}${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}${expr.remaining === true ? " (its hit points less its damage, at least 0)" : ""}`, read };
   }
+  if (expr.startedPlayers === true) return { text: "the number of players who started the game, an eliminated one included", read: ["startedPlayers"] };
   if (expr.players === true) return { text: "the number of players", read: ["players"] };
   if (expr.remainingQuestPoints === "activeLocation") return { text: "the quest points the active location still needs (its quest points less its progress; 0 with no active location)", read: ["remainingQuestPoints"] };
   if (expr.victoryPoints === true) return { text: "the Victory points of the cards in the victory display added up (read live)", read: ["victoryPoints"] };
@@ -46,12 +47,14 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (typeof expr.playersAtThreat === "number") return { text: `the number of living players with a threat of ${expr.playersAtThreat} or higher`, read: ["playersAtThreat"] };
   if (expr.lakeTownDamage === true) return { text: "the damage on Lake-town", read: ["lakeTownDamage"] };
   if (expr.victoryDisplay === true) return { text: "the Victory points in the victory display", read: ["victoryDisplay"] };
+  if (expr.siegeTally === true) return { text: "the Siege values added up this round: each enemy destroyed and each location explored adds its printed Siege value", read: ["siegeTally"] };
   if (expr.pursuit === true) return { text: "the pursuit value", read: ["pursuit"] };
   if (expr.questCards === true) return { text: "the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1)", read: ["questCards"] };
   if (expr.shadowCardsInPlay === true) return { text: "the number of shadow cards dealt to the enemies in play (in the staging area and engaged)", read: ["shadowCardsInPlay"] };
   if (expr.discardPileMaxCost === true) return { text: "the highest printed cost among the cards in the acting player's discard pile (0 for none, a hero or an X cost)", read: ["discardPileMaxCost"] };
   if (expr.discarded === "cost") return { text: "the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0)", read: ["discarded"] };
   if (expr.discarded === "types") return { text: "the number of different card types among the cards this effect has discarded from decks, all the players' together", read: ["discarded"] };
+  if (expr.investigateValue === true) return { text: "the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed)", read: ["investigateValue"] };
   if (expr.discardedThreat === true) return { text: "the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)", read: ["discardedThreat"] };
   if (isObj(expr.discardedMatching)) return { text: `the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are ${pick(expr.discardedMatching, ctx)}`, read: ["discardedMatching"] };
   if (expr.destroyedWillpower === true) return { text: "the Willpower the destroyed character had in play (last known)", read: ["destroyedWillpower"] };

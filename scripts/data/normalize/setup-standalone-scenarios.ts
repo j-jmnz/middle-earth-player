@@ -45,6 +45,88 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 || names.without(match[1] ?? "").replace(/\bThe\b|\s/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];
   }
+  // The Ruins of Belegost (50601): "Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins (without looking). Shuffle the others into the
+  // encounter deck (without looking at them)": the Loot objectives of the set other than the Sword of Belegost, which the line before sets aside. The load list sets all five aside;
+  // the first step hides one under Stalking the Ruins and the second shuffles the other four into the encounter deck.
+  if ((match = /^Randomly select 1 of the (\d+) remaining Loot objectives and place it facedown underneath (.+?) \(without looking\)$/.exec(sentence))) {
+    const loot = names.cards.filter((card) => card.type === "objective" && card.encounterSet === "The Ruins of Belegost" && /^Loot\b/.test(card.text ?? "") && card.name !== "Sword of Belegost");
+    const under = names.codesOf(match[2] ?? "");
+    return loot.length !== Number(match[1]) || under.length === 0 ? null : [{ kind: "step", step: "hideLoot", codes: loot.map((card) => card.code), to: under }];
+  }
+  if (/^Shuffle the others into the encounter deck \(without looking at them\)$/.test(sentence)) {
+    const loot = names.cards.filter((card) => card.type === "objective" && card.encounterSet === "The Ruins of Belegost" && /^Loot\b/.test(card.text ?? "") && card.name !== "Sword of Belegost");
+    return loot.length === 0 ? null : [{ kind: "step", step: "shuffleOthersIn", codes: loot.map((card) => card.code) }];
+  }
+  // Murder at the Prancing Pony (50701): "Search the encounter deck for the 5 Suspect enemies and 5 Hideout locations. Randomly select 1 Suspect and 1 Hideout and set them aside out of play,
+  // facedown (without looking at them). Build the Investigation deck (see rules) and place it next to the quest deck." The load list sets all ten and both copies of Taken by Surprise aside;
+  // the first step finds the ten, the second hides one Suspect and one Hideout, the third shuffles the other eight with the Taken by Surprise copies into the Investigation deck (rules card 2).
+  if ((match = /^Search the encounter deck for the (\d+) Suspect enemies and (\d+) Hideout locations$/.exec(sentence))) {
+    const suspects = names.cards.filter((card) => card.type === "enemy" && card.traits.includes("Suspect") && card.encounterSet === "Investigation");
+    const hideouts = names.cards.filter((card) => card.type === "location" && card.traits.includes("Hideout") && card.encounterSet === "Investigation");
+    return suspects.length !== Number(match[1]) || hideouts.length !== Number(match[2]) ? null : [{ kind: "step", step: "findSuspectsAndHideouts", codes: [...suspects, ...hideouts].map((card) => card.code) }];
+  }
+  if (/^Randomly select 1 Suspect and 1 Hideout and set them aside out of play, facedown \(without looking at them\)$/.test(sentence)) {
+    const cards = names.cards.filter((card) => card.encounterSet === "Investigation" && (card.traits.includes("Suspect") || card.traits.includes("Hideout")));
+    return cards.length === 0 ? null : [{ kind: "step", step: "hideSuspectAndHideout", codes: cards.map((card) => card.code) }];
+  }
+  if (/^Build the Investigation deck \(see rules\) and place it next to the quest deck$/.test(sentence)) {
+    const cards = names.cards.filter((card) => card.encounterSet === "Investigation");
+    return cards.length === 0 ? null : [{ kind: "step", step: "buildInvestigationDeck", codes: [...new Set(cards.map((card) => card.code))] }];
+  }
+  // "Make The Prancing Pony the active location and add 1 Ramshackle Manor to the staging area".
+  if ((match = /^Make (.+?) the active location and add (\d+|an?|one) (.+?) to the staging area$/.exec(sentence))) {
+    const active = names.codesOf(match[1] ?? "");
+    const staged = names.codesOf(match[3] ?? "");
+    return active.length === 0 || staged.length === 0 ? null : [{ kind: "active", codes: active }, { kind: "stage", codes: staged, perPlayer: null, count: /^\d+$/.test(match[2] ?? "") ? Number(match[2]) : 1 }];
+  }
+  // The Siege of Annúminas (50803): "Each player searches the encounter deck for a different location and adds it to the staging area. One of those locations must be Gate of Annúminas.": the line after
+  // the search names the one location that is not free to choose.
+  if ((match = /^One of those locations must be (.+)$/.exec(sentence))) {
+    const codes = names.codesOf(match[1] ?? "");
+    return codes.length === 0 || names.without(match[1] ?? "").replace(/\s/g, "") !== "" ? null : [{ kind: "step", step: "gateAmongLocations", codes }];
+  }
+  // The Siege of Annúminas' Standard Game Mode (50801): "Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E. Remove the 1C-3C deck and 1E-3E deck from the game. Search the
+  // encounter deck for Annúminas, add it to the staging area, and set its city strength to 20. Flip this card over and place it next to the quest deck."
+  if (/^Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E$/.test(sentence)) return [{ kind: "step", step: "arrangeQuestDecks", codes: [] }];
+  if (/^Remove the 1C-3C deck and (?:the )?1E-3E deck from the game$/.test(sentence)) return [{ kind: "step", step: "removeQuestDecks", codes: [] }];
+  if ((match = /^Search the encounter deck for (.+?), add it to the staging area, and set its city strength to (\d+)$/.exec(sentence))) {
+    const codes = names.codesOf(match[1] ?? "");
+    return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: null, count: 1 }, { kind: "step", step: "setCityStrength", codes, count: Number(match[2]) }];
+  }
+  if (/^Flip this card over(?: and place it next to the quest deck)?$/.test(sentence)) return [{ kind: "step", step: "flipModeCard", codes: [] }];
+  // Attack on Dol Guldur (50901): "Set Host of Lórien and all 4 Lieutenant enemies aside, out of play": the named card and the four Lieutenant-trait enemies of the set (Bane of Amon Lanc, Sorcerer of Dol
+  // Guldur, Chieftain Morlug, Dungeon Dweller).
+  if ((match = /^Set (.+?) and all (\d+) ([A-Z][a-z]+) enemies aside,? out of play$/.exec(sentence))) {
+    const own = names.cards.filter((card) => card.type === "enemy" && card.traits.includes(match?.[3] ?? "") && card.encounterSet === "Attack on Dol Guldur");
+    const codes = [...names.codesOf(match[1] ?? ""), ...own.map((card) => card.code)];
+    return own.length !== Number(match[2]) || names.codesOf(match[1] ?? "").length === 0 || names.without(match[1] ?? "").replace(/\s/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];
+  }
+  // Attack on Dol Guldur's Standard Game Mode (50931): "Add Dol Guldur to the staging area, attach a threat dial to it, and set its value to 5. Then, increase its value by 5 for each player. For the rest of the
+  // game, that threat dial is the siege tracker and it displays the city strength of Dol Guldur. Flip this card over.": the dial is the city strength, as the Siege's "set its city strength to 20" is. The
+  // sentence that names the siege tracker adds no move: the strength steps above it set the tracker.
+  if ((match = /^Add (.+?) to the staging area, attach a threat dial to it, and set its value to (\d+)$/.exec(sentence))) {
+    const codes = names.codesOf(match[1] ?? "");
+    return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: null, count: 1 }, { kind: "step", step: "setCityStrength", codes, count: Number(match[2]) }];
+  }
+  if ((match = /^Then,? increase its value by (\d+) for each player$/.exec(sentence))) {
+    const codes = names.cards.filter((card) => card.type === "objective" && card.name === "Dol Guldur" && card.encounterSet === "Attack on Dol Guldur").map((card) => card.code);
+    return codes.length === 0 ? null : [{ kind: "step", step: "raiseCityStrengthPerPlayer", codes, count: Number(match[1]) }];
+  }
+  if (/^For the rest of the game, that threat dial is the siege tracker and it displays the city strength of Dol Guldur$/.test(sentence)) return [];
+  // The Wizard's Quest (51001): "The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area": a search with no card
+  // named, so it moves no pile card (Escape from Khazad-dûm's 51301 prints "0-cost enemy or location", the same search); the encounter deck keeps the cards until the Setup record finds them.
+  if (/^The opposing team searches the encounter deck for one different 0[ -]cost enemy or (?:0[ -]cost )?location per player and adds them to the staging area$/.test(sentence)) return [{ kind: "step", step: "searchZeroCostPerPlayer", codes: [] }];
+  // The Hunt for the Dreadnaught's Standard Mode (40002): "Set aside all 7 unique enemies (including the Dreadnaught)" (Easy Mode prints "Set the following enemies aside: ..."): the unique enemies of the box, the Dreadnaught (a ship-enemy) among them.
+  if ((match = /^Set (?:the following enemies aside: |aside )all (\d+) unique enemies \(including the Dreadnaught\)$/.exec(sentence))) {
+    const codes = names.cards.filter((card) => card.isUnique && (card.type === "enemy" || card.type === "ship-enemy") && card.printings.some((printing) => printing.pack === "THftD")).map((card) => card.code);
+    return codes.length === Number(match[1]) ? [{ kind: "aside", codes, allCopies: false }] : null;
+  }
+  // "Shuffle the encounter deck and discard cards from the top until 2 locations are discarded (3 locations instead if there are 3 or more players)": the locations go to the staging area (the next sentence).
+  if ((match = /^Shuffle the encounter deck and discard cards from the top until (\d+) locations are discarded \((\d+) locations instead if there are (\d+) or more players\)$/.exec(sentence))) {
+    return [{ kind: "discardToStaging", types: ["location"], amount: { count: Number(match[1]), manyCount: Number(match[2]), from: Number(match[3]) }, eachPlayer: false, shuffleFirst: true }];
+  }
+  // The Mines of Moria (51201): "Each player adds 1 resource to each of his heroes' resource pools": the Setup record gives each hero the resources.
+  if ((match = /^Each player adds (\d+) resources? to each of (?:his|their) heroes['’] resource pools$/.exec(sentence))) return [{ kind: "step", step: "eachHeroResources", codes: [], resources: Number(match[1]) }];
   // "Shuffle any unused Scoutcards back into the encounter deck" (the card prints "Scoutcards"): the copies not staged stay in the encounter deck.
   if (/^Shuffle any unused Scout ?cards back into the encounter deck$/.test(sentence)) return [{ kind: "shuffleEncounterDeck" }];
   return null;

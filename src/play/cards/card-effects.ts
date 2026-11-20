@@ -19,6 +19,7 @@ import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
+import { hiddenMark, isHeldFaceup, keptMark } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { modifiedStat, printedStat } from "../../rules/core/keywords.ts";
@@ -329,6 +330,11 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   // The cards captured underneath a card in Escape from Mount Gram: "3 captured", with their owners spoken (readouts/gram.ts).
   const owners = game.capture != null ? capturedOwners(game, cardId) : [];
   if (owners.length > 0) return capturedPill(owners);
+  // The player cards Carried Away, Necromancer's Pass and Nameless Thing hold faceup under them, and the cards Hidden Threat lays facedown under the main quest (readouts/standalone-scenarios/wizards-quest.ts): a card with both shows both.
+  const kept = keptMark(game, ctx, cardId, isHeldFaceup);
+  const hidden = hiddenMark(game, cardId);
+  if (kept && hidden) return { text: `${kept.text} · ${hidden.text}`, loses: false, speech: `${kept.speech}. ${hidden.speech}`, count: kept.count + hidden.count };
+  if (kept ?? hidden) return kept ?? hidden;
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);

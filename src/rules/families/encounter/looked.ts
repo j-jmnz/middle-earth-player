@@ -19,5 +19,7 @@ export function announceLooked(state: ScenarioState, ctx: ReduceContext, seat: n
 
 /** The effect is done: each look it made is announced now. */
 export function releaseLooks(state: ScenarioState, data: EffectData): ScenarioState {
-  return (data.lookedBy ?? []).reduce((current, seat) => queueEvent(current, { trigger: "lookedAtEncounterDeck", seat }), state);
+  const heard = (data.lookedBy ?? []).reduce((current, seat) => queueEvent(current, { trigger: "lookedAtEncounterDeck", seat }), state);
+  // The cards of the Investigation deck the effect showed hear the look, each once (families/investigation/look.ts).
+  return [...new Set(data.investigationLooked ?? [])].reduce((current, id) => queueEvent(current, { trigger: "lookedAtInvestigationDeck", seat: state.firstPlayer, subject: id }), heard);
 }

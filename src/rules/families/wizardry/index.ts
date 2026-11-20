@@ -25,7 +25,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 // "If no Wizardry effect is triggered this way" (143062:A:1): the active location prints none, or there is no active location.
 function condition(state: ScenarioState, found: Condition, seat: number, ctx: ReduceContext): boolean | null {
-  if (found.kind === "questProgressNoted") return questProgressNoted(state) === found.is;
+  if (found.kind === "questProgressNoted") return questProgressNoted(state, found.min) === found.is;
   return found.kind === "hasWizardry" ? activeHasWizardry(state, seat, ctx) : null;
 }
 

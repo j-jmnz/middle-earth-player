@@ -32,6 +32,7 @@ export type Act =
 export type Expect =
   | { expect: "stat"; code: string; name: StatName; value: number }
   | { expect: "flag"; code: string; name: FlagName; value: boolean }
+  | { expect: "classFlag"; code: string; name: FlagName; value: boolean }
   | { expect: "zone"; code: string; zone: string }
   | { expect: "committed"; code: string; value: boolean }
   | { expect: "count"; code: string; zone: string; value: number }
@@ -55,6 +56,7 @@ export type Expect =
   | { expect: "won" }
   | { expect: "notWon" }
   | { expect: "frame"; name: string }
+  | { expect: "window"; kind: string; value: boolean }
   | { expect: "offers"; intent: PlayerIntent["type"]; code?: string; value?: boolean };
 
 export type Row = { line: string; layout?: Layout; act: Act | readonly Act[]; expect: Expect | readonly Expect[]; name?: string };

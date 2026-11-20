@@ -24,7 +24,7 @@ import { travelsOverActive } from "../families/grapple/travel.ts";
 import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
-import { branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
+import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
 import { threatFromOtherAreas } from "../families/breaking/threat.ts";
@@ -284,7 +284,10 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     // A stage that names AdvanceToRandomStage (19048:B:2) proceeds to one of the stages it lists at random, each played once.
     const rolled = ordered || branched ? null : randomStageFrom(next, current.code);
     if (rolled) next = rolled.state;
-    const nextId = ordered ? ordered.id : rolled ? rolled.id : (() => {
+    // A stage that names AdvanceIfAttached (50601:B:3) proceeds to the stage its Loot condition names.
+    const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);
+    if (attached) next = attached.state;
+    const nextId = ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
       const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : next.stages[index + 1]?.code;
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();

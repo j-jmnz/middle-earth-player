@@ -100,8 +100,9 @@ const VERBS = [
   // `reshuffle`: a deck that runs out first has the encounter discard pile shuffled back in and the discarding goes on, when the discard pile holds such a card (faq.last-encounter-card, 148004:A:1); with none in either pile nothing is found.
   z.strictObject({ verb: z.literal("DiscardUntil"), type: discardType.optional(), types: z.array(encounterType).min(2).optional(), trait: z.string().min(1).optional(), reshuffle: z.literal(true).optional(), ...when }),
   // The "when revealed" effects of the picked card (or `card`) resolve for the actor, as if it had just been revealed. It
-  // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed.
-  verbFlags(z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }), { runsInFrame: true }),
+  // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed. With `reveal` the card is
+  // revealed in full (rr.reveal: its keywords and its staging too: "Reveal that treachery", 51007:B:1).
+  verbFlags(z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), reveal: z.literal(true).optional(), ...when }), { runsInFrame: true }),
   // The staging step of this phase reveals `amount` fewer cards (rr.step-3-3), to a minimum of `min` (0 or 1). With `who: picked`, the player picked last reveals that many fewer
   // ("That player reveals 1 fewer encounter card this phase (to a minimum of 0)", 143020:A:2): the reveals the players make in turn skip that player's, and nothing else is shortened. A player's own reveal is one card, so `min: 1` leaves it as it is.
   z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), who: z.literal("picked").optional(), ...when }),

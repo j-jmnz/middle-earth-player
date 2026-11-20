@@ -109,7 +109,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives": case "discardedHasShadowOrTentacle": case "firstLetterMatches":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "committedThisRound": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "lastLocateFailed": case "lastLocatePassed": case "hasPass": case "playerWithoutReady": case "drew": case "engagedWithLastPlayer": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "night":
+    case "attackedThisPhase": case "optionTaken": case "namedFlag": case "discoverUnavailable": case "investigateIgnored": case "investigationTop": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "committedThisRound": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "lastLocateFailed": case "lastLocatePassed": case "hasPass": case "playerWithoutReady": case "drew": case "engagedWithLastPlayer": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "exploredPending": case "night":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -200,6 +200,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       // rr.step-7-5): a Refresh Action may be used there. An ended phase an event names is read as it is.
       if (scope.phase == null && condition.is === "Refresh" && state.phase === "End of round") return true;
       return (scope.phase ?? state.phase) === condition.is;
+    case "phaseEnded":
+      return state.boundaryPhase === condition.is && state.phase !== condition.is;
     case "undefended": {
       // The attack in progress has no defender yet (or a shadow effect made it count as undefended); `is: false` asks for the defended one.
       const attack = state.pendingAttack;
@@ -357,7 +359,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "stageProgress": {
       const stage = state.questStage ? state.cards[state.questStage] : undefined;
-      return stage != null && stage.progress >= condition.min;
+      return stage != null && stage.progress >= condition.min * (condition.perStartedPlayer === true ? state.seatCount : 1);
     }
     case "victoryPoints":
       return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, ctx.cards), 0) >= condition.min;

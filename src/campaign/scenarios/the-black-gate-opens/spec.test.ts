@@ -1,5 +1,5 @@
 // Rules: mec113.dire, mec113.saga-staging-rules, mec113.immune-to-player-card-effects, mec113.peril, rr.effects, rr.forced, rr.shadow-effects, rr.lasting-effects, rr.engaged, rr.then, rr.defending-player, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json).
-import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, flag, quest, reveal, resolve, resourcesOn, stagingThreat, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, attackersOf, cardSpecs, classFlag, damageOn, deckCount, defend, endPhase, flag, quest, reveal, resolve, resourcesOn, stagingThreat, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Black Gate Opens (the-return-of-the-king, part 5 of the box): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a bar on travel, a card
@@ -56,6 +56,7 @@ const ROWS: readonly Row[] = [
   { line: "146039:A:3", name: "or +3 Attack instead when the attacker is The Mouth of Sauron", layout: { ...STAGE2, engaged: [{ code: MOUTH, seat: 0 }] }, act: [attack(MOUTH, { shadow: "146039" }), defend("dh2")], expect: zone("dh2", "discard") },
 
   { line: "146040:A:1", name: "When Revealed: each player deals 1 damage to a questing character; until the end of the phase each damaged character gets -1 Willpower", layout: { committed: ["dh1", "dh2"] }, act: [reveal("146040"), answer("dh1")], expect: [damageOn("dh1", 1), stat("dh1", "willpower", 1)] },
+  { line: "146040:A:1", name: "and the damaged character cannot be healed until the end of the phase", layout: { committed: ["dh1", "dh2"] }, act: [reveal("146040"), answer("dh1")], expect: [classFlag("dh1", "cannotBeHealed")] },
   { line: "146040:A:2", name: "Shadow: the first player chooses a non-unique enemy in the staging area; it engages the defending player", layout: { ...STAGE2, staging: ["f3"], deck: ["f0", "f0"] }, act: attack("f0", { shadow: "146040", undefended: true }), expect: zone("f3", "engaged") },
 
   { line: "146041:A:2", name: "When Revealed: the first player takes control of Gwaihir", layout: { deck: ["146041"] }, act: reveal("146041"), expect: zone("146041", "play") },

@@ -13,7 +13,7 @@ import { pickSchema } from "./effect-schema-pick.ts";
 export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage", "smaug", "lakeTown"]);
 
 // The decks beside the encounter deck a record names (emce.caves-deck, emce.evil-creatures-deck, mec112.setup-journey-to-the-cross-roads; src/rules/core/piles.ts NAMED_PILES): the one list `pile` of a wilderland verb, the amount `pile` and the condition `pileHas` share.
-export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug"]);
+export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug", "investigation"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").
@@ -35,6 +35,8 @@ export const amountExprSchema = z.strictObject({
   stage: z.literal(true).optional(),
   // The number of players in the game.
   players: z.literal(true).optional(),
+  // The number of players who started the game, an eliminated one included ("per player" on a global value counts "the players who started that scenario", 40004:B:1, 40013:A:2).
+  startedPlayers: z.literal(true).optional(),
   // The stage number of the Stormcaller's current quest stage (2 to 4, dcce.stormcallers-area): "X is the Stormcaller's current quest stage" (12028:A:2). 0 with no Stormcaller's area.
   stormcallerStage: z.literal(true).optional(),
   // The part number of the campaign card of the scenario being played: its place in its campaign, counting from 1 ("X is the campaign card's part
@@ -84,10 +86,14 @@ export const amountExprSchema = z.strictObject({
   firstPlayerTens: z.literal(true).optional(),
   // The Discover value of the active location: its Discover X (a number, or the amount its record reads) with the adjustment a Response made, 0 when it has none ("the Discover value of the active location", 19095:A:3; emce.discover). Read by the wilderland family.
   discoverValue: z.literal(true).optional(),
+  // The Investigate value of the active location: its Investigate X (a number, or the amount its record reads) with the cards its flag adds not counted, 0 when it has none or no location is active ("1 more than the Investigate value of the active location", 50727:A:1; the keyword being ignored does not change it). Read by the investigation family.
+  investigateValue: z.literal(true).optional(),
   // How many of the cards the running effect discarded from the top of the encounter deck (DiscardEncounterTop) match the pick, still in the discard pile ("for each enemy discarded this way", 12185:A:2). Read by the wilderland family.
   discardedMatching: pickSchema.optional(),
   // The printed cost of the card the source guards: the player cards under it, and the card it is attached to as a guard ("X is that card's cost", 18050:A:1). Read by the wilderland family.
   guardedCost: z.literal(true).optional(),
+  // The Siege values added up for this round (docs/brief.md, Attack on Dol Guldur, reading 4): each destroyed enemy and each explored location adds its printed Siege value (TallySiege), "X is the total siege value of each location explored and each enemy destroyed this round" (50907:A:1). 0 once the round is over. Read by the wilderland family.
+  siegeTally: z.literal(true).optional(),
   // The damage on the card the answered event is about beyond its printed hit points: "for each excess point of damage dealt" (18049:A:2). Read by the wilderland family.
   excessOf: z.literal("subject").optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).

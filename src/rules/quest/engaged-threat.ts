@@ -26,5 +26,9 @@ export function engagedContributors(view: ScenarioState, cards: Cards): ThreatSo
       if (whole || flagged(view, id, "engagedThreat")) found.push({ id, threat: modifiedStat(view, instance, "threat", cards), from: "engaged" });
     }
   });
+  // The enemy engaged with every player while it stays in the staging area (the Dreadnaught, Massive) is engaged with the player the card names too: it contributes once more ("each Ship enemy engaged with you", 40024:A:1).
+  for (const [id, instance] of Object.entries(view.cards)) {
+    if (instance.zone === "staging" && view.modifiers.length > 0 && flagged(view, id, "engagedThreat") && flagged(view, id, "engagedWithAll") && !flagged(view, id, "noThreatContribution")) found.push({ id, threat: modifiedStat(view, instance, "threat", cards), from: "engaged" });
+  }
   return found;
 }

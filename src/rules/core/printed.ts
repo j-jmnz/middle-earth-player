@@ -68,6 +68,9 @@ export type Keywords = {
   uncharted: boolean;
   // Aflame X (dcce.aflame): the damage on a location that destroys it, null when the card prints none.
   aflame: number | null;
+  // The Siege value the card prints (docs/brief.md, Attack on Dol Guldur, reading 2), null when it prints none.
+  siegeValue: number | null;
+  pillage: number | null;
   // Burn X (The Battle of Lake-town): the burn damage a location adds to the pool "resolve all burn damage" deals, null when the card prints none.
   burn: number | null;
   // Grapple (dcce.grapple): the location in the staging area the enemy attaches to, facedown, when it is revealed; null when the card prints none.
@@ -118,6 +121,8 @@ export type PrintedCard = {
   backType: "player" | "encounter" | null;
   // An Objective-Location (Lost in Mirkwood, 18029 to 18032): an objective card that the players travel to, that takes progress as the active location and goes to the victory display explored. `type` stays "objective" (it is guarded, claimed and revealed as an objective).
   objectiveLocation: boolean;
+  // The copies the card allows in a deck, when the catalog states it (rr.deckbuilding; read by AddEventsToHand, 40009:B:2). Absent where the engine never needs it.
+  deckLimit?: number | null;
   // Null for a card that is not a ship.
   ship: ShipKind | null;
   // The encounter set the card belongs to, or null (the fleet: The Dream-chaser's Fleet; the Stormcaller Elite).
@@ -151,6 +156,8 @@ const EMPTY_KEYWORDS: Keywords = {
   uncharted: false,
   aflame: null,
   burn: null,
+  siegeValue: null,
+  pillage: null,
   grapple: null,
   phantom: false,
   spectral: false,
@@ -444,6 +451,8 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       uncharted: keywords.uncharted === true,
       aflame: keywords.aflame ?? null,
       burn: keywords.burn ?? null,
+      siegeValue: keywords.siegeValue ?? null,
+      pillage: keywords.pillage ?? null,
       grapple: keywords.grapple ?? null,
       phantom: keywords.phantom === true,
       spectral: keywords.spectral === true,

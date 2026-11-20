@@ -154,7 +154,7 @@ export function immediateAttackBy(state: ScenarioState, instruction: Verb<"Immed
   const id = refCard(state, instruction.target ?? "subject", frameScope(state, focus.seat, focus.sourceId));
   const enemy = id ? state.cards[id] : undefined;
   if (!id || !enemy || enemy.zone !== "engaged" || enemy.controller !== focus.seat) return state;
-  return attackWith(state, id, ctx, steps);
+  return attackWith(state, id, ctx, steps, undefined, instruction.extraShadow);
 }
 
 /**

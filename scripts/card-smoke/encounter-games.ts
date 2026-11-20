@@ -7,6 +7,7 @@ import { nextIntent } from "../../test/harness/auto-player.ts";
 import { dice, playIntent, seedOf, triggerIntent, type Dice } from "./policy.ts";
 import { encounterStart, kept, type EncounterWorld, type Profile } from "./encounter-world.ts";
 import { POLICY } from "./world.ts";
+import { flagged } from "../../src/rules/core/state.ts";
 import { escapeCommitLimit } from "../../src/rules/families/escape/commit.ts";
 import { describeError } from "../log.ts";
 
@@ -107,7 +108,9 @@ function complete(state: ScenarioState, ctx: ReduceContext, offer: LegalIntent, 
       const enemyId = pickOne(roll, [...new Set(ready.flatMap((id) => legalAttackEnemies(state, seat, id, ctx.cards)))]);
       if (!enemyId) return null;
       const attackers = ready.filter((id) => legalAttackEnemies(state, seat, id, ctx.cards).includes(enemyId));
-      return { type: "DeclareAttackers", enemyId, attackerIds: subset(roll, attackers) };
+      // An enemy that cannot be attacked by more than 1 character at a time (The Great Bridge's lasting flag, 145050:A:1) gets one attacker.
+      const chosen = subset(roll, attackers);
+      return { type: "DeclareAttackers", enemyId, attackerIds: flagged(state, enemyId, "singleAttacker") ? chosen.slice(0, 1) : chosen };
     }
     case "Distribute": {
       const cardId = pickOne(roll, legalTargets(state, { type: "Distribute" }, ctx));

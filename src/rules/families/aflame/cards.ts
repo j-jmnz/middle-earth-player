@@ -51,11 +51,11 @@ export function searchAflame(state: ScenarioState, instruction: Verb<"SearchAfla
 }
 
 /** EngageFirstPlayer: the source enemy, in the staging area, engages the first player; with `moves`, one engaged with another player moves to the first player (nothing stops it unless it cannot be engaged). */
-export function engageFirstPlayer(state: ScenarioState, focus: Focus, steps: EngineStep[], moves = false): ScenarioState {
-  if (!focus.sourceId) return state;
-  const enemy = state.cards[focus.sourceId];
-  if (moves && enemy?.zone === "engaged" && enemy.controller !== state.firstPlayer) return flagged(state, focus.sourceId, "cannotBeEngaged") ? state : engageWith(state, state.firstPlayer, focus.sourceId, steps);
-  return engageEnemy(state, state.firstPlayer, focus.sourceId, steps);
+export function engageFirstPlayer(state: ScenarioState, focus: Focus, steps: EngineStep[], moves = false, enemyId: string = focus.sourceId ?? ""): ScenarioState {
+  const enemy = enemyId ? state.cards[enemyId] : undefined;
+  if (!enemyId || !enemy) return state;
+  if (moves && enemy.zone === "engaged" && enemy.controller !== state.firstPlayer) return flagged(state, enemyId, "cannotBeEngaged") ? state : engageWith(state, state.firstPlayer, enemyId, steps);
+  return engageEnemy(state, state.firstPlayer, enemyId, steps);
 }
 
 // The use EngageLowestThreat records once the first player has chosen among tied seats (title-wide, so the other copies' triggers this phase do nothing more).

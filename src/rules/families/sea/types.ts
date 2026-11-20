@@ -34,6 +34,8 @@ export type SeaState = {
   held?: Readonly<Record<string, HeldEnemy>>;
   // The Ship objectives that were exhausted when the settle sweep last looked, kept only in a game whose cards hear `shipExhausted` (families/sea/water.ts).
   exhausted?: readonly string[];
+  // The box's own fleet has been prepared (PrepareFleet `own`): from now on a player with no ship-objective is eliminated (families/sea/fleet.ts).
+  fleet?: true;
   // The Stormcaller's area, once a Setup has prepared it (families/stormcaller/area.ts).
   stormcaller?: StormcallerArea;
 };

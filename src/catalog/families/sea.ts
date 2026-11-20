@@ -12,21 +12,25 @@ import { verbFlags } from "../verb-flags.ts";
 const VERBS = [
   // Setup: "Prepare the Corsair deck" (dcce.corsair-deck). Every non-ship enemy still in the encounter deck goes to the Corsair deck, which is
   // then shuffled; from now on a non-ship enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it.
-  z.strictObject({ verb: z.literal("PrepareCorsairDeck"), ...when }),
+  // `trait` (The Hunt for the Dreadnaught, reading 6): only the non-ship enemies with this trait join the Corsair deck, and only they are discarded to the Corsair discard pile (the Sea Monster stays an encounter enemy).
+  z.strictObject({ verb: z.literal("PrepareCorsairDeck"), trait: z.string().min(1).optional(), ...when }),
   // "Shuffle the Corsair deck and Corsair discard pile into the encounter deck" (dcce.from-sea-to-land, The City of Corsairs stage 2B): the Corsair
   // deck is gone from then on, so a non-ship enemy is discarded to the encounter discard pile as in any other game.
   z.strictObject({ verb: z.literal("EndCorsairDeck"), ...when }),
   // Setup: "Players prepare their fleet" (dcce.prepare-your-fleet). Each player in turn takes one of the six ship-objectives set aside (the
   // Dream-chaser is forced on the last player who has not got it; a lone player takes the Dream-chaser and one other), the unused ships leave the
   // game, and the Heading card is attached to the Dream-chaser, set to on-course. A seat with a choice asks it as a choice of cards.
-  verbFlags(z.strictObject({ verb: z.literal("PrepareFleet"), ...when }), { setupRuns: "top" }),
+  // `own` (The Hunt for the Dreadnaught, docs/brief.md, The Hunt for the Dreadnaught, reading 4): the ships are the box's own unique ship-objectives set aside; each seat takes one, in player order (a lone player one), there is no
+  // Dream-chaser and no Heading card, and the unused ships stay set aside.
+  verbFlags(z.strictObject({ verb: z.literal("PrepareFleet"), own: z.literal(true).optional(), ...when }), { setupRuns: "top" }),
   // "Shift your heading off-course" / "on-course" (dcce.heading): one step toward Storm / toward Sun, never past either end. Nothing happens in a
   // game with no Heading card.
   z.strictObject({ verb: z.literal("ShiftHeading"), direction: z.enum(["onCourse", "offCourse"]), ...when }),
   // "Reveal the top card of the Corsair deck and put it into play, engaged with you" (dcce.boarding, dcce.corsair-deck): `count` cards (1 by
   // default) for the actor, or for each player (`eachSeat`), or for one player the first player names (`anyPlayer`: "One player must reveal the top card of the Corsair deck and engage it", 12154:A:1; the only
   // player takes it without being asked). The deck refills from its discard pile when it runs out.
-  z.strictObject({ verb: z.literal("RevealCorsair"), count: positiveAmountSchema.optional(), who: z.enum(["actor", "eachSeat", "anyPlayer"]).optional(), ...when }),
+  // `shadow` (Descendant of Castamir, Ramming Ship: "deal each of them 1 shadow card"): each card put into play is dealt this many shadow cards at once (docs/brief.md, The Hunt for the Dreadnaught, reading 22).
+  z.strictObject({ verb: z.literal("RevealCorsair"), count: positiveAmountSchema.optional(), who: z.enum(["actor", "eachSeat", "anyPlayer"]).optional(), shadow: z.number().int().positive().optional(), ...when }),
   // "Engages the last player" (dcce.last-player): the source enemy, in the staging area, engages the player to the right of the first player.
   z.strictObject({ verb: z.literal("EngageLastPlayer"), ...when }),
   // Engine use: "Boarding X" resolves for the ship-enemy that engaged the actor from the staging area (dcce.boarding), in a frame under the Responses to the engagement.
@@ -84,7 +88,8 @@ const VERBS = [
   // "The engaged Ship enemy with the highest Attack makes an immediate attack. Until the end of the phase, add 1 to the total Threat in the staging area for each damage dealt by this attack" (12131:A:1): the last picked
   // enemy makes an immediate attack (counted for noneReturned like any attack made by an effect); with `raiseStagingThreat`, when the attack ends the total Threat in the staging area is raised, until the phase or the
   // round ends, by the damage the attack dealt.
-  z.strictObject({ verb: z.literal("AttackWithPicked"), raiseStagingThreat: z.enum(["endOfPhase", "endOfRound"]).optional(), ...when }),
+  // `who` (the Dreadnaught, an enemy that stays in the staging area but attacks every player): the player attacked when the picked enemy is in the staging area, the actor by default (40015:A:3, "the Dreadnaught attacks you") or the first player (40043:A:1). `counted`: an attack of an enemy that stays in the staging area is counted for noneReturned too (40043:A:1, "if no attack is made").
+  z.strictObject({ verb: z.literal("AttackWithPicked"), raiseStagingThreat: z.enum(["endOfPhase", "endOfRound"]).optional(), who: z.literal("firstPlayer").optional(), counted: z.literal(true).optional(), ...when }),
   // "Set the current encounter deck and discard pile aside, inactive" (12148:B:1, dcce.from-sea-to-land): every card of the encounter deck and its discard pile goes to the set-aside zone, and the Corsair
   // piles are left alone. `carry`: the cards with these codes are the ones the stage's search "shuffles into the second encounter deck" ("each copy of Battle-hardened and each copy of Watch Tower"): they
   // stay in the encounter deck, those in the discard pile moving to it, and are not set aside. Copies in play stay in play. The second deck is the encounter set the stage's Setup set aside: ShuffleSetAsideSet
@@ -114,11 +119,31 @@ const VERBS = [
   // round", 12155:A:1). An ally that entered play and left again counts (families/sea/entries.ts).
   // `perPlayer`: each player's own count, by the seat that controls the ally as it enters ("Each player cannot play, or put into play, more than 1 ally each round", 144071:B:2; rr.play-and-put-into-play).
   z.strictObject({ verb: z.literal("LimitEntries"), cardType: z.literal("ally"), max: z.number().int().min(0), perPlayer: z.literal(true).optional(), ...when }),
+  // Pillage X (docs/brief.md, The Hunt for the Dreadnaught, reading 21): the actor discards the top `amount` cards of their deck, one at a time, each event card among them announced as `pillaged` (the source enemy, the card as the other card). The attack's
+  // end runs it for an enemy with the Pillage keyword (printed or gained, the flag `pillage`), in the frame of its other effects (families/sea/pillage.ts).
+  z.strictObject({ verb: z.literal("Pillage"), amount: positiveAmountSchema, ...when }),
+  // "Deal 4 damage to the Ship enemy or Ship objective with the fewest remaining hit points" (40033:A:2): the Ship enemies and the Ship objectives in play (any player's) with the fewest hit points left are the candidates; the first player chooses among tied ones, and the one found is picked.
+  z.strictObject({ verb: z.literal("PickFewestHitPoints"), ...when }),
+  // "Each player puts 1 set-aside unique Corsair enemy into play at random engaged with them" (40013:B:3): of the unique `trait` enemies set aside, one chosen with the game's seed is put into play engaged with the actor, not revealed and dealt no shadow card.
+  z.strictObject({ verb: z.literal("EngageRandomSetAside"), trait: z.string().min(1), ...when }),
+  // Constant on a mode card: "If a player controls no ship-objective, that player is eliminated from the game" (40001:B:3, 40002:B:2), once the box's fleet is prepared; a settle sweep checks it (families/sea/fleet.ts).
+  z.strictObject({ verb: z.literal("EliminateWithoutShip"), ...when }),
+  // "Until the end of the game, that hero gains the printed Traits of another hero you control" (40006:A:3): the second-last picked hero (the first pick) gains the printed Traits of the last picked one.
+  z.strictObject({ verb: z.literal("GainHeroTraits"), ...when }),
+  // "Choose up to 2 events from your discard pile and/or your collection and add them to your hand (following deckbuilding rules)" (40009:B:2, docs/brief.md, The Hunt for the Dreadnaught, reading 10): the actor chooses up to `upTo` event cards one at a time and may stop:
+  // events of their discard pile, and events of the collection (every deck-legal event the world holds), a copy of a title they hold 3 of in the deck, hand, discard pile and play with the ones added not offered. A collection card is a card the game did not hold: it is made in the hand. `taken` is engine use: the answers so far.
+  verbFlags(z.strictObject({ verb: z.literal("AddEventsToHand"), upTo: z.number().int().positive(), taken: z.array(z.string()).optional(), ...when }), { collection: "event" }),
+  // "Flip it to its Upgraded side" (40034:A:1): the last picked Ship objective, if it shows its Basic side and has an Upgraded side, flips to it, keeping its damage and tokens, and hears `flipped`.
+  z.strictObject({ verb: z.literal("FlipShip"), ...when }),
 ] as const;
 
 // About a Ship objective: it became exhausted by any means, defending, attacking, questing, Sailing or an effect ("When attached objective exhausts", 12132:A:1). Announced by a settle sweep (families/sea/water.ts) only in a game
 // whose cards hear it.
-const TRIGGERS = ["shipExhausted"] as const;
+const TRIGGERS = [
+  "shipExhausted",
+  // About the enemy whose Pillage discarded a card: an event card discarded from the deck of the player the enemy attacked ("After an event card is discarded from your deck by Corsair Plunderer's Pillage keyword", 40021:A:2). The card is the event's subject.
+  "pillaged",
+] as const;
 
 const FLAGS = [
   // The holder can be committed to any Sailing test, whoever controls it, not only the first player's ("The Dream-chaser can be committed to
@@ -156,6 +181,18 @@ const FLAGS = [
   "shipAttackersOnly",
   // On an enemy: it is immune to player events, not to the other player cards ("Each Raider enemy with at least 1 resource on it is immune to player events", 12159:A:1; families/sea/immune.ts).
   "immuneToPlayerEvents",
+  // On "seat:N": the cards the seat draws once the box's fleet is taken, beyond the 6 of the opening hand ("Your starting hand size is 8 cards", 40009:A:2; families/sea/fleet.ts).
+  "startingHand",
+  // On an enemy: the Pillage it gains ("gains Pillage 3", 40034:A:2), added to its printed Pillage X (families/sea/pillage.ts).
+  "pillage",
+  // On a character: it cannot be declared as an attacker against the Dreadnaught ("Engaged player cannot attack the Dreadnaught", 40014:A:2).
+  "cannotAttackDreadnaught",
+  // On an enemy that is no ship: Ship objectives may attack and defend against it ("Ship objectives may attack and defend against Sea Monster", 40033:A:1; families/sea/ships.ts).
+  "shipFightable",
+  // On an enemy: for each point of excess combat damage it deals, the defending player deals 1 damage to a Ship objective they control (40019:A:3; families/defense/excess.ts).
+  "excessDamagesShip",
+  // On an enemy in the staging area that is engaged with every player (engagedWithAll): each player declares attackers against it in the combat phase with their own characters, and ranged characters of the others may join (Massive, 40013:A:1; rr.ranged).
+  "attackableEngagedWithAll",
 ] as const;
 
 export const manifest = { name: "sea", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -23,7 +23,7 @@ import { addStandIns, entry, fillerRecord, HERO, HERO2, HERO3, idOf, idsOf, open
 // everything here, so a scenario's tests import it from there.
 
 /** A card the layout places: a code, or a code with its tokens (and the seat it belongs to, the first by default). */
-export type Placed = Entry | { code: string; seat: number; damage?: number; resources?: number };
+export type Placed = Entry | { code: string; seat: number; damage?: number; resources?: number; upgraded?: true };
 
 /** A card of a hand or a deck: a code (every seat gets one), or a code and the one seat that holds it. */
 export type Dealt = string | { code: string; seat: number };
@@ -42,6 +42,8 @@ export type Layout = {
   firstPlayer?: 0 | 1;
   seed?: number;
   stage?: string;
+  // The quest cards of the game, in order, as a Quick-build leaves them (the 1A card, one stage 2 and one stage 3): a stage number reads the card's place among them. Absent: every quest card of the scenario.
+  stages?: readonly string[];
   progress?: number;
   // The side the current quest stage shows (B by default; A for a stage 2 of a quest deck that has not flipped yet, 03070:A:1).
   side?: "A" | "B";
@@ -64,6 +66,9 @@ export type Layout = {
   heroResources?: number;
   // The campaign card is on the table (a campaign game).
   campaign?: boolean;
+  // The scenario's mode card lies beside the quest deck on its back, as a finished Setup leaves it (The Siege of Annúminas' Standard Game Mode, 50801:B:1).
+  // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
+  modeCard?: true | "easy";
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
   attached?: readonly { code: string; to: string }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
@@ -138,7 +143,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   // A layout that names a Nightmare quest card as its stage (Grimbeorn's Folly) has it after the printed stages, as the Nightmare deal does (src/campaign/start.ts).
   const printedDefinition = scenarioDefinition(world.dealt, world.campaign, effects);
   const nightmareStages = world.dealt.nightmare?.questCards ?? [];
-  const definition = layout.stage != null && nightmareStages.includes(layout.stage) ? { ...printedDefinition, stages: [...printedDefinition.stages, ...nightmareStages.map((code) => stageOf(code, effects))] } : printedDefinition;
+  const withNightmare = layout.stage != null && nightmareStages.includes(layout.stage) ? { ...printedDefinition, stages: [...printedDefinition.stages, ...nightmareStages.map((code) => stageOf(code, effects))] } : printedDefinition;
+  const definition = layout.stages ? { ...withNightmare, stages: withNightmare.stages.filter((entry) => layout.stages?.includes(entry.code)) } : withNightmare;
   const cards = new Map(world.cards);
   for (const code of options.extra ?? []) {
     const card = cardsByCode().get(code);
@@ -175,7 +181,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   const put = (code: string, dest: Destination, tokens: Entry = code, face?: "up" | "down"): void => {
     const row = entry(tokens);
     const spawned = spawn(state, code, dest, face);
-    state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources });
+    state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources, ...(row.upgraded ? { face: "B" as const } : {}) });
   };
   for (const item of layout.play ?? []) put(entry(item).code, { zone: "play", seat: seatOf(item) }, item);
   for (const code of layout.deck ?? []) put(code, { zone: "encounterDeck" }, code, "down");
@@ -188,6 +194,11 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   if (layout.nightmare) put(entry(layout.nightmare).code, { zone: "nightmare" }, layout.nightmare, "up");
   if (layout.night) put(entry(layout.night).code, { zone: "nightObjective" }, layout.night, "up");
   if (layout.campaign && world.dealt.campaignCard !== undefined) put(world.dealt.campaignCard, { zone: "campaign" });
+  const modeCode = layout.modeCard === "easy" && "easyModeCard" in world.data ? world.data.easyModeCard : layout.modeCard && "modeCard" in world.data ? world.data.modeCard : undefined;
+  if (modeCode !== undefined) {
+    const spawned = spawn(state, modeCode, { zone: "modeCard" });
+    state = updateCard(spawned.state, spawned.id, { face: "B" });
+  }
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);

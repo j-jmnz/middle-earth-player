@@ -44,6 +44,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // shuffle buildStart appends; the definition runs those, not this record, so nothing is placed twice. Its SetAside order is the
   // piles' order (Weathertop, Midgewater, The Witch-king, Ringwraith), so the record stays a subsequence of what runs.
   {"id":"141025:setup:1","cardCode":"141025","lines":["141025:A:1"],"timing":"setup","instructions":[{"verb":"SetAside","code":"141046"},{"verb":"SetAside","code":"141048"},{"verb":"SetAside","code":"141068"},{"verb":"SetAside","code":"141069"},{"verb":"AddToStaging","code":"141045"},{"verb":"AddToStaging","code":"141051"},{"verb":"ShuffleEncounterDeck"}]},
+  // 141025:B:1 names The Prancing Pony, a title Murder at the Prancing Pony (50715) prints too, so the template cannot pick a card by name: the record is written here.
+  {"id":"141025:constant:1","cardCode":"141025","lines":["141025:B:1"],"timing":"constant","condition":{"kind":"inPlay","code":"141045","is":true},"instructions":[{"verb":"Restrict","what":"advance"}]},
   // 141026 Into the Wild
   {"id":"141026:whenRevealed:1","cardCode":"141026","lines":["141026:B:1"],"timing":"whenRevealed","instructions":[{"verb":"AddSetAsideToStaging","code":"141048"},{"verb":"PlaceQuestProgress","perPlayer":1}]},
   {"id":"141026:forced:1","cardCode":"141026","lines":["141026:B:2"],"timing":"forced","trigger":"endOfRound","instructions":[{"verb":"Choose","who":"firstPlayer","options":[{"id":"progress","requires":{"kind":"questProgress"},"instructions":[{"verb":"RemoveQuestProgress","perPlayer":1}]},{"id":"ringwraith","requires":{"kind":"outOfPlay","code":"141069"},"instructions":[{"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]}]}]},

@@ -27,8 +27,8 @@ const VERBS = [
   // (an engaged one returns to the staging area first, 12133:A:1), is attached to the objective `to` (the last picked card by default) as its guard (rr.guarded). It stays
   // in the staging area, counts its Threat there, and leaves the objective when it leaves play. A guard that already guards another objective is moved and frees that one.
   // `replaceGuards`: the objective's own guards are detached first and stay in the staging area as the cards they are ("If it was guarded, detach the encounter guarding it first", 900401:A:2). `stayEngaged`: an engaged guard keeps its
-  // engagement (the card never says to return it, 900401:A:2: agent recommendation).
-  z.strictObject({ verb: z.literal("AttachGuard"), guard: cardRefSchema.optional(), to: cardRefSchema.optional(), replaceGuards: z.literal(true).optional(), stayEngaged: z.literal(true).optional(), ...when }),
+  // engagement (the card never says to return it, 900401:A:2: agent recommendation). `detach`: an objective attached to a character is detached first, into the staging area faceup and unclaimed, and then guarded ("attach a Loot objective you control to it as a guarded objective", 50630:A:2).
+  z.strictObject({ verb: z.literal("AttachGuard"), guard: cardRefSchema.optional(), to: cardRefSchema.optional(), replaceGuards: z.literal(true).optional(), stayEngaged: z.literal(true).optional(), detach: z.literal(true).optional(), ...when }),
   // A constant (12134:A:2 to 12137:A:2, "If ~ is free of encounters, add it to the staging area, controlled by the players"): the source objective in the staging area is controlled
   // by the players as soon as it is free of encounters and no effect is resolving (the settle sweep, families/objectives/control.ts): it is marked `claimed`, with no controller,
   // so it stays in the staging area. It does nothing when run.

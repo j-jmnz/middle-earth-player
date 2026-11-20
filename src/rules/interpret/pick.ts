@@ -109,6 +109,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   if (spec.looked) return lookedPool(state, spec, seats);
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
   else if (from === "victory") raw.push(...state.victory);
+  // The encounter discard pile, the most recently discarded card first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1).
+  else if (from === "encounterDiscard") raw.push(...[...state.encounterDiscard].reverse());
   else if (from === "loot") raw.push(...Object.values(state.cards).filter((card) => card.zone === "under" && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
   else if (from === "discard") {
     for (const index of seats) {
@@ -209,11 +211,14 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.nonNeutral && (printed.sphere == null || printed.sphere === "neutral")) return false;
   if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
   if (spec.cardType && printed.type !== spec.cardType) return false;
+  if (spec.enemyOrLocation && printed.type !== "enemy" && printed.type !== "location") return false;
   if (spec.questCardType && !isQuestCardType(printed.type)) return false;
   if (spec.sideQuest && !isSideQuestType(printed.type)) return false;
   if (spec.notCardType && printed.type === spec.notCardType) return false;
   if (spec.committed != null && instance.committed !== spec.committed) return false;
   if (spec.participating && !(at.participants ?? []).includes(id)) return false;
+  // No card is at another stage in a game with one stage (50805:B:2).
+  if (spec.atOtherStage) return false;
   if (spec.nonUnique && printed.isUnique) return false;
   if (spec.unique && !printed.isUnique) return false;
   if (spec.hasShadow && !instance.shadowId) return false;
@@ -326,6 +331,28 @@ export function pickCandidates(
   picked: readonly string[],
   sourceId: string | null,
   ctx: ReduceContext,
+  x?: number,
+  participants?: readonly string[],
+  counting = false,
+  event?: { subject?: string | null; other?: string | null; discards?: boolean },
+): string[] {
+  const found = candidatesOf(state, spec, seat, picked, sourceId, ctx, x, participants, counting, event);
+  // "The opposing team chooses" (docs/brief.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left (with `highestThreat` on enemies, the one with the highest Attack among those level on Threat), the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
+  if (spec.challenge !== true || counting) return found;
+  // "the highest Threat, then the highest Attack" (docs/brief.md, The Woodland Realm, reading 3): level on Threat, the enemy with the highest Attack.
+  const level = spec.highestThreat === true && found.length > 1 ? tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "attack", ctx.cards) : 0), "highest") : found;
+  // "the highest Attack, then the highest Threat" (docs/brief.md, The Mines of Moria, reading 3: Denizen of the Deep): level on Attack, the enemy with the highest Threat.
+  const levelAttack = spec.highestAttack === true && level.length > 1 ? tiedExtreme(level, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "threat", ctx.cards) : 0), "highest") : level;
+  return levelAttack.slice(0, 1);
+}
+
+function candidatesOf(
+  state: ScenarioState,
+  spec: PickSpec,
+  seat: number,
+  picked: readonly string[],
+  sourceId: string | null,
+  ctx: ReduceContext,
   // The X an event was played for, for a pick that asks for a printed cost of X.
   x?: number,
   // The characters that took part in the attack the Response answers.
@@ -375,6 +402,10 @@ export function pickCandidates(
   if (spec.highestCost) return highestCost(state, found, ctx);
   // "The ally you control with the highest Willpower" (901304:A:2).
   if (spec.highestWillpower) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "willpower", ctx.cards) : 0), "highest");
+  // "The enemy in the staging area with the highest engagement cost" (50926:A:2).
+  if (spec.highestEngagementCost) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "engagementCost", ctx.cards) : 0), "highest");
+  // "The lowest engagement cost enemy in the staging area" (51151:A:2).
+  if (spec.lowestEngagementCost) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "engagementCost", ctx.cards) : 0), "lowest");
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
   return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }

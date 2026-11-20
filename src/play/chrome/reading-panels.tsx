@@ -20,6 +20,7 @@ import { CloseButton, TextButton } from "../../ui/buttons.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import { SettingsRows } from "./setting-rows.tsx";
 import { ELIMINATION_THREAT } from "../readouts/threat-level.ts";
+import type { DialList } from "../readouts/dials.ts";
 import type { TableSettings } from "../../ui/table-settings.ts";
 import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -203,6 +204,30 @@ export function ThreatSourceList({ title, total, cards, adjust, onRead, onClose 
 }
 
 /** This round's engine steps and their causes, on paper. Text only: it is how a player checks a number against its source. */
+/** The panel a scenario dial opens: its headed lists of names (the Investigation List's checked off and not checked off), on paper, with the dial's note at the foot. Text only. */
+export function DialPanel({ title, lists, said, note, onClose }: { title: string; lists: readonly DialList[]; said: string; note: string | null; onClose: () => void }) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const focus = usePanelFocus();
+  return (
+    <View testID="dial-panel" collapsable={false} style={{ flexShrink: 1 }}>
+      <View ref={focus} accessible accessibilityRole="header" accessibilityLabel={said} className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
+        <Text className="font-display text-title text-ink">{title}</Text>
+      </View>
+      <PanelClose testID="dial-panel-close" onPress={onClose} />
+      <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
+        {lists.map((list) => (
+          <View key={list.heading} testID={`dial-list-${list.heading}`} className="border-b py-2" style={{ borderColor: t.inkLine }}>
+            <Text className="font-display text-eyebrow uppercase text-inkLabel">{list.heading}</Text>
+            <Text className="mt-0.5 text-body text-ink">{list.lines.length > 0 ? list.lines.join(", ") : "None"}</Text>
+          </View>
+        ))}
+        {note ? <Text className="mt-2 text-label text-inkMuted">{note}</Text> : null}
+      </ScrollView>
+    </View>
+  );
+}
+
 export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
   const t = useTableTokens();
   const s = useUiScale();
