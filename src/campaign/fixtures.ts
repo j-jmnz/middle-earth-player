@@ -75,6 +75,7 @@ import forestFixtures from "./fixtures/the-old-forest.json";
 import downsFixtures from "./fixtures/fog-on-the-barrow-downs.json";
 import belegostFixtures from "./fixtures/the-ruins-of-belegost.json";
 import ponyFixtures from "./fixtures/murder-at-the-prancing-pony.json";
+import annuminasFixtures from "./fixtures/the-siege-of-annuminas.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -168,6 +169,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "fog-on-the-barrow-downs": downsFixtures,
   "the-ruins-of-belegost": belegostFixtures,
   "murder-at-the-prancing-pony": ponyFixtures,
+  "the-siege-of-annuminas": annuminasFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

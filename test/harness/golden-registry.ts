@@ -71,6 +71,7 @@ import * as forest from "../scenarios/the-old-forest/game.ts";
 import * as downs from "../scenarios/fog-on-the-barrow-downs/game.ts";
 import * as belegost from "../scenarios/the-ruins-of-belegost/game.ts";
 import * as pony from "../scenarios/murder-at-the-prancing-pony/game.ts";
+// import * as annuminas from "../scenarios/the-siege-of-annuminas/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -168,4 +169,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("fog-on-the-barrow-downs", "Fog on the Barrow-downs", downs.DOWNS_GOLDENS, downs.downsWorld, downs.playGolden),
   entry("the-ruins-of-belegost", "The Ruins of Belegost", belegost.BELEGOST_GOLDENS, belegost.belegostWorld, belegost.playGolden),
   entry("murder-at-the-prancing-pony", "Murder at the Prancing Pony", pony.PONY_GOLDENS, pony.ponyWorld, pony.playGolden),
+  // entry("the-siege-of-annuminas", "The Siege of Annúminas", annuminas.ANNUMINAS_GOLDENS, annuminas.annuminasWorld, annuminas.playGolden),
 ];
