@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "2202c0fce371b65e509b8de86dd70d0cb275bb68f5049edfafc73e8d1be85546"
+        "value": "e3cb0663b2eeb3206ef98f155c890e0221ccc83e0751377321cb155c6a33b8c3"
       },
-      "fetchedAt": "2026-11-20T11:42:21.622Z",
+      "fetchedAt": "2026-11-20T13:47:34.979Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -577,6 +577,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Mines-of-Moria",
           "sha256": "14f79cdbfbe1a0d834696e2e85a9d5c6e3d40d4656dd3d38a36770f5b90ada90",
           "bytes": 19081
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Escape-from-Khazad-dûm.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Escape-from-Khazad-dûm",
+          "sha256": "76df4372ff5d5a310ac122526c4936abc3817dbd6a4c1340cdde6a0a1ad27c0c",
+          "bytes": 18163
         }
       ]
     },

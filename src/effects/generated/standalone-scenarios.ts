@@ -28,4 +28,8 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"51227:shadow:1","cardCode":"51227","lines":["51227:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
   {"id":"51236:constant:1","cardCode":"51236","lines":["51236:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]},
   {"id":"51248:shadow:1","cardCode":"51248","lines":["51248:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"}]},
+  {"id":"51318:constant:1","cardCode":"51318","lines":["51318:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]},
+  {"id":"51321:constant:1","cardCode":"51321","lines":["51321:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]},
+  {"id":"51330:shadow:1","cardCode":"51330","lines":["51330:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"}]},
+  {"id":"51334:shadow:1","cardCode":"51334","lines":["51334:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"}]},
 ];

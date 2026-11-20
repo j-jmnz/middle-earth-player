@@ -246,6 +246,11 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
           easy.placements.set(keyOf(ship.code, "setAside"), 1);
         }
       }
+      // A card Hall of Beorn's scenario list deals and the load list omits (overrides.scenarioAdded: Escape from Khazad-dûm's Durin's Bane): added to its pile in both decks.
+      for (const rule of overrides.scenarioAdded.filter((item) => item.scenario === id)) {
+        normal.placements.set(keyOf(rule.code, rule.pile), rule.normal);
+        easy.placements.set(keyOf(rule.code, rule.pile), rule.easy);
+      }
       const stormcallerStages = new Set([...normal.placements.keys()].filter((key) => key.endsWith("\u0000stormcallerQuests")).map((key) => key.split("\u0000")[0] ?? ""));
       stages = questCodes.filter((code) => !stormcallerStages.has(code));
       const deckStages = [...normal.placements.keys()].filter((key) => key.endsWith("\u0000quest")).map((key) => key.split("\u0000")[0] ?? "");
@@ -287,7 +292,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         campaignPlaced.add(code);
         continue;
       }
-      if (!pileAccepts({ code, pile, printed, quest, facts })) {
+      // A card an override adds is placed by a later stage, not by the Setup (Durin's Bane, set aside by stage 1B): no Setup line names it.
+      if (!overrides.scenarioAdded.some((rule) => rule.scenario === id && rule.code === code) && !pileAccepts({ code, pile, printed, quest, facts })) {
         // The Harad enemies the campaign log records (Setup: "Set each Harad enemy recorded in the campaign log aside"): the campaign record deals them.
         if (namedByCampaign || loggedHarad(camp, printed)) campaignPlaced.add(code);
         else local.push(`${id}: ${nameOf(code)} is in the ${pile} pile and no Setup line puts it there`);

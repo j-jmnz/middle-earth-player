@@ -52,6 +52,20 @@ const overridesSchema = z.object({
       }),
     )
     .default([]),
+  // A card the scenario deals that the DragnCards load list omits (Escape from Khazad-dûm's Durin's Bane, which stage 1B sets aside): `normal` and `easy` copies are added to `pile`, in both decks.
+  scenarioAdded: z
+    .array(
+      z.object({
+        scenario: z.string().min(1),
+        code: z.string().min(1),
+        pile: z.enum(PILES),
+        normal: z.number().int().positive(),
+        easy: z.number().int().nonnegative(),
+        reason: z.string().min(1),
+        source: z.string().min(1),
+      }),
+    )
+    .default([]),
   // A card whose Hall of Beorn `RingsDbCardId` is another card's: the code RingsDB gives it (or, where RingsDB lists none, a six-digit code), by Hall of Beorn's card set and collector number (The Mountain of
   // Fire's Orc Disguise, Captains of the West and Raise the Shire). `title` names one of two cards that share a collector number (Angmar Awakened's Protect the Innocent and Arnor Ravaged, the two sides of one card).
   hobRingsDbCodes: z.array(z.object({ set: z.string().min(1), number: z.number().int().positive(), title: z.string().min(1).optional(), code: z.string().regex(/^\d{5,6}$/), reason: z.string().min(1), source: z.string().min(1) })).default([]),

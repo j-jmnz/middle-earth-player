@@ -13,11 +13,11 @@
     "attack-on-dol-guldur",
     "the-wizards-quest",
     "the-woodland-realm",
-    "the-mines-of-moria"
+    "the-mines-of-moria",
+    "escape-from-khazad-dum"
   ],
   "kind": "cycle",
   "later": [
-    "Escape from Khazad-dûm",
     "The Hunt for the Dreadnaught"
   ],
   "starterDecks": [],
