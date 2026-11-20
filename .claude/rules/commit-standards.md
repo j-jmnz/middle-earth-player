@@ -28,7 +28,7 @@ Every session, agent and contributor that commits follows these (user instructio
 
 - Commit and push often (user instruction, 2026-11-10). An agent that writes code, records, tests or docs commits and pushes to the session's work branch after each step that leaves `pnpm lint`, `pnpm typecheck` and its quick tests green: a verb with its test, a batch of records, the goldens, a fix. The subject says what the step did, like any commit, with no `checkpoint` keyword (user instruction, 2026-11-16): `feat: Add the Helm's Deep Defense keyword`. `pnpm commit:check` refuses a subject that ends in one.
 - Such a commit follows these standards like any other, holds no file that must not be committed (a scan, a PDF, `catalog.db`, a scratch script), and never moves another scenario's golden or fixture. The orchestrator still checks each task's whole diff before its own commit (`.claude/agents/orchestrator.md`, After each task).
-- Push with `git push -u origin <branch>` to the branch the session's harness or brief names, never to `main`.
+- Push with `git push -u origin <branch>` to the task's branch (`.claude/rules/agent-standards.md`), never to `main`.
 
 ## Squash
 
