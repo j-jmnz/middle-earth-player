@@ -126,6 +126,7 @@ describe("issue updates", () => {
     expect(issueMessage("issues", { action: "closed", issue: { ...fromMessage, state_reason: "not_planned" } })).toContain("closed without a change");
     expect(issueMessage("issues", { action: "closed", issue: { ...fromMessage, state_reason: "duplicate" } })).toContain("closed as a duplicate");
     expect(issueMessage("issues", { action: "labeled", issue: fromMessage })).toBeNull();
+    expect(issueMessage("issues", { action: "closed", issue: { ...fromMessage, state_reason: "completed" }, sender: { login: "github-actions[bot]" } })).toBeNull();
     expect(closedBy("- A (closes #1, #2; see #3)\n- B (closes #2)")).toEqual([1, 2]);
   });
 });

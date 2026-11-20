@@ -23,8 +23,8 @@ describe("release versions (.claude/rules/release-standards.md, Versioning)", ()
   });
 
   it("reads the issues a body closes and the ones it refers to (the Issues rule of .claude/rules/agent-standards.md)", () => {
-    const body = "Summary.\n\nCloses #12\nfixes: #13, #14\nResolved #15 and #16\nRefs #17 #12\nThis line names #18 in passing.\n";
-    expect(change("fix: A (#41)", body)).toMatchObject({ closes: [12, 13, 14, 15, 16], refs: [17] });
+    const body = "Summary.\n\nSettles #11\nCloses #12\nfixes: #13, #14\nResolved #15 and #16\nRefs #17 #12\nThis line names #18 in passing.\n";
+    expect(change("fix: A (#41)", body)).toMatchObject({ closes: [11, 12, 13, 14, 15, 16], refs: [17] });
     expect(change("fix: A", "Prefixes #3\nCloses issue 4")).toMatchObject({ closes: [], refs: [] });
   });
 
