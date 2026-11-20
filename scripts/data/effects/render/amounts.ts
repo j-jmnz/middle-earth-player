@@ -35,6 +35,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
     // `remaining` (hit points): what the card has left, its hit points less its damage and at least 0.
     return { text: `${expr.remaining === true ? "remaining " : ""}${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}${expr.remaining === true ? " (its hit points less its damage, at least 0)" : ""}`, read };
   }
+  if (expr.startedPlayers === true) return { text: "the number of players who started the game, an eliminated one included", read: ["startedPlayers"] };
   if (expr.players === true) return { text: "the number of players", read: ["players"] };
   if (expr.remainingQuestPoints === "activeLocation") return { text: "the quest points the active location still needs (its quest points less its progress; 0 with no active location)", read: ["remainingQuestPoints"] };
   if (expr.victoryPoints === true) return { text: "the Victory points of the cards in the victory display added up (read live)", read: ["victoryPoints"] };

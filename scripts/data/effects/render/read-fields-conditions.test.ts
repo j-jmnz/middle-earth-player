@@ -17,6 +17,7 @@ describe("effects render read fields, conditions", () => {
     optionTaken: [{ kind: "optionTaken", id: "penalty" }],
     attackedThisPhase: [{ kind: "attackedThisPhase", name: "A Card" }],
     phase: [{ kind: "phase", is: "combat" }],
+    phaseEnded: [{ kind: "phaseEnded", is: "Quest" }],
     hasEngaged: [{ kind: "hasEngaged", trait: "Orc" }],
     exhausted: [{ kind: "exhausted", code: "12345", is: true }],
     count: [{ kind: "count", pick: { type: "hero", control: "you" }, min: 1, max: 3 }],

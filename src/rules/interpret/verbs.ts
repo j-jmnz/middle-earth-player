@@ -389,7 +389,7 @@ export function questProgressMoved(
   state: ScenarioState,
   instruction: Extract<Instruction, { verb: "RemoveQuestProgress" | "PlaceQuestProgress" }>,
 ): number {
-  const amount = instruction.perPlayer * livingSeats(state).length;
+  const amount = instruction.perPlayer * (instruction.verb === "RemoveQuestProgress" && instruction.startedPlayers === true ? state.seatCount : livingSeats(state).length);
   if (instruction.verb === "PlaceQuestProgress") return amount;
   const stage = state.questStage ? state.cards[state.questStage] : undefined;
   return Math.max(0, Math.min(amount, stage?.progress ?? 0));

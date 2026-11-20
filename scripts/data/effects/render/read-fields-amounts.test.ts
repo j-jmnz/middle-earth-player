@@ -14,6 +14,7 @@ describe("effects render read fields, amounts", () => {
     { stat: "hitPoints", ofNamed: "A Card", remaining: true },
     { discardedMatching: PICK },
     { players: true },
+    { startedPlayers: true },
     { namelessCost: 3 },
     { playersAtStage: true },
     { victoryPoints: true },

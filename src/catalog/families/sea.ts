@@ -88,8 +88,8 @@ const VERBS = [
   // "The engaged Ship enemy with the highest Attack makes an immediate attack. Until the end of the phase, add 1 to the total Threat in the staging area for each damage dealt by this attack" (12131:A:1): the last picked
   // enemy makes an immediate attack (counted for noneReturned like any attack made by an effect); with `raiseStagingThreat`, when the attack ends the total Threat in the staging area is raised, until the phase or the
   // round ends, by the damage the attack dealt.
-  // `who` (the Dreadnaught, an enemy that stays in the staging area but attacks every player): the player attacked when the picked enemy is in the staging area, the actor by default (40015:A:3, "the Dreadnaught attacks you") or the first player (40043:A:1).
-  z.strictObject({ verb: z.literal("AttackWithPicked"), raiseStagingThreat: z.enum(["endOfPhase", "endOfRound"]).optional(), who: z.literal("firstPlayer").optional(), ...when }),
+  // `who` (the Dreadnaught, an enemy that stays in the staging area but attacks every player): the player attacked when the picked enemy is in the staging area, the actor by default (40015:A:3, "the Dreadnaught attacks you") or the first player (40043:A:1). `counted`: an attack of an enemy that stays in the staging area is counted for noneReturned too (40043:A:1, "if no attack is made").
+  z.strictObject({ verb: z.literal("AttackWithPicked"), raiseStagingThreat: z.enum(["endOfPhase", "endOfRound"]).optional(), who: z.literal("firstPlayer").optional(), counted: z.literal(true).optional(), ...when }),
   // "Set the current encounter deck and discard pile aside, inactive" (12148:B:1, dcce.from-sea-to-land): every card of the encounter deck and its discard pile goes to the set-aside zone, and the Corsair
   // piles are left alone. `carry`: the cards with these codes are the ones the stage's search "shuffles into the second encounter deck" ("each copy of Battle-hardened and each copy of Watch Tower"): they
   // stay in the encounter deck, those in the discard pile moving to it, and are not set aside. Copies in play stay in play. The second deck is the encounter set the stage's Setup set aside: ShuffleSetAsideSet

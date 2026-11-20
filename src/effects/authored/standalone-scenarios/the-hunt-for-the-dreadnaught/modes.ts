@@ -3,7 +3,7 @@ import type { Copy } from "../../reprint.ts";
 import * as H from "./shared.ts";
 
 // The two mode cards and the two quest stages.
-const { MODE, EASY, DREADNAUGHT, BLACK_SAILS, CORSAIR_WARSHIP, COBAS_HAVEN, GONDORIAN_WARSHIP, EACH_PLAYER, setup, noShipEliminated, questAction, PLAYERS } = H;
+const { MODE, EASY, DREADNAUGHT, BLACK_SAILS, CORSAIR_WARSHIP, COBAS_HAVEN, GONDORIAN_WARSHIP, EACH_PLAYER, setup, noShipEliminated, questAction, STARTED } = H;
 
 export const MODES: readonly (Effect | Copy)[] = [
   // 40002 Standard Mode (the Normal game). Front: the fleet is chosen, the Corsair deck prepared (only Corsairs: the Sea Monster stays in the encounter deck), the 7 unique enemies are set aside by the piles, the encounter deck is shuffled
@@ -28,22 +28,22 @@ export const MODES: readonly (Effect | Copy)[] = [
   questAction(EASY, "40001:B:2", false),
   noShipEliminated(EASY, "40001:B:3"),
 
-  // 40004 Searching the High Seas, stage 1B: global quest points 8 for each player; no more than 5 progress for each player each round; the players advance only after the quest phase has ended (reading 29).
-  { id: "40004:constant:1", cardCode: "40004", lines: ["40004:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { ...PLAYERS, times: 8 }, until: "whileSourceInPlay", target: "self" }] },
-  { id: "40004:constant:2", cardCode: "40004", lines: ["40004:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questProgressCap", amount: { ...PLAYERS, times: 5 }, until: "whileSourceInPlay", target: "table" }] },
-  { id: "40004:constant:3", cardCode: "40004", lines: ["40004:B:3"], timing: "constant", condition: { kind: "phase", is: "Quest" }, instructions: [{ verb: "Restrict", what: "advance" }] },
+  // 40004 Searching the High Seas, stage 1B: global quest points 8 for each player who started; no more than 5 progress for each player each round; the stage advances only as the quest phase ends, never in another phase (reading 29).
+  { id: "40004:constant:1", cardCode: "40004", lines: ["40004:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { ...STARTED, times: 8 }, until: "whileSourceInPlay", target: "self" }] },
+  { id: "40004:constant:2", cardCode: "40004", lines: ["40004:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questProgressCap", amount: { ...STARTED, times: 5 }, until: "whileSourceInPlay", target: "table" }] },
+  { id: "40004:constant:3", cardCode: "40004", lines: ["40004:B:3"], timing: "constant", condition: { kind: "not", condition: { kind: "phaseEnded", is: "Quest" } }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
   // 40005 Destroy the Dreadnaught, stage 2. A: the set-aside Dreadnaught joins the staging area, Elite side up. B: the same progress cap; the Action shuffles a set-aside Gondorian Warship into the encounter deck for 5 progress for each
   // player; the Response cancels the Dreadnaught's attack for 4 threat; the players win when it is destroyed.
   { id: "40005:whenRevealed:1", cardCode: "40005", lines: ["40005:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: DREADNAUGHT }] },
-  { id: "40005:constant:1", cardCode: "40005", lines: ["40005:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questProgressCap", amount: { ...PLAYERS, times: 5 }, until: "whileSourceInPlay", target: "table" }] },
+  { id: "40005:constant:1", cardCode: "40005", lines: ["40005:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questProgressCap", amount: { ...STARTED, times: 5 }, until: "whileSourceInPlay", target: "table" }] },
   {
     id: "40005:action:1",
     cardCode: "40005",
     lines: ["40005:B:2"],
     timing: "action",
-    condition: { kind: "setAsideHas", code: GONDORIAN_WARSHIP },
-    instructions: [{ verb: "RemoveQuestProgress", perPlayer: 5 }, { verb: "ShuffleRandomSetAside", name: "Gondorian Warship" }, { verb: "ShuffleEncounterDeck" }],
+    condition: { kind: "all", conditions: [{ kind: "setAsideHas", code: GONDORIAN_WARSHIP }, { kind: "stageProgress", min: 5, perStartedPlayer: true }] },
+    instructions: [{ verb: "RemoveQuestProgress", perPlayer: 5, startedPlayers: true }, { verb: "ShuffleRandomSetAside", name: "Gondorian Warship" }, { verb: "ShuffleEncounterDeck" }],
   },
   {
     id: "40005:response:1",

@@ -79,7 +79,7 @@ export const questAction = (code: string, line: string, reveal: boolean): Effect
   lines: [line],
   timing: "action",
   limit: "oncePerGameGroup",
-  condition: { kind: "canPick", pick: NON_UNIQUE_ENGAGED },
+  condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "canPick", pick: NON_UNIQUE_ENGAGED }] },
   instructions: [{ verb: "Pick", pick: NON_UNIQUE_ENGAGED }, { verb: "DamageCard", amount: 10, target: "picked" }, ...(reveal ? [{ verb: "RevealEncounter" } as Instruction] : [])],
 });
 // "Choose a hero you control" then "Until the end of the game, that hero gains ranged" (Golden Wing, A:3).
@@ -117,5 +117,7 @@ export const threatOrBoarding = (code: string, line: string, threat: number): Ef
   ],
 });
 
+// "N PerPlayer" on a global value (the stages, the Dreadnaught): N for each player who started the scenario, an eliminated one included (docs/brief.md, The Hunt for the Dreadnaught, reading 16).
+export const STARTED = { startedPlayers: true } as const;
 export const PLAYERS = { players: true } as const;
 

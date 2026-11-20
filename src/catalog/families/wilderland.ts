@@ -180,7 +180,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ArrangeLookedDeck"), kept: z.string().optional(), bottom: z.array(z.string()).optional(), ...when }),
   // "...it makes an immediate attack against you" (12179:A:4): the card the answered event is about (`target`, the subject by default), an enemy engaged with the actor, makes an immediate attack against them, dealt a shadow card of its own as any attack an effect makes is.
   // Nothing happens when it is not engaged or may not attack.
-  z.strictObject({ verb: z.literal("ImmediateAttackBy"), target: cardRefSchema.optional(), ...when }),
+  // `extraShadow`: that many more shadow cards are dealt to it for this attack, after its usual one ("Deal him 2 additional shadow cards for this attack", 40017:A:3).
+  z.strictObject({ verb: z.literal("ImmediateAttackBy"), target: cardRefSchema.optional(), extraShadow: z.number().int().positive().optional(), ...when }),
   // "For each ready character a player controls, he must choose: either exhaust that character, or deal 1 damage to it" (19021:A:1): the actor, run for each player in turn, is asked once for each ready character they control, in the order they entered play,
   // whether it is exhausted or takes `amount` damage. The characters are those ready when the verb starts.
   // With `or: "threat"` the other choice is to raise their threat by `amount` ("either exhaust that character or raise his threat by 1", 19045:A:1).

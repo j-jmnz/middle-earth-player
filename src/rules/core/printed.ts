@@ -121,6 +121,8 @@ export type PrintedCard = {
   backType: "player" | "encounter" | null;
   // An Objective-Location (Lost in Mirkwood, 18029 to 18032): an objective card that the players travel to, that takes progress as the active location and goes to the victory display explored. `type` stays "objective" (it is guarded, claimed and revealed as an objective).
   objectiveLocation: boolean;
+  // The copies the card allows in a deck, when the catalog states it (rr.deckbuilding; read by AddEventsToHand, 40009:B:2). Absent where the engine never needs it.
+  deckLimit?: number | null;
   // Null for a card that is not a ship.
   ship: ShipKind | null;
   // The encounter set the card belongs to, or null (the fleet: The Dream-chaser's Fleet; the Stormcaller Elite).

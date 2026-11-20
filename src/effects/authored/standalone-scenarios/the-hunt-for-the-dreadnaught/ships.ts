@@ -3,7 +3,7 @@ import { copyLine, type Copy } from "../../reprint.ts";
 import * as H from "./shared.ts";
 
 // The six ship-objectives, the Gondorian Warship, the Dreadnaught and the six unique Corsairs.
-const { DREADNAUGHT, YOUR_HEROES, ANY_CHARACTER, ANY_ENEMY, DREADNAUGHT_PICK, ALL_PLAYERS, EACH_PLAYER, heroStat, flipResponse, noDreadnaught, afterAttacks, pillageKeyword, setup, RANGED_HERO, EXHAUSTED_CHARACTER, playAllyOrAttachment, PLAYERS } = H;
+const { DREADNAUGHT, YOUR_HEROES, ANY_CHARACTER, ANY_ENEMY, DREADNAUGHT_PICK, ALL_PLAYERS, EACH_PLAYER, heroStat, flipResponse, noDreadnaught, afterAttacks, pillageKeyword, setup, RANGED_HERO, EXHAUSTED_CHARACTER, playAllyOrAttachment, STARTED } = H;
 
 export const SHIPS: readonly (Effect | Copy)[] = [
   // The six ship-objectives (Immune and Sentinel are keywords). Side A is Basic, side B Upgraded (flipped once, by Belfalas Shipyard); each side's constant is for its controller's heroes and the Response of side B hears "after X flips".
@@ -23,9 +23,9 @@ export const SHIPS: readonly (Effect | Copy)[] = [
   heroStat("40007", "40007:B:2", 2, "hitPoints", 2, [{ verb: "ModifyStat", stat: "ranged", amount: 1, until: "whileSourceInPlay", holders: YOUR_HEROES }]),
   flipResponse("40007", "40007:B:3", [{ verb: "Pick", pick: ANY_ENEMY }, { verb: "DamageCard", amount: 6, target: "picked" }], { kind: "canPick", pick: ANY_ENEMY }),
 
-  // 40008 Pride of Lebennin. The starting-hand line is a Setup draw after the mulligan (reading 3): 5 more cards, then 5 cards of the hand are shuffled into the deck. B: heal 2 from a character, up to 2 cards of the encounter discard pile to the victory display.
+  // 40008 Pride of Lebennin. The starting-hand line is a Setup draw after the mulligan (reading 3): the hand is shuffled into the deck and 6 cards are drawn again (so a mulligan taken before the ship was chosen has no effect: "You cannot take a mulligan"), then 5 more cards, then 5 cards of the hand are shuffled into the deck. B: heal 2 from a character, up to 2 cards of the encounter discard pile to the victory display.
   heroStat("40008", "40008:A:2", 1, "defense", 1),
-  { id: "40008:forced:1", cardCode: "40008", lines: ["40008:A:3"], timing: "forced", trigger: "setupHandDrawn", instructions: [{ verb: "Draw", amount: 5 }, { verb: "Each", pick: { type: "card", control: "you", from: "hand" }, upTo: 5, rest: [], instructions: [{ verb: "PutOnDeck", position: "shuffle", target: "picked" }] }] },
+  { id: "40008:forced:1", cardCode: "40008", lines: ["40008:A:3"], timing: "forced", trigger: "setupHandDrawn", instructions: [{ verb: "ShuffleHandIntoDeck" }, { verb: "Draw", amount: 6 }, { verb: "Draw", amount: 5 }, { verb: "Each", pick: { type: "card", control: "you", from: "hand" }, upTo: 5, rest: [], instructions: [{ verb: "PutOnDeck", position: "shuffle", target: "picked" }] }] },
   heroStat("40008", "40008:B:2", 2, "defense", 2),
   flipResponse("40008", "40008:B:3", [
     { verb: "Pick", pick: ANY_CHARACTER },
@@ -50,7 +50,7 @@ export const SHIPS: readonly (Effect | Copy)[] = [
     condition: { kind: "all", conditions: [{ kind: "resources", min: 2 }, { kind: "canPick", pick: EXHAUSTED_CHARACTER }] },
     instructions: [{ verb: "SpendResources", amount: 2 }, { verb: "Pick", pick: EXHAUSTED_CHARACTER }, { verb: "Ready", target: "picked" }],
   },
-  flipResponse("40010", "40010:B:2", [{ verb: "Pick", pick: YOUR_HEROES }, { verb: "AddResources", amount: 2, to: "picked" }, { verb: "Pick", pick: { type: "card", control: "any", state: "exhausted" } }, { verb: "Ready", target: "picked" }]),
+  flipResponse("40010", "40010:B:2", [{ verb: "Pick", pick: { ...YOUR_HEROES, control: "any" } }, { verb: "AddResources", amount: 2, to: "picked" }, { verb: "Pick", pick: { type: "card", control: "any", state: "exhausted" } }, { verb: "Ready", target: "picked" }]),
   {
     id: "40010:action:2",
     cardCode: "40010",
@@ -81,15 +81,15 @@ export const SHIPS: readonly (Effect | Copy)[] = [
     lines: ["40013:A:1"],
     timing: "constant",
     instructions: [
-      { verb: "ModifyStat", stat: "archeryPlayers", amount: 1, until: "whileSourceInPlay", target: "self" },
+      { verb: "ModifyStat", stat: "archery", amount: STARTED, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "engagedWithAll", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "leavesStagingWhenDefeated", amount: 1, until: "whileSourceInPlay", target: "self" },
-      { verb: "ModifyStat", stat: "damageCap", amount: { ...PLAYERS, times: 5 }, until: "whileSourceInPlay", target: "self" },
+      { verb: "ModifyStat", stat: "damageCap", amount: { ...STARTED, times: 5 }, until: "whileSourceInPlay", target: "self" },
     ],
   },
-  { id: "40013:constant:2", cardCode: DREADNAUGHT, lines: ["40013:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: { ...PLAYERS, times: 15 }, until: "whileSourceInPlay", target: "self" }] },
+  { id: "40013:constant:2", cardCode: DREADNAUGHT, lines: ["40013:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: { ...STARTED, times: 15 }, until: "whileSourceInPlay", target: "self" }] },
   {
     id: "40013:forced:1",
     cardCode: DREADNAUGHT,
@@ -109,10 +109,10 @@ export const SHIPS: readonly (Effect | Copy)[] = [
       { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "leavesStagingWhenDefeated", amount: 1, until: "whileSourceInPlay", target: "self" },
-      { verb: "ModifyStat", stat: "damageCap", amount: { ...PLAYERS, times: 5 }, until: "whileSourceInPlay", target: "self" },
+      { verb: "ModifyStat", stat: "damageCap", amount: { ...STARTED, times: 5 }, until: "whileSourceInPlay", target: "self" },
     ],
   },
-  { id: "40013:constant:4", cardCode: DREADNAUGHT, lines: ["40013:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: { ...PLAYERS, times: 15 }, until: "whileSourceInPlay", target: "self" }] },
+  { id: "40013:constant:4", cardCode: DREADNAUGHT, lines: ["40013:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: { ...STARTED, times: 15 }, until: "whileSourceInPlay", target: "self" }] },
   { id: "40013:forced:2", cardCode: DREADNAUGHT, lines: ["40013:B:3"], timing: "forced", trigger: "flipped", subject: "self", instructions: [EACH_PLAYER([{ verb: "EngageRandomSetAside", trait: "Corsair" }])] },
 
   // The six unique Corsairs (Victory 10, immune to player card effects).
@@ -134,7 +134,7 @@ export const SHIPS: readonly (Effect | Copy)[] = [
   // 40016 Descendant of Castamir: after it engages you, the top 2 Corsair cards go into play engaged with you, each dealt 1 shadow card.
   noDreadnaught("40016", "40016:A:2"),
   { id: "40016:forced:1", cardCode: "40016", lines: ["40016:A:3"], timing: "forced", trigger: "engaged", subject: "self", eventSeat: "you", instructions: [{ verb: "RevealCorsair", count: 2, shadow: 1 }] },
-  // 40017 Hydraken: after he attacks, once each round, an additional attack with 2 shadow cards, and the engaged player raises their threat by 4.
+  // 40017 Hydraken: after he attacks, once each round, an additional attack dealt its usual shadow card and 2 more (all three resolve), and the engaged player raises their threat by 4 (reading 22).
   noDreadnaught("40017", "40017:A:2"),
   {
     id: "40017:forced:1",
@@ -144,7 +144,7 @@ export const SHIPS: readonly (Effect | Copy)[] = [
     trigger: "attackResolved",
     subject: "self",
     limit: "oncePerRound",
-    instructions: [{ verb: "DealShadowTo", target: "self" }, { verb: "DealShadowTo", target: "self" }, { verb: "RaiseThreat", amount: 4, who: "actor" }, { verb: "ImmediateAttackBy", target: "self" }],
+    instructions: [{ verb: "RaiseThreat", amount: 4, who: "actor" }, { verb: "ImmediateAttackBy", target: "self", extraShadow: 2 }],
   },
   // 40018 Ophidian: no more than 1 character can attack him each round (one at a time, and no other once one was declared); a character that defends against him takes 2 damage.
   {

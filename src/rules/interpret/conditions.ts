@@ -200,6 +200,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       // rr.step-7-5): a Refresh Action may be used there. An ended phase an event names is read as it is.
       if (scope.phase == null && condition.is === "Refresh" && state.phase === "End of round") return true;
       return (scope.phase ?? state.phase) === condition.is;
+    case "phaseEnded":
+      return state.boundaryPhase === condition.is && state.phase !== condition.is;
     case "undefended": {
       // The attack in progress has no defender yet (or a shadow effect made it count as undefended); `is: false` asks for the defended one.
       const attack = state.pendingAttack;
@@ -357,7 +359,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "stageProgress": {
       const stage = state.questStage ? state.cards[state.questStage] : undefined;
-      return stage != null && stage.progress >= condition.min;
+      return stage != null && stage.progress >= condition.min * (condition.perStartedPlayer === true ? state.seatCount : 1);
     }
     case "victoryPoints":
       return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, ctx.cards), 0) >= condition.min;

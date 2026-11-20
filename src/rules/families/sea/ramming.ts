@@ -28,7 +28,7 @@ export function attackWithPicked(state: ScenarioState, instruction: Extract<Inst
   if (!enemy || !state.cards[enemy]) return state;
   // An enemy that stays in the staging area but is engaged with every player (the Dreadnaught) attacks the actor, or the first player.
   const staged = state.cards[enemy]?.zone === "staging";
-  const begun = attackWith(state, enemy, ctx, steps, staged ? (instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat) : undefined);
+  const begun = attackWith(state, enemy, ctx, steps, staged ? (instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat) : undefined, 0, instruction.counted === true);
   const attack = begun.pendingAttack;
   if (!attack || attack === state.pendingAttack || !instruction.raiseStagingThreat) return begun;
   const raise: Instruction = { verb: "RaiseStagingThreat", amount: { dealt: true }, until: instruction.raiseStagingThreat };

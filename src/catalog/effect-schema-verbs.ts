@@ -169,8 +169,8 @@ export const simpleVerbs = [
   // When copies are out of play in more than one zone, the first player chooses which (rr.first-player). Nothing happens
   // with no copy left.
   codeVerb("ShuffleOutOfPlayIntoEncounterDeck"),
-  // Removes progress from the current quest card, `perPlayer` for each player in the game. It stops at 0 (141026:B:2).
-  z.strictObject({ verb: z.literal("RemoveQuestProgress"), perPlayer: z.number().int().positive(), ...when }),
+  // Removes progress from the current quest card, `perPlayer` for each player in the game (`startedPlayers`: who started it, 40005:B:2). It stops at 0 (141026:B:2).
+  z.strictObject({ verb: z.literal("RemoveQuestProgress"), perPlayer: z.number().int().positive(), startedPlayers: z.literal(true).optional(), ...when }),
   // Places progress on the current quest, `perPlayer` for each player in the game. The active location takes it first
   // (rr.active-location), and a full quest card advances (rr.quest-advancement) unless something forbids it (141026:B:1).
   z.strictObject({ verb: z.literal("PlaceQuestProgress"), perPlayer: z.number().int().positive(), ...when }),

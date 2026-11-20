@@ -96,7 +96,7 @@ const DONE = "done";
 const MOST_COPIES = 3;
 const COLLECTION = "collection:";
 
-/** AddEventsToHand (40009:B:2): the actor chooses up to `upTo` events, one at a time, from their discard pile and from the collection, and adds them to their hand; they may stop. A title already held in 3 copies (deck, hand, discard pile, play and the cards added) is not offered
+/** AddEventsToHand (40009:B:2): the actor chooses up to `upTo` events, one at a time, from their discard pile and from the collection, and adds them to their hand; they may stop. A title already held in 3 copies, or in its own deck limit when the card has a lower one (deck, hand, discard pile, play and the cards added), is not offered
  * again (rr.deckbuilding). An event of the collection is made in the hand: the game did not hold it. */
 export function addEventsToHand(state: ScenarioState, instruction: Extract<Instruction, { verb: "AddEventsToHand" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const taken = [...(instruction.taken ?? [])];
@@ -120,7 +120,7 @@ export function addEventsToHand(state: ScenarioState, instruction: Extract<Instr
   const events = (ids: readonly string[]): string[] => ids.filter((id) => printedOf(ctx.cards, next.cards[id]?.code ?? "").type === "event" && held(printedOf(ctx.cards, next.cards[id]?.code ?? "").name) <= MOST_COPIES);
   const fromDiscard = events(next.seats[seat]?.discard ?? []).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
   const fromCollection = [...ctx.cards.values()]
-    .filter((printed) => printed.type === "event" && printed.sphere != null && held(printed.name) < MOST_COPIES)
+    .filter((printed) => printed.type === "event" && printed.sphere != null && held(printed.name) < Math.min(MOST_COPIES, printed.deckLimit ?? MOST_COPIES))
     .map((printed) => `${COLLECTION}${printed.code}`)
     .sort();
   const options = [...fromDiscard, ...fromCollection];

@@ -73,6 +73,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // that hear the reveal, and only in a game with a record that reads this condition. Read by the mount-doom family.
   z.strictObject({ kind: z.literal("firstTreachery") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
+  // The named phase has just ended: the engine has moved on and its boundary (Forced effects at the end of the phase) has not yet been crossed ("The players can only advance at the end of the quest phase", 40004:B:3).
+  z.strictObject({ kind: z.literal("phaseEnded"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
@@ -316,8 +318,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The answered damaged event placed the source's `nth` damage token: it holds at least that many now and held fewer before ("After
   // placing the 6th damage here", 142024:A:3).
   z.strictObject({ kind: z.literal("damageReached"), nth: z.number().int().positive() }),
-  // The current quest card holds at least `min` progress tokens ("While there are at least 8 progress tokens on this stage", 41007:B:1).
-  z.strictObject({ kind: z.literal("stageProgress"), min: z.number().int().positive() }),
+  // The current quest card holds at least `min` progress tokens (`perStartedPlayer`: for each player who started the game, "Remove 5 PerPlayer progress from this stage", 40005:B:2) ("While there are at least 8 progress tokens on this stage", 41007:B:1).
+  z.strictObject({ kind: z.literal("stageProgress"), min: z.number().int().positive(), perStartedPlayer: z.boolean().optional() }),
   // The cards in the victory display are worth at least `min` Victory points together ("they have collected at least 20 victory points", 02082:B:2; rr.victory). Read by rules/interpret/conditions.ts, the sum the score takes (src/campaign/score.ts).
   z.strictObject({ kind: z.literal("victoryPoints"), min: z.number().int().positive() }),
   // The running effect's X is at least the remaining hit points of the picked card (its hit points less its damage): "If the printed cost of the

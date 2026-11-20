@@ -3,7 +3,7 @@ import { copyLine, type Copy } from "../../reprint.ts";
 import * as H from "./shared.ts";
 
 // The Corsair deck, the Corsair ship-enemies, the locations and the treacheries.
-const { BLACK_SAILS, YOUR_HEROES, YOUR_SHIP, ANY_SHIP, SHIP_ENEMY, ANY_ENEMY, READY_CHARACTER, YOUR_CHARACTER, ATTACKER_IS_SHIP, IN_STAGING, SEVEN_ALLIES, EACH_PLAYER, pillaged, pillageKeyword, threatOrBoarding, PLAYERS } = H;
+const { DREADNAUGHT_PICK, BLACK_SAILS, YOUR_HEROES, YOUR_SHIP, ANY_SHIP, SHIP_ENEMY, ANY_ENEMY, READY_CHARACTER, YOUR_CHARACTER, ATTACKER_IS_SHIP, IN_STAGING, SEVEN_ALLIES, EACH_PLAYER, pillaged, pillageKeyword, threatOrBoarding, PLAYERS } = H;
 
 export const ENCOUNTER: readonly (Effect | Copy)[] = [
   // The Corsair deck: non-unique Corsairs, which enter play only by card effects.
@@ -17,7 +17,18 @@ export const ENCOUNTER: readonly (Effect | Copy)[] = [
   pillageKeyword("40023", "40023:A:1"),
   pillaged("40023", "40023:A:2", [{ verb: "Pick", pick: { ...YOUR_HEROES, hasResources: true } }, { verb: "DiscardResources", amount: 1, target: "picked" }]),
   // 40024 Southron Sailor, 40025 Umbar Captain.
-  copyLine("11060:A:1", "40024:A:1"),
+  // 40024 Southron Sailor (as 11060:A:1 reads, and the Dreadnaught, a Ship enemy engaged with every player, contributes its Threat once more: reading 17).
+  {
+    id: "40024:constant:1",
+    cardCode: "40024",
+    lines: ["40024:A:1"],
+    timing: "constant",
+    condition: { kind: "sourceIn", zone: "engaged" },
+    instructions: [
+      { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", engaged: "you", trait: "Ship" } },
+      { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "whileSourceInPlay", holders: DREADNAUGHT_PICK },
+    ],
+  },
   { id: "40025:constant:1", cardCode: "40025", lines: ["40025:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "engaged" }, instructions: [{ verb: "ModifyStat", stat: "cannotAttackShips", amount: 1, until: "whileSourceInPlay", holders: YOUR_CHARACTER }] },
 
   // The Corsair ship-enemies. 40026 Black Sails: archery 3 in the staging area; Shadow: a Ship attacker returns to the staging area after the attack.
@@ -69,8 +80,8 @@ export const ENCOUNTER: readonly (Effect | Copy)[] = [
   { id: "40035:constant:1", cardCode: "40035", lines: ["40035:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "activeLocation" }, instructions: [{ verb: "ModifyStat", stat: "boarding", amount: -1, until: "whileSourceInPlay", holders: SHIP_ENEMY }] },
   // 40036 Isle of Fortune: enters play with 1 resource for each player; discards 1 when a Ship enemy enters play; when explored as the active location the resources go to a hero's pool.
   { id: "40036:triggered:1", cardCode: "40036", lines: ["40036:A:1"], timing: "triggered", trigger: "enteredPlay", subject: "self", instructions: [{ verb: "PlaceResourceTokens", amount: PLAYERS, on: "self" }] },
-  { id: "40036:forced:1", cardCode: "40036", lines: ["40036:A:2"], timing: "forced", trigger: "enteredPlay", subject: { type: "enemy", control: "any", trait: "Ship", staging: true }, instructions: [{ verb: "RemoveResourceTokens", amount: 1, code: "40036" }] },
-  { id: "40036:response:1", cardCode: "40036", lines: ["40036:A:3"], timing: "response", trigger: "activeExplored", subject: "self", instructions: [{ verb: "Pick", pick: { ...YOUR_HEROES, control: "any", who: "firstPlayer" } }, { verb: "MoveResources", all: true }] },
+  { id: "40036:forced:1", cardCode: "40036", lines: ["40036:A:2"], timing: "forced", trigger: "enteredPlay", subject: { type: "enemy", control: "any", trait: "Ship", staging: true }, instructions: [{ verb: "RemoveResourceTokens", amount: 1, on: "self" }] },
+  { id: "40036:response:1", cardCode: "40036", lines: ["40036:A:3"], timing: "response", trigger: "activeExplored", subject: "self", instructions: [{ verb: "Pick", pick: { type: "location", control: "any", isSource: true } }, { verb: "Pick", pick: { ...YOUR_HEROES, control: "any", who: "firstPlayer" } }, { verb: "MoveResources", all: true }] },
   // 40037 Mouths of Anduin: in the staging area it reveals a card after a When Revealed effect is canceled; Shadow: an undefended attack reveals a card.
   { id: "40037:forced:1", cardCode: "40037", lines: ["40037:A:1"], timing: "forced", trigger: "whenRevealedCanceled", condition: IN_STAGING, instructions: [{ verb: "RevealEncounter" }] },
   { id: "40037:shadow:1", cardCode: "40037", lines: ["40037:A:2"], timing: "shadow", instructions: [{ verb: "RevealEncounter", when: { kind: "undefended" } }] },
@@ -130,7 +141,7 @@ export const ENCOUNTER: readonly (Effect | Copy)[] = [
     instructions: [
       { verb: "Pick", pick: { ...ANY_ENEMY, stagingOnly: true, highestEngagementCost: true, who: "firstPlayer" } },
       { verb: "EngageFirstPlayer", target: "picked" },
-      { verb: "AttackWithPicked", who: "firstPlayer" },
+      { verb: "AttackWithPicked", who: "firstPlayer", counted: true },
       { verb: "GainSurge", when: { kind: "noneReturned" } },
     ],
   },

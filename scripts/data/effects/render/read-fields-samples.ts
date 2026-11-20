@@ -156,7 +156,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   EndPhase: [{ verb: "EndPhase" }],
   PlaceLoggedDamageOn: [{ verb: "PlaceLoggedDamageOn", code: "10158" }],
   ChooseBoon: [{ verb: "ChooseBoon", codes: ["10161", "10162"], seat: 1 }],
-  RemoveResourceTokens: [{ verb: "RemoveResourceTokens", code: "09072", amount: 1 }, { verb: "RemoveResourceTokens", on: "picked", amount: 1 }, { verb: "RemoveResourceTokens", on: "subject", amount: 1 }],
+  RemoveResourceTokens: [{ verb: "RemoveResourceTokens", code: "09072", amount: 1 }, { verb: "RemoveResourceTokens", on: "picked", amount: 1 }, { verb: "RemoveResourceTokens", on: "subject", amount: 1 }, { verb: "RemoveResourceTokens", on: "self", amount: 1 }],
   SearchMove: [
     { verb: "SearchMove", trait: "Orc", type: "enemy", code: "09043", to: "engagedFirstPlayer", each: true, deckOnly: true, victory: true, remember: true, require: "03014", requireFor: "picked" },
     { verb: "SearchMove", traits: ["Troll", "Giant"], to: "engaged" },

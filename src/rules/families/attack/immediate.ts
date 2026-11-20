@@ -5,7 +5,7 @@
 import { beginEnemyAttack } from "../../combat/combat.ts";
 import { attackBarred } from "../../interpret/constants.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import type { ReduceContext } from "../../interpret/interpret.ts";
+import { dealAdditionalShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { dealAttackShadow } from "../defense/listen.ts";
@@ -15,15 +15,17 @@ import { effectData } from "../encounter/moves.ts";
 // (rr.attacks-outside-the-combat-phase, faq.additional-attacks).
 // Without a `seat` the enemy must still be engaged and attacks the player it is engaged with; the attack is counted before it starts (the Forced effects of its start push
 // frames over the running effect's). With a `seat` the enemy, engaged with another player or in the staging area, attacks that living player and is not counted.
-export function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, steps: EngineStep[], seat?: number): ScenarioState {
+// `counting`: an attack with a `seat` is counted too (AttackWithPicked `counted`). `extra`: shadow cards dealt after the usual one ("Deal him 2 additional shadow cards for this attack", 40017:A:3), all of which resolve.
+export function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, steps: EngineStep[], seat?: number, extra = 0, counting = false): ScenarioState {
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
   const target = seat ?? enemy.controller;
   const placed = seat == null ? enemy.zone === "engaged" : (enemy.zone === "engaged" || enemy.zone === "staging") && !state.seats[seat]?.eliminated;
   if (!placed || target == null || attackBarred(state, enemyId, target)) return state;
-  const data = seat == null ? effectData(state) : undefined;
+  const data = seat == null || counting ? effectData(state) : undefined;
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const dealt = dealAttackShadow(counted, enemyId, ctx, steps);
+  let dealt = dealAttackShadow(counted, enemyId, ctx, steps);
+  for (let more = 0; more < extra; more += 1) dealt = dealAdditionalShadow(dealt, enemyId, steps, ctx);
   const begun = beginEnemyAttack(dealt, target, enemyId, ctx, steps, { fromStaging: enemy.zone === "staging" });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }
