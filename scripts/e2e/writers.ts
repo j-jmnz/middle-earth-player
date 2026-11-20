@@ -73,6 +73,7 @@ import { questFixtures } from "./standalone-scenarios/the-wizards-quest.ts";
 import { woodlandFixtures } from "./standalone-scenarios/the-woodland-realm.ts";
 import { minesFixtures } from "./standalone-scenarios/the-mines-of-moria.ts";
 import { khazadFixtures } from "./standalone-scenarios/escape-from-khazad-dum.ts";
+import { dreadnaughtFixtures } from "./standalone-scenarios/the-hunt-for-the-dreadnaught.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -155,4 +156,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-woodland-realm": () => woodlandFixtures(),
   "the-mines-of-moria": () => minesFixtures(),
   "escape-from-khazad-dum": () => khazadFixtures(),
+  "the-hunt-for-the-dreadnaught": () => dreadnaughtFixtures(),
 };
