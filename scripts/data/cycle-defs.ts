@@ -78,8 +78,8 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       { id: "the-siege-of-annuminas", product: "The Siege of Annúminas", deck: { normal: "Q99.08", easy: "Q99.08", label: "Standard The Siege of Annúminas" }, modeCard: "Standard Game Mode" },
       // DragnCards' deck Q99.10 has no Easy twin, and it is the only deck: Epic Multiplayer Mode is a second mode card, not a second deck.
       { id: "attack-on-dol-guldur", product: "Attack on Dol Guldur", deck: { normal: "Q99.10", easy: "Q99.10" }, modeCard: "Standard Game Mode" },
-      // DragnCards' deck Q99.11 has no Easy twin.
-      { id: "the-wizards-quest", product: "The Wizard's Quest", deck: { normal: "Q99.11", easy: "Q99.11" } },
+      // DragnCards' deck Q99.11 has no Easy twin. Hall of Beorn lists the kit's quest card under one set and gives its 43 encounter cards none; they are printed with set numbers 15 to 28.
+      { id: "the-wizards-quest", product: "The Wizard's Quest", deck: { normal: "Q99.11", easy: "Q99.11" }, encounterSets: ["The Wizard's Quest", "The Wizard's Quest 15", "The Wizard's Quest 16", "The Wizard's Quest 17", "The Wizard's Quest 18", "The Wizard's Quest 19", "The Wizard's Quest 20", "The Wizard's Quest 21", "The Wizard's Quest 22", "The Wizard's Quest 23", "The Wizard's Quest 24", "The Wizard's Quest 25", "The Wizard's Quest 26", "The Wizard's Quest 27", "The Wizard's Quest 28"] },
     ],
     // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
     later: ["The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],

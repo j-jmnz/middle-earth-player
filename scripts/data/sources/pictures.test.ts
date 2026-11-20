@@ -102,8 +102,9 @@ describe("pictures", () => {
     // Ered Mithrin: no picture source carries the Campaign Expansion's own cards (cardgame.tools' MEC115 stops at the encounter cards, JvZijp's Drive holds
     // none of a campaign expansion's cards): the pack bundles their scan, Hall of Beorn's digital render (about 1020 × 1451), so each must have one.
     // The Campaign Expansion's 40 cards, by code (120165 is the Journey Up the Anduin campaign card; the rest are 12166 to 12204).
+    // Rider of Mirkwood (51011) is the back of The Wizard's Quest's Rhosgobel on cardgame.tools, whose row names Rhosgobel only: the card keeps its scan (Hall of Beorn's, 1390 × 2083).
     const emce = ["120165", ...Array.from({ length: 39 }, (_, at) => String(12166 + at))];
-    const unpictured = new Set([...MEC108_CHANGED, ...MEC109_CHANGED, ...MEC112_CHANGED, ...MEC113_CHANGED, "11084", ...emce]);
+    const unpictured = new Set([...MEC108_CHANGED, ...MEC109_CHANGED, ...MEC112_CHANGED, ...MEC113_CHANGED, "11084", "51011", ...emce]);
     const missing: string[] = [];
     for (const file of readdirSync(path.join(DATA_DIR, "cards")).filter((name) => name.endsWith(".json"))) {
       for (const card of JSON.parse(readFileSync(path.join(DATA_DIR, "cards", file), "utf8")) as { code: string }[]) {

@@ -362,7 +362,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const booklet = bookletSetsOf(rule).filter((name) => !(def.deck && namesAnObjective(name)));
     const first = hob.QuestCards[0];
     const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign" || byCode.get(code)?.campaignKind != null;
-    let hobSets = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
+    let hobSets = def.encounterSets ? [...def.encounterSets] : [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
     if (def.setupSpan === undefined) {
       // No rules insert is pinned for this scenario (a cycle's Adventure Pack): Hall of Beorn's set list is the list, and the sets of the cards the load list deals must be exactly those.
       const dealtSets = new Set<string>();

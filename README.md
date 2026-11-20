@@ -454,12 +454,12 @@ Escape closes the top panel or the large view. Z, Ctrl+Z or Cmd+Z is Undo. Right
 
 Every official campaign and scenario, then the fan-made ones: first the content from [A Long-extended Party](https://alongextendedparty.com) (ALeP), then the other community projects listed below.
 
-The official campaigns are done, so the cycles are next. Shadows of Mirkwood and Dwarrowdelf are playable: fifteen scenarios, each on Easy, Normal and Nightmare. The Standalone scenarios cycle has its first nine scenarios, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas and Attack on Dol Guldur, on Easy and Normal (none has a Nightmare deck), and the rest of the cycle follows one scenario at a time. The scenarios and cycles not built yet show under Coming later in the app. They come in release order:
+The official campaigns are done, so the cycles are next. Shadows of Mirkwood and Dwarrowdelf are playable: fifteen scenarios, each on Easy, Normal and Nightmare. The Standalone scenarios cycle has its first ten scenarios, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur and The Wizard's Quest, on Easy and Normal (none has a Nightmare deck), and the rest of the cycle follows one scenario at a time. The scenarios and cycles not built yet show under Coming later in the app. They come in release order:
 
 <details>
 <summary>Incoming cycles, in order of implementation</summary>
 
-- The rest of the Standalone scenarios cycle: The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
+- The rest of the Standalone scenarios cycle: The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
 - The Hobbit cycle (the two Hobbit saga boxes): "We Must Away, Ere Break of Day", Over the Misty Mountains Grim, Dungeons Deep and Caverns Dim, Flies and Spiders, The Lonely Mountain, The Battle of Five Armies.
 - The Against the Shadow cycle: Peril in Pelargir, Into Ithilien, The Siege of Cair Andros, The Steward's Fear, The Drúadan Forest, Encounter at Amon Dîn, Assault on Osgiliath, The Blood of Gondor, The Morgul Vale.
 - The Ring-maker cycle: The Fords of Isen, To Catch an Orc, Into Fangorn, The Dunland Trap, The Three Trials, Trouble in Tharbad, The Nîn-in-Eilph, Celebrimbor's Secret, The Antlered Crown.

@@ -1,5 +1,5 @@
 // Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas and Attack on Dol Guldur: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur and The Wizard's Quest: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -24,19 +24,20 @@ const ruins = loadAnyScenario("the-ruins-of-belegost");
 const murder = loadAnyScenario("murder-at-the-prancing-pony");
 const siege = loadAnyScenario("the-siege-of-annuminas");
 const guldur = loadAnyScenario("attack-on-dol-guldur");
+const wizard = loadAnyScenario("the-wizards-quest");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas", "attack-on-dol-guldur"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas", "attack-on-dol-guldur", "the-wizards-quest"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 9, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 10, playable: true, box: null })]);
   });
 });
 
@@ -369,5 +370,34 @@ describe("Attack on Dol Guldur", () => {
     expect(ledger.byKey.get(keyOf("50906", "B"))?.lines[1]).toMatch(/for an ally and puts it into play/);
     expect(ledger.byKey.get(keyOf("50931", "A"))?.lines[0]).toMatch(/increase its value by 5 for each player/);
     expect(ledger.byKey.get(keyOf("50931", "B"))?.lines).toHaveLength(3);
+  });
+});
+
+describe("The Wizard's Quest", () => {
+  it("has codes 510 and the collector number, which Hall of Beorn's 00001 to 00054 would share with earlier packs (overrides.productCodes), the seven quest cards as stages and the double-sided Rhosgobel", () => {
+    expect(wizard).toMatchObject({ id: "the-wizards-quest", name: "The Wizard's Quest", stages: ["51001", "51003", "51004", "51005", "51007", "51008", "51009"] });
+    expect(wizard.campaignCard).toBeUndefined();
+    expect(wizard.campaignPlaced).toEqual([]);
+    expect(wizard.source).toMatchObject({ dragnNormal: "Q99.11", dragnEasy: "Q99.11" });
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TWQ"));
+    expect(own.map((card) => card.code)).toEqual(["51001", "51003", "51004", "51005", "51007", "51008", "51009", ...Array.from({ length: 45 }, (_, at) => `510${String(at + 10)}`)]);
+    expect(wizard.cards.find((card) => card.code === "51010")).toMatchObject({ pile: "staging", back: "51011" });
+  });
+
+  it("deals the 14 encounter sets of the kit, 5 cards each, on Normal and Easy alike", () => {
+    expect(wizard.encounterSets).toHaveLength(15);
+    expect(wizard.encounterSets.slice(1).every((set) => set.count === 5)).toBe(true);
+    for (const difficulty of ["Normal", "Easy"] as const) expect(encounterCodes(wizard, difficulty, 1), difficulty).toHaveLength(70);
+  });
+
+  it("has every printed side read from its scan, with the places Hall of Beorn's text differs fixed", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("510")).flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(59);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("51003", "A"))?.lines[0]).toMatch(/for a card with cost 1 or less .* sets it aside, and shuffles/);
+    expect(ledger.byKey.get(keyOf("51009", "A"))?.lines).toHaveLength(1);
+    expect(ledger.byKey.get(keyOf("51009", "B"))?.lines).toHaveLength(3);
+    expect(ledger.byKey.get(keyOf("51052", "A"))?.lines[1]).toMatch(/if it has the Warg trait/);
   });
 });

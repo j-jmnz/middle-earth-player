@@ -5479,9 +5479,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "a1572afb0ce5e80590926916322d5f2896d3d257fb3bf1b2b056c7a26c0cea63"
+        "value": "5203c416121140e10a32634b3dcc271893d26272bebacbb6fff459b95db51820"
       },
-      "fetchedAt": "2026-11-20T06:32:21.334Z",
+      "fetchedAt": "2026-11-20T06:40:24.442Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -27388,6 +27388,78 @@
           "url": "https://images.cardgame.tools/lotr/MEC75-1-back-Quest-Radagasts_Request-A-The_Wizards_Quest.jpg",
           "sha256": "760324b0944fd828071cd7cc0a3c2decacc575a5974fda742146876458c5e5f4",
           "bytes": 738510
+        },
+        {
+          "path": "pictures/51003.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-2b-front-Quest-Mirkwood_Forest-A_Fork_in_the_Road-A-The_Wizards_Quest.jpg",
+          "sha256": "fb009e8c97d2975daf218e03432e74afae512393bad9b79a6e25d6a2c8f03601",
+          "bytes": 815659
+        },
+        {
+          "path": "pictures/51003.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-3-back-Quest-Mirkwood_Forest-A_Fork_in_the_Road-A-The_Wizards_Quest.jpg",
+          "sha256": "5e3d91b68c5dcf286e29cf5f654fe12eb4785b35e22f821887ac857c3fbedfcf",
+          "bytes": 792161
+        },
+        {
+          "path": "pictures/51004.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-2a-front-Quest-Mirkwood_Forest-Carried_Away-A-The_Wizards_Quest.jpg",
+          "sha256": "fb009e8c97d2975daf218e03432e74afae512393bad9b79a6e25d6a2c8f03601",
+          "bytes": 815659
+        },
+        {
+          "path": "pictures/51004.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-4-back-Quest-Mirkwood_Forest-Carried_Away-A-The_Wizards_Quest.jpg",
+          "sha256": "608d4f66955c0b711154ef63827c0ed61f0da411b8f4fa68ea3a3d3a6ee22f21",
+          "bytes": 900660
+        },
+        {
+          "path": "pictures/51005.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-2c-front-Quest-Mirkwood_Forest-A_New_Terror_Abroad-A-The_Wizards_Quest.jpg",
+          "sha256": "fb009e8c97d2975daf218e03432e74afae512393bad9b79a6e25d6a2c8f03601",
+          "bytes": 815659
+        },
+        {
+          "path": "pictures/51005.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-5-back-Quest-Mirkwood_Forest-A_New_Terror_Abroad-A-The_Wizards_Quest.jpg",
+          "sha256": "b13ef6ec4052469a6625bbbbb760794c33fd0f37f6c50a8c59296567bad1f094",
+          "bytes": 811273
+        },
+        {
+          "path": "pictures/51007.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-6a-front-Quest-The_Necromancers_Tower-The_Tower_of_Sorcery-A-The_Wizards_Quest.jpg",
+          "sha256": "07cdbd2ca083aa41ccbea72aaa4585134edcebe16512753061e0a20f20666a5b",
+          "bytes": 803308
+        },
+        {
+          "path": "pictures/51007.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-7-back-Quest-The_Necromancers_Tower-The_Tower_of_Sorcery-A-The_Wizards_Quest.jpg",
+          "sha256": "0bfa3137df4327cc2adadcfbab65071f8a23b2c7b9e4d1b2e996185818e4c9e0",
+          "bytes": 809610
+        },
+        {
+          "path": "pictures/51008.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-6b-front-Quest-The_Necromancers_Tower-Dungeons_of_the_Necromancer-A-The_Wizards_Quest.jpg",
+          "sha256": "07cdbd2ca083aa41ccbea72aaa4585134edcebe16512753061e0a20f20666a5b",
+          "bytes": 803308
+        },
+        {
+          "path": "pictures/51008.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-8-back-Quest-The_Necromancers_Tower-Dungeons_of_the_Necromancer-A-The_Wizards_Quest.jpg",
+          "sha256": "7b2bb6aad9e8cbdddc1d1cb36f3b4d5a92c11c4a052749872f9547563215df2e",
+          "bytes": 780054
+        },
+        {
+          "path": "pictures/51009.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-6c-front-Quest-The_Necromancers_Tower-Return_to_Rhosgobel-A-The_Wizards_Quest.jpg",
+          "sha256": "07cdbd2ca083aa41ccbea72aaa4585134edcebe16512753061e0a20f20666a5b",
+          "bytes": 803308
+        },
+        {
+          "path": "pictures/51009.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-9-back-Quest-The_Necromancers_Tower-Return_to_Rhosgobel-A-The_Wizards_Quest.jpg",
+          "sha256": "4f388f1785c6cfa970a7f596a809063f47531e2d54b361a645ba22f26b220d3c",
+          "bytes": 831169
         },
         {
           "path": "pictures/51010.A.jpg",

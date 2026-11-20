@@ -84,8 +84,12 @@ export const PDF_PAGES: readonly { code: string; side: ScanSide; pdf: string; pa
 const PRODUCT_OF_PACK: Readonly<Record<string, string>> = { OHaUH: "MEC16", OtD: "MEC24", ...Object.fromEntries(REPRINTS.map((reprint) => [reprint.pack, reprint.product])) };
 
 // cardgame.tools files Mount Gundabad's seven Exploring Gundabad stage 2s under one number (135, fronts 135a to 135g) and their backs under the
-// numbers 136 to 142; the printings number the stage 2s 135 and 137 to 142. A printing filed under another number names it here.
-const FILED_UNDER: Readonly<Record<string, string>> = { "MG 135": "135a", "MG 137": "135b", "MG 138": "135c", "MG 139": "135d", "MG 140": "135e", "MG 141": "135f", "MG 142": "135g" };
+// numbers 136 to 142; the printings number the stage 2s 135 and 137 to 142. A printing filed under another number names it here. The Wizard's Quest's
+// three stage 2 cards are filed under number 2 (fronts 2a to 2c) and its three stage 3 cards under 6 (6a to 6c); the printings number them 3 to 5 and 7 to 9.
+const FILED_UNDER: Readonly<Record<string, string>> = {
+  "MG 135": "135a", "MG 137": "135b", "MG 138": "135c", "MG 139": "135d", "MG 140": "135e", "MG 141": "135f", "MG 142": "135g",
+  "TWQ 3": "2b", "TWQ 4": "2a", "TWQ 5": "2c", "TWQ 7": "6a", "TWQ 8": "6b", "TWQ 9": "6c",
+};
 
 export type Product = { code: string; name: string; type: string };
 

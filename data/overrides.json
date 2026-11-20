@@ -1532,6 +1532,436 @@
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
       "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "51012"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 15"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51013"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 15"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51014"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 15"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51015"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 16"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51016"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 16"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51017"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 16"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51018"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 17"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51019"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 17"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51020"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 17"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51021"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 18"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51022"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 18"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51023"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 18"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51024"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 19"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51025"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 19"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51026"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 19"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51027"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 19"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51028"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 20"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51029"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 20"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51030"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 20"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51031"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 21"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51032"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 21"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51033"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 21"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51034"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 22"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51035"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 22"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51036"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 22"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51037"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 23"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51038"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 23"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51039"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 23"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51040"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 24"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51041"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 24"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51042"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 24"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51043"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 25"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51044"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 25"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51045"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 25"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51046"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 26"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51047"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 26"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51048"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 26"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51049"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 27"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51050"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 27"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51051"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 27"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51052"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 28"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51053"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 28"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
+    },
+    {
+      "match": {
+        "code": "51054"
+      },
+      "set": {
+        "encounterSet": "The Wizard's Quest 28"
+      },
+      "reason": "Hall of Beorn gives the 43 encounter cards of The Wizard's Quest no encounter set. Each is printed with its set's number (a green circle at the top right, 15 to 28, the set's cards numbered x/5) and DragnCards names the sets \"The Wizard's Quest 15\" to \"The Wizard's Quest 28\"; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51012.A to 51054.A; dragncards cardDb.tsv (The Wizard's Quest, encounterSet)"
     }
   ],
   "scenarioPiles": [

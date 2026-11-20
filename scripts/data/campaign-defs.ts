@@ -24,6 +24,8 @@ export type ScenarioDef = {
   deck?: { normal: string; easy: string; label?: string };
   // The title of the mode card whose printed Setup runs before the quest card's (The Siege of Annúminas' "Standard Game Mode"): the build reads its Setup sentences with the quest card's.
   modeCard?: string;
+  // The encounter sets of a kit whose Hall of Beorn scenario file lists none of them (The Wizard's Quest: its quest card names one set, the 14 sets of its encounter cards are in the box): the sets the load list deals, in booklet order.
+  encounterSets?: readonly string[];
   // The product whose campaign card, boons and burdens the scenario deals when it is not `product` (the Dream-chaser Campaign Expansion
   // reprints the nine scenarios of seven boxes and holds every campaign card).
   campaignProduct?: string;
