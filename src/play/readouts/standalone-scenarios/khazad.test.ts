@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 
 import { idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { updateCard } from "../../../rules/core/state.ts";
-import { guardedMark, khazadDials } from "./khazad.ts";
-import { keptMark } from "./wizards-quest.ts";
+import { isHeldFaceup, keptMark } from "./wizards-quest.ts";
+import { khazadDials } from "./khazad.ts";
 
 const ID = "escape-from-khazad-dum";
 const realStages = (stage: string | undefined): string[] => (stage != null && ["51307", "51308", "51309"].includes(stage) ? ["51301", "51303", stage] : ["51301", "51303", "51307"]);
@@ -50,16 +50,16 @@ describe("Durin's Bane set aside", () => {
 describe("the cards under Nameless Thing and Goblin Dungeon", () => {
   it("51351:A:1 the host counts the card it guards, with its owner, and the pill is gone once the card is not held", () => {
     const table = made({ staging: ["51351"], deckOf: ["c3", "filler"] });
-    expect(guardedMark(table.state, table.ctx, idOf(table.state, "51351"))).toBeNull();
+    expect(keptMark(table.state, table.ctx, idOf(table.state, "51351"), isHeldFaceup)).toBeNull();
     const done = resolveRecords(table.state, table.ctx, "51351", "forced", idOf(table.state, "51351")).state;
-    expect(guardedMark(done, table.ctx, idOf(done, "51351"))).toMatchObject({ text: "1 held", count: 1 });
-    expect(guardedMark(done, table.ctx, idOf(done, "dh1"))).toBeNull();
+    expect(keptMark(done, table.ctx, idOf(done, "51351"), isHeldFaceup)).toMatchObject({ text: "1 held", count: 1 });
+    expect(keptMark(done, table.ctx, idOf(done, "dh1"), isHeldFaceup)).toBeNull();
   });
 
   it("51340:A:1 the host counts the ally it holds", () => {
     const table = made({ play: ["ally"] });
     const done = resolveRecords(table.state, table.ctx, "51340", "whenRevealed").state;
     const host = Object.values(done.cards).find((card) => card.code === "51340")?.id ?? "";
-    expect(keptMark(done, table.ctx, host)).toMatchObject({ text: "1 held", count: 1 });
+    expect(keptMark(done, table.ctx, host, isHeldFaceup)).toMatchObject({ text: "1 held", count: 1 });
   });
 });

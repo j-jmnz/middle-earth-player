@@ -1,3 +1,5 @@
+import { flaggedByClass } from "../../src/rules/core/holder-classes.ts";
+import { printedOf } from "../../src/rules/core/printed.ts";
 import { flagged, type ScenarioState } from "../../src/rules/core/state.ts";
 import { declaredDefenders } from "../../src/rules/families/defense/defenders.ts";
 import { modifiedStat } from "../../src/rules/core/keywords.ts";
@@ -43,6 +45,12 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
           // "table" names the table's own flags (skipPlanning, noCollect, cannotPlayEvents, noQuestProgress), which no card holds.
           const got = flagged(state, item.code === "table" ? "table" : idOf(state, item.code), item.name);
           if (got !== item.value) problems.push(`${item.code} ${item.name} is ${got}, not ${item.value}`);
+          break;
+        }
+        case "classFlag": {
+          const card = state.cards[idOf(state, item.code)];
+          const got = card != null && flaggedByClass(state, card, printedOf(done.table.cards, card.code), item.name);
+          if (got !== item.value) problems.push(`${item.code} ${item.name} by class is ${got}, not ${item.value}`);
           break;
         }
         case "zone": {

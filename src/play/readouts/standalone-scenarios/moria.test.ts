@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { updateCard } from "../../../rules/core/state.ts";
 import { idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { hiddenMark, keptMark } from "./wizards-quest.ts";
+import { hiddenMark, isHeldFaceup, keptMark } from "./wizards-quest.ts";
 
 const made = (layout: Layout) => tableFromLayout("the-mines-of-moria", layout);
 
@@ -20,8 +20,8 @@ describe("the cards under the quest of The Mines of Moria", () => {
 
   it("51205:B:1 the stage that holds attachments counts them with their owners, as Carried Away does", () => {
     const table = made({ stage: "51205", attached: [{ code: "attachment", to: "dh1" }], deck: ["f0", "f0"] });
-    expect(keptMark(table.state, table.ctx, idOf(table.state, "51205"))).toBeNull();
+    expect(keptMark(table.state, table.ctx, idOf(table.state, "51205"), isHeldFaceup)).toBeNull();
     const done = resolveRecords(table.state, table.ctx, "51205", "whenRevealed", idOf(table.state, "51205")).state;
-    expect(keptMark(done, table.ctx, idOf(done, "51205"))).toMatchObject({ text: "1 held", count: 1 });
+    expect(keptMark(done, table.ctx, idOf(done, "51205"), isHeldFaceup)).toMatchObject({ text: "1 held", count: 1 });
   });
 });

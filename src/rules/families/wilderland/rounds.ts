@@ -18,10 +18,11 @@ export function noteTreacheryReveal(state: ScenarioState, cardId: string, ctx: R
   const mark = (instanceId: string, stat: "treacheryRevealed" | "firstTreachery") => ({ instanceId, sourceId: instanceId, stat, amount: 1, until: "endOfRound" as const });
   const marked = { ...state, modifiers: [...state.modifiers, mark("table", "treacheryRevealed"), mark(cardId, "firstTreachery")] };
   // "The first treachery revealed each round gains doomed 1" (50721:A:2): it gains Doomed on top of its printed Doomed as it is revealed, while the card that says so is in play.
-  const doomed = constantInstructions(marked, ctx).reduce((sum, { instruction }) => sum + (instruction.verb === "UncancelableWhenRevealed" && instruction.firstRevealedEachRound === true ? (instruction.doomed ?? 0) : 0), 0);
+  const held = constantInstructions(marked, ctx);
+  const doomed = held.reduce((sum, { instruction }) => sum + (instruction.verb === "UncancelableWhenRevealed" && instruction.firstRevealedEachRound === true ? (instruction.doomed ?? 0) : 0), 0);
   const doomedState = doomed > 0 ? markDoomed(marked, cardId, doomed) : marked;
   // "The first treachery revealed each round gains surge" (51240:A:1): the card surges as it is revealed.
-  const surges = constantInstructions(marked, ctx).some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && instruction.firstRevealedEachRound === true && instruction.surge === true);
+  const surges = held.some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && instruction.firstRevealedEachRound === true && instruction.surge === true);
   return surges ? markSurge(doomedState, cardId) : doomedState;
 }
 

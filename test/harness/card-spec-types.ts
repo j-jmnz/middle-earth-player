@@ -32,6 +32,7 @@ export type Act =
 export type Expect =
   | { expect: "stat"; code: string; name: StatName; value: number }
   | { expect: "flag"; code: string; name: FlagName; value: boolean }
+  | { expect: "classFlag"; code: string; name: FlagName; value: boolean }
   | { expect: "zone"; code: string; zone: string }
   | { expect: "committed"; code: string; value: boolean }
   | { expect: "count"; code: string; zone: string; value: number }

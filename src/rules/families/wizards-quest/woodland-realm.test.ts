@@ -130,16 +130,24 @@ describe("the pick fields `from: encounterDiscard` and `challenge` with `highest
 });
 
 describe("a Travel effect that made another location active (51146:A:2 reveals Giant Web, 51131:A:1; reading 20)", () => {
-  it("the travel does not take place and the game goes on, with no failure", () => {
+  const run = (startedActive: boolean) => {
     const base = table(1, []);
     const active = spawn(base, "den", { zone: "activeLocation" });
     const staged = spawn(active.state, "den", { zone: "staging" });
-    const frame = { frame: "ResolveEffect" as const, sourceId: staged.id, actor: 0, peril: false, effectId: "x:travel:1", instructions: [{ verb: "Travel" as const, to: "self" as const }], picked: [], cancel: null, blockCancel: null };
-    const steps: EngineStep[] = [];
-    const done = settle(pushEffectFrame(staged.state, frame, []), ctx, steps);
+    const frame = { frame: "ResolveEffect" as const, sourceId: staged.id, actor: 0, peril: false, effectId: "x:travel:1", instructions: [{ verb: "Travel" as const, to: "self" as const }], picked: [], cancel: null, blockCancel: null, ...(startedActive ? { activeAtStart: active.id } : {}) };
+    const done = settle(pushEffectFrame(staged.state, frame, []), ctx, []);
+    return { done, active, staged };
+  };
+
+  it("the travel does not take place and the game goes on, with no failure, when no location was active as the effect began", () => {
+    const { done, active, staged } = run(false);
     expect(done.failure ?? null).toBeNull();
     expect(done.activeLocation).toBe(active.id);
     expect(done.cards[staged.id]?.zone).toBe("staging");
+  });
+
+  it("a Travel to itself that finds the same location active as before the effect is refused", () => {
+    expect(run(true).done.failure).toBe("Travel was refused");
   });
 });
 

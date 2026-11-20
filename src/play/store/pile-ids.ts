@@ -68,3 +68,39 @@ export function isDiscardPile(pile: PileId): boolean {
 export function opensList(pile: PileId): boolean {
   return isDiscardPile(pile) || pile === "victory";
 }
+
+const NONE: readonly string[] = [];
+
+/** The cards of a pile, bottom first: the shown seat's deck or discard pile, the encounter pair, the second slot's piles. */
+export function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
+  switch (pile) {
+    case "deck":
+      return game.seats[seat]?.deck ?? NONE;
+    case "discard":
+      return game.seats[seat]?.discard ?? NONE;
+    case "encounterDeck":
+      return game.encounterDeck;
+    case "encounterDiscard":
+      return game.encounterDiscard;
+    case "corsairDeck":
+      return game.corsairDeck ?? NONE;
+    case "corsairDiscard":
+      return game.corsairDiscard ?? NONE;
+    case "unchartedDeck":
+    case "grottoDeck":
+      return game.uncharted?.deck ?? NONE;
+    case "evilCreaturesDeck":
+    case "evilCreaturesDiscard":
+    case "balrogDeck":
+    case "balrogDiscard":
+    case "cavesDeck":
+    case "haradDeck":
+    case "angmarOrcDeck":
+    case "investigationDeck":
+    case "smaugDeck":
+    case "smaugDiscard":
+      return game.piles?.[pile] ?? NONE;
+    case "victory":
+      return game.victory;
+  }
+}

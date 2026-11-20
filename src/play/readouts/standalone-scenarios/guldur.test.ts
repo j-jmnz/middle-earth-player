@@ -12,7 +12,7 @@ const made = (layout: Layout) => tableFromLayout(ID, layout);
 const dialOf = (layout: Layout, tally?: number) => {
   const table = made(layout);
   const state = tally == null ? table.state : { ...table.state, siegeTally: { round: table.state.round, value: tally } };
-  return guldurDials(state, nameOfIn(table))[0];
+  return guldurDials(state, table.ctx, nameOfIn(table))[0];
 };
 const DG = (resources: number) => ({ code: "50907", resources });
 
@@ -38,7 +38,7 @@ describe("the city strength dial", () => {
 
   it("50931:B:3 a tap shows the mode card after Dol Guldur while it lies beside the quest deck", () => {
     const table = made({ modeCard: true, stage: "50903", staging: [DG(10)] });
-    const [dial] = guldurDials(table.state, nameOfIn(table));
+    const [dial] = guldurDials(table.state, table.ctx, nameOfIn(table));
     const mode = Object.values(table.state.cards).find((card) => card.code === "50931");
     expect(dial?.extra).toEqual([mode?.id]);
     expect(dialOf({ stage: "50903", staging: [DG(10)] })?.extra).toBeUndefined();
@@ -47,6 +47,6 @@ describe("the city strength dial", () => {
   it("has no dial before Dol Guldur is in play or in another scenario", () => {
     expect(dialOf({ stage: "50903" })).toBeUndefined();
     const other = tableFromLayout("the-old-forest", { staging: ["f0"] });
-    expect(guldurDials(other.state, nameOfIn(other))).toEqual([]);
+    expect(guldurDials(other.state, other.ctx, nameOfIn(other))).toEqual([]);
   });
 });

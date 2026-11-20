@@ -1,6 +1,13 @@
 // The words of the attack family's instructions in a choice (src/catalog/families/attack.ts), and of Commit with a target.
 import type { Instruction } from "../../catalog/boundary.ts";
 
+// The AfterAttack of Body Count: one threat raise for the actor alone, by a printed number, that waits for a destroyed character (`x` at least 1); anything else keeps the generic words.
+function bodyCount(steps: readonly Instruction[]): string | null {
+  const [raise] = steps;
+  if (steps.length !== 1 || raise?.verb !== "RaiseThreat" || typeof raise.amount !== "number" || raise.who != null) return null;
+  return raise.when?.kind === "x" && raise.when.min === 1 ? `raise your threat by ${raise.amount} after this attack if it destroyed a character` : null;
+}
+
 /** One of the attack family's instructions in words, or null when it is not one of them. */
 export function attackWords(instruction: Instruction): string | null {
   switch (instruction.verb) {
@@ -16,7 +23,7 @@ export function attackWords(instruction: Instruction): string | null {
     case "AfterAttack":
       if (instruction.instructions.length > 0 && instruction.instructions.every((inner) => inner.verb === "ReturnToStaging")) return "return the attacking enemy to the staging area after this attack";
       // Body Count (50728:A:2): the threat raise that waits for the attack to end and counts only a destroyed character.
-      return instruction.instructions.length === 1 && instruction.instructions[0]?.verb === "RaiseThreat" && typeof instruction.instructions[0].amount === "number" ? `raise your threat by ${instruction.instructions[0].amount} after this attack if it destroyed a character` : null;
+      return bodyCount(instruction.instructions);
     case "QuestProgress":
       return `place ${typeof instruction.amount === "number" ? instruction.amount : "X"} progress on the current quest`;
     case "ExcessDamageTo":

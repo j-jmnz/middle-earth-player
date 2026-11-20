@@ -2,19 +2,21 @@
 // The player cards a quest card holds faceup under it (an ally under Carried Away, a card of a hand under Necromancer's Pass, an attachment under Narrow Paths) and the cards Hidden Threat lays facedown under the main quest: the host's pill counts them and names each owner, and the held card's preview says where it lies.
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
+import type { CardInstance, ScenarioState } from "../../../rules/core/state.ts";
 import { ownerWords } from "../../words/owner.ts";
 import { hiddenPill, keptCardWords, keptPill, type KeptCard } from "../../words/scenarios/standalone-scenarios/wizards-quest-table.ts";
 
-/** The held cards lying under a card, in the order they were laid there. */
-export function keptUnder(game: ScenarioState, cardId: string): string[] {
-  if (game.heldCards !== true) return [];
-  return Object.values(game.cards).filter((card) => card.zone === "under" && card.host === cardId && card.heldTitle === true).map((card) => card.id);
+/** A player card held faceup under a card: by its title (Carried Away's ally, Narrow Paths' attachment) or until it is discarded when the host leaves play (Nameless Thing's, 51351:A:1). */
+export const isHeldFaceup = (card: CardInstance): boolean => card.heldTitle === true || card.heldDiscard === true;
+
+/** The cards lying under a card that `isHeld` accepts, in the order they were laid there. */
+function keptUnder(game: ScenarioState, cardId: string, isHeld: (card: CardInstance) => boolean): string[] {
+  return Object.values(game.cards).filter((card) => card.zone === "under" && card.host === cardId && isHeld(card)).map((card) => card.id);
 }
 
-/** The pill of a card that holds player cards ("2 held"), or null when it holds none (a game with no held card reads one flag and leaves). */
-export function keptMark(game: ScenarioState, ctx: ReduceContext, cardId: string): { text: string; loses: boolean; speech: string; count: number } | null {
-  const ids = keptUnder(game, cardId);
+/** The pill of a card that holds player cards ("2 held"), or null when it holds none. */
+export function keptMark(game: ScenarioState, ctx: ReduceContext, cardId: string, isHeld: (card: CardInstance) => boolean): { text: string; loses: boolean; speech: string; count: number } | null {
+  const ids = keptUnder(game, cardId, isHeld);
   if (ids.length === 0) return null;
   const kept: KeptCard[] = ids.map((id) => {
     const card = game.cards[id];

@@ -5,6 +5,9 @@
 // warm "critical" when the tally is as much as the strength left. The engine decided every number; nothing here changes one. A tap shows Dol Guldur, then the Standard Game Mode beside the quest deck. Empty in any other scenario. Pure, so a test reads it.
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { siegeTallyOf } from "../../../rules/families/wilderland/dolguldur.ts";
+import { holds } from "../../../rules/interpret/conditions.ts";
+import type { ReduceContext } from "../../../rules/engine/reduce.ts";
+import { effectsOf } from "../../../rules/windows/listen.ts";
 
 import { guldurCityWords, guldurNearWords, guldurZeroWords, tallyWords } from "./guldur-words.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
@@ -15,15 +18,15 @@ const DOL_GULDUR = "50907";
 const LOW = 5;
 
 /** The dial Dol Guldur's city strength holds now: none in any other scenario, or with Dol Guldur out of play. */
-export function guldurDials(game: ScenarioState, nameOf: (code: string) => string): readonly TableDial[] {
+export function guldurDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   if (game.scenarioId !== SCENARIO) return [];
   const city = cardsOf(game, DOL_GULDUR)[0];
   if (!city) return [];
   const strength = city.resources;
   const tally = siegeTallyOf(game);
-  // At stage 3 only the tally comes off (50907:A:1); the quest stages before it are the first three of the quest deck.
-  const stageCode = game.questStage ? game.cards[game.questStage]?.code : undefined;
-  const atStage3 = stageCode != null && ["50903", "50904", "50905", "50906"].includes(stageCode);
+  // At stage 3 only the tally comes off (50907:A:1): the round-end record's own condition says when.
+  const takesTally = effectsOf(ctx, DOL_GULDUR).find((effect) => effect.id === "50907:forced:3")?.condition;
+  const atStage3 = takesTally != null && holds(game, takesTally, { actor: 0, sourceId: city.id, returned: 0 }, ctx);
   const warn = atStage3 && strength > 0 && tally >= strength ? { level: "critical" as const, words: guldurZeroWords(tally) } : strength <= LOW ? { level: "near" as const, words: guldurNearWords(strength) } : null;
   const mode = Object.values(game.cards).find((card) => card.zone === "modeCard");
   return [{ id: "city", testID: "guldur-city", label: "City", name: `City strength of ${nameOf(DOL_GULDUR)}, the players win at 0 with no Lieutenant in play:`, value: strength, cardId: city.id, ...(mode ? { extra: [mode.id] } : {}), ...(warn ? { warn } : {}), note: guldurCityWords(strength, tallyWords(tally, atStage3)) }];
