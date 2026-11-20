@@ -15,7 +15,7 @@ import { payingSlack } from "../../rules/families/deck/play.ts";
 import { chosenX } from "../../rules/families/misc/cost.ts";
 import { heroPays } from "../../rules/player/payments.ts";
 import { printedOf, type Sphere } from "../../rules/core/printed.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
+import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 import { costPayer, costSphere } from "../../rules/player/usage.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
@@ -84,7 +84,22 @@ export function triggerRequest(state: ScenarioState, ctx: ReduceContext, cardId:
     const held = state.cards[payer]?.resources ?? 0;
     return { seat, cardId, total: resources.amount, exact: true, pools: held > 0 ? [{ heroId: payer, max: held }] : [] };
   }
-  return { seat, cardId, total: resources.amount, exact: true, pools: poolsFor(state, ctx, seat, costSphere(resources, instance, ctx)) };
+  // A pool the effect pays back into comes last, so the first guess does not pay a card's resource into its own pool (Bifur,
+  // 03002:A:1: "Pay 1 resource from a hero's resource pool to add 1 resource to Bifur's resource pool"). It may still be tapped.
+  const into = payees(effect, instance);
+  const pools = poolsFor(state, ctx, seat, costSphere(resources, instance, ctx));
+  return { seat, cardId, total: resources.amount, exact: true, pools: [...pools.filter((pool) => !into.has(pool.heroId)), ...pools.filter((pool) => into.has(pool.heroId))] };
+}
+
+// The cards whose pools the effect adds resources to: its source (`to: self`) or the source's host (`to: host`).
+function payees(effect: Effect, source: CardInstance): Set<string> {
+  const into = new Set<string>();
+  for (const instruction of effect.instructions) {
+    if (instruction.verb !== "AddResources") continue;
+    if (instruction.to === "self") into.add(source.id);
+    if (instruction.to === "host" && source.host) into.add(source.host);
+  }
+  return into;
 }
 
 /** A first guess the player can change: the pools in seat order, each giving what it holds until the total is met. */
