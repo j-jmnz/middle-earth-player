@@ -40,7 +40,7 @@ Read the sections your task touches.
 - `README.md` (~8.0K tok)
   - 58–95 Features (~550)
     - 81–95 Themes (~190)
-  - 96–114 What you can play (~280)
+  - 96–114 What you can play (~270)
   - 115–122 Private by design (~170)
   - 123–128 Accessibility (~120)
   - 129–226 Install (~1.7K)
@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~325.4K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~325.3K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -152,21 +152,21 @@ Read the sections your task touches.
     - 2017–2044 The Long Dark (~4.8K) ← 4
     - 2045–2076 Foundations of Stone (~4.3K) ← 3
     - 2077–2107 Shadow and Flame (~4.1K) ← 4
-  - 2108–2584 Standalone scenarios (~66.5K) ← 1
+  - 2108–2584 Standalone scenarios (~66.4K) ← 1
     - 2112–2135 The Massing at Osgiliath (~2.5K) ← 1
     - 2136–2158 The Battle of Lake-town (~4.0K) ← 36
     - 2159–2175 The Stone of Erech (~2.2K) ← 20
     - 2176–2210 The Old Forest (~4.1K) ← 10
     - 2211–2246 Fog on the Barrow-downs (~5.0K) ← 9
-    - 2247–2281 The Ruins of Belegost (~6.1K) ← 8
-    - 2282–2316 Murder at the Prancing Pony (~4.7K) ← 17
-    - 2317–2349 The Siege of Annúminas (~4.1K) ← 13
-    - 2350–2380 Attack on Dol Guldur (~4.1K) ← 18
-    - 2381–2412 The Wizard's Quest (~4.1K) ← 22
-    - 2413–2448 The Woodland Realm (~4.7K) ← 16
-    - 2449–2488 The Mines of Moria (~4.9K) ← 12
-    - 2489–2538 Escape from Khazad-dûm (~6.9K) ← 14
-    - 2539–2584 The Hunt for the Dreadnaught (~8.8K) ← 20
+    - 2247–2281 The Ruins of Belegost (~6.1K) ← 9
+    - 2282–2316 Murder at the Prancing Pony (~4.7K) ← 18
+    - 2317–2349 The Siege of Annúminas (~4.1K) ← 14
+    - 2350–2380 Attack on Dol Guldur (~4.1K) ← 19
+    - 2381–2412 The Wizard's Quest (~4.1K) ← 23
+    - 2413–2448 The Woodland Realm (~4.7K) ← 17
+    - 2449–2488 The Mines of Moria (~4.9K) ← 13
+    - 2489–2538 Escape from Khazad-dûm (~6.9K) ← 15
+    - 2539–2584 The Hunt for the Dreadnaught (~8.8K) ← 21
   - 2585–2593 Nightmare (~410) ← 22
   - 2594–2636 Deckbuilding (~2.5K) ← 1
   - 2637–2717 Effects (~4.1K)
@@ -310,26 +310,26 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~17.7K tok)
+- `docs/phases/STATUS.md` — Phase status (~18.9K tok)
   - 5–13 Rules (~340)
   - 14–20 Phases (~20)
-  - 21–361 Open items (~16.3K)
+  - 21–377 Open items (~17.6K)
     - 23–25 Reviews (~90)
     - 26–31 Readings (not user-confirmed) (~140)
     - 32–34 Engine code (~50)
-    - 35–40 Cards tab views (~160)
-    - 41–43 README (~90)
-    - 44–48 Releases (~150)
-    - 49–56 Desktop (~310)
-    - 57–106 Fixtures (~1.7K)
-    - 107–145 Rules and engine (~1.6K)
-    - 146–269 Rules and engine (Angmar Awakened) (~5.5K)
-    - 270–292 Screens and code (~1.5K)
-    - 293–312 Rules and engine (The Two Towers) (~1.4K)
-    - 313–340 Rules and engine (Dwarrowdelf) (~1.6K)
-    - 341–347 Rules and engine (Shadows of Mirkwood) (~380)
-    - 348–361 Rules and engine (Standalone scenarios) (~1.7K)
-  - 362–387 Standing decisions (~940)
+    - 35–41 Cards tab views (~230)
+    - 42–44 README (~90)
+    - 45–49 Releases (~150)
+    - 50–57 Desktop (~310)
+    - 58–109 Fixtures (~1.8K)
+    - 110–148 Rules and engine (~1.6K)
+    - 149–272 Rules and engine (Angmar Awakened) (~5.5K)
+    - 273–295 Screens and code (~1.5K)
+    - 296–315 Rules and engine (The Two Towers) (~1.4K)
+    - 316–343 Rules and engine (Dwarrowdelf) (~1.6K)
+    - 344–350 Rules and engine (Shadows of Mirkwood) (~380)
+    - 351–377 Rules and engine (Standalone scenarios) (~2.8K)
+  - 378–403 Standing decisions (~940)
 
 ## Live plans
 

@@ -108,7 +108,7 @@ All eight official campaigns from the revised products, in the order the app lis
 | Dream-chaser | Dream-chaser Campaign Expansion | 9 |
 | Ered Mithrin | Ered Mithrin Campaign Expansion | 9 |
 | Shadows of Mirkwood (cycle) | The Hunt for Gollum to Return to Mirkwood (six Adventure Packs) | 6 |
-| Standalone scenarios (cycle) | The Massing at Osgiliath and The Battle of Lake-town, the first of the scenarios printed on their own | 2 |
+| Standalone scenarios (cycle) | The scenarios printed on their own, The Massing at Osgiliath to The Hunt for the Dreadnaught | 14 |
 
 There is no online multiplayer, and there won't be. The app is built for one device.
 
