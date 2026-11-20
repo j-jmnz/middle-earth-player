@@ -1,7 +1,7 @@
 // Copy game state (docs/design-system-table.md, Table menu): the table menu's debug row, shown while Debug tools is on. It reads the game the store holds
 // and the intents the session has saved when the row is tapped, writes them as text (src/play/store/debug-snapshot.ts) and puts the text on the
-// clipboard, then says whether it did. Nothing is sent anywhere: the player pastes it where they choose (PRIVACY.md). The phone build holds no
-// clipboard module (clipboard.ts), so there the copy answers false and the alert says so.
+// clipboard (clipboard.ts on the web and desktop, clipboard.native.ts on a phone), then says whether it did. Nothing is sent anywhere: the player
+// pastes it where they choose (PRIVACY.md).
 import { Alert, Platform } from "react-native";
 
 import { debugText, type DebugInput } from "../../play/store/debug-snapshot";
@@ -15,7 +15,7 @@ export type GameStateSource = { store: TableStore; nameOf: (code: string) => str
 export const COPIED = "Game state copied";
 export const COPIED_LINE = "Paste it into a bug report. It holds hidden cards and the order of every deck.";
 export const NOT_COPIED = "Could not copy the game state";
-export const NOT_COPIED_LINE = "This device gave the app no clipboard to write to.";
+export const NOT_COPIED_LINE = "The device refused the write to its clipboard.";
 
 // The web build has no Alert (react-native-web's does nothing), so it uses the browser's own.
 function tell(title: string, line: string): void {
