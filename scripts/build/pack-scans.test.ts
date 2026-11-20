@@ -308,6 +308,9 @@ describe("pack scans", () => {
     expect(await darkTop(await shrinkToMaxSide(upright, "player-side-quest"))).toBe(false);
     // A quest's side B is filed the other way up.
     expect(await darkTop(await shrinkToMaxSide(upright, "quest", "B"))).toBe(false);
+    // The Hunt for the Dreadnaught's quest stages are filed the other way up from other quests.
+    expect(await darkTop(await shrinkToMaxSide(upright, "quest", "A", "40004"))).toBe(false);
+    expect(await darkTop(await shrinkToMaxSide(upright, "quest", "B", "40005"))).toBe(true);
     const png = await shrinkToMaxSide(upright, "ally");
     expect(await sharp(Buffer.from(png)).metadata()).toMatchObject({ format: "jpeg", width: 700, height: 1000 });
   });

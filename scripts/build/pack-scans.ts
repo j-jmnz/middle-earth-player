@@ -20,7 +20,7 @@ const KEEP_BYTES = 400_000;
 
 // What a picture in assets/scans was packed from, so a later pack keeps it while its pin is the same: the pinned file's sha256 and the
 // map entries it gave (the card, and its scene). Raise PACK_VERSION when shrinkToMaxSide or sceneOf changes what a pin packs to.
-const PACK_VERSION = 1;
+const PACK_VERSION = 2;
 const STAMP_FILE = ".packed.json";
 type Stamp = { version: number; entries: Record<string, { pin: string; scans: PackedScan[] }> };
 
@@ -43,10 +43,10 @@ export type PackScansOptions = {
   // The asset mirror, read before a pin's URL (scripts/data/mirror/client.ts, mirrorReader); null on a miss.
   mirror?: (hash: string) => Promise<Uint8Array | null>;
   render?: (pdfFile: string, page: number) => Uint8Array;
-  shrink?: (body: Uint8Array, typeCode: string, side: "A" | "B") => Promise<Uint8Array>;
+  shrink?: (body: Uint8Array, typeCode: string, side: "A" | "B", code: string) => Promise<Uint8Array>;
   // The first quest card of each scenario: its scene is also bundled on its own, at the source's size (`<code>.scene`, sceneOf).
   sceneCodes?: ReadonlySet<string>;
-  scene?: (body: Uint8Array, typeCode: string) => Promise<Uint8Array>;
+  scene?: (body: Uint8Array, typeCode: string, code: string) => Promise<Uint8Array>;
   // How many pictures are loaded at once (PACK_CONCURRENCY when not given).
   concurrency?: number;
 };
@@ -148,11 +148,11 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
         continue;
       }
       const working = performance.now();
-      const shown = await shrink(body, card.type_code, key.endsWith(".B") ? "B" : "A");
+      const shown = await shrink(body, card.type_code, key.endsWith(".B") ? "B" : "A", card.code);
       total += shown.byteLength;
       const scans = [writeScan(key, shown, options.scansDir)];
       if (wantsScene) {
-        const scene = await (options.scene ?? sceneOf)(body, card.type_code);
+        const scene = await (options.scene ?? sceneOf)(body, card.type_code, card.code);
         total += scene.byteLength;
         scans.push(writeScan(`${key}.scene`, scene, options.scansDir));
       }
@@ -281,13 +281,24 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
 // "141022 - 1B" runs bottom to top), so it takes the opposite turn.
 const UPRIGHT_TURN: Readonly<Record<string, number>> = { quest: 90, "player-side-quest": 270, "encounter-side-quest": 270 };
 
+// The cards JvZijp files upright the other way from the rest of their kind (the text box on the left, its text running bottom to
+// top): The Hunt for the Dreadnaught's two quest stages (user report, 2026-11-20: shown upside down, and the scenario's scene cut
+// from the text box). They take the opposite turn.
+const TURNED_THE_OTHER_WAY: ReadonlySet<string> = new Set(["40004", "40005"]);
+
+// The clockwise turn that lays a picture of `media`'s size down: none for a picture already wider than tall.
+function layDownTurn(media: { width: number; height: number }, typeCode: string, code: string): number {
+  const turn = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  return turn !== 0 && TURNED_THE_OTHER_WAY.has(code) ? (turn + 180) % 360 : turn;
+}
+
 // Scales a picture down to MAX_SIDE on its long side as a JPEG, laying an upright quest picture down first. A JPEG already
 // within MAX_SIDE, the right way round and at most KEEP_BYTES is kept byte for byte; a PNG, or a JPEG saved at a far higher
 // quality than the bundle needs (JvZijp's campaign pages run to 1.2 MB), is encoded again.
-export async function shrinkToMaxSide(body: Uint8Array, typeCode = "", side: "A" | "B" = "A"): Promise<Uint8Array> {
+export async function shrinkToMaxSide(body: Uint8Array, typeCode = "", side: "A" | "B" = "A", code = ""): Promise<Uint8Array> {
   const media = sniffImage(body);
   if (!media) throw new Error("Picture is not a JPEG or PNG");
-  const sideA = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  const sideA = layDownTurn(media, typeCode, code);
   const turn = side === "B" && sideA !== 0 ? (sideA + 180) % 360 : sideA;
   if (turn === 0 && media.extension === "jpg" && Math.max(media.width, media.height) <= MAX_SIDE && body.byteLength <= KEEP_BYTES) return body;
   const image = turn === 0 ? sharp(body) : sharp(body).rotate(turn);
@@ -304,10 +315,10 @@ const HALFTONE_BLUR = 1.2;
  * A scenario's scene from its first quest card's picture, laid down: the SCENE_PICTURE region at the source's own size, unscaled, so the
  * scene a page draws large is never a crop of the shrunk card. A print scan is softened (PRINT_SCAN_WIDTH).
  */
-export async function sceneOf(body: Uint8Array, typeCode = "quest"): Promise<Uint8Array> {
+export async function sceneOf(body: Uint8Array, typeCode = "quest", code = ""): Promise<Uint8Array> {
   const media = sniffImage(body);
   if (!media) throw new Error("A scene's picture is not a JPEG or PNG");
-  const turn = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  const turn = layDownTurn(media, typeCode, code);
   const width = turn % 180 === 0 ? media.width : media.height;
   const height = turn % 180 === 0 ? media.height : media.width;
   const laid = await sharp(body).rotate(turn).toBuffer();
