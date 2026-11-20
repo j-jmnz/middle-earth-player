@@ -6,6 +6,9 @@ import type { Amount, Condition, Effect, Instruction, PickSpec } from "../../../
 // Rules: rr.search, rr.reveal, rr.cancel, rr.explored, rr.forced, rr.travel, rr.engaged, rr.staging, rr.first-player, rr.ownership-and-control, rr.victory, rr.quest-advancement, rr.attachment-cards, rr.doomed-x, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json).
 const STAGE_1 = "51101";
 const STAGES_2 = ["51103", "51104", "51105"] as const;
+// The search of the running effect found an enemy ("then", rr.then): `remember` leaves it as the picked card.
+const FOUND_ENEMY: Condition = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } };
+const HAS_COST_2: Condition = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", minCost: 2 } };
 const STAGES_3 = ["51107", "51108", "51109"] as const;
 const SPIDER_DEN = "51110";
 const MENDOR = "51111";
@@ -102,7 +105,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
   progressCap("51105", "51105:B:2"),
 
-  // 51107 The Forest of Great Fear (stage 3): the opposing team finds an enemy of any cost (reading 13; no shuffle is printed) and a resource goes on an enemy with cost 2 or higher; that enemy gets +2/+2 and is immune to player card effects, and the stage cannot be defeated while it is in play.
+  // 51107 The Forest of Great Fear (stage 3): the opposing team finds an enemy of any cost (reading 13; the deck is shuffled after the search) and a resource goes on an enemy with cost 2 or higher; that enemy gets +2/+2 and is immune to player card effects, and the stage cannot be defeated while it is in play.
   topSearch("51107", 2),
   {
     id: "51107:whenRevealed:2",
@@ -110,18 +113,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["51107:B:1"],
     timing: "whenRevealed",
     instructions: [
-      { verb: "SearchMove", type: "enemy", to: "staging", byChallenge: true },
-      { verb: "Pick", pick: { ...ENEMY_STAGED_OR_ENGAGED, minCost: 2, highestThreat: true, challenge: true } },
-      { verb: "PlaceResourceTokens", amount: 1, on: "picked", when: { kind: "canPick", pick: { ...ENEMY_STAGED_OR_ENGAGED, minCost: 2 } } },
+      // "Then" (rr.then): the Pick and the resource follow only when the search found an enemy, which `remember` leaves as the picked card; the resource goes on the enemy the Pick chose, an enemy with cost 2 or more.
+      { verb: "SearchMove", type: "enemy", to: "staging", byChallenge: true, remember: true },
+      { verb: "ShuffleEncounterDeck" },
+      { verb: "Pick", pick: { ...ENEMY_STAGED_OR_ENGAGED, minCost: 2, highestThreat: true, challenge: true }, when: FOUND_ENEMY },
+      { verb: "PlaceResourceTokens", amount: 1, on: "picked", when: HAS_COST_2 },
+      // "While this stage is in play, the enemy with a resource gets +2 Attack, +2 Defense, and is immune to player card effects": lasting on the enemy the resource went on, until this stage leaves play.
+      ...(["attack", "defense", "immuneToPlayerCards"] as const).map((stat): Instruction => ({ verb: "ModifyStat", stat, amount: stat === "immuneToPlayerCards" ? 1 : 2, until: "whileSourceInPlay", target: "picked", when: HAS_COST_2 })),
     ],
-  },
-  {
-    // The while-clause of the When Revealed line 51107:B:1 is a constant, carried here under the constant line B:2 (the coverage check pairs a constant record with a constant line).
-    id: "51107:constant:1",
-    cardCode: "51107",
-    lines: ["51107:B:2"],
-    timing: "constant",
-    instructions: ["attack", "defense"].map((stat): Instruction => ({ verb: "ModifyStat", stat: stat as "attack", amount: 2, until: "whileSourceInPlay", holders: { ...ENEMY_STAGED_OR_ENGAGED, hasResources: true } })).concat([{ verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", holders: { ...ENEMY_STAGED_OR_ENGAGED, hasResources: true } }]),
   },
   { id: "51107:constant:2", cardCode: "51107", lines: ["51107:B:2"], timing: "constant", condition: { kind: "canPick", pick: { ...ENEMY_STAGED_OR_ENGAGED, hasResources: true } }, instructions: [{ verb: "Restrict", what: "advance" }] },
   wins("51107", "51107:B:2"),
@@ -158,7 +157,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51112:constant:3", cardCode: "51112", lines: ["51112:A:2"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "cannotReadyByPlayerCard", amount: 1, until: "whileSourceInPlay", holders: { type: "character", control: "any" } }] },
 
   // 51113 Forest Grove: X is 1 more than the stage number; Travel: each player deals X damage to a character he controls.
-  { id: "51113:constant:1", cardCode: "51113", lines: ["51113:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: STAGE_PLUS_1, until: "whileSourceInPlay", target: "self" }] },
+  { id: "51113:constant:1", cardCode: "51113", lines: ["51113:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: STAGE_PLUS_1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "questPoints", amount: STAGE_PLUS_1, until: "whileSourceInPlay", target: "self" }] },
   { id: "51113:travel:1", cardCode: "51113", lines: ["51113:A:2"], timing: "travel", instructions: [EACH_PLAYER([{ verb: "Pick", pick: MY_CHARACTER }, { verb: "DamageCard", amount: STAGE_PLUS_1, target: "picked" }])] },
 
   // 51114 Despair: no character's printed text box counts until the end of the round; the Shadow blanks the defender's until the end of the phase (Traits stay).
@@ -342,7 +341,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51141 Massing at Night: the opposing team finds one different 0 cost enemy per player (at most 2). Shadow: a destroyed character gives an additional attack against you.
   { id: "51141:whenRevealed:1", cardCode: "51141", lines: ["51141:A:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", limit: 2, instructions: [{ verb: "SearchMove", type: "enemy", maxCost: 0, to: "staging", different: true, byChallenge: true }] } as Instruction, { verb: "ShuffleEncounterDeck" }] },
-  { id: "51141:shadow:1", cardCode: "51141", lines: ["51141:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", shadow: false, when: KILLED }] }] },
+  { id: "51141:shadow:1", cardCode: "51141", lines: ["51141:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", when: KILLED }] }] },
 
   // 51142 Wild Wargs: dealt a shadow card with no effect, it returns to the staging area (the records of 01085:A:1).
   { id: "51142:forced:1", cardCode: "51142", lines: ["51142:A:1"], timing: "forced", trigger: "attackResolved", subject: "self", condition: { kind: "shadowBlank" }, instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] },

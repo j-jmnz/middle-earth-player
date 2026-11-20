@@ -90,16 +90,15 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51107:B:1 (back): When Revealed: The opposing team searches the encounter deck and discard pile for an enemy, adds it to the staging area, then places a resource on an enemy in play with cost 2 or higher. While this stage is in play, the enemy with a resource gets +2 Attack, +2 Defense, and is immune to player card effects.
   51107:whenRevealed:2: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
-    - choose enemy (any player controls) or in the staging area, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with a printed cost of at least 2 (a card with no printed cost never matches) [also {"highestThreat":true}]
-    - then, if there is a enemy (any player controls) or in the staging area, with a printed cost of at least 2 (a card with no printed cost never matches) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the picked card
+    - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
+    - shuffle the encounter deck
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with a printed cost of at least 2 (a card with no printed cost never matches) [also {"highestThreat":true}]
+    - then, if the picked card is a enemy (any player controls) with a printed cost of at least 2 (a card with no printed cost never matches) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the picked card
+    - then, if the picked card is a enemy (any player controls) with a printed cost of at least 2 (a card with no printed cost never matches) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat attack 2, while this card is in play
+    - then, if the picked card is a enemy (any player controls) with a printed cost of at least 2 (a card with no printed cost never matches) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat defense 2, while this card is in play
+    - then, if the picked card is a enemy (any player controls) with a printed cost of at least 2 (a card with no printed cost never matches) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat immuneToPlayerCards 1, while this card is in play
 
 51107:B:2 (back): This stage cannot be defeated while the enemy with a resource is in play. When this stage is defeated, the players win the game.
-  51107:constant:1: Constant
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) or in the staging area, with resources on it: stat attack 2, while this card is in play
-    - each enemy (any player controls) or in the staging area, with resources on it: stat defense 2, while this card is in play
-    - each enemy (any player controls) or in the staging area, with resources on it: stat immuneToPlayerCards 1, while this card is in play
   51107:constant:2: Constant
     only if there is a enemy (any player controls) or in the staging area, with resources on it to choose
     - the players cannot defeat this stage while this holds
@@ -195,7 +194,9 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51113:A:1 (front): X is 1 more than the stage number of the main quest.
   51113:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat threat the stage number of the quest + 1, while this card is in play
+    - this card: stat questPoints the stage number of the quest + 1, while this card is in play
 
 51113:A:2 (front): Travel: Each player deals X damage to a character he controls.
   51113:travel:1: Travel
@@ -584,7 +585,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51141:A:2 (shadow): Shadow: If this attack destroys a character, attacking enemy makes an additional attack against you after this one.
   51141:shadow:1: Shadow
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 51142 Wild Wargs
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -758,4 +759,4 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 456 by template, 14 as JSON)
+(rendered pieces: 463 by template, 14 as JSON)
