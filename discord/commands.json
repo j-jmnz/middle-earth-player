@@ -2,11 +2,11 @@
   {
     "name": "issue",
     "type": 1,
-    "description": "Create a GitHub issue from this thread's bug report",
+    "description": "Turn this thread's bug report into a GitHub issue",
     "options": [
       {
         "name": "replies",
-        "description": "Put the thread's replies in the issue as well",
+        "description": "Include the replies in the issue too",
         "type": 5,
         "required": false
       }

@@ -7,6 +7,10 @@ export interface Env {
   GITHUB_TOKEN: string;
   /** The secret the repository's webhook signs its deliveries with. */
   GITHUB_WEBHOOK_SECRET: string;
+  /** The channel that gets the release announcements; unset, no announcement is posted. */
+  RELEASES_CHANNEL_ID?: string;
+  /** A role the announcement mentions, for players who want a ping; unset, it pings no one. */
+  RELEASES_ROLE_ID?: string;
   /** `owner/name` of the repository the issues go to. */
   GITHUB_REPO: string;
 }
@@ -40,6 +44,16 @@ export async function editReply(env: Env, interactionToken: string, content: str
   if (!response.ok) throw new Error(`Discord edit of the reply answered ${response.status}: ${await response.text()}`);
 }
 
+/** A refusal from the GitHub API, with its status for the moderator's message. */
+export class GitHubError extends Error {
+  readonly status: number;
+
+  constructor(status: number, detail: string) {
+    super(`GitHub answered ${status}: ${detail}`);
+    this.status = status;
+  }
+}
+
 /** A GitHub REST call with the bot's token. Returns the parsed JSON, or null on a 404. */
 export async function github<T>(env: Env, method: string, route: string, body?: unknown): Promise<T | null> {
   const response = await fetch(`https://api.github.com${route}`, {
@@ -54,6 +68,6 @@ export async function github<T>(env: Env, method: string, route: string, body?: 
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`GitHub answered ${response.status}: ${await response.text()}`);
+  if (!response.ok) throw new GitHubError(response.status, await response.text());
   return (await response.json()) as T;
 }

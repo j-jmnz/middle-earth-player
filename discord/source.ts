@@ -143,7 +143,15 @@ export function sourceMarker(source: SourceRef): string {
   return `<!-- discord ${sourceToId(source)} -->`;
 }
 
-/** The source an issue body names, or null for an issue the bot did not make. */
+/**
+ * The issue body with its marker retired, once the release that ships the fix is posted: the bot follows the issue no
+ * further, so a later comment or reopen does not post in a thread whose report is done.
+ */
+export function retiredBody(body: string): string {
+  return body.replace(/<!-- discord (issue:)/, "<!-- discord released $1");
+}
+
+/** The source an issue body names, or null for an issue the bot did not make or no longer follows. */
 export function sourceInBody(body: string | null | undefined): SourceRef | null {
   const found = body ? MARKER.exec(body) : null;
   return found ? sourceFromId(found[1]!) : null;
@@ -172,13 +180,17 @@ async function threadOn(env: Env, channelId: string, messageId: string, threadNa
  * Posts where the report is: in the thread on the report message (started as `threadName` when there is none), else
  * as a reply to the message; for a thread report, in the thread. Mentions never ping.
  */
-export async function postAt(env: Env, source: SourceRef, content: string, threadName: string): Promise<void> {
+export async function postAt(env: Env, source: SourceRef, content: string, threadName: string): Promise<"thread" | "reply"> {
   const message = { content, allowed_mentions: { parse: [] } };
   if (source.kind === "thread") {
     await discord(env, "POST", `/channels/${source.threadId}/messages`, message);
-    return;
+    return "thread";
   }
   const thread = await threadOn(env, source.channelId, source.messageId, threadName);
-  if (thread) await discord(env, "POST", `/channels/${thread}/messages`, message);
-  else await discord(env, "POST", `/channels/${source.channelId}/messages`, { ...message, message_reference: { message_id: source.messageId, fail_if_not_exists: false } });
+  if (thread) {
+    await discord(env, "POST", `/channels/${thread}/messages`, message);
+    return "thread";
+  }
+  await discord(env, "POST", `/channels/${source.channelId}/messages`, { ...message, message_reference: { message_id: source.messageId, fail_if_not_exists: false } });
+  return "reply";
 }

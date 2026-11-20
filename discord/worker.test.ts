@@ -122,21 +122,24 @@ describe("Discord issue bot", () => {
       labels: ["rules"],
       body: expect.stringContaining("Gandalf costs 4.\n\n### Attachments\n\n- [shot.png](https://cdn.discordapp.com/shot.png)"),
     });
-    expect((issue.body as { body: string }).body).toContain("Reported on Discord by **Frodo** ([message](https://discord.com/channels/1/200/300)). Filed by **elrond**");
+    expect((issue.body as { body: string }).body).toContain("---\nReported by **Frodo** on [Discord](https://discord.com/channels/1/200/300) · filed by **elrond**\n");
     expect((issue.body as { body: string }).body).toMatch(/<!-- discord issue:m:200:300 -->$/);
     const thread = calls.find((call) => call.url.endsWith("/channels/200/messages/300/threads"))!;
     expect(thread.body).toEqual({ name: "#42 Gandalf costs 5", auto_archive_duration: 10080 });
     const link = calls.find((call) => call.method === "POST" && call.url.endsWith("/channels/300/messages"))!;
-    expect(link.body).toEqual({ content: expect.stringContaining("#42"), allowed_mentions: { parse: [] } });
+    expect(link.body).toEqual({
+      content: "Thanks for the report, **Frodo**! It's now tracked as **[#42](<https://github.com/owner/repo/issues/42>)** on GitHub. I'll post updates here.",
+      allowed_mentions: { parse: [] },
+    });
     const told = calls.find((call) => call.method === "PATCH")!;
-    expect(told.body).toMatchObject({ content: expect.stringContaining("I posted the link beside the report") });
+    expect(told.body).toMatchObject({ content: expect.stringContaining("Done! I created **[#42](<https://github.com/owner/repo/issues/42>)** and posted it in a thread on the report.") });
   });
 
   it("tells the moderator when GitHub refuses the issue", async () => {
     const calls = stubFetch({ "GET /channels/200/messages/300": report, "PATCH /webhooks/100/t/messages/@original": {} });
     const components = [{ custom_id: "title", value: "A bug" }, { custom_id: "kind", values: ["bug"] }, { custom_id: "body", value: "Text" }];
     await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:m:200:300", components } });
-    expect(calls.find((call) => call.method === "PATCH")!.body).toMatchObject({ content: expect.stringContaining("I could not create the issue. GitHub answered 404") });
+    expect(calls.find((call) => call.method === "PATCH")!.body).toMatchObject({ content: "Sorry, I couldn't create the issue: I couldn't find the repository, or the GitHub token can't see it." });
   });
 
   it("registers the two commands the worker answers", () => {
