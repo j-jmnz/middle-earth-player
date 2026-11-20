@@ -34,7 +34,8 @@ export function attachToDial(state: ScenarioState, instruction: Verb<"AttachToDi
   const seat = instruction.firstPlayer === true ? state.firstPlayer : focus.seat;
   if (!code || state.seats[seat]?.eliminated || (instruction.unlimited !== true && dialCopy(state, seat, code))) return state;
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-  const sourceWaiting = source != null && !inPlay(source.zone) ? source.id : undefined;
+  // The source card waits out of play (Overcome by Fear in the pool); a revealed card (`firstPlayer`, Nightfall 51045:A:2) lies where its reveal put it.
+  const sourceWaiting = source != null && (!inPlay(source.zone) || instruction.firstPlayer === true) ? source.id : undefined;
   const id = instruction.code ? setAsideCopy(state, code) : sourceWaiting;
   if (!id) return state;
   const placed = updateCard(moveCard(state, id, { zone: "play", seat }), id, { face: "up", exhausted: false, host: null, controller: seat });

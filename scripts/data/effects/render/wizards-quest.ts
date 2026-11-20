@@ -26,8 +26,8 @@ export const WIZARDS_QUEST_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>>
     text: `the opposing team searches the top ${str(i.top)} cards of the encounter deck for the card nearest the top that costs ${str(i.maxCost)} or less (${str(i.maxCostMulti)} or less with two or more players), sets it aside, shuffles the encounter deck and reveals the card; its When Revealed effects cannot be canceled (with no such card, only the shuffle)`,
     read: ["top", "maxCost", "maxCostMulti"],
   }),
-  HoldPickedUnder: () => ({ text: "the last picked card (an ally in play, or a card of a hand) lies faceup under this card, its owner's still and out of play (an ally in play loses its tokens and its attachments are discarded); no copy of its title can be played or put into play while it lies there; it returns to its owner's hand when this card leaves play", read: [] }),
-  BarHeldTitles: () => ({ text: "no card with the title of a card held under this one can be played or put into play (the bar is the engine's, HoldPickedUnder holds the cards)", read: [] }),
+  HoldPickedUnder: () => ({ text: "the last picked card (an ally in play, or a card of a hand) lies faceup under this card, its owner's still and out of play (an ally in play loses its tokens and its attachments are discarded); no copy of its title can be played while it lies there; it returns to its owner's hand when this card leaves play", read: [] }),
+  BarHeldTitles: () => ({ text: "no card with the title of a card held under this one can be played (the bar is the engine's, HoldPickedUnder holds the cards)", read: [] }),
 };
 
 export const WIZARDS_QUEST_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {

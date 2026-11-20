@@ -12,11 +12,14 @@ import { pickCandidates } from "../../interpret/pick.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { settle } from "../../engine/machine.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachTo, spawn } from "../../core/zones.ts";
 import { carryAwayHero } from "../wilderland/carried.ts";
 import { flipOver } from "../wilderland/flip.ts";
 import { manifest } from "./index.ts";
+import { attachToDial } from "../attachments/dial.ts";
+import { manifest as nightmare } from "../nightmare/index.ts";
 
 const SETS = ["Set A", "Set B", "Set C", "Set D"];
 const CARDS = cardMap([
@@ -34,6 +37,7 @@ const CARDS = cardMap([
   definePrinted({ code: "elf", name: "Elf", type: "ally", sphere: "lore", cost: 2, willpower: 1, health: 2 }),
   definePrinted({ code: "ring", name: "Ring", type: "attachment", sphere: "lore", cost: 1 }),
   definePrinted({ code: "rhos", name: "Rhosgobel", type: "location", threat: 1, questPoints: 1 }),
+  definePrinted({ code: "sideq", name: "Side quest", type: "encounter-side-quest", questPoints: 3 }),
   definePrinted({ code: "rider", name: "Rider", type: "enemy", threat: 0, attack: 6, engagementCost: 50, defense: 3, health: 10 }),
 ]);
 const ctx: ReduceContext = { effects: [], cards: CARDS };
@@ -246,3 +250,41 @@ describe("FlipOver `target: subject` (51001:B:1, reading 7)", () => {
   });
 });
 
+
+describe("the fields the judged rows added (docs/brief.md, The Wizard's Quest, readings 14 to 18)", () => {
+  it("ForEachPlayer limit: the instructions run for the first players only (51048:A:1, at most 2 locations)", () => {
+    const state = [0, 1].reduce((made, seat) => spawn(made, "frodo", { zone: "heroes", seat }).state, idleScenario(2));
+    const raised = (limit: number | undefined) => {
+      const frame = { frame: "ResolveEffect" as const, sourceId: null, actor: 0, peril: false, effectId: "x:whenRevealed:1", instructions: [{ verb: "ForEachPlayer" as const, order: "firstFirst" as const, ...(limit != null ? { limit } : {}), instructions: [{ verb: "RaiseThreat" as const, amount: 1, who: "actor" as const }] }], picked: [], cancel: null, blockCancel: null };
+      const steps: EngineStep[] = [];
+      settle(pushEffectFrame(state, frame, []), ctx, steps);
+      return steps.flatMap((step) => (step.kind === "threat" ? [step.seat] : []));
+    };
+    expect(raised(undefined)).toEqual([0, 1]);
+    expect(raised(1)).toEqual([0]);
+  });
+
+  it("AttachToDial firstPlayer unlimited: the card lies on the first player's dial whoever reveals it, and a dial that holds a copy takes another (51045:A:2)", () => {
+    const base = idleScenario(2);
+    const made = spawn(base, "ring", { zone: "encounterDeck" });
+    const first = attachToDial(made.state, { verb: "AttachToDial", firstPlayer: true, unlimited: true }, { seat: 1, sourceId: made.id });
+    expect(first.cards[made.id]).toMatchObject({ zone: "play", controller: 0 });
+    const next = spawn(first, "ring", { zone: "encounterDeck" });
+    const second = attachToDial(next.state, { verb: "AttachToDial", firstPlayer: true, unlimited: true }, { seat: 1, sourceId: next.id });
+    expect(second.cards[next.id]).toMatchObject({ zone: "play", controller: 0 });
+    const limited = attachToDial(next.state, { verb: "AttachToDial" }, { seat: 0, sourceId: next.id });
+    expect(limited.cards[next.id]?.zone).toBe("encounterDeck");
+  });
+
+  it("AttachToQuest main: the main quest card, never the side quest that is the current quest (51023:A:2)", () => {
+    let state = spawn(idleScenario(1), "stage", { zone: "questStage" }).state;
+    const stageId = state.questStage as string;
+    const side = spawn(state, "sideq", { zone: "staging" });
+    const card = spawn(side.state, "mist", { zone: "encounterDeck" });
+    state = { ...card.state, sideQuests: true, modifiers: [{ instanceId: side.id, sourceId: side.id, stat: "currentQuest", amount: 1, until: "endOfPhase" }] };
+    const main = nightmare.run?.(state, { verb: "AttachToQuest", main: true }, { seat: 0, sourceId: card.id }, ctx, []) as ScenarioState;
+    expect(main.cards[card.id]?.host).toBe(stageId);
+    const current = nightmare.run?.(state, { verb: "AttachToQuest" }, { seat: 0, sourceId: card.id }, ctx, []) as ScenarioState;
+    expect(current.cards[card.id]?.host).toBe(side.id);
+  });
+});

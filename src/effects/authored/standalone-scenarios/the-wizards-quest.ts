@@ -275,7 +275,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "51033",
     lines: ["51033:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "Each", pick: { type: "card", control: "any", engagedEnemies: true, unique: false, enemyOrLocation: true, lowestThreat: true, challenge: true }, instructions: [{ verb: "DiscardPicked" }, { verb: "RevealEncounter" }] }],
+    instructions: [{ verb: "Each", pick: { type: "card", control: "any", engagedEnemies: true, unique: false, enemyOrLocation: true, lowestThreat: true, challenge: true }, instructions: [{ verb: "Discard", target: { kind: "picked" } }, { verb: "RevealEncounter" }] }],
   },
   { id: "51033:shadow:1", cardCode: "51033", lines: ["51033:A:2"], timing: "shadow", instructions: [{ verb: "Choose", who: "actor", options: [{ id: "reveal", instructions: [{ verb: "RevealEncounter" }] }, { id: "undefended", instructions: [{ verb: "ConsiderUndefended" }] }] }] },
 
@@ -300,7 +300,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "endOfRound",
     instructions: [
       { verb: "Pick", pick: { type: "attachment", control: "any", attachedTo: "host", other: true } },
-      { verb: "DiscardPicked", when: { kind: "canPick", pick: { type: "attachment", control: "any", attachedTo: "host", other: true } } },
+      { verb: "Discard", target: { kind: "picked" }, when: { kind: "canPick", pick: { type: "attachment", control: "any", attachedTo: "host", other: true } } },
       { verb: "Discard", target: { kind: "self" }, when: { kind: "not", condition: { kind: "canPick", pick: { type: "attachment", control: "any", attachedTo: "host", other: true } } } },
     ],
   },
@@ -384,7 +384,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "Each", pick: { type: "character", control: "any", state: "ready", hasAttachment: {} }, instructions: [{ verb: "Exhaust", target: { kind: "picked" } }] },
     ],
   },
-  { id: "51054:shadow:1", cardCode: "51054", lines: ["51054:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "any", attachedTo: "defender" } }, { verb: "DiscardPicked" }] },
+  { id: "51054:shadow:1", cardCode: "51054", lines: ["51054:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "any", attachedTo: "defender" } }, { verb: "Discard", target: { kind: "picked" } }] },
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];
