@@ -61,12 +61,15 @@ The user downloads the files by hand (user decision, 2026-11-20): The Sounds Res
 
 One game for each kind, so the mix stays consistent. First choice, then the fallback:
 
-| Kind | First choice | Fallback |
+The Sounds Resource has no rip of the LOTR Adventure Card Game, Gwent or Shadow of Mordor and Shadow of War (a search of the site, 2026-11-20). The sources that exist:
+
+| Kind | Source | Fallback |
 | --- | --- | --- |
-| Cards | The Lord of the Rings: Adventure Card Game | Gwent (The Witcher) |
-| Tokens | Balatro | Tabletop Simulator |
-| Combat | Middle-earth: Shadow of Mordor or Shadow of War | The Battle for Middle-earth II |
-| Dread and stings | Darkest Dungeon | The Battle for Middle-earth II |
+| UI | [HOME Menu, Menu Sounds](https://sounds.spriters-resource.com/nintendo_switch/systembios/asset/411814/) (Switch 1; no Switch 2 rip yet) | A cut from Nintendo's Switch 2 video |
+| Cards | [Bicycle Board / Card Games, General Sounds](https://sounds.spriters-resource.com/pc_computer/bicycleboardcardgames/asset/565561/) (real cards: shuffle, deal, place) | [Hearthstone, Board](https://sounds.spriters-resource.com/pc_computer/hearthstone/asset/397108/) and [General](https://sounds.spriters-resource.com/pc_computer/hearthstone/asset/396767/) Sound Effects |
+| Tokens | [Balatro, Sound Effects](https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/) | Hearthstone, General Sound Effects |
+| Combat | [The Battle for Middle-earth](https://sounds.spriters-resource.com/pc_computer/lordoftheringsbattleformiddleearth/) (its unit and creature pages) | [The Witcher 3](https://sounds.spriters-resource.com/pc_computer/thewitcher3wildhunt/) (its monster pages) |
+| Dread and stings | [Darkest Dungeon](https://sounds.spriters-resource.com/pc_computer/darkestdungeon/) (its sound effect pages, not the narrator) | The Battle for Middle-earth |
 
 ### Music: the film trilogy
 
@@ -79,7 +82,7 @@ One game for each kind, so the mix stays consistent. First choice, then the fall
 
 Save each file under one folder, in the subfolder and with the name given here (the extension is whatever the source gives: WAV or FLAC first, else the best quality offered). A row with two names wants two or three takes of the sound, saved as `-1`, `-2`, `-3`, so a repeat does not sound the same each time. Keep a `sources.txt` in each subfolder: the page URL each file came from.
 
-### `ui/` (Switch 2, else Switch 1)
+### `ui/` (Switch 1 HOME Menu, until a Switch 2 rip exists)
 
 | File | The sound |
 | --- | --- |
@@ -92,7 +95,7 @@ Save each file under one folder, in the subfolder and with the name given here (
 | `ui.open`, `ui.close` | A menu or panel opening and closing (Quick Settings, the Home button menu) |
 | `ui.notice` | A pop-up notification |
 
-### `cards/` (LOTR Adventure Card Game, else Gwent)
+### `cards/` (Bicycle Board / Card Games, else Hearthstone)
 
 | File | The sound |
 | --- | --- |
@@ -105,7 +108,7 @@ Save each file under one folder, in the subfolder and with the name given here (
 | `card.discard` | A card sent to the discard pile |
 | `card.exhaust`, `card.ready` | A card turned sideways and back (a slide or tap) |
 
-### `tokens/` (Balatro, else Tabletop Simulator)
+### `tokens/` (Balatro, else Hearthstone)
 
 | File | The sound |
 | --- | --- |
@@ -114,7 +117,7 @@ Save each file under one folder, in the subfolder and with the name given here (
 | `token.progress` | A lighter, brighter token |
 | `token.remove` | Tokens cleared off a card |
 
-### `combat/` (Shadow of Mordor or Shadow of War, else BFME II)
+### `combat/` (The Battle for Middle-earth, else The Witcher 3)
 
 | File | The sound |
 | --- | --- |
@@ -125,7 +128,7 @@ Save each file under one folder, in the subfolder and with the name given here (
 | `combat.troll` | A troll roar (a large enemy) |
 | `combat.nazgul` | A Nazgûl scream (a Nazgûl revealed; BFME has the best one) |
 
-### `dread/` (Darkest Dungeon, else BFME II)
+### `dread/` (Darkest Dungeon, else The Battle for Middle-earth)
 
 | File | The sound |
 | --- | --- |
