@@ -12,6 +12,7 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 import { ownerWords } from "../words/owner.ts";
 import { prisonerWords } from "../readouts/widgets.ts";
 import { pelennorDetail } from "./pelennor-preview.ts";
+import { keptDetail } from "../readouts/wizards-quest.ts";
 import { angmarDetail } from "./angmar-preview.ts";
 import { barrowDetail } from "../readouts/standalone-scenarios/barrow-downs.ts";
 import { ungolDetail } from "./ungol-preview.ts";
@@ -55,6 +56,8 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (stone) return stone;
   const flame = flameDetail(game, cardId, name);
   if (flame) return flame;
+  const kept = keptDetail(game, cardId, name);
+  if (kept) return kept;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
   const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name);
