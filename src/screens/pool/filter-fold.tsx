@@ -7,10 +7,9 @@ import Animated, { useAnimatedStyle, useSharedValue, type SharedValue } from "re
 
 import { useOpenMotion } from "../../ui/motion-run";
 import { MOTION } from "../../ui/motion-tokens";
-import { withAlphaHex } from "../../ui/tokens";
 import { useUiScale } from "../../ui/ui-scale";
 import { usePalette } from "../kit/palette-hook";
-import { OPEN_FOLD, foldOnScroll, openAt } from "./scroll-fold";
+import { OPEN_FOLD, foldOnScroll, openAt, shadeOf } from "./scroll-fold";
 
 export type FilterFoldState = {
   // Whether the filters fold at all here: they then sit over the top of the list (FilterFold), and the list starts under them.
@@ -52,7 +51,7 @@ export function useFilterFold(enabled: boolean, shown: unknown): FilterFoldState
     const from = last.round === round ? last.fold : openAt(last.y);
     const fold = foldOnScroll(from, contentOffset.y, contentSize.height - layoutMeasurement.height, height);
     state.current = { round, fold, y: contentOffset.y };
-    scrolled.set(Math.min(Math.max(0, contentOffset.y), 64));
+    scrolled.set(Math.min(Math.max(0, contentOffset.y), 96));
     setFolded(fold.folded);
   };
   const reveal = () => {
@@ -66,19 +65,20 @@ export function useFilterFold(enabled: boolean, shown: unknown): FilterFoldState
 /**
  * The filters over the top of the list, which starts under them by their height, so a fold changes no layout and renders nothing
  * under it. Folding lifts them 24 pt and fades them, over `filtersFold` and `filtersUnfold` (reduced motion snaps), clipped at the
- * list's top, so they slide away under the search row. A night shade behind them, solid under the rows and falling to nothing below
- * them, hides the cards that scroll under them; it shows once the list has left its top. It rises with the rows and stops 16 pt under
+ * list's top, so they slide away under the search row. A night shade behind them, solid under the rows and easing to nothing over 56 pt
+ * below them (`shadeOf`), hides the cards that scroll under them; it comes in over the list's first 48 pt of scroll. It rises with the rows and stops 16 pt under
  * the search row, so folded the cards still pass under a short band and never touch the search. It runs as far past the screen's inset
  * as the type chips' row does, so the row reaches the edges; the shade does too where the pool runs to the screen's sides, and keeps to
- * the pool's column (`column`) where a pane stands beside it, so it ends on the cards' edge and not in the gap. Folded, the filters are hidden from a screen reader and take no touch; a
- * keyboard's focus landing in them shows them.
+ * the pool's column (`column`) where a pane stands beside it, so it ends on the cards' edge and not in the gap. Folded, the filters are
+ * hidden from a screen reader and take no touch; a keyboard's focus landing in them shows them.
  */
 export function FilterFold({ fold, column = false, children }: { fold: FilterFoldState; column?: boolean; children: ReactNode }) {
   const palette = usePalette();
   const s = useUiScale();
   const { progress } = useOpenMotion(!fold.folded, MOTION.filtersUnfold, MOTION.filtersFold);
   const lift = 24 * s;
-  const fall = 24 * s;
+  const fall = 56 * s;
+  const comeIn = 48 * s;
   const band = 16 * s;
   const scrolled = fold.scrolled;
   // How far the shade rises when folded: all of its solid part but the band.
@@ -88,11 +88,9 @@ export function FilterFold({ fold, column = false, children }: { fold: FilterFol
     // The words fade a little ahead of the lift, so they are gone before they reach the search row.
     return { opacity: p * p, transform: [{ translateY: -lift * (1 - p) }] };
   });
-  const shade = useAnimatedStyle(() => ({ opacity: Math.min(1, scrolled.get() / fall), transform: [{ translateY: -rise * (1 - progress.get()) }] }));
+  const shade = useAnimatedStyle(() => ({ opacity: Math.min(1, scrolled.get() / comeIn), transform: [{ translateY: -rise * (1 - progress.get()) }] }));
   const height = fold.height + fall;
-  const solid = Math.round((fold.height / height) * 100);
-  const night = withAlphaHex(palette.night, 0.94);
-  const clear = withAlphaHex(palette.night, 0);
+  const gradient = shadeOf(palette.night, fold.height / height);
   return (
     // NativeWind does not style a Reanimated view: the place, the bleed and the clip are the plain view around them, the inset the view
     // inside.
@@ -103,7 +101,7 @@ export function FilterFold({ fold, column = false, children }: { fold: FilterFol
       onFocus={fold.folded ? fold.reveal : undefined}
     >
       <View pointerEvents="none" className={`absolute top-0 ${column ? "left-6 right-6" : "left-0 right-0"}`} style={{ height }}>
-        <Animated.View style={[{ position: "absolute", left: 0, right: 0, top: 0, height, backgroundImage: `linear-gradient(180deg, ${night} ${solid}%, ${clear} 100%)` }, shade]} />
+        <Animated.View style={[{ position: "absolute", left: 0, right: 0, top: 0, height, backgroundImage: gradient }, shade]} />
       </View>
       <Animated.View style={rows} aria-hidden={fold.folded} importantForAccessibility={fold.folded ? "no-hide-descendants" : "auto"}>
         <View className="px-6 pb-2" onLayout={(event) => fold.onMeasure(Math.ceil(event.nativeEvent.layout.height))}>

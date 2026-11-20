@@ -204,7 +204,7 @@ Read the sections your task touches.
   - 390–401 Banner (~750) ← 5
   - 402–421 Screen reader (~3.0K) ← 19
   - 422–425 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~36.1K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~36.2K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~750) ← 1
   - 35–45 Performance (~720) ← 4
