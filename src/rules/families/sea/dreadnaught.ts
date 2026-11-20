@@ -15,9 +15,11 @@ import { lastPicked, pickedList } from "../../interpret/player-verbs.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { gameReads } from "../../core/game-reads.ts";
-import { moveEncounter } from "../encounter/moves.ts";
+import { effectData, moveEncounter } from "../encounter/moves.ts";
+import { announceEnteredHand } from "../island/hand.ts";
 import { markPicked } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
 
@@ -88,4 +90,40 @@ export function gainHeroTraits(state: ScenarioState, ctx: ReduceContext, focus: 
 /** The attacker may not be declared against the Dreadnaught while the flag holds on it (a character "engaged player cannot attack the Dreadnaught" bars, 40014:A:2). */
 export function barredFromDreadnaught(state: ScenarioState, attackerId: string, enemyId: string, cards: ReadonlyMap<string, PrintedCard>): boolean {
   return state.modifiers.length > 0 && flagged(state, attackerId, "cannotAttackDreadnaught") && printedOf(cards, state.cards[enemyId]?.code ?? "").name === "Dreadnaught";
+}
+
+const DONE = "done";
+const MOST_COPIES = 3;
+const COLLECTION = "collection:";
+
+/** AddEventsToHand (40009:B:2): the actor chooses up to `upTo` events, one at a time, from their discard pile and from the collection, and adds them to their hand; they may stop. A title already held in 3 copies (deck, hand, discard pile, play and the cards added) is not offered
+ * again (rr.deckbuilding). An event of the collection is made in the hand: the game did not hold it. */
+export function addEventsToHand(state: ScenarioState, instruction: Extract<Instruction, { verb: "AddEventsToHand" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const taken = [...(instruction.taken ?? [])];
+  let next = state;
+  const answer = focus.chosen;
+  const seat = focus.seat;
+  const pile = next.seats[seat];
+  if (!pile || next.seats[seat]?.eliminated) return state;
+  if (answer === DONE) return state;
+  if (answer) {
+    if (answer.startsWith(COLLECTION)) next = spawn(next, answer.slice(COLLECTION.length), { zone: "hand", seat }).state;
+    else next = announceEnteredHand(next, moveCard(next, answer, { zone: "hand", seat }), seat, ctx);
+    taken.push(answer);
+  }
+  if (taken.length >= instruction.upTo) return next;
+  const held = (title: string): number => {
+    const mine = next.seats[seat];
+    const ids = [...(mine?.deck ?? []), ...(mine?.hand ?? []), ...(mine?.discard ?? []), ...(mine?.play ?? [])];
+    return ids.filter((id) => printedOf(ctx.cards, next.cards[id]?.code ?? "").name === title).length;
+  };
+  const events = (ids: readonly string[]): string[] => ids.filter((id) => printedOf(ctx.cards, next.cards[id]?.code ?? "").type === "event" && held(printedOf(ctx.cards, next.cards[id]?.code ?? "").name) <= MOST_COPIES);
+  const fromDiscard = events(next.seats[seat]?.discard ?? []).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
+  const fromCollection = [...ctx.cards.values()]
+    .filter((printed) => printed.type === "event" && printed.sphere != null && held(printed.name) < MOST_COPIES)
+    .map((printed) => `${COLLECTION}${printed.code}`)
+    .sort();
+  const options = [...fromDiscard, ...fromCollection];
+  if (options.length === 0) return next;
+  return effectData(next) ? askTarget(next, { instruction: { ...instruction, taken }, seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, [...options, DONE]) : next;
 }

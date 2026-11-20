@@ -130,7 +130,7 @@ export const ENCOUNTER: readonly (Effect | Copy)[] = [
     instructions: [
       { verb: "Pick", pick: { ...ANY_ENEMY, stagingOnly: true, highestEngagementCost: true, who: "firstPlayer" } },
       { verb: "EngageFirstPlayer", target: "picked" },
-      { verb: "AttackWithPicked" },
+      { verb: "AttackWithPicked", who: "firstPlayer" },
       { verb: "GainSurge", when: { kind: "noneReturned" } },
     ],
   },

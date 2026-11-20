@@ -35,6 +35,7 @@ export const SHIPS: readonly (Effect | Copy)[] = [
 
   // 40009 Silent Mist. A: the starting hand is 8 cards, a Setup draw of 2 after the mulligan (reading 3); Action: an event costing 3 or more is played for 1 less. B: up to 2 events of the discard pile (and the collection) go to the hand; the Action is 2 cheaper.
   { id: "40009:constant:1", cardCode: "40009", lines: ["40009:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "startingHand", amount: 2, until: "whileSourceInPlay", target: "actorSeat" }] },
+  flipResponse("40009", "40009:B:2", [{ verb: "AddEventsToHand", upTo: 2 }]),
   { id: "40009:action:1", cardCode: "40009", lines: ["40009:A:3"], timing: "action", instructions: [{ verb: "PlayFromHand", pick: { type: "card", control: "you", cardType: "event", minCost: 3 }, reduce: 1, min: 0 }] },
   { id: "40009:action:2", cardCode: "40009", lines: ["40009:B:3"], timing: "action", instructions: [{ verb: "PlayFromHand", pick: { type: "card", control: "you", cardType: "event", minCost: 3 }, reduce: 2, min: 0 }] },
 
@@ -129,7 +130,7 @@ export const SHIPS: readonly (Effect | Copy)[] = [
   },
   // 40015 Commander of the Dreadnaught: after it attacks you, the Dreadnaught attacks you.
   noDreadnaught("40015", "40015:A:2"),
-  afterAttacks("40015", "40015:A:3", 1, [{ verb: "Pick", pick: DREADNAUGHT_PICK }, { verb: "ImmediateAttackBy", target: "picked" }]),
+  afterAttacks("40015", "40015:A:3", 1, [{ verb: "Pick", pick: DREADNAUGHT_PICK }, { verb: "AttackWithPicked" }]),
   // 40016 Descendant of Castamir: after it engages you, the top 2 Corsair cards go into play engaged with you, each dealt 1 shadow card.
   noDreadnaught("40016", "40016:A:2"),
   { id: "40016:forced:1", cardCode: "40016", lines: ["40016:A:3"], timing: "forced", trigger: "engaged", subject: "self", eventSeat: "you", instructions: [{ verb: "RevealCorsair", count: 2, shadow: 1 }] },

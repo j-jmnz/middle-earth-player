@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { flagged } from "../../core/state.ts";
 import { codesIn, fightEnemy, idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { eliminateWithoutShip } from "./dreadnaught.ts";
+import { spawn } from "../../core/zones.ts";
 import { pillageAmount } from "./pillage.ts";
 import { corsairTrait, stampRoutes } from "./routes.ts";
 
@@ -116,5 +117,62 @@ describe("40021:A:1 Pillage", () => {
       expect(before - (fight.run.state.seats[0]?.deck.length ?? 0), `undefended ${undefended}`).toBe(2);
       expect((fight.run.state.seats[0]?.discard.length ?? 0) - (fight.start.seats[0]?.discard.length ?? 0), `undefended ${undefended}`).toBeGreaterThanOrEqual(2);
     }
+  });
+});
+
+describe("40009:B:2 Silent Mist's Response", () => {
+  const withDiscard = () => {
+    const made = table({});
+    const state = [0, 1].reduce((current) => spawn(current, "event", { zone: "discard", seat: 0 }).state, made.state);
+    return { made, state };
+  };
+
+  it("adds up to 2 events from the discard pile or the collection to the hand, one at a time, and the player may stop", () => {
+    const { made, state } = withDiscard();
+    const handBefore = state.seats[0]?.hand.length ?? 0;
+    let asked = 0;
+    const stop = resolveRecords(state, made.ctx, "40009", "response", undefined, (current) => {
+      asked += 1;
+      return asked === 1 ? (current.window?.kind === "choose" ? (current.window.options[0] ?? "") : "") : "done";
+    });
+    expect((stop.state.seats[0]?.hand.length ?? 0) - handBefore).toBe(1);
+    expect(stop.state.seats[0]?.discard.length).toBe(1);
+    let both = 0;
+    const two = resolveRecords(state, made.ctx, "40009", "response", undefined, (current) => {
+      both += 1;
+      return current.window?.kind === "choose" ? (current.window.options[0] ?? "") : "";
+    });
+    expect((two.state.seats[0]?.hand.length ?? 0) - handBefore).toBe(2);
+    expect(both).toBeGreaterThanOrEqual(2);
+  });
+
+  it("offers an event of the collection as a card made in the hand, never a third copy of a title already held in 3", () => {
+    const { made, state } = withDiscard();
+    const full = [0, 1, 2].reduce((current) => spawn(current, "event", { zone: "deck", seat: 0 }).state, state);
+    const options: string[] = [];
+    resolveRecords(full, made.ctx, "40009", "response", undefined, (current) => {
+      if (current.window?.kind === "choose") options.push(...current.window.options);
+      return "done";
+    });
+    expect(options).toContain("done");
+    expect(options.filter((option) => option.startsWith("collection:"))).not.toContain("collection:event");
+  });
+});
+
+describe("40015:A:3 Commander of the Dreadnaught and 40043:A:1 Out of the Mist", () => {
+  it("40015:A:3 after Commander attacks you, the Dreadnaught, which stays in the staging area, attacks you", () => {
+    const made = table({ phase: "Combat", engaged: [{ code: "40015", seat: 0 }], staging: ["40013"], seats: 2 });
+    const run = resolveRecords(made.state, made.ctx, "40015", "forced", idOf(made.state, "40015"));
+    const attack = run.state.pendingAttack;
+    expect(attack ? run.state.cards[attack.enemyId]?.code : null).toBe("40013");
+    expect(attack?.seat).toBe(0);
+  });
+
+  it("40043:A:1 the staged enemy with the highest engagement cost attacks the first player, and Out of the Mist gains no surge when it did", () => {
+    const made = table({ phase: "Encounter", staging: ["40013"], seats: 2, firstPlayer: 1 });
+    const run = resolveRecords(made.state, made.ctx, "40043", "whenRevealed", undefined);
+    const attack = run.state.pendingAttack;
+    expect(attack ? run.state.cards[attack.enemyId]?.code : null).toBe("40013");
+    expect(attack?.seat).toBe(1);
   });
 });

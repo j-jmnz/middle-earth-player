@@ -9,6 +9,7 @@ export const DREADNAUGHT_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>> =
   EngageRandomSetAside: (i) => ({ text: `put 1 set-aside unique ${str(i.trait)} enemy chosen at random into play engaged with the acting player, not revealed and dealt no shadow card`, read: ["trait"] }),
   EliminateWithoutShip: () => ({ text: "a player who controls no ship-objective is eliminated from the game (checked once the fleet is prepared)", read: [] }),
   GainHeroTraits: () => ({ text: "the first picked hero gains the printed Traits of the last picked hero until the end of the game", read: [] }),
+  AddEventsToHand: (i) => ({ text: `the acting player chooses up to ${str(i.upTo)} events, one at a time, from their discard pile and from their collection (never a third copy of a title they hold 3 of) and adds them to their hand; they may stop`, read: ["upTo"] }),
   FlipShip: () => ({ text: "the picked Ship objective flips to its Upgraded side, if it shows its Basic side and has an Upgraded side", read: [] }),
 };
 
@@ -18,5 +19,6 @@ export const DREADNAUGHT_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   EngageRandomSetAside: [{ verb: "EngageRandomSetAside", trait: "Corsair" }],
   EliminateWithoutShip: [{ verb: "EliminateWithoutShip" }],
   GainHeroTraits: [{ verb: "GainHeroTraits" }],
+  AddEventsToHand: [{ verb: "AddEventsToHand", upTo: 2 }],
   FlipShip: [{ verb: "FlipShip" }],
 };

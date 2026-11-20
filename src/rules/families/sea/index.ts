@@ -31,7 +31,7 @@ import { shipAttackReason, shipDefenseReason, shipEnemyAttacking, shipObjectives
 import { announceShipsExhausted, noteAttachedToShip } from "./water.ts";
 import { carryToSecondDeck, damageOnMatching, discardAllInPlay, setAsideEncounterDeck } from "./swap.ts";
 import { immuneToEvents } from "./immune.ts";
-import { eliminateWithoutShip, engageRandomSetAside, flipShip, gainHeroTraits, pickFewestHitPoints } from "./dreadnaught.ts";
+import { addEventsToHand, eliminateWithoutShip, engageRandomSetAside, flipShip, gainHeroTraits, pickFewestHitPoints } from "./dreadnaught.ts";
 import { pillage } from "./pillage.ts";
 import { attackOtherPlayers } from "./attacks.ts";
 import { entriesBarred, entriesRefusal, noteEntries } from "./entries.ts";
@@ -99,7 +99,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "TakeControlAsShip":
       return takeControlAsShip(state, focus);
     case "AttackWithPicked":
-      return attackWithPicked(state, instruction, ctx, steps);
+      return attackWithPicked(state, instruction, focus, ctx, steps);
     case "SetAsideEncounterDeck":
       return setAsideEncounterDeck(state, instruction);
     case "AttackOtherPlayers":
@@ -118,6 +118,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return gainHeroTraits(state, ctx, focus);
     case "FlipShip":
       return flipShip(state, ctx);
+    case "AddEventsToHand":
+      return addEventsToHand(state, instruction, focus, ctx, steps);
     // A constant the engine reads when an ally is played or put into play (families/sea/entries.ts).
     case "EliminateWithoutShip":
     case "LimitEntries":
@@ -144,4 +146,4 @@ const SEA_TRAVEL: TravelHooks = {
   unpayable: (state, instruction) => instruction.verb === "RevealCorsair" && !corsairHolds(state),
 };
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx, steps) => eliminateWithoutShip(noteEntries(announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx), ctx), ctx, steps) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked", "SetAsideEncounterDeck", "CarryToSecondDeck", "AttackOtherPlayers", "DiscardAllInPlay", "LimitEntries", "TravelOrAddResources", "TravelOrRaiseThreat", "Pillage", "PickFewestHitPoints", "EngageRandomSetAside", "GainHeroTraits", "FlipShip", "EliminateWithoutShip"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT, travel: SEA_TRAVEL, play: (state, cardId, ctx, how) => entriesBarred(state, cardId, ctx, how.seat), playReason: entriesRefusal, pick: (state, id, _spec, at, ctx) => immuneToEvents(state, id, at, ctx), amount: (state, amount, scope, ctx) => (amount.damageOn ? damageOnMatching(state, amount.damageOn, scope, ctx) : null), condition: (state, condition, scope) => (condition.kind === "lastPlayer" ? scope.actor === lastPlayer(state) : null) };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx, steps) => eliminateWithoutShip(noteEntries(announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx), ctx), ctx, steps) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked", "SetAsideEncounterDeck", "CarryToSecondDeck", "AttackOtherPlayers", "DiscardAllInPlay", "LimitEntries", "TravelOrAddResources", "TravelOrRaiseThreat", "Pillage", "PickFewestHitPoints", "EngageRandomSetAside", "GainHeroTraits", "FlipShip", "EliminateWithoutShip", "AddEventsToHand"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT, travel: SEA_TRAVEL, play: (state, cardId, ctx, how) => entriesBarred(state, cardId, ctx, how.seat), playReason: entriesRefusal, pick: (state, id, _spec, at, ctx) => immuneToEvents(state, id, at, ctx), amount: (state, amount, scope, ctx) => (amount.damageOn ? damageOnMatching(state, amount.damageOn, scope, ctx) : null), condition: (state, condition, scope) => (condition.kind === "lastPlayer" ? scope.actor === lastPlayer(state) : null) };

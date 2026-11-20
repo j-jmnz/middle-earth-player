@@ -88,7 +88,8 @@ const VERBS = [
   // "The engaged Ship enemy with the highest Attack makes an immediate attack. Until the end of the phase, add 1 to the total Threat in the staging area for each damage dealt by this attack" (12131:A:1): the last picked
   // enemy makes an immediate attack (counted for noneReturned like any attack made by an effect); with `raiseStagingThreat`, when the attack ends the total Threat in the staging area is raised, until the phase or the
   // round ends, by the damage the attack dealt.
-  z.strictObject({ verb: z.literal("AttackWithPicked"), raiseStagingThreat: z.enum(["endOfPhase", "endOfRound"]).optional(), ...when }),
+  // `who` (the Dreadnaught, an enemy that stays in the staging area but attacks every player): the player attacked when the picked enemy is in the staging area, the actor by default (40015:A:3, "the Dreadnaught attacks you") or the first player (40043:A:1).
+  z.strictObject({ verb: z.literal("AttackWithPicked"), raiseStagingThreat: z.enum(["endOfPhase", "endOfRound"]).optional(), who: z.literal("firstPlayer").optional(), ...when }),
   // "Set the current encounter deck and discard pile aside, inactive" (12148:B:1, dcce.from-sea-to-land): every card of the encounter deck and its discard pile goes to the set-aside zone, and the Corsair
   // piles are left alone. `carry`: the cards with these codes are the ones the stage's search "shuffles into the second encounter deck" ("each copy of Battle-hardened and each copy of Watch Tower"): they
   // stay in the encounter deck, those in the discard pile moving to it, and are not set aside. Copies in play stay in play. The second deck is the encounter set the stage's Setup set aside: ShuffleSetAsideSet
@@ -129,6 +130,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("EliminateWithoutShip"), ...when }),
   // "Until the end of the game, that hero gains the printed Traits of another hero you control" (40006:A:3): the second-last picked hero (the first pick) gains the printed Traits of the last picked one.
   z.strictObject({ verb: z.literal("GainHeroTraits"), ...when }),
+  // "Choose up to 2 events from your discard pile and/or your collection and add them to your hand (following deckbuilding rules)" (40009:B:2, docs/brief.md, The Hunt for the Dreadnaught, reading 10): the actor chooses up to `upTo` event cards one at a time and may stop:
+  // events of their discard pile, and events of the collection (every deck-legal event the world holds), a copy of a title they hold 3 of in the deck, hand, discard pile and play with the ones added not offered. A collection card is a card the game did not hold: it is made in the hand. `taken` is engine use: the answers so far.
+  verbFlags(z.strictObject({ verb: z.literal("AddEventsToHand"), upTo: z.number().int().positive(), taken: z.array(z.string()).optional(), ...when }), { collection: "event" }),
   // "Flip it to its Upgraded side" (40034:A:1): the last picked Ship objective, if it shows its Basic side and has an Upgraded side, flips to it, keeping its damage and tokens, and hears `flipped`.
   z.strictObject({ verb: z.literal("FlipShip"), ...when }),
 ] as const;

@@ -1,0 +1,920 @@
+Scenario piles that place cards with no record (quest: 40004 Searching the High Seas; quest: 40005 Destroy the Dreadnaught; setAside: 40014 Captain of the Haven; setAside: 40015 Commander of the Dreadnaught; setAside: 40016 Descendant of Castamir; setAside: 40017 Hydraken; setAside: 40018 Ophidian; setAside: 40019 Varjax; setAside: 40006 Eithiliant; setAside: 40007 Golden Wing; setAside: 40008 Pride of Lebennin; setAside: 40009 Silent Mist; setAside: 40010 Swan Ship of Dol Amroth; setAside: 40011 Twilight's Call; setAside: 40012 Gondorian Warship; setAside: 40013 Dreadnaught; corsairDeck: 40020 Brash Corsair; corsairDeck: 40021 Corsair Plunderer; corsairDeck: 40022 Daring Buccaneer; corsairDeck: 40023 Fierce Marauder; corsairDeck: 40024 Southron Sailor; corsairDeck: 40025 Umbar Captain)
+
+## 40001 Easy Mode
+
+40001:A:1 (front): Setup:
+  40001:setup:1: Setup (record also names 40001:A:2)
+    - [json PrepareFleet {"verb":"PrepareFleet","own":true}]
+  40001:setup:2: Setup (record also names 40001:A:3)
+    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck","trait":"Corsair"}]
+  40001:setup:3: Setup (record also names 40001:A:4)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the copy of the card with code 40026 in the encounter deck is set aside, out of play
+    - the copy of the card with code 40029 in the encounter deck is set aside, out of play
+  40001:setup:4: Setup (record also names 40001:A:5)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - search the encounter deck, discard pile and victory display for the card with code 40035 and add it to the staging area (not revealed; nothing when none is found)
+    - shuffle the encounter deck
+  40001:setup:5: Setup (record also names 40001:A:6)
+    - for each player, first player first:
+      - each hero the acting player controls gains 1 resource(s)
+  40001:setup:6: Setup (record also names 40001:A:7)
+    (no instructions)
+
+40001:A:2 (front): • Players prepare their fleet.
+  40001:setup:1: Setup (record also names 40001:A:1)
+    - [json PrepareFleet {"verb":"PrepareFleet","own":true}]
+
+40001:A:3 (front): • Prepare the Corsair deck.
+  40001:setup:2: Setup (record also names 40001:A:1)
+    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck","trait":"Corsair"}]
+
+40001:A:4 (front): • Set the following enemies aside: all 7 unique enemies (including the Dreadnaught), 2 copies of Black Sails, and 1 copy of Corsair Warship.
+  40001:setup:3: Setup (record also names 40001:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the copy of the card with code 40026 in the encounter deck is set aside, out of play
+    - the copy of the card with code 40029 in the encounter deck is set aside, out of play
+
+40001:A:5 (front): • Add the Cobas Haven location to the staging area. Shuffle the encounter deck.
+  40001:setup:4: Setup (record also names 40001:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - search the encounter deck, discard pile and victory display for the card with code 40035 and add it to the staging area (not revealed; nothing when none is found)
+    - shuffle the encounter deck
+
+40001:A:6 (front): • Add 1 resource to each hero's resource pool.
+  40001:setup:5: Setup (record also names 40001:A:1)
+    - for each player, first player first:
+      - each hero the acting player controls gains 1 resource(s)
+
+40001:A:7 (front): • Flip this card over and place it next to the quest deck.
+  40001:setup:6: Setup (record also names 40001:A:1)
+    (no instructions)
+
+40001:B:1 (back): Each player draws 1 additional card during the resource phase.
+  40001:constant:1: Constant
+    - each player: stat extraDraw 1, while this card is in play
+
+40001:B:2 (back): Quest Action: Deal 10 damage to a non-unique enemy engaged with a player in any group. (Group limit once per game.)
+  40001:action:1: Action (limit oncePerGameGroup)
+    only if there is a non-unique enemy (any player controls) to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique enemy (any player controls)
+    - deal 10 damage to the picked card
+
+40001:B:3 (back): If a player controls no ship-objective, that player is eliminated from the game.
+  40001:constant:3: Constant
+    - a player who controls no ship-objective is eliminated from the game (checked once the fleet is prepared)
+
+## 40002 Standard Mode
+
+40002:A:1 (front): Setup:
+  40002:setup:1: Setup (record also names 40002:A:2)
+    - [json PrepareFleet {"verb":"PrepareFleet","own":true}]
+  40002:setup:2: Setup (record also names 40002:A:3)
+    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck","trait":"Corsair"}]
+  40002:setup:3: Setup (record also names 40002:A:4)
+    (no instructions)
+  40002:setup:4: Setup (record also names 40002:A:5)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - discard cards from the top of the encounter deck until 1 location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area
+  40002:setup:5: Setup (record also names 40002:A:6)
+    (no instructions)
+
+40002:A:2 (front): • Players prepare their fleet.
+  40002:setup:1: Setup (record also names 40002:A:1)
+    - [json PrepareFleet {"verb":"PrepareFleet","own":true}]
+
+40002:A:3 (front): • Prepare the Corsair deck.
+  40002:setup:2: Setup (record also names 40002:A:1)
+    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck","trait":"Corsair"}]
+
+40002:A:4 (front): • Set aside all 7 unique enemies (including the Dreadnaught).
+  40002:setup:3: Setup (record also names 40002:A:1)
+    (no instructions)
+
+40002:A:5 (front): • Shuffle the encounter deck and discard cards from the top until 2 locations are discarded (3 locations instead if there are 3 or more players). Add those locations to the staging area.
+  40002:setup:4: Setup (record also names 40002:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - discard cards from the top of the encounter deck until 1 location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area
+
+40002:A:6 (front): • Flip this card over and place it next to the quest deck.
+  40002:setup:5: Setup (record also names 40002:A:1)
+    (no instructions)
+
+40002:B:1 (back): Quest Action: Deal 10 damage to a non-unique enemy engaged with a player in any group. Reveal the top card of the encounter deck. (Group limit once per game.)
+  40002:action:1: Action (limit oncePerGameGroup)
+    only if there is a non-unique enemy (any player controls) to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique enemy (any player controls)
+    - deal 10 damage to the picked card
+    - the acting player reveals an encounter card
+
+40002:B:2 (back): If a player controls no ship-objective, that player is eliminated from the game.
+  40002:constant:3: Constant
+    - a player who controls no ship-objective is eliminated from the game (checked once the fleet is prepared)
+
+## 40004 Searching the High Seas
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+40004:B:1 (back): *This stage has a global quest point value of 8 per player among all groups.
+  40004:constant:1: Constant
+    - this card: stat questPoints the number of players x 8, while this card is in play
+
+40004:B:2 (back): No more than 5 PerPlayer progress can be placed on this stage each round.
+  40004:constant:2: Constant
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) the number of players x 5, while this card is in play
+
+40004:B:3 (back): The players can only advance at the end of the quest phase.
+  40004:constant:3: Constant
+    only if it is the Quest phase
+    - the players cannot defeat this stage while this holds
+
+## 40005 Destroy the Dreadnaught
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+40005:A:1 (front): When Revealed: Add the set-aside Dreadnaught enemy to the staging area, Elite side faceup.
+  40005:whenRevealed:1: When revealed
+    - one set-aside card with code 40013 joins the staging area (it is not revealed)
+
+40005:B:1 (back): No more than 5 PerPlayer progress can be placed on this stage each round.
+  40005:constant:1: Constant
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) the number of players x 5, while this card is in play
+
+40005:B:2 (back): Action: Remove 5 PerPlayer progress from this stage to choose any group to shuffle 1 set aside Gondorian Warship card into their encounter deck.
+  40005:action:1: Action
+    only if a copy of the card with code 40012 is set aside, out of play
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RemoveQuestProgress {"verb":"RemoveQuestProgress","perPlayer":5}]
+    - [json ShuffleRandomSetAside {"verb":"ShuffleRandomSetAside","name":"Gondorian Warship"}]
+    - shuffle the encounter deck
+
+40005:B:3 (back): Response: When the Dreadnaught attacks you, raise your threat by 4 to cancel the attack.
+  40005:response:1: Response on the event enemyAttacks (heard about enemy (any player controls) named "Dreadnaught"; event happened to the controller; cost: raise your threat by 4)
+    - [json CancelAttack {"verb":"CancelAttack"}]
+
+40005:B:4 (back): When the Dreadnaught is destroyed, the players win the game.
+  40005:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Dreadnaught")
+    - the players win the game
+
+## 40006 Eithiliant
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40006:A:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40006:A:2 (front): Each hero you control gets +1 Willpower.
+  40006:constant:1: Constant
+    - each hero (you control): stat willpower 1, while this card is in play
+
+40006:A:3 (front): Setup: Choose a hero you control. Until the end of the game, that hero gains the printed Traits of another hero you control.
+  40006:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - choose hero (you control) other than the cards this effect already picked
+    - the first picked hero gains the printed Traits of the last picked hero until the end of the game
+
+40006:B:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40006:B:2 (back): Each hero you control gets +2 Willpower.
+  40006:constant:2: Constant
+    - each hero (you control): stat willpower 2, while this card is in play
+
+40006:B:3 (back): Response: After Eithiliant flips, shuffle up to 6 cards from your discard pile into your deck. Place 6 progress on a location in any group.
+  40006:response:1: Response on the event flipped (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each card (you control) in the discard pile (up to 6 chosen):
+      - [json PutOnDeck {"verb":"PutOnDeck","position":"shuffle","target":"picked"}]
+    - choose location (any player controls)
+    - place 6 progress on the picked card
+
+## 40007 Golden Wing
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40007:A:1: Immune to player card effects. Ranged. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40007:A:2 (front): Each hero you control gets +1 hit point.
+  40007:constant:1: Constant
+    - each hero (you control): stat hitPoints 1, while this card is in play
+
+40007:A:3 (front): Setup: Reduce your threat by 3. Choose a hero you control. Until the end of the game, that hero gains ranged.
+  40007:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - lower threat by 3 (the acting player)
+    - choose hero (you control)
+    - the picked card: stat ranged 1, until the end of the game
+
+40007:B:1: Immune to player card effects. Ranged. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40007:B:2 (back): Each hero you control gets +2 hit points and gains ranged.
+  40007:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each hero (you control): stat hitPoints 2, while this card is in play
+    - each hero (you control): stat ranged 1, while this card is in play
+
+40007:B:3 (back): Response: After Golden Wing flips, deal 6 damage to an enemy in any group.
+  40007:response:1: Response on the event flipped (heard about this card)
+    only if there is a enemy (any player controls) or in the staging area to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area
+    - deal 6 damage to the picked card
+
+## 40008 Pride of Lebennin
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40008:A:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40008:A:2 (front): Each hero you control gets +1 Defense.
+  40008:constant:1: Constant
+    - each hero (you control): stat defense 1, while this card is in play
+
+40008:A:3 (front): Forced: When you draw your starting hand, draw 5 additional cards, then shuffle 5 cards from your hand into your deck. You cannot take a mulligan.
+  40008:forced:1: Forced on the event setupHandDrawn
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player draws 5 card(s)
+    - the actor must choose 5 of the card (you control) in hand to keep (all stay with no more than that many; nothing is asked then); for each of the others (the chosen ones get the steps in the second list):
+
+40008:B:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40008:B:2 (back): Each hero you control gets +2 Defense.
+  40008:constant:2: Constant
+    - each hero (you control): stat defense 2, while this card is in play
+
+40008:B:3 (back): Response: After Pride of Lebennin flips, heal 2 damage from a character. Choose up to 2 cards from the encounter discard pile and add them to the victory display.
+  40008:response:1: Response on the event flipped (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls)
+    - heal 2 damage from the picked card
+    - for each card (any player controls) encounterDiscard (up to 2 chosen):
+      - the picked card is added to the victory display
+
+## 40009 Silent Mist
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40009:A:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40009:A:2 (front): Your starting hand size is 8 cards.
+  40009:constant:1: Constant
+    - actorSeat: stat startingHand 2, while this card is in play
+
+40009:A:3 (front): Action: Play an event from your hand with a cost of 3 or more, reducing its cost by 1.
+  40009:action:1: Action
+    - the acting player plays a card (you control) of card type event, with a printed cost of at least 3 (a card with no printed cost never matches) from their hand as part of the effect, its cost reduced by 1 (not below 0)
+
+40009:B:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40009:B:2 (back): Response: After Silent Mist flips, choose up to 2 events from your discard pile and/or your collection and add them to your hand (following deckbuilding rules).
+  40009:response:1: Response on the event flipped (heard about this card)
+    - the acting player chooses up to 2 events, one at a time, from their discard pile and from their collection (never a third copy of a title they hold 3 of) and adds them to their hand; they may stop
+
+40009:B:3 (back): Action: Play an event from your hand with a cost of 3 or more, reducing its cost by 2.
+  40009:action:2: Action
+    - the acting player plays a card (you control) of card type event, with a printed cost of at least 3 (a card with no printed cost never matches) from their hand as part of the effect, its cost reduced by 2 (not below 0)
+
+## 40010 Swan Ship of Dol Amroth
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40010:A:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40010:A:2 (front): Setup: Add 1 resource to each of your heroes' resource pools.
+  40010:setup:1: Setup
+    - each hero the acting player controls gains 1 resource(s)
+
+40010:A:3 (front): Action: Spend 2 resources to ready a character. (Limit once per round.)
+  40010:action:1: Action (limit once per round)
+    only if all of: ([json condition {"kind":"resources","min":2}]) and (there is a exhausted character (any player controls) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SpendResources {"verb":"SpendResources","amount":2}]
+    - choose exhausted character (any player controls)
+    - ready the picked card
+
+40010:B:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40010:B:2 (back): Response: After Swan Ship of Dol Amroth flips, add 2 resources to a hero's resource pool. Ready a card.
+  40010:response:1: Response on the event flipped (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - add 2 resources to the picked card
+    - choose exhausted card (any player controls)
+    - ready the picked card
+
+40010:B:3 (back): Action: Spend 1 resource to ready a card. (Limit once per round.)
+  40010:action:2: Action (limit once per round)
+    only if all of: ([json condition {"kind":"resources","min":1}]) and (there is a exhausted card (any player controls) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SpendResources {"verb":"SpendResources","amount":1}]
+    - choose exhausted card (any player controls)
+    - ready the picked card
+
+## 40011 Twilight's Call
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40011:A:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40011:A:2 (front): The first card you play each round does not require a resource match.
+  40011:constant:1: Constant
+    - [json IgnoreResourceMatch {"verb":"IgnoreResourceMatch","pick":{"type":"card","control":"you"},"firstEachRound":true}]
+
+40011:A:3 (front): Action: Play an ally or attachment from your hand. (Limit once per round.)
+  40011:action:1: Action (limit once per round)
+    - the acting player chooses one of:
+      * option "ally" (only if there is a card (you control) in hand, of card type ally to choose):
+        - the acting player plays a card (you control) of card type ally from their hand as part of the effect
+      * option "attachment" (only if there is a card (you control) in hand, of card type attachment to choose):
+        - the acting player plays a card (you control) of card type attachment from their hand as part of the effect
+
+40011:B:1: Immune to player card effects. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40011:B:2 (back): Each card you play does not require a resource match.
+  40011:constant:2: Constant
+    - [json IgnoreResourceMatch {"verb":"IgnoreResourceMatch","pick":{"type":"card","control":"you"}}]
+
+40011:B:3 (back): Response: After Twilight's Call flips, draw 3 cards.
+  40011:response:1: Response on the event flipped (heard about this card)
+    - the acting player draws 3 card(s)
+
+40011:B:4 (back): Action: Play an ally or attachment from your hand.
+  40011:action:2: Action
+    - the acting player chooses one of:
+      * option "ally" (only if there is a card (you control) in hand, of card type ally to choose):
+        - the acting player plays a card (you control) of card type ally from their hand as part of the effect
+      * option "attachment" (only if there is a card (you control) in hand, of card type attachment to choose):
+        - the acting player plays a card (you control) of card type attachment from their hand as part of the effect
+
+## 40012 Gondorian Warship
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40012:A:1: Immune to player card effects. Ranged. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40012:A:2 (front): When Revealed: Choose a player. That player gains control of Gondorian Warship.
+  40012:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls) chosen by the first player
+    - the effect goes on with the picked player as the acting player
+    - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
+
+40012:A:3 (front): Forced: When Gondorian Warship is destroyed, set it aside, out of play.
+  40012:forced:1: Forced on the event characterDestroyed (heard about this card)
+    - [json SetAsideSelf {"verb":"SetAsideSelf"}]
+
+40012:A:4 (shadow): Shadow: Deal 5 damage to attacking enemy.
+  40012:shadow:1: Shadow
+    - deal 5 damage to the attacking enemy
+
+## 40013 Dreadnaught
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40013:A:1 (front): Archery 1 PerPlayer. Massive. Immune to player card effects. Cannot take more than 5 PerPlayer damage each round.
+  40013:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat archeryPlayers 1, while this card is in play
+    - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat leavesStagingWhenDefeated (it cannot leave the staging area, except that damage that destroys it discards it) 1, while this card is in play
+    - this card: stat damageCap the number of players x 5, while this card is in play
+
+40013:A:2 (front): *The Dreadnaught has a global hit point value of 15 per player among all groups.
+  40013:constant:2: Constant
+    - this card: stat hitPoints the number of players x 15, while this card is in play
+
+40013:A:3 (front): Forced: At the end of the round, if the Dreadnaught has less than half of its starting hit points, flip it over.
+  40013:forced:1: Forced at the end of the round
+    only if remaining hit points of this card (its hit points less its damage, at least 0) x 2 is less than hit points of this card
+    - [json FlipCard {"verb":"FlipCard"}]
+
+40013:B:1 (back): Massive. Immune to player card effects. Cannot take more than 5 PerPlayer damage each round.
+  40013:constant:3: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat leavesStagingWhenDefeated (it cannot leave the staging area, except that damage that destroys it discards it) 1, while this card is in play
+    - this card: stat damageCap the number of players x 5, while this card is in play
+
+40013:B:2 (back): *The Dreadnaught has a global hit point value of 15 per player among all groups.
+  40013:constant:4: Constant
+    - this card: stat hitPoints the number of players x 15, while this card is in play
+
+40013:B:3 (back): Forced: After the Dreadnaught flips, each player puts 1 set-aside unique Corsair enemy into play at random engaged with them.
+  40013:forced:2: Forced on the event flipped (heard about this card)
+    - for each player, first player first:
+      - put 1 set-aside unique Corsair enemy chosen at random into play engaged with the acting player, not revealed and dealt no shadow card
+
+## 40014 Captain of the Haven
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40014:A:1 (front): Immune to player card effects. Pillage 8.
+  (the keyword part is owned by the card's keywords; the records cover: Pillage 8.)
+  40014:constant:1: Constant
+    (no instructions)
+
+40014:A:2 (front): Engaged player cannot attack the Dreadnaught.
+  40014:constant:2: Constant
+    only if this card is engaged with the player
+    - each character (you control): stat cannotAttackDreadnaught 1, while this card is in play
+
+40014:A:3 (front): Forced: At the end of the combat phase, if engaged player has no cards in their deck, that player is eliminated from the game.
+  40014:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (this card is engaged with the player) and (the number of card (you control) in the deck is at most 0)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 40015 Commander of the Dreadnaught
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40015:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40015:A:2 (front): Engaged player cannot attack the Dreadnaught.
+  40015:constant:1: Constant
+    only if this card is engaged with the player
+    - each character (you control): stat cannotAttackDreadnaught 1, while this card is in play
+
+40015:A:3 (front): Forced: After Commander of the Dreadnaught attacks you, the Dreadnaught attacks you.
+  40015:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dreadnaught"
+    - [json AttackWithPicked {"verb":"AttackWithPicked"}]
+
+## 40016 Descendant of Castamir
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40016:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40016:A:2 (front): Engaged player cannot attack the Dreadnaught.
+  40016:constant:1: Constant
+    only if this card is engaged with the player
+    - each character (you control): stat cannotAttackDreadnaught 1, while this card is in play
+
+40016:A:3 (front): Forced: After Descendant of Castamir engages you, put the top 2 cards of the Corsair deck into play engaged with you and deal each of them 1 shadow card.
+  40016:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    - [json RevealCorsair {"verb":"RevealCorsair","count":2,"shadow":1}]
+
+## 40017 Hydraken
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40017:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40017:A:2 (front): Engaged player cannot attack the Dreadnaught.
+  40017:constant:1: Constant
+    only if this card is engaged with the player
+    - each character (you control): stat cannotAttackDreadnaught 1, while this card is in play
+
+40017:A:3 (front): Forced: After Hydraken attacks, he makes an additional attack. Deal him 2 additional shadow cards for this attack and engaged player raises their threat by 4. (Limit once per round.)
+  40017:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; limit once per round)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card is dealt a shadow card
+    - this card is dealt a shadow card
+    - raise threat by 4 (the acting player)
+    - this card (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
+
+## 40018 Ophidian
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40018:A:1 (front): Immune to player card effects. No more than 1 character can attack Ophidian each round.
+  (the keyword part is owned by the card's keywords; the records cover: No more than 1 character can attack Ophidian each round.)
+  40018:constant:1: Constant
+    - this card: stat singleAttacker 1, while this card is in play
+  40018:triggered:1: Triggered (mandatory, not printed as Forced) after a character is declared as an attacker (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    - the event's other card: stat cannotBeAttacked 1, until the end of the round
+
+40018:A:2 (front): Engaged player cannot attack the Dreadnaught.
+  40018:constant:2: Constant
+    only if this card is engaged with the player
+    - each character (you control): stat cannotAttackDreadnaught 1, while this card is in play
+
+40018:A:3 (front): Forced: When a character defends against Ophidian, deal 2 damage to that character.
+  40018:forced:1: Forced after a character is declared as a defender (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    - deal 2 damage to the card the event is about
+
+## 40019 Varjax
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+40019:A:1: Archery 3. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40019:A:2 (front): Engaged player cannot attack the Dreadnaught.
+  40019:constant:1: Constant
+    only if this card is engaged with the player
+    - each character (you control): stat cannotAttackDreadnaught 1, while this card is in play
+
+40019:A:3 (front): For each point of excess combat damage dealt by Varjax, defending player deals 1 damage to a Ship they control.
+  40019:constant:2: Constant
+    - this card: stat excessDamagesShip 1, while this card is in play
+
+## 40020 Brash Corsair
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+40020:A:1 (front): Forced: When engaged player exhausts a Ship objective, Brash Corsair attacks that player.
+  40020:forced:1: Forced on the event shipExhausted (heard about Ship character (you control))
+    only if this card is engaged with the player
+    - this card (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
+
+## 40021 Corsair Plunderer
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+40021:A:1 (front): Pillage 2. (After this enemy attacks you, discard the top 2 cards of your deck.)
+  40021:constant:1: Constant
+    (no instructions)
+
+40021:A:2 (front): Forced: After an event card is discarded from your deck by Corsair Plunderer's Pillage keyword, discard an attachment you control.
+  40021:forced:1: Forced on the event pillaged (heard about this card)
+    only if the card the event is about is a card (any player controls) in the discard pile, of card type event
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 40022 Daring Buccaneer
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+40022:A:1 (front): Pillage 3. (After this enemy attacks you, discard the top 3 cards of your deck.)
+  40022:constant:1: Constant
+    (no instructions)
+
+40022:A:2 (front): Forced: After an event card is discarded from your deck by Daring Buccaneer's Pillage keyword, deal 1 damage to a character you control.
+  40022:forced:1: Forced on the event pillaged (heard about this card)
+    only if the card the event is about is a card (any player controls) in the discard pile, of card type event
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal 1 damage to the picked card
+
+## 40023 Fierce Marauder
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+40023:A:1 (front): Pillage 3. (After this enemy attacks you, discard the top 3 cards of your deck.)
+  40023:constant:1: Constant
+    (no instructions)
+
+40023:A:2 (front): Forced: After an event card is discarded from your deck by Fierce Marauder's Pillage keyword, discard 1 resource from the resource pool of a hero you control.
+  40023:forced:1: Forced on the event pillaged (heard about this card)
+    only if the card the event is about is a card (any player controls) in the discard pile, of card type event
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) with resources on it
+    - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
+
+## 40024 Southron Sailor
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+40024:A:1 (front): While Southron Sailor is engaged with you, each Ship enemy engaged with you contributes its Threat to the total Threat in the staging area.
+  40024:constant:1: Constant
+    only if this card is engaged with the player
+    - each Ship enemy (any player controls) engaged with you: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, while this card is in play
+
+## 40025 Umbar Captain
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+40025:A:1 (front): Engaged player cannot attack Ship enemies.
+  40025:constant:1: Constant
+    only if this card is engaged with the player
+    - each character (you control): stat cannotAttackShips 1, while this card is in play
+
+## 40026 Black Sails
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40026:A:1 (front): Boarding 2. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  40026:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+40026:A:2 (front): While Black Sails is in the staging area, it gains Archery 3.
+  40026:constant:2: Constant
+    only if this card is in the staging area
+    - this card: stat archery 3, while this card is in play
+
+40026:A:3 (shadow): Shadow: If attacking enemy is a Ship, return it to the staging area after this attack.
+  40026:shadow:1: Shadow
+    - if the attacking enemy is a Ship enemy (any player controls) or in the staging area: when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 40027 Corsair Skiff
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40027:A:1 (front): Surge. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  40027:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+40027:A:2 (front): Forced: When Corsair Skiff engages you from the staging area, either raise your threat by 3 or it gains Boarding 1.
+  40027:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    only if [json condition {"kind":"fromStaging"}]
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 3 (the acting player)
+      * option "boarding" (only if [json condition {"kind":"corsairHas"}]):
+        - this card: stat boarding 1, while this card is in play
+
+## 40028 Corsair Skirmisher
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40028:A:1: Boarding 1. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+40028:A:2 (front): Response: After Corsair Skirmisher is destroyed as an enemy, the engaged player may discard allies they control with a total of at least 3 Willpower to take control of Corsair Skirmisher as a ship-objective with Willpower equal to its Threat. (It loses the ship-enemy card type and gains the ship-objective card type).
+  40028:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
+    only if [json condition {"kind":"alliesWillpower","min":3}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardAlliesForWillpower {"verb":"DiscardAlliesForWillpower","willpower":3}]
+    - [json TakeControlAsShip {"verb":"TakeControlAsShip"}]
+
+## 40029 Corsair Warship
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40029:A:1 (front): Boarding 3. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  40029:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+40029:A:2 (front): While Corsair Warship is in the staging area, it cannot be damaged and gains Archery 4.
+  40029:constant:2: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotTakeDamage 1, while this card is in play
+    - this card: stat archery 4, while this card is in play
+
+## 40030 Ramming Ship
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40030:A:1 (front): Cannot have attachments.
+  40030:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+40030:A:2 (front): Forced: After Ramming Ship engages you, it gets +4 Attack until the end of the round.
+  40030:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    - this card: stat attack 4, until the end of the round
+
+40030:A:3 (shadow): Shadow: Put the top card of the Corsair deck into play engaged with you and deal it 1 shadow card.
+  40030:shadow:1: Shadow
+    - [json RevealCorsair {"verb":"RevealCorsair","shadow":1}]
+
+## 40031 Slave Ship
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40031:A:1 (front): Boarding 1. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  40031:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+40031:A:2 (front): For each point of damage that is dealt to a Ship objective by Slave Ship's attack, deal 1 point of damage to a non-Ship character controlled by the defending player, as well.
+  40031:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - when the attack in progress ends:
+      - if all of: ([json condition {"kind":"dealt"}]) and (the event's other card is a Ship character (any player controls)): the acting player assigns the damage just dealt damage among the character (you control) without Ship, one at a time
+
+## 40032 War Galley
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40032:A:1 (front): Archery 2. Boarding 1. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  40032:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+40032:A:2 (front): Forced: When War Galley engages you from the staging area, either raise your threat by 4 or it gains Boarding 1.
+  40032:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    only if [json condition {"kind":"fromStaging"}]
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 4 (the acting player)
+      * option "boarding" (only if [json condition {"kind":"corsairHas"}]):
+        - this card: stat boarding 1, while this card is in play
+
+## 40033 Sea Monster
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40033:A:1 (front): Ship objectives may attack and defend against Sea Monster.
+  40033:constant:1: Constant
+    - this card: stat shipFightable 1, while this card is in play
+
+40033:A:2 (front): When Revealed: Deal 4 damage to the Ship enemy or Ship objective with the fewest remaining hit points.
+  40033:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - pick the Ship enemy or Ship objective in play, any player's, with the fewest hit points left (the first player chooses among ties)
+    - deal 4 damage to the picked card
+
+## 40034 Belfalas Shipyard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40034:A:1 (front): Response: After Belfalas Shipyard is explored as the active location, the players as a group spend 5 resources to heal 5 damage from a Ship objective in any group. Ready that Ship and flip it to its Upgraded side.
+  40034:response:1: Response on the event activeExplored (heard about this card)
+    only if all of: ([json condition {"kind":"resources","min":5,"group":true}]) and (there is a Ship character (any player controls) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SpendResources {"verb":"SpendResources","amount":5,"group":true}]
+    - choose Ship character (any player controls) chosen by the first player
+    - heal 5 damage from the picked card
+    - ready the picked card
+    - the picked Ship objective flips to its Upgraded side, if it shows its Basic side and has an Upgraded side
+
+40034:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack and gains Pillage 3.
+  40034:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - the attacking enemy: stat pillage 3, until the end of the attack
+
+## 40035 Cobas Haven
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40035:A:1 (front): While Cobas Haven is the active location, reduce the Boarding value on each Ship enemy by 1.
+  40035:constant:1: Constant
+    only if this card is the active location
+    - each Ship enemy (any player controls) or in the staging area: stat boarding -1, while this card is in play
+
+## 40036 Isle of Fortune
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40036:A:1 (front): Isle of Fortune enters play with 1 PerPlayer resource(s) on it.
+  40036:triggered:1: Triggered (mandatory, not printed as Forced) after a card enters play (heard about this card)
+    - place the number of players resource tokens on this card
+
+40036:A:2 (front): Forced: After a Ship enemy enters play, discard 1 resource from Isle of Fortune.
+  40036:forced:1: Forced after a card enters play (heard about Ship enemy (any player controls) or in the staging area)
+    - up to 1 resource token(s) come off the card with code 40036 in play
+
+40036:A:3 (front): Response: When Isle of Fortune is explored as the active location, move each resource on it to a hero's resource pool.
+  40036:response:1: Response on the event activeExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls) chosen by the first player
+    - move all the resource tokens from the card picked before the last to the last card picked
+
+## 40037 Mouths of Anduin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40037:A:1 (front): While Mouths of Anduin is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, reveal the top card of the encounter deck."
+  40037:forced:1: Forced on the event whenRevealedCanceled
+    only if this card is in the staging area
+    - the acting player reveals an encounter card
+
+40037:A:2 (shadow): Shadow: If this attack is undefended, reveal the top card of the encounter deck.
+  40037:shadow:1: Shadow
+    - if the attack has no defender: the acting player reveals an encounter card
+
+## 40038 Tolfalas Landing
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40038:A:1 (front): While Tolfalas Landing is in the staging area, it gains: "Forced: After a player draws any number of cards from a player card effect, that player raises their threat by that number."
+  40038:forced:1: Forced on the event cardsDrawn
+    only if all of: (this card is in the staging area) and ([json condition {"kind":"byPlayerCard"}])
+    - raise threat by X (the acting player)
+
+40038:A:2 (shadow): Shadow: Raise your threat by 1 (3 instead if you have 5 or more cards in hand).
+  40038:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the cards in your hand is less than 5: raise threat by 1 (the acting player)
+    - then, if 4 is less than the cards in your hand (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 3 (the acting player)
+
+## 40039 Wicked Cove
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40039:A:1 (front): Each location in the staging area is immune to player card effects.
+  40039:constant:1: Constant
+    - each location (any player controls) in the staging area only: stat immuneToPlayerCards 1, while this card is in play
+
+40039:A:2 (shadow): Shadow: Until the end of the round, attacking enemy is immune to player card effects and gets +2 Defense.
+  40039:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat immuneToPlayerCards 1, until the end of the round
+    - the attacking enemy: stat defense 2, until the end of the round
+
+## 40040 Ballista Barrage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40040:A:1 (front): Doomed 1. (Raise each player's threat by 1.)
+  (the keyword part is owned by the card's keywords; the records cover: (Raise each player's threat by 1.))
+  40040:whenRevealed:1: When revealed (record also names 40040:A:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json Doomed {"verb":"Doomed","amount":1}]
+    - each Ship enemy (any player controls) or in the staging area: stat archery 2, until the end of the round
+
+40040:A:2 (front): When Revealed: Until the end of the round, each Ship enemy gains Archery 2.
+  40040:whenRevealed:1: When revealed (record also names 40040:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json Doomed {"verb":"Doomed","amount":1}]
+    - each Ship enemy (any player controls) or in the staging area: stat archery 2, until the end of the round
+
+40040:A:3 (shadow): Shadow: Assign 2 damage among characters you control (3 damage instead if there are 10 or more cards in your discard pile).
+  40040:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of card (you control) in the discard pile is at most 9: the acting player assigns 2 damage among the character (you control), one at a time
+    - then, if the number of card (you control) in the discard pile is at least 10 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player assigns 3 damage among the character (you control), one at a time
+
+## 40041 Boarding Party
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40041:A:1 (front): When Revealed: Each player puts the top card of the Corsair deck into play engaged with them.
+  40041:whenRevealed:1: When revealed
+    - [json RevealCorsair {"verb":"RevealCorsair","who":"eachSeat"}]
+
+40041:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you control an exhausted Ship objective).
+  40041:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the number of exhausted Ship character (you control) is at least 1): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the number of exhausted Ship character (you control) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 40042 Grappled!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40042:A:1 (front): When Revealed: Attach to a Ship objective. (Counts as a Condition attachment with the text: "Attached objective cannot ready. Action: Exhaust 3 characters to discard Grappled!")
+  40042:whenRevealed:1: When revealed
+    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship"}}]
+  40042:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  40042:constant:2: Constant
+    - its host: stat doesNotReady 1, while this card is in play
+  40042:action:1: Action
+    only if the number of ready character (you control) is at least 3
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - repeat 3 times:
+      - choose ready character (you control)
+      - exhaust the picked card
+    - discard this card
+
+40042:A:2 (shadow): Shadow: If defending character is a Ship attach Grappled! to it.
+  40042:shadow:1: Shadow
+    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship","defender":true}}]
+
+## 40043 Out of the Mist
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40043:A:1 (front): When Revealed: The enemy with the highest engagement cost engages the first player and attacks them. If no attack is made this way, Out of the Mist gains surge.
+  40043:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
+    - this enemy, in the staging area, engages the first player [also {"target":"picked"}]
+    - [json AttackWithPicked {"verb":"AttackWithPicked","who":"firstPlayer"}]
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+40043:A:2 (shadow): Shadow: Either raise your threat by 4 or attacking enemy makes an additional attack.
+  40043:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 4 (the acting player)
+      * option "attack":
+        - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 40044 Overworked
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40044:A:1 (front): When Revealed: Until the end of the round, treat the text box of each non-Ship ally as blank, except for Traits. If a player controls 7 or more allies, Overworked gains surge.
+  40044:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each ally (any player controls) without Ship: stat blankText (its text box is blank) 1, until the end of the round
+    - for each player, first player first:
+      - if the number of ally (you control) is at least 7: this card gains surge (one more encounter card is revealed when it has been resolved)
+
+40044:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if you control 7 or more allies).
+  40044:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of ally (you control) is at most 6: the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the number of ally (you control) is at least 7 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 40045 Taking on Water
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40045:A:1 (front): When Revealed: Attach to a Ship objective. (Counts as a Condition attachment with the text: "Forced: When attached objective exhausts, deal 2 damage to it. Action: Exhaust 3 characters to discard Taking on Water.")
+  40045:whenRevealed:1: When revealed
+    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship"}}]
+  40045:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  40045:forced:1: Forced on the event shipExhausted (heard about the host)
+    - deal 2 damage to its host
+  40045:action:1: Action
+    only if the number of ready character (you control) is at least 3
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - repeat 3 times:
+      - choose ready character (you control)
+      - exhaust the picked card
+    - discard this card
+
+40045:A:2 (shadow): Shadow: If defending character is a Ship, attach Taking on Water to it.
+  40045:shadow:1: Shadow
+    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship","defender":true}}]
+
+## 40046 Violent Tempest
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+40046:A:1 (front): When Revealed: Deal 1 damage to each enemy. Each player assigns X damage among characters they control. X is the number of exhausted characters they control.
+  40046:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - deal 1 damage to each enemy (any player controls) or in the staging area
+    - for each player, first player first:
+      - the acting player assigns the number of exhausted character (you control) damage among the character (you control), one at a time
+
+40046:A:2 (shadow): Shadow: Deal 1 damage to defending character.
+  40046:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+(rendered pieces: 508 by template, 44 as JSON)

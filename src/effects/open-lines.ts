@@ -3,7 +3,6 @@
 export const OPEN_LINES: readonly string[] = [
   "21072:B:1",
   "21072:B:2",
-  "40009:B:2",
   "906501:A:2",
   "906501:A:3",
   "906502:A:2",

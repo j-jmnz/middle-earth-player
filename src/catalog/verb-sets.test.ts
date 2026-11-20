@@ -32,6 +32,7 @@ describe("verb flags", () => {
   it("mark exactly the verbs that reach into the collection", () => {
     expect(sorted(collectionVerbs("hero"))).toEqual(["AttachCollectionHero", "SwapHero", "TakeHeroFromCollection"]);
     expect(sorted(collectionVerbs("card"))).toEqual(["TakeCardFromCollection"]);
+    expect(sorted(collectionVerbs("event"))).toEqual(["AddEventsToHand"]);
     expect(sorted(collectionVerbs("treasure"))).toEqual(["AttachRandomTreasure", "ChooseRandomTreasure", "ClaimRandomTreasure", "SearchGuardForTreasure"]);
   });
 });

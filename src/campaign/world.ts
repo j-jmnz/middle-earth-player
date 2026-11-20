@@ -138,6 +138,19 @@ function namesCollection(effects: readonly Effect[], codes: ReadonlySet<string>)
   });
 }
 
+// Whether a card among these codes has a record, at any depth, with a verb that chooses an event card from the collection (`collection: "event"`, src/catalog/verb-flags.ts).
+function namesCollectionEvents(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
+  const eventVerbs = collectionVerbs("event");
+  return effects.some((effect) => {
+    if (!codes.has(effect.cardCode)) return false;
+    let found = false;
+    walkInstructions(effect.instructions, (instruction) => {
+      if (typeof instruction.verb === "string" && eventVerbs.has(instruction.verb)) found = true;
+    });
+    return found;
+  });
+}
+
 // Whether a card among these codes has a record, at any depth, with a verb that draws from the treasures of the catalog (`collection: "treasure"`, src/catalog/verb-flags.ts).
 export function namesTreasures(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
   const treasureVerbs = collectionVerbs("treasure");
@@ -193,8 +206,10 @@ export function loadWorld<TRun>(
   const withTreasures = treasures.length > 0 ? [...rows, ...treasures.filter((row) => !loaded.has(row.code))] : rows;
   // A card that names the player's collection (Helm of Secrecy, Thorongil) needs every hero card the player may own: the app
   // tracks no collection, so that is every deck-legal hero (families/misc/collection.ts).
-  if (!namesCollection(effects, new Set(codes))) return worldFrom(campaign, scenario, effects, withTreasures);
-  const known = new Set(withTreasures.map((row) => row.code));
+  // A card that chooses an event of the collection (Silent Mist) needs every deck-legal event: the app tracks no collection either.
+  const withEvents = namesCollectionEvents(effects, new Set(codes)) ? [...withTreasures, ...catalog.select().from(cards).where(and(eq(cards.typeCode, "event"), eq(cards.deckLegal, true))).all().filter((row) => !loaded.has(row.code))] : withTreasures;
+  if (!namesCollection(effects, new Set(codes))) return worldFrom(campaign, scenario, effects, withEvents);
+  const known = new Set(withEvents.map((row) => row.code));
   const heroes = catalog.select().from(cards).where(and(eq(cards.typeCode, "hero"), eq(cards.deckLegal, true))).all();
-  return worldFrom(campaign, scenario, effects, [...withTreasures, ...heroes.filter((row) => !known.has(row.code))]);
+  return worldFrom(campaign, scenario, effects, [...withEvents, ...heroes.filter((row) => !known.has(row.code))]);
 }

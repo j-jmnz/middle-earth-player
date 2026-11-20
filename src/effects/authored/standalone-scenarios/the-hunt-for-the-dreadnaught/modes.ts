@@ -52,6 +52,7 @@ export const MODES: readonly (Effect | Copy)[] = [
     timing: "response",
     trigger: "enemyAttacks",
     subject: { type: "enemy", control: "any", names: ["Dreadnaught"] },
+    eventSeat: "you",
     cost: { kind: "raiseThreat", amount: 4 },
     instructions: [{ verb: "CancelAttack" }],
   },
