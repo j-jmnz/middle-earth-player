@@ -7949,6 +7949,983 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "51301",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Out-of-the-Depths-1A.jpg",
+        "sha256": "32f14af3a10e286f2de61d1ddd139c4981e37ca03a4b8828ad19d6b58622e6c9"
+      },
+      "lines": [
+        "Setup: Add Dark Pit to the staging area. The opposing team searches the encounter deck for one different 0-cost enemy or location per player and adds them to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51301",
+      "side": "B",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Out-of-the-Depths-1B.jpg",
+        "sha256": "aab1518811aaf4bc08c6d366662baddf7669300b2d290988f9f1d82a67b917a4"
+      },
+      "lines": [
+        "Forced: When Dark Pit is explored, flip it over and set Durin's Bane aside, out of play. Each player searches the top 5 cards of his deck for a card, adds it to his hand, and shuffles his deck.",
+        "This stage cannot be defeated while Dark Pit is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51303",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-Old-One-Lair-2A.jpg",
+        "sha256": "93bff3191540181f179bae30f09422da1279ba97fc4cce54ed2c0299fd669c99"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51303",
+      "side": "B",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-Old-One-Lair-2B.jpg",
+        "sha256": "0046809e6f387b54f866aa0d35423d855b4fcf78faa6a40ee6bfbd1c37f8b721"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for an enemy with cost 2 or less, adds it to the staging area, and places a resource on it. Shuffle the encounter deck.",
+        "The enemy with a resource on it is immune to player card effects, and progress cannot be placed on this stage while that enemy is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51304",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-A-Wrong-Turn-2A.jpg",
+        "sha256": "93bff3191540181f179bae30f09422da1279ba97fc4cce54ed2c0299fd669c99"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51304",
+      "side": "B",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-A-Wrong-Turn-2B.jpg",
+        "sha256": "d2c9eaed3cc20477c2543aec8d192a67b37861e268c847d32c8dd7651ed69454"
+      },
+      "lines": [
+        "When Revealed: Each player chooses 1 card in his hand and shuffles the rest into his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51305",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-A-Way-Up-2A.jpg",
+        "sha256": "93bff3191540181f179bae30f09422da1279ba97fc4cce54ed2c0299fd669c99"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51305",
+      "side": "B",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-A-Way-Up-2B.jpg",
+        "sha256": "1cd4dfd3e17a596f96f02a19ee93e59a99b18b30ff7e92a90642fe1bd223949c"
+      },
+      "lines": [
+        "Add the active location's Threat to the staging area.",
+        "During the travel phase, the players must travel to a location, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51307",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-The-Bridge-of-Khazad-dûm-3A.jpg",
+        "sha256": "18af792d75e4c369793d33a6fb391c4cf4832b3aa72305f640bf755e785ad525"
+      },
+      "lines": [
+        "When Revealed: Add the set-aside Durin's Bane to the staging area. It cannot take damage this round. If there is more than 1 player, it makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51307",
+      "side": "B",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-The-Bridge-of-Khazad-dûm-3B.jpg",
+        "sha256": "303a849b5ffd5f7f281b0acab50268be9c360ce6496ebe0751687aa1fd2f8bce"
+      },
+      "lines": [
+        "No more than 5 progress can be placed here each round.",
+        "Forced: At the beginning of the quest phase, Durin's Bane makes an attack against the first player. Any undefended or excess damage dealt by this attack must be placed here.",
+        "If this stage has damage on it equal to or greater than its quest points, the players lose the game. If this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51308",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-Last-Lord-of-Moria-3A.jpg",
+        "sha256": "18af792d75e4c369793d33a6fb391c4cf4832b3aa72305f640bf755e785ad525"
+      },
+      "lines": [
+        "When Revealed: Add the set-aside Durin's Bane to the staging area. It cannot take damage this round. If there is more than 1 player, it makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51308",
+      "side": "B",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-Last-Lord-of-Moria-3B.jpg",
+        "sha256": "676c7e01bebc53d14f3bf52376f8245f9c4cdd52d8a50e247ec1336af510910f"
+      },
+      "lines": [
+        "Durin's Bane engages the first player.",
+        "Durin's Bane cannot take more than X damage each round, where X is the number of progress tokens on this stage.",
+        "This stage cannot be defeated while Durin's Bane is in play. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51309",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-The-Rear-Guard-3A.jpg",
+        "sha256": "18af792d75e4c369793d33a6fb391c4cf4832b3aa72305f640bf755e785ad525"
+      },
+      "lines": [
+        "When Revealed: Add the set-aside Durin's Bane to the staging area. It cannot take damage this round. If there is more than 1 player, it makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51309",
+      "side": "B",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-The-Rear-Guard-3B.jpg",
+        "sha256": "3f92e1a92cba2e609c27a3e4f1e334a60f7bba15bb907611c0a89a605a49029a"
+      },
+      "lines": [
+        "Each player's threat cannot be reduced by player card effect.",
+        "Durin's Bane is considered to be engaged with each player and attacks each player in turn order during the combat phase. (Deal and resolve a shadow card for each attack.)",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51310",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Dark-Pit.jpg",
+        "sha256": "6d98872cde0430b0ae810d1d86afb2e63ff42e15fc5be6980c69aead4c9dd71e"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51311",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Durin's-Bane.jpg",
+        "sha256": "5bba113299bf71492240eca22a977dd7e4b645f1d3beed49104fabb16db7abfc"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Cannot be optionally engaged.",
+        "Forced: After Durin's Bane attacks and destroys a character you control, raise your threat by 2 and heal 2 damage from Durin's Bane."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51312",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Black-Bats.jpg",
+        "sha256": "29b82561da96d101c3c65c5bd585dce6d0a6edc1a1c8016dab4416f6e19c350c"
+      },
+      "lines": [
+        "When Revealed: Either raise each player's threat by 2, or reveal an additional encounter card.",
+        "Shadow: Either raise your threat by 2, or this attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51313",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nest-of-Vermin.jpg",
+        "sha256": "84d9a6cf1323732f0c0b3e4c6c355f5d322e2b41cb24e7751174695daaedfd59"
+      },
+      "lines": [
+        "While Nest of Vermin is in the staging area, each Creature enemy gets +1 Threat.",
+        "Forced: When Nest of Vermin is explored, the opposing team searches the encounter deck and discard pile for a Creature enemy with cost 1 or less and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51314",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Swarm-of-Bats.jpg",
+        "sha256": "1a8e37ad48f359a67093172e4a53615fde39453a84187d43b306e452b6db2ed1"
+      },
+      "lines": [
+        "When Revealed: Each character gets -1 Willpower until the end of the phase.",
+        "Shadow: Each character you control gets -1 Attack and -1 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51315",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Cave-Spider.jpg",
+        "sha256": "535478c9ce72a46e14433611339e0a1a9e85f2c6fbe15661fddd8a8d7ad3c58f"
+      },
+      "lines": [
+        "Forced: When Cave Spider attacks, either remove 2 progress from the main quest, or Cave Spider gets +2 Attack for this attack.",
+        "Shadow: Either remove 2 progress from the main quest or attacking enemy gets +2 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51316",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/The-Mountain's-Roots.jpg",
+        "sha256": "aa783b6cbc60e173e278966a386a8a2c308707a8088d660a044ba73bf9c3faf2"
+      },
+      "lines": [
+        "X is 1 more than the stage number of the main quest.",
+        "Travel: Each player discards the top X cards of his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51317",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Watchful-Eyes.jpg",
+        "sha256": "3b9ce6a5cc3e00db380c94eba1cab1ad32b009d4f4cc031789dcf90160f63fb2"
+      },
+      "lines": [
+        "When Revealed: The opposing team attaches Watchful Eyes to a hero. (Counts as a Condition attachment with the text: 'Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51318",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Cave-troll.jpg",
+        "sha256": "5a890e80960d713541c26482a0f4d004b09b7848eb3d322fa095bc1847563eee"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments.",
+        "Allies cannot be declared as attackers or defenders against Cave-troll."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51319",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Twisting-Passage.jpg",
+        "sha256": "43e401a1ac571da95d400008e214ba2b7e6386b62a07b2b928a9eec5136ce22e"
+      },
+      "lines": [
+        "When Revealed: Discard the top card of the encounter deck. If that card is a location, add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51320",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Undisturbed-Bones.jpg",
+        "sha256": "b082a375c30d6130754a1dd95d5eeaef03d262b95607a5975a834fa445fa02fb"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Attach to the main quest. (Counts as a Condition attachment with the text, 'Forced: When a 'when revealed' effect would be canceled, discard Undisturbed Bones instead.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51321",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Old-Stone-troll.jpg",
+        "sha256": "93ea3b95add69857dd68f1ca85ecdbcd20409a8ca7a2abe9f050c8f7cf772543"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments.",
+        "Forced: After Old Stone-troll attacks and destroys a character you control, raise your threat by 1 for each excess point of damage dealt."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51322",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Frightful-Den.jpg",
+        "sha256": "c448921fdb660a68ea1dbc66c367e0678e4c785830fd49f4147e1dd6230a6dfe"
+      },
+      "lines": [
+        "While Frightful Den is in the staging area, each Troll enemy gets -10 engagement cost.",
+        "Forced: When Frightful Den is explored, the opposing team searches the encounter deck and discard pile for a Troll enemy with cost 1 or less and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51323",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Deep-Deep-Dark.jpg",
+        "sha256": "f6a182aa21d279fae96851b98be086b783e48e5fe3bb4f8d5cbefb636a14ec31"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either raise your threat by 1 for each character you control, or discard a character you control.",
+        "Shadow: Raise your threat by 1 for each enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51324",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Rock-Adder.jpg",
+        "sha256": "549d118a609f390f2328fae782616abb24f17cb3d186ff71e098dbdf3ddc69fe"
+      },
+      "lines": [
+        "Players cannot declare defenders against Rock Adder.",
+        "Shadow: If this attack is undefended, attacking enemy gets +2 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51325",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Bottomless-Chasm.jpg",
+        "sha256": "76de3645b72f0a0660d0fc55a5b644b3972e623147eb829a12923adaa0d547d9"
+      },
+      "lines": [
+        "When faced with the option to travel, the players must travel to Bottomless Chasm, if able.",
+        "Shadow: Attacking enemy gets +2 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51326",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Lost-and-Alone.jpg",
+        "sha256": "b1aa7620081c0b22f4ce1d672f9ec90e2f0559644d0eaabbba74304fd3f459f5"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses a questing character controlled by each player and removes them from the quest.",
+        "Shadow: Defending character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51327",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Hobgoblin.jpg",
+        "sha256": "3a71091411ab3e22e6b8b254c5698f919a3b3a8317bdc54d2aac9d1fa52930b7"
+      },
+      "lines": [
+        "Forced: After Hobgoblin engages a player, it cannot take damage until the end of the round.",
+        "Shadow: Attacking enemy cannot take damage this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51328",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Western-Hall.jpg",
+        "sha256": "49c5dbdbb7d6eee71ec1c7610470acedbcdf4bce2f12def4bfca783ed0f8e95a"
+      },
+      "lines": [
+        "Travel: Discard the top card of the encounter deck. Raise each player's threat by X, where X is that card's printed Threat.",
+        "Shadow: If this attack destroys a character, reveal the top card of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51329",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/New-Devilry.jpg",
+        "sha256": "6ed8d67a9dc07a3f0ddf490e307439f69d187eda04b209a5ebbc7a78a37e1c1c"
+      },
+      "lines": [
+        "When Revealed: Until the end of the round, treat each character's text box as if it were blank, except for Traits.",
+        "Shadow: Until the end of the phase, treat the defending character's text box as blank, except for Traits."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51330",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Unspeakable-Thing.jpg",
+        "sha256": "7b60a94eae337eb35fdfe5beb207341be9715f4b18db68c1bfc4fbe58782ead3"
+      },
+      "lines": [
+        "Forced: When Unspeakable Thing attacks you, discard the top card of your deck. Unspeakable Thing gets +X Attack for this attack, where X is the discarded card's printed cost.",
+        "Shadow: Attacking enemy gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51331",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Lightless-Grotto.jpg",
+        "sha256": "babb18560eae1272deb3e7414e732a646e56ae2f684f275e3410ee79c6f1e8e1"
+      },
+      "lines": [
+        "While Lightless Grotto is in the staging area, non-unique enemies in the staging area cannot take damage.",
+        "Travel: The first player chooses an enemy in the staging area and engages it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51332",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Many-Roads.jpg",
+        "sha256": "f0967f4f00c7e35c286f8ab1ba39072b795120082493e50849f39ffa9f9447a2"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for a different 0-cost location per player and adds them to the staging area. Shuffle the encounter deck.",
+        "Shadow: The opposing team shuffles a location from the encounter discard pile into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51333",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Shadow-Dweller.jpg",
+        "sha256": "1eea920ad5a5d3b563d0863498bb02134bce84228deaf14260c59de73ea9fdf5"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments or take non-combat damage.",
+        "Forced: When Shadow Dweller attacks you, discard the top card of your deck and assign X damage among characters you control, where X is the discarded card's cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51334",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Branching-Paths.jpg",
+        "sha256": "6e7a01bbac9ec99429992bdb89cfbc13ebe6a7e0c86047cb16aa49875f4611f9"
+      },
+      "lines": [
+        "Branching Paths gets +1 Threat for each location in the staging area. (Limit +3 Threat.)",
+        "Shadow: Attacking enemy gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51335",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Fatigue.jpg",
+        "sha256": "ffdb64da11208205c6bdc2f7766abe653b0ca058ed75055e5c50577db2f07b4c"
+      },
+      "lines": [
+        "When Revealed: Each player exhausts a character he controls. Until the end of the round, characters cannot be readied by player card effects.",
+        "Shadow: Remove the defending character from the attack. A different defending character may be declared."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51336",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Elder-Nameless-Thing.jpg",
+        "sha256": "7555ac60d70100b6c568e61ef9dd55f9556b04a516d317c18b1e03c5671b03b8"
+      },
+      "lines": [
+        "Cannot be optionally engaged.",
+        "While Elder Nameless Thing is in the staging area, it gains: 'Forced: After players have committed characters to the quest, Elder Nameless Thing makes an attack against the first player.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51337",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Silent-Caverns.jpg",
+        "sha256": "7626d1c1762af0bf6b701e33fc7f12a6873b16a85bc9c5b06a406372a7dd40ed"
+      },
+      "lines": [
+        "While Silent Caverns is in the staging area, each player's threat cannot be reduced by more than 1 each round.",
+        "Travel: Raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51338",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Dark-Places.jpg",
+        "sha256": "6ddd5f3fbd3cc2c825a7889a74cc1573cffef2cffcf70bc3f5bb19919a21dc3a"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by X, where X is the threat of the active location. If there is no active location, Dark Places gains surge.",
+        "Shadow: Attacking enemy gets +X Attack, where X is the stage number of the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51339",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Orc-Horn-Blower.jpg",
+        "sha256": "58101327b37b88ea0faff01578d013ca8c5c268ff4c747afdf917494898202b9"
+      },
+      "lines": [
+        "Forced: At the beginning of the combat phase, deal each engaged enemy an additional shadow card.",
+        "Shadow: Deal attacking enemy 2 additional shadow cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51340",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Goblin-Dungeon.jpg",
+        "sha256": "705a022dea10eb5cca71b5c70bcfaddd53096de77053c932d32d4a1f321cbbec"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses an ally, discards all tokens from it, and places it faceup under Goblin Dungeon as a guarded objective. When Goblin Dungeon is explored, return that ally to its owner's control exhausted."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51341",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Deep-Fissure.jpg",
+        "sha256": "1461db140598e292b11bb4038647c91181958e5bf784283ba94169544ca9ee34"
+      },
+      "lines": [
+        "When Revealed: Each player deals 1 damage to a questing character he controls and removes that character from the quest.",
+        "Shadow: Deal 1 damage to a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51342",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Black-Uruks.jpg",
+        "sha256": "5144f795aea68fdac7f4b213795b9f8b14441a133852dff25a70d42e5d860d87"
+      },
+      "lines": [
+        "While Black Uruks is attacking, it gets +1 Attack for each shadow card dealt for this attack.",
+        "Shadow: The opposing team searches the top 5 cards of the encounter deck for a card and deals it to attacking enemy as a shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51343",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Dreadful-Gap.jpg",
+        "sha256": "95750111c3d04de0ddd79b87b4605a6172355fcfab1075b582c3c87bfa92a485"
+      },
+      "lines": [
+        "While Dreadful Gap is in the staging area, progress cannot be placed on other locations in the staging area.",
+        "Travel: The opposing team chooses a card in the encounter discard pile and shuffles it into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51344",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Orcish-Howls.jpg",
+        "sha256": "51452c33a44c3b7c48d69cedb3c8d7de8e035db16ac8e3aea75221843427f13d"
+      },
+      "lines": [
+        "When Revealed: Exhaust X characters, where X is the number of Uruk enemies in play. If there are no Uruk enemies in play, Orcish Howls gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it is an Uruk)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51345",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Orc-Raiders.jpg",
+        "sha256": "2fb5b63b7a84f3b27130bf5937464c15b0967ffbdc96f08cb2296ca58f7eae07"
+      },
+      "lines": [
+        "Forced: After Orc Raiders engages a player, deal it a shadow card.",
+        "Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51346",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/The-Great-Bridge.jpg",
+        "sha256": "3b53b9f5933c8eb76282c1dff6693e3fb7c3ebeebcb54ea4e892672751e66b85"
+      },
+      "lines": [
+        "While The Great Bridge is in the staging area, no more than 1 character can be declared as an attacker against each enemy.",
+        "Forced: When The Great Bridge is explored, reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51347",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Vast-and-Intricate.jpg",
+        "sha256": "b5a097ae44d236a8216309d949390084d9b12da6db8d6ae3eec0a0cb96b058e3"
+      },
+      "lines": [
+        "When Revealed: The opposing team attaches Vast and Intricate to a non-unique location in the staging area. If there are no non-unique locations in the staging area, Vast and Intricate gains surge. (Counts as a Condition attachment with the text: 'Attached location gets +2 Threat and is immune to player card effects.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51348",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Chieftain-of-the-Pit.jpg",
+        "sha256": "591c7f2dac65f829c725a5594059ac611f6b38b4a26f2c666d2a108db7e58075"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments or take non-combat damage.",
+        "Shadow effects cannot be canceled.",
+        "Forced: When Chieftain of the Pit attacks, deal it an additional shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51349",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Forked-Passage.jpg",
+        "sha256": "a0a93b8ffc6d43ce7ef200a25f5dfa1ec4c72b827dc8957a5286e749acf9b705"
+      },
+      "lines": [
+        "While Forked Passage is in the staging area, raise each player's threat by 1 additional point during the refresh phase.",
+        "Travel: Raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51350",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Chance-Encounter.jpg",
+        "sha256": "34f8604dc06a765599ed916f7e362e32074c6e3a418fc83874e0d63e1c9ff4e9"
+      },
+      "lines": [
+        "When Revealed: The highest Attack enemy in the staging area makes an attack against the first player. If no attack is made this way, Chance Encounter gains surge.",
+        "Shadow: If attacking enemy is unique, it makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51351",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nameless-Thing.jpg",
+        "sha256": "d623efec1f72ae3ddfed83a0a16a81cc0eceb82eef8321b702780b27fdf732a5"
+      },
+      "lines": [
+        "Forced: After Nameless Thing enters play, the first player attaches the top card of his deck to it faceup as a guarded attachment. Nameless Thing gets +X Threat, +X Attack, and +X Defense, where X is that card's printed cost. When Nameless Thing leaves play, discard that card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51352",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Mithril-Lode.jpg",
+        "sha256": "a65e822b4dea28dcf9d6329b2286803e4b2d8de596edc5389ceffa30e8422b67"
+      },
+      "lines": [
+        "While Mithril Lode is the active location, it gains: 'Response: When Mithril Lode is explored, each player adds 1 resource to the resource pool of a hero he controls.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51353",
+      "side": "A",
+      "printing": "EfKD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/A-Foe-Beyond.jpg",
+        "sha256": "a0caa9298a0eb6ddd2fa2f370e355f49f13afc4ed04ce27ba13f962c9d8ad1e6"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses an attachment controlled by a player and discards it. If no attachment is discarded this way, A Foe Beyond gains surge.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

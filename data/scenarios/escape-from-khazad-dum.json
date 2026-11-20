@@ -372,13 +372,8 @@
       "code": "51310",
       "normal": 1,
       "easy": 1,
-      "pile": "staging"
-    },
-    {
-      "code": "51311",
-      "normal": 1,
-      "easy": 1,
-      "pile": "setAside"
+      "pile": "staging",
+      "back": "51311"
     }
   ],
   "campaignPlaced": [],

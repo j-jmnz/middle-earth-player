@@ -2947,9 +2947,10 @@
         "code": "51312"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 15"
+        "encounterSet": "Escape from Khazad-dûm 15",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -2957,9 +2958,10 @@
         "code": "51313"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 15"
+        "encounterSet": "Escape from Khazad-dûm 15",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -2967,9 +2969,10 @@
         "code": "51314"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 15"
+        "encounterSet": "Escape from Khazad-dûm 15",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -2977,9 +2980,10 @@
         "code": "51315"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 16"
+        "encounterSet": "Escape from Khazad-dûm 16",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -2987,9 +2991,10 @@
         "code": "51316"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 16"
+        "encounterSet": "Escape from Khazad-dûm 16",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -2997,9 +3002,10 @@
         "code": "51317"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 16"
+        "encounterSet": "Escape from Khazad-dûm 16",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3007,9 +3013,10 @@
         "code": "51318"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 17"
+        "encounterSet": "Escape from Khazad-dûm 17",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3017,9 +3024,10 @@
         "code": "51319"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 17"
+        "encounterSet": "Escape from Khazad-dûm 17",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3027,9 +3035,10 @@
         "code": "51320"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 17"
+        "encounterSet": "Escape from Khazad-dûm 17",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3037,9 +3046,10 @@
         "code": "51321"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 18"
+        "encounterSet": "Escape from Khazad-dûm 18",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3047,9 +3057,10 @@
         "code": "51322"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 18"
+        "encounterSet": "Escape from Khazad-dûm 18",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3057,9 +3068,10 @@
         "code": "51323"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 18"
+        "encounterSet": "Escape from Khazad-dûm 18",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3067,9 +3079,10 @@
         "code": "51324"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 19"
+        "encounterSet": "Escape from Khazad-dûm 19",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3077,9 +3090,10 @@
         "code": "51325"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 19"
+        "encounterSet": "Escape from Khazad-dûm 19",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3087,9 +3101,10 @@
         "code": "51326"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 19"
+        "encounterSet": "Escape from Khazad-dûm 19",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3097,9 +3112,10 @@
         "code": "51327"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 20"
+        "encounterSet": "Escape from Khazad-dûm 20",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3107,9 +3123,10 @@
         "code": "51328"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 20"
+        "encounterSet": "Escape from Khazad-dûm 20",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3117,9 +3134,10 @@
         "code": "51329"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 20"
+        "encounterSet": "Escape from Khazad-dûm 20",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3127,9 +3145,10 @@
         "code": "51330"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 21"
+        "encounterSet": "Escape from Khazad-dûm 21",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3137,9 +3156,10 @@
         "code": "51331"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 21"
+        "encounterSet": "Escape from Khazad-dûm 21",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3147,9 +3167,10 @@
         "code": "51332"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 21"
+        "encounterSet": "Escape from Khazad-dûm 21",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3157,9 +3178,10 @@
         "code": "51333"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 22"
+        "encounterSet": "Escape from Khazad-dûm 22",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3167,9 +3189,10 @@
         "code": "51334"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 22"
+        "encounterSet": "Escape from Khazad-dûm 22",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3177,9 +3200,10 @@
         "code": "51335"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 22"
+        "encounterSet": "Escape from Khazad-dûm 22",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3187,9 +3211,10 @@
         "code": "51336"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 23"
+        "encounterSet": "Escape from Khazad-dûm 23",
+        "cost": 3
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3197,9 +3222,10 @@
         "code": "51337"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 23"
+        "encounterSet": "Escape from Khazad-dûm 23",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3207,9 +3233,10 @@
         "code": "51338"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 23"
+        "encounterSet": "Escape from Khazad-dûm 23",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3217,9 +3244,10 @@
         "code": "51339"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 24"
+        "encounterSet": "Escape from Khazad-dûm 24",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3227,9 +3255,10 @@
         "code": "51340"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 24"
+        "encounterSet": "Escape from Khazad-dûm 24",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3237,9 +3266,10 @@
         "code": "51341"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 24"
+        "encounterSet": "Escape from Khazad-dûm 24",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3247,9 +3277,10 @@
         "code": "51342"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 25"
+        "encounterSet": "Escape from Khazad-dûm 25",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3257,9 +3288,10 @@
         "code": "51343"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 25"
+        "encounterSet": "Escape from Khazad-dûm 25",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3267,9 +3299,10 @@
         "code": "51344"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 25"
+        "encounterSet": "Escape from Khazad-dûm 25",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3277,9 +3310,10 @@
         "code": "51345"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 26"
+        "encounterSet": "Escape from Khazad-dûm 26",
+        "cost": 3
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3287,9 +3321,10 @@
         "code": "51346"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 26"
+        "encounterSet": "Escape from Khazad-dûm 26",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3297,9 +3332,10 @@
         "code": "51347"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 26"
+        "encounterSet": "Escape from Khazad-dûm 26",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3307,9 +3343,10 @@
         "code": "51348"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 27"
+        "encounterSet": "Escape from Khazad-dûm 27",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3317,9 +3354,10 @@
         "code": "51349"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 27"
+        "encounterSet": "Escape from Khazad-dûm 27",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3327,9 +3365,10 @@
         "code": "51350"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 27"
+        "encounterSet": "Escape from Khazad-dûm 27",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3337,9 +3376,10 @@
         "code": "51351"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 28"
+        "encounterSet": "Escape from Khazad-dûm 28",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3347,9 +3387,10 @@
         "code": "51352"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 28"
+        "encounterSet": "Escape from Khazad-dûm 28",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     },
     {
@@ -3357,9 +3398,10 @@
         "code": "51353"
       },
       "set": {
-        "encounterSet": "Escape from Khazad-dûm 28"
+        "encounterSet": "Escape from Khazad-dûm 28",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
     }
   ],
@@ -3935,8 +3977,9 @@
       "code": "51310",
       "from": "setAside",
       "pile": "staging",
-      "reason": "DragnCards loads Dark Pit set aside (Q99.14). The quest card Out of the Depths (51301) prints \"Setup: Add Dark Pit to the staging area.\", so it starts in the staging area.",
-      "source": "scan 51301.A; dragncards preBuiltDecks.json (Q99.14)"
+      "reason": "DragnCards loads Dark Pit set aside (Q99.14) and omits its back, Durin's Bane (the scans number them 1/2 and 2/2, as The Mines of Moria's Watcher and Chamber of Mazarbul; Hall of Beorn files them as two cards, #10 and #11). The quest card Out of the Depths (51301) prints \"Setup: Add Dark Pit to the staging area.\", so it starts in the staging area, and stage 1B flips it over to Durin's Bane. `back` names that side.",
+      "source": "scan 51301.A; dragncards preBuiltDecks.json (Q99.14)",
+      "back": "51311"
     }
   ],
   "scenarioRemovals": [
@@ -4876,17 +4919,6 @@
       "code": "147006",
       "reason": "Hall of Beorn's scenario file lists the quest cards of stages 1 and 2 only. The Wicked Willow (stage 3A, 3B, card 6 of 24 in the box; the stage 2B text advances to stage 3A) is a quest card of the encounter set, and DragnCards' deck Q99.04 deals it as the last quest stage.",
       "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
-    }
-  ],
-  "scenarioAdded": [
-    {
-      "scenario": "escape-from-khazad-dum",
-      "code": "51311",
-      "pile": "setAside",
-      "normal": 1,
-      "easy": 1,
-      "reason": "Hall of Beorn's scenario list deals Durin's Bane once (Normal and Easy), but DragnCards' load list Q99.14 omits it. Stage 1B prints \"set Durin's Bane aside, out of play\" and each stage 3A adds \"the set-aside Durin's Bane\" to the staging area, so it starts out of play, set aside.",
-      "source": "hallofbeorn.com/Export/Scenarios/Escape-from-Khazad-dûm (ScenarioCards); scans 51301.B and 51307.A; dragncards preBuiltDecks.json (Q99.14)"
     }
   ]
 }

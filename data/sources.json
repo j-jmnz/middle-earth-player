@@ -29824,9 +29824,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "139d1a0a474a169bb73b062a22804a0db39f7a747cbc0a2bcb6899bee960535b"
+        "value": "f17c6953c63a05aa7a8368eb4b657e6880a8353be520685d1dbfceba60841256"
       },
-      "fetchedAt": "2026-11-20T11:56:10.753Z",
+      "fetchedAt": "2026-11-20T14:01:04.976Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -43663,6 +43663,354 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Massing-in-the-Deep.jpg",
           "sha256": "8cfcb8f53531df36a8f504db33b11e755bbc87f48b1fcbd5ad6a69463278bd94",
           "bytes": 705706
+        },
+        {
+          "path": "scans/51301.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Out-of-the-Depths-1A.jpg",
+          "sha256": "32f14af3a10e286f2de61d1ddd139c4981e37ca03a4b8828ad19d6b58622e6c9",
+          "bytes": 914639
+        },
+        {
+          "path": "scans/51301.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Out-of-the-Depths-1B.jpg",
+          "sha256": "aab1518811aaf4bc08c6d366662baddf7669300b2d290988f9f1d82a67b917a4",
+          "bytes": 864516
+        },
+        {
+          "path": "scans/51303.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-Old-One-Lair-2A.jpg",
+          "sha256": "93bff3191540181f179bae30f09422da1279ba97fc4cce54ed2c0299fd669c99",
+          "bytes": 841241
+        },
+        {
+          "path": "scans/51303.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-Old-One-Lair-2B.jpg",
+          "sha256": "0046809e6f387b54f866aa0d35423d855b4fcf78faa6a40ee6bfbd1c37f8b721",
+          "bytes": 757363
+        },
+        {
+          "path": "scans/51304.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-A-Wrong-Turn-2A.jpg",
+          "sha256": "93bff3191540181f179bae30f09422da1279ba97fc4cce54ed2c0299fd669c99",
+          "bytes": 841241
+        },
+        {
+          "path": "scans/51304.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-A-Wrong-Turn-2B.jpg",
+          "sha256": "d2c9eaed3cc20477c2543aec8d192a67b37861e268c847d32c8dd7651ed69454",
+          "bytes": 774571
+        },
+        {
+          "path": "scans/51305.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-A-Way-Up-2A.jpg",
+          "sha256": "93bff3191540181f179bae30f09422da1279ba97fc4cce54ed2c0299fd669c99",
+          "bytes": 841241
+        },
+        {
+          "path": "scans/51305.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Search-for-an-Exit-A-Way-Up-2B.jpg",
+          "sha256": "1cd4dfd3e17a596f96f02a19ee93e59a99b18b30ff7e92a90642fe1bd223949c",
+          "bytes": 830419
+        },
+        {
+          "path": "scans/51307.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-The-Bridge-of-Khazad-dûm-3A.jpg",
+          "sha256": "18af792d75e4c369793d33a6fb391c4cf4832b3aa72305f640bf755e785ad525",
+          "bytes": 803237
+        },
+        {
+          "path": "scans/51307.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-The-Bridge-of-Khazad-dûm-3B.jpg",
+          "sha256": "303a849b5ffd5f7f281b0acab50268be9c360ce6496ebe0751687aa1fd2f8bce",
+          "bytes": 825244
+        },
+        {
+          "path": "scans/51308.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-Last-Lord-of-Moria-3A.jpg",
+          "sha256": "18af792d75e4c369793d33a6fb391c4cf4832b3aa72305f640bf755e785ad525",
+          "bytes": 803237
+        },
+        {
+          "path": "scans/51308.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-Last-Lord-of-Moria-3B.jpg",
+          "sha256": "676c7e01bebc53d14f3bf52376f8245f9c4cdd52d8a50e247ec1336af510910f",
+          "bytes": 888146
+        },
+        {
+          "path": "scans/51309.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-The-Rear-Guard-3A.jpg",
+          "sha256": "18af792d75e4c369793d33a6fb391c4cf4832b3aa72305f640bf755e785ad525",
+          "bytes": 803237
+        },
+        {
+          "path": "scans/51309.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nearing-the-Gate-The-Rear-Guard-3B.jpg",
+          "sha256": "3f92e1a92cba2e609c27a3e4f1e334a60f7bba15bb907611c0a89a605a49029a",
+          "bytes": 822085
+        },
+        {
+          "path": "scans/51310.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Dark-Pit.jpg",
+          "sha256": "6d98872cde0430b0ae810d1d86afb2e63ff42e15fc5be6980c69aead4c9dd71e",
+          "bytes": 799403
+        },
+        {
+          "path": "scans/51311.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Durin's-Bane.jpg",
+          "sha256": "5bba113299bf71492240eca22a977dd7e4b645f1d3beed49104fabb16db7abfc",
+          "bytes": 795605
+        },
+        {
+          "path": "scans/51312.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Black-Bats.jpg",
+          "sha256": "29b82561da96d101c3c65c5bd585dce6d0a6edc1a1c8016dab4416f6e19c350c",
+          "bytes": 800262
+        },
+        {
+          "path": "scans/51313.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nest-of-Vermin.jpg",
+          "sha256": "84d9a6cf1323732f0c0b3e4c6c355f5d322e2b41cb24e7751174695daaedfd59",
+          "bytes": 846417
+        },
+        {
+          "path": "scans/51314.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Swarm-of-Bats.jpg",
+          "sha256": "1a8e37ad48f359a67093172e4a53615fde39453a84187d43b306e452b6db2ed1",
+          "bytes": 790067
+        },
+        {
+          "path": "scans/51315.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Cave-Spider.jpg",
+          "sha256": "535478c9ce72a46e14433611339e0a1a9e85f2c6fbe15661fddd8a8d7ad3c58f",
+          "bytes": 837243
+        },
+        {
+          "path": "scans/51316.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/The-Mountain's-Roots.jpg",
+          "sha256": "aa783b6cbc60e173e278966a386a8a2c308707a8088d660a044ba73bf9c3faf2",
+          "bytes": 811660
+        },
+        {
+          "path": "scans/51317.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Watchful-Eyes.jpg",
+          "sha256": "3b9ce6a5cc3e00db380c94eba1cab1ad32b009d4f4cc031789dcf90160f63fb2",
+          "bytes": 706996
+        },
+        {
+          "path": "scans/51318.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Cave-troll.jpg",
+          "sha256": "5a890e80960d713541c26482a0f4d004b09b7848eb3d322fa095bc1847563eee",
+          "bytes": 764945
+        },
+        {
+          "path": "scans/51319.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Twisting-Passage.jpg",
+          "sha256": "43e401a1ac571da95d400008e214ba2b7e6386b62a07b2b928a9eec5136ce22e",
+          "bytes": 824319
+        },
+        {
+          "path": "scans/51320.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Undisturbed-Bones.jpg",
+          "sha256": "b082a375c30d6130754a1dd95d5eeaef03d262b95607a5975a834fa445fa02fb",
+          "bytes": 851663
+        },
+        {
+          "path": "scans/51321.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Old-Stone-troll.jpg",
+          "sha256": "93ea3b95add69857dd68f1ca85ecdbcd20409a8ca7a2abe9f050c8f7cf772543",
+          "bytes": 803303
+        },
+        {
+          "path": "scans/51322.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Frightful-Den.jpg",
+          "sha256": "c448921fdb660a68ea1dbc66c367e0678e4c785830fd49f4147e1dd6230a6dfe",
+          "bytes": 789996
+        },
+        {
+          "path": "scans/51323.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Deep-Deep-Dark.jpg",
+          "sha256": "f6a182aa21d279fae96851b98be086b783e48e5fe3bb4f8d5cbefb636a14ec31",
+          "bytes": 736466
+        },
+        {
+          "path": "scans/51324.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Rock-Adder.jpg",
+          "sha256": "549d118a609f390f2328fae782616abb24f17cb3d186ff71e098dbdf3ddc69fe",
+          "bytes": 807611
+        },
+        {
+          "path": "scans/51325.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Bottomless-Chasm.jpg",
+          "sha256": "76de3645b72f0a0660d0fc55a5b644b3972e623147eb829a12923adaa0d547d9",
+          "bytes": 780827
+        },
+        {
+          "path": "scans/51326.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Lost-and-Alone.jpg",
+          "sha256": "b1aa7620081c0b22f4ce1d672f9ec90e2f0559644d0eaabbba74304fd3f459f5",
+          "bytes": 753054
+        },
+        {
+          "path": "scans/51327.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Hobgoblin.jpg",
+          "sha256": "3a71091411ab3e22e6b8b254c5698f919a3b3a8317bdc54d2aac9d1fa52930b7",
+          "bytes": 793650
+        },
+        {
+          "path": "scans/51328.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Western-Hall.jpg",
+          "sha256": "49c5dbdbb7d6eee71ec1c7610470acedbcdf4bce2f12def4bfca783ed0f8e95a",
+          "bytes": 768378
+        },
+        {
+          "path": "scans/51329.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/New-Devilry.jpg",
+          "sha256": "6ed8d67a9dc07a3f0ddf490e307439f69d187eda04b209a5ebbc7a78a37e1c1c",
+          "bytes": 689664
+        },
+        {
+          "path": "scans/51330.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Unspeakable-Thing.jpg",
+          "sha256": "7b60a94eae337eb35fdfe5beb207341be9715f4b18db68c1bfc4fbe58782ead3",
+          "bytes": 712440
+        },
+        {
+          "path": "scans/51331.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Lightless-Grotto.jpg",
+          "sha256": "babb18560eae1272deb3e7414e732a646e56ae2f684f275e3410ee79c6f1e8e1",
+          "bytes": 797455
+        },
+        {
+          "path": "scans/51332.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Many-Roads.jpg",
+          "sha256": "f0967f4f00c7e35c286f8ab1ba39072b795120082493e50849f39ffa9f9447a2",
+          "bytes": 762776
+        },
+        {
+          "path": "scans/51333.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Shadow-Dweller.jpg",
+          "sha256": "1eea920ad5a5d3b563d0863498bb02134bce84228deaf14260c59de73ea9fdf5",
+          "bytes": 742649
+        },
+        {
+          "path": "scans/51334.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Branching-Paths.jpg",
+          "sha256": "6e7a01bbac9ec99429992bdb89cfbc13ebe6a7e0c86047cb16aa49875f4611f9",
+          "bytes": 774082
+        },
+        {
+          "path": "scans/51335.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Fatigue.jpg",
+          "sha256": "ffdb64da11208205c6bdc2f7766abe653b0ca058ed75055e5c50577db2f07b4c",
+          "bytes": 837636
+        },
+        {
+          "path": "scans/51336.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Elder-Nameless-Thing.jpg",
+          "sha256": "7555ac60d70100b6c568e61ef9dd55f9556b04a516d317c18b1e03c5671b03b8",
+          "bytes": 709806
+        },
+        {
+          "path": "scans/51337.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Silent-Caverns.jpg",
+          "sha256": "7626d1c1762af0bf6b701e33fc7f12a6873b16a85bc9c5b06a406372a7dd40ed",
+          "bytes": 846213
+        },
+        {
+          "path": "scans/51338.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Dark-Places.jpg",
+          "sha256": "6ddd5f3fbd3cc2c825a7889a74cc1573cffef2cffcf70bc3f5bb19919a21dc3a",
+          "bytes": 769671
+        },
+        {
+          "path": "scans/51339.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Orc-Horn-Blower.jpg",
+          "sha256": "58101327b37b88ea0faff01578d013ca8c5c268ff4c747afdf917494898202b9",
+          "bytes": 716030
+        },
+        {
+          "path": "scans/51340.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Goblin-Dungeon.jpg",
+          "sha256": "705a022dea10eb5cca71b5c70bcfaddd53096de77053c932d32d4a1f321cbbec",
+          "bytes": 775474
+        },
+        {
+          "path": "scans/51341.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Deep-Fissure.jpg",
+          "sha256": "1461db140598e292b11bb4038647c91181958e5bf784283ba94169544ca9ee34",
+          "bytes": 822070
+        },
+        {
+          "path": "scans/51342.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Black-Uruks.jpg",
+          "sha256": "5144f795aea68fdac7f4b213795b9f8b14441a133852dff25a70d42e5d860d87",
+          "bytes": 754517
+        },
+        {
+          "path": "scans/51343.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Dreadful-Gap.jpg",
+          "sha256": "95750111c3d04de0ddd79b87b4605a6172355fcfab1075b582c3c87bfa92a485",
+          "bytes": 812179
+        },
+        {
+          "path": "scans/51344.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Orcish-Howls.jpg",
+          "sha256": "51452c33a44c3b7c48d69cedb3c8d7de8e035db16ac8e3aea75221843427f13d",
+          "bytes": 760403
+        },
+        {
+          "path": "scans/51345.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Orc-Raiders.jpg",
+          "sha256": "2fb5b63b7a84f3b27130bf5937464c15b0967ffbdc96f08cb2296ca58f7eae07",
+          "bytes": 746793
+        },
+        {
+          "path": "scans/51346.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/The-Great-Bridge.jpg",
+          "sha256": "3b53b9f5933c8eb76282c1dff6693e3fb7c3ebeebcb54ea4e892672751e66b85",
+          "bytes": 768662
+        },
+        {
+          "path": "scans/51347.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Vast-and-Intricate.jpg",
+          "sha256": "b5a097ae44d236a8216309d949390084d9b12da6db8d6ae3eec0a0cb96b058e3",
+          "bytes": 819199
+        },
+        {
+          "path": "scans/51348.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Chieftain-of-the-Pit.jpg",
+          "sha256": "591c7f2dac65f829c725a5594059ac611f6b38b4a26f2c666d2a108db7e58075",
+          "bytes": 777922
+        },
+        {
+          "path": "scans/51349.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Forked-Passage.jpg",
+          "sha256": "a0a93b8ffc6d43ce7ef200a25f5dfa1ec4c72b827dc8957a5286e749acf9b705",
+          "bytes": 720886
+        },
+        {
+          "path": "scans/51350.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Chance-Encounter.jpg",
+          "sha256": "34f8604dc06a765599ed916f7e362e32074c6e3a418fc83874e0d63e1c9ff4e9",
+          "bytes": 792747
+        },
+        {
+          "path": "scans/51351.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Nameless-Thing.jpg",
+          "sha256": "d623efec1f72ae3ddfed83a0a16a81cc0eceb82eef8321b702780b27fdf732a5",
+          "bytes": 746932
+        },
+        {
+          "path": "scans/51352.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/Mithril-Lode.jpg",
+          "sha256": "a65e822b4dea28dcf9d6329b2286803e4b2d8de596edc5389ceffa30e8422b67",
+          "bytes": 780132
+        },
+        {
+          "path": "scans/51353.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Khazad-dum/A-Foe-Beyond.jpg",
+          "sha256": "a0caa9298a0eb6ddd2fa2f370e355f49f13afc4ed04ce27ba13f962c9d8ad1e6",
+          "bytes": 781142
         },
         {
           "path": "scans/900101.A.jpg",

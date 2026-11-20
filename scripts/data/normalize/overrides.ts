@@ -22,6 +22,8 @@ const overridesSchema = z.object({
         code: z.string().min(1),
         from: z.enum(PILES).optional(),
         pile: z.enum([...PILES, "campaign"]),
+        // The code of the card's other side, where the load list holds only one side of a two-sided card (Escape from Khazad-dûm's Dark Pit, whose back is Durin's Bane).
+        back: z.string().min(1).optional(),
         reason: z.string().min(1),
         source: z.string().min(1),
       }),
@@ -47,20 +49,6 @@ const overridesSchema = z.object({
         pile: z.enum(PILES).optional(),
         normal: z.number().int().nonnegative().optional(),
         easy: z.number().int().nonnegative().optional(),
-        reason: z.string().min(1),
-        source: z.string().min(1),
-      }),
-    )
-    .default([]),
-  // A card the scenario deals that the DragnCards load list omits (Escape from Khazad-dûm's Durin's Bane, which stage 1B sets aside): `normal` and `easy` copies are added to `pile`, in both decks.
-  scenarioAdded: z
-    .array(
-      z.object({
-        scenario: z.string().min(1),
-        code: z.string().min(1),
-        pile: z.enum(PILES),
-        normal: z.number().int().positive(),
-        easy: z.number().int().nonnegative(),
         reason: z.string().min(1),
         source: z.string().min(1),
       }),
