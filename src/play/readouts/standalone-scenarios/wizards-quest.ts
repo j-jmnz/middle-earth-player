@@ -1,10 +1,10 @@
-// Rules: rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/brief.md, The Wizard's Quest, readings 9 and 3; docs/design-system-table.md, The Wizard's Quest).
+// Rules: rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/brief.md, The Wizard's Quest, readings 9 and 3; docs/design-system-table.md, Top bar).
 // The player cards a card of The Wizard's Quest holds faceup under it (an ally under Carried Away, a card of a hand under Necromancer's Pass): the host's pill counts them and names each owner, and the held card's preview says where it lies.
-import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import { printedOf } from "../../rules/core/printed.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
-import { ownerWords } from "../words/owner.ts";
-import { keptCardWords, keptPill, type KeptCard } from "../words/scenarios/wizards-quest-table.ts";
+import type { ReduceContext } from "../../../rules/engine/reduce.ts";
+import { printedOf } from "../../../rules/core/printed.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import { ownerWords } from "../../words/owner.ts";
+import { keptCardWords, keptPill, type KeptCard } from "../../words/scenarios/wizards-quest-table.ts";
 
 /** The held cards lying under a card, in the order they were laid there. */
 export function keptUnder(game: ScenarioState, cardId: string): string[] {

@@ -1,5 +1,5 @@
 // Rules: rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/brief.md, The Wizard's Quest, readings 9 and 3).
-// What the table says of the player cards Carried Away and Necromancer's Pass hold faceup under them (src/play/readouts/wizards-quest.ts). The engine decided who holds what; these only say it. Each sentence stays at about 25 words.
+// What the table says of the player cards Carried Away and Necromancer's Pass hold faceup under them (src/play/readouts/standalone-scenarios/wizards-quest.ts). The engine decided who holds what; these only say it. Each sentence stays at about 25 words.
 
 import { plural } from "../list.ts";
 

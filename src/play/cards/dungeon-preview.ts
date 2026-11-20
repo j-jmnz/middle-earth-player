@@ -12,7 +12,7 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 import { ownerWords } from "../words/owner.ts";
 import { prisonerWords } from "../readouts/widgets.ts";
 import { pelennorDetail } from "./pelennor-preview.ts";
-import { keptDetail } from "../readouts/wizards-quest.ts";
+import { keptDetail } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { angmarDetail } from "./angmar-preview.ts";
 import { barrowDetail } from "../readouts/standalone-scenarios/barrow-downs.ts";
 import { ungolDetail } from "./ungol-preview.ts";
