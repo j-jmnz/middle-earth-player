@@ -113,6 +113,10 @@ const VERBS = [
   z.strictObject({ verb: z.literal("TallySiege"), ...when }),
   // "randomly select a stage 3 that was not in play this round" (50931:B:2): of the stages in `codes`, those but the current one, the game's seed picks one and the running effect notes its code as an option taken (the condition `optionTaken`), for the penalty records that follow.
   z.strictObject({ verb: z.literal("SelectRandomStage"), codes: z.array(code).min(2), ...when }),
+  // "place it in his play area under his control" (50902:A:1, Power of Lórien): the card in the staging area with this code enters the first player's play area, faceup and ready. Nothing happens when it is not in the staging area.
+  z.strictObject({ verb: z.literal("TakeControlOfStaged"), code, ...when }),
+  // "Then, discard each copy of that card from play" (50911:A:2): after a DiscardFromDeck, each card in play with the title of the card it discarded last, whoever controls it, is discarded.
+  z.strictObject({ verb: z.literal("DiscardCopiesOfDiscarded"), ...when }),
   // Truly Lost (18075:A:1): "Each player places his hand of cards facedown under a different location in the staging area." The actor chooses a location in the staging area (an Objective-Location is one) that no player has put a hand under yet, and every card of their hand goes facedown under it, still theirs.
   // With an empty hand nothing is chosen.
   z.strictObject({ verb: z.literal("PlaceHandUnderLocation"), ...when }),
@@ -366,6 +370,8 @@ const FLAGS = [
   "refreshUsed",
   // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/brief.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keywords.ts).
   "losesIndestructible",
+  // On an enemy: no Response cancels a Shadow effect the enemy attacks with ("its shadow cards cannot be canceled", 50916:A:1). Read by cancelBarred (rules/families/encounter/cancel.ts).
+  "shadowsUncancelable",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

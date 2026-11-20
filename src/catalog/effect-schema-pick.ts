@@ -342,6 +342,8 @@ export const pickSchema = z.strictObject({
   highestAttack: z.literal(true).optional(),
   // Of the cards that match, only those with the highest current Willpower, as the table shows it ("discard the ally you control with the highest Willpower", 901304:A:2); every one of them when tied, and then the chooser decides. Read by src/rules/interpret/pick.ts.
   highestWillpower: z.literal(true).optional(),
+  // Of the cards that match, only those with the highest current engagement cost ("The enemy in the staging area with the highest engagement cost", 50926:A:2); every one of them when tied, and then the chooser decides.
+  highestEngagementCost: z.literal(true).optional(),
   // Of the cards that match, only those with the lowest Attack or the lowest Threat, as the table shows it ("the lowest Attack Harad enemy engaged with you", 144036:A:2; "the lowest Threat Harad enemy in the staging area", 144038:A:2); every one of them
   // when tied, and then the chooser (the player who reveals) decides. Read by the harad family (src/rules/families/harad/pick.ts).
   lowestAttack: z.literal(true).optional(),

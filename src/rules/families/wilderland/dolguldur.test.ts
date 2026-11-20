@@ -12,6 +12,8 @@ import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { topFrame } from "../../windows/windows.ts";
+import { cancelBarred } from "../encounter/cancel.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
 import { CARDS, ctxOf, record, table } from "./fixture.ts";
 
 const inFrame = (state: ScenarioState, subject?: string): ScenarioState =>
@@ -104,5 +106,56 @@ describe("AdvanceToStage `again`", () => {
     const again = runInstruction(inFrame(stained), { verb: "AdvanceToStage", code: "stage3a", again: true }, focus, ctx, []);
     expect(again.questStage).toBe(aside.id);
     expect(again.cards[aside.id]).toMatchObject({ zone: "questStage", progress: 0, resources: 0 });
+  });
+});
+
+describe("TakeControlOfStaged (50902:A:1)", () => {
+  it("moves the staged card into the first player's play area under his control, and does nothing when it is not staged", () => {
+    const hill = spawn(table(2), "siegePlace", { zone: "staging" });
+    const taken = runInstruction(inFrame(hill.state), { verb: "TakeControlOfStaged", code: "siegePlace" }, focus, ctxOf([]), []);
+    expect(taken.cards[hill.id]).toMatchObject({ zone: "play", controller: taken.firstPlayer, face: "up" });
+    const bare = inFrame(table());
+    expect(runInstruction(bare, { verb: "TakeControlOfStaged", code: "siegePlace" }, focus, ctxOf([]), [])).toEqual(bare);
+  });
+});
+
+describe("DiscardCopiesOfDiscarded (50911:A:2)", () => {
+  it("discards each card in play with the title of the last card the effect discarded from a deck, and no other", () => {
+    const base = spawn(spawn(spawn(table(), "siegeEnemy", { zone: "staging" }).state, "siegeEnemy", { zone: "engaged", seat: 0 }).state, "orc", { zone: "staging" });
+    const copies = Object.values(base.state.cards).filter((card) => card.code === "siegeEnemy").map((card) => card.id);
+    const discarded = spawn(base.state, "siegeEnemy", { zone: "discard", seat: 0 });
+    const frame = inFrame(discarded.state);
+    const top = topFrame(frame);
+    if (top?.data.kind !== "effect") throw new Error("no effect frame");
+    const marked: ScenarioState = { ...frame, stack: frame.stack.map((entry) => (entry === top ? { ...entry, data: { ...top.data, discardedFromDecks: [discarded.id] } } : entry)) };
+    const done = runInstruction(marked, { verb: "DiscardCopiesOfDiscarded" }, focus, ctxOf([]), []);
+    for (const id of copies) expect(done.cards[id]?.zone).not.toBe("staging");
+    expect(done.cards[base.id]?.zone).toBe("staging");
+    const none = runInstruction(frame, { verb: "DiscardCopiesOfDiscarded" }, focus, ctxOf([]), []);
+    expect(copies.map((id) => none.cards[id]?.zone)).toEqual(["staging", "engaged"]);
+  });
+});
+
+describe("the pick field highestEngagementCost (50926:A:2)", () => {
+  it("keeps the enemies with the highest engagement cost, every one when tied", () => {
+    const low = spawn(table(), "orc", { zone: "staging" });
+    const high = spawn(low.state, "siegeEnemy", { zone: "staging" });
+    const pick = { type: "enemy", control: "any", stagingOnly: true, highestEngagementCost: true } as const;
+    expect(pickCandidates(high.state, pick, 0, [], null, ctxOf([]))).toEqual([high.id]);
+    const tied = spawn(high.state, "siegeEnemy", { zone: "staging" });
+    expect(pickCandidates(tied.state, pick, 0, [], null, ctxOf([])).sort()).toEqual([high.id, tied.id].sort());
+  });
+});
+
+describe("the flag shadowsUncancelable (50916:A:1)", () => {
+  it("bars a cancel Response in the shadow window of an attack by the enemy that holds it, and no other attack", () => {
+    const enemy = spawn(table(), "siegeEnemy", { zone: "engaged", seat: 0 });
+    const cancel = record("x:response:1", "x", "response", [{ verb: "CancelEffect" }], { trigger: "shadowPending" });
+    const event = { trigger: "shadowPending", seat: 0 } as const;
+    const attacking = (state: ScenarioState): ScenarioState => ({ ...state, pendingAttack: { enemyId: enemy.id } as ScenarioState["pendingAttack"] });
+    const flagged: ScenarioState = { ...enemy.state, modifiers: [...enemy.state.modifiers, { instanceId: enemy.id, sourceId: enemy.id, stat: "shadowsUncancelable", amount: 1, until: "whileSourceInPlay" }] };
+    expect(cancelBarred(attacking(flagged), event, cancel)).toBe(true);
+    expect(cancelBarred(attacking(enemy.state), event, cancel)).toBe(false);
+    expect(cancelBarred(flagged, event, cancel)).toBe(false);
   });
 });

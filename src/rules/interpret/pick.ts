@@ -377,6 +377,8 @@ export function pickCandidates(
   if (spec.highestCost) return highestCost(state, found, ctx);
   // "The ally you control with the highest Willpower" (901304:A:2).
   if (spec.highestWillpower) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "willpower", ctx.cards) : 0), "highest");
+  // "The enemy in the staging area with the highest engagement cost" (50926:A:2).
+  if (spec.highestEngagementCost) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "engagementCost", ctx.cards) : 0), "highest");
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
   return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }

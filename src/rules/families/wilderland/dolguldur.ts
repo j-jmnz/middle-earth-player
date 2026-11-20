@@ -8,6 +8,10 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { destroyCard } from "../../core/keywords.ts";
+import { moveCard } from "../../core/zones.ts";
+import { inPlay, updateCard } from "../../core/state.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -48,4 +52,25 @@ export function selectRandomStage(state: ScenarioState, instruction: Verb<"Selec
   const shuffled = shuffleIds(others, state.seed, state.seedCursor);
   const chosen = shuffled.ids[0];
   return chosen ? noteTaken({ ...state, seedCursor: shuffled.cursor }, chosen) : state;
+}
+
+/** TakeControlOfStaged: the card in the staging area with the code enters the first player's play area under his control, faceup and ready ("place it in his play area under his control", 50902:A:1). Nothing happens when it is not there. */
+export function takeControlOfStaged(state: ScenarioState, instruction: Verb<"TakeControlOfStaged">): ScenarioState {
+  const id = state.staging.find((candidate) => state.cards[candidate]?.code === instruction.code);
+  if (!id) return state;
+  return updateCard(moveCard(state, id, { zone: "play", seat: state.firstPlayer }), id, { face: "up", exhausted: false });
+}
+
+/** DiscardCopiesOfDiscarded: each card in play with the title of the card the running effect last discarded from a deck goes to its owner's discard pile ("Then, discard each copy of that card from play", 50911:A:2). */
+export function discardCopiesOfDiscarded(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const data = topFrame(state)?.data;
+  const last = data?.kind === "effect" ? data.discardedFromDecks?.at(-1) : undefined;
+  const name = last ? printedOf(ctx.cards, state.cards[last]?.code ?? "").name : null;
+  if (!name) return state;
+  let next = state;
+  for (const card of Object.values(state.cards)) {
+    if (card.id === last || !inPlay(card.zone) || printedOf(ctx.cards, card.code).name !== name) continue;
+    next = destroyCard(next, card.id, ctx.cards, steps);
+  }
+  return next;
 }

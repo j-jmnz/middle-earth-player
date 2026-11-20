@@ -59,6 +59,7 @@ describe("effects render read fields, picks", () => {
     lowestThreat: true,
     highestCost: true,
     highestWillpower: true,
+    highestEngagementCost: true,
     maxWillpower: 1,
     attachedTo: "host",
     minCost: 0,
