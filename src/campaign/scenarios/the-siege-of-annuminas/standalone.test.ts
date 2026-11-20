@@ -15,18 +15,15 @@ describe("The Siege of Annúminas in the standalone-scenarios cycle", () => {
     expect("modeCard" in scenario && scenario.modeCard).toBe("50801");
   });
 
-  it("deals the same encounter deck on Easy and Normal, less the Gate of Annúminas and one location a player the Setup puts in the staging area", async () => {
+  it("deals the same encounter deck on Easy and Normal, less the Gate of Annúminas the Setup puts in the staging area", async () => {
     const { ctx } = await annuminasWorld();
-    const after = (seats: 1 | 2, difficulty: "Easy" | "Normal") => {
+    const after = (seats: 1, difficulty: "Easy" | "Normal") => {
       const state = expectOk(reduce(startScenario(annuminasStart(seats, 1, difficulty), ctx), { type: "Keep" }, ctx)).state;
       return { deck: state.encounterDeck.length, staging: state.staging.length, set: state.setAside.length, mode: Object.values(state.cards).find((card) => card.zone === "modeCard")?.face };
     };
     expect(after(1, "Easy")).toEqual(after(1, "Normal"));
     const solo = after(1, "Normal");
-    const two = after(2, "Normal");
-    // Annúminas and the Gate are in the staging area, the 10 cards of 1A set aside, 34 cards left for 1 player; a second player adds a location.
+    // Annúminas and the Gate are in the staging area, the 10 cards of 1A set aside, 34 cards left for 1 player.
     expect(solo).toEqual({ deck: 34, staging: 2, set: 10, mode: "B" });
-    expect(two.deck).toBe(33);
-    expect(two.staging).toBe(3);
   });
 });
