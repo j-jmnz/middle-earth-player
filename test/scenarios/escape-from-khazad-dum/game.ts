@@ -71,14 +71,16 @@ export type KhazadGame = PlayedGame;
 // The goldens (src/campaign/scenarios/escape-from-khazad-dum/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type KhazadGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: KhazadDecks; outcome: "won" | "lost"; policy?: Partial<KhazadPolicy>; lossReason?: string };
 
-// The games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost). The scenario has no Easy twin and no Nightmare deck.
+// The games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed with different pairs of stage cards (Last Lord of Moria needs Durin's Bane killed), and the three ways to lose: the stage holds damage
+// equal to its quest points (nobody defends Durin's Bane's attacks), every player's threat at 50 (heroes too small to quest) and every hero destroyed (brittle heroes). The scenario has no Easy twin and no Nightmare deck.
 export const KHAZAD_GOLDENS: readonly KhazadGolden[] = [
   { name: "solo win: A Wrong Turn, The Bridge of Khazad-dûm", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 1, stage3: 0 } },
-  { name: "solo win: A Way Up, Last Lord of Moria", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 2, stage3: 1 } },
-  { name: "solo win: A Wrong Turn, The Rear Guard", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 1, stage3: 2 } },
-  { name: "two-handed win: Old One Lair, The Rear Guard", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 0, stage3: 2 } },
-  { name: "two-handed win: A Wrong Turn, Last Lord of Moria", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 1, stage3: 1 } },
-  { name: "solo loss: the stage holds 10 damage", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { stage2: 1, stage3: 0, undefended: true }, lossReason: "The Bridge of Khazad-dûm holds" },
+  { name: "solo win: Old One Lair, The Bridge of Khazad-dûm", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 0, stage3: 0 } },
+  { name: "solo win: A Way Up, The Rear Guard", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 2, stage3: 2 } },
+  { name: "two-handed win: Old One Lair, Last Lord of Moria", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 0, stage3: 1 } },
+  { name: "two-handed win: A Wrong Turn, The Rear Guard", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 1, stage3: 2 } },
+  { name: "two-handed win: A Way Up, The Bridge of Khazad-dûm", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 2, stage3: 0 } },
+  { name: "solo loss: Durin's Bane's undefended attacks put 10 damage on the stage", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { stage2: 1, stage3: 0, undefended: true }, lossReason: "Nearing the Gate holds" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 4, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
 ];

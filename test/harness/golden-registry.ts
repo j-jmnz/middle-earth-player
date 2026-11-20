@@ -76,7 +76,7 @@ import * as guldur from "../scenarios/attack-on-dol-guldur/game.ts";
 import * as quest from "../scenarios/the-wizards-quest/game.ts";
 import * as woodland from "../scenarios/the-woodland-realm/game.ts";
 import * as mines from "../scenarios/the-mines-of-moria/game.ts";
-// import * as khazad from "../scenarios/escape-from-khazad-dum/game.ts";
+import * as khazad from "../scenarios/escape-from-khazad-dum/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -179,5 +179,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-wizards-quest", "The Wizard's Quest", quest.QUEST_GOLDENS, quest.questWorld, quest.playGolden),
   entry("the-woodland-realm", "The Woodland Realm", woodland.WOODLAND_GOLDENS, woodland.woodlandWorld, woodland.playGolden),
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
-  // entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
+  entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
 ];
