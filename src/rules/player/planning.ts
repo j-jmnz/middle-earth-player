@@ -2,7 +2,7 @@
 // ltp.unique-cards, ltp.neutral-cards (data/rules/entries.json).
 import type { Effect } from "../../catalog/boundary.ts";
 
-import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
+import { attachmentHostIds, enforceRestricted, hostTakesControl, playCost } from "./attach.ts";
 import { discardGrantHosts, discardGranted, spendDiscardGrant } from "../families/angmar/discard-play.ts";
 import { discardsLocked } from "../families/angmar/lock.ts";
 import { announceEventAction } from "../families/deck/pressure.ts";
@@ -89,7 +89,8 @@ export function playCard(
   next = moveCard(next, intent.cardId, { zone: "play", seat });
   next = updateCard(next, intent.cardId, { exhausted: entersExhausted(ctx, instance.code) });
   if (printed.type === "attachment" && intent.hostId) {
-    next = attachTo(next, intent.cardId, intent.hostId);
+    // Played on another player's character, it is that player's to control (rr.attachment-cards).
+    next = hostTakesControl(attachTo(next, intent.cardId, intent.hostId), intent.cardId, ctx);
     next = queueEvent(next, { trigger: "played", seat, cardId: intent.cardId });
     // An attachment played enters play too (rr.in-play-and-out-of-play).
     next = queueEvent(next, { trigger: "enteredPlay", seat, cardId: intent.cardId });

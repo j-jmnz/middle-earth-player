@@ -1,4 +1,4 @@
-// Rules: rr.restricted, rr.resource-match, trg.secrecy (data/rules/entries.json).
+// Rules: rr.restricted, rr.resource-match, trg.secrecy, rr.attachment-cards, rr.ownership-and-control (data/rules/entries.json).
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { resolveAmount } from "../interpret/amounts.ts";
@@ -16,10 +16,11 @@ import { fixedX, grantedSecrecy } from "../families/misc/cost.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { playerCardEffectCanChoose } from "../core/keywords.ts";
-import { printedOf } from "../core/printed.ts";
+import { isCharacterType, printedOf, scenarioOwned } from "../core/printed.ts";
 import { attachBlocked, restrictedLoad } from "../interpret/restrictions.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { heldAmount, livingSeats } from "../core/state.ts";
+import { heldAmount, livingSeats, updateCard } from "../core/state.ts";
+import { attachTo, moveCard } from "../core/zones.ts";
 import { matchesPick, pickCandidates } from "../interpret/pick.ts";
 
 type AttachRule = Extract<Instruction, { verb: "AttachesTo" }>;
@@ -71,6 +72,22 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     if (named.sphere && printedOf(ctx.cards, host.code).sphere !== named.sphere) return false;
     return true;
   });
+}
+
+// "When an attachment enters play attached to a character under another player's control, that player gains control of the
+// attachment" (rr.attachment-cards): a player card that has just attached to another seat's hero or ally moves to that seat's play
+// area, still attached, and keeps the seat that brought it as its owner, so it goes back to that seat's discard pile when it leaves
+// play (rr.ownership-and-control).
+export function hostTakesControl(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
+  const card = state.cards[id];
+  const host = card?.host ? state.cards[card.host] : undefined;
+  if (!card || !host || card.zone !== "play" || card.controller == null || host.controller == null || host.controller === card.controller) return state;
+  if (host.zone !== "heroes" && host.zone !== "play") return state;
+  if (!isCharacterType(printedOf(ctx.cards, host.code))) return state;
+  // The scenario's card never gets a player as owner (families/play/control.ts, giveControl).
+  const owner = scenarioOwned(printedOf(ctx.cards, card.code)) ? undefined : (card.owner ?? card.controller);
+  const moved = attachTo(moveCard(state, id, { zone: "play", seat: host.controller }), id, host.id);
+  return updateCard(moved, id, { owner: owner === host.controller ? undefined : owner });
 }
 
 // What a card costs to play from the hand: its printed cost less each ReduceCost record whose condition holds, Secrecy, the

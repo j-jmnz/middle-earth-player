@@ -8,7 +8,7 @@
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard } from "../../interpret/amounts.ts";
-import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
+import { attachmentHostIds, enforceRestricted, hostTakesControl } from "../../player/attach.ts";
 import { effectCause } from "../../core/cause.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
@@ -145,7 +145,7 @@ export function guardWith(state: ScenarioState, instruction: Extract<Instruction
 function putOn(state: ScenarioState, id: string, hostId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (!state.cards[hostId]) return queueEvent(placeUnattached(state, id, hostId, seat), { trigger: "enteredPlay", seat, cardId: id });
   const placed = updateCard(moveCard(state, id, { zone: "play", seat }), id, { exhausted: false, host: null });
-  const attached = attachTo(placed, id, hostId);
+  const attached = hostTakesControl(attachTo(placed, id, hostId), id, ctx);
   const announced = queueEvent(queueEvent(attached, { trigger: "enteredPlay", seat, cardId: id }), { trigger: "attached", seat, subject: id, other: hostId });
   return enforceRestricted(announced, hostId, ctx, steps);
 }

@@ -606,6 +606,7 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: write
+      issues: write
     outputs:
       # A rerun that found its release already out and only added the desktop app; TestFlight has had that build already.
       added: ${{ steps.released.outputs.released }}
@@ -692,6 +693,15 @@ jobs:
           TESTFLIGHT_URL: ${{ vars.TESTFLIGHT_URL }}
           WINDOWS_SIGNED: ${{ needs.plan.outputs.desktop_signed }}
         run: .github/scripts/add-desktop.sh
+      # Each issue the release's commits close or refer to gets a comment naming the release (docs/releasing.md, Issue comments).
+      # It runs on the rerun that adds the desktop app too, so a release whose comments failed gets them; an issue never gets
+      # one release's comment twice. A failure here must not fail a release that is already out.
+      - name: Comment on the issues the release names
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: .github/scripts/comment-issues.sh
       # The README's installs badge (docs/releasing.md, Installs count). A failure here must not fail a release that is already out.
       - name: Update the installs count
         continue-on-error: true
