@@ -299,6 +299,7 @@ Legal player intents are a closed set. The UI asks `legalIntents(state)` and ren
 - Commit a set of legal characters to the quest, or to a Hide test.
 - Play a card the current window allows, naming which legal resource pools pay its printed cost.
 - Trigger an action or response the engine has judged legal, and pick legal targets.
+- A target is a card. Copies of one card in a deck, a hand or a pile are one choice, since nothing tells them apart. Copies in play are separate choices, since their state differs (which one attacks, damage, attachments, engagement): with two Black Riders engaged, Mr. Underhill (141017:A:3) asks which one cannot attack. The rule is `distinctChoices` (`src/rules/core/state.ts`).
 - Pass an optional window. Seats pass in order. That is what closes an action window. The phase machine then advances on its own.
 - Travel or decline. Optionally engage or decline. Declare a legal defender, or leave the attack undefended. Declare legal attackers.
 - Distribute a fixed total (archery, or an effect that says "assign N damage") across legal recipients so the assigned amounts sum to N.

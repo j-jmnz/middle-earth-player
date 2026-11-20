@@ -62,9 +62,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 34, scenarios: ["a-journey-to-rhosgobel", "escape-from-mount-gram"], note: "An ally removed from the game or captured leaves play, and the cards that answer an ally leaving play hear it." },
   { version: 34, scenarios: ["return-to-mirkwood", "road-to-rivendell", "the-redhorn-gate", "lost-in-mirkwood", "roam-across-rhovanion", "shelobs-lair"], note: "A set-aside card the players take control of, like Gollum or an objective ally, enters play, and the cards that answer a card entering play hear it." },
   { version: 34, scenarios: ["temple-of-the-deceived"], note: "An ally turned up from under the active location enters play, and the cards that answer an ally entering play hear it." },
+  { version: 35, scenarios: "all", note: "When an effect targets one of several copies of a card in play, you choose the copy: Mr. Underhill bars the Black Rider you pick, and an attachment like Pale Blade goes on the enemy you pick." },
 ];
 
-export const ENGINE_VERSION = 34;
+export const ENGINE_VERSION = 35;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

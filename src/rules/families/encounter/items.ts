@@ -23,23 +23,12 @@ import { isPlayerType, printedOf } from "../../core/printed.ts";
 import { lastPicked, putOnDeck } from "../../interpret/player-verbs.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Frame, QueueItem, ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { distinctChoices, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { effectData, pushPicked } from "./moves.ts";
 
 type PickEncounter = Extract<Instruction, { verb: "PickEncounter" }>;
-
-// Copies of one card in a deck or a pile are the same choice.
-function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] {
-  const seen = new Set<string>();
-  return ids.filter((id) => {
-    const code = state.cards[id]?.code ?? id;
-    if (seen.has(code)) return false;
-    seen.add(code);
-    return true;
-  });
-}
 
 // The cards a LookAtTop showed that are still on top of the encounter deck, top first.
 export function lookedOnTop(state: ScenarioState): string[] {
@@ -95,7 +84,7 @@ export function encounterCandidates(state: ScenarioState, instruction: PickEncou
     if (max != null && (inPlay(card.zone) ? modifiedStat(state, card, "threat", ctx.cards) : (printed.threat ?? 0)) > max) return false;
     return true;
   });
-  return instruction.from === "play" ? found : distinctByCode(state, found);
+  return instruction.from === "play" ? found : distinctChoices(state, found);
 }
 
 function pickEncounter(state: ScenarioState, item: QueueItem, sourceId: string | null, ctx: ReduceContext): ScenarioState {
@@ -116,8 +105,8 @@ function arrangeEncounter(state: ScenarioState, item: QueueItem): ScenarioState 
   const offset = item.offset ?? 0;
   const count = lookedOnTop(state).length;
   const rest = state.encounterDeck.slice(offset, count);
-  if (rest.length <= 1 || distinctByCode(state, rest).length <= 1) return state;
-  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctByCode(state, rest));
+  if (rest.length <= 1 || distinctChoices(state, rest).length <= 1) return state;
+  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctChoices(state, rest));
   const from = state.encounterDeck.indexOf(item.chosen);
   if (from < offset) return state;
   const deck = [...state.encounterDeck];

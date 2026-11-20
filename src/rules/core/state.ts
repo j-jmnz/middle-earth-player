@@ -217,6 +217,21 @@ export function heldHero(card: CardInstance): boolean {
   return (card.guardedHero === true || card.captive === true) && card.zone === "captive";
 }
 
+// The choices among cards a player picks from. Copies of one card in a deck, a hand or a pile are the same choice, so only the
+// first is offered. A card in play is its own choice, as copies there differ (which one is attacking, its damage, its
+// attachments, whose area it is in): two engaged Black Riders are two choices for Mr. Underhill (141017:A:3).
+export function distinctChoices(state: ScenarioState, ids: readonly string[]): string[] {
+  const seen = new Set<string>();
+  return ids.filter((id) => {
+    const card = state.cards[id];
+    if (card && inPlay(card.zone)) return true;
+    const code = card?.code ?? id;
+    if (seen.has(code)) return false;
+    seen.add(code);
+    return true;
+  });
+}
+
 export function inPlay(zone: ZoneName): boolean {
   return (
     zone === "heroes" ||

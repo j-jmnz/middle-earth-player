@@ -13,22 +13,13 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { feedsDiscard, pickCandidates } from "../../interpret/pick.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { Frame, QueueItem, ScenarioState } from "../../core/state.ts";
+import { distinctChoices } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 
 type EachInstruction = Extract<Instruction, { verb: "Each" }>;
 
 /** The option that stops choosing. */
 export const DONE = "done";
-
-function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] {
-  const seen = new Set<string>();
-  return ids.filter((id) => {
-    const code = state.cards[id]?.code ?? id;
-    if (seen.has(code)) return false;
-    seen.add(code);
-    return true;
-  });
-}
 
 function costOf(state: ScenarioState, id: string, ctx: ReduceContext): number {
   return printedOf(ctx.cards, state.cards[id]?.code ?? "").cost ?? 0;
@@ -63,7 +54,7 @@ export function chooseEach(state: ScenarioState, item: QueueItem, frame: Pick<Fr
   const options = item.chosen === DONE || taken.length >= limit ? [] : found;
   // `rest`: the actor keeps exactly `limit` cards (he cannot stop early) and the others matching are the rest; with no more than he may keep, all stay and nothing is asked.
   const keepAll = instruction.rest != null && found.length <= limit - taken.length;
-  if (options.length > 0 && !keepAll) return askTarget(state, { ...item, instruction: { ...instruction, taken }, chosen: null }, instruction.rest ? distinctByCode(state, options) : [...distinctByCode(state, options), DONE]);
+  if (options.length > 0 && !keepAll) return askTarget(state, { ...item, instruction: { ...instruction, taken }, chosen: null }, instruction.rest ? distinctChoices(state, options) : [...distinctChoices(state, options), DONE]);
   const cause = item.cause ? { cause: item.cause } : {};
   const pick = { verb: "Pick" as const, pick: instruction.pick };
   const kept = keepAll ? [...taken, ...found] : taken;

@@ -1,5 +1,5 @@
 // Effect items that act on a picked or found card: ReturnToStaging, AttachSelf, the searches, ShuffleIntoDeck, DiscardRestricted, ReadyHero,
-// BarAttack, PlaceProgressOnLocation. The candidates are found, one is chosen (a player chooses only among different cards), and the verb applies.
+// BarAttack, PlaceProgressOnLocation. The candidates are found, one is chosen (copies out of play are one choice, distinctChoices), and the verb applies.
 import { announceLooked } from "../families/encounter/looked.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 import { characters } from "../combat/combat.ts";
@@ -23,7 +23,7 @@ import { printedOf } from "../core/printed.ts";
 import { hasKeyword, modifiedStat } from "../core/keywords.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { Frame, QueueItem, ScenarioState } from "../core/state.ts";
-import { livingSeats, updateCard } from "../core/state.ts";
+import { distinctChoices, livingSeats, updateCard } from "../core/state.ts";
 import { seatFor, shuffleEncounterDeck, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -126,17 +126,6 @@ function mostHitPointsLeft(state: ScenarioState, ids: readonly string[], ctx: Re
   return best == null ? [] : [best];
 }
 
-// Different copies of one card are the same choice. Only different cards make the player pick.
-export function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] {
-  const seen = new Set<string>();
-  return ids.filter((id) => {
-    const code = state.cards[id]?.code ?? id;
-    if (seen.has(code)) return false;
-    seen.add(code);
-    return true;
-  });
-}
-
 function picksOne(instruction: Instruction): boolean {
   if (instruction.verb === "ReturnToStaging") return instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose";
   // "Add each Nazgûl enemy found": every match goes, and nobody chooses.
@@ -158,7 +147,7 @@ export function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ct
     const taken = item.instruction.verb === "SearchMove" && item.instruction.each === true ? found : [greatestChallenge(state, found, ctx)].filter((id): id is string => id != null);
     ids = taken;
   } else if (picksOne(item.instruction)) {
-    const distinct = distinctByCode(state, found);
+    const distinct = distinctChoices(state, found);
     const chooser = item.instruction.verb === "ShuffleIntoDeck" && item.instruction.who === "firstPlayer" ? state.firstPlayer : attachHostChooser(state, item.instruction, attachSeat(state, item.instruction, item.seat, frame.cardId) ?? item.seat);
     if (distinct.length > 1) return askTarget(state, { ...item, seat: chooser }, distinct);
     ids = found.slice(0, 1);
