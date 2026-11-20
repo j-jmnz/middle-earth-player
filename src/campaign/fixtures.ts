@@ -77,6 +77,7 @@ import belegostFixtures from "./fixtures/the-ruins-of-belegost.json";
 import ponyFixtures from "./fixtures/murder-at-the-prancing-pony.json";
 import annuminasFixtures from "./fixtures/the-siege-of-annuminas.json";
 import guldurFixtures from "./fixtures/attack-on-dol-guldur.json";
+import questFixtures from "./fixtures/the-wizards-quest.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -172,6 +173,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "murder-at-the-prancing-pony": ponyFixtures,
   "the-siege-of-annuminas": annuminasFixtures,
   "attack-on-dol-guldur": guldurFixtures,
+  "the-wizards-quest": questFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

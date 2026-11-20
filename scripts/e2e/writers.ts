@@ -69,6 +69,7 @@ import { belegostFixtures } from "./standalone-scenarios/the-ruins-of-belegost.t
 import { ponyFixtures } from "./standalone-scenarios/murder-at-the-prancing-pony.ts";
 import { annuminasFixtures } from "./standalone-scenarios/the-siege-of-annuminas.ts";
 import { guldurFixtures } from "./standalone-scenarios/attack-on-dol-guldur.ts";
+import { questFixtures } from "./standalone-scenarios/the-wizards-quest.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -147,4 +148,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "murder-at-the-prancing-pony": () => ponyFixtures(),
   "the-siege-of-annuminas": () => annuminasFixtures(),
   "attack-on-dol-guldur": () => guldurFixtures(),
+  "the-wizards-quest": () => questFixtures(),
 };
