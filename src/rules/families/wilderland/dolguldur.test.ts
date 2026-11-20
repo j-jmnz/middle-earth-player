@@ -17,6 +17,7 @@ import { CARDS, ctxOf, record, table } from "./fixture.ts";
 const inFrame = (state: ScenarioState, subject?: string): ScenarioState =>
   pushEffectFrame(state, { frame: "ResolveEffect", sourceId: null, actor: 0, peril: false, effectId: "x:forced:1", instructions: [], picked: [], ...(subject ? { subject } : {}), cancel: null, blockCancel: null }, []);
 const scope = { actor: 0, sourceId: null } as const;
+const focus = { seat: 0, sourceId: null } as const;
 const tally = (state: ScenarioState): number => resolveAmount(state, { siegeTally: true }, scope, ctxOf([]));
 
 describe("TallySiege and the amount siegeTally (50907:A:1)", () => {
@@ -26,21 +27,21 @@ describe("TallySiege and the amount siegeTally (50907:A:1)", () => {
     const plain = spawn(place.state, "orc", { zone: "staging" });
     const ctx = ctxOf([]);
     expect(printedOf(CARDS, "siegeEnemy").keywords.siegeValue).toBe(4);
-    let state = runInstruction(inFrame(plain.state, enemy.id), { verb: "TallySiege" }, scope, ctx, []);
+    let state = runInstruction(inFrame(plain.state, enemy.id), { verb: "TallySiege" }, focus, ctx, []);
     expect(tally(state)).toBe(4);
-    state = runInstruction(inFrame(state, place.id), { verb: "TallySiege" }, scope, ctx, []);
+    state = runInstruction(inFrame(state, place.id), { verb: "TallySiege" }, focus, ctx, []);
     expect(tally(state)).toBe(6);
-    state = runInstruction(inFrame(state, plain.id), { verb: "TallySiege" }, scope, ctx, []);
+    state = runInstruction(inFrame(state, plain.id), { verb: "TallySiege" }, focus, ctx, []);
     expect(tally(state)).toBe(6);
   });
 
   it("belongs to one round: the next round reads 0 and starts again", () => {
     const enemy = spawn(table(), "siegeEnemy", { zone: "staging" });
-    const first = runInstruction(inFrame(enemy.state, enemy.id), { verb: "TallySiege" }, scope, ctxOf([]), []);
+    const first = runInstruction(inFrame(enemy.state, enemy.id), { verb: "TallySiege" }, focus, ctxOf([]), []);
     const later: ScenarioState = { ...first, round: first.round + 1 };
     expect(tally(first)).toBe(4);
     expect(tally(later)).toBe(0);
-    expect(tally(runInstruction(inFrame(later, enemy.id), { verb: "TallySiege" }, scope, ctxOf([]), []))).toBe(4);
+    expect(tally(runInstruction(inFrame(later, enemy.id), { verb: "TallySiege" }, focus, ctxOf([]), []))).toBe(4);
   });
 });
 
@@ -51,7 +52,7 @@ describe("SelectRandomStage and optionTaken (50931:B:2)", () => {
     const seen = new Set<string>();
     for (let seed = 1; seed <= 12; seed += 1) {
       const state = inFrame({ ...table(), seed });
-      const picked = runInstruction(state, { verb: "SelectRandomStage", codes }, scope, ctxOf([]), []);
+      const picked = runInstruction(state, { verb: "SelectRandomStage", codes }, focus, ctxOf([]), []);
       const hits = codes.filter((code) => holds(picked, { kind: "optionTaken", id: code }, scope, ctxOf([])));
       expect(hits).toHaveLength(1);
       expect(hits[0]).not.toBe("stage");
@@ -98,9 +99,9 @@ describe("AdvanceToStage `again`", () => {
     const aside = spawn(base, "stage3a", { zone: "setAside" });
     const stained = updateCard(aside.state, aside.id, { progress: 7, resources: 2 });
     const ctx = ctxOf([]);
-    const without = runInstruction(inFrame(stained), { verb: "AdvanceToStage", code: "stage3a" }, scope, ctx, []);
+    const without = runInstruction(inFrame(stained), { verb: "AdvanceToStage", code: "stage3a" }, focus, ctx, []);
     expect(without.questStage).toBe(base.questStage);
-    const again = runInstruction(inFrame(stained), { verb: "AdvanceToStage", code: "stage3a", again: true }, scope, ctx, []);
+    const again = runInstruction(inFrame(stained), { verb: "AdvanceToStage", code: "stage3a", again: true }, focus, ctx, []);
     expect(again.questStage).toBe(aside.id);
     expect(again.cards[aside.id]).toMatchObject({ zone: "questStage", progress: 0, resources: 0 });
   });
