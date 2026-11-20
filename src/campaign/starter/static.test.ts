@@ -8,6 +8,7 @@ import { hasTrait } from "../../rules/interpret/conditions.ts";
 import { ruleCause } from "../../rules/core/cause.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { ARAGORN, CHEAP, DEAR, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { begin, buildTable, idsOf, send, type Scene, type Table } from "../../../test/harness/scene.ts";
 
 const SAM = "141002";
@@ -62,6 +63,17 @@ describe("Attach to rules (constant AttachesTo records)", () => {
     const staff = idsOf(tab, "142008");
     const spend = { type: "PlayCard" as const, cardId: staff, payments: [] };
     expect(refusal(tab.state, { ...spend, hostId: idsOf(tab, SAM) }, tab.ctx)).toBe("That host is illegal");
+  });
+
+  it("Haradrim Spear goes on a Harad character, as its scan prints (17056:A:1)", async () => {
+    const harad = { ...base, cards: new Map([...base.cards, ...(await loadPrinted(["17001", "12166", "17056"]))]) };
+    const tab = buildTable(harad, { ring: "none", start: "planning", heroes: [{ code: "17001", seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: "12166", seat: 0 }], hand: [{ code: "17056", seat: 0 }] });
+    const kahliel = idsOf(tab, "17001");
+    const funded = give(tab, kahliel, 2);
+    const play = (hostId: string) => ({ type: "PlayCard" as const, cardId: idsOf(tab, "17056"), hostId, payments: [{ heroId: kahliel, amount: 2 }] });
+    expect(refusal(funded.state, play(idsOf(tab, ARAGORN)), funded.ctx)).toBe("That host is illegal");
+    expect(refusal(funded.state, play(idsOf(tab, "12166")), funded.ctx)).toBeNull();
+    expect(send(begin(funded.state), play(kahliel), funded.ctx).state.cards[kahliel]?.attachments).toEqual([idsOf(tab, "17056")]);
   });
 
   it("Bill the Pony cannot have attachments (141006:A:1)", () => {
