@@ -20,11 +20,11 @@ After that, the bot posts each change of the issue in the same thread. If the th
 
 | GitHub event | Message in Discord |
 | --- | --- |
-| Issue closed as completed | 🎉 The issue is fixed and will be in the next app update. |
+| Issue closed as completed by a person | 🎉 The issue is fixed and will be in the next app update. The release workflow closes the issues a release settles; that close posts nothing, since the release post covers it. |
 | Issue closed as not planned, or as a duplicate | The issue is closed, and where to read why. |
 | Issue reopened | The issue is reopened for another look. |
 | A person comments on the issue | 💬 Who replied, the comment's first 600 characters as a quote, and a link. Comments from bots are not posted. |
-| A release is published | 🚀 For each issue that the release notes close (`closes #n`), the version that has the fix. A prerelease posts nothing. This is the last post for that issue. |
+| A release is published | 🚀 For each issue that the release notes settle (`closes #n`), the version that has the fix. A prerelease posts nothing. This is the last post for that issue. |
 
 The bot's messages do not ping anyone. The bot only follows issues that it made: each one keeps its Discord place in a hidden comment at the end of the issue body (`<!-- discord issue:… -->`). Do not delete that line when you edit the issue. If the report message or thread is deleted, the bot skips the update.
 

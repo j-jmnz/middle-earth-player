@@ -52,4 +52,9 @@ describe("commit subjects (.claude/rules/commit-standards.md, Subject line)", ()
     expect(bodyProblem(`repo: Add the hook\n\nSee ${link}\n`)).toContain("names a Claude Code session");
     expect(bodyProblem(`repo: Add the hook\n# Claude-Session: ${link}\n`)).toBeUndefined();
   });
+
+  it("refuses a GitHub closing keyword before an issue, which would close it at the merge (Issues rule of .claude/rules/agent-standards.md)", () => {
+    for (const line of ["Closes #12", "fixes: #12", "This resolved #3 too", "Fixed owner/repo#4"]) expect(bodyProblem(`fix: A\n\n${line}\n`)).toContain("Settles #<n>");
+    for (const line of ["Settles #12", "Refs #12", "Prefixes #3", "Fixes the log", "# Closes #12"]) expect(bodyProblem(`fix: A\n\n${line}\n`)).toBeUndefined();
+  });
 });

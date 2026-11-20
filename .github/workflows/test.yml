@@ -141,6 +141,13 @@ jobs:
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: pnpm commit:check "$TITLE"
+      # The description becomes the squash commit's body: no session link, and no keyword that closes an issue at the merge.
+      - name: Pull request description
+        env:
+          DESCRIPTION: ${{ github.event.pull_request.body }}
+        run: |
+          printf '%s\n' "$DESCRIPTION" > "$RUNNER_TEMP/description.md"
+          pnpm commit:check --description "$RUNNER_TEMP/description.md"
       - name: Commit subjects
         env:
           BASE: ${{ github.event.pull_request.base.sha }}

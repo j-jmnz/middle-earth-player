@@ -11,8 +11,9 @@ export type CommitType = (typeof COMMIT_TYPES)[number];
 
 /**
  * One commit since the last release: its type (undefined for a subject from before the commit standards), its summary, its
- * `Breaking:` lines, and the issues its body names: `closes` from a `Closes`, `Fixes` or `Resolves` line, `refs` from a `Refs`
- * line (the Issues rule of .claude/rules/agent-standards.md).
+ * `Breaking:` lines, and the issues its body names: `closes` from a `Settles` line, which the release closes (or a `Closes`,
+ * `Fixes` or `Resolves` line from before that rule, which GitHub closed at the merge), `refs` from a `Refs` line (the Issues
+ * rule of .claude/rules/agent-standards.md).
  */
 export type Change = { type: CommitType | undefined; summary: string; breaking: string[]; closes: number[]; refs: number[] };
 
@@ -20,8 +21,8 @@ export const BUMP_REQUESTS: readonly BumpRequest[] = ["auto", "patch", "minor", 
 const TAG = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const TYPED = new RegExp(`^(${COMMIT_TYPES.join("|")}): (.+)$`);
 const BREAKING = /^Breaking: *(.+)$/gm;
-// A line that names issues, as GitHub's closing keywords spell it: `Closes #12`, `Fixes: #12, #13`, `Refs #14`.
-const ISSUES = /^(close[sd]?|fix(?:e[sd])?|resolve[sd]?|refs?)\b:? *(#\d+(?:(?:, *| +and +| +)#\d+)*)/gim;
+// A line that names issues: `Settles #12`, `Settles: #12, #13`, `Refs #14`, and GitHub's closing keywords of older commits.
+const ISSUES = /^(settle[sd]?|close[sd]?|fix(?:e[sd])?|resolve[sd]?|refs?)\b:? *(#\d+(?:(?:, *| +and +| +)#\d+)*)/gim;
 // The branches a release may be cut from (release-standards.md, Branches).
 const RELEASE_BRANCH = /^(main|release\/v(0|[1-9]\d*)\.(0|[1-9]\d*))$/;
 

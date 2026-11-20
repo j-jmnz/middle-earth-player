@@ -14,7 +14,7 @@ Read whole.
   - 47–50 Agents (~180)
   - 51–54 Skills (~80)
   - 55–58 Cloud sessions (~60)
-- `.claude/rules/agent-standards.md` — Agent standards (~790 tok)
+- `.claude/rules/agent-standards.md` — Agent standards (~840 tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~1.2K tok)
@@ -266,7 +266,7 @@ Read the sections your task touches.
   - 135–145 Asset mirror (~480) ← 5
 - `docs/discord-issues.md` — Discord issue bot (~3.7K tok)
   - 5–16 What it does (~290)
-  - 17–36 Issue updates (~460)
+  - 17–36 Issue updates (~490) ← 1
   - 37–46 Release announcements (~230)
   - 47–50 How it works (~190)
   - 51–169 Set it up (~1.7K)
@@ -282,20 +282,20 @@ Read the sections your task touches.
   - 170–176 Use it (~80)
   - 177–190 Find a problem (~590)
   - 191–196 Change it (~90)
-- `docs/releasing.md` — Releasing (~5.8K tok)
+- `docs/releasing.md` — Releasing (~5.9K tok)
   - 5–20 Start a release (~340) ← 1
   - 21–36 Jobs (~2.1K) ← 4
   - 37–43 Add the desktop app to a release (~350) ← 1
-  - 44–47 Issue comments (~180) ← 3
-  - 48–51 Installs count (~180) ← 2
-  - 52–76 Caches (~820) ← 1
-  - 77–115 Signing (~1.1K) ← 2
-    - 81–84 Desktop signing (optional) (~220) ← 1
-    - 85–98 Android key (~250) ← 1
-    - 99–102 Asset mirror secrets (~140) ← 1
-    - 103–115 TestFlight (optional) (~420) ← 1
-  - 116–119 Installing (~90)
-  - 120–131 Troubleshooting (~450)
+  - 44–49 Issue comments (~340) ← 4
+  - 50–53 Installs count (~180) ← 2
+  - 54–78 Caches (~820) ← 1
+  - 79–117 Signing (~1.1K) ← 2
+    - 83–86 Desktop signing (optional) (~220) ← 1
+    - 87–100 Android key (~250) ← 1
+    - 101–104 Asset mirror secrets (~140) ← 1
+    - 105–117 TestFlight (optional) (~420) ← 1
+  - 118–121 Installing (~90)
+  - 122–133 Troubleshooting (~450)
 
 ## Agent procedures
 
