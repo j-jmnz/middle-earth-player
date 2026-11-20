@@ -139,7 +139,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: STAGE_3,
     lines: ["50805:B:1"],
     timing: "constant",
-    condition: { kind: "count", pick: { type: "enemy", control: "any", names: ["Battering Ram"] }, min: 1 },
+    condition: { kind: "count", pick: { type: "enemy", control: "any", staging: true, names: ["Battering Ram"] }, min: 1 },
     instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", target: "self" }],
   },
   {
@@ -159,7 +159,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "50805:forced:1", cardCode: STAGE_3, lines: ["50805:B:3"], timing: "forced", trigger: "endOfRound", condition: { kind: "inVictory", code: LIEUTENANT, is: true }, instructions: [{ verb: "WinGame" }] },
 
   // 50812 Annúminas. At the end of the round 1 damage for each enemy in play; no city strength left loses the game (reading 4, 11).
-  { id: "50812:forced:1", cardCode: ANNUMINAS, lines: ["50812:A:1"], timing: "forced", trigger: "endOfRound", instructions: [hurtCity({ count: { type: "enemy", control: "any" } })] },
+  { id: "50812:forced:1", cardCode: ANNUMINAS, lines: ["50812:A:1"], timing: "forced", trigger: "endOfRound", instructions: [hurtCity({ count: { type: "enemy", control: "any", staging: true } })] },
   {
     id: "50812:constant:1",
     cardCode: ANNUMINAS,
@@ -218,7 +218,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "50818:shadow:1", cardCode: DUNEDAIN, lines: ["50818:A:3"], timing: "shadow", instructions: [{ verb: "Ready", target: "defender" }, { verb: "ModifyStat", stat: "defense", amount: 2, until: "endOfAttack", target: "defender" }] },
 
   // 50819 Gate of Annúminas. X is 1 more than the enemies in play; travel: each player engages an enemy of the staging area.
-  { id: "50819:constant:1", cardCode: GATE, lines: ["50819:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { count: { type: "enemy", control: "any" }, plus: 1 }, until: "whileSourceInPlay", target: "self" }] },
+  { id: "50819:constant:1", cardCode: GATE, lines: ["50819:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { count: { type: "enemy", control: "any", staging: true }, plus: 1 }, until: "whileSourceInPlay", target: "self" }] },
   { id: "50819:travel:1", cardCode: GATE, lines: ["50819:A:2"], timing: "travel", instructions: [EACH_PLAYER([{ verb: "Pick", pick: ENEMY_IN_STAGING }, { verb: "Engage", target: "picked" }])] },
 
   // 50820 City Wall: at the end of the round a resource; at 3 it is discarded and Annúminas takes 4 damage, and an encounter card is revealed. (Its travel line is a template.)

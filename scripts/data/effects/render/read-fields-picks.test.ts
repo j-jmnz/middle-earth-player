@@ -24,6 +24,8 @@ describe("effects render read fields, picks", () => {
     stagingOnly: true,
     atStage: true,
     otherArea: true,
+    atOtherStage: true,
+    canSpendResources: 2,
     playerCard: false,
     highestThreatPlusRemaining: true,
     attachable: "03041",

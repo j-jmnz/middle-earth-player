@@ -16,10 +16,11 @@ import { SMAUG_SAMPLES, SMAUG_TEMPLATES } from "./smaug.ts";
 import { ERECH_SAMPLES, ERECH_TEMPLATES } from "./erech.ts";
 import { FOG_SAMPLES, FOG_TEMPLATES } from "./fog.ts";
 import { RUINS_SAMPLES, RUINS_TEMPLATES } from "./ruins.ts";
+import { SIEGE_SAMPLES, SIEGE_TEMPLATES } from "./siege.ts";
 import { INVESTIGATION_SAMPLES, INVESTIGATION_TEMPLATES } from "./investigation.ts";
 
 export { ESCAPE_SAMPLES } from "./escape.ts";
-export { ERECH_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES };
+export { ERECH_SAMPLES, FOG_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -74,7 +75,7 @@ const FLIP_GOLLUM = {
 export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES, ...STAT_TEMPLATES,
-  ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES, ...INVESTIGATION_TEMPLATES,
+  ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES, ...SIEGE_TEMPLATES, ...INVESTIGATION_TEMPLATES,
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),
   // The mount-doom family (src/catalog/families/mount-doom.ts).
   FortitudeTest: (i, ctx) => {
