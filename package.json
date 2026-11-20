@@ -49,6 +49,7 @@
     "@babel/core": "7.29.7",
     "@types/better-sqlite3": "^9.6.0",
     "@types/react": "~19.3.0",
+    "aws4fetch": "1.0.20",
     "babel-plugin-react-compiler": "1.0.0",
     "better-sqlite3": "^13.0.3",
     "electron": "45.2.1",
