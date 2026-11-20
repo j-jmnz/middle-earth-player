@@ -59,8 +59,8 @@ function keyFor(name: string, code: string, used: Set<string>): string {
   return key;
 }
 
-// A scenario whose last word another scenario already uses (The Dread Realm owns "realm", Flight from Moria "moria") starts from another word.
-const SHORT_OF: Readonly<Record<string, string>> = { "the-woodland-realm": "woodland", "the-mines-of-moria": "mines" };
+// A scenario whose last word another scenario already uses (The Dread Realm owns "realm", Flight from Moria "moria", The Caves of Nibin-Dûm and The Battle of Carn Dûm "dum") starts from another word.
+const SHORT_OF: Readonly<Record<string, string>> = { "the-woodland-realm": "woodland", "the-mines-of-moria": "mines", "escape-from-khazad-dum": "khazad" };
 
 function defaultShort(id: string): string {
   return SHORT_OF[id] ?? id.split("-").at(-1) ?? id;

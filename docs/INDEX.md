@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~309.7K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~311.6K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -152,7 +152,7 @@ Read the sections your task touches.
     - 2017–2044 The Long Dark (~4.8K) ← 4
     - 2045–2076 Foundations of Stone (~4.3K) ← 3
     - 2077–2107 Shadow and Flame (~4.1K) ← 4
-  - 2108–2486 Standalone scenarios (~50.9K) ← 1
+  - 2108–2499 Standalone scenarios (~52.8K) ← 1
     - 2112–2135 The Massing at Osgiliath (~2.5K) ← 1
     - 2136–2158 The Battle of Lake-town (~4.0K) ← 36
     - 2159–2175 The Stone of Erech (~2.2K) ← 20
@@ -164,19 +164,20 @@ Read the sections your task touches.
     - 2349–2379 Attack on Dol Guldur (~4.1K) ← 18
     - 2380–2411 The Wizard's Quest (~4.1K) ← 22
     - 2412–2447 The Woodland Realm (~4.7K) ← 15
-    - 2448–2486 The Mines of Moria (~4.9K) ← 12
-  - 2487–2495 Nightmare (~410) ← 22
-  - 2496–2538 Deckbuilding (~2.5K) ← 1
-  - 2539–2618 Effects (~4.1K)
-    - 2541–2599 Three layers (~2.4K) ← 10
-    - 2600–2610 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 2611–2614 Window stack (~100)
-    - 2615–2618 Coverage test (~270)
-  - 2619–2642 Data sources (~750) ← 3
-  - 2643–2661 Card images (~1.4K) ← 9
-  - 2662–2689 Persistence and shipping (~3.2K) ← 10
-  - 2690–2732 Screens (~5.9K) ← 2
-    - 2717–2732 Table screen (~1.8K) ← 3
+    - 2448–2487 The Mines of Moria (~4.9K) ← 12
+    - 2488–2499 Escape from Khazad-dûm (~2.0K)
+  - 2500–2508 Nightmare (~410) ← 22
+  - 2509–2551 Deckbuilding (~2.5K) ← 1
+  - 2552–2631 Effects (~4.1K)
+    - 2554–2612 Three layers (~2.4K) ← 10
+    - 2613–2623 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 2624–2627 Window stack (~100)
+    - 2628–2631 Coverage test (~270)
+  - 2632–2655 Data sources (~750) ← 3
+  - 2656–2674 Card images (~1.4K) ← 9
+  - 2675–2702 Persistence and shipping (~3.2K) ← 10
+  - 2703–2745 Screens (~5.9K) ← 2
+    - 2730–2745 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~68.1K tok)
   - 5–8 Overview (~170) ← 1
   - 9–33 Top bar (~6.1K) ← 8
