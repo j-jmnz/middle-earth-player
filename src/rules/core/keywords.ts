@@ -266,6 +266,9 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   // "When attached enemy would take any amount of damage, cancel all of that damage. Then, discard Dragon Scales" (18059:A:2).
   const scaled = flagged(state, id, "cancelsDamage") ? cancelAllDamage(state, id, amount) : null;
   if (scaled) return scaled;
+  // "When attached enemy is dealt enough damage to destroy it, cancel the damage and discard Smoking Blood instead" (51017:A:1): only damage that would destroy the card is canceled.
+  const lethalCanceled = flagged(state, id, "cancelsLethalDamage") && printed.health != null && instance.damage + placedAmount(state, id, printed, amount) >= modifiedStat(state, instance, "hitPoints", cards) ? cancelAllDamage(state, id, amount, "cancelsLethalDamage") : null;
+  if (lethalCanceled) return lethalCanceled;
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
   const cap = source === "quest" && flagged(state, id, "damageCapSparesQuest") ? 0 : heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;

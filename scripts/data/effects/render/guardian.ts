@@ -22,7 +22,7 @@ export function guardianRestrict(i: Obj): Made | null {
 
 export const GUARDIAN_CONDITIONS: Readonly<Record<string, (c: Obj, ctx: Ctx) => Made>> = {
   guardianCanChange: () => ({ text: "the player guarding Gollum may choose a new player: no card says he cannot change and another player is still in the game", read: [] }),
-  encounterHas: (c) => ({ text: `the encounter discard pile${c.piles === "deckAndDiscard" ? " or deck" : ""} holds a ${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.cardType === "string" ? c.cardType : "card"}${c.aflame === true ? " with the Aflame keyword" : ""}`, read: ["piles", "cardType", "aflame", "trait"] }),
+  encounterHas: (c) => ({ text: `the encounter discard pile${c.piles === "deckAndDiscard" ? " or deck" : ""} holds a ${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.cardType === "string" ? c.cardType : "card"}${c.aflame === true ? " with the Aflame keyword" : ""}${typeof c.code === "string" ? ` with code ${c.code}` : ""}`, read: ["piles", "cardType", "aflame", "trait", "code"] }),
   noneDiscarded: () => ({ text: "the running effect has discarded no card (with DiscardEach)", read: [] }),
 };
 
@@ -36,7 +36,7 @@ export const GUARDIAN_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
 
 export const GUARDIAN_CONDITION_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   guardianCanChange: [{ kind: "guardianCanChange" }],
-  encounterHas: [{ kind: "encounterHas", piles: "deckAndDiscard", cardType: "treachery", aflame: true, trait: "Tantrum" }],
+  encounterHas: [{ kind: "encounterHas", piles: "deckAndDiscard", cardType: "treachery", aflame: true, trait: "Tantrum", code: "51031" }],
   noneDiscarded: [{ kind: "noneDiscarded" }],
 };
 

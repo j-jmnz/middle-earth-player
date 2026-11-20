@@ -17,7 +17,7 @@ export function holdPickedUnder(state: ScenarioState, focus: Focus, ctx: ReduceC
   if (!card || !host || id === host.id || card.zone === "under") return state;
   const owner = card.owner ?? card.controller ?? focus.seat;
   const bare = inPlay(card.zone) ? releaseAttachments(state, id, ctx.cards, steps) : state;
-  return updateCard(moveCard(bare, id, { zone: "under", locationId: host.id }), id, { face: "up", owner, controller: null, heldTitle: true, committed: false, damage: 0, resources: 0, progress: 0 });
+  return updateCard(moveCard({ ...bare, heldCards: true }, id, { zone: "under", locationId: host.id }), id, { face: "up", owner, controller: null, heldTitle: true, committed: false, damage: 0, resources: 0, progress: 0 });
 }
 
 /** Whether a card shares its title with one that lies held under an encounter card: it cannot be played or put into play. */
@@ -27,4 +27,22 @@ export function titleHeld(state: ScenarioState, cardId: string, ctx: ReduceConte
   if (!instance || held.length === 0) return false;
   const name = printedOf(ctx.cards, instance.code).name;
   return held.some((card) => printedOf(ctx.cards, card.code).name === name);
+}
+
+/**
+ * The card a held player card lies under has left play (Necromancer's Pass explored or discarded, the stage Carried Away defeated): each card it held returns to its owner's hand and its title is free again. A seat that left the game gets the card in its discard pile.
+ * Runs in the settle loop, so the cards come back as soon as the host is gone, whatever took it.
+ */
+export function releaseHeld(state: ScenarioState): ScenarioState {
+  if (state.heldCards !== true) return state;
+  let next = state;
+  for (const card of Object.values(state.cards)) {
+    if (card.heldTitle !== true || card.zone !== "under") continue;
+    const host = card.host ? state.cards[card.host] : undefined;
+    if (host && (inPlay(host.zone) || host.zone === "questStage")) continue;
+    const seat = card.owner;
+    if (seat == null) continue;
+    next = updateCard(moveCard(next, card.id, { zone: state.seats[seat]?.eliminated ? "discard" : "hand", seat }), card.id, { face: "up", owner: undefined, heldTitle: undefined, host: null });
+  }
+  return next;
 }

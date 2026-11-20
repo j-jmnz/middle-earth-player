@@ -20,7 +20,7 @@ import { familyAttached } from "./family-hooks.ts";
 import { controlledShips, defendingShip } from "../families/sea/campaign.ts";
 import { discardRestricted } from "../families/objectives/claimed.ts";
 import { printedOf } from "../core/printed.ts";
-import { hasKeyword } from "../core/keywords.ts";
+import { hasKeyword, modifiedStat } from "../core/keywords.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { Frame, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
@@ -80,7 +80,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       // An attackingEnemy host is attached inline by the wilderland family (18018:A:2), never offered here.
       if (instruction.to.kind !== "enemy") return [];
       const trait = instruction.to.trait;
-      return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])].filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx) && free(id));
+      const enemies = [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])].filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx) && free(id));
+      return instruction.to.challenge === true ? mostHitPointsLeft(state, enemies, ctx) : enemies;
     }
     case "SearchMove":
     case "SearchReveal": {
@@ -109,6 +110,16 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     default:
       return [];
   }
+}
+
+// The first of the enemies with the most hit points left (the opposing team's choice of host, docs/brief.md, The Wizard's Quest, reading 3).
+function mostHitPointsLeft(state: ScenarioState, ids: readonly string[], ctx: ReduceContext): string[] {
+  const left = (id: string): number => {
+    const instance = state.cards[id];
+    return instance ? modifiedStat(state, instance, "hitPoints", ctx.cards) - instance.damage : 0;
+  };
+  const best = ids.reduce<string | undefined>((top, id) => (top == null || left(id) > left(top) ? id : top), undefined);
+  return best == null ? [] : [best];
 }
 
 // Different copies of one card are the same choice. Only different cards make the player pick.

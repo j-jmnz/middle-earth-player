@@ -69,6 +69,8 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["exceptSphere"], typeof pick.exceptSphere === "string" ? `that is not a ${pick.exceptSphere} card` : null);
   note(["maxWillpower"], typeof pick.maxWillpower === "number" ? `with a current Willpower of ${pick.maxWillpower} or less` : null);
   note(["highestWillpower"], pick.highestWillpower === true ? "with the highest current Willpower of those (ties: the chooser decides)" : null);
+  note(["enemyOrLocation"], pick.enemyOrLocation === true ? "that is an enemy or a location" : null);
+  note(["challenge"], pick.challenge === true ? "(the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked)" : null);
   note(["highestEngagementCost"], pick.highestEngagementCost === true ? "with the highest current engagement cost of those (ties: the chooser decides)" : null);
   note(["attachedTo"], typeof pick.attachedTo === "string" ? `attached to ${pick.attachedTo === "host" ? "this card's host" : pick.attachedTo === "source" ? "this card" : pick.attachedTo === "defender" ? "the defending character" : "the active location"}` : null);
   note(["lowestAttack"], pick.lowestAttack === true ? "with the lowest Attack of those (ties: the chooser decides)" : null);

@@ -1,5 +1,5 @@
 import type { Obj } from "./kit.ts";
-import { ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES } from "./verbs.ts";
+import { ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES, WIZARDS_QUEST_SAMPLES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
@@ -16,6 +16,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...SIEGE_SAMPLES,
   ...GULDUR_SAMPLES,
   ...INVESTIGATION_SAMPLES,
+  ...WIZARDS_QUEST_SAMPLES,
   ModifyStat: [
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: HERO, eachResource: true, doesNotStack: true },
     { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true },
@@ -161,6 +162,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "SearchMove", code: "09061", to: "engaged", discardOnly: true },
     { verb: "SearchMove", to: "engaged" },
     { verb: "SearchMove", to: "stormcallerArea" },
+    { verb: "SearchMove", types: ["enemy", "location"], maxCost: 1, maxCostMulti: 2, top: 5, to: "engaged", byChallenge: true },
   ],
   AssignDamage: [{ verb: "AssignDamage", amount: 2, pick: HERO, who: "eachSeat", left: 1, of: 2 }, { verb: "AssignDamage", amount: 3, pick: HERO, who: "eachSeat", single: true }],
   ExhaustEach: [{ verb: "ExhaustEach", pick: HERO }],
@@ -201,6 +203,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   SearchReveal: [{ verb: "SearchReveal", trait: "Uruk-hai", type: "enemy", who: "firstPlayer", to: "engaged", cost: true, code: "04023" }, { verb: "SearchReveal", traits: ["Shadow", "Flame"], type: "treachery", deckOnly: true }],
   AttachSelf: [
     { verb: "AttachSelf", to: { kind: "hero", trait: "Warrior" } },
+    { verb: "AttachSelf", to: { kind: "enemy", trait: "Troll", challenge: true } },
     { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } },
     { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer", unlimited: true }, announces: true },
     { verb: "AttachSelf", to: { kind: "character", trait: "Eagle", unlimited: true } },
@@ -259,6 +262,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "Restrict", what: "travel", location: "18068", guarding: "Tiny" },
     { verb: "Restrict", what: "travel", trait: "West Bank" },
     { verb: "Restrict", what: "travel", exceptSelf: true },
+    { verb: "Restrict", what: "travel", withResources: true },
     { verb: "Restrict", what: "commit", unlessControls: HERO },
     { verb: "Restrict", what: "draw", unlessControls: HERO }, { verb: "Restrict", what: "draw", engagedPlayer: true }, { verb: "Restrict", what: "commit", guardian: true, exceptAlone: true }, { verb: "Restrict", what: "playFromHand", guardian: true },
   ],

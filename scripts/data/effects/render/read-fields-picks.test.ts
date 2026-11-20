@@ -60,6 +60,8 @@ describe("effects render read fields, picks", () => {
     highestCost: true,
     highestWillpower: true,
     highestEngagementCost: true,
+    enemyOrLocation: true,
+    challenge: true,
     maxWillpower: 1,
     attachedTo: "host",
     minCost: 0,

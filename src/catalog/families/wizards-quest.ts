@@ -20,6 +20,8 @@ const VERBS = [
   // "places them faceup under this stage as guarded objectives" (51004:B:1) and "place faceup under Necromancer's Pass as a guarded objective" (51013:A:1): the last picked card, an ally in play or a card of a hand, lies faceup under the source card, still its owner's, out of play (docs/brief.md, The Wizard's Quest, readings 9 and 3).
   // An ally in play loses its tokens and its attachments are discarded as it leaves play. The source gives them back (ReturnFacedownToHands) and, while they lie there, no copy of their title can be played or put into play (src/rules/families/wizards-quest/held.ts).
   z.strictObject({ verb: z.literal("HoldPickedUnder"), ...when }),
+  // A constant marker of the card that holds player cards under it (51004:B:2, 51013:A:1): "copies of that card cannot be played" while it lies there. The bar is the engine's (a card held by HoldPickedUnder bars its title, families/wizards-quest/held.ts), so run alone it does nothing.
+  z.strictObject({ verb: z.literal("BarHeldTitles") }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -27,6 +29,8 @@ const TRIGGERS = [] as const;
 const FLAGS = [
   // On an encounter card revealed by SearchTopReveal: its When Revealed effects cannot be canceled ("Its 'when revealed' effects cannot be canceled", 51003:A:1). Read by cancelBarred (rules/families/encounter/cancel.ts).
   "revealUncancelable",
+  // On an enemy a constant ModifyStat of its attachment names (51017:A:1, "When attached enemy is dealt enough damage to destroy it, cancel the damage and discard Smoking Blood instead"): damage that would destroy the card is canceled, and the card that granted the flag is discarded. Read by placeDamage (rules/core/keywords.ts).
+  "cancelsLethalDamage",
 ] as const;
 
 export const manifest = { name: "wizards-quest", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

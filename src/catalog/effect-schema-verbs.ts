@@ -29,14 +29,9 @@ const searchSelector = {
   type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(),
   // A card with the Safe keyword (Across the Ettenmoors, mec108.safe): "search the encounter deck and discard pile for a location with the safe keyword" (10077:A:2). With `type: "objective"` the pool's other objectives stay out.
   safe: z.literal(true).optional(),
-  // The Wizard's Quest (51001:A:1, 51003:B:1): a card whose printed cost is at most `maxCost` (at most `maxCostMulti` with two or more players, "cost 2 or less (3 or less if there are two or more players)"), a card of any one of the printed `types` ("0 cost enemy or 0 cost location"),
-  // among the top `top` cards of the encounter deck alone. `byChallenge`: "the opposing team" finds it, so nobody is asked: the card is the one that gives the players the greatest challenge (docs/brief.md, The Wizard's Quest, reading 3): of enemies and locations the highest printed Threat
-  // (an enemy: the highest Attack when Threat is level), then the one nearest the top of the deck; of any other card the one nearest the top.
-  maxCost: z.number().int().min(0).optional(),
-  maxCostMulti: z.number().int().min(0).optional(),
-  types: z.array(z.enum(["enemy", "location", "treachery"])).min(2).optional(),
-  top: z.number().int().positive().optional(),
-  byChallenge: z.literal(true).optional(),
+  // The Wizard's Quest (51001:A:1, 51003:B:1): a printed cost at most `maxCost` (`maxCostMulti` with two or more players), any of the printed `types`, only the top `top` cards of the encounter deck. `byChallenge`: "the opposing team" finds it, so nobody is asked:
+  // the card that gives the players the greatest challenge (docs/brief.md, The Wizard's Quest, reading 3): of enemies and locations the highest Threat (enemies: then the highest Attack), then the one nearest the top; of any other card the one nearest the top.
+  maxCost: z.number().int().min(0).optional(), maxCostMulti: z.number().int().min(0).optional(), types: z.array(z.enum(["enemy", "location", "treachery"])).min(2).optional(), top: z.number().int().positive().optional(), byChallenge: z.literal(true).optional(),
 };
 
 export const simpleVerbs = [
@@ -252,7 +247,8 @@ export const simpleVerbs = [
         minWillpower: z.number().int().min(1).optional(),
         // The card has no limit per hero ("Driven by Fear", 50325:A:1: a second copy may go on the same hero): a hero that carries a copy is offered too.
         unlimited: z.literal(true).optional() }),
-      z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
+      // `challenge` (51017:A:1): the opposing team attaches it, nobody is asked: the enemy with the most hit points left (reading 3).
+      z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1), challenge: z.literal(true).optional() }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),
       // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
@@ -295,6 +291,8 @@ export const simpleVerbs = [
     // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
     guarding: z.string().min(1).optional(),
     exceptTrait: z.string().min(1).optional(),
+    // With "travel": the players cannot travel to a location that holds resource tokens (51003:B:2).
+    withResources: z.literal(true).optional(),
     // With "attach": the card may have boons attached though it has no other attachments ("Cannot have non-boon attachments", 146020:A:1). A boon is a card the campaign pool holds as one (`campaignKind`), which no trait names.
     exceptBoon: z.literal(true).optional(),
     // With "travel" on a card that is not the location: the players cannot travel to a location with this trait ("The players cannot travel to Pelennor locations", 145075:B:3).

@@ -100,6 +100,7 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
     const engaged = longDarkRestrict(i);
     if (engaged) return engaged;
     if (i.what === "draw") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot draw cards through card effects (the framework's draws are not card effects)`, read: ["what", "unlessControls"] };
+    if (i.what === "travel" && i.withResources === true) return { text: "the players cannot travel to a location that holds resource tokens while this holds", read: ["what", "withResources"] };
     if (i.what === "travel" && i.exceptSelf === true) return { text: "the players cannot travel to any location but this one while this card is in play (a Travel Action is not traveling)", read: ["what", "exceptSelf"] };
     if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : typeof i.trait === "string" ? `locations with the trait ${i.trait}` : "any location"} while this holds`, read: ["what", "location", "guarding", "trait"] };
     return null;

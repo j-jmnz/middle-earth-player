@@ -468,6 +468,8 @@ export type ScenarioState = {
   embassy?: { readonly players: readonly string[]; readonly encounter: readonly string[]; readonly pairs: readonly { readonly player: string; readonly encounter: string }[]; readonly at: number };
   // The Siege values of the enemies destroyed and the locations explored in `round` (TallySiege, families/wilderland/dolguldur.ts), for Dol Guldur's city strength. Kept only in a game with such a card; a tally of an earlier round counts as 0.
   siegeTally?: { round: number; value: number };
+  // A card of the game holds a player card under it (HoldPickedUnder, families/wizards-quest/held.ts): the settle sweep that gives held cards back runs only then.
+  heldCards?: true;
   // The stage the quest left when it advanced to `to` past stages that were never played (AdvanceToStage, families/quest/branch.ts noteSkippedStage): "After a quest card is defeated" names it.
   stageLeft?: { to: string; from: string; bypassed?: true };
   // Escape from Mount Gram's captured cards (families/captured/): the Capture X each card prints by code, the codes that are "in each player's staging area" and the cards of those codes now in play (`here`), the rescue the running
