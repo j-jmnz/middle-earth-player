@@ -1,0 +1,616 @@
+Scenario piles that place cards with no record (quest: 50901 Assault on the Golden Wood; quest: 50902 Crossing the Anduin; quest: 50903 The Siege of Dol Guldur; quest: 50904 The Tower of Sorcery; quest: 50905 Battle Under the Trees; quest: 50906 Dungeons of the Necromancer; staging: 50907 Dol Guldur; staging: 50908 Power of Lórien; staging: 50918 Dol Guldur Marauder; setAside: 50909 Host of Lórien; setAside: 50910 Bane of Amon Lanc; setAside: 50911 Sorcerer of Dol Guldur; setAside: 50912 Chieftain Morlug; setAside: 50913 Dungeon Dweller)
+
+## 50901 Assault on the Golden Wood
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50901:A:1 (front): Setup: Set Host of Lórien and all 4 Lieutenant enemies aside, out of play. Add Power of Lórien and 1 copy of Dol Guldur Marauder per player to the staging area. Shuffle the encounter deck.
+  50901:setup:1: Setup
+    - shuffle the encounter deck
+
+50901:B:1 (back): Forced: At the end of the round, place 1 resource here and move all progress from this stage to Power of Lórien. If there are 3 resources here, advance to stage 2A.
+  50901:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - choose objective (any player controls) named "Power of Lórien"
+    - place progress of the current quest stage progress on the picked card
+    - remove progress of the current quest stage progress from the current quest card (all of it when it holds less)
+    - then, if the card with code 50901 in play holds at least 3 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): advance to the next quest stage
+
+50901:B:2 (back): Response: At the end of the round, raise each player's threat by 1 to choose a stage. Each player at that stage draws 1 card and adds 1 resource to a hero's resource pool.
+  50901:response:1: Response at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (each player)
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+      - choose hero (you control)
+      - add 1 resources to the picked card
+
+## 50902 Crossing the Anduin
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50902:A:1 (front): When Revealed: The first player may remove 10 progress from Power of Lórien to take control of the set-aside Host of Lórien. Then, he may remove an additional 20 progress from Power of Lórien to place it in his play area under his control, otherwise discard it.
+  50902:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "host" (only if there is a objective (any player controls) named "Power of Lórien" [also {"minProgress":10}] to choose):
+        - remove 10 progress from "Power of Lórien"
+        - the set-aside card with code 50909 enters play under the first player's control, ready
+        - the first player chooses one of:
+          * option "power" (only if there is a objective (any player controls) named "Power of Lórien" [also {"minProgress":20}] to choose):
+            - remove 20 progress from "Power of Lórien"
+            - the card in the staging area with code 50908 enters the first player's play area under his control, faceup and ready
+          * option "discard":
+            - choose objective (any player controls) named "Power of Lórien"
+            - discard the picked card
+      * option "discard":
+        - choose objective (any player controls) named "Power of Lórien"
+        - discard the picked card
+
+50902:B:1 (back): When Revealed: Each player searches the encounter deck and discard pile for a Dol Guldur location and adds it to the staging area. Shuffle the encounter deck. Advance to a stage 3 of your choice. If you are playing epic multiplayer mode, each team must choose a different stage.
+  50902:whenRevealed:2: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Dol Guldur location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+    - the first player chooses one of:
+      * option "50903":
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50903","again":true}]
+      * option "50904":
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50904","again":true}]
+      * option "50905":
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50905","again":true}]
+      * option "50906":
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50906","again":true}]
+
+## 50903 The Siege of Dol Guldur
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50903:A:1 (front): When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Bane of Amon Lanc to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Bane of Amon Lanc makes an immediate attack against each player in turn order.
+  50903:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50911"}]
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50912"}]
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50913"}]
+    - one set-aside card with code 50910 joins the staging area (it is not revealed)
+    - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Bane of Amon Lanc" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Bane of Amon Lanc"
+    - for each player, first player first:
+      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Bane of Amon Lanc" to choose): the picked enemy attacks the acting player now, from the staging area
+
+50903:B:1 (back): Bane of Amon Lanc gets -1 engagement cost for each progress token on this stage.
+  50903:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Bane of Amon Lanc": stat engagementCost minus (progress of this card), while this card is in play
+
+50903:B:2 (back): Forced: At the end of the round, remove 5 progress from this stage or increase Dol Guldur's city strength by 3. The first player may remove an additional 5 progress to reduce Dol Guldur's city strength by 3.
+  50903:forced:1: Forced at the end of the round (resolves before the other Forced effects of the moment)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player chooses (each option once) one of:
+      * option "progress" (only if the current quest stage holds at least 5 progress):
+        - remove 5 progress from the current quest card (all of it when it holds less)
+        - the first player chooses one of:
+          * option "extra" (only if the current quest stage holds at least 5 progress):
+            - remove 5 progress from the current quest card (all of it when it holds less)
+            - up to 3 resource token(s) come off the card with code 50907 in play
+          * option "decline":
+      * option "penalty":
+    - then, if the running effect took the option "penalty" (a choice made earlier in it, or the stage picked at random) (checked when this step runs, after the steps above; not tied to whether they did anything): place 3 resource tokens on the card in play with code 50907 (when it is not in play, on the card that holds redirectResources, else nowhere)
+
+## 50904 The Tower of Sorcery
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50904:A:1 (front): When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Sorcerer of Dol Guldur to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Sorcerer of Dol Guldur makes an immediate attack against each player in turn order.
+  50904:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50910"}]
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50912"}]
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50913"}]
+    - one set-aside card with code 50911 joins the staging area (it is not revealed)
+    - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur"
+    - for each player, first player first:
+      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur" to choose): the picked enemy attacks the acting player now, from the staging area
+
+50904:B:1 (back): Sorcerer of Dol Guldur gets -1 engagement cost for each progress token on this stage.
+  50904:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur": stat engagementCost minus (progress of this card), while this card is in play
+
+50904:B:2 (back): Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards all but 1 card from his hand. The first player may remove an additional 5 progress from this stage to choose a player at any stage. That player searches his deck for a card, adds it to his hand, and shuffles his deck.
+  50904:forced:1: Forced at the end of the round (resolves before the other Forced effects of the moment)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player chooses (each option once) one of:
+      * option "progress" (only if the current quest stage holds at least 5 progress):
+        - remove 5 progress from the current quest card (all of it when it holds less)
+        - the first player chooses one of:
+          * option "extra" (only if the current quest stage holds at least 5 progress):
+            - remove 5 progress from the current quest card (all of it when it holds less)
+            - choose player (any player controls) chosen by the first player
+            - the rest of the effect is carried out by the last player picked
+            - choose card (you control) in the deck
+            - move the picked card to hand
+            - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+          * option "decline":
+      * option "penalty" (only if [json condition {"kind":"anyHand","min":2}]):
+    - for each player, first player first:
+      - if the running effect took the option "penalty" (a choice made earlier in it, or the stage picked at random): the actor must choose 1 of the card (you control) in hand to keep (all stay with no more than that many; nothing is asked then); for each of the others:
+        - discard the picked card
+
+## 50905 Battle Under the Trees
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50905:A:1 (front): When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Chieftain Morlug to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Chieftain Morlug makes an immediate attack against each player in turn order.
+  50905:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50910"}]
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50911"}]
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50913"}]
+    - one set-aside card with code 50912 joins the staging area (it is not revealed)
+    - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Chieftain Morlug" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Chieftain Morlug"
+    - for each player, first player first:
+      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Chieftain Morlug" to choose): the picked enemy attacks the acting player now, from the staging area
+
+50905:B:1 (back): Chieftain Morlug gets -1 engagement cost for each progress token on this stage.
+  50905:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Chieftain Morlug": stat engagementCost minus (progress of this card), while this card is in play
+
+50905:B:2 (back): Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards cards from the top of the encounter deck until an enemy is discarded and puts it into play engaged with him. (If the last card of the encounter deck is discarded resolving this effect, shuffle the discard pile back into the encounter deck.) The first player may remove an additional 5 progress from this stage to choose a non-unique enemy at any stage and destroy it.
+  50905:forced:1: Forced at the end of the round (resolves before the other Forced effects of the moment)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player chooses (each option once) one of:
+      * option "progress" (only if the current quest stage holds at least 5 progress):
+        - remove 5 progress from the current quest card (all of it when it holds less)
+        - the first player chooses one of:
+          * option "extra" (only if all of: (the current quest stage holds at least 5 progress) and (there is a non-unique enemy (any player controls) or in the staging area, chosen by the first player to choose)):
+            - remove 5 progress from the current quest card (all of it when it holds less)
+            - choose non-unique enemy (any player controls) or in the staging area, chosen by the first player
+            - the picked card is destroyed (not discarded: rr.destroy)
+          * option "decline":
+      * option "penalty":
+    - for each player, first player first:
+      - if the running effect took the option "penalty" (a choice made earlier in it, or the stage picked at random): cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+      - then, if all of: (the running effect took the option "penalty" (a choice made earlier in it, or the stage picked at random)) and (the picked card is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+## 50906 Dungeons of the Necromancer
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+50906:A:1 (front): When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Dungeon Dweller to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Dungeon Dweller makes an immediate attack against each player in turn order.
+  50906:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50910"}]
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50911"}]
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50912"}]
+    - one set-aside card with code 50913 joins the staging area (it is not revealed)
+    - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Dungeon Dweller" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Dungeon Dweller"
+    - for each player, first player first:
+      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Dungeon Dweller" to choose): the picked enemy attacks the acting player now, from the staging area
+
+50906:B:1 (back): Dungeon Dweller gets -1 engagement cost for each progress token on this stage.
+  50906:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Dungeon Dweller": stat engagementCost minus (progress of this card), while this card is in play
+
+50906:B:2 (back): Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards an ally he controls. The first player may remove an additional 5 progress from this stage to choose a player at any stage. That player searches the top 10 cards of his deck for an ally and puts it into play.
+  50906:forced:1: Forced at the end of the round (resolves before the other Forced effects of the moment)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player chooses (each option once) one of:
+      * option "progress" (only if the current quest stage holds at least 5 progress):
+        - remove 5 progress from the current quest card (all of it when it holds less)
+        - the first player chooses one of:
+          * option "extra" (only if the current quest stage holds at least 5 progress):
+            - remove 5 progress from the current quest card (all of it when it holds less)
+            - choose player (any player controls) chosen by the first player
+            - the rest of the effect is carried out by the last player picked
+            - choose card (you control) in the deck, among the top 10, of card type ally [also {"intoPlay":true}]
+            - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+          * option "decline":
+      * option "penalty" (only if there is a ally (any player controls) to choose):
+    - for each player, first player first:
+      - if the running effect took the option "penalty" (a choice made earlier in it, or the stage picked at random): choose ally (you control)
+      - then, if all of: (the running effect took the option "penalty" (a choice made earlier in it, or the stage picked at random)) and (there is a ally (you control) to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 50907 Dol Guldur
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+50907:A:1 (front): While the players are at stage 3, Dol Guldur gains: 'Forced: At the end of the round, after resolving the Forced effect on each stage 3 in play, reduce Dol Guldur's city strength by X, where X is the total siege value of each location explored and each enemy destroyed at each stage this round.'
+  50907:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls))
+    - add the Siege value printed on the card the event is about (a destroyed enemy, an explored location; 0 when it prints none) to this round's Siege tally
+  50907:forced:2: Forced on the event locationExplored (heard about location (any player controls))
+    - add the Siege value printed on the card the event is about (a destroyed enemy, an explored location; 0 when it prints none) to this round's Siege tally
+  50907:forced:3: Forced at the end of the round
+    only if 2 is less than the stage number of the quest
+    - up to the Siege values added up this round: each enemy destroyed and each location explored adds its printed Siege value resource token(s) come off the card with code 50907 in play
+
+## 50908 Power of Lórien
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+50908:A:1 (front): While you control Power of Lórien, it gains: 'Response: Add Power of Lórien to the victory display to cancel and discard an encounter card just revealed from the encounter deck.'
+  50908:response:1: Response on the event encounterRevealed (cost: [json cost {"kind":"addSelfToVictory"}]; only when the encounter deck revealed it)
+    only if this card is in play
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the effect being resolved is canceled: nothing after this resolves
+    - the card the event is about goes to the encounter discard pile
+
+## 50909 Host of Lórien
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50909:A:1: Ranged. Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50909:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50909:A:3 (front): Does not exhaust to quest.
+  50909:constant:1: Constant
+    - this card: stat noExhaustQuest 1, while this card is in play
+
+50909:A:4 (front): If Host of Lórien leaves play, remove it from the game.
+  50909:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - this card is removed from the game
+
+## 50910 Bane of Amon Lanc
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50910:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50910:A:2 (front): Forced: When Bane of Amon Lanc attacks you, discard a random card from your hand. Bane of Amon Lanc gets +X Attack for this attack, where X is that card's printed cost.
+  50910:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+    - this card: stat attack printed cost of the picked card, until the end of the attack
+
+## 50911 Sorcerer of Dol Guldur
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50911:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50911:A:2 (front): Forced: When Sorcerer of Dol Guldur attacks you, discard the top card of your deck. Then, discard each copy of that card from play.
+  50911:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top 1 card(s) of the acting player's deck go to their discard pile
+    - discard each card in play, whoever controls it, with the title of the card this effect last discarded from a deck
+
+## 50912 Chieftain Morlug
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50912:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50912:A:2 (front): Forced: When Chieftain Morlug attacks you, discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with you.
+  50912:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+## 50913 Dungeon Dweller
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+50913:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50913:A:2 (front): Forced: When Dungeon Dweller attacks you, discard an ally you control.
+  50913:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control)
+    - discard the picked card
+
+## 50914 Host of Dol Guldur
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50914:A:1 (front): Archery X.
+  50914:constant:1: Constant (record also names 50914:A:2)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+50914:A:2 (front): X is the number of players.
+  50914:constant:1: Constant (record also names 50914:A:1)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+50914:A:3 (front): Cannot have attachments.
+  50914:constant:2: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+50914:A:4 (front): Forced: At the end of the encounter phase, if Host of Dol Guldur is in the staging area, remove X progress from the main quest.
+  50914:forced:1: Forced at the end of the phase
+    only if all of: (it is the Encounter phase) and (this card is in the staging area)
+    - remove the number of players progress from the current quest card (all of it when it holds less)
+
+## 50915 Mirkwood Olog-hai
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50915:A:1 (front): Forced: After Mirkwood Olog-hai attacks and destroys a character, remove 1 progress from the main quest for each excess point of damage.
+  50915:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    - remove [json amount {"excessOf":"subject"}] progress from the current quest card (all of it when it holds less)
+
+50915:A:2 (shadow): Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area.
+  50915:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove 2 progress from the current quest card (all of it when it holds less)
+      * option "staging":
+        - when the attack in progress ends:
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 50916 Beast of Taur-nu-Fuin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50916:A:1 (front): Beast of Taur-nu-Fuin cannot have attachments and its shadow cards cannot be canceled.
+  50916:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat shadowsUncancelable 1, while this card is in play
+
+50916:A:2 (front): Forced: When Beast of Taur-nu-Fuin attacks, either remove 2 progress from the main quest or deal it an additional shadow card.
+  50916:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - the first player chooses one of:
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove 2 progress from the current quest card (all of it when it holds less)
+      * option "shadow":
+        - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 50917 Amon Lanc Archer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50917:A:1: Archery 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50917:A:2 (front): Forced: After Amon Lanc Archer engages you, either remove 2 progress from the main quest, or deal 2 damage to an ally you control.
+  50917:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player chooses one of:
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove 2 progress from the current quest card (all of it when it holds less)
+      * option "damage" (only if there is a ally (you control) to choose):
+        - choose ally (you control)
+        - deal 2 damage to the picked card
+
+50917:A:3 (shadow): Shadow: Exhaust a character you control.
+  50917:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 50918 Dol Guldur Marauder
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+50918:A:1 (front): Dol Guldur Marauder gets +1 Attack and +1 Defense for each resource on it.
+  50918:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack resources of this card, while this card is in play
+    - this card: stat defense resources of this card, while this card is in play
+
+50918:A:2 (front): Forced: When Dol Guldur Marauder attacks, either remove 1 progress from the main quest or place 1 resource on Dol Guldur Marauder.
+  50918:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - the first player chooses one of:
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove 1 progress from the current quest card (all of it when it holds less)
+      * option "resource":
+        - place 1 resource tokens on this card
+
+## 50919 Battle Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50919:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50919:A:2 (front): Forced: After Battle Warg engages you, either remove 1 progress from the main quest or discard an attachment you control.
+  50919:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player chooses one of:
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove 1 progress from the current quest card (all of it when it holds less)
+      * option "attachment" (only if there is a attachment (you control) to choose):
+        - choose attachment (you control)
+        - discard the picked card
+
+50919:A:3 (shadow): Shadow: Discard an attachment you control.
+  50919:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 50920 Gate of Dol Guldur
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50920:A:1 (front): While Gate of Dol Guldur is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3B. Each player's threat cannot be reduced by more than 1 each round by player card effects.'
+  50920:constant:1: Constant
+    only if all of: (this card is in the staging area) and (the card with code 50903 is not in play)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the players cannot travel to any location while this holds
+    - this card: stat noProgressPlaced 1, while this card is in play
+  50920:constant:2: Constant
+    only if this card is in the staging area
+    - each player: stat playerThreatReductionCap 1, while this card is in play
+
+## 50921 The Sorcerer's Tower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50921:A:1 (front): While The Sorcerer's Tower is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3D. Forced: After a 'when revealed' effect is canceled, reveal the top card of the encounter deck.'
+  50921:constant:1: Constant
+    only if all of: (this card is in the staging area) and (the card with code 50904 is not in play)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the players cannot travel to any location while this holds
+    - this card: stat noProgressPlaced 1, while this card is in play
+  50921:forced:1: Forced on the event whenRevealedCanceled
+    only if this card is in the staging area
+    - the acting player reveals an encounter card
+
+## 50922 The Shadow Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50922:A:1 (front): The Shadow Road gets +2 Threat for each facedown card attached to it.
+  50922:constant:2: Constant
+    - this card: stat threat [json amount {"facedown":true,"times":2}], while this card is in play
+
+50922:A:2 (front): While The Shadow Road is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3F. Forced: After an event is played during the quest phase, attach it facedown to The Shadow Road.'
+  50922:constant:1: Constant
+    only if all of: (this card is in the staging area) and (the card with code 50905 is not in play)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the players cannot travel to any location while this holds
+    - this card: stat noProgressPlaced 1, while this card is in play
+  50922:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+    only if all of: (it is the Quest phase) and (this card is in the staging area)
+    - [json AttachFacedown {"verb":"AttachFacedown"}]
+
+## 50923 Dungeon Door
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50923:A:1 (front): While Dungeon Door is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3H. No more than 1 damage can be healed from each character each round.'
+  50923:constant:1: Constant
+    only if all of: (this card is in the staging area) and (the card with code 50906 is not in play)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the players cannot travel to any location while this holds
+    - this card: stat noProgressPlaced 1, while this card is in play
+  50923:constant:2: Constant
+    only if this card is in the staging area
+    - the table: stat healCap 1, while this card is in play
+
+## 50924 Forest Battleground
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50924:A:1 (front): Forest Battleground gets +1 Threat for each ally controlled by the player with the most allies.
+  50924:constant:1: Constant
+    - this card: stat threat [json amount {"mostPerPlayer":{"type":"ally","control":"you"}}], while this card is in play
+
+50924:A:2 (front): Forced: When Forest Battleground is explored, each player searches the encounter deck and discard pile for an Orc enemy and adds it to the staging area. Shuffle the encounter deck.
+  50924:forced:1: Forced on the event locationExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 50925 Blackened Woods
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50925:A:1 (front): Forced: When Blackened Woods is explored, discard the top card of the encounter deck and raise each player's threat by X, where X is that card's printed Threat.
+  50925:forced:1: Forced on the event locationExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck
+    - raise threat by printed threat of the top card of the encounter discard pile (each player)
+
+50925:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 3 progress from the main quest.
+  50925:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): remove 3 progress from the current quest card (all of it when it holds less)
+
+## 50926 Servant of Sauron
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50926:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50926:A:2 (front): When Revealed: The enemy in the staging area with the highest engagement cost makes an immediate attack against the first player.
+  50926:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
+
+50926:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  50926:shadow:1: Shadow
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 50927 Power Sevenfold
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50927:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50927:A:2 (front): When Revealed: Each player must choose: either search the encounter deck and discard pile for a Dol Guldur location and add it to the staging area, or search the encounter deck and discard pile for an Orc enemy and put it into play engaged with him.
+  50927:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "location" (only if the encounter deck or its discard pile holds a Dol Guldur location):
+          - the acting player finds one Dol Guldur location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+        * option "enemy" (only if the encounter deck or its discard pile holds an Orc enemy):
+          - the acting player finds one Orc enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+## 50928 The Necromancer's Rage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50928:A:1 (front): When Revealed: Deal 1 damage to each exhausted character. Until the end of the phase, each damaged character gets -1 Willpower.
+  50928:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - deal 1 damage to each exhausted character (any player controls)
+    - damagedCharacters: stat willpower -1, until the end of the phase
+
+50928:A:2 (shadow): Shadow: Deal 1 damage to the defending character. Until the end of the phase, the defending character gets -1 Defense for each damage on it.
+  50928:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - deal 1 damage to the defender
+    - the defender: stat defense minus (damage of the defender), until the end of the phase
+
+## 50929 Fear and Despair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50929:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+50929:A:2 (front): When Revealed: Each player exhausts a character he controls. Until the end of the round, characters cannot be readied by player card effects.
+  50929:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+    - every character in play, now and entering later: stat cannotReadyByPlayerCard 1, until the end of the round
+
+50929:A:3 (shadow): Shadow: Defending character cannot ready until the end of the round.
+  50929:shadow:1: Shadow
+    - the defender: stat cannotReady 1, until the end of the round
+
+## 50930 Fastness of Mirkwood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+50930:A:1 (front): When Revealed: No more than 5 progress can be placed on the current quest this round. If Dol Guldur's city strength is 5 or lower, Fastness of Mirkwood gains surge.
+  50930:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, until the end of the round
+    - then, if the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+50930:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack and +1 Defense until the end of the phase (+2 Attack and +2 Defense instead if at least 5 progress is on the quest).
+  50930:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the phase
+    - the attacking enemy: stat defense 1, until the end of the phase
+    - then, if the current quest stage holds at least 5 progress (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the phase
+    - then, if the current quest stage holds at least 5 progress (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat defense 1, until the end of the phase
+
+## 50931 Standard Game Mode
+
+50931:A:1 (front): Setup: Add Dol Guldur to the staging area, attach a threat dial to it, and set its value to 5. Then, increase its value by 5 for each player. For the rest of the game, that threat dial is the siege tracker and it displays the city strength of Dol Guldur. Flip this card over.
+  50931:setup:1: Setup
+    - place the number of players x 5 + 5 resource tokens on the card in play with code 50907 (when it is not in play, on the card that holds redirectResources, else nowhere)
+
+50931:B:1 (back): While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible.
+  50931:constant:1: Constant
+    only if the resource tokens on objective (any player controls) named "Dol Guldur" is less than 1
+    - each Lieutenant enemy (any player controls) or in the staging area: stat losesIndestructible 1, while this card is in play
+
+50931:B:2 (back): While the players are at stage 3, this card gains: 'Forced: After resolving the Forced effect on Dol Guldur, randomly select a stage 3 that was not in play this round and resolve its Forced effect. Then, discard all progress from the current stage 3 and advance to a new stage 3 of your choice.'
+  50931:forced:2: Forced at the end of the round
+    only if 2 is less than the stage number of the quest
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose at random, with the game's seed, one of the stages 50903, 50904, 50905, 50906 but the current one, and note it as the option taken
+    - then, if the running effect took the option "50903" (a choice made earlier in it, or the stage picked at random) (checked when this step runs, after the steps above; not tied to whether they did anything): place 3 resource tokens on the card in play with code 50907 (when it is not in play, on the card that holds redirectResources, else nowhere)
+    - for each player, first player first:
+      - if the running effect took the option "50904" (a choice made earlier in it, or the stage picked at random): the actor must choose 1 of the card (you control) in hand to keep (all stay with no more than that many; nothing is asked then); for each of the others:
+        - discard the picked card
+    - for each player, first player first:
+      - if the running effect took the option "50905" (a choice made earlier in it, or the stage picked at random): cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+      - then, if all of: (the running effect took the option "50905" (a choice made earlier in it, or the stage picked at random)) and (the picked card is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+    - for each player, first player first:
+      - if the running effect took the option "50906" (a choice made earlier in it, or the stage picked at random): choose ally (you control)
+      - then, if all of: (the running effect took the option "50906" (a choice made earlier in it, or the stage picked at random)) and (there is a ally (you control) to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - all progress on this stage (the main quest card) is discarded
+    - the first player chooses one of:
+      * option "50903" (only if the card with code 50903 is not in play):
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50903","again":true}]
+      * option "50904" (only if the card with code 50904 is not in play):
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50904","again":true}]
+      * option "50905" (only if the card with code 50905 is not in play):
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50905","again":true}]
+      * option "50906" (only if the card with code 50906 is not in play):
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50906","again":true}]
+
+50931:B:3 (back): At the end of the round, if Dol Guldur's city strength is 0 and there are no Lieutenant enemies in play, Dol Guldur is captured and the players win the game.
+  50931:forced:1: Forced at the end of the round
+    - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 1) and (the number of Lieutenant enemy (any player controls) or in the staging area is at most 0): the players win the game
+
+(rendered pieces: 489 by template, 31 as JSON)

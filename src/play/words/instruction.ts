@@ -290,6 +290,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return instruction.who === "picked" ? "that player's engaged enemies cannot attack that player" : "that enemy cannot attack you";
     case "DiscardShadowOf":
       return `discard a shadow card from ${refWords(instruction.target)}`;
+    case "DealShadow":
+      return instruction.additional ? "deal it an additional shadow card" : "deal it a shadow card";
     case "DealShadowTo":
       return `deal ${refWords(instruction.target)} another shadow card`;
     case "LookAtShadow":
