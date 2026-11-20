@@ -56,7 +56,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40001:B:2 (back): Quest Action: Deal 10 damage to a non-unique enemy engaged with a player in any group. (Group limit once per game.)
   40001:action:1: Action (limit oncePerGameGroup)
-    only if there is a non-unique enemy (any player controls) to choose
+    only if all of: (it is the Quest phase) and (there is a non-unique enemy (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose non-unique enemy (any player controls)
     - deal 10 damage to the picked card
@@ -105,7 +105,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40002:B:1 (back): Quest Action: Deal 10 damage to a non-unique enemy engaged with a player in any group. Reveal the top card of the encounter deck. (Group limit once per game.)
   40002:action:1: Action (limit oncePerGameGroup)
-    only if there is a non-unique enemy (any player controls) to choose
+    only if all of: (it is the Quest phase) and (there is a non-unique enemy (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose non-unique enemy (any player controls)
     - deal 10 damage to the picked card
@@ -120,15 +120,15 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40004:B:1 (back): *This stage has a global quest point value of 8 per player among all groups.
   40004:constant:1: Constant
-    - this card: stat questPoints the number of players x 8, while this card is in play
+    - this card: stat questPoints the number of players who started the game, an eliminated one included x 8, while this card is in play
 
 40004:B:2 (back): No more than 5 PerPlayer progress can be placed on this stage each round.
   40004:constant:2: Constant
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) the number of players x 5, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) the number of players who started the game, an eliminated one included x 5, while this card is in play
 
 40004:B:3 (back): The players can only advance at the end of the quest phase.
   40004:constant:3: Constant
-    only if it is the Quest phase
+    only if not (the Quest phase has just ended)
     - the players cannot defeat this stage while this holds
 
 ## 40005 Destroy the Dreadnaught
@@ -140,13 +140,13 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40005:B:1 (back): No more than 5 PerPlayer progress can be placed on this stage each round.
   40005:constant:1: Constant
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) the number of players x 5, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) the number of players who started the game, an eliminated one included x 5, while this card is in play
 
 40005:B:2 (back): Action: Remove 5 PerPlayer progress from this stage to choose any group to shuffle 1 set aside Gondorian Warship card into their encounter deck.
   40005:action:1: Action
-    only if a copy of the card with code 40012 is set aside, out of play
+    only if all of: (a copy of the card with code 40012 is set aside, out of play) and (the current quest stage holds at least 5 progress for each player who started the game)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveQuestProgress {"verb":"RemoveQuestProgress","perPlayer":5}]
+    - [json RemoveQuestProgress {"verb":"RemoveQuestProgress","perPlayer":5,"startedPlayers":true}]
     - [json ShuffleRandomSetAside {"verb":"ShuffleRandomSetAside","name":"Gondorian Warship"}]
     - shuffle the encounter deck
 
@@ -236,6 +236,8 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40008:A:3 (front): Forced: When you draw your starting hand, draw 5 additional cards, then shuffle 5 cards from your hand into your deck. You cannot take a mulligan.
   40008:forced:1: Forced on the event setupHandDrawn
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShuffleHandIntoDeck {"verb":"ShuffleHandIntoDeck"}]
+    - the acting player draws 6 card(s)
     - the acting player draws 5 card(s)
     - the actor must choose 5 of the card (you control) in hand to keep (all stay with no more than that many; nothing is asked then); for each of the others (the chosen ones get the steps in the second list):
 
@@ -303,7 +305,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40010:B:2 (back): Response: After Swan Ship of Dol Amroth flips, add 2 resources to a hero's resource pool. Ready a card.
   40010:response:1: Response on the event flipped (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose hero (you control)
+    - choose hero (any player controls)
     - add 2 resources to the picked card
     - choose exhausted card (any player controls)
     - ready the picked card
@@ -380,16 +382,17 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40013:A:1 (front): Archery 1 PerPlayer. Massive. Immune to player card effects. Cannot take more than 5 PerPlayer damage each round.
   40013:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat archeryPlayers 1, while this card is in play
+    - this card: stat archery the number of players who started the game, an eliminated one included, while this card is in play
     - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
+    - this card: stat attackableEngagedWithAll 1, while this card is in play
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
     - this card: stat leavesStagingWhenDefeated (it cannot leave the staging area, except that damage that destroys it discards it) 1, while this card is in play
-    - this card: stat damageCap the number of players x 5, while this card is in play
+    - this card: stat damageCap the number of players who started the game, an eliminated one included x 5, while this card is in play
 
 40013:A:2 (front): *The Dreadnaught has a global hit point value of 15 per player among all groups.
   40013:constant:2: Constant
-    - this card: stat hitPoints the number of players x 15, while this card is in play
+    - this card: stat hitPoints the number of players who started the game, an eliminated one included x 15, while this card is in play
 
 40013:A:3 (front): Forced: At the end of the round, if the Dreadnaught has less than half of its starting hit points, flip it over.
   40013:forced:1: Forced at the end of the round
@@ -400,14 +403,15 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40013:constant:3: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
+    - this card: stat attackableEngagedWithAll 1, while this card is in play
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
     - this card: stat leavesStagingWhenDefeated (it cannot leave the staging area, except that damage that destroys it discards it) 1, while this card is in play
-    - this card: stat damageCap the number of players x 5, while this card is in play
+    - this card: stat damageCap the number of players who started the game, an eliminated one included x 5, while this card is in play
 
 40013:B:2 (back): *The Dreadnaught has a global hit point value of 15 per player among all groups.
   40013:constant:4: Constant
-    - this card: stat hitPoints the number of players x 15, while this card is in play
+    - this card: stat hitPoints the number of players who started the game, an eliminated one included x 15, while this card is in play
 
 40013:B:3 (back): Forced: After the Dreadnaught flips, each player puts 1 set-aside unique Corsair enemy into play at random engaged with them.
   40013:forced:2: Forced on the event flipped (heard about this card)
@@ -478,10 +482,8 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40017:A:3 (front): Forced: After Hydraken attacks, he makes an additional attack. Deal him 2 additional shadow cards for this attack and engaged player raises their threat by 4. (Limit once per round.)
   40017:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; limit once per round)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card is dealt a shadow card
-    - this card is dealt a shadow card
     - raise threat by 4 (the acting player)
-    - this card (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
+    - this card (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own, then 2 more for this attack
 
 ## 40018 Ophidian
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -536,7 +538,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40021:A:2 (front): Forced: After an event card is discarded from your deck by Corsair Plunderer's Pillage keyword, discard an attachment you control.
   40021:forced:1: Forced on the event pillaged (heard about this card)
-    only if the card the event is about is a card (any player controls) in the discard pile, of card type event
+    only if the event's other card is a card (any player controls) in the discard pile, of card type event
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -550,7 +552,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40022:A:2 (front): Forced: After an event card is discarded from your deck by Daring Buccaneer's Pillage keyword, deal 1 damage to a character you control.
   40022:forced:1: Forced on the event pillaged (heard about this card)
-    only if the card the event is about is a card (any player controls) in the discard pile, of card type event
+    only if the event's other card is a card (any player controls) in the discard pile, of card type event
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - deal 1 damage to the picked card
@@ -564,7 +566,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40023:A:2 (front): Forced: After an event card is discarded from your deck by Fierce Marauder's Pillage keyword, discard 1 resource from the resource pool of a hero you control.
   40023:forced:1: Forced on the event pillaged (heard about this card)
-    only if the card the event is about is a card (any player controls) in the discard pile, of card type event
+    only if the event's other card is a card (any player controls) in the discard pile, of card type event
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
     - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -575,7 +577,9 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40024:A:1 (front): While Southron Sailor is engaged with you, each Ship enemy engaged with you contributes its Threat to the total Threat in the staging area.
   40024:constant:1: Constant
     only if this card is engaged with the player
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - each Ship enemy (any player controls) engaged with you: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Dreadnaught": stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, while this card is in play
 
 ## 40025 Umbar Captain
 (the scenario deals it into the corsairDeck pile; the piles place it, no record does)
@@ -742,11 +746,12 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40036:A:2 (front): Forced: After a Ship enemy enters play, discard 1 resource from Isle of Fortune.
   40036:forced:1: Forced after a card enters play (heard about Ship enemy (any player controls) or in the staging area)
-    - up to 1 resource token(s) come off the card with code 40036 in play
+    - up to 1 resource token(s) come off this card
 
 40036:A:3 (front): Response: When Isle of Fortune is explored as the active location, move each resource on it to a hero's resource pool.
   40036:response:1: Response on the event activeExplored (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) that is this card itself
     - choose hero (any player controls) chosen by the first player
     - move all the resource tokens from the card picked before the last to the last card picked
 
@@ -794,15 +799,11 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40040:A:1 (front): Doomed 1. (Raise each player's threat by 1.)
   (the keyword part is owned by the card's keywords; the records cover: (Raise each player's threat by 1.))
-  40040:whenRevealed:1: When revealed (record also names 40040:A:2)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Doomed {"verb":"Doomed","amount":1}]
-    - each Ship enemy (any player controls) or in the staging area: stat archery 2, until the end of the round
+  40040:constant:1: Constant
+    (no instructions)
 
 40040:A:2 (front): When Revealed: Until the end of the round, each Ship enemy gains Archery 2.
-  40040:whenRevealed:1: When revealed (record also names 40040:A:1)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Doomed {"verb":"Doomed","amount":1}]
+  40040:whenRevealed:1: When revealed
     - each Ship enemy (any player controls) or in the staging area: stat archery 2, until the end of the round
 
 40040:A:3 (shadow): Shadow: Assign 2 damage among characters you control (3 damage instead if there are 10 or more cards in your discard pile).
@@ -854,7 +855,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
     - this enemy, in the staging area, engages the first player [also {"target":"picked"}]
-    - [json AttackWithPicked {"verb":"AttackWithPicked","who":"firstPlayer"}]
+    - [json AttackWithPicked {"verb":"AttackWithPicked","who":"firstPlayer","counted":true}]
     - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 40043:A:2 (shadow): Shadow: Either raise your threat by 4 or attacking enemy makes an additional attack.
@@ -917,4 +918,4 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40046:shadow:1: Shadow
     - deal 1 damage to the defender
 
-(rendered pieces: 508 by template, 44 as JSON)
+(rendered pieces: 519 by template, 43 as JSON)

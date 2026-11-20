@@ -70,6 +70,13 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   if (toughness > 0) add("toughness", false, (usable ? (kw.toughness ?? 0) : 0) + toughness);
   else shown("toughness", (kw.toughness ?? 0) > 0, kw.toughness ?? undefined);
 
+  // Pillage X: the printed number and what an effect adds to it (Belfalas Shipyard's Shadow, 40034:A:2).
+  const pillage = (usable ? (kw.pillage ?? 0) : 0) + heldAmount(game, cardId, "pillage");
+  if (pillage > 0) add("pillage", false, pillage);
+  else shown("pillage", (kw.pillage ?? 0) > 0, kw.pillage ?? undefined);
+  // Massive: an enemy that stays in the staging area, engaged with every player, which every player may attack (the Dreadnaught).
+  if (flagged(game, cardId, "attackableEngagedWithAll")) add("massive", false);
+
   if (indestructible(game, cardId, printed)) add("indestructible", false);
   else shown("indestructible", kw.indestructible);
   if (!playerCardEffectCanChoose(printed, game, cardId)) add("immune", false);
