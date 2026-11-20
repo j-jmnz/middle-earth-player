@@ -160,6 +160,7 @@ const ROWS: readonly Row[] = [
   // 51147 Lost and Witless.
   { line: "51147:A:1", name: "When Revealed: each ally card in each hand is discarded", layout: { hand: ["ally", "c1"], deck: F0 }, act: reveal("51147"), expect: [count("ally", "discard", 1), handCount(1)] },
   { line: "51147:A:2", name: "Shadow: if the attack is undefended an ally you control is discarded", layout: { engaged: ["f3"], play: ["ally"], deck: F0 }, act: attack("f3", { shadow: "51147", undefended: true }), expect: [zone("ally", "discard")] },
+  { line: "51147:A:2", name: "an ally discarded is Mendor: the players lose the game", layout: { seats: 2, engaged: ["f3"], play: ["51111"], deck: F0 }, act: attack("f3", { shadow: "51147", undefended: true }), expect: [lost] },
   // 51148 Wicked Spider.
   { line: "51148:A:2", name: "Shadow: the attacker cannot take damage this phase", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51148" }), expect: [flag("f3", "cannotTakeDamage")] },
   // 51149 Old Forest Road.
