@@ -1,5 +1,5 @@
 // Rules: rr.search, rr.reveal, rr.forced, rr.guarded, rr.explored, rr.travel, rr.step-4-2, rr.doomed-x, rr.attachment-cards, rr.cancel, rr.victory, rr.quest-advancement, rr.shadow-effects, mec108.side-quests, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/brief.md (The Wizard's Quest).
-import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, endPhase, exhausted, flag, handCount, heldBy, offers, quest, resolve, respond, resourcesOn, reveal, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, endPhase, exhausted, flag, handCount, heldBy, offers, quest, resolve, respond, resourcesOn, reveal, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Wizard's Quest (standalone-scenarios part 10): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
@@ -50,6 +50,43 @@ const ROWS: readonly Row[] = [
   { line: "51010:A:2", name: "Response: after the players travel to it each hero gains 1 resource and each player draws 1 card", layout: { phase: "Travel", staging: [RHOSGOBEL], deckOf: ["f0", "f0"] }, act: [travel(RHOSGOBEL), respond(RHOSGOBEL)], expect: [resourcesOn("dh1", 2), handCount(2)] },
   { line: "51011:A:2", name: "Threat X: 1 more than the stage number", layout: { stage: "51003", staging: [RIDER] }, act: [], expect: [stat(RIDER, "threat", 3)] },
   { line: "51011:A:3", name: "it cannot leave the staging area unless the players are at stage 3", layout: { stage: "51005", staging: [RIDER] }, act: [], expect: [flag(RIDER, "cannotLeaveStaging")] },
+  // 51012 Nazgûl of Dol Guldur.
+  { line: "51012:A:1", name: "it cannot take non-combat damage", layout: { staging: ["51012"] }, act: [], expect: [flag("51012", "cannotTakeNonCombatDamage")] },
+  { line: "51012:A:2", name: "Forced: after it attacks you its controller raises threat by 3 (or it returns to the staging area)", layout: { threat: [30, 30], engaged: ["51012"], deck: F0 }, act: [attack("51012"), answer("threat")], expect: [threat(33)] },
+  { line: "51012:A:2", name: "or the enemy returns to the staging area", layout: { threat: [30, 30], engaged: ["51012"], deck: F0 }, act: [attack("51012"), answer("return")], expect: [zone("51012", "staging")] },
+  // 51013 Necromancer's Pass.
+  { line: "51013:A:1", name: "When Revealed: the first player keeps a card of his hand and the highest cost card of the others lies under the location", layout: { staging: ["51013"], hand: ["c1", "c3", "c2"] }, act: resolve("51013", "whenRevealed"), expect: [count("c3", "under", 1)] },
+  // 51014 Pursued by Shadow.
+  { line: "51014:A:1", name: "When Revealed: the enemy of highest Attack in the staging area attacks the first player", layout: { staging: ["51018", "51024"], deck: F0 }, act: [reveal("51014"), endPhase], expect: [damageOn("dh1", 2)] },
+  { line: "51014:A:1", name: "with no enemy in the staging area it gains surge", layout: { deck: F0 }, act: reveal("51014"), expect: [count("f0", "staging", 1)] },
+  { line: "51014:A:2", name: "Shadow: after the attack a unique attacker attacks again, dealt a new shadow card", layout: { engaged: ["51015"], deck: F0 }, act: attack("51015", { shadow: "51014" }), expect: [deckCount(5)] },
+  // 51015 Bane of Amon Lanc.
+  { line: "51015:A:2", name: "Forced: after it destroys an ally the defending player discards 1 card for each point of excess damage", layout: { engaged: ["51015"], play: ["ally"], hand: ["c0", "c0", "c0", "c0", "c0"], deck: F0 }, act: [attack("51015"), defend("ally")], expect: [handCount(1)] },
+  // 51016 Oak-wood Grove.
+  { line: "51016:A:1", name: "no progress is placed on the other locations of the staging area while it is there", layout: { staging: ["51016", "place"] }, act: [], expect: [flag("place", "noProgressPlaced")] },
+  { line: "51016:A:2", name: "Travel: each player exhausts a character", layout: { staging: ["51016"] }, act: resolve("51016", "travel"), expect: [exhausted("dh1")] },
+  // 51017 Smoking Blood.
+  { line: "51017:A:1", name: "When Revealed: it attaches to the Troll with the most hit points left and cancels the damage that would destroy it", layout: { staging: [{ code: "51015", damage: 8 }, "51034"], deck: F0 }, act: reveal("51017"), expect: [zone("51017", "attached"), flag("51034", "cancelsLethalDamage"), flag("51015", "cancelsLethalDamage", false)] },
+  { line: "51017:A:1", name: "with no Troll in play it gains surge", layout: { staging: ["f3"], deck: F0 }, act: reveal("51017"), expect: [count("f0", "staging", 1)] },
+  { line: "51017:A:1", name: "a Troll that carries a copy is not a host: with no other Troll it gains surge", layout: { staging: ["51034"], attached: [{ code: "51017", to: "51034" }], deck: F0 }, act: reveal("51017"), expect: [count("f0", "staging", 1)] },
+  // 51018 Forest Flies.
+  { line: "51018:A:1", name: "Forced: as it attacks, the defending player raises threat by 1", layout: { threat: [30, 30], engaged: ["51018"], deck: F0 }, act: attack("51018"), expect: [threat(31)] },
+  { line: "51018:A:2", name: "Shadow: raise your threat by 1 for each enemy engaged with you", layout: { threat: [30, 30], engaged: ["f3", "f0"], deck: F0 }, act: attack("f3", { shadow: "51018" }), expect: [threat(32)] },
+  // 51019 Twilight Hall.
+  { line: "51019:A:2", name: "+1 Threat for each character the first player controls", layout: { staging: ["51019"], play: ["ally"] }, act: [], expect: [stat("51019", "threat", 3)] },
+  { line: "51019:A:3", name: "Forced: when it is explored each player reveals 1 encounter card", layout: { staging: ["51019"], deck: F0 }, act: announce("locationExplored", "51019"), expect: [deckCount(5)] },
+  { line: "51019:A:3", name: "explored as the active location it reveals one card for each player, once", layout: { active: "51019", deck: F0 }, act: announce("activeExplored", "51019"), expect: [deckCount(5)] },
+  // 51020 Swarming Mosquitoes.
+  { line: "51020:A:1", name: "When Revealed: each player deals X damage to a character, X 1 more than the stage number", layout: { stage: "51003", deck: F0 }, act: reveal("51020"), expect: [damageOn("dh1", 3)] },
+  { line: "51020:A:2", name: "Shadow: +1 Attack", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51020", undefended: true }), expect: [damageOn("dh1", 2)] },
+  { line: "51020:A:2", name: "+2 Attack when the defender has an attachment", layout: { engaged: ["f3"], attached: [{ code: "attachment", to: "dh1" }], deck: F0 }, act: [attack("f3", { shadow: "51020" }), defend("dh1")], expect: [damageOn("dh1", 1)] },
+  // 51021 Goblin Sniper.
+  { line: "51021:A:1", name: "it cannot be optionally engaged", layout: { staging: ["51021"] }, act: [], expect: [flag("51021", "cannotBeOptionallyEngaged")] },
+  { line: "51021:A:2", name: "Forced: at the end of the combat phase each player deals 1 damage to a hero", layout: { phase: "Refresh", staging: ["51021"] }, act: announce("endOfPhase", undefined, { seat: null, phase: "Combat" }), expect: [damageOn("dh1", 1)] },
+  { line: "51021:A:3", name: "Shadow: the defending character's Defense is not counted", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51021" }), defend("dh1")], expect: [damageOn("dh1", 1)] },
+  // 51022 Pine Slopes.
+  { line: "51022:A:1", name: "When Revealed: each Pine Slopes gets +2 Threat until the end of the phase", layout: { staging: ["51022"], deck: F0 }, act: reveal("51022"), expect: [stat("51022", "threat", 4)] },
+  { line: "51022:A:2", name: "Travel: the first player raises his threat by 1 for each Pine Slopes in the staging area", layout: { phase: "Travel", threat: [30, 30], staging: ["51022", "51022"] }, act: travel("51022"), expect: [threat(33)] },
 ];
 
 cardSpecs("the-wizards-quest", ROWS);

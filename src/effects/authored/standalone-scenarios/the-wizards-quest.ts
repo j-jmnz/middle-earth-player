@@ -179,7 +179,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: ENEMY_IN_STAGING } } },
     ],
   },
-  { id: "51014:shadow:1", cardCode: "51014", lines: ["51014:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", when: ATTACKER_UNIQUE_OR_NOT }] }] },
+  { id: "51014:shadow:1", cardCode: "51014", lines: ["51014:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", when: ATTACKER_UNIQUE_OR_NOT, instructions: [{ verb: "ImmediateAttack" }] }] },
 
   // 51015 Bane of Amon Lanc: after it destroys an ally the defending player discards 1 card for each excess point of damage.
   { id: "51015:forced:1", cardCode: "51015", lines: ["51015:A:2"], timing: "forced", trigger: "characterDestroyedByAttack", subject: { type: "ally", control: "any" }, eventSeat: "you", condition: { kind: "matches", card: "other", pick: { type: "enemy", control: "any", isSource: true } }, instructions: [{ verb: "DiscardFromHand", amount: { excessOf: "subject" } }] },

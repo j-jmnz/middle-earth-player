@@ -20,6 +20,9 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
+// The `exceptTrait` the template "Cannot have non-<X> attachments" reads from the printed phrase "non-objective player card attachments" (51012:A:1): a card kind, not a Trait.
+const OBJECTIVE_PLAYER_CARD = "objective player card";
+
 export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; withResources?: true; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; exceptSelf?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true; engagedPlayer?: true };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
@@ -197,8 +200,11 @@ export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: 
   if (flagged(state, hostId, "noPlayerAttachments") && isPlayerType(printedOf(ctx.cards, attachmentCode))) return true;
   if (flagged(state, hostId, "cannotHaveTreachery") && printedOf(ctx.cards, attachmentCode).type === "treachery") return true;
   if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
+  const printed = printedOf(ctx.cards, attachmentCode);
+  // "Cannot have non-objective player card attachments" (51012:A:1): only a player card that is not an objective is barred; an encounter card, an objective and a Condition an encounter card makes may attach.
+  const playerCard = isPlayerType(printed) && printed.type !== "objective";
   return restricted(state, ctx, "attach").some(
-    (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)) && !(rule.exceptBoon === true && printedOf(ctx.cards, attachmentCode).campaignKind === "boon"),
+    (rule) => rule.sourceId === hostId && (rule.exceptTrait === OBJECTIVE_PLAYER_CARD ? playerCard : !(rule.exceptTrait != null && traits.includes(rule.exceptTrait))) && !(rule.exceptBoon === true && printed.campaignKind === "boon"),
   );
 }
 

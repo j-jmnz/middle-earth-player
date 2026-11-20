@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { legalIntents } from "../../../rules/engine/legal.ts";
 import { settle } from "../../../rules/engine/machine.ts";
-import { restricted } from "../../../rules/interpret/restrictions.ts";
+import { attachBlocked, restricted } from "../../../rules/interpret/restrictions.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { finish, idOf, opening, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -49,5 +49,16 @@ describe("Dungeons of the Necromancer", () => {
     const back = left(held, made.ctx, held.cards[idOf(held, "dh1")]?.host ?? "");
     expect(back.cards[idOf(back, "dh1")]).toMatchObject({ zone: "heroes", exhausted: true });
     expect(restricted(back, made.ctx, "advance")).toHaveLength(0);
+  });
+});
+
+describe("cannot have non-objective player card attachments", () => {
+  it("51012:A:1 bars a player card attachment and lets an encounter card attach (as 51015:A:1 and 51034:A:1 do)", () => {
+    for (const code of ["51012", "51015", "51034"]) {
+      const made = table({ staging: [code] });
+      const host = idOf(made.state, code);
+      expect(attachBlocked(made.state, made.ctx, host, "attachment")).toBe(true);
+      expect(attachBlocked(made.state, made.ctx, host, "51017")).toBe(false);
+    }
   });
 });
