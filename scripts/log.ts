@@ -2,11 +2,12 @@
 // error, the level: "+1.4s data:sync › ringsdb  141 packs". Lines go to stderr, so stdout stays for data (data query's rows).
 //
 // Level: --verbose (or LOG_LEVEL=debug) adds the per-file detail and error stacks; --quiet (or LOG_LEVEL=warn) keeps
-// warnings and errors only; LOG_LEVEL=silent drops everything. Under Vitest the default is silent, so a test that calls
+// warnings, errors and notices only (a notice is a run's one summary line, which a log under --quiet still needs); LOG_LEVEL=silent
+// drops everything. Under Vitest the default is silent, so a test that calls
 // build() or buildCatalog() stays quiet unless LOG_LEVEL asks otherwise. NO_COLOR or a non-TTY stderr turns colour off.
 
-type Level = "debug" | "info" | "warn" | "error" | "silent";
-const RANK: Record<Level, number> = { debug: 10, info: 20, warn: 30, error: 40, silent: 100 };
+type Level = "debug" | "info" | "notice" | "warn" | "error" | "silent";
+const RANK: Record<Level, number> = { debug: 10, info: 20, notice: 30, warn: 30, error: 40, silent: 100 };
 
 function levelFrom(argv: readonly string[], env: NodeJS.ProcessEnv): Level {
   const asked = env.LOG_LEVEL?.toLowerCase();
@@ -64,6 +65,8 @@ export type Log = {
   readonly tag: string;
   debug(message: string): void;
   info(message: string): void;
+  /** A summary line that --quiet keeps, written like an info line: what a pack in CI must show. */
+  notice(message: string): void;
   warn(message: string): void;
   error(message: string): void;
   /** Runs `work`, logging its label with how long it took, or its failure. */
@@ -89,6 +92,7 @@ export function createLog(tag: string): Log {
     tag,
     debug: (message) => write("debug", tag, message),
     info: (message) => write("info", tag, message),
+    notice: (message) => write("notice", tag, message),
     warn: (message) => write("warn", tag, message),
     error: (message) => write("error", tag, message),
     step(label, work) {
