@@ -214,7 +214,7 @@ Read the sections your task touches.
   - 411–430 Screen reader (~3.0K) ← 19
   - 431–434 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~36.2K tok)
-  - 7–20 Direction (~670)
+  - 7–20 Direction (~660)
   - 21–34 Standards (~750) ← 1
   - 35–45 Performance (~720) ← 4
   - 46–84 Color (~1.5K) ← 2
