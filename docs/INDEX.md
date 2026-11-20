@@ -235,7 +235,7 @@ Read the sections your task touches.
     - 300–315 Campaigns (campaign list) (~1.5K) ← 6
     - 316–331 Scenarios (~1.1K) ← 1
     - 332–343 History (~1.4K) ← 4
-    - 344–361 Briefing (~2.2K) ← 7
+    - 344–361 Briefing (~2.3K) ← 7
     - 362–367 Campaign setup (~1.5K) ← 8
     - 368–373 Campaign path (~930) ← 4
     - 374–377 Campaign log (~840) ← 1
