@@ -48,7 +48,7 @@ const afterKill = (code: string, line: string, instruction: Instruction): Effect
 const DISCARD_ONE: Instruction = { verb: "DiscardFromDeck", amount: 1 };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
-  // 51301 Out of the Depths (stage 1). Setup: the Quick-build, then the opposing team finds one different 0 cost enemy or location for each player (Dark Pit lies in the staging area from the deal). Side B: when Dark Pit is explored it flips and Durin's Bane is set aside, out of play; each player takes a card of the top 5 of his own deck (reading 7); the stage cannot be defeated while Dark Pit is in play.
+  // 51301 Out of the Depths (stage 1). Setup: the Quick-build, then the opposing team finds one different 0 cost enemy or location for each player (Dark Pit lies in the staging area from the deal). Side B: when Dark Pit is explored it flips and Durin's Bane is set aside, out of play; each player takes a card of the top 5 of his own deck (reading 7); the stage cannot be defeated while Dark Pit is in play, which holds until its Forced effect has flipped the card: the explored Dark Pit lies in the encounter discard pile until then (reading 7), so the stage waits for the flip.
   {
     id: "51301:setup:1",
     cardCode: STAGE_1,
@@ -74,7 +74,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       EACH_PLAYER([{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 5 } }, { verb: "MovePicked", to: "hand" }, { verb: "ShuffleDeck" }]),
     ],
   },
-  { id: "51301:constant:1", cardCode: STAGE_1, lines: ["51301:B:2"], timing: "constant", condition: { kind: "inPlay", code: DARK_PIT, is: true }, instructions: [{ verb: "Restrict", what: "advance" }] },
+  { id: "51301:constant:1", cardCode: STAGE_1, lines: ["51301:B:2"], timing: "constant", condition: { kind: "any", conditions: [{ kind: "inPlay", code: DARK_PIT, is: true }, { kind: "outOfPlay", code: DARK_PIT }] }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
   // 51303 Old One Lair (stage 2): the top 5 search; the opposing team adds an enemy with cost 2 or less to the staging area and places a resource on it; while it holds the resource it is immune to player card effects and no progress is placed on this stage (reading 8).
   topSearch("51303", "51303:A:1", "whenRevealed", 1),

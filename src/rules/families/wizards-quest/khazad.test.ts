@@ -46,6 +46,11 @@ describe("Dark Pit and stage 1B (reading 7)", () => {
     expect(restricted(made.state, made.ctx, "advance")).toHaveLength(1);
     expect(restricted(table({ stage: "51301" }).state, made.ctx, "advance")).toHaveLength(0);
   });
+
+  it("51301:B:2 the explored Dark Pit, still in the encounter discard pile, holds the stage until its Forced effect has flipped it", () => {
+    const made = table({ stage: "51301", discard: ["51310"] });
+    expect(restricted(made.state, made.ctx, "advance")).toHaveLength(1);
+  });
 });
 
 describe("A Wrong Turn (51304:B:1, reading 9)", () => {

@@ -12,6 +12,7 @@ import type { CampaignFacts, ModeCard } from "../../src/rules/core/campaign-stat
 import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { definePrinted, type PrintedCard } from "../../src/rules/core/printed.ts";
+import { flagged } from "../../src/rules/core/state.ts";
 import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../src/rules/setup/setup.ts";
@@ -93,7 +94,8 @@ export function attackTogether(state: ScenarioState, ctx: ReduceContext, may: (i
   const reachable = ready.flatMap((id) => legalAttackEnemies(state, seat, id, ctx.cards));
   const enemy = rank ? [...new Set(reachable)].sort((left, right) => rank(left) - rank(right))[0] : reachable[0];
   const attackers = ready.filter((id) => enemy != null && legalAttackEnemies(state, seat, id, ctx.cards).includes(enemy));
-  return enemy && attackers.length > 0 ? { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers } : null;
+  // An enemy that cannot be attacked by more than 1 character at a time (singleAttacker, 145050:A:1, 51346:A:1) is attacked by one.
+  return enemy && attackers.length > 0 ? { type: "DeclareAttackers", enemyId: enemy, attackerIds: flagged(state, enemy, "singleAttacker") ? attackers.slice(0, 1) : attackers } : null;
 }
 
 /**

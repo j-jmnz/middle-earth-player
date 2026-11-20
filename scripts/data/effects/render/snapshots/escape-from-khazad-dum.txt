@@ -24,7 +24,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51301:B:2 (back): This stage cannot be defeated while Dark Pit is in play.
   51301:constant:1: Constant
-    only if the card with code 51310 is in play
+    only if any of: (the card with code 51310 is in play) or ([json condition {"kind":"outOfPlay","code":"51310"}])
     - the players cannot defeat this stage while this holds
 
 ## 51303 Search for an Exit
@@ -765,4 +765,4 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 447 by template, 23 as JSON)
+(rendered pieces: 448 by template, 24 as JSON)
