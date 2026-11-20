@@ -1,8 +1,8 @@
-// Rules: rr.destroy, rr.explored, rr.the-word-choose, rr.forced, mec109.indestructible (data/rules/entries.json); ledger lines 50907:A:1, 50931:B:1, 50931:B:2, 50903:B:2 (docs/brief.md, Attack on Dol Guldur, readings 4, 5, 6, 8 and 18).
+// Rules: rr.destroy, rr.explored, rr.the-word-choose, rr.forced, mec109.indestructible (data/rules/entries.json); ledger lines 50907:A:1, 50931:B:1, 50931:B:2, 50930:A:2, 50903:B:2 (docs/brief.md, Attack on Dol Guldur, readings 4, 5, 6, 8 and 18).
 // The pieces Attack on Dol Guldur adds, on fixture cards: TallySiege and the amount siegeTally, SelectRandomStage with the condition optionTaken, the flag losesIndestructible, an `early` Forced effect and AdvanceToStage `again`.
 import { describe, expect, it } from "vitest";
 
-import { indestructible } from "../../core/keywords.ts";
+import { indestructible, modifiedStat } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
@@ -157,5 +157,21 @@ describe("the flag shadowsUncancelable (50916:A:1)", () => {
     expect(cancelBarred(attacking(flagged), event, cancel)).toBe(true);
     expect(cancelBarred(attacking(enemy.state), event, cancel)).toBe(false);
     expect(cancelBarred(flagged, event, cancel)).toBe(false);
+  });
+});
+
+describe("the flags attackAtFiveProgress and defenseAtFiveProgress (50930:A:2)", () => {
+  it("add their amount to the stat only while the current quest stage holds 5 progress, recalculated as the progress changes", () => {
+    const enemy = spawn(table(), "siegeEnemy", { zone: "engaged", seat: 0 });
+    const stage = Object.values(enemy.state.cards).find((card) => card.zone === "questStage");
+    expect(stage).toBeDefined();
+    const flagged: ScenarioState = { ...enemy.state, modifiers: [...enemy.state.modifiers, { instanceId: enemy.id, sourceId: "x", stat: "attackAtFiveProgress", amount: 1, until: "endOfPhase" }, { instanceId: enemy.id, sourceId: "x", stat: "defenseAtFiveProgress", amount: 1, until: "endOfPhase" }] };
+    const read = (state: ScenarioState, name: "attack" | "defense") => modifiedStat(state, state.cards[enemy.id]!, name, CARDS);
+    const base = { attack: read(flagged, "attack"), defense: read(flagged, "defense") };
+    const at = (progress: number) => updateCard(flagged, stage?.id ?? "", { progress });
+    expect(read(at(4), "attack")).toBe(base.attack);
+    expect(read(at(5), "attack")).toBe(base.attack + 1);
+    expect(read(at(5), "defense")).toBe(base.defense + 1);
+    expect(read(at(0), "defense")).toBe(base.defense);
   });
 });

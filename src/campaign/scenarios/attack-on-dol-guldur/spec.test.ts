@@ -1,5 +1,5 @@
 // Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.victory, rr.engaged, rr.destroy, rr.explored, rr.shadow-effects, rr.cancel, rr.in-play-and-out-of-play, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/brief.md (Attack on Dol Guldur).
-import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, endRound, exhausted, flag, handCount, lost, offers, progressOn, quest, refused, resolve, resourcesOn, respond, reveal, stat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, endRound, exhausted, flag, handCount, offers, progressOn, quest, resolve, resourcesOn, respond, reveal, stat, threat, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Attack on Dol Guldur (standalone-scenarios part 9): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the Setup piles and the Keyword lines) are tests in lines.test.ts, each titled with its line id.
@@ -21,20 +21,6 @@ const WARG = "50919";
 const ADVANCING = { phase: "Quest", deck: ["f0"] } as const;
 const END_OF_ROUND = announce("endOfRound", undefined, { seat: null, phase: "End of round" });
 
-// The four stage 3s: the quest card, the Lieutenant it brings, the Lieutenant of another stage that is in play when it is revealed.
-const STAGES_3 = [
-  { stage: "50903", lieutenant: BANE, other: SORCERER },
-  { stage: "50904", lieutenant: SORCERER, other: MORLUG },
-  { stage: "50905", lieutenant: MORLUG, other: DWELLER },
-  { stage: "50906", lieutenant: DWELLER, other: BANE },
-] as const;
-const stage3Rows = (): Row[] =>
-  STAGES_3.flatMap(({ stage, lieutenant, other }): Row[] => [
-    { line: `${stage}:A:1`, name: "When Revealed: the other Lieutenant is set aside with its tokens gone, this one is added to the staging area and, with city strength 5 or less, attacks the player at once", layout: { stage, side: "A", staging: [DG(5), { code: other, damage: 2 }], setAside: [lieutenant] }, act: resolve(stage, "whenRevealed"), expect: [count(other, "setAside", 1), zone(lieutenant, "staging"), window("defense")] },
-    { line: `${stage}:A:1`, name: "with city strength 6 it makes no immediate attack", layout: { stage, side: "A", staging: [DG(6), other], setAside: [lieutenant] }, act: resolve(stage, "whenRevealed"), expect: [zone(lieutenant, "staging"), window("defense", false)] },
-    { line: `${stage}:B:1`, name: "the Lieutenant gets -1 engagement cost for each progress on the stage", layout: { stage, progress: 4, staging: [lieutenant] }, act: [], expect: [stat(lieutenant, "engagementCost", 41)] },
-  ]);
-
 const ROWS: readonly Row[] = [
   // 50901 Assault on the Golden Wood.
   { line: "50901:B:1", name: "Forced: a resource is placed and all the progress moves to Power of Lórien", layout: { threat: [0, 0], stage: "50901", progress: 4, staging: [DG(10), POWER(0)], deck: PLACES }, act: END_OF_ROUND, expect: [resourcesOn("50901", 1), progressOn("50908", 4), progressOn("50901", 0)] },
@@ -47,7 +33,22 @@ const ROWS: readonly Row[] = [
   { line: "50902:A:1", name: "paying 10 and declining the 20: Power of Lórien is discarded", layout: { stage: "50902", side: "A", staging: [DG(10), POWER(30)], setAside: [HOST_L] }, act: [resolve("50902", "whenRevealed"), answer("host"), answer("discard")], expect: [zone(HOST_L, "play"), count("50908", "encounterDiscard", 1), progressOn("50908", 20)] },
   { line: "50902:A:1", name: "less than 10 progress: Power of Lórien is discarded and the Host stays aside", layout: { stage: "50902", side: "A", staging: [DG(10), POWER(9)], setAside: [HOST_L] }, act: resolve("50902", "whenRevealed"), expect: [count("50908", "encounterDiscard", 1), count(HOST_L, "setAside", 1)] },
   { line: "50902:B:1", name: "When Revealed: each player searches for a Dol Guldur location and the first player advances to a stage 3 of his choice", layout: { stage: "50902", staging: [DG(10)], deck: ["f0", "50920", "f0"] }, act: [resolve("50902", "whenRevealed"), answer("50905")], expect: [zone("50920", "staging"), zone("50905", "questStage")] },
-  ...stage3Rows(),
+  // 50903 the stage 3 that brings 50910.
+  { line: "50903:A:1", name: "When Revealed: the other Lieutenant is set aside with its tokens gone, this one is added to the staging area and, with city strength 5 or less, attacks the player at once", layout: { stage: "50903", side: "A", staging: [DG(5), { code: "50911", damage: 2 }], setAside: ["50910"] }, act: resolve("50903", "whenRevealed"), expect: [count("50911", "setAside", 1), zone("50910", "staging"), window("defense")] },
+  { line: "50903:A:1", name: "with city strength 6 it makes no immediate attack", layout: { stage: "50903", side: "A", staging: [DG(6), "50911"], setAside: ["50910"] }, act: resolve("50903", "whenRevealed"), expect: [zone("50910", "staging"), window("defense", false)] },
+  { line: "50903:B:1", name: "the Lieutenant gets -1 engagement cost for each progress on the stage", layout: { stage: "50903", progress: 4, staging: ["50910"] }, act: [], expect: [stat("50910", "engagementCost", 41)] },
+  // 50904 the stage 3 that brings 50911.
+  { line: "50904:A:1", name: "When Revealed: the other Lieutenant is set aside with its tokens gone, this one is added to the staging area and, with city strength 5 or less, attacks the player at once", layout: { stage: "50904", side: "A", staging: [DG(5), { code: "50912", damage: 2 }], setAside: ["50911"] }, act: resolve("50904", "whenRevealed"), expect: [count("50912", "setAside", 1), zone("50911", "staging"), window("defense")] },
+  { line: "50904:A:1", name: "with city strength 6 it makes no immediate attack", layout: { stage: "50904", side: "A", staging: [DG(6), "50912"], setAside: ["50911"] }, act: resolve("50904", "whenRevealed"), expect: [zone("50911", "staging"), window("defense", false)] },
+  { line: "50904:B:1", name: "the Lieutenant gets -1 engagement cost for each progress on the stage", layout: { stage: "50904", progress: 4, staging: ["50911"] }, act: [], expect: [stat("50911", "engagementCost", 41)] },
+  // 50905 the stage 3 that brings 50912.
+  { line: "50905:A:1", name: "When Revealed: the other Lieutenant is set aside with its tokens gone, this one is added to the staging area and, with city strength 5 or less, attacks the player at once", layout: { stage: "50905", side: "A", staging: [DG(5), { code: "50913", damage: 2 }], setAside: ["50912"] }, act: resolve("50905", "whenRevealed"), expect: [count("50913", "setAside", 1), zone("50912", "staging"), window("defense")] },
+  { line: "50905:A:1", name: "with city strength 6 it makes no immediate attack", layout: { stage: "50905", side: "A", staging: [DG(6), "50913"], setAside: ["50912"] }, act: resolve("50905", "whenRevealed"), expect: [zone("50912", "staging"), window("defense", false)] },
+  { line: "50905:B:1", name: "the Lieutenant gets -1 engagement cost for each progress on the stage", layout: { stage: "50905", progress: 4, staging: ["50912"] }, act: [], expect: [stat("50912", "engagementCost", 41)] },
+  // 50906 the stage 3 that brings 50913.
+  { line: "50906:A:1", name: "When Revealed: the other Lieutenant is set aside with its tokens gone, this one is added to the staging area and, with city strength 5 or less, attacks the player at once", layout: { stage: "50906", side: "A", staging: [DG(5), { code: "50910", damage: 2 }], setAside: ["50913"] }, act: resolve("50906", "whenRevealed"), expect: [count("50910", "setAside", 1), zone("50913", "staging"), window("defense")] },
+  { line: "50906:A:1", name: "with city strength 6 it makes no immediate attack", layout: { stage: "50906", side: "A", staging: [DG(6), "50910"], setAside: ["50913"] }, act: resolve("50906", "whenRevealed"), expect: [zone("50913", "staging"), window("defense", false)] },
+  { line: "50906:B:1", name: "the Lieutenant gets -1 engagement cost for each progress on the stage", layout: { stage: "50906", progress: 4, staging: ["50913"] }, act: [], expect: [stat("50913", "engagementCost", 41)] },
   // The stage 3 Forced effects (the first player removes 5 progress or takes the penalty, and may remove 5 more).
   { line: "50903:B:2", name: "Forced: 5 progress come off the stage", layout: { threat: [0, 0], stage: "50903", progress: 5, staging: [DG(10)], deck: PLACES }, act: [END_OF_ROUND, answer("progress")], expect: [progressOn("50903", 0), resourcesOn("50907", 10)] },
   { line: "50903:B:2", name: "the penalty raises the city strength by 3", layout: { threat: [0, 0], stage: "50903", progress: 5, staging: [DG(10)], deck: PLACES }, act: [END_OF_ROUND, answer("penalty")], expect: [progressOn("50903", 5), resourcesOn("50907", 13)] },
@@ -72,6 +73,7 @@ const ROWS: readonly Row[] = [
   { line: "50913:A:2", name: "Forced: when it attacks, the player discards an ally he controls", layout: { stage: "50903", engaged: [DWELLER], play: ["ally"] }, act: attack(DWELLER, { undefended: true }), expect: [count("ally", "play", 0)] },
   // 50914 Host of Dol Guldur.
   { line: "50914:A:1", name: "Archery equal to the number of players", layout: { stage: "50903", seats: 2, staging: [HOST] }, act: [], expect: [stat(HOST, "archeryPlayers", 1)] },
+  { line: "50914:A:2", name: "Archery X, X the number of players", layout: { stage: "50903", seats: 2, staging: [HOST] }, act: [], expect: [stat(HOST, "archeryPlayers", 1)] },
   { line: "50914:A:3", name: "it cannot have attachments", layout: { stage: "50903", staging: [HOST] }, act: [], expect: [flag(HOST, "cannotHaveAttachments")] },
   { line: "50914:A:4", name: "Forced: at the end of the encounter phase in the staging area, 1 progress for each player comes off the main quest", layout: { stage: "50903", progress: 5, seats: 2, staging: [HOST] }, act: announce("endOfPhase", undefined, { seat: null, phase: "Encounter" }), expect: [progressOn("50903", 3)] },
   // 50915 Mirkwood Olog-hai.
