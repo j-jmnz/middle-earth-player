@@ -14,7 +14,11 @@ function iconFor(word: string): IconName | null {
   return name in ICONS ? (name as IconName) : null;
 }
 
-function paragraph(line: string): TextParagraph | null {
+// The player icon printed after a number ("5 PerPlayer damage") is written PerPlayer in the source and the printed ledger, as Hall of Beorn writes it; a screen says it in words.
+const PER_PLAYER = /\bPerPlayer\b/g;
+
+function paragraph(source: string): TextParagraph | null {
+  const line = source.replace(PER_PLAYER, "per player");
   const runs: TextRun[] = [];
   let bold = false;
   let italic = false;

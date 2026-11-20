@@ -2,10 +2,10 @@
 //
 // The Investigation List of the insert as a top-bar dial: the names of the 5 Suspects and 5 Hideouts the players have checked off. A name is checked off once a look window showed its card (`seen`), or the card is in play, in the victory display or in the
 // discard pile; a card that is set aside or in the Investigation deck and was never shown, and one removed from the game unseen, stays unchecked, so the dial never tells the hidden Suspect and Hideout apart from the deck. The Investigation deck itself is a pile that shows
-// its count and a back only. The engine decided every flag; nothing here changes one. A tap on the dial says the names. Empty in any other scenario. Pure, so a test reads it.
+// its count and a back only. The engine decided every flag; nothing here changes one. A tap on the dial opens a panel with the two lists (a goal dial: more names is the way on). Empty in any other scenario. Pure, so a test reads it.
 import type { ScenarioState } from "../../../rules/core/state.ts";
 
-import { listLimitWords, listWords } from "./pony-words.ts";
+import { listLimitWords, listRuleWords, listWords } from "./pony-words.ts";
 import type { TableDial } from "../dials.ts";
 
 const SCENARIO = "murder-at-the-prancing-pony";
@@ -26,5 +26,5 @@ export function ponyDials(game: ScenarioState, nameOf: (code: string) => string)
   const names = [...SUSPECTS, ...HIDEOUTS];
   const done = names.filter((code) => checked(game, code));
   const left = names.filter((code) => !done.includes(code));
-  return [{ id: "list", testID: "pony-list", label: "List", name: "Investigation List", value: done.length, limit: names.length, limitWords: listLimitWords(), note: listWords(done.map(nameOf), left.map(nameOf)) }];
+  return [{ id: "list", testID: "pony-list", label: "List", name: "Investigation List", value: done.length, limit: names.length, goal: true, limitWords: listLimitWords(), lists: [{ heading: "Checked off", lines: done.map(nameOf) }, { heading: "Not checked off", lines: left.map(nameOf) }], foot: listRuleWords(), said: listWords(done.map(nameOf), left.map(nameOf)), note: listWords(done.map(nameOf), left.map(nameOf)) }];
 }

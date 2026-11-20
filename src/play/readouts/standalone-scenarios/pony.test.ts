@@ -28,6 +28,21 @@ describe("the Investigation List dial", () => {
     expect(dial?.note).not.toMatch(/Checked off: [^.]*Bill Ferny's House/);
   });
 
+  it("50701:A:1 gives a tap the two lists, the seen names under Checked off and the rest under Not checked off, and the rule at the foot", () => {
+    const made = tableFromLayout(ID, { piles: { investigationDeck: ["50709", "50704"] }, staging: ["50711"] });
+    const looked = updateCard(made.state, idOf(made.state, "50709"), { seen: true });
+    const [dial] = ponyDials(looked, nameOfIn(made));
+    const [checked, left] = dial?.lists ?? [];
+    expect(checked).toMatchObject({ heading: "Checked off" });
+    expect(checked?.lines).toHaveLength(2);
+    expect(left).toMatchObject({ heading: "Not checked off" });
+    expect(left?.lines).toHaveLength(8);
+    expect([...(checked?.lines ?? []), ...(left?.lines ?? [])]).toHaveLength(10);
+    expect(dial).toMatchObject({ goal: true });
+    expect(dial?.said).toBe(dial?.note);
+    expect(dial?.foot).toContain("A name is checked off once a look showed its card");
+  });
+
   it("leaves a card removed from the game unseen unchecked", () => {
     const made = tableFromLayout(ID, { piles: { investigationDeck: ["50709"] } });
     const gone = updateCard(made.state, idOf(made.state, "50709"), { zone: "removed" });

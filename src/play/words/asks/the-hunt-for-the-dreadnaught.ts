@@ -47,12 +47,12 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "40034:response:1 @1 Pick": { note: "Belfalas Shipyard: choose a Ship objective. It is healed of 5 damage, readied and flipped to its Upgraded side.", verb: "Heal" },
 
   // 40036:A:3 (Isle of Fortune): its resources go to the pool of a hero the first player chooses.
-  "40036:response:1 @0 Pick": { note: "Isle of Fortune: its resources are moved.", verb: "Move" },
+  "40036:response:1 @0 Pick": { note: "Isle of Fortune: Isle of Fortune itself is picked. It is the location whose resources are moved to a hero.", verb: "Move" },
   "40036:response:1 @1 Pick": { note: "Isle of Fortune: the first player chooses a hero in any group. It gets the resources on Isle of Fortune.", verb: "Add" },
 
   // 40042:A:1 and 40045:A:1 (Grappled!, Taking on Water): the Action exhausts 3 characters.
-  "40042:action:1 @0.0 Pick": { owned: true, note: "Grappled!: choose a ready character you control to exhaust (3 in all) and discard it.", verb: "Exhaust" },
-  "40045:action:1 @0.0 Pick": { owned: true, note: "Taking on Water: choose a ready character you control to exhaust (3 in all) and discard it.", verb: "Exhaust" },
+  "40042:action:1 @0.0 Pick": { owned: true, note: "Grappled!: choose a ready character you control to exhaust, 3 in all. Then Grappled! is discarded.", verb: "Exhaust" },
+  "40045:action:1 @0.0 Pick": { owned: true, note: "Taking on Water: choose a ready character you control to exhaust, 3 in all. Then Taking on Water is discarded.", verb: "Exhaust" },
 
   // 40043:A:1 (Out of the Mist).
   "40043:whenRevealed:1 @0 Pick": { note: "Out of the Mist: choose the enemy in the staging area with the highest engagement cost. It engages the first player and attacks them.", verb: "Engage" },

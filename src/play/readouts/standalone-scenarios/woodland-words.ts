@@ -6,9 +6,7 @@ export const capWords = (placed: number, cap: number, stage: string): string =>
 
 export const capLimitWords = (): string => "progress that can be placed this round";
 
-/** The warning near the cap and at it. */
-export const capNearWords = (left: number, stage: string): string => `${left} more progress can be placed on ${stage} this round.`;
-
+/** The warning at the cap. */
 export const capFullWords = (stage: string): string => `No more progress can be placed on ${stage} this round.`;
 
 /** What a tap on the phase tally dial says. */

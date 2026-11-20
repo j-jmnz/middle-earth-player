@@ -4,6 +4,9 @@ import { useMemo } from "react";
 import { inPlay, type ScenarioState } from "../../rules/core/state.ts";
 
 /** One dial of the top bar: its label, what a screen reader calls it, its number, and what it counts toward. `goal`: the limit is the players' way out (the ring fills in the accent, never warms). `warms`: the limit loses or discards, so the ring warms toward it as the pursuit dial does. `warn`: the dial's own level and words (a last card, one mire token from a discard). `filled`: the number the ring fills with when it is not the disc's (the gate's damage). */
+/** One headed list of names in a dial's panel. */
+export type DialList = { heading: string; lines: readonly string[] };
+
 export type TableDial = {
   id: string;
   // The dial's test id when it is not `isengard-<id>` (The Passage of the Marshes' dials).
@@ -24,6 +27,11 @@ export type TableDial = {
   cardId?: string;
   // Cards a tap shows after that card, in the same preview (the staging cards of a stage no player is at): absent, the card alone.
   extra?: readonly string[];
+  // The lists a tap on the dial reads in a panel (the Investigation List's checked off and not checked off names): absent, the dial opens none. `said` is what a screen reader hears of the panel.
+  lists?: readonly DialList[];
+  said?: string;
+  // The line at the foot of that panel.
+  foot?: string;
   // The pile a tap on the dial opens, as its list (the victory display's, on The Old Forest's stage 2): absent, the dial does nothing.
   pile?: string;
 };

@@ -1,7 +1,7 @@
 // Rules: rr.damage, rr.quest-advancement, rr.action (data/rules/entries.json); ledger lines 40013:A:1, 40013:A:2, 40013:A:3, 40013:B:2, 40004:B:2, 40005:B:1, 40001:B:2, 40002:B:1 (docs/brief.md, The Hunt for the Dreadnaught, The table; docs/design-system-table.md, Top bar).
 //
 // The pieces The Hunt for the Dreadnaught's cards hold on the table, as top-bar dials: the Dreadnaught's hit points left against the 15 for each player who started (a goal dial: destroying it wins; it warns when the next end of the round flips it), the damage it
-// took this round against its cap of 5 for each player (it warms as the cap nears), the progress placed on stage 1B or 2B this round against its cap, and the mode card's Quest Action, a word dial that says Ready or Used (once in the game for every group). The ships'
+// took this round against its cap of 5 for each player and the progress placed on stage 1B or 2B this round against its cap (plain limits: they say "near" at the cap and never warm), after the mode card's Quest Action, a word dial that says Ready or Used (once in the game for every group). The ships'
 // Upgraded side and the Corsair deck are drawn by the card and the pile as for any ship (the dream-chaser table). The engine decided every number (`modifiedStat`, `roundDamage`, `questCapTally`, `uses`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { heldAmount } from "../../../rules/core/state.ts";
@@ -29,7 +29,7 @@ export function huntDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code
     dials.push({
       id: "dreadnaught",
       testID: "hunt-dreadnaught",
-      label: "Dreadnaught · HP",
+      label: "HP",
       name: `${nameOf(DREADNAUGHT)}'s hit points left`,
       value: Math.max(0, hitPoints - ship.damage),
       limit: hitPoints,
@@ -40,6 +40,15 @@ export function huntDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code
       limitWords: dreadnaughtLimitWords(hitPoints),
       note: dreadnaughtWords(ship.damage, hitPoints, game.seatCount, damaged),
     });
+  }
+  // The Quest Action comes before the cap dials: the bar reads HP, Action, then the two limits.
+  const mode = Object.values(game.cards).find((card) => card.zone === "modeCard");
+  const action = mode ? Object.keys(QUEST_ACTIONS).find((id) => id.startsWith(mode.code)) : undefined;
+  if (mode && action) {
+    const used = game.uses.some((use) => use.effectId === action);
+    dials.push({ id: "action", testID: "hunt-action", label: "Action", name: "Quest Action of the mode card:", value: used ? 0 : 1, word: used ? "Used" : "Ready", cardId: mode.id, note: questActionWords(used, QUEST_ACTIONS[action] === true) });
+  }
+  if (ship) {
     const cap = heldAmount(game, ship.id, "damageCap");
     if (cap > 0) {
       const taken = game.roundDamage?.[ship.id] ?? 0;
@@ -50,7 +59,6 @@ export function huntDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code
         name: `Damage ${nameOf(DREADNAUGHT)} took this round:`,
         value: taken,
         limit: cap,
-        warms: true,
         ...(taken >= cap ? { warn: { level: "near" as const, words: roundDamageReachedWords() } } : {}),
         limitWords: roundDamageLimitWords(cap),
         note: roundDamageWords(taken, cap),
@@ -63,7 +71,7 @@ export function huntDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code
     dials.push({
       id: "cap",
       testID: "hunt-cap",
-      label: "Progress",
+      label: "Cap",
       name: "Progress placed on the quest stage this round:",
       value: tally.placed,
       limit: tally.limit,
@@ -71,12 +79,6 @@ export function huntDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code
       limitWords: stageCapLimitWords(tally.limit),
       note: stageCapWords(tally.placed, tally.limit),
     });
-  }
-  const mode = Object.values(game.cards).find((card) => card.zone === "modeCard");
-  const action = mode ? Object.keys(QUEST_ACTIONS).find((id) => id.startsWith(mode.code)) : undefined;
-  if (mode && action) {
-    const used = game.uses.some((use) => use.effectId === action);
-    dials.push({ id: "action", testID: "hunt-action", label: "Quest Action", name: "Quest Action of the mode card:", value: used ? 0 : 1, word: used ? "Used" : "Ready", cardId: mode.id, note: questActionWords(used, QUEST_ACTIONS[action] === true) });
   }
   return dials;
 }

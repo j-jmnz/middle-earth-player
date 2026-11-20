@@ -23,12 +23,13 @@ describe("the progress cap dial of stage 2", () => {
     expect(dialProps(dial!).limit).toBe(5);
   });
 
-  it("51104:B:3 warms with two or less left and is critical at the cap", () => {
-    const near = dials({ stage: "51104" }, [table("questProgressCap", 5), table("questProgressPlaced", 3)])[0];
-    expect(near?.warn).toEqual({ level: "near", words: "2 more progress can be placed on A Chosen Path this round." });
+  it("51104:B:3 says near at the cap and never before it, as a plain limit that does not warm", () => {
+    const left = dials({ stage: "51104" }, [table("questProgressCap", 5), table("questProgressPlaced", 3)])[0];
+    expect(left?.warn).toBeUndefined();
+    expect(left?.warms).toBeUndefined();
     const full = dials({ stage: "51104" }, [table("questProgressCap", 10), table("questProgressPlaced", 6), table("questProgressPlaced", 4)])[0];
     expect(full).toMatchObject({ value: 10, limit: 10 });
-    expect(full?.warn).toEqual({ level: "critical", words: "No more progress can be placed on A Chosen Path this round." });
+    expect(full?.warn).toEqual({ level: "near", words: "No more progress can be placed on A Chosen Path this round." });
   });
 
   it("51105:B:2 says the cap is 5, or 10 with Mendor committed, in its note", () => {
@@ -39,7 +40,7 @@ describe("the progress cap dial of stage 2", () => {
 describe("the phase tally dial of stage 3B", () => {
   it("51108:B:3 counts the progress placed this phase toward 10 as a goal, with no warning", () => {
     const dial = dials({ stage: "51108" }, [table("questProgressPhase", 4), table("questProgressPhase", 2)])[0];
-    expect(dial).toMatchObject({ id: "phase", testID: "woodland-phase", label: "Phase", value: 6, limit: 10, goal: true });
+    expect(dial).toMatchObject({ id: "phase", testID: "woodland-phase", label: "Reveal", value: 6, limit: 10, goal: true });
     expect(dial?.warn).toBeUndefined();
     expect(dial?.note).toContain("6 progress placed on On the Trail this phase.");
   });

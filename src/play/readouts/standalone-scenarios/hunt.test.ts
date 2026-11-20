@@ -20,7 +20,7 @@ const byId = (layout: Layout, id: string) => dialsOf(layout).find((dial) => dial
 describe("the Dreadnaught's hit points dial", () => {
   it("40013:A:2 counts the hit points left of the 15 for each player who started, a goal dial", () => {
     const dial = byId({ staging: [{ code: "40013", damage: 4 }] }, "dreadnaught");
-    expect(dial).toMatchObject({ value: 11, limit: 15, filled: 4, goal: true, label: "Dreadnaught · HP", limitWords: "15 hit points: destroy the Dreadnaught to win" });
+    expect(dial).toMatchObject({ value: 11, limit: 15, filled: 4, goal: true, label: "HP", limitWords: "15 hit points: destroy the Dreadnaught to win" });
     expect(dial?.warn).toBeUndefined();
     expect(dial?.note).toContain("holds 4 damage of 15 hit points (15 for each of 1 players who started)");
     expect(dialProps(dial!).limit).toBe(15);
@@ -41,8 +41,9 @@ describe("the dial of the damage the Dreadnaught took this round", () => {
     const table = made({ seats: 2, staging: ["40013"] });
     const id = idOf(table.state, "40013");
     const open = huntDials(table.state, table.ctx, nameOfIn(table)).find((dial) => dial.id === "damage");
-    expect(open).toMatchObject({ value: 0, limit: 10, warms: true, label: "Damage", limitWords: "No more than 10 damage each round" });
+    expect(open).toMatchObject({ value: 0, limit: 10, label: "Damage", limitWords: "No more than 10 damage each round" });
     const spent = huntDials({ ...table.state, roundDamage: { [id]: 10 } }, table.ctx, nameOfIn(table)).find((dial) => dial.id === "damage");
+    expect(open?.warms).toBeUndefined();
     expect(spent).toMatchObject({ value: 10, warn: { level: "near", words: "The Dreadnaught takes no more damage this round." } });
   });
 });
@@ -51,7 +52,7 @@ describe("the dial of the progress cap of the stage", () => {
   it("40004:B:2 counts the progress placed this round against 5 for each player on stage 1B, and warns at the cap", () => {
     const table = made({ stage: "40004" });
     const open = huntDials(table.state, table.ctx, nameOfIn(table)).find((dial) => dial.id === "cap");
-    expect(open).toMatchObject({ value: 0, limit: 5, label: "Progress", limitWords: "No more than 5 progress each round" });
+    expect(open).toMatchObject({ value: 0, limit: 5, label: "Cap", limitWords: "No more than 5 progress each round" });
     const placed = { ...table.state, modifiers: [...table.state.modifiers, { instanceId: "table", sourceId: "table", stat: "questProgressPlaced" as const, amount: 5, until: "endOfRound" as const }] };
     expect(huntDials(placed, table.ctx, nameOfIn(table)).find((dial) => dial.id === "cap")?.warn?.level).toBe("near");
   });
@@ -65,7 +66,7 @@ describe("the dial of the Quest Action", () => {
   it("40002:B:1 says Ready, then Used once the whole table has used it", () => {
     const table = made({ modeCard: true });
     const [ready] = huntDials(table.state, table.ctx, nameOfIn(table)).filter((dial) => dial.id === "action");
-    expect(ready).toMatchObject({ word: "Ready", label: "Quest Action", value: 1 });
+    expect(ready).toMatchObject({ word: "Ready", label: "Action", value: 1 });
     expect(ready?.note).toContain("then the top card of the encounter deck is revealed");
     const used = { ...table.state, uses: [{ effectId: "40002:action:1", sourceId: idOf(table.state, "40002"), seat: 0, round: 1, phase: "Quest" as const }] };
     const [spent] = huntDials(used as never, table.ctx, nameOfIn(table)).filter((dial) => dial.id === "action");

@@ -4,9 +4,9 @@ import type { Ask } from "../asks.ts";
 // `pnpm test scenario attack-on-dol-guldur --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=attack-on-dol-guldur` prints each sentence.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 50904:B:2, 50905:B:2, 50906:B:2 (the Tower of Sorcery, the Battle Under the Trees, the Dungeons of the Necromancer): the first player removes 5 more progress for the stage's own bonus.
-  "50904:forced:1 @0.progress.1.extra.1 Pick": { owned: true, note: "Choose the player who searches his deck for a card to add to his hand.", verb: "Choose" },
+  "50904:forced:1 @0.progress.1.extra.1 Pick": { owned: true, note: "Choose the player who searches their deck for a card to add to their hand.", verb: "Choose" },
   "50905:forced:1 @0.progress.1.extra.1 Pick": { owned: true, note: "Choose a non-unique enemy in the staging area. It is destroyed.", verb: "Destroy" },
-  "50906:forced:1 @0.progress.1.extra.1 Pick": { owned: true, note: "Choose the player who puts an ally from the top 10 cards of his deck into play.", verb: "Choose" },
+  "50906:forced:1 @0.progress.1.extra.1 Pick": { owned: true, note: "Choose the player who puts an ally from the top 10 cards of their deck into play.", verb: "Choose" },
 
   // 50926:A:2 (Servant of Sauron): the enemy in the staging area with the highest engagement cost attacks the first player; a tie is the first player's choice.
   "50926:whenRevealed:1 @0 Pick": { owned: true, note: "Choose which enemy in the staging area attacks you: the ones tied for the highest engagement cost.", verb: "Choose" },
@@ -17,15 +17,15 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "50903:forced:1 @0.progress.1 extra": { label: "Remove 5 more progress: lower Dol Guldur's city strength by 3" },
   "50903:forced:1 @0.progress.1 decline": { label: "Remove no more progress" },
   "50904:forced:1 @0 progress": { label: "Remove 5 progress from this stage" },
-  "50904:forced:1 @0 penalty": { label: "Each player discards all but 1 card from his hand" },
-  "50904:forced:1 @0.progress.1 extra": { label: "Remove 5 more progress: a player searches his deck for a card" },
+  "50904:forced:1 @0 penalty": { label: "Each player discards all but 1 card from their hand" },
+  "50904:forced:1 @0.progress.1 extra": { label: "Remove 5 more progress: a player searches their deck for a card" },
   "50904:forced:1 @0.progress.1 decline": { label: "Remove no more progress" },
   "50905:forced:1 @0 progress": { label: "Remove 5 progress from this stage" },
-  "50905:forced:1 @0 penalty": { label: "Each player discards from the encounter deck until an enemy and puts it into play engaged with him" },
+  "50905:forced:1 @0 penalty": { label: "Each player discards cards from the encounter deck until an enemy is discarded, and puts it into play engaged with them" },
   "50905:forced:1 @0.progress.1 extra": { label: "Remove 5 more progress: destroy a non-unique enemy in the staging area" },
   "50905:forced:1 @0.progress.1 decline": { label: "Remove no more progress" },
   "50906:forced:1 @0 progress": { label: "Remove 5 progress from this stage" },
-  "50906:forced:1 @0 penalty": { label: "Each player discards an ally he controls" },
+  "50906:forced:1 @0 penalty": { label: "Each player discards an ally they control" },
   "50906:forced:1 @0.progress.1 extra": { label: "Remove 5 more progress: a player puts an ally from the top 10 cards into play" },
   "50906:forced:1 @0.progress.1 decline": { label: "Remove no more progress" },
 
