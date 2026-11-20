@@ -14,7 +14,7 @@ Read whole.
   - 47–50 Agents (~180)
   - 51–54 Skills (~80)
   - 55–58 Cloud sessions (~60)
-- `.claude/rules/agent-standards.md` — Agent standards (~670 tok)
+- `.claude/rules/agent-standards.md` — Agent standards (~790 tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~1.2K tok)
