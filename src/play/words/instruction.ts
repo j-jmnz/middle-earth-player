@@ -29,7 +29,7 @@ import { assaultWords } from "./scenarios/assault.ts";
 import { fortressWords } from "./scenarios/fortress.ts";
 import { companyWords } from "./scenarios/company.ts";
 import { angmarWords } from "./scenarios/angmar/angmar.ts";
-import { investigationWords } from "./scenarios/investigation.ts";
+import { investigationWords } from "./scenarios/standalone-scenarios/investigation.ts";
 import type { ChoiceNames } from "./choice.ts";
 
 export const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };

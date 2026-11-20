@@ -1,5 +1,5 @@
 // Rules: the Investigate keyword of Murder at the Prancing Pony (docs/brief.md, Murder at the Prancing Pony).
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction } from "../../../../catalog/boundary.ts";
 
 /** One instruction of the investigation family in words, as a branch of a Choose says it, or null when it is not one of its verbs that a branch holds. */
 export function investigationWords(instruction: Instruction): string | null {
