@@ -74,7 +74,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       EACH_PLAYER([{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 5 } }, { verb: "MovePicked", to: "hand" }, { verb: "ShuffleDeck" }]),
     ],
   },
-  { id: "51301:constant:1", cardCode: STAGE_1, lines: ["51301:B:2"], timing: "constant", condition: { kind: "any", conditions: [{ kind: "inPlay", code: DARK_PIT, is: true }, { kind: "exploredPending", code: DARK_PIT }] }, instructions: [{ verb: "Restrict", what: "advance" }] },
+  { id: "51301:constant:1", cardCode: STAGE_1, lines: ["51301:B:2"], timing: "constant", condition: { kind: "any", conditions: [{ kind: "inPlay", code: DARK_PIT, is: true }, { kind: "exploredPending", code: DARK_PIT, effect: "51301:forced:1" }] }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
   // 51303 Old One Lair (stage 2): the top 5 search; the opposing team adds an enemy with cost 2 or less to the staging area and places a resource on it; while it holds the resource it is immune to player card effects and no progress is placed on this stage (reading 8).
   topSearch("51303", "51303:A:1", "whenRevealed", 1),

@@ -29,8 +29,10 @@ describe("Dark Pit holds the stage only until it has flipped", () => {
   it("51301:B:2 the explored Dark Pit holds the stage while its explored event waits for the Forced effect, and not after the flip", () => {
     const made = table({ stage: "51301", discard: ["51310"] });
     const id = idOf(made.state, "51310");
-    const waiting = { ...made.state, pendingEvents: [{ trigger: "locationExplored" as const, seat: null, subject: id }] };
-    expect(restricted(waiting, made.ctx, "advance")).toHaveLength(1);
+    for (const trigger of ["locationExplored", "activeExplored"] as const) {
+      const waiting = { ...made.state, pendingEvents: [{ trigger, seat: null, subject: id }] };
+      expect(restricted(waiting, made.ctx, "advance"), trigger).toHaveLength(1);
+    }
     const flipped = table({ stage: "51301", setAside: ["51311"] });
     expect(restricted(flipped.state, flipped.ctx, "advance")).toHaveLength(0);
   });

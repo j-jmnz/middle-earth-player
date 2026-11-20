@@ -362,8 +362,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("safeActive"), is: z.boolean() }),
   // A copy of the card with this code is set aside, out of play ("reveal 1 set-aside copy of Losing Time", 10182:A:3). Read by the angmar family.
   z.strictObject({ kind: z.literal("setAsideHas"), code: z.string().min(1) }),
-  // A copy of the card with this code was explored and its "explored" event still waits to be heard, so its Forced effect has not run: the window between the explore and the flip of Dark Pit (51301:B:2, 51301:B:1). Read by the wizards-quest family.
-  z.strictObject({ kind: z.literal("exploredPending"), code: z.string().min(1) }),
+  // A copy of the card with this code was explored and the Forced effect with this record id has not finished: its "explored" event still waits to be heard, or the effect is running. The window between the explore and the flip of Dark Pit (51301:B:2, 51301:B:1). Read by the wizards-quest family.
+  z.strictObject({ kind: z.literal("exploredPending"), code: z.string().min(1), effect: z.string().min(1) }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
   // Captured cards (Escape from Mount Gram, read by the captured family): `noneUnderAttacker` no card is captured underneath the attacking enemy ("+2 Attack instead if it has no captured cards underneath it", 10045:A:3), `noneUnderSelf` no card is captured underneath the source ("If there are no captured cards underneath Gornákh's Dungeons", 10039:B:2), `someoneEmpty` the Interrogation that is

@@ -69,8 +69,9 @@ export function bonesCancel(state: ScenarioState, ctx: ReduceContext, steps: Eng
   return bones ? destroyCard(state, bones.id, ctx.cards, steps) : null;
 }
 
-/** The condition `exploredPending`: a copy of the card with this code was explored (a `locationExplored` event for it waits in the queue), so the Forced effect that hears it has not run. The stage bar of Dark Pit reads it for the window before the flip (51301:B:2). Null for any other condition. */
+/** The condition `exploredPending`: a copy of the card with this code was explored and the Forced effect that hears it has not finished: its `locationExplored` or `activeExplored` event waits in the queue, or the effect (the record id the condition names) is running on the stack. The stage bar of Dark Pit reads it for the window before the flip (51301:B:2). Null for any other condition. */
 export function exploredPendingHolds(state: ScenarioState, condition: Condition): boolean | null {
   if (condition.kind !== "exploredPending") return null;
-  return (state.pendingEvents ?? []).some((event) => event.trigger === "locationExplored" && event.subject != null && state.cards[event.subject]?.code === condition.code);
+  const waiting = (state.pendingEvents ?? []).some((event) => (event.trigger === "locationExplored" || event.trigger === "activeExplored") && event.subject != null && state.cards[event.subject]?.code === condition.code);
+  return waiting || state.stack.some((frame) => frame.data.kind === "effect" && frame.data.effectId === condition.effect);
 }
