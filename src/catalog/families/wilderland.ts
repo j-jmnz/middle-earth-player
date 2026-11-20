@@ -77,7 +77,8 @@ const VERBS = [
   // "Flip over Woodmen Village and attach Haldan to the just-added enemy as a guarded objective" (18069:A:2): the source card, wherever it lies, shows the card `into` and enters the staging area, faceup; with `guardedBy` the picked card (the enemy the last
   // AddFromPile added) guards it (rr.guarded). The old side is kept as the card's other side.
   // `target: "subject"` (51001:B:1, "When Rhosgobel is explored, flip it over and add Rider of Mirkwood to the staging area"): the card the event is about, the explored location, is the one that flips, not the source.
-  z.strictObject({ verb: z.literal("FlipOver"), into: code, guardedBy: z.literal("picked").optional(), target: z.literal("subject").optional(), ...when }),
+  // `control: "firstPlayer"` (51101:B:1, "flip it over and put Mendor into play under the first player's control, ready"): the back is a player-side card, so it enters the first player's play area, faceup and ready, not the staging area; it enters play for that player (the trigger enteredPlay) and has no owner.
+  z.strictObject({ verb: z.literal("FlipOver"), into: code, guardedBy: z.literal("picked").optional(), target: z.literal("subject").optional(), control: z.literal("firstPlayer").optional(), ...when }),
   // "The player with the most cards in his hand without a copy of Lost in the Wild adds Lost in the Wild to his hand" (18026:A:1): of the players with no card of the source's title in hand, the one with the most cards in hand takes the source into
   // their hand (the first player chooses among players tied). Nothing happens when every player holds a copy.
   z.strictObject({ verb: z.literal("AddSourceToHandOfMost"), ...when }),

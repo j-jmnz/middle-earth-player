@@ -57,8 +57,9 @@ export const pickSchema = z.strictObject({
   // A hero with this printed resource icon ("each hero you control with a printed Spirit resource icon").
   printedIcon: sphereSchema.optional(),
   // `loot`: the loot cards of the chooser's that guard a location, under it (The Burglar's Turn, 22024).
+  // `encounterDiscard`: the encounter discard pile, the card discarded last first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1, docs/brief.md, The Woodland Realm, reading 3).
   // `encounterDeck`: with `looked`, the cards of the encounter deck the running effect looked at ("Look at the top 10 cards of the encounter deck, discard any number of them", 11202:A:5).
-  from: z.enum(["play", "hand", "discard", "deck", "victory", "loot", "encounterDeck"]).optional(),
+  from: z.enum(["play", "hand", "discard", "deck", "victory", "loot", "encounterDeck", "encounterDiscard"]).optional(),
   // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
   // From the discard pile: only its top cards, the last put there ("While the top card of your discard pile is an event").
   top: z.number().int().positive().optional(),

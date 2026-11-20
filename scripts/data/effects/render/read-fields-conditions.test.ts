@@ -42,7 +42,7 @@ describe("effects render read fields, conditions", () => {
     discardedHasShadowOrTentacle: [{ kind: "discardedHasShadowOrTentacle" }],
     firstLetterMatches: [{ kind: "firstLetterMatches" }],
     inVictory: [{ kind: "inVictory", code: "04065", is: true }, { kind: "inVictory", code: "04072", is: false }],
-    questProgressNoted: [{ kind: "questProgressNoted", is: true }, { kind: "questProgressNoted", is: false }],
+    questProgressNoted: [{ kind: "questProgressNoted", is: true, min: 10 }, { kind: "questProgressNoted", is: false }],
     currentQuestProgress: [{ kind: "currentQuestProgress", is: "some" }, { kind: "currentQuestProgress", is: "none" }],
     defendingAgainst: [{ kind: "defendingAgainst", trait: "Undead" }],
     versusDefender: [{ kind: "versusDefender", maxHitPoints: 2, maxWillpower: 1, ally: true }],

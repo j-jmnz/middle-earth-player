@@ -16,7 +16,12 @@ const VERBS = [
   verbFlags(z.strictObject({ verb: z.literal("ChooseQuestStage"), codes: z.array(code).min(2), ...when }), { setupRuns: "top" }),
   // The When Revealed of the stage 2 and stage 3 cards (51003:A:1 to 51009:A:1): "The opposing team searches the top `top` cards of the encounter deck for a card with cost `maxCost` or less (`maxCostMulti` or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card.
   // Its 'when revealed' effects cannot be canceled." The card nearest the top that qualifies is the one (reading 3: no measure ranks the types); it is set aside, the deck is shuffled, and it is revealed as an encounter card, its When Revealed effects uncancelable. With none, only the shuffle (reading 5).
-  z.strictObject({ verb: z.literal("SearchTopReveal"), top: z.number().int().positive(), maxCost: z.number().int().min(0), maxCostMulti: z.number().int().min(0), ...when }),
+  // `maxCostStage` (51138:A:1, "a card with cost equal to or less than the stage number of the main quest"): the limit is the stage number of the current quest card, for any number of players, and takes the place of `maxCost` and `maxCostMulti`.
+  // `cancelable` (51138:A:1 prints no bar): the revealed card's When Revealed effects can be canceled.
+  z.strictObject({ verb: z.literal("SearchTopReveal"), top: z.number().int().positive(), maxCost: z.number().int().min(0).optional(), maxCostMulti: z.number().int().min(0).optional(), maxCostStage: z.literal(true).optional(), cancelable: z.literal(true).optional(), ...when }).refine(
+    (verb) => (verb.maxCostStage === true ? verb.maxCost == null && verb.maxCostMulti == null : verb.maxCost != null && verb.maxCostMulti != null),
+    "SearchTopReveal takes maxCost with maxCostMulti, or maxCostStage alone",
+  ),
   // "places them faceup under this stage as guarded objectives" (51004:B:1) and "place faceup under Necromancer's Pass as a guarded objective" (51013:A:1): the last picked card, an ally in play or a card of a hand, lies faceup under the source card, still its owner's, out of play (docs/brief.md, The Wizard's Quest, readings 9 and 3).
   // An ally in play loses its tokens and its attachments are discarded as it leaves play. The source gives them back (ReturnFacedownToHands) and, while they lie there, no copy of their title can be played (src/rules/families/wizards-quest/held.ts).
   z.strictObject({ verb: z.literal("HoldPickedUnder"), ...when }),

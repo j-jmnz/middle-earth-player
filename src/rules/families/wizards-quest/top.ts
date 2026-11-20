@@ -6,6 +6,7 @@ import { addModifier } from "../../core/keywords.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
+import { stageNumber } from "../caves/progress.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { searchable } from "../../interpret/search.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
@@ -14,10 +15,12 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** SearchTopReveal: the card nearest the top among the top cards of the encounter deck that cost no more than the limit is set aside, the deck is shuffled, and the card is revealed with its When Revealed effects uncancelable. With none, only the shuffle. */
+/** SearchTopReveal: the card nearest the top among the top cards of the encounter deck that cost no more than the limit is set aside, the deck is shuffled, and the card is revealed with its When Revealed effects uncancelable (`cancelable`: cancelable; `maxCostStage`: the limit is the stage number of the main quest). With none, only the shuffle. */
 export function searchTopReveal(state: ScenarioState, instruction: Verb<"SearchTopReveal">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = searchable(state, { top: instruction.top, maxCost: instruction.maxCost, maxCostMulti: instruction.maxCostMulti }, ctx)[0];
+  const stage = instruction.maxCostStage === true ? stageNumber(state) : undefined;
+  const id = searchable(state, { top: instruction.top, maxCost: stage ?? instruction.maxCost, maxCostMulti: stage ?? instruction.maxCostMulti }, ctx)[0];
   if (!id) return shuffleEncounterDeck(state);
-  const aside = shuffleEncounterDeck(addModifier(updateCard(moveCard(state, id, { zone: "setAside" }), id, { face: "down" }), id, id, "revealUncancelable", 1, "endOfGame"));
+  const asideCard = updateCard(moveCard(state, id, { zone: "setAside" }), id, { face: "down" });
+  const aside = shuffleEncounterDeck(instruction.cancelable === true ? asideCard : addModifier(asideCard, id, id, "revealUncancelable", 1, "endOfGame"));
   return startReveal(aside, focus.seat, ctx, steps, id);
 }

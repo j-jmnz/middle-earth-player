@@ -23,8 +23,8 @@ export const WIZARDS_QUEST_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>>
   }),
   ChooseQuestStage: (i) => ({ text: `the first player chooses one of the quest cards with codes ${codes(i.codes)} in the quest deck; the others lie set aside, out of play, and leave the quest's order`, read: ["codes"] }),
   SearchTopReveal: (i) => ({
-    text: `the opposing team searches the top ${str(i.top)} cards of the encounter deck for the card nearest the top that costs ${str(i.maxCost)} or less (${str(i.maxCostMulti)} or less with two or more players), sets it aside, shuffles the encounter deck and reveals the card; its When Revealed effects cannot be canceled (with no such card, only the shuffle)`,
-    read: ["top", "maxCost", "maxCostMulti"],
+    text: `the opposing team searches the top ${str(i.top)} cards of the encounter deck for the card nearest the top that costs ${i.maxCostStage === true ? "no more than the stage number of the main quest" : `${str(i.maxCost)} or less (${str(i.maxCostMulti)} or less with two or more players)`}, sets it aside, shuffles the encounter deck and reveals the card${i.cancelable === true ? "" : "; its When Revealed effects cannot be canceled"} (with no such card, only the shuffle)`,
+    read: ["top", "maxCost", "maxCostMulti", "maxCostStage", "cancelable"],
   }),
   HoldPickedUnder: () => ({ text: "the last picked card (an ally in play, or a card of a hand) lies faceup under this card, its owner's still and out of play (an ally in play loses its tokens and its attachments are discarded); no copy of its title can be played while it lies there; it returns to its owner's hand when this card leaves play", read: [] }),
   BarHeldTitles: () => ({ text: "no card with the title of a card held under this one can be played (the bar is the engine's, HoldPickedUnder holds the cards)", read: [] }),
@@ -33,7 +33,7 @@ export const WIZARDS_QUEST_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>>
 export const WIZARDS_QUEST_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   BuildQuickDeck: [{ verb: "BuildQuickDeck", sets: ["The Wizard's Quest 15", "The Wizard's Quest 16", "The Wizard's Quest 17"], keep: 2 }],
   ChooseQuestStage: [{ verb: "ChooseQuestStage", codes: ["51003", "51004", "51005"] }],
-  SearchTopReveal: [{ verb: "SearchTopReveal", top: 5, maxCost: 1, maxCostMulti: 2 }],
+  SearchTopReveal: [{ verb: "SearchTopReveal", top: 5, maxCost: 1, maxCostMulti: 2 }, { verb: "SearchTopReveal", top: 5, maxCostStage: true, cancelable: true }],
   HoldPickedUnder: [{ verb: "HoldPickedUnder" }],
   BarHeldTitles: [{ verb: "BarHeldTitles" }],
 };

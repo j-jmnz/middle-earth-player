@@ -109,6 +109,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   if (spec.looked) return lookedPool(state, spec, seats);
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
   else if (from === "victory") raw.push(...state.victory);
+  // The encounter discard pile, the most recently discarded card first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1).
+  else if (from === "encounterDiscard") raw.push(...[...state.encounterDiscard].reverse());
   else if (from === "loot") raw.push(...Object.values(state.cards).filter((card) => card.zone === "under" && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
   else if (from === "discard") {
     for (const index of seats) {
@@ -335,8 +337,11 @@ export function pickCandidates(
   event?: { subject?: string | null; other?: string | null; discards?: boolean },
 ): string[] {
   const found = candidatesOf(state, spec, seat, picked, sourceId, ctx, x, participants, counting, event);
-  // "The opposing team chooses" (docs/brief.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left, the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
-  return spec.challenge === true && !counting ? found.slice(0, 1) : found;
+  // "The opposing team chooses" (docs/brief.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left (with `highestThreat` on enemies, the one with the highest Attack among those level on Threat), the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
+  if (spec.challenge !== true || counting) return found;
+  // "the highest Threat, then the highest Attack" (docs/brief.md, The Woodland Realm, reading 3): level on Threat, the enemy with the highest Attack.
+  const level = spec.highestThreat === true && found.length > 1 ? tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "attack", ctx.cards) : 0), "highest") : found;
+  return level.slice(0, 1);
 }
 
 function candidatesOf(
