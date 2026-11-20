@@ -63,7 +63,7 @@ export const pillaged = (code: string, line: string, instructions: Instruction[]
   timing: "forced",
   trigger: "pillaged",
   subject: "self",
-  condition: { kind: "matches", card: "subject", pick: { type: "card", control: "any", cardType: "event", from: "discard" } },
+  condition: { kind: "matches", card: "other", pick: { type: "card", control: "any", cardType: "event", from: "discard" } },
   instructions,
 });
 // "Pillage X." keyword lines: the keyword is the card's printed field (overrides.cards), the attack's end runs it (families/sea/pillage.ts).

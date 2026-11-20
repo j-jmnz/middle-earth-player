@@ -25,7 +25,7 @@ export function pillageAfter(state: ScenarioState, enemyId: string, ctx: ReduceC
   return amount > 0 ? { verb: "Pillage", amount } : null;
 }
 
-/** Pillage: the actor discards the top `amount` cards of their deck, one at a time; each event card is announced as `pillaged` (the source enemy, the card as subject). */
+/** Pillage: the actor discards the top `amount` cards of their deck, one at a time; each event card is announced as `pillaged` (the source enemy, the card as the other card). */
 export function pillage(state: ScenarioState, instruction: Extract<Instruction, { verb: "Pillage" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   let next = state;
@@ -33,7 +33,7 @@ export function pillage(state: ScenarioState, instruction: Extract<Instruction, 
     const top = next.seats[focus.seat]?.deck[0];
     if (!top) break;
     next = queueEvent(moveCard(next, top, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: top });
-    if (focus.sourceId && printedOf(ctx.cards, next.cards[top]?.code ?? "").type === "event") next = queueEvent(next, { trigger: "pillaged", seat: focus.seat, cardId: focus.sourceId, subject: top });
+    if (focus.sourceId && printedOf(ctx.cards, next.cards[top]?.code ?? "").type === "event") next = queueEvent(next, { trigger: "pillaged", seat: focus.seat, cardId: focus.sourceId, other: top });
   }
   return next;
 }

@@ -13,6 +13,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { drawMany, type ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { recordsOfFace } from "../dreamchaser/faces.ts";
+import { syncConstants } from "../../interpret/constants.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -100,9 +101,11 @@ function fleetSetups(state: ScenarioState, ctx: ReduceContext, steps: EngineStep
 
 // "Your starting hand size is 8 cards" (Silent Mist, 40009:A:2): a ship that holds the flag `startingHand` (the cards more than the usual 6) lets its controller draw them once the fleet is taken; the hands were drawn before (reading 3).
 function startingHands(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
-  for (const seat of livingSeats(state)) {
-    const more = state.modifiers.length > 0 ? heldAmount(state, `seat:${seat}`, "startingHand") : 0;
+  // The ships just taken hold their constants once the table has read them.
+  const synced = syncConstants(state, ctx);
+  let next = synced;
+  for (const seat of livingSeats(synced)) {
+    const more = synced.modifiers.length > 0 ? heldAmount(synced, `seat:${seat}`, "startingHand") : 0;
     if (more > 0) next = drawMany(next, seat, more, steps, ruleCause("rr.setup"), ctx, false, false, true);
   }
   return next;

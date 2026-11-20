@@ -119,7 +119,7 @@ const VERBS = [
   // round", 12155:A:1). An ally that entered play and left again counts (families/sea/entries.ts).
   // `perPlayer`: each player's own count, by the seat that controls the ally as it enters ("Each player cannot play, or put into play, more than 1 ally each round", 144071:B:2; rr.play-and-put-into-play).
   z.strictObject({ verb: z.literal("LimitEntries"), cardType: z.literal("ally"), max: z.number().int().min(0), perPlayer: z.literal(true).optional(), ...when }),
-  // Pillage X (docs/brief.md, The Hunt for the Dreadnaught, reading 21): the actor discards the top `amount` cards of their deck, one at a time, each event card among them announced as `pillaged` (the source enemy, subject the card). The attack's
+  // Pillage X (docs/brief.md, The Hunt for the Dreadnaught, reading 21): the actor discards the top `amount` cards of their deck, one at a time, each event card among them announced as `pillaged` (the source enemy, the card as the other card). The attack's
   // end runs it for an enemy with the Pillage keyword (printed or gained, the flag `pillage`), in the frame of its other effects (families/sea/pillage.ts).
   z.strictObject({ verb: z.literal("Pillage"), amount: positiveAmountSchema, ...when }),
   // "Deal 4 damage to the Ship enemy or Ship objective with the fewest remaining hit points" (40033:A:2): the Ship enemies and the Ship objectives in play (any player's) with the fewest hit points left are the candidates; the first player chooses among tied ones, and the one found is picked.

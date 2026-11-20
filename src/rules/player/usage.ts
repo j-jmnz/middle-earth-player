@@ -19,7 +19,7 @@ import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
-import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
+import { currentCause, effectCause, UNATTRIBUTED } from "../core/cause.ts";
 import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
 import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
@@ -238,7 +238,8 @@ export function payUsage(
         break;
       }
       case "raiseThreat":
-        next = raiseThreat(next, seat, cost.amount, steps, currentCause(steps, UNATTRIBUTED));
+        // The cost of a Response taken before its frame is pushed has no running effect: it is the record's own (40005:B:3, "raise your threat by 4").
+        next = raiseThreat(next, seat, cost.amount, steps, currentCause(steps, effectCause(effect)));
         break;
       case "discardDeckTop": {
         // Each card is announced ("After ~ is discarded from your deck", families/deck/moves.ts).

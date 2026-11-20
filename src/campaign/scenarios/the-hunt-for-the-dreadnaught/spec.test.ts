@@ -1,12 +1,11 @@
 // Rules: rr.setup, rr.forced, rr.response, rr.action, rr.player-elimination, rr.quest-advancement, rr.cancel, rr.cost, rr.engaged, rr.damage, rr.immune, rr.first-player, rr.effects, dcce.ship-objectives, dcce.ship-enemies, dcce.prepare-your-fleet, dcce.corsair-deck, dcce.boarding, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/brief.md (The Hunt for the Dreadnaught).
-import { announce, answer, attack, attackersOf, window, cardSpecs, count, damageOn, deckCount, defend, endPhase, endRound, drew, exhausted, flag, handCount, progressOn, quest, resolve, resourcesOn, reveal, side, stagingThreat, stat, threat, zone, lost, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, attackersOf, window, cardSpecs, count, damageOn, deckCount, defend, endPhase, endRound, drew, flag, handCount, progressOn, quest, resolve, resourcesOn, reveal, side, stagingThreat, stat, threat, won, zone, lost, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Hunt for the Dreadnaught (standalone-scenarios part 14): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The quest deck is the real one (`stages`); the lines a row cannot
 // express (a whole Setup, a choice among the ships, a seeded game) are tests in lines.test.ts, each titled with its line id.
 const STAGES = ["40004", "40005"] as const;
 const FLEET = ["40006", "40007", "40008", "40009", "40010", "40011"];
-const ON = (code: string, to = "dh1") => ({ code, to });
 const SETUP_FLEET = { setAside: FLEET, deck: ["f0", "f0", "f0", "f0"] } as const;
 
 const ROWS: readonly Row[] = [
@@ -100,6 +99,10 @@ const ROWS: readonly Row[] = [
   { line: "40043:A:1", name: "When Revealed: the staged enemy with the highest engagement cost engages the first player and attacks them", layout: { stages: STAGES, staging: ["40013"], deck: ["40043", "f0"] }, act: reveal("40043"), expect: [window("defense")] },
   { line: "40044:A:1", name: "When Revealed: the text boxes of the non-Ship allies are blank until the end of the round", layout: { stages: STAGES, play: ["ally"], deck: ["40044", "f0"] }, act: reveal("40044"), expect: [flag("ally", "blankText")] },
   { line: "40045:A:2", name: "Shadow: attach to the defending Ship objective", layout: { stages: STAGES, play: ["40006"] }, act: [attack("40029", { shadow: "40045" }), defend("40006")], expect: [zone("40045", "attached")] },
+  { line: "40005:B:4", name: "the players win the game when the Dreadnaught is destroyed", layout: { stages: STAGES, stage: "40005", staging: ["40013"] }, act: announce("enemyDestroyed", "40013"), expect: [won] },
+  { line: "40009:A:2", name: "your starting hand size is 8 cards: the player who takes it draws 2 more once the fleet is taken", layout: { stages: STAGES, setAside: FLEET, deckOf: ["filler", "filler", "filler", "filler"] }, act: [resolve("40002", "setup"), answer("40009")], expect: [handCount(2)] },
+  { line: "40031:A:2", name: "deals 1 damage to a non-Ship character of the defending player for each point its attack deals to a Ship objective", layout: { stages: STAGES, play: ["40006"] }, act: [attack("40031"), defend("40006")], expect: [damageOn("40006", 4), damageOn("dh1", 4)] },
+  { line: "40038:A:1", name: "Forced: in the staging area, when a player draws cards by a player card effect they raise their threat by that many", layout: { stages: STAGES, staging: ["40038"] }, act: announce("cardsDrawn", undefined, { amount: 2, byPlayerCard: true }), expect: [threat(30)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-hunt-for-the-dreadnaught", ROWS);
