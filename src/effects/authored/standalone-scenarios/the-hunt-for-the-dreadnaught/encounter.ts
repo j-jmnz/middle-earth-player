@@ -104,8 +104,9 @@ export const ENCOUNTER: readonly (Effect | Copy)[] = [
     instructions: [{ verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "endOfRound", target: "attacker" }, { verb: "ModifyStat", stat: "defense", amount: 2, until: "endOfRound", target: "attacker" }],
   },
 
-  // The treacheries. 40040 Ballista Barrage: Doomed 1; each Ship enemy gains Archery 2 until the end of the round; Shadow: 2 damage among your characters (3 with 10 or more cards in your discard pile).
-  { id: "40040:whenRevealed:1", cardCode: "40040", lines: ["40040:A:1", "40040:A:2"], timing: "whenRevealed", instructions: [{ verb: "Doomed", amount: 1 }, { verb: "ModifyStat", stat: "archery", amount: 2, until: "endOfRound", holders: { type: "enemy", control: "any", trait: "Ship", staging: true } }] },
+  // The treacheries. 40040 Ballista Barrage: Doomed 1 is the printed keyword; each Ship enemy gains Archery 2 until the end of the round; Shadow: 2 damage among your characters (3 with 10 or more cards in your discard pile).
+  { id: "40040:constant:1", cardCode: "40040", lines: ["40040:A:1"], timing: "constant", instructions: [] },
+  { id: "40040:whenRevealed:1", cardCode: "40040", lines: ["40040:A:2"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "archery", amount: 2, until: "endOfRound", holders: { type: "enemy", control: "any", trait: "Ship", staging: true } }] },
   {
     id: "40040:shadow:1",
     cardCode: "40040",

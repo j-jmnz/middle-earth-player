@@ -23,7 +23,7 @@ import { addStandIns, entry, fillerRecord, HERO, HERO2, HERO3, idOf, idsOf, open
 // everything here, so a scenario's tests import it from there.
 
 /** A card the layout places: a code, or a code with its tokens (and the seat it belongs to, the first by default). */
-export type Placed = Entry | { code: string; seat: number; damage?: number; resources?: number };
+export type Placed = Entry | { code: string; seat: number; damage?: number; resources?: number; upgraded?: true };
 
 /** A card of a hand or a deck: a code (every seat gets one), or a code and the one seat that holds it. */
 export type Dealt = string | { code: string; seat: number };
@@ -67,7 +67,8 @@ export type Layout = {
   // The campaign card is on the table (a campaign game).
   campaign?: boolean;
   // The scenario's mode card lies beside the quest deck on its back, as a finished Setup leaves it (The Siege of Annúminas' Standard Game Mode, 50801:B:1).
-  modeCard?: true;
+  // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
+  modeCard?: true | "easy";
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
   attached?: readonly { code: string; to: string }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
@@ -180,7 +181,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   const put = (code: string, dest: Destination, tokens: Entry = code, face?: "up" | "down"): void => {
     const row = entry(tokens);
     const spawned = spawn(state, code, dest, face);
-    state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources });
+    state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources, ...(row.upgraded ? { face: "B" as const } : {}) });
   };
   for (const item of layout.play ?? []) put(entry(item).code, { zone: "play", seat: seatOf(item) }, item);
   for (const code of layout.deck ?? []) put(code, { zone: "encounterDeck" }, code, "down");
@@ -193,8 +194,9 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   if (layout.nightmare) put(entry(layout.nightmare).code, { zone: "nightmare" }, layout.nightmare, "up");
   if (layout.night) put(entry(layout.night).code, { zone: "nightObjective" }, layout.night, "up");
   if (layout.campaign && world.dealt.campaignCard !== undefined) put(world.dealt.campaignCard, { zone: "campaign" });
-  if (layout.modeCard && "modeCard" in world.data && world.data.modeCard !== undefined) {
-    const spawned = spawn(state, world.data.modeCard, { zone: "modeCard" });
+  const modeCode = layout.modeCard === "easy" && "easyModeCard" in world.data ? world.data.easyModeCard : layout.modeCard && "modeCard" in world.data ? world.data.modeCard : undefined;
+  if (modeCode !== undefined) {
+    const spawned = spawn(state, modeCode, { zone: "modeCard" });
     state = updateCard(spawned.state, spawned.id, { face: "B" });
   }
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
