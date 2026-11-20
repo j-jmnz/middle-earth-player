@@ -5491,9 +5491,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "a63a387addd164e4fa7bc67dec4b1e09416967223d20c44e38fd6990162f22a7"
+        "value": "4f2658c77d5556a6a4fd55365a9b5b2cf7d6431ad14898bb022ed5675cc7ac4f"
       },
-      "fetchedAt": "2026-11-20T09:35:37.927Z",
+      "fetchedAt": "2026-11-20T12:00:35.342Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -28078,6 +28078,348 @@
           "url": "https://images.cardgame.tools/lotr/OP077-53-front-Treachery-Wasted_Provisions.jpg",
           "sha256": "3d547dced56a40ff1173eb71be1ba1c6ec88b2bc3db2a314ae13c2aba3de9172",
           "bytes": 886616
+        },
+        {
+          "path": "pictures/51201.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-1-front-Quest-To_the_West_door-A-The_Mines_of_Moria.jpg",
+          "sha256": "eedaa0bf3b5603d8e07a19b976a22c83c5637abea243b21ebc838d5930f9b17d",
+          "bytes": 908994
+        },
+        {
+          "path": "pictures/51201.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-1-back-Quest-To_the_West_door-A-The_Mines_of_Moria.jpg",
+          "sha256": "9f90b53ceece74aaee74724ed1439eb0e10cbc659132a3615be6e7c93abe4f2c",
+          "bytes": 906082
+        },
+        {
+          "path": "pictures/51203.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-2a-front-Quest-Journey_in_the_Black_Pit-A_Presence_in_the_Dark-A-The_Mines_of_Moria.jpg",
+          "sha256": "0187e7b41842d5cbbbed66d341cacf517daf6e548cea9d377fa4a5856a8f99fa",
+          "bytes": 804834
+        },
+        {
+          "path": "pictures/51203.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-3-back-Quest-Journey_in_the_Black_Pit-A_Presence_in_the_Dark-A-The_Mines_of_Moria.jpg",
+          "sha256": "e16622b96163d56bec849cfb152a9ea4f40411312adecad72087411622c498d7",
+          "bytes": 722604
+        },
+        {
+          "path": "pictures/51204.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-2b-front-Quest-Journey_in_the_Black_Pit-The_Long_Dark_of_Moria-A-The_Mines_of_Moria.jpg",
+          "sha256": "0187e7b41842d5cbbbed66d341cacf517daf6e548cea9d377fa4a5856a8f99fa",
+          "bytes": 804834
+        },
+        {
+          "path": "pictures/51204.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-4-back-Quest-Journey_in_the_Black_Pit-The_Long_Dark_of_Moria-A-The_Mines_of_Moria.jpg",
+          "sha256": "beffb4c09975d82fab6288f5ea70edb0262862cf6091d4db07296e10458a0377",
+          "bytes": 833479
+        },
+        {
+          "path": "pictures/51205.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-2c-front-Quest-Journey_in_the_Black_Pit-Narrow_Paths-A-The_Mines_of_Moria.jpg",
+          "sha256": "0187e7b41842d5cbbbed66d341cacf517daf6e548cea9d377fa4a5856a8f99fa",
+          "bytes": 804834
+        },
+        {
+          "path": "pictures/51205.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-5-back-Quest-Journey_in_the_Black_Pit-Narrow_Paths-A-The_Mines_of_Moria.jpg",
+          "sha256": "e5fb8cb330bd3491770c6a20b4901a3ef2e134d3f019c3ee5879aad9a0bfee22",
+          "bytes": 724414
+        },
+        {
+          "path": "pictures/51207.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-6a-front-Quest-Search_for_the_Chamber-Drums_in_the_Deep-A-The_Mines_of_Moria.jpg",
+          "sha256": "5d3bbd5141f43ea3dd7a122142145dfd122b927a653105e8a2e7a95e815e4891",
+          "bytes": 765951
+        },
+        {
+          "path": "pictures/51207.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-7-back-Quest-Search_for_the_Chamber-Drums_in_the_Deep-A-The_Mines_of_Moria.jpg",
+          "sha256": "efb10c06f998259b46131100480d085bb9fd245268a152550e32eba1b40eedb5",
+          "bytes": 801820
+        },
+        {
+          "path": "pictures/51208.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-6b-front-Quest-Search_for_the_Chamber-The_Fate_of_Balin-A-The_Mines_of_Moria.jpg",
+          "sha256": "5d3bbd5141f43ea3dd7a122142145dfd122b927a653105e8a2e7a95e815e4891",
+          "bytes": 765951
+        },
+        {
+          "path": "pictures/51208.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-8-back-Quest-Search_for_the_Chamber-The_Fate_of_Balin-A-The_Mines_of_Moria.jpg",
+          "sha256": "2336816d46a3e071aaa7ae87fb7bdbca17598ef1bbb553a6500a6d5c29d25640",
+          "bytes": 775859
+        },
+        {
+          "path": "pictures/51209.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-6c-front-Quest-Search_for_the_Chamber-Continuing_Eastward-A-The_Mines_of_Moria.jpg",
+          "sha256": "5d3bbd5141f43ea3dd7a122142145dfd122b927a653105e8a2e7a95e815e4891",
+          "bytes": 765951
+        },
+        {
+          "path": "pictures/51209.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-9-back-Quest-Search_for_the_Chamber-Continuing_Eastward-A-The_Mines_of_Moria.jpg",
+          "sha256": "7e85aef8b28df085155a7e2852da58f0cb58e5c1088cf2788b1c86719a7cd9ac",
+          "bytes": 778205
+        },
+        {
+          "path": "pictures/51210.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-10-front-Enemy-The_Watcher-The_Mines_of_Moria.jpg",
+          "sha256": "a3cd51ad709c6f08c378348ea77b6324ea29e42c450092409f19094c3968ce92",
+          "bytes": 713445
+        },
+        {
+          "path": "pictures/51212.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-12-front-Enemy-Savage_Werewolf.jpg",
+          "sha256": "64f6f09d3ea8512d38924f9f9722adc69251c5b07be58021db57a2446f986cff",
+          "bytes": 728542
+        },
+        {
+          "path": "pictures/51213.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-13-front-Location-Many_pillared_Hall.jpg",
+          "sha256": "a80d56c6afb4e3e6d3fcc6854f30df8d5c78f0708c2d48fa2983a336abea8918",
+          "bytes": 740969
+        },
+        {
+          "path": "pictures/51214.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-14-front-Treachery-Shadow_of_Fear.jpg",
+          "sha256": "00a7402fcbec4961f59539e42b1af858336002a8ec85dbd42087b6bd0bc13d3b",
+          "bytes": 743385
+        },
+        {
+          "path": "pictures/51215.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-15-front-Enemy-Deep_dweller.jpg",
+          "sha256": "77a77811108bcd132e1c60cb12c867569d7abbab9ce0b1e50a272e6c8bddfaee",
+          "bytes": 815303
+        },
+        {
+          "path": "pictures/51216.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-16-front-Location-Darkened_Stairway.jpg",
+          "sha256": "15db6921879123fba0296fcc5625115061c2cabca1a4142f3ee2c2eefadcfd00",
+          "bytes": 811953
+        },
+        {
+          "path": "pictures/51217.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-17-front-Treachery-We_Cannot_Get_Out.jpg",
+          "sha256": "de2cec526c128afb5a085d1bf36052a03bdbacb2bcc9148a03db84e190dce47d",
+          "bytes": 761332
+        },
+        {
+          "path": "pictures/51218.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-18-front-Enemy-Spider_Broodling.jpg",
+          "sha256": "63981a0e6ebfa01e6165e11a6aeb4fdfce6dcc64d9cf39a9eea8ce5f4a6c052e",
+          "bytes": 731938
+        },
+        {
+          "path": "pictures/51219.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-19-front-Location-Spider_Burrow.jpg",
+          "sha256": "b0eadac20e5d70c80c2f44abed72ea03b2a2a226182aa5c816465fafa58c7c94",
+          "bytes": 785612
+        },
+        {
+          "path": "pictures/51220.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-20-front-Treachery-Grabbed_by_Spiders.jpg",
+          "sha256": "d6ebff61ce378ba148a38d146c0f378270414eb07575e33c10aa7055cf3a54cc",
+          "bytes": 786717
+        },
+        {
+          "path": "pictures/51221.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-21-front-Enemy-Moria_Bats.jpg",
+          "sha256": "56dfd1603318ea9b48d8c49bf19d57c27b9e8c47a8e4c5c536ca77500713fa01",
+          "bytes": 669109
+        },
+        {
+          "path": "pictures/51222.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-22-front-Location-Ancient_Guardroom.jpg",
+          "sha256": "f36e34af5c8cbd9f1042c74a21afa34f74adce0328063885346eb1ed07d1b1a4",
+          "bytes": 869545
+        },
+        {
+          "path": "pictures/51223.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-23-front-Treachery-Denizen_of_the_Deep.jpg",
+          "sha256": "55a4b4f9601b06712edfdbea18b2e5c0cbab02434b269283b62df8cb440ae711",
+          "bytes": 709055
+        },
+        {
+          "path": "pictures/51224.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-24-front-Enemy-Werewolf.jpg",
+          "sha256": "488093ba92ac76bf1041432d2b177f0a7cb879e01fc398c9b8cb1aecdb1969c4",
+          "bytes": 807790
+        },
+        {
+          "path": "pictures/51225.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-25-front-Location-Fouled_Well.jpg",
+          "sha256": "d7061575493a3cd0e040af5f5f026b0b59bf394d470a88000af235fc37a95063",
+          "bytes": 771090
+        },
+        {
+          "path": "pictures/51226.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-26-front-Treachery-Cave_In.jpg",
+          "sha256": "0233a832922c82f084b133c2f79f6ea9b15fb89c8dbcca50742ed853adcb7d82",
+          "bytes": 734914
+        },
+        {
+          "path": "pictures/51227.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-27-front-Enemy-Hive_Guardian.jpg",
+          "sha256": "2d625f974e24a8a4b7a8760dace4a2a6e136d54535d9ce3a49ed68b901537314",
+          "bytes": 751908
+        },
+        {
+          "path": "pictures/51228.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-28-front-Location-Abandoned_Mines.jpg",
+          "sha256": "b0de936d9add0b11228520bceb30b15eb00746412def2c8bf8689cd2bdefabe0",
+          "bytes": 816881
+        },
+        {
+          "path": "pictures/51229.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-29-front-Treachery-Sudden_Pitfall.jpg",
+          "sha256": "1fa0f610ca6c0e9432006dc83dd58cd987d7a649b0d27c685b48b947d0b2f70a",
+          "bytes": 707553
+        },
+        {
+          "path": "pictures/51230.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-30-front-Enemy-Web_spinner.jpg",
+          "sha256": "1ec3b209c9a8789f5508ea365b342892778f4dff028538def3046ec0dbddfaf6",
+          "bytes": 687346
+        },
+        {
+          "path": "pictures/51231.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-31-front-Location-Cobwebbed_Cavern.jpg",
+          "sha256": "8877b124baaee15c5a8b74bed773d9c62e2ed979743d4f688fa546bed9eb049c",
+          "bytes": 759459
+        },
+        {
+          "path": "pictures/51232.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-32-front-Treachery-Foul_Air.jpg",
+          "sha256": "1870f243c1c55a19ba560e864a0684d7bca329b582a780041a03fb85d0d7fd53",
+          "bytes": 789141
+        },
+        {
+          "path": "pictures/51233.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-33-front-Enemy-Brood_Mother.jpg",
+          "sha256": "d23e3cf403dcd1bbd734729c1692228af2205cd7e40da7e5892349b525f78f61",
+          "bytes": 784704
+        },
+        {
+          "path": "pictures/51234.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-34-front-Location-Lightless_Passage.jpg",
+          "sha256": "9fb87d01b2b1e45c449b15ca8beac264985afc77071070756cb1df2afea99e11",
+          "bytes": 755011
+        },
+        {
+          "path": "pictures/51235.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-35-front-Treachery-Lurking_Malice.jpg",
+          "sha256": "31a3f15b50dbd0de381bab924d750804dbf24f936d883407b2f10c6fc809f911",
+          "bytes": 729422
+        },
+        {
+          "path": "pictures/51236.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-36-front-Enemy-Great_Cave_troll.jpg",
+          "sha256": "2948550295b5859534a63dabd07a63e807991da9380074a4824346bcd65b7303",
+          "bytes": 729152
+        },
+        {
+          "path": "pictures/51237.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-37-front-Location-Zigil_Mineshaft.jpg",
+          "sha256": "0d5bb150aec511969870bc9588c4bbf89d23d4f2773e69fb08eeb839dbfaf856",
+          "bytes": 730815
+        },
+        {
+          "path": "pictures/51238.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-38-front-Treachery-Dark_and_Dreadful.jpg",
+          "sha256": "bce0dcbc9331591b12c60ce21f5249693b3f5c868ea7dce4b76c4b144153a091",
+          "bytes": 722127
+        },
+        {
+          "path": "pictures/51239.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-39-front-Enemy-Goblin_Follower.jpg",
+          "sha256": "6114bc55e63fabf573b67eebab4d079808304c77e59a0ae07c6a17ba8de86c2a",
+          "bytes": 710320
+        },
+        {
+          "path": "pictures/51240.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-40-front-Location-Stairs_of_Nain.jpg",
+          "sha256": "381a54d03779a644f757db67df0cc37c2ac3f7be39bd63e331218c81213f2907",
+          "bytes": 733836
+        },
+        {
+          "path": "pictures/51241.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-41-front-Treachery-Hidden_Threat.jpg",
+          "sha256": "9a8ee4c81f98f6f0aeda1ee45482f499ba6253d7322b81dd93c3d6baab0d70a0",
+          "bytes": 761200
+        },
+        {
+          "path": "pictures/51242.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-42-front-Enemy-Goblin_Warlord.jpg",
+          "sha256": "0869d76017a3a0b9da738558e1b353bc84598aafdaa027e96c527520982b5c77",
+          "bytes": 748145
+        },
+        {
+          "path": "pictures/51243.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-43-front-Location-Dwarven_Forge.jpg",
+          "sha256": "50a1715c95f12e5a1f9450cc9cc5839e32f5adcd9f88592f6b3765d93f476623",
+          "bytes": 725081
+        },
+        {
+          "path": "pictures/51244.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-44-front-Treachery-Signs_of_Conflict.jpg",
+          "sha256": "b271f8cb3b9159bc1bcdc28789015c5d42e551487f99a03a103a41c39a27fdef",
+          "bytes": 778430
+        },
+        {
+          "path": "pictures/51245.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-45-front-Enemy-Goblin_Archer.jpg",
+          "sha256": "3e9b6312e03f735a882f2d58c9e239b8dc5f200365b0d39d1029924fdb88afbe",
+          "bytes": 722484
+        },
+        {
+          "path": "pictures/51246.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-46-front-Location-Narrow_Fissure.jpg",
+          "sha256": "1d74a2b4527853b536795048a88faed3fe05cbc4eaa4514e1dce7fc348238b27",
+          "bytes": 731774
+        },
+        {
+          "path": "pictures/51247.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-47-front-Treachery-Crumbling_Ruin.jpg",
+          "sha256": "3734ca7de5c8abef923141378061e9f101fb2d20345b9f51d17611983d71d12c",
+          "bytes": 709680
+        },
+        {
+          "path": "pictures/51248.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-48-front-Enemy-Goblin_Sneak.jpg",
+          "sha256": "01edf862ca0e083780adaa3aa5083bef31880d992ad09834fcca68e763eb53c0",
+          "bytes": 711686
+        },
+        {
+          "path": "pictures/51249.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-49-front-Location-Plundered_Armoury.jpg",
+          "sha256": "d396de447bdb61a0bc4b3b5c05073ebe14b8419c1f9a82e9b4897688ad790183",
+          "bytes": 700878
+        },
+        {
+          "path": "pictures/51250.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-50-front-Treachery-They_Are_Coming.jpg",
+          "sha256": "20501eb5665fd8d6b86502434e43367589ebf236b064bd2d0a6e1dfe5524e82b",
+          "bytes": 763785
+        },
+        {
+          "path": "pictures/51251.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-51-front-Enemy-Swarming_Goblins.jpg",
+          "sha256": "c6dad11aae2f7a3615ce8d0bfa6e20b22259d3a90c96bc0c92ea4134142429f6",
+          "bytes": 740320
+        },
+        {
+          "path": "pictures/51252.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-52-front-Location-Goblin_Tunnels.jpg",
+          "sha256": "37171bd85db4b4f7f64d5fac43a107fedc281d39b49ae296f1de0fe5ea4501d8",
+          "bytes": 758718
+        },
+        {
+          "path": "pictures/51253.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/UMEC84-53-front-Treachery-Massing_in_the_Deep.jpg",
+          "sha256": "8cfcb8f53531df36a8f504db33b11e755bbc87f48b1fcbd5ad6a69463278bd94",
+          "bytes": 705706
         },
         {
           "path": "pictures/9901014.A.jpg",
