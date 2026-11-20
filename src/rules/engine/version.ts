@@ -49,9 +49,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 32, scenarios: "all", note: "A card that exhausts to quest, attack, defend or pay a cost now triggers its \"after it exhausts\" effects, like Turayn, Arwen Undómiel, Tiny and Grievous Wound." },
   { version: 33, scenarios: "all", note: "A card played from your hand at no cost, like the Silvan allies Host of Galadhrim plays again, needs no hero of its sphere." },
   { version: 33, scenarios: ["across-the-ettenmoors", "a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "An event played at no cost, like one Send for Help finds or one Scavenge for Supplies lets you play, needs no hero of its sphere." },
+  { version: 34, scenarios: "all", note: "An attacker that leaves play before the attack deals its damage, like Beechbone destroyed by his own damage, adds no Attack to it." },
 ];
 
-export const ENGINE_VERSION = 33;
+export const ENGINE_VERSION = 34;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

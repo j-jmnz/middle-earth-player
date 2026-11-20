@@ -11,7 +11,7 @@ import { modifiedStat } from "../../rules/core/keywords.ts";
 import { startReveal } from "../../rules/windows/frames.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
+import { legalIntents, reduce } from "../../rules/engine/reduce.ts";
 import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
 import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
@@ -29,6 +29,8 @@ const STAND = "01038";
 const GONDOLIN = "01039";
 const PLATE = "01040";
 const AXE = "01041";
+// Beechbone (Ent ally): pays 1 damage to deal X damage, X his damage, when he is declared as an attacker.
+const BEECHBONE = "10118";
 const ORC = "orc";
 const GOBLIN = "goblin";
 const WEAK = "weak";
@@ -40,7 +42,7 @@ let base: Awaited<ReturnType<typeof starterBase>>;
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([FERRY, GIMLI, LEGOLAS, THALIN, SPEARMAN, BLADE_MASTERY, RAIN, THICKET, SWIFT, STAND, GONDOLIN, PLATE, AXE]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([FERRY, GIMLI, LEGOLAS, THALIN, SPEARMAN, BLADE_MASTERY, RAIN, THICKET, SWIFT, STAND, GONDOLIN, PLATE, AXE, BEECHBONE]))]);
   cards.set(ORC, definePrinted({ code: ORC, name: "Orc", type: "enemy", traits: ["Orc"], threat: 1, engagementCost: 40, attack: 2, defense: 1, health: 5 }));
   cards.set(GOBLIN, definePrinted({ code: GOBLIN, name: "Goblin", type: "enemy", traits: ["Goblin"], threat: 1, engagementCost: 40, attack: 2, defense: 1, health: 5 }));
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 1 }));
@@ -293,5 +295,24 @@ describe("Citadel Plate (01040) and Dwarven Axe (01041), from the templates", ()
     const tab = table({ heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }], attached: [{ code: AXE, host: GIMLI }, { code: AXE, host: LEGOLAS }] });
     expect(stat(tab.state, tab, idsOf(tab, GIMLI), "attack")).toBe(4);
     expect(stat(tab.state, tab, idsOf(tab, LEGOLAS), "attack")).toBe(4);
+  });
+});
+
+describe("An attacker that leaves play before the damage (rr.step-6-8-2)", () => {
+  it("adds no Attack: Beechbone destroyed by his own cost deals only his X (10118:A:2)", () => {
+    const tab = table({ heroes: [{ code: GIMLI, seat: 0 }], allies: [{ code: BEECHBONE, seat: 0 }], engaged: [{ code: ORC, seat: 0 }] });
+    const beechbone = idsOf(tab, BEECHBONE);
+    const orc = idsOf(tab, ORC);
+    // Beechbone's line is not in a printed ledger, so the steps are read without the harness's cause check.
+    const step = (state: ScenarioState, intent: Parameters<typeof reduce>[1]): ScenarioState => {
+      const result = reduce(state, intent, tab.ctx);
+      if (!result.ok) throw new Error(result.reason);
+      return result.state;
+    };
+    let state = step(attacking(updateCard(tab.state, beechbone, { damage: 3 })), { type: "DeclareAttackers", enemyId: orc, attackerIds: [beechbone] });
+    state = step(state, { type: "Trigger", cardId: beechbone, effectId: "10118:response:1" });
+    while (legalIntents(state, tab.ctx).some((intent) => intent.type === "Pass") && state.pendingStrike) state = step(state, { type: "Pass" });
+    expect(state.cards[beechbone]?.zone).toBe("discard");
+    expect(state.cards[orc]?.damage).toBe(4);
   });
 });
