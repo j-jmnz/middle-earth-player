@@ -3,7 +3,12 @@ import { announce, cardSpecs, committed, count, damageOn, flag, handCount, resol
 
 // Card specs for The Mines of Moria (standalone-scenarios part 12): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
-// The layout numbers the stages in the order of the data (51201, 51203, 51204, ...): 51203 stands for stage 2 and 51204 for stage 3.
+// Each layout holds the quest cards a Quick-build game keeps (1A, one stage 2, one stage 3), so a stage number is the printed one.
+const STAGES_3 = ["51207", "51208", "51209"];
+const withStages = (row: Row): Row => {
+  const stage = row.layout?.stage ?? "51201";
+  return { ...row, layout: { stages: STAGES_3.includes(stage) ? ["51201", "51203", stage] : ["51201", stage === "51201" ? "51203" : stage, "51207"], ...row.layout } };
+};
 const ROWS: readonly Row[] = [
   // The cards the Build task checked on a table; the Finish task adds the rows of the other lines.
   { line: "51219:A:2", name: "Forced: when Spider Burrow is explored the opposing team finds a Spider enemy of cost 1 or less", layout: { stage: "51203", staging: ["51219"], deck: ["51213", "51218", "f0"] }, act: announce("locationExplored", "51219"), expect: [zone("51218", "staging")] },
@@ -26,4 +31,4 @@ const ROWS: readonly Row[] = [
   { line: "51248:A:1", name: "the opposing team finds a Goblin enemy of cost 1 or less among the top 5 cards", layout: { stage: "51203", deck: ["f0", "f0", "51251"] }, act: resolve("51248", "whenRevealed"), expect: [zone("51251", "staging")] },
 ];
 
-if (ROWS.length > 0) cardSpecs("the-mines-of-moria", ROWS);
+if (ROWS.length > 0) cardSpecs("the-mines-of-moria", ROWS.map(withStages));

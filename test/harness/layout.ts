@@ -42,6 +42,8 @@ export type Layout = {
   firstPlayer?: 0 | 1;
   seed?: number;
   stage?: string;
+  // The quest cards of the game, in order, as a Quick-build leaves them (the 1A card, one stage 2 and one stage 3): a stage number reads the card's place among them. Absent: every quest card of the scenario.
+  stages?: readonly string[];
   progress?: number;
   // The side the current quest stage shows (B by default; A for a stage 2 of a quest deck that has not flipped yet, 03070:A:1).
   side?: "A" | "B";
@@ -140,7 +142,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   // A layout that names a Nightmare quest card as its stage (Grimbeorn's Folly) has it after the printed stages, as the Nightmare deal does (src/campaign/start.ts).
   const printedDefinition = scenarioDefinition(world.dealt, world.campaign, effects);
   const nightmareStages = world.dealt.nightmare?.questCards ?? [];
-  const definition = layout.stage != null && nightmareStages.includes(layout.stage) ? { ...printedDefinition, stages: [...printedDefinition.stages, ...nightmareStages.map((code) => stageOf(code, effects))] } : printedDefinition;
+  const withNightmare = layout.stage != null && nightmareStages.includes(layout.stage) ? { ...printedDefinition, stages: [...printedDefinition.stages, ...nightmareStages.map((code) => stageOf(code, effects))] } : printedDefinition;
+  const definition = layout.stages ? { ...withNightmare, stages: withNightmare.stages.filter((entry) => layout.stages?.includes(entry.code)) } : withNightmare;
   const cards = new Map(world.cards);
   for (const code of options.extra ?? []) {
     const card = cardsByCode().get(code);

@@ -14,7 +14,10 @@ import { finish, idOf, idsOf, opening, resolveRecords, revealFromTop, send, star
 import { titleHeld } from "./held.ts";
 import { arrangeTopByChallenge } from "./hidden.ts";
 
-const table = (layout: Layout) => tableFromLayout("the-mines-of-moria", layout);
+// The quest cards a Quick-build game keeps: 1A, one stage 2 and one stage 3 (the Setup of 51201), so a stage number is the printed one.
+const STAGES_2 = ["51203", "51204", "51205"];
+const realStages = (stage: string | undefined): string[] => (stage != null && ["51207", "51208", "51209"].includes(stage) ? ["51201", "51203", stage] : ["51201", STAGES_2.includes(stage ?? "") ? (stage as string) : "51203", "51207"]);
+const table = (layout: Layout) => tableFromLayout("the-mines-of-moria", { stages: realStages(layout.stage), ...layout });
 const codesOf = (state: ScenarioState, ids: readonly string[]): string[] => ids.map((id) => state.cards[id]?.code ?? "");
 
 describe("The Watcher and stage 1B (reading 7)", () => {
@@ -48,7 +51,6 @@ describe("The Watcher and stage 1B (reading 7)", () => {
 });
 
 describe("Chamber of Mazarbul (reading 8)", () => {
-  // The layout numbers the stages in the order of the data (51201, 51203, 51204, ...), where a game keeps one stage 2 and one stage 3: 51203 stands for stage 2 and 51204 for stage 3.
   const travelTargets = (stage: string): string[] => {
     const made = table({ stage, phase: "Travel", staging: ["51211", "51213"], hand: ["filler"] });
     return legalTargets(made.state, { type: "Travel" }, made.ctx).map((id) => made.state.cards[id]?.code ?? "");
@@ -56,7 +58,7 @@ describe("Chamber of Mazarbul (reading 8)", () => {
 
   it("51211:A:3 the players cannot travel to it before stage 3, and can at stage 3", () => {
     expect(travelTargets("51203")).toEqual(["51213"]);
-    expect(travelTargets("51204").sort()).toEqual(["51211", "51213"]);
+    expect(travelTargets("51207").sort()).toEqual(["51211", "51213"]);
   });
 
   it("51211:A:1 its Threat is 1 more than the stage number", () => {
@@ -66,7 +68,7 @@ describe("Chamber of Mazarbul (reading 8)", () => {
       return card ? modifiedStat(made.state, card, "threat", made.cards) : -1;
     };
     expect(threatAt("51203")).toBe(3);
-    expect(threatAt("51204")).toBe(4);
+    expect(threatAt("51207")).toBe(4);
   });
 });
 

@@ -2,12 +2,14 @@ import type { Amount, Condition, Effect, Instruction, PickSpec } from "../../../
 import { consideredEngaged } from "../considered-engaged.ts";
 
 // Records for The Mines of Moria (standalone-scenarios cycle part 12, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
-// The scenario is a kit like The Wizard's Quest and The Woodland Realm (src/effects/authored/standalone-scenarios/the-wizards-quest.ts, the-woodland-realm.ts): the quest card 51201's Setup gives each hero a resource, the Quick-build of the other two kits is dealt by the data (the load list deals all 14 sets and a stage 2 and a stage 3 are kept
-// by the seed: docs/brief.md, The Mines of Moria, reading 2), and The Watcher lies in the staging area from the deal. "The opposing team" chooses and searches in the manner that gives the players the greatest challenge: the engine's fixed policy, never a prompt (docs/brief.md, The Mines of Moria, readings 1 and 3).
+// The scenario is a kit like The Wizard's Quest and The Woodland Realm (src/effects/authored/standalone-scenarios/the-wizards-quest.ts, the-woodland-realm.ts): the quest card 51201's Setup gives each hero a resource, the Setup builds the Quick-build as the other two kits do (7 of the 14 sets, the first player's stage 2 and stage 3: docs/brief.md, The Mines of Moria, reading 2), and The Watcher lies in the staging area from the deal. "The opposing team" chooses and searches in the manner that gives the players the greatest challenge: the engine's fixed policy, never a prompt (docs/brief.md, The Mines of Moria, readings 1 and 3).
 // Rules: rr.search, rr.reveal, rr.cancel, rr.explored, rr.forced, rr.travel, rr.engaged, rr.staging, rr.first-player, rr.guarded, rr.victory, rr.quest-advancement, rr.attachment-cards, rr.blank, rr.surge, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json).
 const STAGE_1 = "51201";
 const WATCHER = "51210";
 const CHAMBER = "51211";
+const STAGES_2 = ["51203", "51204", "51205"] as const;
+const STAGES_3 = ["51207", "51208", "51209"] as const;
+const SETS = Array.from({ length: 14 }, (_, at) => `The Mines of Moria ${1 + at}`);
 
 const EACH_PLAYER = (instructions: Instruction[]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", instructions } as Instruction);
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
@@ -55,7 +57,13 @@ const discardRandom = (): Instruction => EACH_PLAYER([{ verb: "DiscardRandomFrom
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 51201 To the West-door (stage 1). Setup: each hero gains 1 resource (The Watcher lies in the staging area from the deal). Side B: while this stage holds 5 progress The Watcher is considered engaged with each player (it attacks each in turn order with a shadow card for each attack, any character may attack it, it adds no Threat there: rr.engaged, reading 7);
   // it cannot leave the staging area but by its defeat; when it is defeated the one two-sided card turns over and Chamber of Mazarbul enters the staging area (reading 7); the stage cannot be defeated while The Watcher is in play.
-  { id: "51201:setup:1", cardCode: STAGE_1, lines: ["51201:A:1"], timing: "setup", instructions: [EACH_PLAYER([{ verb: "HeroesGainResources", amount: 1 }])] },
+  { id: "51201:setup:1", cardCode: STAGE_1, lines: ["51201:A:1"], timing: "setup", instructions: [
+      { verb: "BuildQuickDeck", sets: SETS, keep: 7 },
+      { verb: "ChooseQuestStage", codes: [...STAGES_2] },
+      { verb: "ChooseQuestStage", codes: [...STAGES_3] },
+      EACH_PLAYER([{ verb: "HeroesGainResources", amount: 1 }]),
+    ],
+  },
   { id: "51201:constant:1", cardCode: STAGE_1, lines: ["51201:B:1"], timing: "constant", condition: { kind: "stageProgress", min: 5 }, instructions: consideredEngaged(THE_WATCHER) },
   {
     id: "51201:constant:3",
@@ -142,7 +150,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51211 Chamber of Mazarbul: X (Threat) is 1 more than the stage number; the players cannot travel here before stage 3 (reading 8); Travel: each player discards 1 random card from his hand.
   { id: "51211:constant:1", cardCode: CHAMBER, lines: ["51211:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: STAGE_PLUS_1, until: "whileSourceInPlay", target: "self" }] },
-  { id: "51211:constant:2", cardCode: CHAMBER, lines: ["51211:A:3"], timing: "constant", condition: { kind: "not", condition: { kind: "onStage", stage: 3 } }, instructions: [{ verb: "Restrict", what: "travel" }] },
+  { id: "51211:constant:2", cardCode: CHAMBER, lines: ["51211:A:3"], timing: "constant", condition: { kind: "not", condition: { kind: "onStage", stage: 3 } }, instructions: [{ verb: "Restrict", what: "travel", location: CHAMBER }] },
   { id: "51211:travel:1", cardCode: CHAMBER, lines: ["51211:A:4"], timing: "travel", instructions: [discardRandom()] },
 
   // 51212 Savage Werewolf: dealt a shadow card with no effect it makes an additional attack, dealt no shadow card (the records of 18022:A:1). Shadow: the attacker attacks again.
@@ -267,9 +275,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["51229:A:1"],
     timing: "whenRevealed",
     instructions: [
+      { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: { type: "ally", control: "any" } } } },
       { verb: "Pick", pick: { type: "ally", control: "any", highestCost: true, challenge: true } },
       { verb: "Discard", target: { kind: "picked" }, when: { kind: "canPick", pick: { type: "ally", control: "any" } } },
-      { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: { type: "ally", control: "any" } } } },
     ],
   },
   {
@@ -392,7 +400,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", holders: STAGED_LOCATIONS },
     ],
   },
-  { id: "51244:shadow:1", cardCode: "51244", lines: ["51244:A:2"], timing: "shadow", instructions: plusAttack(1, 2, { kind: "canPick", pick: { ...ENGAGED_WITH_YOU, other: true } }) },
+  { id: "51244:shadow:1", cardCode: "51244", lines: ["51244:A:2"], timing: "shadow", instructions: plusAttack(1, 2, { kind: "canPick", pick: { ...ENGAGED_WITH_YOU, attackingEnemy: false } }) },
 
   // 51245 Goblin Archer: while in the staging area it gains a Forced effect at the end of the encounter phase: assign X damage among characters in play, X the enemies in play.
   { id: "51245:forced:1", cardCode: "51245", lines: ["51245:A:1"], timing: "forced", trigger: "endOfPhase", condition: { kind: "all", conditions: [IN_STAGING, { kind: "phase", is: "Encounter" }] }, instructions: [{ verb: "AssignDamage", amount: { count: ENEMY_STAGED_OR_ENGAGED }, pick: ANY_CHARACTER }] },
@@ -425,7 +433,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51253 Massing in the Deep: each engaged enemy makes an attack (surge when none did). Shadow: each enemy engaged with you gets +1 Attack.
   { id: "51253:whenRevealed:1", cardCode: "51253", lines: ["51253:A:1"], timing: "whenRevealed", instructions: [{ verb: "ImmediateAttackEach" }, { verb: "GainSurge", when: { kind: "noneReturned" } }] },
-  { id: "51253:shadow:1", cardCode: "51253", lines: ["51253:A:2"], timing: "shadow", instructions: [{ verb: "Each", pick: ENGAGED_WITH_YOU, instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "picked" }] }] },
+  { id: "51253:shadow:1", cardCode: "51253", lines: ["51253:A:2"], timing: "shadow", instructions: [{ verb: "Each", pick: ENGAGED_WITH_YOU, instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfPhase", target: "picked" }] }] },
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];
