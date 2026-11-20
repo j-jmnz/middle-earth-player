@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~291.8K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~293.1K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -152,7 +152,7 @@ Read the sections your task touches.
     - 2017–2044 The Long Dark (~4.8K) ← 4
     - 2045–2076 Foundations of Stone (~4.3K) ← 3
     - 2077–2107 Shadow and Flame (~4.1K) ← 4
-  - 2108–2348 Standalone scenarios (~33.0K) ← 1
+  - 2108–2358 Standalone scenarios (~34.2K) ← 1
     - 2112–2135 The Massing at Osgiliath (~2.5K) ← 1
     - 2136–2158 The Battle of Lake-town (~4.0K) ← 36
     - 2159–2175 The Stone of Erech (~2.2K) ← 20
@@ -161,18 +161,19 @@ Read the sections your task touches.
     - 2247–2281 The Ruins of Belegost (~6.1K) ← 8
     - 2282–2316 Murder at the Prancing Pony (~4.7K) ← 16
     - 2317–2348 The Siege of Annúminas (~4.1K) ← 13
-  - 2349–2357 Nightmare (~410) ← 22
-  - 2358–2400 Deckbuilding (~2.5K) ← 1
-  - 2401–2480 Effects (~4.1K)
-    - 2403–2461 Three layers (~2.4K) ← 10
-    - 2462–2472 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 2473–2476 Window stack (~100)
-    - 2477–2480 Coverage test (~270)
-  - 2481–2504 Data sources (~750) ← 3
-  - 2505–2523 Card images (~1.4K) ← 9
-  - 2524–2551 Persistence and shipping (~3.2K) ← 10
-  - 2552–2594 Screens (~5.9K) ← 2
-    - 2579–2594 Table screen (~1.8K) ← 3
+    - 2349–2358 Attack on Dol Guldur (~1.2K) ← 1
+  - 2359–2367 Nightmare (~410) ← 22
+  - 2368–2410 Deckbuilding (~2.5K) ← 1
+  - 2411–2490 Effects (~4.1K)
+    - 2413–2471 Three layers (~2.4K) ← 10
+    - 2472–2482 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 2483–2486 Window stack (~100)
+    - 2487–2490 Coverage test (~270)
+  - 2491–2514 Data sources (~750) ← 3
+  - 2515–2533 Card images (~1.4K) ← 9
+  - 2534–2561 Persistence and shipping (~3.2K) ← 10
+  - 2562–2604 Screens (~5.9K) ← 2
+    - 2589–2604 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~67.3K tok)
   - 5–8 Overview (~170) ← 1
   - 9–30 Top bar (~5.3K) ← 5
@@ -356,7 +357,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Old Forest (1); brief.md, The Siege of Annúminas (1); releasing.md, Add the desktop app to a release (1); releasing.md, Jobs (1)
+- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Attack on Dol Guldur (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Old Forest (1); brief.md, The Siege of Annúminas (1); releasing.md, Add the desktop app to a release (1); releasing.md, Jobs (1)
 - `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Foundations of Stone (1); brief.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)

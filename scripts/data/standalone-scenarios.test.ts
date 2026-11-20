@@ -332,3 +332,42 @@ describe("The Siege of Annúminas", () => {
     expect(ledger.byKey.get(keyOf("50831", "A"))?.lines[0]).toMatch(/^When Revealed: Each player must choose/);
   });
 });
+
+describe("Attack on Dol Guldur", () => {
+  it("has codes 509 and the collector number, which Hall of Beorn's 00001 to 00032 would share with The Massing at Osgiliath's (overrides.productCodes), the two mode cards and the six Standard stages", () => {
+    expect(guldur).toMatchObject({ id: "attack-on-dol-guldur", name: "Attack on Dol Guldur", stages: ["50901", "50902", "50903", "50904", "50905", "50906"], modeCard: "50931" });
+    expect(guldur.campaignCard).toBeUndefined();
+    expect(guldur.campaignPlaced).toEqual([]);
+    expect(guldur.source).toMatchObject({ dragnNormal: "Q99.10", dragnEasy: "Q99.10" });
+    expect(guldur.nightmare).toBeUndefined();
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "AoDG"));
+    expect(own.map((card) => card.code)).toEqual(Array.from({ length: 32 }, (_, at) => `509${String(at + 1).padStart(2, "0")}`));
+    expect(byCode.get("50931")).toMatchObject({ name: "Standard Game Mode", type: "campaign" });
+    expect(byCode.get("50932")).toMatchObject({ name: "Epic Multiplayer Mode", type: "campaign" });
+    expect(byCode.get("50907")?.name).toBe("Dol Guldur");
+  });
+
+  it("deals the 36 encounter cards plus the Dol Guldur Marauders the 1A Setup does not stage (4 less 1 for each player) on Normal and Easy alike, Dol Guldur and Power of Lórien staged and the Host of Lórien and the four Lieutenants set aside (50901:A:1, 50931:A:1)", () => {
+    for (const seats of [1, 2, 3, 4]) {
+      expect(encounterCodes(guldur, "Normal", seats), `${seats} seats`).toHaveLength(36 + 4 - seats);
+      expect(encounterCodes(guldur, "Easy", seats), `${seats} seats`).toHaveLength(36 + 4 - seats);
+    }
+    for (const difficulty of ["Normal", "Easy"] as const) {
+      expect(setupInstructions(guldur, difficulty).filter((step) => step.verb === "SetAside").map((step) => step.code).sort(), difficulty).toEqual(["50909", "50910", "50911", "50912", "50913"]);
+    }
+    expect(guldur.cards.find((card) => card.code === "50907")).toMatchObject({ pile: "staging", normal: 1, easy: 1 });
+    expect(guldur.cards.some((card) => ["50931", "50932"].includes(card.code))).toBe(false);
+  });
+
+  it("has every printed side read from its scan, the mode cards included, with the four places Hall of Beorn's text differs fixed", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("509")).flatMap((card) => (card.type === "quest" || card.type === "campaign" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(40);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("50913", "A"))?.lines[0]).toBe("Indestructible. Immune to player card effects.");
+    expect(ledger.byKey.get(keyOf("50920", "A"))?.lines[0]).toMatch(/The players cannot travel/);
+    expect(ledger.byKey.get(keyOf("50906", "B"))?.lines[1]).toMatch(/for an ally and puts it into play/);
+    expect(ledger.byKey.get(keyOf("50931", "A"))?.lines[0]).toMatch(/increase its value by 5 for each player/);
+    expect(ledger.byKey.get(keyOf("50931", "B"))?.lines).toHaveLength(3);
+  });
+});
