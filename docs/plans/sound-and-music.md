@@ -47,32 +47,136 @@ Rules for the sound module, taken from the haptics:
 
 ## Sources
 
-Every file comes from an online source, is pinned by sha256 in `data/sources.json`, is fetched by `pnpm data sync audio` into `.cache/audio/`, and is packed by `pnpm assets audio` into `assets/audio/` (gitignored), as the booklets are (`scripts/build/pack-booklets.ts`). No audio file is committed. `THIRD_PARTY_NOTICES.md` gets an audio section.
+Every file names the online page it came from and is pinned by sha256 in `data/sources.json`; `pnpm data sync audio` copies it from the user's download folder into `.cache/audio/` and checks the sha256, and it and is packed by `pnpm assets audio` into `assets/audio/` (gitignored), as the booklets are (`scripts/build/pack-booklets.ts`). No audio file is committed. `THIRD_PARTY_NOTICES.md` gets an audio section.
 
-### UI: Switch 2 system sounds
+The user downloads the files by hand (user decision, 2026-11-20): The Sounds Resource answers automated requests with a bot challenge. The list is under Download list.
 
-- A search (2026-11-18) found no rip of the Switch 2 HOME Menu sounds. Nintendo's own video plays each menu sound in turn, and a GameXplain video compares them with the Switch's: these are the candidate sources, cut by timestamp. [Instant Gaming](https://news.instant-gaming.com/en/articles/12538-these-are-the-sound-effects-from-the-switch-2-main-menu), [Nintendo Soup](https://nintendosoup.com/video-comparison-of-the-switch-2-and-switch-home-menu-sound-effects/).
-- A video source has a background bed and compression. Each cut is checked by ear; a sound with speech or music under it is dropped.
-- Still to find: a clean rip (The Sounds Resource, game-rip archives) once one exists.
+### UI: Switch system sounds
 
-### Gameplay: card and combat sounds
+- The Switch 2 HOME Menu sounds have no rip found yet. Candidates: a cut from Nintendo's own video of the menu sounds ([Instant Gaming](https://news.instant-gaming.com/en/articles/12538-these-are-the-sound-effects-from-the-switch-2-main-menu)), or a dump from the user's own console where its firmware still allows one.
+- The Switch 1 HOME Menu sounds are a different set (most Switch 2 sounds were remade, [Nintendo Soup](https://nintendosoup.com/video-comparison-of-the-switch-2-and-switch-home-menu-sound-effects/)). Candidates: a rip on The Sounds Resource, or a dump from the user's own Switch 1 (Atmosphère, hactool, then the HOME Menu's sound archive; SoundNX lists the system sound paths).
+- A cut from a video is checked by ear; a sound with speech or music under it is dropped.
 
-Candidates, in order of fit. None is checked yet.
+### Gameplay: card, token, combat and dread sounds
 
-1. **The Lord of the Rings: Adventure Card Game** (Asmodee Digital, 2019): the digital version of this game, so its card, token, threat and combat sounds match the table. No rip was found in the search; the next step is the game's own files (Unity asset bundles) or The Sounds Resource.
-2. **Hearthstone**: a large, clean set of card draw, play, shuffle and hit sounds.
-3. **The Lord of the Rings Online** and **The Battle for Middle-earth II**: swords, shields, orcs and trolls for the combat spotlight.
-4. **Inscryption**, **Slay the Spire**: card handling and soft stings.
+One game for each kind, so the mix stays consistent. First choice, then the fallback:
 
-The full set is about 25 short sounds. One source for the card sounds and one for combat keep the mix consistent.
+| Kind | First choice | Fallback |
+| --- | --- | --- |
+| Cards | The Lord of the Rings: Adventure Card Game | Gwent (The Witcher) |
+| Tokens | Balatro | Tabletop Simulator |
+| Combat | Middle-earth: Shadow of Mordor or Shadow of War | The Battle for Middle-earth II |
+| Dread and stings | Darkest Dungeon | The Battle for Middle-earth II |
 
 ### Music: the film trilogy
 
-- Source: Howard Shore's score from the three films, from the soundtrack albums (The Complete Recordings), not from the film's mixed audio track, which carries dialogue and effects.
-- Each scenario gets a calm loop and a combat loop, cut from the cue that scores the same place in the film. The Fellowship of the Ring saga's scenario names follow the film's scenes: A Shadow of the Past (the Shire), A Knife in the Dark (Weathertop), Flight to the Ford, The Ring Goes South (Hollin and Caradhras), Journey in the Dark (Moria and the Bridge), Breaking of the Fellowship (Amon Hen). The Two Towers and The Return of the King saga scenarios map the same way.
-- Boxes with no film scene (Mirkwood, Dream-chaser, Ered Mithrin, Angmar Awakened) take loops by mood: elven cues for Mirkwood and Lothlórien places, Moria cues for underground, Isengard and Mordor cues for battles. The Hobbit films' score is a candidate for Mirkwood and Ered Mithrin, outside the stated trilogy: a user decision.
-- The campaign list and the root screens play one menu loop.
+- Source: Howard Shore's score, from the three original soundtrack albums or The Complete Recordings, not from a film's mixed audio track, which carries dialogue and effects.
+- Each scenario gets a calm loop and a combat loop, cut from the cue that scores the same place in the film; the boxes with no film scene take loops by mood (Download list, Music).
+- The Hobbit films' score would fit Mirkwood and Ered Mithrin, outside the stated trilogy: a user decision.
 - A scenario's music map is data: `data/audio/music.json`, each scenario id to its calm and combat clip ids, so `pnpm data check` covers it.
+
+## Download list
+
+Save each file under one folder, in the subfolder and with the name given here (the extension is whatever the source gives: WAV or FLAC first, else the best quality offered). A row with two names wants two or three takes of the sound, saved as `-1`, `-2`, `-3`, so a repeat does not sound the same each time. Keep a `sources.txt` in each subfolder: the page URL each file came from.
+
+### `ui/` (Switch 2, else Switch 1)
+
+| File | The sound |
+| --- | --- |
+| `ui.select` | The cursor moving to another icon or row |
+| `ui.confirm` | A press on an item (A) |
+| `ui.back` | Back (B) |
+| `ui.error` | The "cannot do that" sound |
+| `ui.toggle-on`, `ui.toggle-off` | A settings switch turned on and off |
+| `ui.tab` | A category or tab change (L, R) |
+| `ui.open`, `ui.close` | A menu or panel opening and closing (Quick Settings, the Home button menu) |
+| `ui.notice` | A pop-up notification |
+
+### `cards/` (LOTR Adventure Card Game, else Gwent)
+
+| File | The sound |
+| --- | --- |
+| `card.draw-1..3` | A card drawn from the deck to the hand |
+| `card.pick` | A card lifted from the hand |
+| `card.land-1..3` | A card set down on the table |
+| `card.shuffle` | A deck shuffled |
+| `card.deal` | Several cards dealt in a row (the Setup) |
+| `card.flip` | A card turned faceup (an encounter card revealed) |
+| `card.discard` | A card sent to the discard pile |
+| `card.exhaust`, `card.ready` | A card turned sideways and back (a slide or tap) |
+
+### `tokens/` (Balatro, else Tabletop Simulator)
+
+| File | The sound |
+| --- | --- |
+| `token.resource-1..3` | A chip or coin added |
+| `token.damage` | A heavier token or a hit thud |
+| `token.progress` | A lighter, brighter token |
+| `token.remove` | Tokens cleared off a card |
+
+### `combat/` (Shadow of Mordor or Shadow of War, else BFME II)
+
+| File | The sound |
+| --- | --- |
+| `combat.strike-1..3` | A sword or weapon hit on flesh or armour |
+| `combat.block` | A strike stopped by a shield |
+| `combat.kill` | A killing blow, heavier than a strike |
+| `combat.orc` | An orc or Uruk roar or grunt (an enemy engages) |
+| `combat.troll` | A troll roar (a large enemy) |
+| `combat.nazgul` | A Nazgûl scream (a Nazgûl revealed; BFME has the best one) |
+
+### `dread/` (Darkest Dungeon, else BFME II)
+
+| File | The sound |
+| --- | --- |
+| `dread.threat-up` | A low, ominous rise |
+| `dread.threat-down` | A short relief chord |
+| `dread.danger` | A tense warning (threat near elimination) |
+| `dread.shadow` | A shadow card dealt to an enemy |
+| `dread.treachery` | A treachery card revealed |
+| `dread.phase` | A soft chime or bell (a phase change) |
+| `dread.stage` | A quest stage advanced |
+| `dread.win`, `dread.loss` | A short victory and defeat sting |
+
+### `music/` (the three soundtrack albums)
+
+Download the three albums whole: The Fellowship of the Ring, The Two Towers and The Return of the King (the original soundtracks, or The Complete Recordings). Name each file as it comes, with its track number. The track titles below are the original soundtrack's; check them against the album downloaded, and use the Complete Recordings cue of the same scene where it has one. Each row is the calm loop, then the combat loop.
+
+| Scenario | Calm | Combat |
+| --- | --- | --- |
+| Menus | The Prophecy | (none) |
+| A Shadow of the Past | Concerning Hobbits | The Black Rider |
+| A Knife in the Dark | At the Sign of the Prancing Pony | A Knife in the Dark |
+| Flight to the Ford | The Shadow of the Past | Flight to the Ford |
+| The Ring Goes South | The Ring Goes South | The Treason of Isengard |
+| Journey in the Dark | A Journey in the Dark | The Bridge of Khazad Dûm |
+| Breaking of the Fellowship | The Great River | Amon Hen |
+| The Uruk-hai | The Three Hunters | The Uruk-hai |
+| Helm's Deep | The Riders of Rohan | Helm's Deep |
+| The Road to Isengard | Treebeard | Isengard Unleashed |
+| The Passage of the Marshes | The Taming of Sméagol | The Black Gate Is Closed |
+| Journey to the Cross-roads | Samwise the Brave | Minas Morgul |
+| Shelob's Lair | Twilight and Shadow | Shelob's Lair |
+| The Passing of the Grey Company | Hope and Memory | Andúril |
+| The Siege of Gondor | The Steward of Gondor | The White Tree |
+| The Battle of the Pelennor Fields | The Ride of the Rohirrim | The Fields of the Pelennor |
+| The Tower of Cirith Ungol | Cirith Ungol | Ash and Smoke |
+| The Black Gate Opens | A Storm Is Coming | The Black Gate Opens |
+| Mount Doom | Hope Fails | The End of All Things |
+
+The boxes with no film scene take a mood's pair:
+
+| Mood | Calm | Combat | Scenarios |
+| --- | --- | --- | --- |
+| Forest | The Shadow of the Past | The Black Rider | Passage Through Mirkwood, Lost in Mirkwood, Return to Mirkwood, The Hunt for Gollum, A Journey to Rhosgobel, Intruders in Chetwood |
+| River and wilds | The Great River | The Uruk-hai | Journey Along the Anduin, Journey up the Anduin, Roam Across Rhovanion, Conflict at the Carrock, The Hills of Emyn Muil, The Dead Marshes |
+| Hills | The Three Hunters | Forth Eorlingas | The Weather Hills, The Wastes of Eriador, Across the Ettenmoors, The Oath |
+| Dark fortress | Minas Morgul | The Treason of Isengard | Escape from Dol Guldur, Escape from Mount Gram, The Treachery of Rhudaur, The Battle of Carn Dûm, The Dread Realm, Deadmen's Dike |
+| Underground | A Journey in the Dark | The Bridge of Khazad Dûm | The Caves of Nibin-Dûm, Mount Gundabad |
+| Dragons | Many Meetings | Isengard Unleashed | The King's Quest, The Withered Heath, Fire in the Night, The Ghost of Framsburg, The Fate of Wilderland |
+| Sea | The Grey Havens | Helm's Deep | Every Dream-chaser scenario |
+
+Win and loss stings may be cut from The Return of the King (win) and Hope Fails (loss) in place of `dread.win` and `dread.loss`.
 
 ## Looping
 
@@ -96,7 +200,7 @@ Motion and feel gains: Sound effects (on), UI sounds (on), Music (on), Music vol
 ## Steps
 
 1. User decisions above (release packing, VFX, Hobbit cues).
-2. Find and pin the sources: one UI set, one card set, one combat set, the three score albums. Record each in `data/sources.json`.
+2. The user downloads the files on the Download list. Record each in `data/sources.json` with its page URL and sha256.
 3. `pnpm data sync audio`, `data/audio/clips.json`, `data/audio/music.json`, and the ffmpeg cut and pack step (`pnpm assets audio`).
 4. `src/ui/sound.ts` and the settings rows; the UI sounds on the haptic events.
 5. Gameplay sounds on the motion, token, dial, banner and spotlight events.
