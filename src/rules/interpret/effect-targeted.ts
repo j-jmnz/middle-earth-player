@@ -7,7 +7,7 @@ import { characters } from "../combat/combat.ts";
 import { frameScope, hostOf, refCard } from "./amounts.ts";
 import { askTarget } from "../windows/choices.ts";
 import { hasTrait } from "./conditions.ts";
-import { outOfPlayChoices, searchable } from "./search.ts";
+import { greatestChallenge, outOfPlayChoices, searchable } from "./search.ts";
 import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "../windows/frames.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -138,6 +138,10 @@ export function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ct
     // On an encounter or quest effect the first player picks among the choices (rr.first-player).
     if (found.length > 1) return askTarget(state, { ...item, seat: state.firstPlayer }, found);
     ids = found.slice(0, 1);
+  } else if ((item.instruction.verb === "SearchMove" || item.instruction.verb === "SearchReveal") && item.instruction.byChallenge === true) {
+    // "The opposing team searches" (docs/brief.md, The Wizard's Quest, reading 3): nobody is asked; the card that gives the players the greatest challenge is found. `each` takes every card, as it does without a choice.
+    const taken = item.instruction.verb === "SearchMove" && item.instruction.each === true ? found : [greatestChallenge(state, found, ctx)].filter((id): id is string => id != null);
+    ids = taken;
   } else if (picksOne(item.instruction)) {
     const distinct = distinctByCode(state, found);
     const chooser = item.instruction.verb === "ShuffleIntoDeck" && item.instruction.who === "firstPlayer" ? state.firstPlayer : attachHostChooser(state, item.instruction, attachSeat(state, item.instruction, item.seat, frame.cardId) ?? item.seat);

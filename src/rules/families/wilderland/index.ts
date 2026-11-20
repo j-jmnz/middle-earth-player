@@ -49,7 +49,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SetAsideDiscardForPool":
       return setAsideDiscardForPool(state, instruction, focus, ctx, steps);
     case "FlipOver":
-      return flipOver(state, instruction, focus);
+      return flipOver(state, instruction, focus, eventSubject(state));
     case "AddSourceToHandOfMost":
       return addSourceToHandOfMost(state, instruction, focus, ctx, steps);
     // A Shadow card's "attach this card to attacking enemy" (18018:A:2) needs no question, so it runs inline; every other AttachSelf is the effect frame's.
@@ -85,7 +85,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "GrantSurgeToSubject":
       return grantSurge(state, eventSubject(state));
     case "CarryAwayHero":
-      return carryAwayHero(state, ctx, steps);
+      return carryAwayHero(state, ctx, steps, instruction.keepAttachments === true);
     case "ReleaseGuardedHero":
       return releaseGuardedHero(state, eventSubject(state));
     case "DiscardGuardedHeroes":

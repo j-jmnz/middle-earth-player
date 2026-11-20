@@ -25,5 +25,7 @@ export function cancelBarred(state: ScenarioState, event: GameEvent, effect: Eff
   const cancels = effect.instructions.some((instruction) => instruction.verb === "CancelEffect");
   // The Beast of Taur-nu-Fuin's own shadow cards cannot be canceled (50916:A:1): the enemy of the attack in progress holds the flag.
   if (event.trigger === "shadowPending" && cancels && flagged(state, state.pendingAttack?.enemyId ?? "", "shadowsUncancelable")) return true;
+  // The card SearchTopReveal revealed (51003:A:1): its When Revealed effects cannot be canceled.
+  if (event.trigger === "whenRevealedPending" && cancels && flagged(state, event.subject ?? event.cardId ?? "", "revealUncancelable")) return true;
   return (event.trigger === "whenRevealedPending" || event.trigger === "shadowPending") && encounterUncancelable(state) && cancels;
 }

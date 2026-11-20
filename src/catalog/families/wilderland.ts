@@ -76,7 +76,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SetAsideDiscardForPool"), exclude: z.array(z.enum(["unique", "objective", "burden"])), ...when }),
   // "Flip over Woodmen Village and attach Haldan to the just-added enemy as a guarded objective" (18069:A:2): the source card, wherever it lies, shows the card `into` and enters the staging area, faceup; with `guardedBy` the picked card (the enemy the last
   // AddFromPile added) guards it (rr.guarded). The old side is kept as the card's other side.
-  z.strictObject({ verb: z.literal("FlipOver"), into: code, guardedBy: z.literal("picked").optional(), ...when }),
+  // `target: "subject"` (51001:B:1, "When Rhosgobel is explored, flip it over and add Rider of Mirkwood to the staging area"): the card the event is about, the explored location, is the one that flips, not the source.
+  z.strictObject({ verb: z.literal("FlipOver"), into: code, guardedBy: z.literal("picked").optional(), target: z.literal("subject").optional(), ...when }),
   // "The player with the most cards in his hand without a copy of Lost in the Wild adds Lost in the Wild to his hand" (18026:A:1): of the players with no card of the source's title in hand, the one with the most cards in hand takes the source into
   // their hand (the first player chooses among players tied). Nothing happens when every player holds a copy.
   z.strictObject({ verb: z.literal("AddSourceToHandOfMost"), ...when }),
@@ -98,7 +99,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PutObjectiveLocationAfterDiscard") }),
   // Carried Away (18074:A:1): "Each player chooses a hero he controls, discards each token and attachment from that hero, and places it in the staging area ... attaches that enemy to the hero he owns in the staging area, guarding it." After a Pick of the hero, a DiscardUntil enemy and a
   // MoveEncounterCard of that enemy to the staging area, the hero (the card picked before the last) loses its tokens and attachments and lies facedown under the enemy (the captive zone: in play, controlled by no one), flagged as guarded; the enemy guards it (guardsHero). Nothing happens when no enemy was found.
-  z.strictObject({ verb: z.literal("CarryAwayHero"), ...when }),
+  // `keepAttachments` (51008:B:1, "discard all tokens from the chosen hero"): only the hero's tokens are discarded; its attachments stay on it under the enemy (docs/brief.md, The Wizard's Quest, reading 10).
+  z.strictObject({ verb: z.literal("CarryAwayHero"), keepAttachments: z.literal(true).optional(), ...when }),
   // Carried Away (18074:B:2): "When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted." (user ruling, 2026-11-05: when it leaves play in any way) The hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted.
   z.strictObject({ verb: z.literal("ReleaseGuardedHero"), ...when }),
   // Carried Away (18074:B:3): "When the players advance from this stage, discard each guarded hero." Each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated (rr.player-elimination).

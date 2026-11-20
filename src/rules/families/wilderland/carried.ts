@@ -19,8 +19,8 @@ export function heroGuardedBy(state: ScenarioState, enemyId: string): string | n
   return Object.values(state.cards).find((card) => card.guardedHero === true && card.zone === "captive" && card.host === enemyId)?.id ?? null;
 }
 
-/** CarryAwayHero: the hero picked before the last card (the enemy just discarded and added to the staging area) loses its tokens and attachments and lies under the enemy. Nothing happens when no enemy came or the hero is not a hero in play. */
-export function carryAwayHero(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+/** CarryAwayHero: the hero picked before the last card (the enemy just discarded and added to the staging area) loses its tokens and attachments (`keepAttachments`: its tokens only) and lies under the enemy. Nothing happens when no enemy came or the hero is not a hero in play. */
+export function carryAwayHero(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], keepAttachments = false): ScenarioState {
   const picked = pickedList(state);
   const enemyId = picked.at(-1);
   const heroId = picked.at(-2);
@@ -28,6 +28,8 @@ export function carryAwayHero(state: ScenarioState, ctx: ReduceContext, steps: E
   const hero = heroId ? state.cards[heroId] : undefined;
   if (!enemyId || !heroId || !enemy || !hero || hero.zone !== "heroes" || hero.controller == null || !inPlay(enemy.zone) || printedOf(ctx.cards, enemy.code).type !== "enemy") return state;
   const held = heldFrom(state, heroId);
+  // `keepAttachments` (51008:B:1): the attachments stay attached, faceup, with the hero under the enemy.
+  if (keepAttachments) return updateCard(captureHero(state, heroId, enemyId, { attachmentsDown: false, keepTokens: false }), heroId, { guardedHero: true, committed: false, ...held });
   const bare = releaseAttachments(state, heroId, ctx.cards, steps);
   return updateCard(captureHero(bare, heroId, enemyId), heroId, { guardedHero: true, committed: false, ...held });
 }

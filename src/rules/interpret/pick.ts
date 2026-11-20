@@ -328,6 +328,23 @@ export function pickCandidates(
   picked: readonly string[],
   sourceId: string | null,
   ctx: ReduceContext,
+  x?: number,
+  participants?: readonly string[],
+  counting = false,
+  event?: { subject?: string | null; other?: string | null; discards?: boolean },
+): string[] {
+  const found = candidatesOf(state, spec, seat, picked, sourceId, ctx, x, participants, counting, event);
+  // "The opposing team chooses" (docs/brief.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left, the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
+  return spec.challenge === true && !counting ? found.slice(0, 1) : found;
+}
+
+function candidatesOf(
+  state: ScenarioState,
+  spec: PickSpec,
+  seat: number,
+  picked: readonly string[],
+  sourceId: string | null,
+  ctx: ReduceContext,
   // The X an event was played for, for a pick that asks for a printed cost of X.
   x?: number,
   // The characters that took part in the attack the Response answers.

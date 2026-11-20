@@ -29,6 +29,14 @@ const searchSelector = {
   type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(),
   // A card with the Safe keyword (Across the Ettenmoors, mec108.safe): "search the encounter deck and discard pile for a location with the safe keyword" (10077:A:2). With `type: "objective"` the pool's other objectives stay out.
   safe: z.literal(true).optional(),
+  // The Wizard's Quest (51001:A:1, 51003:B:1): a card whose printed cost is at most `maxCost` (at most `maxCostMulti` with two or more players, "cost 2 or less (3 or less if there are two or more players)"), a card of any one of the printed `types` ("0 cost enemy or 0 cost location"),
+  // among the top `top` cards of the encounter deck alone. `byChallenge`: "the opposing team" finds it, so nobody is asked: the card is the one that gives the players the greatest challenge (docs/brief.md, The Wizard's Quest, reading 3): of enemies and locations the highest printed Threat
+  // (an enemy: the highest Attack when Threat is level), then the one nearest the top of the deck; of any other card the one nearest the top.
+  maxCost: z.number().int().min(0).optional(),
+  maxCostMulti: z.number().int().min(0).optional(),
+  types: z.array(z.enum(["enemy", "location", "treachery"])).min(2).optional(),
+  top: z.number().int().positive().optional(),
+  byChallenge: z.literal(true).optional(),
 };
 
 export const simpleVerbs = [

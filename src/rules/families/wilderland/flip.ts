@@ -8,9 +8,9 @@ import { moveCard } from "../../core/zones.ts";
 import { guardWith } from "../objectives/guard.ts";
 import type { Focus } from "../index.ts";
 
-/** FlipOver: the source card, wherever it lies, becomes the card `into` and enters the staging area faceup with none of its old tokens; with `guardedBy` the picked card guards it. A source that is gone changes nothing. */
-export function flipOver(state: ScenarioState, instruction: Extract<Instruction, { verb: "FlipOver" }>, focus: Focus): ScenarioState {
-  const id = focus.sourceId;
+/** FlipOver: the source card (with `target: "subject"` the card the event is about), wherever it lies, becomes the card `into` and enters the staging area faceup with none of its old tokens; with `guardedBy` the picked card guards it. A source that is gone changes nothing. */
+export function flipOver(state: ScenarioState, instruction: Extract<Instruction, { verb: "FlipOver" }>, focus: Focus, subject: string | null = null): ScenarioState {
+  const id = instruction.target === "subject" ? subject : focus.sourceId;
   const card = id ? state.cards[id] : undefined;
   if (!id || !card) return state;
   const flipped = updateCard(moveCard(state, id, { zone: "staging" }), id, { code: instruction.into, other: card.code, face: "up", controller: null, progress: 0, damage: 0, resources: 0 });
