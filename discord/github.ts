@@ -1,9 +1,10 @@
 // Issue updates from GitHub to Discord. The repository's webhook posts to /github; each delivery is signed with
 // GITHUB_WEBHOOK_SECRET (HMAC-SHA256 of the raw body). An issue the bot made carries its Discord source in its body
 // (sourceMarker), so the update goes beside the report: closed, reopened, a new comment, and the release that ships
-// the fix (docs/discord-issues.md, Issue updates).
+// the fix, after which the bot stops following the issue (docs/discord-issues.md, Issue updates).
 import { github, type Env } from "./env.ts";
-import { postAt, sourceInBody } from "./source.ts";
+import { announceRelease, type Release } from "./release.ts";
+import { postAt, retiredBody, sourceInBody } from "./source.ts";
 import { bytesOfHex } from "./verify.ts";
 
 interface Issue {
@@ -19,7 +20,7 @@ interface Delivery {
   action?: string;
   issue?: Issue;
   comment?: { body: string; html_url: string; user: { login: string; type: string } };
-  release?: { tag_name: string; html_url: string; body?: string | null; prerelease: boolean; draft: boolean };
+  release?: Release;
   sender?: { login: string };
 }
 
@@ -44,9 +45,9 @@ function threadName(issue: Issue): string {
   return `#${issue.number} ${issue.title}`;
 }
 
-// The issue's name in a message, linked without a preview card.
+// The issue's number in a message, bold and linked without a preview card. The thread is named for the issue already.
 function named(issue: Issue): string {
-  return `[#${issue.number}](<${issue.html_url}>) (${issue.title})`;
+  return `**[#${issue.number}](<${issue.html_url}>)**`;
 }
 
 /** The message an issue event posts, or null for an event the bot does not report. */
@@ -54,14 +55,14 @@ export function issueMessage(event: string, delivery: Delivery): string | null {
   const { action, issue, comment } = delivery;
   if (!issue || issue.pull_request) return null;
   if (event === "issues" && action === "closed") {
-    if (issue.state_reason === "not_planned") return `Issue ${named(issue)} is closed as not planned.`;
-    if (issue.state_reason === "duplicate") return `Issue ${named(issue)} is closed as a duplicate.`;
-    return `Issue ${named(issue)} is fixed. The fix comes in the next release.`;
+    if (issue.state_reason === "not_planned") return `${named(issue)} has been closed without a change for now. The issue on GitHub explains why.`;
+    if (issue.state_reason === "duplicate") return `${named(issue)} was already reported in another issue, so it's closed as a duplicate. Follow the link on GitHub for updates.`;
+    return `🎉 Good news: ${named(issue)} is fixed! The fix will be in the next app update, and I'll let you know here when it's out.`;
   }
-  if (event === "issues" && action === "reopened") return `Issue ${named(issue)} is open again.`;
+  if (event === "issues" && action === "reopened") return `${named(issue)} has been reopened. We're taking another look.`;
   // Comments from people only: a bot's comment (a CI report, this bot's own) is not news for the reporter.
   if (event === "issue_comment" && action === "created" && comment && comment.user.type !== "Bot") {
-    return `**${comment.user.login}** commented on ${named(issue)}:\n${quote(comment.body)}\n[Read on GitHub](<${comment.html_url}>)`;
+    return `💬 **${comment.user.login}** replied on GitHub:\n${quote(comment.body)}\n[Read the full comment](<${comment.html_url}>)`;
   }
   return null;
 }
@@ -72,13 +73,17 @@ export function closedBy(notes: string): number[] {
   return [...new Set(numbers)];
 }
 
-// A published release: each issue it closes that the bot made hears which version has the fix.
+// A published release: each issue it closes that the bot made hears which version has the fix. That is the report's
+// last post: the issue's marker is retired, so the bot follows it no further (retiredBody).
 async function postRelease(env: Env, release: NonNullable<Delivery["release"]>): Promise<void> {
   if (release.draft || release.prerelease) return;
   for (const number of closedBy(release.body ?? "")) {
     const issue = await github<Issue>(env, "GET", `/repos/${env.GITHUB_REPO}/issues/${number}`);
     const source = sourceInBody(issue?.body);
-    if (issue && source) await postAt(env, source, `The fix for ${named(issue)} is in [${release.tag_name}](<${release.html_url}>). Update the app to get it.`, threadName(issue));
+    if (!issue?.body || !source) continue;
+    const message = `🚀 The fix for ${named(issue)} is out in **${release.tag_name}**! Update the app to get it. [Release notes](<${release.html_url}>)`;
+    await postAt(env, source, message, threadName(issue));
+    await github(env, "PATCH", `/repos/${env.GITHUB_REPO}/issues/${number}`, { body: retiredBody(issue.body) });
   }
 }
 
@@ -92,8 +97,10 @@ export async function handleGitHub(request: Request, env: Env): Promise<Response
   const delivery = JSON.parse(body) as Delivery;
   try {
     if (event === "release" && delivery.action === "published" && delivery.release) {
+      // The announcement first: it is what most players read. A failure in either still answers 500.
+      const announced = await announceRelease(env, delivery.release);
       await postRelease(env, delivery.release);
-      return new Response("Posted the release.");
+      return new Response(announced ? "Announced the release and posted it to its reports." : "Posted the release to its reports.");
     }
     const message = issueMessage(event, delivery);
     const source = sourceInBody(delivery.issue?.body);

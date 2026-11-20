@@ -57,7 +57,7 @@ describe("issue updates", () => {
     expect(response.status).toBe(200);
     expect(calls.map((call) => `${call.method} ${new URL(call.url).pathname}`)).toEqual(["GET /api/v10/channels/300", "POST /api/v10/channels/300/messages"]);
     expect(calls[1]!.body).toEqual({
-      content: "Issue [#42](<https://github.com/owner/repo/issues/42>) (Gandalf costs 5) is fixed. The fix comes in the next release.",
+      content: "🎉 Good news: **[#42](<https://github.com/owner/repo/issues/42>)** is fixed! The fix will be in the next app update, and I'll let you know here when it's out.",
       allowed_mentions: { parse: [] },
     });
   });
@@ -70,14 +70,14 @@ describe("issue updates", () => {
     await run(await delivery("issues", { action: "reopened", issue: fromMessage }));
     const threadAsked = calls.find((call) => call.url.endsWith("/threads"))!;
     expect(threadAsked.body).toEqual({ name: "#42 Gandalf costs 5", auto_archive_duration: 10080 });
-    expect(calls.at(-1)!.body).toMatchObject({ content: expect.stringContaining("is open again"), message_reference: { message_id: "300" } });
+    expect(calls.at(-1)!.body).toMatchObject({ content: expect.stringContaining("has been reopened"), message_reference: { message_id: "300" } });
   });
 
   it("posts in the thread when a person comments, quoting the comment", async () => {
     const calls = stubFetch({ "POST discord.com/channels/500/messages": {} });
     const comment = { body: "Fixed on main.\nPlease check.", html_url: "https://github.com/owner/repo/issues/42#c1", user: { login: "j", type: "User" } };
     await run(await delivery("issue_comment", { action: "created", issue: fromThread, comment }));
-    expect(calls[0]!.body.content).toBe("**j** commented on [#42](<https://github.com/owner/repo/issues/42>) (Gandalf costs 5):\n> Fixed on main.\n> Please check.\n[Read on GitHub](<https://github.com/owner/repo/issues/42#c1>)");
+    expect(calls[0]!.body.content).toBe("💬 **j** replied on GitHub:\n> Fixed on main.\n> Please check.\n[Read the full comment](<https://github.com/owner/repo/issues/42#c1>)");
     expect(calls[0]!.body.message_reference).toBeUndefined();
   });
 
@@ -90,18 +90,30 @@ describe("issue updates", () => {
     expect(calls).toEqual([]);
   });
 
-  it("tells each report that a published release closes which version has its fix", async () => {
+  it("tells each report that a published release closes which version has its fix, then stops following it", async () => {
     const calls = stubFetch({
       "GET api.github.com/repos/owner/repo/issues/42": fromMessage,
       "GET api.github.com/repos/owner/repo/issues/7": { ...fromThread, number: 7, body: "Not from Discord" },
       "GET discord.com/channels/300": { id: "300" },
       "POST discord.com/channels/300/messages": {},
+      "PATCH api.github.com/repos/owner/repo/issues/42": {},
     });
     const release = { tag_name: "v0.4.0", html_url: "https://github.com/owner/repo/releases/v0.4.0", body: "- Fix Gandalf's cost (closes #42, #7)\n- Other (see #9)", prerelease: false, draft: false };
     await run(await delivery("release", { action: "published", release }));
     const posts = calls.filter((call) => call.method === "POST");
     expect(posts).toHaveLength(1);
-    expect(posts[0]!.body.content).toBe("The fix for [#42](<https://github.com/owner/repo/issues/42>) (Gandalf costs 5) is in [v0.4.0](<https://github.com/owner/repo/releases/v0.4.0>). Update the app to get it.");
+    expect(posts[0]!.body.content).toBe("🚀 The fix for **[#42](<https://github.com/owner/repo/issues/42>)** is out in **v0.4.0**! Update the app to get it. [Release notes](<https://github.com/owner/repo/releases/v0.4.0>)");
+    const retired = calls.filter((call) => call.method === "PATCH");
+    expect(retired.map((call) => [call.url, call.body])).toEqual([["https://api.github.com/repos/owner/repo/issues/42", { body: "Text\n<!-- discord released issue:m:200:300 -->" }]]);
+  });
+
+  it("posts nothing more once the release is posted", async () => {
+    const calls = stubFetch({});
+    const released = { ...fromMessage, body: "Text\n<!-- discord released issue:m:200:300 -->" };
+    const comment = { body: "Thanks!", html_url: "x", user: { login: "j", type: "User" } };
+    await run(await delivery("issue_comment", { action: "created", issue: released, comment }));
+    await run(await delivery("issues", { action: "reopened", issue: released }));
+    expect(calls).toEqual([]);
   });
 
   it("answers 500 when Discord refuses the post, so GitHub can send it again", async () => {
@@ -111,7 +123,7 @@ describe("issue updates", () => {
   });
 
   it("words each closing reason and reads the release notes' issue list", () => {
-    expect(issueMessage("issues", { action: "closed", issue: { ...fromMessage, state_reason: "not_planned" } })).toContain("closed as not planned");
+    expect(issueMessage("issues", { action: "closed", issue: { ...fromMessage, state_reason: "not_planned" } })).toContain("closed without a change");
     expect(issueMessage("issues", { action: "closed", issue: { ...fromMessage, state_reason: "duplicate" } })).toContain("closed as a duplicate");
     expect(issueMessage("issues", { action: "labeled", issue: fromMessage })).toBeNull();
     expect(closedBy("- A (closes #1, #2; see #3)\n- B (closes #2)")).toEqual([1, 2]);

@@ -1,12 +1,12 @@
 // The form a moderator checks before the issue is made, and the issue itself. The three kinds are the issue templates'
 // labels (.github/ISSUE_TEMPLATE): bug, rules and accessibility.
-import { github, type Env } from "./env.ts";
+import { github, GitHubError, type Env } from "./env.ts";
 import { sourceMarker, TEXT_MAX, type Report, type SourceRef } from "./source.ts";
 
 export const KINDS = [
-  { value: "bug", label: "App bug", description: "A crash, a layout problem or anything else that is not a rules question" },
-  { value: "rules", label: "Rules or card bug", description: "A card, keyword or rule plays differently from what is printed" },
-  { value: "accessibility", label: "Accessibility barrier", description: "Something a player cannot see, read, hear, reach or operate" },
+  { value: "bug", label: "App bug", description: "A crash, a layout glitch, or anything that isn't about the rules" },
+  { value: "rules", label: "Rules or card bug", description: "A card, keyword or rule doesn't work the way it's printed" },
+  { value: "accessibility", label: "Accessibility barrier", description: "Something a player can't see, read, hear, reach or use" },
 ] as const;
 
 export type Kind = (typeof KINDS)[number]["value"];
@@ -20,12 +20,12 @@ const LABEL = 18;
 export function issueForm(customId: string, report: Report) {
   return {
     custom_id: customId,
-    title: "Create GitHub issue",
+    title: "Report a bug on GitHub",
     components: [
-      { type: LABEL, label: "Title", component: { type: TEXT_INPUT, custom_id: "title", style: 1, min_length: 3, max_length: 256, required: true, value: report.title } },
+      { type: LABEL, label: "Issue title", component: { type: TEXT_INPUT, custom_id: "title", style: 1, min_length: 3, max_length: 256, required: true, value: report.title } },
       {
         type: LABEL,
-        label: "Type",
+        label: "What kind of problem is it?",
         component: {
           type: STRING_SELECT,
           custom_id: "kind",
@@ -36,8 +36,8 @@ export function issueForm(customId: string, report: Report) {
       },
       {
         type: LABEL,
-        label: "Report",
-        description: "The issue text. Attachments and a link to Discord are added below it.",
+        label: "Details",
+        description: "Edit this as you like. Screenshots and a link back to Discord are added for you.",
         component: { type: TEXT_INPUT, custom_id: "body", style: 2, max_length: TEXT_MAX, required: true, value: report.text || "(No text)" },
       },
     ],
@@ -75,15 +75,25 @@ export function readForm(components: Component[]): FormValues | null {
 export function issueBody(values: FormValues, report: Report | null, filedBy: string, source: SourceRef): string {
   const files = report?.attachments ?? [];
   const attachments = files.length
-    ? ["", "### Attachments", "", ...files.map((file) => `- [${file.name}](${file.url})`), "", "_Discord attachment links expire after about a day. Save a screenshot into this issue to keep it._"]
+    ? ["", "### Attachments", "", ...files.map((file) => `- [${file.name}](${file.url})`), "", "_Discord attachment links expire after about a day. Drag a screenshot into a comment here to keep it._"]
     : [];
-  const from = report ? `Reported on Discord by **${report.author}** ([message](${report.link})).` : "Reported on Discord.";
-  return [values.body, ...attachments, "", "---", `${from} Filed by **${filedBy}** with the Discord issue bot.`, sourceMarker(source)].join("\n");
+  const from = report ? `Reported by **${report.author}** on [Discord](${report.link})` : "Reported on Discord";
+  return [values.body, ...attachments, "", "---", `${from} · filed by **${filedBy}**`, sourceMarker(source)].join("\n");
 }
 
 /** Creates the issue and returns its number and page. */
 export async function createIssue(env: Env, values: FormValues, body: string): Promise<{ number: number; url: string }> {
   const issue = await github<{ number: number; html_url: string }>(env, "POST", `/repos/${env.GITHUB_REPO}/issues`, { title: values.title, body, labels: [values.kind] });
-  if (!issue) throw new Error(`GitHub answered 404: no repository ${env.GITHUB_REPO}, or the token cannot see it`);
+  if (!issue) throw new GitHubError(404, `no repository ${env.GITHUB_REPO}, or the token cannot see it`);
   return { number: issue.number, url: issue.html_url };
+}
+
+/** Why the issue could not be made, in a line for the moderator. The full error goes to the Worker log. */
+export function failureReason(error: unknown): string {
+  if (!(error instanceof GitHubError)) return "something went wrong on my side. The Worker log has the details.";
+  if (error.status === 401) return "the GitHub token has expired or is wrong.";
+  if (error.status === 403) return "the GitHub token isn't allowed to create issues in this repository.";
+  if (error.status === 404) return "I couldn't find the repository, or the GitHub token can't see it.";
+  if (error.status === 422) return "GitHub didn't accept the title or a label. Check that the bug, rules and accessibility labels exist.";
+  return `GitHub answered with an error (${error.status}). The Worker log has the details.`;
 }
