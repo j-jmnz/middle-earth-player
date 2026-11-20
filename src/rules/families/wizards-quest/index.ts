@@ -10,7 +10,7 @@ import type { Focus } from "../index.ts";
 import { arrangeTopByChallenge, hideUnderQuest } from "./hidden.ts";
 import { holdPickedUnder, releaseHeld, titleHeld } from "./held.ts";
 import { buildQuickDeck, chooseQuestStage } from "./quick.ts";
-import { removeDefender, searchTopShadow } from "./khazad.ts";
+import { exploredPendingHolds, removeDefender, searchTopShadow } from "./khazad.ts";
 import { searchTopReveal } from "./top.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -45,6 +45,7 @@ export const manifest: RulesFamily = {
   name: "wizards-quest",
   verbs: ["BuildQuickDeck", "ChooseQuestStage", "SearchTopReveal", "HoldPickedUnder", "BarHeldTitles", "HideUnderQuest", "ArrangeTopByChallenge", "RemoveDefender", "SearchTopShadow", "ReplacesRevealCancel"],
   run,
+  condition: (state, condition) => exploredPendingHolds(state, condition),
   settle: { sweep: (state) => releaseHeld(state) },
   play: (state, cardId, ctx, how) => titleHeld(state, cardId, ctx, how?.putting === true),
 };

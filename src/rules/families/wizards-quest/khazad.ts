@@ -1,6 +1,6 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.shadow-effects, rr.cancel, rr.search, faq.additional-attacks (data/rules/entries.json); ledger lines 51335:A:2, 51342:A:2, 51320:A:2 (docs/brief.md, Escape from Khazad-dûm, readings 20, 21 and 27).
 // The verbs of Escape from Khazad-dûm that read or change the enemy attack in progress and the cancel of a When Revealed effect: RemoveDefender, SearchTopShadow and Undisturbed Bones' replacement of a cancel.
-import type { Instruction, ModifierStat } from "../../../catalog/boundary.ts";
+import type { Condition, Instruction, ModifierStat } from "../../../catalog/boundary.ts";
 
 import { destroyCard } from "../../core/keywords.ts";
 import { heldAmountByClass } from "../../core/holder-classes.ts";
@@ -67,4 +67,10 @@ export function bonesCancel(state: ScenarioState, ctx: ReduceContext, steps: Eng
   if (!cancelsWhenRevealed(state)) return null;
   const bones = Object.values(state.cards).find((card) => inPlay(card.zone) && effectsOf(ctx, card.code).some((effect) => effect.instructions.some((instruction) => instruction.verb === "ReplacesRevealCancel")));
   return bones ? destroyCard(state, bones.id, ctx.cards, steps) : null;
+}
+
+/** The condition `exploredPending`: a copy of the card with this code was explored (a `locationExplored` event for it waits in the queue), so the Forced effect that hears it has not run. The stage bar of Dark Pit reads it for the window before the flip (51301:B:2). Null for any other condition. */
+export function exploredPendingHolds(state: ScenarioState, condition: Condition): boolean | null {
+  if (condition.kind !== "exploredPending") return null;
+  return (state.pendingEvents ?? []).some((event) => event.trigger === "locationExplored" && event.subject != null && state.cards[event.subject]?.code === condition.code);
 }

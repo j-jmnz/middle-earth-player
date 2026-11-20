@@ -149,9 +149,12 @@ const VERBS = [
   // "The first player chooses a player to attach an Artifact attachment from his hand to Dragon Hoard. That attachment gains the guarded (location) keyword" (18043:A:3): the last picked card of a hand is guarded by a location of the encounter deck, found as the Guarded (location) keyword does (emce.guarded-x), and lies in the staging area; once nothing guards it the players claim it, the first player choosing the character it attaches to, as for a treasure. With no location to find it is claimed at once.
   z.strictObject({ verb: z.literal("GuardPickedAttachment"), types: z.array(z.enum(["enemy", "location"])).min(1), ...when }),
   // "The first player attaches the top card of his deck to Hobgoblin faceup as a guarded attachment" (18050:A:2): the first player's top deck card lies faceup under the source, which guards it (cardsUnder). Nothing happens with an empty deck.
-  z.strictObject({ verb: z.literal("GuardWithDeckTop"), ...when }),
+  // With `discards`: "when it leaves play, discard that card" (Nameless Thing, 51351:A:1): the card goes to its owner's discard pile, not to the hand (families/wilderland/kings.ts returnHeld).
+  z.strictObject({ verb: z.literal("GuardWithDeckTop"), discards: z.literal(true).optional(), ...when }),
   // A marker on Hobgoblin (18050:A:2, its Forced record on leftPlay): "When Hobgoblin leaves play, return the card it was guarding to its owner's hand". An enemy leaving play queues no event, so the settle sweep returns a card held under an enemy that is out of play (families/wilderland/kings.ts returnHeld). It does nothing when run.
   z.strictObject({ verb: z.literal("ReturnGuardedToHand") }),
+  // A marker on Nameless Thing (51351:A:1, its Forced record on leftPlay): "When Nameless Thing leaves play, discard that card". Like ReturnGuardedToHand it does nothing when run; the settle sweep discards the card (a GuardWithDeckTop `discards`).
+  z.strictObject({ verb: z.literal("DiscardGuarded") }),
   // "Cancel the attack" (18080:B:2): the player attack in progress deals no damage; its attackers stay exhausted. Run in the response to enemyAttacked, which resolves before the attack's strength is read.
   z.strictObject({ verb: z.literal("CancelStrike"), ...when }),
   // The Withered Heath (part 4, campaign card 12175; ledger lines 12175:A:2, 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1, 19022:B:1, 19024:A:1, 19024:B:2, 12176:A:4, 12179:A:4).

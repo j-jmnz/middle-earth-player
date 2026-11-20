@@ -74,7 +74,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       EACH_PLAYER([{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 5 } }, { verb: "MovePicked", to: "hand" }, { verb: "ShuffleDeck" }]),
     ],
   },
-  { id: "51301:constant:1", cardCode: STAGE_1, lines: ["51301:B:2"], timing: "constant", condition: { kind: "any", conditions: [{ kind: "inPlay", code: DARK_PIT, is: true }, { kind: "outOfPlay", code: DARK_PIT }] }, instructions: [{ verb: "Restrict", what: "advance" }] },
+  { id: "51301:constant:1", cardCode: STAGE_1, lines: ["51301:B:2"], timing: "constant", condition: { kind: "any", conditions: [{ kind: "inPlay", code: DARK_PIT, is: true }, { kind: "exploredPending", code: DARK_PIT }] }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
   // 51303 Old One Lair (stage 2): the top 5 search; the opposing team adds an enemy with cost 2 or less to the staging area and places a resource on it; while it holds the resource it is immune to player card effects and no progress is placed on this stage (reading 8).
   topSearch("51303", "51303:A:1", "whenRevealed", 1),
@@ -292,11 +292,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51327:shadow:1", cardCode: "51327", lines: ["51327:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfPhase", target: "attacker" }] },
 
   // 51328 Western Hall: Travel: the top card of the encounter deck is discarded and each player raises his threat by its printed Threat (the records of 142055:A:2); Shadow: a destroyed character reveals the top card.
-  { id: "51328:travel:1", cardCode: "51328", lines: ["51328:A:1"], timing: "travel", instructions: [{ verb: "MoveEncounterCard", card: "deckTop", to: "discard" }, { verb: "RaiseThreat", amount: { stat: "threat", of: "discardTop", printed: true }, who: "eachSeat" }] },
+  { id: "51328:travel:1", cardCode: "51328", lines: ["51328:A:1"], timing: "travel", instructions: [{ verb: "MoveEncounterCard", card: "deckTop", to: "discard" }, { verb: "RaiseThreat", amount: { stat: "threat", of: "picked", printed: true }, who: "eachSeat" }] },
   afterKill("51328", "51328:A:2", { verb: "RevealEncounter", when: KILLED }),
 
   // 51329 New Devilry: each character's text box is blank until the end of the round, its Traits kept (the records of 51114:A:1 and :A:2); Shadow: the defending character's, until the end of the phase.
-  { id: "51329:whenRevealed:1", cardCode: "51329", lines: ["51329:A:1"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "endOfRound", holders: { type: "character", control: "any" } }] },
+  { id: "51329:whenRevealed:1", cardCode: "51329", lines: ["51329:A:1"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "endOfRound", target: "characters" }] },
   { id: "51329:shadow:1", cardCode: "51329", lines: ["51329:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "endOfPhase", target: "defender" }] },
 
   // 51330 Unspeakable Thing: when it attacks you, the top card of your deck is discarded and it gets +X Attack for this attack, X the printed cost of that card (the records of 09034:A:1).
@@ -427,9 +427,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
   { id: "51350:shadow:1", cardCode: "51350", lines: ["51350:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", when: { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", unique: true } }, instructions: [{ verb: "ImmediateAttack" }] }] },
 
-  // 51351 Nameless Thing: after it enters play the first player attaches the top card of his deck to it faceup as a guarded attachment; it gets +X Threat, Attack and Defense, X that card's printed cost; the card is discarded when it leaves play (the records of 18050:A:1 and :A:2).
-  { id: "51351:forced:1", cardCode: "51351", lines: ["51351:A:1"], timing: "forced", trigger: "encounterEnteredPlay", subject: "self", instructions: [{ verb: "GuardWithDeckTop" }] },
-  { id: "51351:forced:2", cardCode: "51351", lines: ["51351:A:1"], timing: "forced", trigger: "leftPlay", subject: "self", instructions: [{ verb: "ReturnGuardedToHand" }] },
+  // 51351 Nameless Thing: after it enters play the first player attaches the top card of his deck to it faceup as a guarded attachment; it gets +X Threat, Attack and Defense, X that card's printed cost; the card is discarded when it leaves play (the records of 18050:A:1 and :A:2, with `discards`).
+  { id: "51351:forced:1", cardCode: "51351", lines: ["51351:A:1"], timing: "forced", trigger: "encounterEnteredPlay", subject: "self", instructions: [{ verb: "GuardWithDeckTop", discards: true }] },
+  { id: "51351:forced:2", cardCode: "51351", lines: ["51351:A:1"], timing: "forced", trigger: "leftPlay", subject: "self", instructions: [{ verb: "DiscardGuarded" }] },
   {
     id: "51351:constant:1",
     cardCode: "51351",

@@ -137,6 +137,8 @@ export type CardInstance = {
   captive?: true;
   // A player card an enemy holds, faceup: under it (Hobgoblin, 18050:A:2) or attached to it (a boon Shagrat guards, 146069:B:1). It returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set by GuardWithDeckTop and GuardWithSetAside.
   held?: true;
+  // With `held`: the card is discarded, not returned to the hand, when its holder leaves play (Nameless Thing, 51351:A:1). Set by GuardWithDeckTop `discards`.
+  heldDiscard?: true;
   // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideInPlay with keepDamage.
   keepsDamage?: true;
   // An enemy attached to a character as an attachment (Wraith of Carn Dûm, 101157:A:1): it has no enemy text while it lies there, hears no leaving of play, and returns to the staging area as an enemy when its host leaves play (families/angmar/reanimate/attached.ts).

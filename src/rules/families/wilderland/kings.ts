@@ -98,13 +98,13 @@ export function guardPickedAttachment(state: ScenarioState, instruction: Verb<"G
   return guardWith(updateCard(moveCard(searched.state, found, { zone: "staging" }), found, { face: "up", controller: null }), found, id);
 }
 
-/** GuardWithDeckTop: the first player's top deck card lies faceup under the source, which guards it. */
-export function guardWithDeckTop(state: ScenarioState, focus: Focus): ScenarioState {
+/** GuardWithDeckTop: the first player's top deck card lies faceup under the source, which guards it; with `discards` it is discarded, not returned to the hand, when the source leaves play (51351:A:1). */
+export function guardWithDeckTop(state: ScenarioState, focus: Focus, discards = false): ScenarioState {
   const source = focus.sourceId;
   const seat = state.firstPlayer;
   const top = state.seats[seat]?.deck[0];
   if (!source || !top || !state.cards[source]) return state;
-  return updateCard(moveCard(state, top, { zone: "under", locationId: source }), top, { face: "up", owner: seat, controller: null, held: true });
+  return updateCard(moveCard(state, top, { zone: "under", locationId: source }), top, { face: "up", owner: seat, controller: null, held: true, ...(discards ? { heldDiscard: true as const } : {}) });
 }
 
 /**
@@ -119,6 +119,13 @@ export function returnHeld(state: ScenarioState, ctx: ReduceContext): ScenarioSt
     // The holder leaving play sends the card under it to its owner's discard pile (moveCard); a holder out of play with the card still under it is read the same.
     const host = card.zone === "under" && card.host ? state.cards[card.host] : undefined;
     if (card.zone === "under" && host && inPlay(host.zone)) continue;
+    // A card the holder discards (`discards`): it goes to its owner's discard pile once the holder is out of play, and is held no more.
+    if (card.heldDiscard === true) {
+      const seat = card.owner ?? card.controller ?? -1;
+      const released = card.zone === "under" && seat >= 0 ? moveCard(next, card.id, { zone: "discard", seat }) : next;
+      next = updateCard(released, card.id, { owner: undefined, face: "up", held: undefined, heldDiscard: undefined });
+      continue;
+    }
     const owner = card.zone === "discard" ? state.seats.findIndex((seat) => seat.discard.includes(card.id)) : (card.owner ?? card.controller ?? -1);
     // A boon guarded on Shagrat lands in the encounter discard pile when he leaves play (nobody controls it); its owner is kept on it.
     if (owner >= 0 && (card.zone === "discard" || card.zone === "under" || card.zone === "encounterDiscard")) next = updateCard(moveCard(next, card.id, { zone: "hand", seat: owner }), card.id, { owner: undefined, face: "up", held: undefined });
