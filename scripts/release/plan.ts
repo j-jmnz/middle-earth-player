@@ -50,7 +50,7 @@ function previousTag(): string | undefined {
   return tryGit(["describe", "--tags", "--abbrev=0", "--match", RELEASE_TAGS, "HEAD"]);
 }
 
-function changesSince(tag: string | undefined): Change[] {
+export function changesSince(tag: string | undefined): Change[] {
   const range = tag ? [`${tag}..HEAD`] : ["HEAD"];
   const log = git(["log", "--no-merges", `--format=%s${FIELD}%b${RECORD}`, ...range]);
   return log
@@ -92,7 +92,7 @@ function scenarioName(id: string): string {
   return data.name.replace(/ \(Campaign\)$/, "");
 }
 
-function repository(): string {
+export function repository(): string {
   if (process.env.GITHUB_REPOSITORY) return process.env.GITHUB_REPOSITORY;
   const pkg = JSON.parse(readFileSync(path.join(ROOT, "package.json"), "utf8")) as { repository?: { url?: string } };
   const match = /github\.com\/([^/]+\/[^/.]+)/.exec(pkg.repository?.url ?? "");
@@ -127,7 +127,7 @@ function plannedTag(args: string[], request: BumpRequest, branch: string, log: L
 }
 
 /** A tag the release workflow already made on HEAD, with the release before it, so its notes can be written again. */
-function releasedTag(tag: string): { previous: string | undefined; tag: string } {
+export function releasedTag(tag: string): { previous: string | undefined; tag: string } {
   if (!parseTag(tag)) throw new Error(`"${tag}" is not a release tag`);
   const at = tryGit(["rev-list", "-n", "1", `refs/tags/${tag}`]);
   if (!at) throw new Error(`${tag} does not exist`);

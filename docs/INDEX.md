@@ -282,19 +282,20 @@ Read the sections your task touches.
   - 170–176 Use it (~80)
   - 177–190 Find a problem (~590)
   - 191–196 Change it (~90)
-- `docs/releasing.md` — Releasing (~5.6K tok)
+- `docs/releasing.md` — Releasing (~5.8K tok)
   - 5–20 Start a release (~340) ← 1
   - 21–36 Jobs (~2.1K) ← 4
   - 37–43 Add the desktop app to a release (~350) ← 1
-  - 44–47 Installs count (~180) ← 2
-  - 48–72 Caches (~820) ← 1
-  - 73–111 Signing (~1.1K) ← 2
-    - 77–80 Desktop signing (optional) (~220) ← 1
-    - 81–94 Android key (~250) ← 1
-    - 95–98 Asset mirror secrets (~140) ← 1
-    - 99–111 TestFlight (optional) (~420) ← 1
-  - 112–115 Installing (~90)
-  - 116–127 Troubleshooting (~450)
+  - 44–47 Issue comments (~180) ← 3
+  - 48–51 Installs count (~180) ← 2
+  - 52–76 Caches (~820) ← 1
+  - 77–115 Signing (~1.1K) ← 2
+    - 81–84 Desktop signing (optional) (~220) ← 1
+    - 85–98 Android key (~250) ← 1
+    - 99–102 Asset mirror secrets (~140) ← 1
+    - 103–115 TestFlight (optional) (~420) ← 1
+  - 116–119 Installing (~90)
+  - 120–131 Troubleshooting (~450)
 
 ## Agent procedures
 
@@ -389,7 +390,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/game`: development.md, Reading a game as text (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
-- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Installs count (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
+- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Installs count (2); releasing.md, Issue comments (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/showcase`: design-system.md, Color (1)
 - `scripts/tools`: .claude/rules/code-standards.md, Test cost (4); agents/agent-brief.md, Scenario procedure (4); architecture.md, Modules (1); design-system-table.md, Choice tray (1); development.md, Commands (1)
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (49); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (5); brief.md, Attack on Dol Guldur (4); brief.md, Escape from Khazad-dûm (4); brief.md, Murder at the Prancing Pony (4); brief.md, The Mines of Moria (4); brief.md, The Siege of Annúminas (4); brief.md, The Wizard's Quest (4); brief.md, The Woodland Realm (4); brief.md, The Battle of Lake-town (3); brief.md, The Hunt for the Dreadnaught (3); brief.md, The Old Forest (3); brief.md, The Ruins of Belegost (3); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); brief.md, Fog on the Barrow-downs (2); brief.md, The Stone of Erech (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)
