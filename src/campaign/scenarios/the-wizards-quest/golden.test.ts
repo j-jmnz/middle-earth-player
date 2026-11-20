@@ -33,8 +33,9 @@ describe("The Wizard's Quest golden", () => {
         // The first player has chosen one stage 2 and one stage 3 card; the other four wait out of the game.
         expect(state.stages.map((stage) => stage.code), golden.name).toHaveLength(3);
         expect(state.stages[0]?.code, golden.name).toBe("51001");
-        const sets = new Set(state.encounterDeck.map((id) => state.cards[id]?.encounterSet).filter((set) => set != null));
-        expect(sets.size, golden.name).toBeLessThanOrEqual(7);
+        // 7 sets of 5 cards (standalone.test.ts counts the sets), less the 0 cost card each player's Setup search added to the staging area.
+        expect(state.encounterDeck.length, golden.name).toBe(35 - golden.seatCount);
+        expect(state.staging, golden.name).toHaveLength(1 + golden.seatCount);
       },
     },
     wins: "wins when the stage 3 card of the first player's choice is defeated, settles at once with a score and earns nothing",
