@@ -8,7 +8,7 @@ import { encounterCodes } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
-import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
+import { loadAnyScenario, loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 import { scenarioFacts, startFor } from "./briefing.ts";
@@ -255,5 +255,15 @@ describe("a standalone game", () => {
     expect(parseStandaloneLoadout({ scenarioId: PAST })).toBeNull();
     expect(parseStandaloneActive({ engineVersion: "old" })).toBeNull();
     expect(parseStandaloneResult({ outcome: "draw" })).toBeNull();
+  });
+});
+
+// The Fellowship event kits print their encounter cards in numbered packets of five; the briefing names the one printed set.
+describe("a Fellowship event kit's briefing sets", () => {
+  const kits = { "the-wizards-quest": "The Wizard's Quest", "the-woodland-realm": "The Woodland Realm", "the-mines-of-moria": "The Mines of Moria", "escape-from-khazad-dum": "Escape from Khazad-dûm" };
+  it.each(Object.entries(kits))("names one set for %s, with the whole deck", (scenarioId, name) => {
+    const world = loadWorld(catalog, loadCampaign("standalone-scenarios"), loadAnyScenario(scenarioId), EFFECTS);
+    const facts = scenarioFacts(world, "Normal", "standalone");
+    expect(facts.sets).toEqual([{ name, count: facts.deckSize }]);
   });
 });
