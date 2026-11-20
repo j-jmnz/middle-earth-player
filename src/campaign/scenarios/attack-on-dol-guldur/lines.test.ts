@@ -2,7 +2,7 @@
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): the Setup the deal and the mode card leave, the Response at the end of the round, the lines that must not work in the other zone or stage, the bars that reach one location only and the lasting numbers.
 import { describe, expect, it } from "vitest";
 
-import { legalIntents, legalTargets } from "../../../rules/engine/reduce.ts";
+import { legalIntents, legalTargets, reduce, startScenario } from "../../../rules/engine/reduce.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 import type { GameEvent } from "../../../rules/core/state.ts";
 import { heldAmount } from "../../../rules/core/state.ts";
@@ -10,8 +10,8 @@ import { spawn } from "../../../rules/core/zones.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { first, opening, revealFromTop, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
-import { playToEnd } from "../../../../test/harness/game-kit.ts";
-import { guldurIntent, guldurStart, guldurWorld, DEFAULT_POLICY } from "../../../../test/scenarios/attack-on-dol-guldur/game.ts";
+import { expectOk } from "../../../rules/core/test-fixture.ts";
+import { guldurStart, guldurWorld } from "../../../../test/scenarios/attack-on-dol-guldur/game.ts";
 
 const table = (layout: Layout) => tableFromLayout("attack-on-dol-guldur", layout);
 const PLACES = ["place", "place", "place", "place", "place", "place"];
@@ -34,7 +34,7 @@ const codes = (state: ScenarioState, ids: readonly string[]) => ids.map((id) => 
 // The game after its Setup and the first player's Keep (the opening the goldens check too), with no intent played.
 const opened = async (seats: 1 | 2, seed: number): Promise<ScenarioState> => {
   const { ctx } = await guldurWorld("strong");
-  return playToEnd(guldurStart(seats, seed, "Normal"), ctx, (state, memory) => guldurIntent(state, ctx, memory, DEFAULT_POLICY), 0).kept;
+  return expectOk(reduce(startScenario(guldurStart(seats, seed, "Normal"), ctx), { type: "Keep" }, ctx)).state;
 };
 const fire = (state: ScenarioState, ctx: ReduceContext, event: GameEvent): ScenarioState => settle(fireForced({ ...state, window: null }, event, ctx, []), ctx, []);
 
