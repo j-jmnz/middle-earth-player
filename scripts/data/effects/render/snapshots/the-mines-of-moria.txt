@@ -366,7 +366,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
   51226:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) that is the active location
-    - return the picked card to the staging area
+    - return the active location to the staging area
     - each player assigns threat of the picked card damage among the character (you control), one at a time
     - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
@@ -535,10 +535,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51238:A:1 (front): When Revealed: Each player discards 1 random card from his hand. Until the end of the phase, add X Threat to the staging area, where X is the total cost of the discarded cards.
   51238:whenRevealed:1: When revealed
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - for each player, first player first:
-      - the acting player discards 1 random card(s) from hand
-    - the total Threat in the staging area is the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0) higher until the end of the phase
+    - each player discards 1 random card(s) from hand; until the end of the phase the total Threat in the staging area is raised by the total printed cost of the cards discarded
 
 51238:A:2 (shadow): Shadow: Discard 1 random card from your hand.
   51238:shadow:1: Shadow
@@ -586,7 +583,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 51242:A:2 (front): Forced: After Goblin Warlord enters play, the opposing team searches the encounter deck and discard pile for a 0-cost Goblin enemy and adds it to the staging area. Shuffle the encounter deck.
-  51242:forced:1: Forced after a card enters play (heard about this card)
+  51242:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Goblin enemy with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
@@ -692,8 +689,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51251:A:1 (front): When Revealed: Return each copy of Swarming Goblins in the encounter discard pile to the staging area.
   51251:whenRevealed:1: When revealed
-    - for each enemy (any player controls) encounterDiscard, named "Swarming Goblins":
-      - the picked card goes to the staging area (it is not revealed)
+    - every card with code 51251 in the encounter discard pile (the deck is not searched) and adds it to the staging area (it is not revealed)
 
 51251:A:2 (shadow): Shadow: If the attacking enemy is a Goblin, put Swarming Goblins into play engaged with you.
   51251:shadow:1: Shadow
@@ -727,4 +723,4 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the attack
 
-(rendered pieces: 430 by template, 11 as JSON)
+(rendered pieces: 425 by template, 11 as JSON)

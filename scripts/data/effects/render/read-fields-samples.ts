@@ -200,7 +200,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   HoldCaptive: [{ verb: "HoldCaptive" }],
   ReturnCaptive: [{ verb: "ReturnCaptive", under: "143022" }],
   DamageHeldCaptive: [{ verb: "DamageHeldCaptive", amount: 1 }],
-  DiscardRandomFromHand: [{ verb: "DiscardRandomFromHand", amount: 2, who: "eachSeat", remember: true }],
+  DiscardRandomFromHand: [{ verb: "DiscardRandomFromHand", amount: 2, who: "eachSeat", remember: true }, { verb: "DiscardRandomFromHand", who: "eachSeat", raiseStagingByCost: true }],
   SearchReveal: [{ verb: "SearchReveal", trait: "Uruk-hai", type: "enemy", who: "firstPlayer", to: "engaged", cost: true, code: "04023" }, { verb: "SearchReveal", traits: ["Shadow", "Flame"], type: "treachery", deckOnly: true }],
   AttachSelf: [
     { verb: "AttachSelf", to: { kind: "hero", trait: "Warrior" } },

@@ -246,7 +246,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "whenRevealed",
     instructions: [
       { verb: "Pick", pick: { type: "location", control: "any", active: true } },
-      { verb: "ReturnToStaging", target: { kind: "picked" } },
+      { verb: "ReturnToStaging", target: { kind: "activeLocation" } },
       { verb: "AssignDamage", amount: { stat: "threat", of: "picked" }, pick: MY_CHARACTER, who: "eachSeat" },
       { verb: "GainSurge", when: { kind: "noneReturned" } },
     ],
@@ -360,7 +360,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51237:action:1", cardCode: "51237", lines: ["51237:A:1"], timing: "action", condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "firstPlayer" }] }, instructions: [{ verb: "RaiseThreat", amount: 1, who: "eachSeat" }, { verb: "ModifyStat", stat: "threat", amount: -1, until: "endOfPhase", target: "self" }] },
 
   // 51238 Dark and Dreadful: each player discards 1 random card from his hand; until the end of the phase the staging area adds the total printed cost of the discarded cards as Threat. Shadow: discard 1 random card from your hand.
-  { id: "51238:whenRevealed:1", cardCode: "51238", lines: ["51238:A:1"], timing: "whenRevealed", instructions: [discardRandom(), { verb: "RaiseStagingThreat", amount: { discarded: "cost" }, until: "endOfPhase" }] },
+  { id: "51238:whenRevealed:1", cardCode: "51238", lines: ["51238:A:1"], timing: "whenRevealed", instructions: [{ verb: "DiscardRandomFromHand", who: "eachSeat", raiseStagingByCost: true }] },
   { id: "51238:shadow:1", cardCode: "51238", lines: ["51238:A:2"], timing: "shadow", instructions: [{ verb: "DiscardRandomFromHand" }] },
 
   // 51239 Goblin Follower: cannot be optionally engaged; while in the staging area it gains a Forced effect: after an enemy engages a player, it engages that player (the records of 18021:A:1 and 18021:A:2).
@@ -376,7 +376,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51242 Goblin Warlord: no non-objective player card attachments, no non-combat damage; after it enters play the opposing team finds a 0 cost Goblin enemy in the deck or discard pile and adds it to the staging area.
   ...armoured("51242"),
-  { id: "51242:forced:1", cardCode: "51242", lines: ["51242:A:2"], timing: "forced", trigger: "enteredPlay", subject: "self", instructions: [{ verb: "SearchMove", trait: "Goblin", type: "enemy", maxCost: 0, to: "staging", byChallenge: true }, { verb: "ShuffleEncounterDeck" }] },
+  { id: "51242:forced:1", cardCode: "51242", lines: ["51242:A:2"], timing: "forced", trigger: "encounterEnteredPlay", subject: "self", instructions: [{ verb: "SearchMove", trait: "Goblin", type: "enemy", maxCost: 0, to: "staging", byChallenge: true }, { verb: "ShuffleEncounterDeck" }] },
 
   // 51243 Dwarven Forge: while it is the active location it gains a Response after it is explored: each player draws 1 card.
   { id: "51243:response:1", cardCode: "51243", lines: ["51243:A:1"], timing: "response", trigger: "activeExplored", subject: "self", instructions: [EACH_PLAYER([{ verb: "Draw", amount: 1 }])] },
@@ -416,7 +416,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51250:shadow:1", cardCode: "51250", lines: ["51250:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", from: "encounterDiscard", highestThreat: true, challenge: true } }, { verb: "MoveEncounterCard", card: "picked", to: "shuffle" }] },
 
   // 51251 Swarming Goblins: each copy in the encounter discard pile returns to the staging area. Shadow: with a Goblin attacker it enters play engaged with you.
-  { id: "51251:whenRevealed:1", cardCode: "51251", lines: ["51251:A:1"], timing: "whenRevealed", instructions: [{ verb: "Each", pick: { type: "enemy", control: "any", from: "encounterDiscard", names: ["Swarming Goblins"] }, instructions: [{ verb: "MoveEncounterCard", card: "picked", to: "staging" }] }] },
+  { id: "51251:whenRevealed:1", cardCode: "51251", lines: ["51251:A:1"], timing: "whenRevealed", instructions: [{ verb: "SearchMove", code: "51251", discardOnly: true, each: true, to: "staging" }] },
   { id: "51251:shadow:1", cardCode: "51251", lines: ["51251:A:2"], timing: "shadow", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "engaged", when: ATTACKER_IS({ type: "enemy", control: "any", trait: "Goblin" }) }] },
 
   // 51252 Goblin Tunnels: each Goblin enemy gets +1 Attack while it is in the staging area; explored, the opposing team finds a Goblin enemy with cost 1 or less.

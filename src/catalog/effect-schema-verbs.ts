@@ -451,8 +451,8 @@ export const simpleVerbs = [
   // The source card (a shadow card) is shuffled into the encounter deck instead of being discarded (141069:A:3).
   verb("ShuffleSelfIntoEncounterDeck"),
   // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed
-  // picks them (141047:A:2, 141084:A:2). `raiseByCost`: the discarding player's threat is raised by the discarded card's printed cost, 0 for a card with no printed cost or an X cost ("Discard a random card from your hand and raise your threat by its printed cost", 10052:A:2).
-  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), remember: z.literal(true).optional(), raiseByCost: z.literal(true).optional(), ...when }),
+  // picks them (141047:A:2, 141084:A:2). `raiseByCost`: the discarding player's threat is raised by the discarded card's printed cost, 0 for a card with no printed cost or an X cost ("Discard a random card from your hand and raise your threat by its printed cost", 10052:A:2). `raiseStagingByCost` (with `who: eachSeat`): "Until the end of the phase, add X Threat to the staging area, where X is the total cost of the discarded cards" (51238:A:1): the table's total Threat in the staging area is raised until the end of the phase by the printed costs of the cards every player discarded, 0 for a card with no printed cost.
+  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), remember: z.literal(true).optional(), raiseByCost: z.literal(true).optional(), raiseStagingByCost: z.literal(true).optional(), ...when }),
   // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
   codeVerb("ShuffleIntoEncounterDeck"),
   // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.

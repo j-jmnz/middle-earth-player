@@ -134,7 +134,11 @@ export function runExtraVerb(
         const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
         const living = livingSeats(state);
         const at = Math.max(0, living.indexOf(state.firstPlayer));
-        return [...living.slice(at), ...living.slice(0, at)].reduce((current, seat) => discardRandom(current, seat, amount, focus.sourceId, ctx), state);
+        const done = [...living.slice(at), ...living.slice(0, at)].reduce((current, seat) => discardRandom(current, seat, amount, focus.sourceId, ctx), state);
+        if (instruction.raiseStagingByCost !== true) return done;
+        // The cards that joined the discard piles are the ones discarded: their printed costs raise the staging area's total Threat for the phase (51238:A:1).
+        const total = living.reduce((sum, seat) => sum + (done.seats[seat]?.discard ?? []).slice(state.seats[seat]?.discard.length ?? 0).reduce((cost, id) => cost + (printedOf(ctx.cards, done.cards[id]?.code ?? "").cost ?? 0), 0), 0);
+        return total > 0 ? { ...done, modifiers: [...done.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "moreStagingThreat", amount: total, until: "endOfPhase" }] } : done;
       }
       const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
       const discarded = discardRandom(state, seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
