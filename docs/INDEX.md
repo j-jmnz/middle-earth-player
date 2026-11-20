@@ -165,7 +165,7 @@ Read the sections your task touches.
     - 2380–2411 The Wizard's Quest (~4.1K) ← 22
     - 2412–2447 The Woodland Realm (~4.7K) ← 15
     - 2448–2487 The Mines of Moria (~4.9K) ← 12
-    - 2488–2499 Escape from Khazad-dûm (~2.0K)
+    - 2488–2499 Escape from Khazad-dûm (~2.0K) ← 1
   - 2500–2508 Nightmare (~410) ← 22
   - 2509–2551 Deckbuilding (~2.5K) ← 1
   - 2552–2631 Effects (~4.1K)
@@ -362,7 +362,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
 - `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Attack on Dol Guldur (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Old Forest (1); brief.md, The Siege of Annúminas (1); releasing.md, Add the desktop app to a release (1); releasing.md, Jobs (1)
-- `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Foundations of Stone (1); brief.md, The Two Towers (1)
+- `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Escape from Khazad-dûm (1); brief.md, Foundations of Stone (1); brief.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
