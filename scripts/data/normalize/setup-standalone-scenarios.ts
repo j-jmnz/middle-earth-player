@@ -101,14 +101,14 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     const codes = [...names.codesOf(match[1] ?? ""), ...own.map((card) => card.code)];
     return own.length !== Number(match[2]) || names.codesOf(match[1] ?? "").length === 0 || names.without(match[1] ?? "").replace(/\s/g, "") !== "" ? null : [{ kind: "aside", codes, allCopies: false }];
   }
-  // Attack on Dol Guldur's Standard Game Mode (50931): "Add Dol Guldur to the staging area, attach a threat dial to it, and set its value to 5. Then, increase it's value by 5 for each player. For the rest of the
+  // Attack on Dol Guldur's Standard Game Mode (50931): "Add Dol Guldur to the staging area, attach a threat dial to it, and set its value to 5. Then, increase its value by 5 for each player. For the rest of the
   // game, that threat dial is the siege tracker and it displays the city strength of Dol Guldur. Flip this card over.": the dial is the city strength, as the Siege's "set its city strength to 20" is. The
   // sentence that names the siege tracker adds no move: the strength steps above it set the tracker.
   if ((match = /^Add (.+?) to the staging area, attach a threat dial to it, and set its value to (\d+)$/.exec(sentence))) {
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: null, count: 1 }, { kind: "step", step: "setCityStrength", codes, count: Number(match[2]) }];
   }
-  if ((match = /^Then,? increase it['’]s value by (\d+) for each player$/.exec(sentence))) {
+  if ((match = /^Then,? increase its value by (\d+) for each player$/.exec(sentence))) {
     const codes = names.cards.filter((card) => card.type === "objective" && card.name === "Dol Guldur" && card.encounterSet === "Attack on Dol Guldur").map((card) => card.code);
     return codes.length === 0 ? null : [{ kind: "step", step: "raiseCityStrengthPerPlayer", codes, count: Number(match[1]) }];
   }
