@@ -110,8 +110,8 @@ export const MOTION = {
   toastIn: tween(160, null),
   toastOut: tween(120, null),
   // The Cards tab's filters fold away under the search as the pool scrolls down, and come back as it scrolls up.
-  filtersFold: tween(180, "outCubic"),
-  filtersUnfold: tween(200, "outCubic"),
+  filtersFold: tween(320, "inOutSine"),
+  filtersUnfold: tween(300, "inOutSine"),
   // The combat spotlight, one attack (docs/design-system-table.md, Spotlight): the dark comes in and the cards arc to the center
   // (enter), the attack value, the gauge and the matchup line pop and a shadow card flips (read), the attacker draws back and glows
   // (charge), strikes (lunge), everything holds at the hit (stop), the target takes the hit (impact), the gauge counts it one step at a
