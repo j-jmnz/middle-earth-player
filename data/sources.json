@@ -5467,9 +5467,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "e699cfb32467b93e9f31591e5ae8e29696bd12d8877e69165b571bcb01b5babb"
+        "value": "639124baffcf77ae1ecf80b80bf6b9d23ee4bb259076dedcdada20f496553b20"
       },
-      "fetchedAt": "2026-11-19T22:40:08.588Z",
+      "fetchedAt": "2026-11-20T01:07:18.515Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -26878,6 +26878,252 @@
           "url": "https://drive.usercontent.google.com/download?id=1ix4CMmBLGFuNsjsdTRwB5hyLVJjsFAqM&export=download&confirm=t",
           "sha256": "cd6c156f8c2044741223df06aea01415756daa4bbdc46b3b9d56e36e351d318c",
           "bytes": 4196371
+        },
+        {
+          "path": "pictures/50801.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ka_ayHV2YAAWdUkEJdD2SKa-yUqYTby0&export=download&confirm=t",
+          "sha256": "d471246d0a116c24c3283132e015b78b4d43c31e4ce511a9c60dc550e2e1f6f2",
+          "bytes": 4345077
+        },
+        {
+          "path": "pictures/50802.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1k_1Y2p4Cuc0rmrhDz1nB1yUoLS_ssvtT&export=download&confirm=t",
+          "sha256": "99a0e5e511bfd12cdff92963436823890ee35743d5aea7a7be8ee7a824d334a7",
+          "bytes": 4262003
+        },
+        {
+          "path": "pictures/50803.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1kXFXcAHkNzcE79vPez5NgaQnBZ5u7hcr&export=download&confirm=t",
+          "sha256": "4b6773993081a0e9f2ac7125936b20b9fd7635f7730563fac03d8be015416de5",
+          "bytes": 3500025
+        },
+        {
+          "path": "pictures/50803.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ko2WJ6qyrnFiKncjB9pb28kbI4T0IqTC&export=download&confirm=t",
+          "sha256": "0efef44730ce633c639967952a94bc8f4e2dad89f706afd91aa7927b7f28ac77",
+          "bytes": 3338208
+        },
+        {
+          "path": "pictures/50804.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1kmqwlT1Sh3bWUTOrp_b_AcRgBwlODgjb&export=download&confirm=t",
+          "sha256": "925724ce6f5884da0f5099fe47b5055afbc818d6e247247108bc3550407c3521",
+          "bytes": 3496072
+        },
+        {
+          "path": "pictures/50804.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1kkVsfzS_wKINYrdXiGQBFdI7ZYlwrb6r&export=download&confirm=t",
+          "sha256": "32d818e683bcbe3c7304482167f1be4eae8c7253bc7feabadcf1dd625244e85e",
+          "bytes": 3412300
+        },
+        {
+          "path": "pictures/50805.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1khHVcAlcLXGaCIJ9wOlkSoRkagZRnM9A&export=download&confirm=t",
+          "sha256": "14700cc0d6a9b55f11b7a3d22bd372396180935406db21952aeddfa17e70dc7e",
+          "bytes": 3526542
+        },
+        {
+          "path": "pictures/50805.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1kb9Pl4uqp2dXl_HPxiyR_HdCYCCKita5&export=download&confirm=t",
+          "sha256": "c0e515686da301e40b61d601dadf00516aadfbba80904bd1c77ba567e91c1876",
+          "bytes": 3322406
+        },
+        {
+          "path": "pictures/50806.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1l1u11VnvmZp8sKkiDSUB9jqNNLV3vzJg&export=download&confirm=t",
+          "sha256": "ee19a40a6e93afd3bf2d59f9bee79eb4efd438a5a2147cefc661da6ff83a17cc",
+          "bytes": 3669464
+        },
+        {
+          "path": "pictures/50806.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP016-6-back-Quest-Raise_the_Levee-C-The_Siege_of_Annuminas.jpg",
+          "sha256": "9432f403ce1445f10440756b3281df9d8f589979d6baaee90fb5649a1edf5e89",
+          "bytes": 733567
+        },
+        {
+          "path": "pictures/50807.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1kzT46ozBmJEfkWEFg-qBBMf5qWIqUoMQ&export=download&confirm=t",
+          "sha256": "505d79abfe5f28b2e353dff79ce9aa4aed411fc9873cf4995cd5fc29cc118b7e",
+          "bytes": 3677990
+        },
+        {
+          "path": "pictures/50807.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP016-7-back-Quest-Guard_the_Gate-C-The_Siege_of_Annuminas.jpg",
+          "sha256": "a1736b3a67a34620e8c58b0eb86811b32758a3509f78a5c806c3760dedc5c9f8",
+          "bytes": 703778
+        },
+        {
+          "path": "pictures/50808.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1lJOkgBmAhQz5cJP3bxfb9AgkzUjB-YNA&export=download&confirm=t",
+          "sha256": "b7df32a4e6800e2cc57fe428f4ff0c0324973bdf4bbe36593e6ab984cfbcd33e",
+          "bytes": 3540167
+        },
+        {
+          "path": "pictures/50808.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP016-8-back-Quest-Rescue_the_Captives-C-The_Siege_of_Annuminas.jpg",
+          "sha256": "c799ad9148c81144ed8499475af5356b49943217f267c57b9b8337e971e71054",
+          "bytes": 724818
+        },
+        {
+          "path": "pictures/50809.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1lDRjIkoKeCkjF-NqdBQmMhYxQo9aT2ZO&export=download&confirm=t",
+          "sha256": "e1ae33725c6b4c61263a641952334a4ed3de074d7056ce7ca22bbbf74374b9c6",
+          "bytes": 3526992
+        },
+        {
+          "path": "pictures/50809.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP016-9-back-Quest-Delay_the_Enemy-E-The_Siege_of_Annuminas.jpg",
+          "sha256": "3af9a5c466bed7d384e27132bbbda5e0b28c512fa991c3aa935e5c8bef2a408a",
+          "bytes": 703063
+        },
+        {
+          "path": "pictures/50810.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1l6GOOaOcugHhBE-Y-IyDTSGZtyAv0djr&export=download&confirm=t",
+          "sha256": "b363c37729a66575d96ebdca1f957c52ec3db7f42fbbaf4957cee50e5fb0ed9e",
+          "bytes": 3440894
+        },
+        {
+          "path": "pictures/50810.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP016-10-back-Quest-Man_the_Walls-E-The_Siege_of_Annuminas.jpg",
+          "sha256": "072cf0348f623bb2edc4d30afbc6e2bca83b9b8399c09bc5887b85acc820f66c",
+          "bytes": 678861
+        },
+        {
+          "path": "pictures/50811.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1lUs3kQ7DJ2T8UfxsXvPKi1Vpj5zp9jpX&export=download&confirm=t",
+          "sha256": "dad7702a91bfc4e70a1ca7fe6b90fcc3042c762972989d69a0bbc6e303862f4a",
+          "bytes": 3614392
+        },
+        {
+          "path": "pictures/50811.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP016-11-back-Quest-Stop_the_Attack-E-The_Siege_of_Annuminas.jpg",
+          "sha256": "31578585c04fb1a5849452224854e78292d5dcdd92391077b4a2fb07bafa0ac8",
+          "bytes": 697486
+        },
+        {
+          "path": "pictures/50812.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1j2NJ6Kg6fw3g4QmkAoPh6tCHeMsXJDJ-&export=download&confirm=t",
+          "sha256": "07b220ad256dd6689778cf01407f802a26ae55e480699bea4c13f7ab055d4af0",
+          "bytes": 4324125
+        },
+        {
+          "path": "pictures/50813.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1j-wSrmEBj4gIbOZ6vBTAxihgXWv0jjKa&export=download&confirm=t",
+          "sha256": "34c73142f5dca02814beb0223a6e08ab392224102e1addf905be50930d3571d2",
+          "bytes": 4223062
+        },
+        {
+          "path": "pictures/50814.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jEzYpMpu0lV4VzuB7WnYPYMcDXI4C4Eo&export=download&confirm=t",
+          "sha256": "d0ff36fc06e73cff153328b6b3725038369cd9ca823dc447480bdee9259809fd",
+          "bytes": 4335670
+        },
+        {
+          "path": "pictures/50815.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jDB5i_LG8cpDfpEUsa82JRAbWTBWtyYq&export=download&confirm=t",
+          "sha256": "cbbfd4d4ce711fcab5764bd04fe6f13180cdbd6e66488b526f92b364a5061951",
+          "bytes": 4327734
+        },
+        {
+          "path": "pictures/50816.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1j9-bg9YCKGwP_xNKoiXjZupIS3WV2bzy&export=download&confirm=t",
+          "sha256": "a4972eccd9e41174e9de5a33b9aa5b92d8e0329dd41b844880e9e4d2a6ec519c",
+          "bytes": 4393238
+        },
+        {
+          "path": "pictures/50817.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1j4c-zOCOanKUG5dbiV8Gxas9Utj3Z98z&export=download&confirm=t",
+          "sha256": "d3fd8a951b87b22888552a54b5624131450466daec3fe8639ddd7247b9f21484",
+          "bytes": 4163070
+        },
+        {
+          "path": "pictures/50818.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jXNkvf-C7lhS7mwap72N1zQvOnWtNlzR&export=download&confirm=t",
+          "sha256": "08407397cf7a87c7ee7fcaf09eb7eee2803662236f7ae40ee9c89ee922be09f3",
+          "bytes": 4219466
+        },
+        {
+          "path": "pictures/50819.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jXBcazua1XVmSbnp6SVaSK6887FVSlPJ&export=download&confirm=t",
+          "sha256": "ceccfecd562520ef8d2bbd5a0bff70274d50cc31b4ac82381c37919c7b4b7ea9",
+          "bytes": 4266703
+        },
+        {
+          "path": "pictures/50820.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jHiXEEZ8mhfbKEli9qq8l-q_2gvDc4i-&export=download&confirm=t",
+          "sha256": "3fd46ad4ac3627b61c6408df6f8c8a4fd0400fcb29540308e0995312101c0a83",
+          "bytes": 4359878
+        },
+        {
+          "path": "pictures/50821.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jFIXlrUDPe_RSrcIPEUMd0z7_Fy-JmsQ&export=download&confirm=t",
+          "sha256": "902836b6ae803ce3762316d9e0c2c9bca91be02662bcd24db700a51277012fcf",
+          "bytes": 4533111
+        },
+        {
+          "path": "pictures/50822.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jv_3YAQCjdpxBUTaCnrwbWNnbiMCeT4L&export=download&confirm=t",
+          "sha256": "34ff1bc42b156007bbab0e12a20ea6a7728e48d5bfbd95f7a06f2fffafffd8e9",
+          "bytes": 4526136
+        },
+        {
+          "path": "pictures/50823.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jrM-QuCRoNYXmQf4MpfJ2WpAqmoGunXU&export=download&confirm=t",
+          "sha256": "9ff3ee99440eadc753f25aa1d341f409b59aaa80da6e558660a0a229978abf63",
+          "bytes": 4293889
+        },
+        {
+          "path": "pictures/50824.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jkk7LORwE51oN5W-tLHCgkScY8hccMjc&export=download&confirm=t",
+          "sha256": "941ca2ebc193611631f125338767a5eeb44f013532155eb88aad63104d9df56b",
+          "bytes": 4300392
+        },
+        {
+          "path": "pictures/50825.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jYcjkmdm6ef94pCiGNjNIoXJtyJRRubC&export=download&confirm=t",
+          "sha256": "f487759f51175bd7fc5c0f7334b64ba205a13ce69531fd14dc9492777e5a6e4e",
+          "bytes": 4158721
+        },
+        {
+          "path": "pictures/50826.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1k8sSaOFh1GiKUuLesr24t9Qy6gwVL2kj&export=download&confirm=t",
+          "sha256": "4d01bfb7d3238a1c360db4e689c4875bceed2f5f4f12fbeed07390edc8aa46ab",
+          "bytes": 4269665
+        },
+        {
+          "path": "pictures/50827.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1k24Jj7oiv3t4vtaRdTMTnE0bgRJ2X9Ub&export=download&confirm=t",
+          "sha256": "b356e956c11524f58247d16253a8acdb976fecba8b0a5893fcf11f0d88b91afc",
+          "bytes": 4351705
+        },
+        {
+          "path": "pictures/50828.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jz26kUMYXlrxc8_V7hphQZcFGyCT6SAJ&export=download&confirm=t",
+          "sha256": "36af07f16dc2759c48997fbe29e4061c647c544d6eee5d7ebd1e75baed87c2cf",
+          "bytes": 4255181
+        },
+        {
+          "path": "pictures/50829.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1jxf24mHXiz21IQ0HHYv329-EHgY_BdQw&export=download&confirm=t",
+          "sha256": "41dd351e2a343e1ae46a17f89f1ca8808e3b1605f09ea20f0fc9db2fe21f4932",
+          "bytes": 4315802
+        },
+        {
+          "path": "pictures/50830.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1kUEdTm-QtLNKCdJBp53IbeCE_vi-RuRk&export=download&confirm=t",
+          "sha256": "e4af906d29f26b0e176323053712c0e35232b25654d20c59ad9c88fe238d4fd0",
+          "bytes": 4237238
+        },
+        {
+          "path": "pictures/50831.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1kSyyHTFAzNct7ObGT91JiosgPkPQ4sVJ&export=download&confirm=t",
+          "sha256": "6fdb3734c228a60cecd158caac17c4bdf2eb2a4efa35e189eb22fd6f109f3572",
+          "bytes": 4281307
+        },
+        {
+          "path": "pictures/50832.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1kOW3J488AHwe4IjuWZ6pT3ipK7THqXHZ&export=download&confirm=t",
+          "sha256": "944a2897f046466699d100806f26cdb001885ec34efe165b4479dfce4387f69f",
+          "bytes": 4169393
         },
         {
           "path": "pictures/9901014.A.jpg",
