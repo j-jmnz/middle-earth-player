@@ -121,7 +121,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     read: ["code", "target", "afterAttack", "host"],
   }),
   AttachToDial: (i) => ({
-    text: typeof i.code === "string" ? `the acting player attaches a set-aside copy of the card with code ${str(i.code)} to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)` : i.firstPlayer === true ? "this card attaches itself to the first player's threat dial (whoever reveals it)" : "this card attaches itself to the acting player's threat dial (nothing when the dial holds a copy already)",
+    text: typeof i.code === "string" ? `the acting player attaches a set-aside copy of the card with code ${str(i.code)} to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)` : i.firstPlayer === true ? `this card attaches itself to the first player's threat dial (whoever reveals it${i.unlimited === true ? "; a dial that holds a copy takes another" : ""})` : "this card attaches itself to the acting player's threat dial (nothing when the dial holds a copy already)",
     read: ["code", "firstPlayer", "unlimited"],
   }),
   DetachFromDial: (i) => ({

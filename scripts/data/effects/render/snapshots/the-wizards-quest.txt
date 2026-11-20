@@ -625,7 +625,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51045:A:2 (front): When Revealed: Attach to the first player's threat dial. (Counts as a Condition attachment with the text: 'Forced: Raise your threat by an additional point during the refresh phase.')
   51045:whenRevealed:1: When revealed
-    - this card attaches itself to the first player's threat dial (whoever reveals it)
+    - this card attaches itself to the first player's threat dial (whoever reveals it; a dial that holds a copy takes another)
   51045:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   51045:forced:1: Forced at the end of the phase

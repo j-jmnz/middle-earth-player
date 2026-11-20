@@ -312,6 +312,6 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   Delay: [{ verb: "Delay", until: "endOfRound", uncancelable: { kind: "firstPlayer" }, subject: "picked", instructions: [] }],
   AfterAttack: [{ verb: "AfterAttack", instructions: [] }],
   Repeat: [{ verb: "Repeat", times: 2, instructions: [] }],
-  ForEachPlayer: [{ verb: "ForEachPlayer", order: "lastFirst", instructions: [] }, { verb: "ForEachPlayer", order: "lastFirst", seats: "guardian", instructions: [] }, { verb: "ForEachPlayer", order: "firstFirst", limit: 2, instructions: [] }],
+  ForEachPlayer: [{ verb: "ForEachPlayer", order: "lastFirst", instructions: [] }, { verb: "ForEachPlayer", order: "lastFirst", seats: "guardian", instructions: [] }, { verb: "ForEachPlayer", order: "lastFirst", limit: 2, instructions: [] }],
 };
 
