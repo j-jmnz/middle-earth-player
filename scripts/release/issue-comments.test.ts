@@ -7,14 +7,14 @@ const REPO = "j-jmnz/middle-earth-player";
 const LINK = `[v0.3.1](https://github.com/${REPO}/releases/tag/v0.3.1)`;
 
 describe("release issue comments (docs/releasing.md, Issue comments)", () => {
-  it("says a closed issue is fixed in the release, with the commit's line and the marker", () => {
-    const [comment] = issueComments([parseCommit("fix: Make Hasty Stroke cancel the shadow effect (#105)", "Closes #99")], "v0.3.1", REPO);
-    expect(comment).toEqual({ issue: 99, body: `Fixed in ${LINK}:\n\n- Make Hasty Stroke cancel the shadow effect (#105)\n\n${markerOf("v0.3.1")}\n` });
+  it("says a settled issue is fixed in the release, with the commit's line and the marker", () => {
+    const [comment] = issueComments([parseCommit("fix: Make Hasty Stroke cancel the shadow effect (#105)", "Settles #99")], "v0.3.1", REPO);
+    expect(comment).toEqual({ issue: 99, body: `Fixed in ${LINK}:\n\n- Make Hasty Stroke cancel the shadow effect (#105)\n\n${markerOf("v0.3.1")}\n`, close: true });
   });
 
-  it("says released for a closing change that is not a fix, and work for a referred issue", () => {
-    const comments = issueComments([parseCommit("feat: Add the Hobbit saga (#110)", "Closes #50\nRefs #60")], "v0.3.1", REPO);
-    expect(comments.map((comment) => comment.issue)).toEqual([50, 60]);
+  it("says released for a settling change that is not a fix, and work for a referred issue", () => {
+    const comments = issueComments([parseCommit("feat: Add the Hobbit saga (#110)", "Settles #50\nRefs #60")], "v0.3.1", REPO);
+    expect(comments.map(({ issue, close }) => ({ issue, close }))).toEqual([{ issue: 50, close: true }, { issue: 60, close: false }]);
     expect(comments[0].body.startsWith(`Released in ${LINK}:`)).toBe(true);
     expect(comments[1].body.startsWith(`Work on this issue is in ${LINK}:\n\n- Add the Hobbit saga (#110)\n`)).toBe(true);
   });

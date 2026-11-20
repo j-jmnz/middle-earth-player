@@ -24,6 +24,9 @@ interface Delivery {
   sender?: { login: string };
 }
 
+// The account the release workflow's token acts as.
+const RELEASE_BOT = "github-actions[bot]";
+
 // The longest piece of a comment the bot quotes.
 const QUOTE_MAX = 600;
 
@@ -57,6 +60,8 @@ export function issueMessage(event: string, delivery: Delivery): string | null {
   if (event === "issues" && action === "closed") {
     if (issue.state_reason === "not_planned") return `${named(issue)} has been closed without a change for now. The issue on GitHub explains why.`;
     if (issue.state_reason === "duplicate") return `${named(issue)} was already reported in another issue, so it's closed as a duplicate. Follow the link on GitHub for updates.`;
+    // The release workflow closes the issues a release settles (docs/releasing.md, Issue comments); the release post says so.
+    if (delivery.sender?.login === RELEASE_BOT) return null;
     return `🎉 Good news: ${named(issue)} is fixed! The fix will be in the next app update, and I'll let you know here when it's out.`;
   }
   if (event === "issues" && action === "reopened") return `${named(issue)} has been reopened. We're taking another look.`;
