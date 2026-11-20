@@ -1,9 +1,32 @@
-// Rules: TODO name the rule ids the scenario implements (data/rules/entries.json).
-import { describe, it } from "vitest";
+// Rules: none (a scenario with no Nightmare deck); docs/brief.md (The Siege of Annúminas).
+// What is The Siege of Annúminas's own in the standalone game. Its Setup is the golden suite's opening check (golden.test.ts); the cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a
+// standalone run with nothing earned, the loss reasons) are the golden suite's too (test/harness/golden-suite.ts, standalone: true).
+import { describe, expect, it } from "vitest";
 
-// What is The Siege of Annúminas's own in the standalone game. The cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a standalone run with nothing earned, the loss reasons) are the golden suite's
-// (test/harness/golden-suite.ts, standalone: true).
-// TODO: turn each into a test once the scenario's records exist.
+import { annuminasStart, annuminasWorld } from "../../../../test/scenarios/the-siege-of-annuminas/game.ts";
+import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";
+import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
+import { expectOk } from "../../../rules/core/test-fixture.ts";
+
 describe("The Siege of Annúminas in the standalone-scenarios cycle", () => {
-  it.todo("deals its Nightmare deck on Nightmare when every card of it has a record (src/campaign/playable.ts)");
+  it("has no Nightmare deck and deals the Standard Game Mode as its mode card", () => {
+    const scenario = loadAnyScenario("the-siege-of-annuminas");
+    expect(scenario.nightmare).toBeUndefined();
+    expect("modeCard" in scenario && scenario.modeCard).toBe("50801");
+  });
+
+  it("deals the same encounter deck on Easy and Normal, less the Gate of Annúminas and one location a player the Setup puts in the staging area", async () => {
+    const { ctx } = await annuminasWorld();
+    const after = (seats: 1 | 2, difficulty: "Easy" | "Normal") => {
+      const state = expectOk(reduce(startScenario(annuminasStart(seats, 1, difficulty), ctx), { type: "Keep" }, ctx)).state;
+      return { deck: state.encounterDeck.length, staging: state.staging.length, set: state.setAside.length, mode: Object.values(state.cards).find((card) => card.zone === "modeCard")?.face };
+    };
+    expect(after(1, "Easy")).toEqual(after(1, "Normal"));
+    const solo = after(1, "Normal");
+    const two = after(2, "Normal");
+    // Annúminas and the Gate are in the staging area, the 10 cards of 1A set aside, 34 cards left for 1 player; a second player adds a location.
+    expect(solo).toEqual({ deck: 34, staging: 2, set: 10, mode: "B" });
+    expect(two.deck).toBe(33);
+    expect(two.staging).toBe(3);
+  });
 });
