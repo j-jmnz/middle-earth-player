@@ -286,7 +286,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["50908:A:1"],
     timing: "response",
     trigger: "encounterRevealed",
-    byEncounterDeck: true,
     cost: { kind: "addSelfToVictory" },
     // "While you control Power of Lórien": in a play area (taken at stage 2B), not in the staging area.
     condition: { kind: "not", condition: { kind: "sourceIn", zone: "staging" } },
