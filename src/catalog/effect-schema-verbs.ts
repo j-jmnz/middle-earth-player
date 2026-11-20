@@ -255,8 +255,8 @@ export const simpleVerbs = [
       // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
       z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),
       // A character (hero or ally, an objective ally included) of any player, chosen by the first player: with `trait`, one that has the Trait now ("Attach to an Eagle character", 900607:A:2; a character that lost it is not offered); with `name`, the
-      // character of that title ("Attach to Wilyador", 900608:A:2). A character that carries a copy is not offered, unless `unlimited` (the card has no limit per character). With none to host it the card is discarded.
-      z.strictObject({ kind: z.literal("character"), trait: z.string().min(1).optional(), name: z.string().min(1).optional(), unlimited: z.literal(true).optional() }),
+      // character of that title ("Attach to Wilyador", 900608:A:2). A character that carries a copy is not offered, unless `unlimited` (the card has no limit per character). With none to host it the card is discarded. `control: mostAttachments`: of the characters the card is not on yet, those holding the most attachments ("Attach to the character with the most attachments without Befouled Equipment attached", 51036:A:1); the first player chooses among those tied.
+      z.strictObject({ kind: z.literal("character"), trait: z.string().min(1).optional(), name: z.string().min(1).optional(), unlimited: z.literal(true).optional(), control: z.literal("mostAttachments").optional() }),
     ]),
     // The attachment is announced as it attaches (the `attached` trigger, as a played attachment is, rr.attachment-cards): "more than 1 copy" on a hero is read as the second one attaches (04023:A:1).
     announces: z.literal(true).optional(),
@@ -268,9 +268,9 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("HideTest"), x: z.number().int().positive(), ...when }),
   // The source enemy attacks now, dealt a shadow card of its own; with `shadow: false` it is dealt none ("makes an additional attack after this one. (Do not deal it a shadow card.)", 18022:A:1).
   // `keepShadows` (with `shadow: false`): the shadow cards the enemy already holds are not discarded first, so they all resolve in this attack ("do not deal it another shadow card for this attack", 10131:A:2).
-  // `afterThis`: while the source enemy's attack is in progress the new attack is made once this one has ended ("makes an additional attack against you after this one", 143052:A:1); with no attack under way nothing happens.
+  // `afterThis`: while the source enemy's attack is in progress the new attack is made once this one has ended ("makes an additional attack against you after this one", 143052:A:1); with no attack under way nothing happens. `blankBonus`: when the shadow card dealt for this attack has no shadow effect the attacking enemy gets this much Attack for the attack ("If Hunting Warg is dealt a shadow card with no shadow effect for this attack, it gets +2 Attack", 51037:A:1).
   // `target: subject`: the enemy the answered event is about, engaged with a player, attacks that player, not the source (a Forced effect of the quest stage, "it makes an immediate attack. Do not deal it a shadow card", 50607:B:2).
-  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), keepShadows: z.literal(true).optional(), afterThis: z.literal(true).optional(), target: z.literal("subject").optional(), ...when }), { runsInFrame: true }),
+  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), keepShadows: z.literal(true).optional(), afterThis: z.literal(true).optional(), target: z.literal("subject").optional(), blankBonus: z.number().int().positive().optional(), ...when }), { runsInFrame: true }),
   // The attack in progress counts as undefended, even if a defender was declared.
   verb("ConsiderUndefended"),
   // The actor readies one hero they control.

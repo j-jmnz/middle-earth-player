@@ -66,7 +66,10 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       const free = (id: string): boolean => (unlimited || !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code)) && (code == null || !attachBlocked(state, ctx, id, code));
       if (instruction.to.kind === "character") {
         const { trait, name } = instruction.to;
-        return livingSeats(state).flatMap((seat) => characters(state, seat, ctx.cards)).filter((id) => (trait == null || hasTrait(state, id, trait, ctx)) && (name == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name) && free(id));
+        const hosts = livingSeats(state).flatMap((seat) => characters(state, seat, ctx.cards)).filter((id) => (trait == null || hasTrait(state, id, trait, ctx)) && (name == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name) && free(id));
+        if (instruction.to.control !== "mostAttachments") return hosts;
+        const most = Math.max(0, ...hosts.map((id) => state.cards[id]?.attachments.length ?? 0));
+        return hosts.filter((id) => (state.cards[id]?.attachments.length ?? 0) === most);
       }
       if (instruction.to.kind === "hero") {
         const seat = attachSeat(state, instruction, item.seat, sourceId);

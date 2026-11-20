@@ -16,8 +16,6 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51001:B:1 (back): Forced: When Rhosgobel is explored, flip it over and add Rider of Mirkwood to the staging area.
   51001:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "Rhosgobel")
     - [json FlipOver {"verb":"FlipOver","into":"51011","target":"subject"}]
-  51001:forced:2: Forced on the event activeExplored (heard about location (any player controls) named "Rhosgobel")
-    - [json FlipOver {"verb":"FlipOver","into":"51011","target":"subject"}]
 
 51001:B:2 (back): This stage cannot be defeated while Rhosgobel is in play.
   51001:constant:1: Constant
@@ -96,7 +94,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   51007:forced:1: Forced when the staging step begins, before the first card is revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
-    - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
+    - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is revealed in full (its keywords and When Revealed effects)
 
 51007:B:2 (back): If the players defeat this stage, they win the game.
   51007:questResolution:1: Quest resolution
@@ -224,7 +222,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51014:A:2 (shadow): Shadow: If attacking enemy is unique, it makes an additional attack against you after this one.
   51014:shadow:1: Shadow
     - when the attack in progress ends:
-      - if the attacking enemy is a unique enemy (any player controls): the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
+      - if the attacking enemy is a unique enemy (any player controls): the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 51015 Bane of Amon Lanc
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -260,7 +258,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   51017:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - attach this card to an enemy in play with the trait Troll (the opposing team attaches it, so nobody is asked: the enemy with the most hit points left)
-    - then, if not (there is a Troll enemy (any player controls) or in the staging area to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if not (there is a Troll enemy (any player controls) or in the staging area, with no attachment named "Smoking Blood" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
   51017:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
@@ -290,9 +288,6 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51019:A:3 (front): Forced: When Twilight Hall is explored, reveal 1 encounter card per player.
   51019:forced:1: Forced on the event locationExplored (heard about this card)
-    - for each player, first player first:
-      - the acting player reveals an encounter card
-  51019:forced:2: Forced on the event activeExplored (heard about this card)
     - for each player, first player first:
       - the acting player reveals an encounter card
 
@@ -338,7 +333,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51022:A:2 (front): Travel: Raise your threat by 1 for each Pine Slopes in the staging area.
   51022:travel:1: Travel
-    - raise threat by the number of location (any player controls) in the staging area only, named "Pine Slopes" (each player)
+    - raise threat by the number of location (any player controls) in the staging area only, named "Pine Slopes" (the first player)
 
 ## 51023 Under the Shadow
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -348,7 +343,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51023:A:2 (front): When Revealed: Attach to the main quest. (Counts as a condition attachment with the text: 'Each player cannot play more than 1 card each phase.')
   51023:whenRevealed:1: When revealed
-    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
+    - this card is attached to the main quest card (never a side quest) and leaves with it
   51023:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
@@ -386,10 +381,6 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
-  51026:forced:2: Forced on the event activeExplored (heard about this card)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - the top card of the encounter deck goes to the encounter discard pile
-    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 51027 Evil Storm
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -418,7 +409,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51028:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   51028:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 51029 Patch of Midnight
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -473,12 +464,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
-    - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
-  51032:forced:2: Forced on the event activeExplored (heard about this card)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - shuffle the encounter discard pile into the encounter deck
-    - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
-    - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
+    - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is revealed in full (its keywords and When Revealed effects)
 
 ## 51033 Power Sevenfold
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -508,7 +494,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51035:A:2 (front): Travel: The opposing team searches the top 5 cards of the encounter deck for a Hill Troll and adds it to the staging area, if able. Shuffle the encounter deck.
   51035:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one card, among the top 5 cards of the encounter deck only with code 51034 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - the acting player finds one card, among the top 5 cards of the encounter deck only with code 51034 in the encounter deck and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 ## 51036 Befouled Equipment
@@ -516,7 +502,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51036:A:1 (front): When Revealed: Attach to the character with the most attachments without Befouled Equipment attached. (Counts as a Condition attachment with the text: 'Forced: At the end of the round, discard an attachment from attached character. Befouled Equipment cannot be discarded this way unless it is the only attachment on attached character.')
   51036:whenRevealed:1: When revealed
-    - attach this card to a hero
+    - attach this card to the character of any player with the most attachments, among those that carry no copy of this card (the first player chooses among those tied); with none this card is discarded
   51036:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   51036:forced:1: Forced at the end of the round
@@ -530,10 +516,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51037:A:1 (front): Forced: After Hunting Warg engages a player, it makes an immediate attack. If Hunting Warg is dealt a shadow card with no shadow effect for this attack, it gets +2 Attack until the end of the phase.
   51037:forced:1: Forced after an enemy engages a player (heard about this card)
-    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
-  51037:forced:2: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
-    only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
-    - this card: stat attack 2, until the end of the phase
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded; when the shadow card dealt for it has no shadow effect the enemy gets +2 Attack for this attack
 
 ## 51038 Hunter's Lookout
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -576,7 +559,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51040:A:2 (shadow): Shadow: Defending character gets -1 Defense for each damage on it.
   51040:shadow:1: Shadow
-    - the defender: stat defense minus (damage of the defender), until the end of the phase
+    - the defender: stat defense minus (damage of the defender), until the end of the attack
 
 ## 51041 The Shadow Road
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -642,7 +625,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51045:A:2 (front): When Revealed: Attach to the first player's threat dial. (Counts as a Condition attachment with the text: 'Forced: Raise your threat by an additional point during the refresh phase.')
   51045:whenRevealed:1: When revealed
-    - this card attaches itself to the acting player's threat dial (nothing when the dial holds a copy already)
+    - this card attaches itself to the first player's threat dial (whoever reveals it)
   51045:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   51045:forced:1: Forced at the end of the phase
@@ -679,7 +662,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51048:A:1 (front): When Revealed: The opposing team searches the encounter deck and discard pile for one different 0 cost location per player (limit 2) and adds them to the staging area. Shuffle the encounter deck.
   51048:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - for each player, first player first:
+    - for each player (at most 2 players), first player first:
       - the acting player finds one location with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
     - shuffle the encounter deck
 
@@ -759,10 +742,6 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one non-unique Warg enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
-  51053:forced:2: Forced on the event activeExplored (heard about this card)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one non-unique Warg enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
-    - shuffle the encounter deck
 
 ## 51054 Weighed Down
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -780,4 +759,4 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - choose attachment (any player controls) attached to the defending character
     - discard the picked card
 
-(rendered pieces: 489 by template, 22 as JSON)
+(rendered pieces: 467 by template, 21 as JSON)

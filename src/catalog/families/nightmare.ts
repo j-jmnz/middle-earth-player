@@ -12,7 +12,8 @@ const VERBS = [
   // The source (a treachery being revealed) attaches to the current quest card ("When Revealed: Attach to the current quest", 906107:A:2).
   // It leaves play with that stage, which discards it (rr.attachment-cards). With no quest card in play it stays where it is and goes to the
   // encounter discard pile as a revealed treachery does.
-  z.strictObject({ verb: z.literal("AttachToQuest"), ...when }),
+  // `main`: the main quest card, never a side quest that is the current quest ("Attach to the main quest", mec108.side-quests, 51023:A:2).
+  z.strictObject({ verb: z.literal("AttachToQuest"), main: z.literal(true).optional(), ...when }),
   // The card with this code's printed title is searched for in the encounter deck, then its discard pile, then the victory display, and the
   // first copy found is added to the staging area ("searches the encounter deck, discard pile, and victory display for Khamûl the Easterling and
   // adds it to the staging area", 906101:A:2; rr.search). It is not revealed. Nothing happens when no copy is in those places. The deck is

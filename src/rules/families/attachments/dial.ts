@@ -31,8 +31,8 @@ function codeOf(state: ScenarioState, instruction: { code?: string | undefined }
  * already holds a copy (Limit 1 per threat dial), or no copy is left. */
 export function attachToDial(state: ScenarioState, instruction: Verb<"AttachToDial">, focus: Focus): ScenarioState {
   const code = codeOf(state, instruction, focus);
-  const seat = focus.seat;
-  if (!code || state.seats[seat]?.eliminated || dialCopy(state, seat, code)) return state;
+  const seat = instruction.firstPlayer === true ? state.firstPlayer : focus.seat;
+  if (!code || state.seats[seat]?.eliminated || (instruction.unlimited !== true && dialCopy(state, seat, code))) return state;
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
   const sourceWaiting = source != null && !inPlay(source.zone) ? source.id : undefined;
   const id = instruction.code ? setAsideCopy(state, code) : sourceWaiting;

@@ -10,6 +10,7 @@ const attachSelfText = (i: Obj): Made | null => (isObj(i.to) && i.to.kind === "c
 export const ATTACH_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Made | null>> = {
   AttachSelf: (i) => {
     if (isObj(i.to) && i.to.kind === "enemy") return { text: `attach this card to an enemy in play with the trait ${str(i.to.trait)}${i.to.challenge === true ? " (the opposing team attaches it, so nobody is asked: the enemy with the most hit points left)" : ""}`, read: ["to"] };
+    if (isObj(i.to) && i.to.kind === "character" && i.to.control === "mostAttachments") return { text: "attach this card to the character of any player with the most attachments, among those that carry no copy of this card (the first player chooses among those tied); with none this card is discarded", read: ["to"] };
     const made = attachSelfText(i);
     return made && i.announces === true ? { text: `${made.text} (the attachment is announced as it attaches: a Forced effect on an attachment hears it)`, read: [...made.read, "announces"] } : made;
   },

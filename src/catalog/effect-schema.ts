@@ -210,6 +210,8 @@ const forEachPlayerSchema = verbFlags(z.strictObject({
   // `otherThanGuardian`: each player but him, in player order ("reduce the threat of each player not guarding Gollum by 2", 02133:A:2).
   // `engaged`: only the player the source enemy is engaged with ("the engaged player chooses", 901703:A:2); nobody when it is not engaged.
   seats: z.enum(["guardian", "otherThanGuardian", "engaged"]).optional(),
+  // At most this many players, in the order the effect runs ("one different 0 cost location per player (limit 2)", 51048:A:1).
+  limit: z.number().int().positive().optional(),
   // An Each runs for the player acting: "deal 1 damage to each character controlled by the player guarding Gollum" is an Each of the characters he controls (02138:A:2).
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, eachSchema])),
 }), { runsInFrame: true });

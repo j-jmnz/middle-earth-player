@@ -7,7 +7,8 @@ import { beginEnemyAttack } from "../combat/combat.ts";
 import { attackBarred } from "./constants.ts";
 import { dealForAttack } from "../families/south/watcher.ts";
 import { askTarget, openBranch } from "../windows/choices.ts";
-import { holds } from "./conditions.ts";
+import { holds, shadowBlankOf } from "./conditions.ts";
+import { addModifier } from "../core/keywords.ts";
 import { distinctByCode, targeted } from "./effect-targeted.ts";
 import { pushHide } from "../quest/hide.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -233,7 +234,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, instruction.target === "subject" ? (frameScope(state, item.seat, frame.cardId).subject ?? null) : frame.cardId, item.seat, ctx, steps, { shadow: instruction.shadow !== false, keep: instruction.keepShadows === true });
+      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, instruction.target === "subject" ? (frameScope(state, item.seat, frame.cardId).subject ?? null) : frame.cardId, item.seat, ctx, steps, { shadow: instruction.shadow !== false, keep: instruction.keepShadows === true, ...(instruction.blankBonus != null ? { blankBonus: instruction.blankBonus } : {}) });
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -277,7 +278,8 @@ function expandPlayers(
   if (data?.kind !== "effect") return state;
   // The players sharing the acting player's staging area when areas are joined (families/captured/); every living player otherwise. `seats: "guardian"`: the player guarding Gollum, and the others while a card widens the effect (families/guardian/seats.ts).
   const seats = instruction.seats === "guardian" ? guardianSeats(state, ctx, topFrame(state)?.cardId ?? null) : instruction.seats === "otherThanGuardian" ? otherThanGuardian(state) : instruction.seats === "engaged" ? engagedSeats(state, topFrame(state)?.cardId ?? null) : isolatedAreas(state) ? sharing(state, item.seat) : livingSeats(state);
-  const ordered = instruction.order === "lastFirst" ? [...seats].reverse() : seats;
+  const turned = instruction.order === "lastFirst" ? [...seats].reverse() : seats;
+  const ordered = instruction.limit == null ? turned : turned.slice(0, instruction.limit);
   const expanded = ordered.flatMap((seat) =>
     instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat, chosen: null, ...(cause ? { cause } : {}) })),
   );
@@ -342,8 +344,8 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window. `shadow`: a shadow card is dealt for the attack (the default); `keep`: with none dealt, the shadow cards the enemy holds stay.
-function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean } = {}): ScenarioState {
-  const { shadow = true, keep = false } = options;
+function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean; readonly blankBonus?: number } = {}): ScenarioState {
+  const { shadow = true, keep = false, blankBonus } = options;
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the
   // additional attack its shadow grants against the same player, dealt a shadow card of its own ("Attacking enemy makes an additional attack
@@ -356,7 +358,9 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, seat: nu
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
   // An attack an effect makes is dealt a shadow card of its own (families/defense/listen.ts), unless the card says it is not (`shadow: false`, 18022:A:1).
   const dealt = shadow ? dealAttackShadow(state, sourceId, ctx, steps) : keep ? state : discardShadowOf(state, sourceId);
-  const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
+  // A shadow card with no shadow effect gives the enemy `blankBonus` Attack for this attack (51037:A:1).
+  const bonus = blankBonus != null && shadowBlankOf(dealt, sourceId, ctx) ? addModifier(dealt, sourceId, sourceId, "attack", blankBonus, "endOfAttack") : dealt;
+  const begun = beginEnemyAttack(bonus, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };
 }

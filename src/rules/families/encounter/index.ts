@@ -95,6 +95,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const id = refCard(state, instruction.card ?? "picked", frameScope(state, focus.seat, focus.sourceId));
       const code = id ? state.cards[id]?.code : undefined;
       if (!id || !code) return state;
+      if (instruction.reveal === true) return startReveal(state, focus.seat, ctx, steps, id);
       const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
       return pushCardEffects(state, "whenRevealed", id, focus.seat, false, effects, ctx, steps);
     }

@@ -26,10 +26,9 @@ const ENGAGED_WITH_YOU: PickSpec = { type: "enemy", control: "any", engaged: "yo
 const SOME_PROGRESS: Condition = { kind: "stageProgress", min: 1 };
 const KILLED = { kind: "x", min: 1 } as const;
 
-// "When <location> is explored" is heard as an explored location of the staging area and as the active location.
-const explored = (code: string, line: string, instructions: Instruction[], first = 1): Effect[] => [
-  { id: `${code}:forced:${first}`, cardCode: code, lines: [line], timing: "forced", trigger: "locationExplored", subject: "self", instructions },
-  { id: `${code}:forced:${first + 1}`, cardCode: code, lines: [line], timing: "forced", trigger: "activeExplored", subject: "self", instructions },
+// "When <location> is explored": the trigger `locationExplored` hears the exploring of a location in the staging area and of the active location (triggerHears), so one record serves both.
+const explored = (code: string, line: string, instructions: Instruction[]): Effect[] => [
+  { id: `${code}:forced:1`, cardCode: code, lines: [line], timing: "forced", trigger: "locationExplored", subject: "self", instructions },
 ];
 // "The opposing team searches the top 5 cards of the encounter deck for a card with cost N or less (M or less if there are two or more players) ..." (the A side of every stage 2 and stage 3 card).
 const topSearch = (code: string, line: string, maxCost: number): Effect => ({
@@ -64,7 +63,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "ShuffleEncounterDeck" },
     ],
   },
-  ...explored(RHOSGOBEL, "51001:B:1", [], 1).map((effect): Effect => ({ ...effect, id: effect.id.replace(RHOSGOBEL, STAGE_1), cardCode: STAGE_1, subject: { type: "location", control: "any", names: ["Rhosgobel"] }, instructions: [{ verb: "FlipOver", into: RIDER, target: "subject" }] })),
+  ...explored(RHOSGOBEL, "51001:B:1", []).map((effect): Effect => ({ ...effect, id: effect.id.replace(RHOSGOBEL, STAGE_1), cardCode: STAGE_1, subject: { type: "location", control: "any", names: ["Rhosgobel"] }, instructions: [{ verb: "FlipOver", into: RIDER, target: "subject" }] })),
   { id: "51001:constant:1", cardCode: STAGE_1, lines: ["51001:B:2"], timing: "constant", condition: { kind: "inPlay", code: RHOSGOBEL, is: true }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
   // 51003 A Fork in the Road (stage 2). The location found has a resource on it; while the stage has quest points left it is immune to player card effects and cannot be traveled to (reading 12), and the stage cannot be defeated while it is in play.
@@ -110,7 +109,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51007 The Necromancer's Tower (stage 3): after the characters are committed, discard until a treachery is discarded and reveal it (reading 11); defeating the stage wins the game.
   topSearch("51007", "51007:A:1", 2),
-  { id: "51007:forced:1", cardCode: "51007", lines: ["51007:B:1"], timing: "forced", trigger: "stagingStepBegins", instructions: [{ verb: "DiscardUntil", type: "treachery" }, { verb: "ResolveWhenRevealed", when: { kind: "matches", card: "picked", pick: { type: "treachery", control: "any" }, inPlay: false } }] },
+  { id: "51007:forced:1", cardCode: "51007", lines: ["51007:B:1"], timing: "forced", trigger: "stagingStepBegins", instructions: [{ verb: "DiscardUntil", type: "treachery" }, { verb: "ResolveWhenRevealed", reveal: true, when: { kind: "matches", card: "picked", pick: { type: "treachery", control: "any" }, inPlay: false } }] },
   wins("51007", "51007:B:2"),
 
   // 51008 Dungeons of the Necromancer (stage 3). Each player's chosen hero lies under the enemy he discards until (its tokens discarded, its attachments kept, reading 10); the hero returns exhausted when the enemy leaves play; the stage cannot be defeated while an enemy guards a hero.
@@ -180,7 +179,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: ENEMY_IN_STAGING } } },
     ],
   },
-  { id: "51014:shadow:1", cardCode: "51014", lines: ["51014:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", shadow: false, when: ATTACKER_UNIQUE_OR_NOT }] }] },
+  { id: "51014:shadow:1", cardCode: "51014", lines: ["51014:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", when: ATTACKER_UNIQUE_OR_NOT }] }] },
 
   // 51015 Bane of Amon Lanc: after it destroys an ally the defending player discards 1 card for each excess point of damage.
   { id: "51015:forced:1", cardCode: "51015", lines: ["51015:A:2"], timing: "forced", trigger: "characterDestroyedByAttack", subject: { type: "ally", control: "any" }, eventSeat: "you", condition: { kind: "matches", card: "other", pick: { type: "enemy", control: "any", isSource: true } }, instructions: [{ verb: "DiscardFromHand", amount: { excessOf: "subject" } }] },
@@ -190,7 +189,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51016:travel:1", cardCode: "51016", lines: ["51016:A:2"], timing: "travel", instructions: [EACH_PLAYER([{ verb: "Pick", pick: READY_CHARACTER }, { verb: "Exhaust", target: { kind: "picked" } }])] },
 
   // 51017 Smoking Blood: attached to the Troll with the most hit points left (reading 3), or it gains surge; it is a Condition that cancels the damage that would destroy the enemy and is discarded.
-  { id: "51017:whenRevealed:1", cardCode: "51017", lines: ["51017:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "enemy", trait: "Troll", challenge: true } }, { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: { type: "enemy", control: "any", staging: true, trait: "Troll" } } } }] },
+  { id: "51017:whenRevealed:1", cardCode: "51017", lines: ["51017:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "enemy", trait: "Troll", challenge: true } }, { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: { type: "enemy", control: "any", staging: true, trait: "Troll", hasAttachment: { names: ["Smoking Blood"], none: true } } } } }] },
   { id: "51017:constant:1", cardCode: "51017", lines: ["51017:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "ModifyStat", stat: "cancelsLethalDamage", amount: 1, until: "whileSourceInPlay", target: "host" }] },
 
   // 51018 Forest Flies: raises the defending player's threat by 1 as it attacks. Shadow: raise your threat by 1 for each enemy engaged with you.
@@ -199,7 +198,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51019 Twilight Hall: +1 Threat for each character the first player controls; exploring it reveals 1 encounter card for each player.
   { id: "51019:constant:2", cardCode: "51019", lines: ["51019:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { count: { type: "character", control: "any", controlledBy: "firstPlayer" } }, until: "whileSourceInPlay", target: "self" }] },
-  ...explored("51019", "51019:A:3", [EACH_PLAYER([{ verb: "RevealEncounter" }])], 1),
+  ...explored("51019", "51019:A:3", [EACH_PLAYER([{ verb: "RevealEncounter" }])]),
 
   // 51020 Swarming Mosquitoes: each player deals X damage to a character, X 1 more than the stage number. Shadow: +1 Attack, +2 when the defender has an attachment.
   { id: "51020:whenRevealed:1", cardCode: "51020", lines: ["51020:A:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "Pick", pick: MY_CHARACTER }, { verb: "DamageCard", amount: STAGE_PLUS_1, target: "picked" }])] },
@@ -210,12 +209,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51021:forced:1", cardCode: "51021", lines: ["51021:A:2"], timing: "forced", trigger: "endOfPhase", condition: { kind: "phase", is: "Combat" }, instructions: [damageOneOf(MY_HERO)] },
   { id: "51021:shadow:1", cardCode: "51021", lines: ["51021:A:3"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "defenseIgnored", amount: 1, until: "endOfAttack", target: "attacker" }] },
 
-  // 51022 Pine Slopes: each Pine Slopes gets +2 Threat until the end of the phase. Travel: raise your threat by 1 for each Pine Slopes in the staging area.
+  // 51022 Pine Slopes: each Pine Slopes gets +2 Threat until the end of the phase. Travel: raise your threat (the first player's: he travels, rr.step-4-2, docs/brief.md, The Wizard's Quest, reading 14) by 1 for each Pine Slopes in the staging area.
   { id: "51022:whenRevealed:1", cardCode: "51022", lines: ["51022:A:1"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "threat", amount: 2, until: "endOfPhase", holders: { type: "location", control: "any", names: ["Pine Slopes"] } }] },
-  { id: "51022:travel:1", cardCode: "51022", lines: ["51022:A:2"], timing: "travel", instructions: [{ verb: "RaiseThreat", amount: { count: { type: "location", control: "any", stagingOnly: true, names: ["Pine Slopes"] } }, who: "eachSeat" }] },
+  { id: "51022:travel:1", cardCode: "51022", lines: ["51022:A:2"], timing: "travel", instructions: [{ verb: "RaiseThreat", amount: { count: { type: "location", control: "any", stagingOnly: true, names: ["Pine Slopes"] } }, who: "firstPlayer" }] },
 
   // 51023 Under the Shadow (Doomed 1 is a keyword): attached to the main quest as a Condition; each player cannot play more than 1 card each phase.
-  { id: "51023:whenRevealed:1", cardCode: "51023", lines: ["51023:A:2"], timing: "whenRevealed", instructions: [{ verb: "AttachToQuest" }] },
+  { id: "51023:whenRevealed:1", cardCode: "51023", lines: ["51023:A:2"], timing: "whenRevealed", instructions: [{ verb: "AttachToQuest", main: true }] },
   { id: "51023:constant:1", cardCode: "51023", lines: ["51023:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "LimitPlaysPerPhase", max: 1 }] },
 
   // 51024 Necromancer's Warg: after it engages you, 1 damage to a character you control. Shadow: with an Orc and a Warg enemy engaged with you, discard a character you control.
@@ -235,7 +234,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51025:forced:1", cardCode: "51025", lines: ["51025:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "SearchMove", code: "51024", to: "engaged" }, { verb: "ShuffleEncounterDeck" }] },
 
   // 51026 Watched Path: exploring it discards the top card of the encounter deck; an enemy so discarded is added to the staging area.
-  ...explored("51026", "51026:A:1", [{ verb: "MoveEncounterCard", card: "deckTop", to: "discard" }, { verb: "MoveEncounterCard", card: "picked", to: "staging", when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } } }], 1),
+  ...explored("51026", "51026:A:1", [{ verb: "MoveEncounterCard", card: "deckTop", to: "discard" }, { verb: "MoveEncounterCard", card: "picked", to: "staging", when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } } }]),
 
   // 51027 Evil Storm: each player deals 1 damage to a questing character; each damaged character gets -1 Willpower and cannot be healed until the end of the phase (a lasting effect, faq.lasting-effects). Shadow: 1 damage to the defender.
   {
@@ -253,7 +252,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51028 Spider of Dol Guldur: after it destroys an ally it returns to the staging area. Shadow: the attacker attacks again.
   { id: "51028:forced:1", cardCode: "51028", lines: ["51028:A:1"], timing: "forced", trigger: "characterDestroyedByAttack", subject: { type: "ally", control: "any" }, condition: { kind: "matches", card: "other", pick: { type: "enemy", control: "any", isSource: true } }, instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] },
-  { id: "51028:shadow:1", cardCode: "51028", lines: ["51028:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", shadow: false }] }] },
+  { id: "51028:shadow:1", cardCode: "51028", lines: ["51028:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack" }] }] },
 
   // 51029 Patch of Midnight: at the beginning of the staging step it is discarded and the top card of the encounter deck is revealed. Shadow: if the attack destroys a character, reveal the top card.
   { id: "51029:forced:1", cardCode: "51029", lines: ["51029:A:1"], timing: "forced", trigger: "stagingStepBegins", condition: IN_STAGING, instructions: [{ verb: "Discard", target: { kind: "self" } }, { verb: "RevealEncounter" }] },
@@ -268,7 +267,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51032 The Sorcerer's Tower: while in the staging area each treachery gains Doomed 1; exploring it shuffles the discard pile into the deck and resolves the first treachery discarded.
   { id: "51032:constant:1", cardCode: "51032", lines: ["51032:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "GainsDoomed", amount: 1, pick: { type: "treachery", control: "any" } }] },
-  ...explored("51032", "51032:A:2", [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntil", type: "treachery" }, { verb: "ResolveWhenRevealed", when: { kind: "matches", card: "picked", pick: { type: "treachery", control: "any" }, inPlay: false } }], 1),
+  ...explored("51032", "51032:A:2", [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntil", type: "treachery" }, { verb: "ResolveWhenRevealed", reveal: true, when: { kind: "matches", card: "picked", pick: { type: "treachery", control: "any" }, inPlay: false } }]),
 
   // 51033 Power Sevenfold: the opposing team chooses one non-unique enemy or location in play, the one with the lowest Threat (reading 3), discards it and reveals 1 card. Shadow: either reveal an encounter card or treat the attack as undefended.
   {
@@ -285,7 +284,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51035:travel:1", cardCode: "51035", lines: ["51035:A:2"], timing: "travel", instructions: [{ verb: "SearchMove", code: "51034", top: 5, to: "staging" }, { verb: "ShuffleEncounterDeck" }] },
 
   // 51036 Befouled Equipment: attached to the hero with the most attachments that has no Befouled Equipment (reading: the heroes carry the attachments); at the end of the round an attachment of the host is discarded, this card only when it is the only one.
-  { id: "51036:whenRevealed:1", cardCode: "51036", lines: ["51036:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "mostAttachments" } }] },
+  { id: "51036:whenRevealed:1", cardCode: "51036", lines: ["51036:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "character", control: "mostAttachments" } }] },
   {
     id: "51036:constant:1",
     cardCode: "51036",
@@ -306,9 +305,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
 
-  // 51037 Hunting Warg: after it engages a player it makes an immediate attack; dealt a shadow card with no effect it gets +2 Attack until the end of the phase.
-  { id: "51037:forced:1", cardCode: "51037", lines: ["51037:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "ImmediateAttack" }] },
-  { id: "51037:forced:2", cardCode: "51037", lines: ["51037:A:1"], timing: "forced", trigger: "attackResolved", subject: "self", condition: { kind: "shadowBlank" }, instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", target: "self" }] },
+  // 51037 Hunting Warg: after it engages a player it makes an immediate attack; dealt a shadow card with no effect for that attack it gets +2 Attack for it (ImmediateAttack `blankBonus`, for the attack itself: docs/brief.md, The Wizard's Quest, reading 16).
+  { id: "51037:forced:1", cardCode: "51037", lines: ["51037:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "ImmediateAttack", blankBonus: 2 }] },
 
   // 51038 Hunter's Lookout: while in the staging area it raises each player's threat at the end of the round for each enemy in the staging area. Travel: the highest Attack enemy in the staging area attacks the first player.
   { id: "51038:forced:1", cardCode: "51038", lines: ["51038:A:1"], timing: "forced", trigger: "endOfRound", condition: IN_STAGING, instructions: [{ verb: "RaiseThreat", amount: { count: ENEMY_IN_STAGING }, who: "eachSeat" }] },
@@ -320,7 +318,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51040 Dol Guldur Orcs: each player deals 1 damage to a character he controls. Shadow: the defender gets -1 Defense for each damage on it.
   { id: "51040:whenRevealed:1", cardCode: "51040", lines: ["51040:A:1"], timing: "whenRevealed", instructions: [damageOneOf(MY_CHARACTER)] },
-  { id: "51040:shadow:1", cardCode: "51040", lines: ["51040:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "defense", amount: { stat: "damage", of: "defender", negative: true }, until: "endOfPhase", target: "defender" }] },
+  { id: "51040:shadow:1", cardCode: "51040", lines: ["51040:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "defense", amount: { stat: "damage", of: "defender", negative: true }, until: "endOfAttack", target: "defender" }] },
 
   // 51041 The Shadow Road: while in the staging area it gains a Forced effect after a player optionally engages an enemy: he deals 1 damage to a character he controls. Travel: each player deals 1 damage to a character.
   { id: "51041:forced:1", cardCode: "51041", lines: ["51041:A:1"], timing: "forced", trigger: "optionallyEngaged", condition: IN_STAGING, instructions: [{ verb: "Pick", pick: MY_CHARACTER }, { verb: "DamageCard", amount: 1, target: "picked" }] },
@@ -339,7 +337,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51044:shadow:1", cardCode: "51044", lines: ["51044:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { count: ENGAGED_WITH_YOU }, until: "endOfAttack", target: "attacker" }] },
 
   // 51045 Nightfall (Doomed 1 is a keyword): attached to the first player's threat dial as a Condition; each refresh phase its player raises threat by 1 more.
-  { id: "51045:whenRevealed:1", cardCode: "51045", lines: ["51045:A:2"], timing: "whenRevealed", instructions: [{ verb: "AttachToDial" }] },
+  { id: "51045:whenRevealed:1", cardCode: "51045", lines: ["51045:A:2"], timing: "whenRevealed", instructions: [{ verb: "AttachToDial", firstPlayer: true, unlimited: true }] },
   { id: "51045:constant:1", cardCode: "51045", lines: ["51045:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
   { id: "51045:forced:1", cardCode: "51045", lines: ["51045:A:2"], timing: "forced", trigger: "endOfPhase", condition: { kind: "phase", is: "Refresh" }, instructions: [{ verb: "RaiseThreat", amount: 1, who: "actor" }] },
 
@@ -352,7 +350,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51047:shadow:1", cardCode: "51047", lines: ["51047:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "attacker", when: { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", engagedThisRound: true } } }] },
 
   // 51048 Fastness of Mirkwood: the opposing team finds a different 0 cost location for each player (at most 2) and adds them to the staging area. Shadow: a destroyed character returns the active location to the staging area.
-  { id: "51048:whenRevealed:1", cardCode: "51048", lines: ["51048:A:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "SearchMove", type: "location", maxCost: 0, to: "staging", different: true, byChallenge: true }]), { verb: "ShuffleEncounterDeck" }] },
+  { id: "51048:whenRevealed:1", cardCode: "51048", lines: ["51048:A:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", limit: 2, instructions: [{ verb: "SearchMove", type: "location", maxCost: 0, to: "staging", different: true, byChallenge: true }] } as Instruction, { verb: "ShuffleEncounterDeck" }] },
   { id: "51048:shadow:1", cardCode: "51048", lines: ["51048:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ReturnToStaging", target: { kind: "activeLocation" }, when: KILLED }] }] },
 
   // 51049 Dark Bats: after it damages a character the top card of the encounter deck is revealed and Dark Bats is discarded. Shadow: +1 Attack and an additional shadow card.
@@ -373,7 +371,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51053 The Wargs' Glade: while in the staging area the first Warg enemy revealed each round gains surge; exploring it, the opposing team adds a non-unique Warg enemy found in the deck or discard pile to the staging area.
   { id: "51053:constant:1", cardCode: "51053", lines: ["51053:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "FirstTraitSurge", trait: "Warg", type: "enemy" }] },
-  ...explored("51053", "51053:A:2", [{ verb: "SearchMove", trait: "Warg", type: "enemy", nonUnique: true, to: "staging", byChallenge: true }, { verb: "ShuffleEncounterDeck" }], 1),
+  ...explored("51053", "51053:A:2", [{ verb: "SearchMove", trait: "Warg", type: "enemy", nonUnique: true, to: "staging", byChallenge: true }, { verb: "ShuffleEncounterDeck" }]),
 
   // 51054 Weighed Down: each character with an attachment is exhausted; with none exhausted it gains surge. Shadow: an attachment of the defender is discarded.
   {
