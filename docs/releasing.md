@@ -92,6 +92,10 @@ Secrets: `ANDROID_KEYSTORE_BASE64` (the contents of `keystore.b64`), `ANDROID_KE
 
 After the first release, set the variable `ANDROID_CERT_SHA256` to the certificate fingerprint the `android` job printed (also in the release notes). From then on a build signed with any other key fails before it is published, since players could not update over the last release. Until it is set, each signed build warns with the value to use.
 
+### Asset mirror secrets
+
+Optional. With them, the `assets` job reads the card pictures and PDFs from the asset mirror before their sources and pushes what it had to fetch (`docs/development.md`, Asset mirror). Secrets: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`, from an R2 token with Object Read & Write on the bucket only; the bucket name goes in the variable `R2_BUCKET` (a secret of that name works too). The showcase workflow's pack uses the same ones. Without them the job reads the sources, and a failed push only warns.
+
 ### TestFlight (optional)
 
 Needs a paid Apple Developer Program membership. Each version goes through Beta App Review, which applies the App Review Guidelines (intellectual property included) and can refuse a build. The GitHub release does not wait for it; a refusal only means TestFlight testers miss that release. One-time setup by the owner:

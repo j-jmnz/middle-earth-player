@@ -9,7 +9,7 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 Read whole.
 
 - `CLAUDE.md` — Claude Code (~3.3K tok)
-  - 7–26 Data (~1.3K)
+  - 7–26 Data (~1.4K)
   - 27–46 Commands (~1.3K)
   - 47–50 Agents (~180)
   - 51–54 Skills (~80)
@@ -54,9 +54,9 @@ Read the sections your task touches.
   - 498–501 Support (~90)
   - 502–517 Attribution (~410)
   - 518–521 License (~50)
-- `docs/architecture.md` — Architecture (~28.6K tok)
+- `docs/architecture.md` — Architecture (~28.7K tok)
   - 7–41 Stack (~1.2K)
-  - 42–77 Processes (~690)
+  - 42–77 Processes (~730)
   - 78–162 Modules (~2.4K) ← 3
     - 126–162 Repository map (~1.0K) ← 1
   - 163–188 State (~1.1K) ← 10
@@ -247,13 +247,14 @@ Read the sections your task touches.
     - 495–502 Booklet (~540) ← 2
     - 503–506 Database (~110)
   - 507–526 States (~620)
-- `docs/development.md` — Development (~4.3K tok)
+- `docs/development.md` — Development (~4.7K tok)
   - 5–14 In a browser (~170)
   - 15–32 Checking a screen in a browser (~700) ← 3
   - 33–52 Reading a game as text (~760) ← 4
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
-  - 82–133 Commands (~2.0K) ← 4
+  - 82–134 Commands (~2.1K) ← 4
+  - 135–144 Asset mirror (~360) ← 5
 - `docs/discord-issues.md` — Discord issue bot (~3.7K tok)
   - 5–16 What it does (~290)
   - 17–36 Issue updates (~460)
@@ -272,18 +273,19 @@ Read the sections your task touches.
   - 170–176 Use it (~80)
   - 177–190 Find a problem (~590)
   - 191–196 Change it (~90)
-- `docs/releasing.md` — Releasing (~5.4K tok)
+- `docs/releasing.md` — Releasing (~5.6K tok)
   - 5–20 Start a release (~340) ← 1
   - 21–36 Jobs (~2.1K) ← 4
   - 37–43 Add the desktop app to a release (~350) ← 1
   - 44–47 Installs count (~180) ← 2
   - 48–72 Caches (~820) ← 1
-  - 73–107 Signing (~980) ← 2
+  - 73–111 Signing (~1.1K) ← 2
     - 77–80 Desktop signing (optional) (~220) ← 1
     - 81–94 Android key (~250) ← 1
-    - 95–107 TestFlight (optional) (~420) ← 1
-  - 108–111 Installing (~90)
-  - 112–123 Troubleshooting (~450)
+    - 95–98 Asset mirror secrets (~140) ← 1
+    - 99–111 TestFlight (optional) (~420) ← 1
+  - 112–115 Installing (~90)
+  - 116–127 Troubleshooting (~450)
 
 ## Agent procedures
 
@@ -372,7 +374,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
 - `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Old Forest (1); releasing.md, Add the desktop app to a release (1); releasing.md, Caches (1); releasing.md, Jobs (1)
-- `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Foundations of Stone (1); brief.md, The Two Towers (1)
+- `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); development.md, Asset mirror (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Foundations of Stone (1); brief.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)

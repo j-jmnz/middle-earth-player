@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { BOOKLETS, type BookletId } from "../../src/screens/booklets/books.ts";
 import { BOOKLET_PACK_DIR, DATA_DIR, PDF_CACHE_DIR } from "../data/paths.ts";
+import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { fetchBytes, sha256, type SourceRecord } from "../data/sources/fetch.ts";
 import { bytes, describeError, runScript, type Log } from "../log.ts";
 
@@ -33,11 +34,14 @@ export type PackBookletsOptions = {
   /** Gets each `<id>.pdf` and the `bundled-map.ts` that requires them; metro.config.js puts that map in place of the stub. */
   outDir: string;
   fetch?: (url: string) => Promise<Uint8Array>;
+  // The asset mirror, read before a pin's URL (scripts/data/mirror/client.ts, mirrorReader); null on a miss.
+  mirror?: (hash: string) => Promise<Uint8Array | null>;
 };
 
 /**
  * Copies each book's pinned PDF into the app's assets and writes the map the reader installs from. The `.cache/pdf` copy
- * is used when its hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache). Bytes that do
+ * is used when its hash matches the pin; otherwise the asset mirror's copy, then the pinned URL (a release machine has no
+ * cache), and the fetched PDF is kept in the cache. Bytes that do
  * not match the pin fail the build: run `pnpm data sync rules` to move the pin.
  */
 export async function packBooklets(options: PackBookletsOptions, log: Log): Promise<PackedBooklet[]> {
@@ -57,11 +61,14 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
       copyFileSync(cached, target);
       log.debug(`${id}: ${file} from the cache`);
     } else {
-      log.info(`${id}: ${file} not in the cache at its pin, fetching ${pin.url}`);
-      const body = await fetchPdf(pin.url);
+      const mirrored = await options.mirror?.(pin.sha256);
+      if (!mirrored) log.info(`${id}: ${file} not in the cache at its pin, fetching ${pin.url}`);
+      const body = mirrored ?? (await fetchPdf(pin.url));
       const hash = sha256(body);
       if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data sync rules and check the change.`);
       writeFileSync(target, body);
+      mkdirSync(options.pdfCacheDir, { recursive: true });
+      writeFileSync(cached, body);
     }
     packed.push({ id, filename, bytes: pin.bytes, sha256: pin.sha256 });
   }
@@ -83,7 +90,7 @@ function writeBookletMap(mapPath: string, packed: readonly PackedBooklet[]): voi
 
 /** Packs from this checkout's pins and PDF cache into `assets/booklets`. `data sync rules` runs it after a fetch. */
 export function packBookletsHere(log: Log): Promise<PackedBooklet[]> {
-  return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_PACK_DIR }, log);
+  return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_PACK_DIR, mirror: mirrorReader(mirrorFromEnv(), log) }, log);
 }
 
 function isDirectRun(): boolean {

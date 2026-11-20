@@ -9,6 +9,7 @@ import { SCENE_PICTURE } from "../../src/screens/art/crop.ts";
 import { sniffImage } from "../../src/screens/images/policy.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../data/paths.ts";
 import { fetchBytesRetrying, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
+import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { renderPdfPage } from "../data/sources/pictures.ts";
 import { bytes, runScript, type Log } from "../log.ts";
 
@@ -39,6 +40,8 @@ export type PackScansOptions = {
   scansDir: string;
   mapPath: string;
   fetch?: (url: string) => Promise<Uint8Array>;
+  // The asset mirror, read before a pin's URL (scripts/data/mirror/client.ts, mirrorReader); null on a miss.
+  mirror?: (hash: string) => Promise<Uint8Array | null>;
   render?: (pdfFile: string, page: number) => Uint8Array;
   shrink?: (body: Uint8Array, typeCode: string, side: "A" | "B") => Promise<Uint8Array>;
   // The first quest card of each scenario: its scene is also bundled on its own, at the source's size (`<code>.scene`, sceneOf).
@@ -55,8 +58,8 @@ type Pin = SourceFile & { cacheDir: string };
  * app needs no network (user decision, 2026-10-29) and a quest stage on its B side shows that side. Side B is written as
  * `<code>.B` and keyed so in the map (src/play/canvas/picture-key.ts). The file is the
  * card's `pictures` file of data/sources.json when it has one, else its `scans` file: the cached copy is used when its
- * hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache), and a PDF page is rendered from
- * the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data sync scans pictures` to move the pins.
+ * hash matches the pin; otherwise the asset mirror's copy, then the pinned URL (a release machine has no cache), and a PDF
+ * page the mirror does not hold is rendered from the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data sync scans pictures` to move the pins.
  * A picture larger than MAX_SIDE is scaled down to it. A card with neither is drawn as its text.
  */
 export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
@@ -214,18 +217,24 @@ type RenderNotes = { noPdftoppm: string[]; rehashed: string[] };
 
 type LoadContext = PackScansOptions & { fetchScan: (url: string) => Promise<Uint8Array>; pdfPins: ReadonlyMap<string, SourceFile>; notes: RenderNotes };
 
-// The pinned bytes: the cache at the pin, else the URL, else the PDF page rendered again. A rendered page that hashes
+// The pinned bytes: the cache at the pin, else the mirror, else the URL, else the PDF page rendered again. A rendered page that hashes
 // differently (another poppler) is used with a warning; a page that cannot be rendered (no pdftoppm) returns null.
 async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body: Uint8Array; fetched: boolean } | null> {
   const cached = path.join(pin.cacheDir, path.basename(pin.path));
   if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) return { body: new Uint8Array(readFileSync(cached)), fetched: false };
+  const mirrored = await context.mirror?.(pin.sha256);
+  if (mirrored) {
+    mkdirSync(pin.cacheDir, { recursive: true });
+    writeFileSync(cached, mirrored);
+    return { body: mirrored, fetched: true };
+  }
   const page = pageOf(pin.url);
   if (page) {
     const pdfPin = context.pdfPins.get(page.pdf);
     if (!pdfPin) throw new Error(`${pin.path} is a page of ${page.pdf}, which data/sources.json does not pin. Run pnpm data sync pictures.`);
     const pdfFile = path.join(context.pdfCacheDir, path.basename(pdfPin.path));
     if (!existsSync(pdfFile) || sha256(readFileSync(pdfFile)) !== pdfPin.sha256) {
-      const body = await context.fetchScan(pdfPin.url);
+      const body = (await context.mirror?.(pdfPin.sha256)) ?? (await context.fetchScan(pdfPin.url));
       if (sha256(body) !== pdfPin.sha256) throw new Error(`${pdfPin.url} has sha256 ${sha256(body)}, pinned ${pdfPin.sha256}. Run pnpm data sync pictures and check the change.`);
       mkdirSync(context.pdfCacheDir, { recursive: true });
       writeFileSync(pdfFile, body);
@@ -350,6 +359,7 @@ if (isDirectRun()) {
         scansDir: path.join(root, "assets/scans"),
         mapPath: path.join(root, "src/screens/images/scan-map.ts"),
         sceneCodes: sceneCodesOf(path.join(DATA_DIR, "scenarios")),
+        mirror: mirrorReader(mirrorFromEnv(), log),
       },
       log,
     );

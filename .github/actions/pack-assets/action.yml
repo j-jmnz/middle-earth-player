@@ -33,6 +33,11 @@ runs:
       name: Catalog, booklets and pictures
       shell: bash
       run: pnpm assets --quiet
+    # What the pack fetched from the sources goes to the asset mirror, after a failure too, so the next machine reads it from
+    # there (docs/development.md, Asset mirror). Only with the mirror's secrets; a failed push warns and never fails the pack.
+    - if: always() && env.R2_SECRET_ACCESS_KEY != ''
+      shell: bash
+      run: pnpm data mirror push scans pictures nightmare rules || echo "::warning::The asset mirror push failed; the next pack reads those files from their sources"
     # Saved after a failure too, under a key of its own: pack-scans stamps what it finished, so a rerun fetches only the rest.
     - if: always() && steps.restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
