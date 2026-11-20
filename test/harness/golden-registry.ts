@@ -74,6 +74,7 @@ import * as pony from "../scenarios/murder-at-the-prancing-pony/game.ts";
 import * as annuminas from "../scenarios/the-siege-of-annuminas/game.ts";
 import * as guldur from "../scenarios/attack-on-dol-guldur/game.ts";
 import * as quest from "../scenarios/the-wizards-quest/game.ts";
+// import * as woodland from "../scenarios/the-woodland-realm/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -174,4 +175,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-siege-of-annuminas", "The Siege of Annúminas", annuminas.ANNUMINAS_GOLDENS, annuminas.annuminasWorld, annuminas.playGolden),
   entry("attack-on-dol-guldur", "Attack on Dol Guldur", guldur.GULDUR_GOLDENS, guldur.guldurWorld, guldur.playGolden),
   entry("the-wizards-quest", "The Wizard's Quest", quest.QUEST_GOLDENS, quest.questWorld, quest.playGolden),
+  // entry("the-woodland-realm", "The Woodland Realm", woodland.WOODLAND_GOLDENS, woodland.woodlandWorld, woodland.playGolden),
 ];
