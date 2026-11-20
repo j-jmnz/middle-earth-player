@@ -1,5 +1,5 @@
 // Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost and Murder at the Prancing Pony: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony and The Siege of Annúminas: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -22,19 +22,20 @@ const forest = loadAnyScenario("the-old-forest");
 const fog = loadAnyScenario("fog-on-the-barrow-downs");
 const ruins = loadAnyScenario("the-ruins-of-belegost");
 const murder = loadAnyScenario("murder-at-the-prancing-pony");
+const siege = loadAnyScenario("the-siege-of-annuminas");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 7, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 8, playable: true, box: null })]);
   });
 });
 
@@ -286,5 +287,47 @@ describe("Murder at the Prancing Pony", () => {
     expect(ledger.byKey.get(keyOf("50704", "A"))?.lines[2]).toMatch(/discard pile, and victory display/);
     expect(ledger.byKey.get(keyOf("50726", "A"))?.lines[1]).toMatch(/attached and return that enemy/);
     expect(ledger.byKey.get(keyOf("50722", "A"))?.lines[0]).toMatch(/Bree-land Informant makes an attack/);
+  });
+});
+
+describe("The Siege of Annúminas", () => {
+  it("has codes 508 and the collector number, which Hall of Beorn's 00001 to 00032 would share with The Massing at Osgiliath's (overrides.productCodes), the two mode cards and Standard Game Mode's stages 1A to 3A", () => {
+    expect(siege).toMatchObject({ id: "the-siege-of-annuminas", name: "The Siege of Annúminas", stages: ["50803", "50804", "50805"] });
+    expect(siege.campaignCard).toBeUndefined();
+    expect(siege.campaignPlaced).toEqual([]);
+    expect(siege.source).toMatchObject({ dragnNormal: "Q99.08", dragnEasy: "Q99.08" });
+    expect(siege.nightmare).toBeUndefined();
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TSoA"));
+    expect(own.map((card) => card.code)).toEqual(Array.from({ length: 32 }, (_, at) => `508${String(at + 1).padStart(2, "0")}`));
+    expect(byCode.get("02095")?.printings.some((printing) => printing.pack === "TSoA")).toBe(false);
+    expect(byCode.get("50801")).toMatchObject({ name: "Standard Game Mode", type: "campaign" });
+    expect(byCode.get("50802")).toMatchObject({ name: "Epic Multiplayer Mode", type: "campaign" });
+    expect(byCode.get("50812")?.name).toBe("Annúminas");
+  });
+
+  it("deals the 35 encounter cards, Annúminas staged by the mode card's Setup and the Lieutenant, Battering Ram, Enemy Camp, Siege Tunnel, 3 Hosts and 3 Dúnedain set aside (50803:A:1, 50801:A:1), on Normal and Easy alike", () => {
+    for (const seats of [1, 2, 3, 4]) {
+      expect(encounterCodes(siege, "Normal", seats), `${seats} seats`).toHaveLength(35);
+      expect(encounterCodes(siege, "Easy", seats), `${seats} seats`).toHaveLength(35);
+    }
+    for (const difficulty of ["Normal", "Easy"] as const) {
+      expect(setupInstructions(siege, difficulty).filter((step) => step.verb === "SetAside").map((step) => step.code).sort(), difficulty).toEqual(["50813", "50814", "50815", "50816", "50817", "50817", "50817", "50818", "50818", "50818"]);
+    }
+    expect(siege.cards.find((card) => card.code === "50812")).toMatchObject({ pile: "staging", normal: 1, easy: 1 });
+    expect(siege.cards.some((card) => ["50801", "50802", "50806", "50807", "50808", "50809", "50810", "50811"].includes(card.code))).toBe(false);
+  });
+
+  it("has every printed side read from its scan, the mode cards and the Epic stages included, with the printed typos kept under misprints", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("508")).flatMap((card) => (card.type === "quest" || card.type === "campaign" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(43);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("50801", "A"))?.lines[0]).toMatch(/Remove the 1C-3C deck and the 1E-3E deck/);
+    expect(ledger.byKey.get(keyOf("50801", "A"))?.misprints).toHaveLength(1);
+    expect(ledger.byKey.get(keyOf("50801", "B"))?.lines).toHaveLength(2);
+    expect(ledger.byKey.get(keyOf("50803", "A"))?.lines[0]).toMatch(/each copy of Host of Angmar, and each copy of Dúnedain of Annúminas aside/);
+    expect(ledger.byKey.get(keyOf("50803", "A"))?.misprints[0]?.printed).toMatch(/each copy Dúnedain of Annúminas/);
+    expect(ledger.byKey.get(keyOf("50808", "B"))?.lines[0]).toBe("Progress cannot be placed here while Enemy Camp is in play.");
+    expect(ledger.byKey.get(keyOf("50831", "A"))?.lines[0]).toMatch(/^When Revealed: Each player must choose/);
   });
 });

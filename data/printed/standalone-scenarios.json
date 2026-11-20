@@ -3563,6 +3563,765 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "50801",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Standard-Game-Mode-SetupA.jpg",
+        "sha256": "62a39768c925ae1326dfd69993bebe0ee1a13436ff2dddfe556cde97af1b53bf"
+      },
+      "lines": [
+        "Setup: Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E. Remove the 1C-3C deck and the 1E-3E deck from the game. Search the encounter deck for Annúminas, add it to the staging area, and set its city strength to 20. Flip this card over and place it next to the quest deck."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Setup: Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E. Remove the 1C-3C deck and the 1E-3E deck from the game. Search the encounter deck for Annúminas, add it to the staging area, and set its city strength to 20. Flip this card over and place it next to the the quest deck."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50801",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Standard-Game-Mode-SetupB.jpg",
+        "sha256": "dcdfb58b66d84550217d62b8098170a5d620197a24fb668dbc5ede7eaa4eb3da"
+      },
+      "lines": [
+        "Forced: When the players advance to stage 2A (and before resolving its 'when revealed' effect), shuffle each set aside Dúnedain of Annúminas into the encounter deck. Then, shuffle X copies of Host of Angmar into the encounter deck, where X is one less than the number of players in the game, to a minimum of 1.",
+        "If a player is eliminated from the game, deal 9 damage to Annúminas."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50802",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Epic-Multiplayer-Mode-SetupA.jpg",
+        "sha256": "c078a6d079e096ddc5620095696c051f9cc5a47b116d999d2a933c7528b0ac45"
+      },
+      "lines": [
+        "Setup: Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E. Create three separate staging areas, one for each quest deck. Give each stage its own encounter deck. Divide the players into 3 teams, one team for each stage. The team at stage 1A searches the encounter deck for Annúminas, adds it to their staging area and sets its city strength to 50. Each other team removes their copy of Annúminas from the game. Flip over all 3 Setup cards and place 1 next to each quest deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50802",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Epic-Multiplayer-Mode-SetupB.jpg",
+        "sha256": "9374dfa2c7115524cc1f1a18d7da5d7497986c5d6354c2725a46459985c933d5"
+      },
+      "lines": [
+        "Each stage 2 can only be defeated at the beginning of the round, and only if each other stage 2 is complete.",
+        "While the players are at stage 2, each stage gains: \"Forced: At the end of the round, each Host of Angmar in the staging area moves to the next staging area in descending alphabetical order. If it cannot move, discard it and deal 9 damage to Annúminas.\"",
+        "For example: At the end of the round, there is a Host of Angmar in the staging area at stage 2F. After the teams at stage 2B and 2D resolve their end-of-round effects, the Host of Angmar in the staging area at stage 2F moves to the staging area of stage 2D.",
+        "If the last player at a stage is eliminated, the enemy has broken through the city's defenses and all teams lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50803",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Rebuild-the-Defenses-1A.jpg",
+        "sha256": "b94edadf5aeecc3cd4948882e2cde77f238f0f6e0a9b9a779f12f5420f3fbdb1"
+      },
+      "lines": [
+        "Setup: Set Lieutenant of Angmar, Battering Ram, Enemy Camp, Siege Tunnel, each copy of Host of Angmar, and each copy of Dúnedain of Annúminas aside, out of play. Each player searches the encounter deck for a different location and adds it to the staging area. One of those locations must be Gate of Annúminas. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Setup: Set Lieutenant of Angmar, Battering Ram, Enemy Camp, Siege Tunnel, each copy of Host of Angmar, and each copy Dúnedain of Annúminas aside, out of play. Each player searches the encounter deck for a different location and adds it to the staging area. One of those locations must be Gate of Annúminas. Shuffle the encounter deck."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50803",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Rebuild-the-Defenses-1B.jpg",
+        "sha256": "6eb2d88884acbfd702888095b2c7b3759fa6e9a1672c5265f2675425f6c150c2"
+      },
+      "lines": [
+        "Forced: At the beginning of the round (before the resource phase), place 1 resource here. Then, if there are 4 resources here, advance to stage 2.",
+        "Response: At the end of the round, remove 10 progress from this stage to increase the city strength of Annúminas by 10."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50804",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Defend-the-City-2A.jpg",
+        "sha256": "3261166715784d79fcf4d1b52eb19b8541a202aa923b452c473eca77ccbe6b68"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded. X is one less than the number of players at this stage, to a minimum of 1. Add each enemy discarded in this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50804",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Defend-the-City-2B.jpg",
+        "sha256": "1ad678477b5fe5b58ba2c094e6c7bde2274bf7649a4ef7b62674ab98e239dd7a"
+      },
+      "lines": [
+        "This stage gets -10 quest points for each Host of Angmar in a victory display.",
+        "Forced: After the players have committed characters to the quest, the highest Attack enemy in the staging area makes an attack against each player in turn order. If no attacks are made in this way, reveal the top card of the encounter deck.",
+        "Response: At the end of the round, choose a stage. Each player at that stage heals 1 damage from a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50805",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Lead-the-Sortie-3A.jpg",
+        "sha256": "86ac5639fad2caa3b13f39db214f297d9366f81f1cae33b02f6079c142ef1b65"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck. The first player adds Battering Ram and Lieutenant of Angmar to the staging area. Each other player reveals an encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50805",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Lead-the-Sortie-3B.jpg",
+        "sha256": "2a3276cbf6b9d3fc922074cb160ca5b79dd3be8f95c5bd480e485fd8f9a1c5eb"
+      },
+      "lines": [
+        "Progress cannot be placed here while Battering Ram is in play.",
+        "Response: At the end of the round, raise each player's threat by 1 and reveal an encounter card to choose a non-unique enemy worth no victory points at another stage. Discard the chosen enemy.",
+        "If Lieutenant of Angmar is in a victory display at the end of the round, the players have routed the enemy and win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50806",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Raise-the-Levee-C-1C.jpg",
+        "sha256": "b3f63d62d5f7018cbfbd2ae58adc8dfd1edcbb83e46e4c3ec2f3b45104aa3525"
+      },
+      "lines": [
+        "Setup: Set Lieutenant of Angmar, Battering Ram, Enemy Camp, Siege Tunnel, each copy of Host of Angmar, and each copy of Dúnedain of Annúminas aside, out of play. Shuffle the encounter deck. Each player discards cards from the top of the encounter deck until he discards an enemy or location. Add each enemy and location discarded in this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Setup: Set Lieutenant of Angmar, Battering Ram, Enemy Camp, Siege Tunnel, each copy of Host of Angmar, and each copy Dúnedain of Annúminas aside, out of play. Shuffle the encounter deck. Each player discards cards from the the top of the encounter deck until he discards an enemy or location. Add each enemy and location discarded in this way to the staging area."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50806",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Raise-the-Levee-C-1D.jpg",
+        "sha256": "d900731fa2e2a3b8a5482420faabbdad80ce1058025fdd3dc55c32ccae48abe1"
+      },
+      "lines": [
+        "Forced: At the beginning of the round (before the resource phase), place 1 resource here. Then, if there are 4 resources here, advance to stage 2.",
+        "Response: At the end of the round, remove 10 progress from this stage. Then, the first player at each stage takes control of a set aside Dúnedain of Annúminas."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50807",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Guard-the-Gate-C-2C.jpg",
+        "sha256": "d6df5f84d3dab187fe76778302e6cd406f57727fb63a89c9088f70e2fab9da6d"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded. X is one less than the number of players at this stage, to a minimum of 1. Add each enemy discarded in this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50807",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Guard-the-Gate-C-2D.jpg",
+        "sha256": "a915dc601c73d65c907ea4ce899a5fd2da7a97d28e4294864331df254d30b66b"
+      },
+      "lines": [
+        "This stage gets -10 quest points for each Host of Angmar in a victory display.",
+        "Forced: Reveal 1 additional card during the quest phase.",
+        "Response: At the end of the round, choose a stage. Each player at that stage chooses a hero he controls and adds 1 resource to that hero's pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50808",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Rescue-the-Captives-C-3C.jpg",
+        "sha256": "ffb8c603db30fb6dc83f5baebd936e0836f7afe0622125691b38accff95e8437"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck. The first player adds Enemy Camp to the staging area. Each other player reveals an encounter card. Each player at each stage chooses a hero he controls, discards all tokens and attachments from it, and places it facedown under the main quest at their stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50808",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Rescue-the-Captives-C-3D.jpg",
+        "sha256": "efcc7da7c97319d2f84a00758f24d3e092ed5c67f320e354be5b0c69cb74caa7"
+      },
+      "lines": [
+        "Progress cannot be placed here while Enemy Camp is in play.",
+        "Response: At the end of the round, raise each player's threat by 1 and reveal an encounter card to choose a non-unique enemy worth no victory points at another stage. Discard the chosen enemy.",
+        "If Lieutenant of Angmar is in a victory display at the end of the round, the players have routed the enemy and won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50809",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Delay-the-Enemy-E-1E.jpg",
+        "sha256": "1f1dfeeefb5021a39d07882684086c80e68cd2eee10671936fac506cea1289d4"
+      },
+      "lines": [
+        "Setup: Set Lieutenant of Angmar, Battering Ram, Enemy Camp, Siege Tunnel, each copy of Host of Angmar, and each copy of Dúnedain of Annúminas aside, out of play. Each player searches the encounter deck for a different enemy and adds it to the staging area. One of those enemies must be Vanguard of Carn Dûm. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Setup: Set Lieutenant of Angmar, Battering Ram, Enemy Camp, Siege Tunnel, each copy of Host of Angmar, and each copy Dúnedain of Annúminas aside, out of play. Each player searches the enocunter deck for a different enemy and adds it to the staging area. One of those enemies must be Vanguard of Carn Dûm. Shuffle the encounter deck."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50809",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Delay-the-Enemy-E-1F.jpg",
+        "sha256": "2d11d283b62435c193fa65ae9e39e87f3635deb2d685112949a8df7a28e79357"
+      },
+      "lines": [
+        "Forced: At the beginning of the round (before the resource phase), place 1 resource here. Then, if there are 4 resources here, advance to stage 2.",
+        "Response: At the end of the round, remove 10 progress from this stage, then the players at each other stage reveal 1 fewer encounter card during their next quest phase (to a minimum of 0)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50810",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Man-the-Walls-E-2E.jpg",
+        "sha256": "87f22775d262fca08fbb09e587bfd677cb5bad09222c4de145c2ca845f7187ee"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded. X is one less than the number of players at this stage, to a minimum of 1. Add each enemy discarded in this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50810",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Man-the-Walls-E-2F.jpg",
+        "sha256": "c1fdbe33366d647686b970fbd73e1483054e263f553af3b8f3ab25d39c4795e2"
+      },
+      "lines": [
+        "This stage gets -10 quest points for each Host of Angmar in a victory display.",
+        "Forced: At the beginning of the round, add 1 set aside Host of Angmar (from any stage's set aside area) to this staging area.",
+        "Response: At the end of the round, choose a stage. Each player at that stage draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50811",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Stop-the-Attack-E-3E.jpg",
+        "sha256": "8536797d2bd6f256d57602621cac9940e52bcc8e31152103a69c68582e5e4bce"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck. The first player adds Siege Tunnel to the staging area. Each other player reveals an encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50811",
+      "side": "B",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Stop-the-Attack-E-3F.jpg",
+        "sha256": "5c952e5a1b8f6335e68ed9df686de9e1e3d32a5a99820751dda644d29d916cf4"
+      },
+      "lines": [
+        "Progress cannot be placed here while Siege Tunnel is in play.",
+        "Response: At the end of the round, raise each player's threat by 1 and reveal an encounter card to choose a non-unique enemy worth no victory points at another stage. Discard the chosen enemy.",
+        "If Lieutenant of Angmar is in a victory display at the end of the round, the players have routed the enemy and won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50812",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Annúminas.jpg",
+        "sha256": "3cf5949f2f503d229060aae429ee884183b5366bc579dfaaecfdb62c33f070fb"
+      },
+      "lines": [
+        "Forced: At the end of the round, deal 1 damage to Annúminas for each enemy at each stage.",
+        "If the city strength of Annúminas reaches 0, the city is overrun by the forces of Angmar and all teams lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50813",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Lieutenant-of-Angmar.jpg",
+        "sha256": "0db36b3ddb8fb4173bb3253ebcba72903d81b3fd8ff982477fceb5e9cb196537"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Lieutenant of Angmar cannot take damage unless there is at least 10 progress on the main quest.",
+        "Forced: At the end of the round, Lieutenant of Angmar moves to the staging area with the lowest total Threat and makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50814",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Battering-Ram.jpg",
+        "sha256": "299538cd0bee32338bcd666b628f29f8e18a4eec33a4905a8a0c13fc1c0e1dac"
+      },
+      "lines": [
+        "X is 1 more than the number of resources on Battering Ram. Immune to player card effects.",
+        "Forced: At the end of the round, place 1 resource on Battering Ram. Then, deal X damage to Annúminas.",
+        "Travel: Reveal 1 encounter card per player to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50815",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Enemy-Camp.jpg",
+        "sha256": "a5f2b6be761a1ac864624723c7d77ff46f0d2f761bc94b360b8854db8336be75"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: At the end of the round, if Enemy Camp is in play, discard 1 random facedown hero from under each stage 3. If Enemy Camp is in the victory display, return each hero under each stage 3 to its owner's control instead.",
+        "Travel: Reveal 1 encounter card per player to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50816",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Siege-Tunnel.jpg",
+        "sha256": "8aebdd0a6401f54ac5c1e3f8d892ce2cc7c29078c835f4c11ed2875955a75a1d"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: At the end of the round, each team discards from the top of their encounter deck until an enemy is discarded and adds that enemy to their staging area.",
+        "Travel: Reveal 1 encounter card per player to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50817",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Host-of-Angmar.jpg",
+        "sha256": "776f9abea67e96d6087b26af1f25ce8d684db24378be801bcf1031b2ff18f43f"
+      },
+      "lines": [
+        "Archery 2.",
+        "Immune to player card effects.",
+        "Forced: After Host of Angmar attacks and destroys a character, either remove 2 progress from the main quest, or return Host of Angmar to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50818",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Dúnedain-of-Annúminas.jpg",
+        "sha256": "c3258db921bcfdbc868cfc5d0077f1b635d59891010a39b409427378389283c4"
+      },
+      "lines": [
+        "Surge. Ranged. Sentinel.",
+        "When Revealed: Any player may spend 1 resource to take control of Dúnedain of Annúminas. Otherwise, discard it.",
+        "Shadow: Ready the defending character and give it +2 Defense for this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50819",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Gate-of-Annúminas.jpg",
+        "sha256": "6dbb2e85a9f3eb4040e25b15ef2213319fe2eb67dec99e72e88d47baf5dbb66b"
+      },
+      "lines": [
+        "X is 1 more than the number of enemies in play.",
+        "Travel: Each player engages an enemy in the staging area to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50820",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/City-Wall.jpg",
+        "sha256": "0249934069176dd7a7bac3b9021db77753cb864078763bf7471ab1d453874cb9"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: At the end of the round, place 1 resource on City Wall. Then, if there are 3 resources here, discard City Wall to deal 4 damage to Annúminas and reveal an encounter card.",
+        "Travel: Reveal the top card of the encounter deck to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50821",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Arnor-Battlefield.jpg",
+        "sha256": "36f5e53c5e36ec516ee4ccc889f8f6283ed82e01afb48a6233c91f92dd193cfa"
+      },
+      "lines": [
+        "While Arnor Battlefield is in the staging area, each non-unique enemy gets -5 engagement cost.",
+        "Travel: Each player deals 1 damage to a hero he controls to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50822",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Hills-of-Evendim.jpg",
+        "sha256": "49c8e194cba1ee7693726423bb0efed6b55a034a454724a718f8f6436a898685"
+      },
+      "lines": [
+        "While Hills of Evendim is in the staging area, 'when revealed' effects cannot be canceled.",
+        "Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add the discarded enemy to the staging area to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50823",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Shores-of-Lake-Nenuial.jpg",
+        "sha256": "db4e4124f3cf3db61271018e55f3d631f85e4edb197dfa949bc3e538ce1c7f2f"
+      },
+      "lines": [
+        "While Shores of Lake Nenuial is in the staging area, progress cannot be placed on other locations in the staging area.",
+        "Travel: Raise each player's threat by 2 to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50824",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Warg-of-Carn-Dûm.jpg",
+        "sha256": "12ae5c4e6a6ee931753415aa2364d58b3e840350095e28aed9981d25914838f3"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Warg of Carn Dûm engages you, either remove 1 progress from the main quest, or exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50825",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Orc-of-Angmar.jpg",
+        "sha256": "6f4490cd62083bddc139dd4a159b753f876a6790d67b1e0c14605219263e4964"
+      },
+      "lines": [
+        "Archery 1.",
+        "Forced: When Orc of Angmar attacks, either remove 1 progress from the main quest, or it gets +2 Defense until the end of the phase.",
+        "Shadow: Defender gets -2 Defense until end of round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50826",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Angmar-Warg-rider.jpg",
+        "sha256": "2207539d7fe5feab6cc12354cb2e2cec752c7eed9091b952691d1187db1788f7"
+      },
+      "lines": [
+        "Archery 1.",
+        "Forced: After Angmar Warg-rider engages you, either remove 2 progress from the main quest, or it makes an immediate attack.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50827",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Savage-Werewolf.jpg",
+        "sha256": "d80342140b66eeb0e92cd2084eef96b5ac19ad9809bdcff5a7f63d880ccbecf3"
+      },
+      "lines": [
+        "Forced: After Savage Werewolf attacks and destroys a character, remove 3 progress from the main quest.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50828",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Vanguard-of-Carn-Dûm.jpg",
+        "sha256": "cbae40838c628359f9bdc5cc57c6cf749fc715e06871b30bd113d1f128efa471"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "While Vanguard of Carn Dûm is in the staging area, no more than 5 progress can be placed on the main quest each round.",
+        "Shadow: Defender cannot ready this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50829",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/The-Hordes-of-Angmar.jpg",
+        "sha256": "b1e6ea92f9e6e84b9a41264fc47b5f4791fabf4c192c0f3e410a532ce2d650fd"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either return the highest Threat enemy engaged with you to the staging area, or search the encounter deck and discard pile for an enemy and put it into play engaged with you.",
+        "Shadow: If this attack destroys a character, reveal the top card of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50830",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Sorcery-of-Carn-Dûm.jpg",
+        "sha256": "08fd9c4a120f828c09afb2e32c5ff62e83df68d56c0567801d8b5b549b349a87"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player must choose: either discard the highest cost attachment you control, or assign X damage among characters you control, where X is the number of attachments you control.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50831",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Caught-in-the-Press.jpg",
+        "sha256": "42a8a2de1a00da143e1ab34bcc0789104365c2872e40212250045219e74bf86a"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either deal 1 damage to each questing character you control, or each questing character you control gets -1 Willpower until the end of the phase.",
+        "Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50832",
+      "side": "A",
+      "printing": "TSoA",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Weary-Warriors.jpg",
+        "sha256": "3e3d15adedafc49b36d1810c926e867439920a1c719e17d0e54d4f8fb1d568b0"
+      },
+      "lines": [
+        "When Revealed: Each player deals 1 damage to a hero he controls. If that hero is questing, remove it from the quest. Until the end of the round, treat each damaged character's text box as if it were blank (except for Traits).",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender is damaged)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

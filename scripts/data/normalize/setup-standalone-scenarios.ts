@@ -79,6 +79,21 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     const staged = names.codesOf(match[3] ?? "");
     return active.length === 0 || staged.length === 0 ? null : [{ kind: "active", codes: active }, { kind: "stage", codes: staged, perPlayer: null, count: /^\d+$/.test(match[2] ?? "") ? Number(match[2]) : 1 }];
   }
+  // The Siege of Annúminas (50803): "Each player searches the encounter deck for a different location and adds it to the staging area. One of those locations must be Gate of Annúminas.": the line after
+  // the search names the one location that is not free to choose.
+  if ((match = /^One of those locations must be (.+)$/.exec(sentence))) {
+    const codes = names.codesOf(match[1] ?? "");
+    return codes.length === 0 || names.without(match[1] ?? "").replace(/\s/g, "") !== "" ? null : [{ kind: "step", step: "gateAmongLocations", codes }];
+  }
+  // The Siege of Annúminas' Standard Game Mode (50801): "Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E. Remove the 1C-3C deck and 1E-3E deck from the game. Search the
+  // encounter deck for Annúminas, add it to the staging area, and set its city strength to 20. Flip this card over and place it next to the quest deck."
+  if (/^Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E$/.test(sentence)) return [{ kind: "step", step: "arrangeQuestDecks", codes: [] }];
+  if (/^Remove the 1C-3C deck and (?:the )?1E-3E deck from the game$/.test(sentence)) return [{ kind: "step", step: "removeQuestDecks", codes: [] }];
+  if ((match = /^Search the encounter deck for (.+?), add it to the staging area, and set its city strength to (\d+)$/.exec(sentence))) {
+    const codes = names.codesOf(match[1] ?? "");
+    return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: null, count: 1 }, { kind: "step", step: "setCityStrength", codes, count: Number(match[2]) }];
+  }
+  if (/^Flip this card over and place it next to the quest deck$/.test(sentence)) return [{ kind: "step", step: "flipModeCard", codes: [] }];
   // "Shuffle any unused Scoutcards back into the encounter deck" (the card prints "Scoutcards"): the copies not staged stay in the encounter deck.
   if (/^Shuffle any unused Scout ?cards back into the encounter deck$/.test(sentence)) return [{ kind: "shuffleEncounterDeck" }];
   return null;

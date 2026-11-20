@@ -1416,6 +1416,13 @@
   ],
   "scenarioPiles": [
     {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50812",
+      "pile": "staging",
+      "reason": "DragnCards loads Annúminas set aside (Q99.08). The Standard Game Mode card (50801) prints \"Setup: ... Search the encounter deck for Annúminas, add it to the staging area, and set its city strength to 20.\", so it starts in the staging area.",
+      "source": "scan 50801.A; dragncards preBuiltDecks.json (Q99.08)"
+    },
+    {
       "scenario": "mount-gundabad",
       "code": "19143",
       "pile": "attachedChosen",
@@ -2115,6 +2122,12 @@
   ],
   "productCodes": [
     {
+      "set": "The Siege of Annúminas",
+      "prefix": "508",
+      "reason": "Hall of Beorn numbers The Siege of Annúminas's cards 00001 to 00032 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of TSoA. A code must name one card, so the earlier standalone packs keep their codes and the Siege's are 508 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 8 for the pack's position in it (50801 Standard Game Mode, 50832 Weary Warriors). Boromir (02095) and Faramir (06081), which Hall of Beorn tags with the product, are RingsDB's own cards and keep their codes.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Siege of Annúminas, Number, RingsDbCardId); ringsdb.com packs (TSoA, cycle 50, position 8; no cards listed)"
+    },
+    {
       "set": "Murder at the Prancing Pony",
       "prefix": "507",
       "reason": "Hall of Beorn numbers Murder at the Prancing Pony's cards 00001 to 00029 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and others, and RingsDB lists no card of MatPP. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 507 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 7 for the pack's position in it (50701 Investigating the Crime, 50729 Deadly Accusations). Legolas (01005), the product's player card, is RingsDB's Core Set hero and keeps his code.",
@@ -2210,6 +2223,12 @@
     }
   ],
   "dragnPackAliases": [
+    {
+      "dragncards": "The Siege of Annuminas",
+      "pack": "TSoA",
+      "reason": "DragnCards spells the pack's name without the accent (\"The Siege of Annuminas\"); its rows' collector numbers (12 to 32) and names find the cards of TSoA, whose Hall of Beorn numbers they equal.",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); data/raw/ringsdb/packs.json"
+    },
     {
       "dragncards": "The Battle of Lake-Town",
       "pack": "TBoLT",
@@ -2428,6 +2447,54 @@
     }
   ],
   "scenarioExcluded": [
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50801",
+      "reason": "Standard Game Mode is the mode card, not a card a pile deals: its Setup (Annúminas to the staging area with city strength 20, the three quest decks) and its back's Forced effect run from beside the quest deck, as the Hard Mode card of Dream-chaser does. DragnCards loads it as a Campaign row and Hall of Beorn's scenario list counts it once, so the count check skips it.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (ScenarioCards); dragncards preBuiltDecks.json (Q99.08); scan 50801.A and 50801.B"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50802",
+      "reason": "Epic Multiplayer Mode is the mode card of the Epic Multiplayer Mode of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50806",
+      "reason": "Raise the Levee is stage 1C of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50807",
+      "reason": "Guard the Gate is stage 2C of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50808",
+      "reason": "Rescue the Captives is stage 3C of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50809",
+      "reason": "Delay the Enemy is stage 1E of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50810",
+      "reason": "Man the Walls is stage 2E of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
+    {
+      "scenario": "the-siege-of-annuminas",
+      "code": "50811",
+      "reason": "Stop the Attack is stage 3E of The Siege of Annúminas, which the app does not play: Epic Multiplayer Mode divides the players into three teams at three stages (1A, 1C and 1E, each with its own staging area and encounter deck). The Standard Game Mode's Setup arranges the quest cards into three quest decks and removes the 1C to 3C and 1E to 3E decks from the game, so the scenario's stages are 1A, 2A and 3A, as DragnCards' Standard deck Q99.08 deals them. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas (QuestCards); dragncards preBuiltDecks.json (Q99.08 Standard, Q99.09 Epic); quest card 50801 Setup"
+    },
     {
       "scenario": "the-siege-of-gondor",
       "code": "145072",

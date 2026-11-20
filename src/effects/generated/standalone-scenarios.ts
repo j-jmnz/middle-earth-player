@@ -18,4 +18,6 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"50712:constant:1","cardCode":"50712","lines":["50712:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"50713:constant:1","cardCode":"50713","lines":["50713:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"50719:travel:1","cardCode":"50719","lines":["50719:A:3"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
+  {"id":"50820:travel:1","cardCode":"50820","lines":["50820:A:3"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
+  {"id":"50828:constant:1","cardCode":"50828","lines":["50828:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
 ];

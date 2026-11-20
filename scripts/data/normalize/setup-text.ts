@@ -137,6 +137,12 @@ export type SetupStep =
   | "findSuspectsAndHideouts" // "Search the encounter deck for the 5 Suspect enemies and 5 Hideout locations": `codes` the ten
   | "hideSuspectAndHideout" // "Randomly select 1 Suspect and 1 Hideout and set them aside out of play, facedown (without looking at them)": `codes` the ten
   | "buildInvestigationDeck" // "Build the Investigation deck (see rules)": `codes` the ten and Taken by Surprise; the eight not hidden and Taken by Surprise are shuffled facedown into the deck
+  // The Siege of Annúminas: quoted from the stage 1A card Setup (50803).
+  | "arrangeQuestDecks" // "Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E" (Standard Game Mode, 50801)
+  | "removeQuestDecks" // "Remove the 1C-3C deck and 1E-3E deck from the game": the six quest cards of the other two decks
+  | "setCityStrength" // "set its city strength to 20": `codes` Annúminas, `count` the strength
+  | "flipModeCard" // "Flip this card over and place it next to the quest deck": the mode card's back (its Forced lines) is in play all game
+  | "gateAmongLocations" // "One of those locations must be Gate of Annúminas": `codes` Gate of Annúminas, one of the locations the players search for
   | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"
   | "addToStartingHand" // "Each player adds 1 copy of Determination to their starting hand"
   | "shuffleHandIntoDeck" // "Each player shuffles his starting hand into his deck"

@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "438abb7dd9371506358dfac47143fc43610acf014c541b4a509d27f459a4d9f3"
+        "value": "8cd7b523ba6032f7c5426186f980c0068776717fcc6f95e855175c317aea9718"
       },
-      "fetchedAt": "2026-11-19T22:16:11.407Z",
+      "fetchedAt": "2026-11-20T00:39:36.585Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -547,6 +547,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/Murder-at-the-Prancing-Pony",
           "sha256": "e29c7c8adc3b084e9381ec8b409d163bad695af2325bf327df930a946cbcebb1",
           "bytes": 12824
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Siege-of-Annúminas.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas",
+          "sha256": "e85165f64e9e0f62fb67b9b9aadfd315d04a1465c3e19d9b63eb148de8a7ed15",
+          "bytes": 26465
         }
       ]
     },
@@ -28270,9 +28276,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "c532f62ba4b9d48ea03a36c965ddbfa48b7de1d8e0365553abc66c202b958bc2"
+        "value": "fc114dee2a4c0788faca6be6741a73f20f2ed7e54cb6734214ce5dd3b4de01c9"
       },
-      "fetchedAt": "2026-11-19T22:30:12.084Z",
+      "fetchedAt": "2026-11-20T00:55:07.556Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -40561,6 +40567,264 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Murder-at-the-Prancing-Pony/Deadly-Accusations.jpg",
           "sha256": "fa7e8bab3e8e4d22f350471dfbf3296f2d4f9e4b7f25f9012ae105e284715c51",
           "bytes": 138279
+        },
+        {
+          "path": "scans/50801.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Standard-Game-Mode-SetupA.jpg",
+          "sha256": "62a39768c925ae1326dfd69993bebe0ee1a13436ff2dddfe556cde97af1b53bf",
+          "bytes": 956828
+        },
+        {
+          "path": "scans/50801.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Standard-Game-Mode-SetupB.jpg",
+          "sha256": "dcdfb58b66d84550217d62b8098170a5d620197a24fb668dbc5ede7eaa4eb3da",
+          "bytes": 906107
+        },
+        {
+          "path": "scans/50802.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Epic-Multiplayer-Mode-SetupA.jpg",
+          "sha256": "c078a6d079e096ddc5620095696c051f9cc5a47b116d999d2a933c7528b0ac45",
+          "bytes": 990399
+        },
+        {
+          "path": "scans/50802.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Epic-Multiplayer-Mode-SetupB.jpg",
+          "sha256": "9374dfa2c7115524cc1f1a18d7da5d7497986c5d6354c2725a46459985c933d5",
+          "bytes": 1001411
+        },
+        {
+          "path": "scans/50803.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Rebuild-the-Defenses-1A.jpg",
+          "sha256": "b94edadf5aeecc3cd4948882e2cde77f238f0f6e0a9b9a779f12f5420f3fbdb1",
+          "bytes": 1052082
+        },
+        {
+          "path": "scans/50803.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Rebuild-the-Defenses-1B.jpg",
+          "sha256": "6eb2d88884acbfd702888095b2c7b3759fa6e9a1672c5265f2675425f6c150c2",
+          "bytes": 981806
+        },
+        {
+          "path": "scans/50804.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Defend-the-City-2A.jpg",
+          "sha256": "3261166715784d79fcf4d1b52eb19b8541a202aa923b452c473eca77ccbe6b68",
+          "bytes": 1071821
+        },
+        {
+          "path": "scans/50804.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Defend-the-City-2B.jpg",
+          "sha256": "1ad678477b5fe5b58ba2c094e6c7bde2274bf7649a4ef7b62674ab98e239dd7a",
+          "bytes": 1041927
+        },
+        {
+          "path": "scans/50805.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Lead-the-Sortie-3A.jpg",
+          "sha256": "86ac5639fad2caa3b13f39db214f297d9366f81f1cae33b02f6079c142ef1b65",
+          "bytes": 1034310
+        },
+        {
+          "path": "scans/50805.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Lead-the-Sortie-3B.jpg",
+          "sha256": "2a3276cbf6b9d3fc922074cb160ca5b79dd3be8f95c5bd480e485fd8f9a1c5eb",
+          "bytes": 958845
+        },
+        {
+          "path": "scans/50806.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Raise-the-Levee-C-1C.jpg",
+          "sha256": "b3f63d62d5f7018cbfbd2ae58adc8dfd1edcbb83e46e4c3ec2f3b45104aa3525",
+          "bytes": 1042244
+        },
+        {
+          "path": "scans/50806.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Raise-the-Levee-C-1D.jpg",
+          "sha256": "d900731fa2e2a3b8a5482420faabbdad80ce1058025fdd3dc55c32ccae48abe1",
+          "bytes": 986896
+        },
+        {
+          "path": "scans/50807.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Guard-the-Gate-C-2C.jpg",
+          "sha256": "d6df5f84d3dab187fe76778302e6cd406f57727fb63a89c9088f70e2fab9da6d",
+          "bytes": 1039771
+        },
+        {
+          "path": "scans/50807.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Guard-the-Gate-C-2D.jpg",
+          "sha256": "a915dc601c73d65c907ea4ce899a5fd2da7a97d28e4294864331df254d30b66b",
+          "bytes": 940900
+        },
+        {
+          "path": "scans/50808.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Rescue-the-Captives-C-3C.jpg",
+          "sha256": "ffb8c603db30fb6dc83f5baebd936e0836f7afe0622125691b38accff95e8437",
+          "bytes": 1019011
+        },
+        {
+          "path": "scans/50808.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Rescue-the-Captives-C-3D.jpg",
+          "sha256": "efcc7da7c97319d2f84a00758f24d3e092ed5c67f320e354be5b0c69cb74caa7",
+          "bytes": 941237
+        },
+        {
+          "path": "scans/50809.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Delay-the-Enemy-E-1E.jpg",
+          "sha256": "1f1dfeeefb5021a39d07882684086c80e68cd2eee10671936fac506cea1289d4",
+          "bytes": 1016188
+        },
+        {
+          "path": "scans/50809.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Delay-the-Enemy-E-1F.jpg",
+          "sha256": "2d11d283b62435c193fa65ae9e39e87f3635deb2d685112949a8df7a28e79357",
+          "bytes": 944812
+        },
+        {
+          "path": "scans/50810.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Man-the-Walls-E-2E.jpg",
+          "sha256": "87f22775d262fca08fbb09e587bfd677cb5bad09222c4de145c2ca845f7187ee",
+          "bytes": 1045507
+        },
+        {
+          "path": "scans/50810.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Man-the-Walls-E-2F.jpg",
+          "sha256": "c1fdbe33366d647686b970fbd73e1483054e263f553af3b8f3ab25d39c4795e2",
+          "bytes": 952582
+        },
+        {
+          "path": "scans/50811.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Stop-the-Attack-E-3E.jpg",
+          "sha256": "8536797d2bd6f256d57602621cac9940e52bcc8e31152103a69c68582e5e4bce",
+          "bytes": 1029338
+        },
+        {
+          "path": "scans/50811.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Stop-the-Attack-E-3F.jpg",
+          "sha256": "5c952e5a1b8f6335e68ed9df686de9e1e3d32a5a99820751dda644d29d916cf4",
+          "bytes": 993700
+        },
+        {
+          "path": "scans/50812.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Annúminas.jpg",
+          "sha256": "3cf5949f2f503d229060aae429ee884183b5366bc579dfaaecfdb62c33f070fb",
+          "bytes": 958700
+        },
+        {
+          "path": "scans/50813.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Lieutenant-of-Angmar.jpg",
+          "sha256": "0db36b3ddb8fb4173bb3253ebcba72903d81b3fd8ff982477fceb5e9cb196537",
+          "bytes": 996962
+        },
+        {
+          "path": "scans/50814.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Battering-Ram.jpg",
+          "sha256": "299538cd0bee32338bcd666b628f29f8e18a4eec33a4905a8a0c13fc1c0e1dac",
+          "bytes": 917109
+        },
+        {
+          "path": "scans/50815.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Enemy-Camp.jpg",
+          "sha256": "a5f2b6be761a1ac864624723c7d77ff46f0d2f761bc94b360b8854db8336be75",
+          "bytes": 1012036
+        },
+        {
+          "path": "scans/50816.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Siege-Tunnel.jpg",
+          "sha256": "8aebdd0a6401f54ac5c1e3f8d892ce2cc7c29078c835f4c11ed2875955a75a1d",
+          "bytes": 937799
+        },
+        {
+          "path": "scans/50817.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Host-of-Angmar.jpg",
+          "sha256": "776f9abea67e96d6087b26af1f25ce8d684db24378be801bcf1031b2ff18f43f",
+          "bytes": 930078
+        },
+        {
+          "path": "scans/50818.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Dúnedain-of-Annúminas.jpg",
+          "sha256": "c3258db921bcfdbc868cfc5d0077f1b635d59891010a39b409427378389283c4",
+          "bytes": 1001329
+        },
+        {
+          "path": "scans/50819.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Gate-of-Annúminas.jpg",
+          "sha256": "6dbb2e85a9f3eb4040e25b15ef2213319fe2eb67dec99e72e88d47baf5dbb66b",
+          "bytes": 945959
+        },
+        {
+          "path": "scans/50820.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/City-Wall.jpg",
+          "sha256": "0249934069176dd7a7bac3b9021db77753cb864078763bf7471ab1d453874cb9",
+          "bytes": 934460
+        },
+        {
+          "path": "scans/50821.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Arnor-Battlefield.jpg",
+          "sha256": "36f5e53c5e36ec516ee4ccc889f8f6283ed82e01afb48a6233c91f92dd193cfa",
+          "bytes": 982869
+        },
+        {
+          "path": "scans/50822.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Hills-of-Evendim.jpg",
+          "sha256": "49c8e194cba1ee7693726423bb0efed6b55a034a454724a718f8f6436a898685",
+          "bytes": 971018
+        },
+        {
+          "path": "scans/50823.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Shores-of-Lake-Nenuial.jpg",
+          "sha256": "db4e4124f3cf3db61271018e55f3d631f85e4edb197dfa949bc3e538ce1c7f2f",
+          "bytes": 830529
+        },
+        {
+          "path": "scans/50824.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Warg-of-Carn-Dûm.jpg",
+          "sha256": "12ae5c4e6a6ee931753415aa2364d58b3e840350095e28aed9981d25914838f3",
+          "bytes": 975337
+        },
+        {
+          "path": "scans/50825.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Orc-of-Angmar.jpg",
+          "sha256": "6f4490cd62083bddc139dd4a159b753f876a6790d67b1e0c14605219263e4964",
+          "bytes": 966942
+        },
+        {
+          "path": "scans/50826.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Angmar-Warg-rider.jpg",
+          "sha256": "2207539d7fe5feab6cc12354cb2e2cec752c7eed9091b952691d1187db1788f7",
+          "bytes": 994179
+        },
+        {
+          "path": "scans/50827.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Savage-Werewolf.jpg",
+          "sha256": "d80342140b66eeb0e92cd2084eef96b5ac19ad9809bdcff5a7f63d880ccbecf3",
+          "bytes": 1016086
+        },
+        {
+          "path": "scans/50828.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Vanguard-of-Carn-Dûm.jpg",
+          "sha256": "cbae40838c628359f9bdc5cc57c6cf749fc715e06871b30bd113d1f128efa471",
+          "bytes": 997829
+        },
+        {
+          "path": "scans/50829.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/The-Hordes-of-Angmar.jpg",
+          "sha256": "b1e6ea92f9e6e84b9a41264fc47b5f4791fabf4c192c0f3e410a532ce2d650fd",
+          "bytes": 1059151
+        },
+        {
+          "path": "scans/50830.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Sorcery-of-Carn-Dûm.jpg",
+          "sha256": "08fd9c4a120f828c09afb2e32c5ff62e83df68d56c0567801d8b5b549b349a87",
+          "bytes": 1016739
+        },
+        {
+          "path": "scans/50831.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Caught-in-the-Press.jpg",
+          "sha256": "42a8a2de1a00da143e1ab34bcc0789104365c2872e40212250045219e74bf86a",
+          "bytes": 1052967
+        },
+        {
+          "path": "scans/50832.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Weary-Warriors.jpg",
+          "sha256": "3e3d15adedafc49b36d1810c926e867439920a1c719e17d0e54d4f8fb1d568b0",
+          "bytes": 998075
         },
         {
           "path": "scans/900101.A.jpg",

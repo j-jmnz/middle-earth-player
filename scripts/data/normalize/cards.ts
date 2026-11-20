@@ -35,6 +35,8 @@ const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> 
   // The Sands of Harad's objective heroes (Kahliel, Firyal, Yazan, Jubayr): listed in the Cards tab, not dealt.
   Objective_Hero: { type: "objective", typeName: "Objective Hero" },
   Campaign: { type: "campaign", typeName: "Campaign" },
+  // The mode cards of the standalone scenarios (The Siege of Annúminas' Standard Game Mode and Epic Multiplayer Mode, The Hunt for the Dreadnaught's Easy, Standard and Hard Mode): DragnCards types them Campaign.
+  GenCon_Setup: { type: "campaign", typeName: "Campaign" },
   Nightmare_Setup: { type: "nightmare", typeName: "Nightmare" },
   // Ered Mithrin: an objective that is also a location (The Old Ford), and the treasure a discovered campaign card becomes (emce.treasure).
   Objective_Location: { type: "objective", typeName: "Objective Location" },

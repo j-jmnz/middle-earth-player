@@ -102,8 +102,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       problems.push(`${id}: DragnCards has no ${def.deck?.normal ?? "Q0C"} deck labelled "${hob.Title}"`);
       continue;
     }
-    if (def.deck && entry?.[1]?.label !== hob.Title) {
-      problems.push(`${id}: DragnCards ${def.deck.normal} is labelled "${entry?.[1]?.label ?? ""}", not "${hob.Title}"`);
+    const deckLabel = def.deck?.label ?? hob.Title;
+    if (def.deck && entry?.[1]?.label !== deckLabel) {
+      problems.push(`${id}: DragnCards ${def.deck.normal} is labelled "${entry?.[1]?.label ?? ""}", not "${deckLabel}"`);
       continue;
     }
     const [normalKey, normalDeck] = entry ?? [null, null];
@@ -146,7 +147,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // The Stormcaller's own stages (2C to 4C, `stormcallerQuests`) are listed with the others and leave `stages` once the load list is read.
     const questCodes = hob.QuestCards.flatMap((quest) => {
       const card = bySlug.get(quest.Slug);
-      return card && !isNightmareCard(card) ? [card.code] : [];
+      // A mode card (The Siege of Annúminas' Standard Game Mode) is listed with the quest cards but is no stage; a quest card the scenario never plays is excluded by an override (the Siege's Epic Multiplayer stages).
+      return card && card.type === "quest" && !isNightmareCard(card) && !overrides.scenarioExcluded.some((rule) => rule.scenario === id && rule.code === card.code) ? [card.code] : [];
     });
     for (const rule of overrides.scenarioStages) if (rule.scenario === id && !questCodes.includes(rule.code)) questCodes.push(rule.code);
     let stages = questCodes;
@@ -155,7 +157,12 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const questSetup = setupOf(byCode.get(stages[0] ?? "")?.text, false).setup;
     const campaignLines = setupOf(byCode.get(campaignCard ?? "")?.text, def.deck !== undefined || product.sagaStart === true);
     const campaignSetup = campaignLines.setup;
-    const quest: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
+    // A mode card's Setup (the Siege's Standard Game Mode: Annúminas to the staging area) runs before the quest card's: its sentences are read with the quest card's.
+    const modeCard = def.modeCard === undefined ? undefined : cards.find((card) => card.type === "campaign" && card.name === def.modeCard && card.printings.some((p) => cardPacks.includes(p.pack)));
+    const modeSetup = setupOf(modeCard?.text, false).setup;
+    const modeParsed: ParsedSetup = modeSetup ? parseSetup(modeSetup, names) : { clauses: [], unread: [] };
+    const questParsed: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
+    const quest: ParsedSetup = { clauses: [...modeParsed.clauses, ...questParsed.clauses], unread: [...modeParsed.unread, ...questParsed.unread] };
     const camp: ParsedSetup = campaignSetup ? parseSetup(campaignSetup, names) : { clauses: [], unread: [] };
     for (const sentence of [...quest.unread, ...camp.unread]) local.push(`${id}: a Setup sentence no pattern reads: ${sentence}`);
     local.push(...burdenSetProblems(id, camp, cards, plain));

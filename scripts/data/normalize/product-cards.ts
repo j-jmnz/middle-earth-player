@@ -12,7 +12,7 @@ import { titleKey } from "./names.ts";
 const PRODUCT_PACK: ReadonlyMap<string, string> = new Map(PRODUCTS.flatMap((product) => (product.twinPack === null ? [[product.name, product.packs[0] ?? ""] as const] : [])));
 
 // Types of the cards taken from those boxes: what a scenario deals. Player cards of the box are RingsDB's.
-const PRODUCT_TYPES = new Set(["Enemy", "Location", "Treachery", "Quest", "Objective", "Objective_Ally", "Objective_Location", "Campaign", "Ship_Enemy", "Ship_Objective", "Treasure", "Encounter_Side_Quest"]);
+const PRODUCT_TYPES = new Set(["Enemy", "Location", "Treachery", "Quest", "Objective", "Objective_Ally", "Objective_Location", "Campaign", "GenCon_Setup", "Ship_Enemy", "Ship_Objective", "Treasure", "Encounter_Side_Quest"]);
 
 // A product whose Hall of Beorn codes collide takes the code from its collector number (overrides.productCodes).
 export function productCodeOf(overrides: Pick<Overrides, "productCodes">): (card: HobCard) => string | null {
@@ -75,7 +75,8 @@ export function addProductCards(
 // The encounter and quest cards of every other pack data/collection.json lists (the cycles and boxes no campaign of the app plays
 // yet), from Hall of Beorn alone and keyed by its RingsDB code, so the Cards tab's Encounter cards view lists every product. They are
 // read, not dealt: no scenario names them. A pack's Hall of Beorn card set is its RingsDB name, the Hobbit boxes' with "The Hobbit: " before it.
-const BROWSE_TYPES = new Set([...PRODUCT_TYPES, "Objective_Hero"]);
+// The standalone mode cards (GenCon_Setup) are a built scenario's: an unbuilt product's stay out until its scenario is built.
+const BROWSE_TYPES = new Set([...[...PRODUCT_TYPES].filter((type) => type !== "GenCon_Setup"), "Objective_Hero"]);
 const BUILT_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => [...product.packs, ...(product.twinPack ? [product.twinPack] : [])]));
 
 export function addBrowseCards(
