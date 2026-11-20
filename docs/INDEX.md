@@ -160,16 +160,16 @@ Read the sections your task touches.
     - 2212–2247 Fog on the Barrow-downs (~5.0K) ← 9
   - 2248–2256 Nightmare (~410) ← 22
   - 2257–2299 Deckbuilding (~2.5K) ← 1
-  - 2300–2379 Effects (~4.1K)
-    - 2302–2360 Three layers (~2.4K) ← 10
-    - 2361–2371 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 2372–2375 Window stack (~100)
-    - 2376–2379 Coverage test (~270)
-  - 2380–2403 Data sources (~750) ← 3
-  - 2404–2422 Card images (~1.4K) ← 9
-  - 2423–2450 Persistence and shipping (~3.2K) ← 10
-  - 2451–2493 Screens (~5.9K) ← 2
-    - 2478–2493 Table screen (~1.8K) ← 3
+  - 2300–2381 Effects (~4.2K)
+    - 2302–2362 Three layers (~2.5K) ← 10
+    - 2363–2373 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 2374–2377 Window stack (~100)
+    - 2378–2381 Coverage test (~270)
+  - 2382–2405 Data sources (~750) ← 3
+  - 2406–2424 Card images (~1.4K) ← 9
+  - 2425–2452 Persistence and shipping (~3.2K) ← 10
+  - 2453–2495 Screens (~5.9K) ← 2
+    - 2480–2495 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~66.6K tok)
   - 5–8 Overview (~170) ← 1
   - 9–27 Top bar (~4.7K) ← 5

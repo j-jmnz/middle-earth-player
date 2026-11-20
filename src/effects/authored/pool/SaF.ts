@@ -3,26 +3,14 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // Records for the SaF player cards whose lines no template reads (data/cards/SaF.json). An id here that a template also
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
-  // 04129 We Are Not Idle. X is the number of Dwarf heroes the player exhausts; a cost is paid with their own cards (rr.cost).
-  {"id":"04129:action:1","cardCode":"04129","lines":["04129:A:1"],"timing":"action","condition":{"kind":"canPick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},"instructions":[{"verb":"Choose","who":"actor","options":[
-    {"id":"x1","requires":{"kind":"count","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"},"min":1},"instructions":[
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"AddResources","amount":1,"to":"picked"},{"verb":"Draw","amount":1}]},
-    {"id":"x2","requires":{"kind":"count","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"},"min":2},"instructions":[
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"AddResources","amount":2,"to":"picked"},{"verb":"Draw","amount":1}]},
-    {"id":"x3","requires":{"kind":"count","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"},"min":3},"instructions":[
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"AddResources","amount":3,"to":"picked"},{"verb":"Draw","amount":1}]},
-    {"id":"x4","requires":{"kind":"count","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"},"min":4},"instructions":[
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
-      {"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"AddResources","amount":4,"to":"picked"},{"verb":"Draw","amount":1}]}]}]},
+  // 04129 We Are Not Idle. X is chosen from 0 to the ready Dwarf heroes the player controls (rr.the-letter-x): with X = 0 no hero
+  // exhausts and the card still draws 1. The X resources go to any hero ("a hero's resource pool"); with X = 0 none is picked.
+  {"id":"04129:action:1","cardCode":"04129","lines":["04129:A:1"],"timing":"action","instructions":[
+    {"verb":"ChooseX","min":0,"max":[{"count":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}}]},
+    {"verb":"Repeat","times":{"x":true},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Dwarf","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}}]},
+    {"verb":"Pick","pick":{"type":"hero","control":"any"},"when":{"kind":"less","left":0,"right":{"x":true}}},
+    {"verb":"AddResources","amount":{"x":true},"to":"picked","when":{"kind":"less","left":0,"right":{"x":true}}},
+    {"verb":"Draw","amount":1}]},
   // 04130 Hardy Leadership (line 1 is the generated 04130:constant:1). "Each Dwarf": every Dwarf character in play.
   {"id":"04130:constant:2","cardCode":"04130","lines":["04130:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"hitPoints","amount":1,"until":"whileSourceInPlay","holders":{"type":"character","control":"any","trait":"Dwarf"}}]},
   // 04133 Miruvor (line 1 is the generated 04133:constant:1). Two of the four, then Miruvor goes to the discard pile, or to the
