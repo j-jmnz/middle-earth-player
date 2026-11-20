@@ -1,5 +1,5 @@
 // Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest and The Woodland Realm: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm and The Mines of Moria: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -26,19 +26,20 @@ const siege = loadAnyScenario("the-siege-of-annuminas");
 const guldur = loadAnyScenario("attack-on-dol-guldur");
 const wizard = loadAnyScenario("the-wizards-quest");
 const woodland = loadAnyScenario("the-woodland-realm");
+const moria = loadAnyScenario("the-mines-of-moria");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas", "attack-on-dol-guldur", "the-wizards-quest", "the-woodland-realm"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas", "attack-on-dol-guldur", "the-wizards-quest", "the-woodland-realm", "the-mines-of-moria"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 11, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 12, playable: true, box: null })]);
   });
 });
 
@@ -432,5 +433,37 @@ describe("The Woodland Realm", () => {
     expect(ledger.byKey.get(keyOf("51110", "A"))?.lines[1]).toMatch(/\(1 cost or less instead if there are two or more players\)/);
     expect(ledger.byKey.get(keyOf("51151", "A"))?.lines[1]).toMatch(/^Shadow: Engage the lowest engagement cost enemy/);
     expect(ledger.byKey.get(keyOf("51122", "A"))?.misprints).toHaveLength(1);
+  });
+});
+
+describe("The Mines of Moria", () => {
+  it("has codes 512 and the collector number, which Hall of Beorn's 00001 to 00053 would share with earlier packs (overrides.productCodes), the seven quest cards as stages and the two-sided The Watcher / Chamber of Mazarbul", () => {
+    expect(moria).toMatchObject({ id: "the-mines-of-moria", name: "The Mines of Moria", stages: ["51201", "51203", "51204", "51205", "51207", "51208", "51209"] });
+    expect(moria.campaignCard).toBeUndefined();
+    expect(moria.campaignPlaced).toEqual([]);
+    expect(moria.source).toMatchObject({ dragnNormal: "Q99.13", dragnEasy: "Q99.13" });
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TMoM"));
+    expect(own.map((card) => card.code)).toEqual(["51201", "51203", "51204", "51205", "51207", "51208", "51209", ...Array.from({ length: 44 }, (_, at) => `512${String(at + 10)}`)]);
+    expect(moria.cards.find((card) => card.code === "51210")).toMatchObject({ pile: "staging", back: "51211" });
+  });
+
+  it("deals the 14 encounter sets of the kit, 5 cards each, on Normal and Easy alike, and gives every encounter card its printed cost", () => {
+    expect(moria.encounterSets).toHaveLength(15);
+    expect(moria.encounterSets.slice(1).every((set) => set.count === 5)).toBe(true);
+    for (const difficulty of ["Normal", "Easy"] as const) expect(encounterCodes(moria, difficulty, 1), difficulty).toHaveLength(70);
+    for (let number = 12; number <= 53; number += 1) expect(byCode.get(`512${number}`)?.cost, `512${number}`).not.toBeNull();
+    expect([byCode.get("51212")?.cost, byCode.get("51219")?.cost, byCode.get("51233")?.cost, byCode.get("51253")?.cost]).toEqual(["2", "2", "3", "1"]);
+  });
+
+  it("has every printed side read from its scan, with the places Hall of Beorn's text differs fixed", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("512")).flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(58);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("51201", "A"))?.lines[0]).toMatch(/^Setup: Each player adds 1 resource to each of his heroes' resource pools\. Add The Watcher/);
+    expect(ledger.byKey.get(keyOf("51214", "A"))?.lines[0]).toMatch(/The opposing team attaches Shadow of Fear/);
+    expect(ledger.byKey.get(keyOf("51221", "A"))?.lines[1]).toMatch(/into the encounter deck\.$/);
+    expect(ledger.byKey.get(keyOf("51223", "A"))?.lines[0]).toMatch(/Denizen of the Deep gains surge\. \(Counts as a Condition attachment/);
+    expect(ledger.byKey.get(keyOf("51242", "A"))?.lines[0]).toMatch(/non-combat damage\.$/);
   });
 });

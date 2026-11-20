@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~304.8K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~306.5K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -152,7 +152,7 @@ Read the sections your task touches.
     - 2017–2044 The Long Dark (~4.8K) ← 4
     - 2045–2076 Foundations of Stone (~4.3K) ← 3
     - 2077–2107 Shadow and Flame (~4.1K) ← 4
-  - 2108–2447 Standalone scenarios (~46.0K) ← 1
+  - 2108–2459 Standalone scenarios (~47.7K) ← 1
     - 2112–2135 The Massing at Osgiliath (~2.5K) ← 1
     - 2136–2158 The Battle of Lake-town (~4.0K) ← 36
     - 2159–2175 The Stone of Erech (~2.2K) ← 20
@@ -164,18 +164,19 @@ Read the sections your task touches.
     - 2349–2379 Attack on Dol Guldur (~4.1K) ← 18
     - 2380–2411 The Wizard's Quest (~4.1K) ← 22
     - 2412–2447 The Woodland Realm (~4.7K) ← 15
-  - 2448–2456 Nightmare (~410) ← 22
-  - 2457–2499 Deckbuilding (~2.5K) ← 1
-  - 2500–2579 Effects (~4.1K)
-    - 2502–2560 Three layers (~2.4K) ← 10
-    - 2561–2571 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 2572–2575 Window stack (~100)
-    - 2576–2579 Coverage test (~270)
-  - 2580–2603 Data sources (~750) ← 3
-  - 2604–2622 Card images (~1.4K) ← 9
-  - 2623–2650 Persistence and shipping (~3.2K) ← 10
-  - 2651–2693 Screens (~5.9K) ← 2
-    - 2678–2693 Table screen (~1.8K) ← 3
+    - 2448–2459 The Mines of Moria (~1.7K)
+  - 2460–2468 Nightmare (~410) ← 22
+  - 2469–2511 Deckbuilding (~2.5K) ← 1
+  - 2512–2591 Effects (~4.1K)
+    - 2514–2572 Three layers (~2.4K) ← 10
+    - 2573–2583 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 2584–2587 Window stack (~100)
+    - 2588–2591 Coverage test (~270)
+  - 2592–2615 Data sources (~750) ← 3
+  - 2616–2634 Card images (~1.4K) ← 9
+  - 2635–2662 Persistence and shipping (~3.2K) ← 10
+  - 2663–2705 Screens (~5.9K) ← 2
+    - 2690–2705 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~68.0K tok)
   - 5–8 Overview (~170) ← 1
   - 9–33 Top bar (~6.0K) ← 7
