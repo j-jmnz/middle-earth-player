@@ -7,7 +7,7 @@
         "kind": "git",
         "value": "629db897de0c5a82a72610ff76e22dc01f59a4ac"
       },
-      "fetchedAt": "2026-11-19T22:16:13.773Z",
+      "fetchedAt": "2026-11-20T06:04:20.308Z",
       "files": [
         {
           "path": "raw/dragncards/cardDb.tsv",
@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "efeacf607d27651044868820585c2aac511875d735ea9a5fb838da14b376b5b7"
+        "value": "933457179004561d0a7bad11332739229470c8d89d488464016268a1aa77a9d2"
       },
-      "fetchedAt": "2026-11-20T02:57:05.044Z",
+      "fetchedAt": "2026-11-20T05:58:12.153Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -559,6 +559,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/Attack-on-Dol-Guldur",
           "sha256": "73ea6eacca4ad42221ecd0af2f1f8c31785c036fa586912ac5dea3f0f2a40b70",
           "bytes": 20303
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Wizard's-Quest.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Wizard's-Quest",
+          "sha256": "21741213151329c1ed0545475928d00ea3596ff447cc823ee18a2cab57c703ee",
+          "bytes": 17094
         }
       ]
     },
@@ -28768,9 +28774,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "09753a452fea125d85cfee9329c15a9999efeb8abfede85e53df8c7c960f380c"
+        "value": "5a0f8413d4b4b52ec8f6cb2ce2708e4d60c7b8782212573309ceae7fbd8064ac"
       },
-      "fetchedAt": "2026-11-20T03:32:35.966Z",
+      "fetchedAt": "2026-11-20T06:28:17.759Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -41557,6 +41563,360 @@
           "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ac5a17df-dcd0-4bfb-91fe-a444910f30ec.B.jpg",
           "sha256": "fe3c68d5d0de441937a4f59c5a95900dd2a5d30ed65fee5c9973d60e79e63927",
           "bytes": 159131
+        },
+        {
+          "path": "scans/51001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Radagast's-Request-1A.jpg",
+          "sha256": "4cd49d4cb68c5ef19976cf5c5b66de653fcda14ddd36307af4f928b0c03bab9a",
+          "bytes": 1645619
+        },
+        {
+          "path": "scans/51001.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Radagast's-Request-1B.jpg",
+          "sha256": "832b8c9c72740cc76488822402f8bdc6e6c87ef6ef641889e5b7c506963c31cc",
+          "bytes": 1677806
+        },
+        {
+          "path": "scans/51003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-A-Fork-in-the-Road-2A.jpg",
+          "sha256": "a49ef120dcd2fd7497b83e13ca380084991b3c0d7628f94179347a7bb924cfeb",
+          "bytes": 1781009
+        },
+        {
+          "path": "scans/51003.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-A-Fork-in-the-Road-2B.jpg",
+          "sha256": "6fd2be52a15f9042c5bd03c86701f70462ceeafdb6aa3b569a3f4d71adac0016",
+          "bytes": 1726807
+        },
+        {
+          "path": "scans/51004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-Carried-Away-2A.jpg",
+          "sha256": "a49ef120dcd2fd7497b83e13ca380084991b3c0d7628f94179347a7bb924cfeb",
+          "bytes": 1781009
+        },
+        {
+          "path": "scans/51004.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-Carried-Away-2B.jpg",
+          "sha256": "2cb39821e24f8c3a3b807e99ffd376191df1fc402867ded524ee0ac4d7506866",
+          "bytes": 1925857
+        },
+        {
+          "path": "scans/51005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-A-New-Terror-Abroad-2A.jpg",
+          "sha256": "a49ef120dcd2fd7497b83e13ca380084991b3c0d7628f94179347a7bb924cfeb",
+          "bytes": 1781009
+        },
+        {
+          "path": "scans/51005.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-A-New-Terror-Abroad-2B.jpg",
+          "sha256": "d468212052e893da0cd74ef6c4901d7065558a59230c7a28587393adf9a8a85d",
+          "bytes": 1772075
+        },
+        {
+          "path": "scans/51007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-The-Tower-of-Sorcery-3A.jpg",
+          "sha256": "3eeb1662e0d5b210b2bc9c002dd03fb737af3a69e80d0737c38768eaf13ce076",
+          "bytes": 1566223
+        },
+        {
+          "path": "scans/51007.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-The-Tower-of-Sorcery-3B.jpg",
+          "sha256": "4a92b3ccab8ae01143efd7c22ff2f1ccdfee9c90299e2daaced16d45349a2089",
+          "bytes": 1589756
+        },
+        {
+          "path": "scans/51008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-Dungeons-of-the-Necromancer-3A.jpg",
+          "sha256": "3eeb1662e0d5b210b2bc9c002dd03fb737af3a69e80d0737c38768eaf13ce076",
+          "bytes": 1566223
+        },
+        {
+          "path": "scans/51008.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-Dungeons-of-the-Necromancer-3B.jpg",
+          "sha256": "ff8ac0de22b1af430ff222b1664bc5e287b1a909cdd09b5f539795be32f5664b",
+          "bytes": 1719199
+        },
+        {
+          "path": "scans/51009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-Return-to-Rhosgobel-3A.jpg",
+          "sha256": "3eeb1662e0d5b210b2bc9c002dd03fb737af3a69e80d0737c38768eaf13ce076",
+          "bytes": 1566223
+        },
+        {
+          "path": "scans/51009.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-Return-to-Rhosgobel-3B.jpg",
+          "sha256": "733e7b36d8011d2d6b02d318575f00b69e2505930013dd385d7dbcecf79da6ac",
+          "bytes": 1880961
+        },
+        {
+          "path": "scans/51010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Rhosgobel.jpg",
+          "sha256": "f887859e717f78d7a967a8645540b79d9187e2dd6c83d19be35d6e81ea22d242",
+          "bytes": 1719504
+        },
+        {
+          "path": "scans/51011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Rider-of-Mirkwood.jpg",
+          "sha256": "536f0f3872e7f636d90fa74f23b62b16631ad7b52e07409e2f884da3302aaca6",
+          "bytes": 1624342
+        },
+        {
+          "path": "scans/51012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Nazgûl-of-Dol-Guldur.jpg",
+          "sha256": "4bc3cc801440206595788c9e42f18fc1bfe3881ba5e0637a8a458050a388267f",
+          "bytes": 1641145
+        },
+        {
+          "path": "scans/51013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Necromancer's-Pass.jpg",
+          "sha256": "d507dc25404c9f6363c2c6bf2aaf27103e7b1bc9da7a306e33723c95525f4fb3",
+          "bytes": 1728251
+        },
+        {
+          "path": "scans/51014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Pursued-by-Shadow.jpg",
+          "sha256": "8cec6ace97ac995dd43e136d191f99db61f49e23cbfbab5a638df13e3fce129a",
+          "bytes": 1599198
+        },
+        {
+          "path": "scans/51015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Bane-of-Amon-Lanc.jpg",
+          "sha256": "53cc2d0238d590ec38279ab3ce5280f22b805258e9b98dc92d67988c91aaec02",
+          "bytes": 1658389
+        },
+        {
+          "path": "scans/51016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Oak-wood-Grove.jpg",
+          "sha256": "958c3f4ca141b9a59256181da9eb606a7ae64aef9597483f598fab4365c78ebe",
+          "bytes": 1634459
+        },
+        {
+          "path": "scans/51017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Smoking-Blood.jpg",
+          "sha256": "c725e9bc67bf4ceca94d0f11821f46e980682e59092449c90995cc5c6203f771",
+          "bytes": 1486904
+        },
+        {
+          "path": "scans/51018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Forest-Flies.jpg",
+          "sha256": "6e752bc53917d52b5f7e51c018bee43f451a229e0775a45de5603388e21a9a3e",
+          "bytes": 1586003
+        },
+        {
+          "path": "scans/51019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Twilight-Hall.jpg",
+          "sha256": "8bf11ab1133b96658b259546a5dad113cf8edc0cdceb3365e31c0385e03378ca",
+          "bytes": 1796439
+        },
+        {
+          "path": "scans/51020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Swarming-Mosquitoes.jpg",
+          "sha256": "3f5334f6b4b1782ad2787578e01e2685e975c953eebd33a2aa3dce1defb1a704",
+          "bytes": 1633277
+        },
+        {
+          "path": "scans/51021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Goblin-Sniper.jpg",
+          "sha256": "80945f773ef1fbe43ea01f9e0dc6ec81ec241189d35317e3a1fb679ae6d700b7",
+          "bytes": 1774552
+        },
+        {
+          "path": "scans/51022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Pine-Slopes.jpg",
+          "sha256": "055462eaac59b2e718161cdf22da34d640096232628eef193297a8b94cf3d062",
+          "bytes": 1633679
+        },
+        {
+          "path": "scans/51023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Under-the-Shadow.jpg",
+          "sha256": "eae0838dacbebd3483accefd0c29c1fe1105bbc20de51bcadda7f226cd6bf0ea",
+          "bytes": 1702943
+        },
+        {
+          "path": "scans/51024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Necromancer's-Warg.jpg",
+          "sha256": "bc40675fa003aef7b51413652f8a7c84a8b716c809c99f00af29d84a022bdd7e",
+          "bytes": 1706060
+        },
+        {
+          "path": "scans/51025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Dol-Guldur-Beastmaster.jpg",
+          "sha256": "699fff0471bf4319cb10667470bb4c7c25d66d7f65e316ed8e97fc5ec842ec70",
+          "bytes": 1494142
+        },
+        {
+          "path": "scans/51026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Watched-Path.jpg",
+          "sha256": "67f961c380a8be3214a444cce71308640d68d46128a40890572c0f65d804075f",
+          "bytes": 1592926
+        },
+        {
+          "path": "scans/51027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Evil-Storm.jpg",
+          "sha256": "089ffb04952f51c2a36950b0ef751da0e54fd396e1ef565a68723ea5a2f28942",
+          "bytes": 1467426
+        },
+        {
+          "path": "scans/51028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Spider-of-Dol-Guldur.jpg",
+          "sha256": "21083b203d929d135f15125d60d093d1ee5cc38f76acae485004887affa5086b",
+          "bytes": 1395592
+        },
+        {
+          "path": "scans/51029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Patch-of-Midnight.jpg",
+          "sha256": "5d7eb59d31a18cc368d914dfeab5a3b1adec1236db5f64eeaa2e1bd5847138e0",
+          "bytes": 1721056
+        },
+        {
+          "path": "scans/51030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Eyes-in-the-Dark.jpg",
+          "sha256": "175c28642f7fca1768d08f78eff758487707706550f50920c654ce0bcf227b2c",
+          "bytes": 1446514
+        },
+        {
+          "path": "scans/51031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Eastern-Crows.jpg",
+          "sha256": "14ac01dc863a2a5e97de5e1a0526dd5ab5a897e942829c26762248fe80de399a",
+          "bytes": 1768926
+        },
+        {
+          "path": "scans/51032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Sorcerer's-Tower.jpg",
+          "sha256": "dd40b660e208383bb762cf459b8d710c7bf1c686b5b44d89c056d6c41758ebdc",
+          "bytes": 1777731
+        },
+        {
+          "path": "scans/51033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Power-Sevenfold.jpg",
+          "sha256": "f0ef32c3c238625f83bf677674c0061eea356ea88644e9f568ac5ff680361132",
+          "bytes": 1767102
+        },
+        {
+          "path": "scans/51034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Hill-Troll.jpg",
+          "sha256": "0ca840e704fb5c2f1254cf8b01dfe8bbf06a2b07b26627d0a3ed3ee0a82531bd",
+          "bytes": 1506072
+        },
+        {
+          "path": "scans/51035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Troll-Cave.jpg",
+          "sha256": "b84d597ea2b79ee5d1d8aa6ceb32d17e2dcc3fe027f95d4e306a8dd658d2ed03",
+          "bytes": 1536441
+        },
+        {
+          "path": "scans/51036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Befouled-Equipment.jpg",
+          "sha256": "819b123ab87cd654942d508fd0b60d8dd34643b93095187284a00570c1f5e6ab",
+          "bytes": 1705339
+        },
+        {
+          "path": "scans/51037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Hunting-Warg.jpg",
+          "sha256": "c05e1ce2ab914ee7754997da367f99cf5fde7b0930ebfe57101619ea8b1dd5ac",
+          "bytes": 1510757
+        },
+        {
+          "path": "scans/51038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Hunter's-Lookout.jpg",
+          "sha256": "a8846cd122e0783989734fcc654ce5d0aafbccc8528e47076555614a53d623ae",
+          "bytes": 1710807
+        },
+        {
+          "path": "scans/51039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Restless-Hunters.jpg",
+          "sha256": "43eec168ff50dfc198c8fdaea9ab0ce96341ca2e0b5627caf37eca98ce5119ac",
+          "bytes": 1475991
+        },
+        {
+          "path": "scans/51040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Dol-Guldur-Orcs.jpg",
+          "sha256": "1f2cbafa4c3c43a498ebd6d4a093235d1f957e053a313959f2bf778a5da32023",
+          "bytes": 1698721
+        },
+        {
+          "path": "scans/51041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Shadow-Road.jpg",
+          "sha256": "35fbbf3056c5e12ded1847d5fbe7c50d20e7161a7e58ceaeca990a094ba072c3",
+          "bytes": 1589397
+        },
+        {
+          "path": "scans/51042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Reach.jpg",
+          "sha256": "619d217d88ced8c145c44e3962ed1c86991938997c79a0a4fef762c1f3ad7682",
+          "bytes": 1652343
+        },
+        {
+          "path": "scans/51043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Ravenous-Spider.jpg",
+          "sha256": "5fd8bbcdb6cd664b0d7cc761c387a082b8ca609873909ae847e986453f11679d",
+          "bytes": 1710078
+        },
+        {
+          "path": "scans/51044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Forest-Gate.jpg",
+          "sha256": "2f3426406a0dc03bca1a07a9cfe3920d3b82024bdb29dcf08f2f86720ba1ce14",
+          "bytes": 1654618
+        },
+        {
+          "path": "scans/51045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Nightfall.jpg",
+          "sha256": "96c6dfd26e44fef84fc7b53ad91908719bd66cea053fcb337c01c50556c5f431",
+          "bytes": 1648602
+        },
+        {
+          "path": "scans/51046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Venomous-Spider.jpg",
+          "sha256": "aeed90c40614ced1a783e850fe530f234fafbc0b28310092a19a02c28acef3f5",
+          "bytes": 1677581
+        },
+        {
+          "path": "scans/51047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Pitch-dark-Thicket.jpg",
+          "sha256": "0cafb8741f5e7aaa99cad483147fbae5ce1fd40881315c4ba0cc84aefb726edb",
+          "bytes": 1657563
+        },
+        {
+          "path": "scans/51048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Fastness-of-Mirkwood.jpg",
+          "sha256": "dea89da50052c453ef67e9a930f9563f76a407505311572c95385fbc31427850",
+          "bytes": 1756271
+        },
+        {
+          "path": "scans/51049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Dark-Bats.jpg",
+          "sha256": "d61b1e4b7e909b363b4645599ca4cb2e99f0741f55c83f7b10231bdc1f974ab2",
+          "bytes": 1703910
+        },
+        {
+          "path": "scans/51050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Forest-Stream.jpg",
+          "sha256": "01b0147f9758efc870a51622f77a6fb16e02c94e6fa15730e1d87f7ec4c76a11",
+          "bytes": 1552733
+        },
+        {
+          "path": "scans/51051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Treacherous-Fog.jpg",
+          "sha256": "a65cb215efce28ef1cc2e1fc60edd584849d135257856f4b652c224cdb2500fa",
+          "bytes": 1742897
+        },
+        {
+          "path": "scans/51052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Howling-Warg.jpg",
+          "sha256": "f8502f6cafd03aefc306dbca36ca6a652239aeec72fe3d8875386989fec7cf53",
+          "bytes": 1611181
+        },
+        {
+          "path": "scans/51053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Wargs'-Glade.jpg",
+          "sha256": "5e8d79c347935fa7f8e22190cbdc8af67fe7518c5769a5a2b611c325bfd53e20",
+          "bytes": 1645742
+        },
+        {
+          "path": "scans/51054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Weighed-Down.jpg",
+          "sha256": "30a2ee91ed2c05e17ed5c735d579afbdc59f232309bb961b10477fe247f4159c",
+          "bytes": 1632408
         },
         {
           "path": "scans/900101.A.jpg",

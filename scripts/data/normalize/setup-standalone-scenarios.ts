@@ -113,6 +113,9 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
     return codes.length === 0 ? null : [{ kind: "step", step: "raiseCityStrengthPerPlayer", codes, count: Number(match[1]) }];
   }
   if (/^For the rest of the game, that threat dial is the siege tracker and it displays the city strength of Dol Guldur$/.test(sentence)) return [];
+  // The Wizard's Quest (51001): "The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area": a search with no card
+  // named, so it moves no pile card; the encounter deck keeps the cards until the Setup record finds them.
+  if (/^The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area$/.test(sentence)) return [{ kind: "step", step: "searchZeroCostPerPlayer", codes: [] }];
   // "Shuffle any unused Scoutcards back into the encounter deck" (the card prints "Scoutcards"): the copies not staged stay in the encounter deck.
   if (/^Shuffle any unused Scout ?cards back into the encounter deck$/.test(sentence)) return [{ kind: "shuffleEncounterDeck" }];
   return null;

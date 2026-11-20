@@ -1852,6 +1852,70 @@
       "pile": "activeLocation",
       "reason": "DragnCards loads Tarlang's Neck set aside (Q99.03). The quest card The Disappearance (50301) prints \"Setup: Make Tarlang's Neck the active location.\", so it is the active location at the start of the game.",
       "source": "dragncards preBuiltDecks.json (Q99.03); The Disappearance 50301 printed Setup"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51001",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: Radagast's Request is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51003",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: Mirkwood Forest (A Fork in the Road) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51004",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: Mirkwood Forest (Carried Away) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51005",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: Mirkwood Forest (A New Terror Abroad) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51007",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: The Necromancer's Tower (The Tower of Sorcery) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51008",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: The Necromancer's Tower (Dungeons of the Necromancer) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51009",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.11 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in Attack on Dol Guldur: The Necromancer's Tower (Return to Rhosgobel) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.11); scan of the quest card"
+    },
+    {
+      "scenario": "the-wizards-quest",
+      "code": "51010",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads Rhosgobel set aside (Q99.11). The quest card Radagast's Request (51001) prints \"Setup: Add Rhosgobel to the staging area.\", so it starts in the staging area.",
+      "source": "scan 51001.A; dragncards preBuiltDecks.json (Q99.11)"
     }
   ],
   "scenarioRemovals": [
@@ -2242,6 +2306,12 @@
   ],
   "productCodes": [
     {
+      "set": "The Wizard's Quest",
+      "prefix": "510",
+      "reason": "Hall of Beorn numbers The Wizard's Quest's cards 00001 to 00054 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and of the core set's, and RingsDB lists no card of TWQ. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 510 and the two-digit collector number: 5 and 10 for the pack's position (10) in RingsDB's cycle 50, the Standalone scenarios, with the field's three-digit limit (51001 Radagast's Request, 51054 Weighed Down).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Wizard's Quest, Number, RingsDbCardId); ringsdb.com packs (TWQ, cycle 50, position 10; no cards listed)"
+    },
+    {
       "set": "Attack on Dol Guldur",
       "prefix": "509",
       "reason": "Hall of Beorn numbers Attack on Dol Guldur's cards 00001 to 00032 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of AoDG. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 509 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 9 for the pack's position in it (50901 Assault on the Golden Wood, 50932 Epic Multiplayer Mode).",
@@ -2494,6 +2564,22 @@
       "code": "03070",
       "reason": "Flight from Moria's seven stage 2 quest cards are all titled 'Search for an Exit' on side A. DragnCards files the stage 2 card that Hall of Beorn calls Search-for-an-Exit-Heading-Down-KD (#70) as Khazad-dûm #76, with side B 'Heading Down', so neither the title nor the collector number finds it; the name of its side B does.",
       "source": "data/raw/dragncards/cardDb.tsv (Khazad-dum 76, Search for an Exit / Heading Down); hallofbeorn.com/Export/QuestCards (Search-for-an-Exit-Heading-Down-KD)"
+    },
+    {
+      "dragncards": "The Wizard's Quest",
+      "number": 10,
+      "side": "a",
+      "code": "51010",
+      "reason": "DragnCards files Rhosgobel and the Rider of Mirkwood as one two-named card, collector number 10 (Rhosgobel, then Rider of Mirkwood). Hall of Beorn files them as two cards, #10 Rhosgobel and #11 Rider of Mirkwood. Side A is Rhosgobel.",
+      "source": "dragncards cardDb.tsv (The Wizard's Quest 10, both rows) and preBuiltDecks.json (Q99.11); hallofbeorn.com/Export/EncounterCards (Rhosgobel-TWQ, Rider-of-Mirkwood-TWQ)"
+    },
+    {
+      "dragncards": "The Wizard's Quest",
+      "number": 10,
+      "side": "b",
+      "code": "51011",
+      "reason": "The second name of the DragnCards card number 10 is the Rider of Mirkwood, which Hall of Beorn numbers 11. See the side A entry.",
+      "source": "dragncards cardDb.tsv (The Wizard's Quest 10); hallofbeorn.com/Export/EncounterCards (Rider-of-Mirkwood-TWQ)"
     }
   ],
   "encounterSetAliases": [

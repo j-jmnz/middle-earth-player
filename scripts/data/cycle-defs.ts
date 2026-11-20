@@ -58,7 +58,7 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     name: "Standalone scenarios",
     kind: "cycle",
     released: "2011-09-21",
-    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur"],
+    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest"],
     scenarios: [
       // DragnCards' deck Q99.01 has no Easy twin: Hall of Beorn's Easy counts equal the Normal ones, so Easy loads the same deck.
       { id: "the-massing-at-osgiliath", product: "The Massing at Osgiliath", deck: { normal: "Q99.01", easy: "Q99.01" } },
@@ -78,9 +78,11 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       { id: "the-siege-of-annuminas", product: "The Siege of Annúminas", deck: { normal: "Q99.08", easy: "Q99.08", label: "Standard The Siege of Annúminas" }, modeCard: "Standard Game Mode" },
       // DragnCards' deck Q99.10 has no Easy twin, and it is the only deck: Epic Multiplayer Mode is a second mode card, not a second deck.
       { id: "attack-on-dol-guldur", product: "Attack on Dol Guldur", deck: { normal: "Q99.10", easy: "Q99.10" }, modeCard: "Standard Game Mode" },
+      // DragnCards' deck Q99.11 has no Easy twin.
+      { id: "the-wizards-quest", product: "The Wizard's Quest", deck: { normal: "Q99.11", easy: "Q99.11" } },
     ],
     // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
-    later: ["The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
+    later: ["The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
     saga: false,
     ledger: "standalone-scenarios",
   },

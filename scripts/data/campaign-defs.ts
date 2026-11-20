@@ -137,6 +137,7 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "Murder at the Prancing Pony", packs: ["MatPP"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2015", scenarioTitle: "Murder at the Prancing Pony" },
   { name: "The Siege of Annúminas", packs: ["TSoA"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2016", scenarioTitle: "The Siege of Annúminas" },
   { name: "Attack on Dol Guldur", packs: ["AoDG"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2017", scenarioTitle: "Attack on Dol Guldur" },
+  { name: "The Wizard's Quest", packs: ["TWQ"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
   { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
