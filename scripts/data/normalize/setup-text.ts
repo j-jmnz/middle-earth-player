@@ -142,6 +142,7 @@ export type SetupStep =
   | "removeQuestDecks" // "Remove the 1C-3C deck and 1E-3E deck from the game": the six quest cards of the other two decks
   | "setCityStrength" // "set its city strength to 20": `codes` Annúminas, `count` the strength
   | "flipModeCard" // "Flip this card over and place it next to the quest deck": the mode card's back (its Forced lines) is in play all game
+  | "raiseCityStrengthPerPlayer" // "Then, increase its value by 5 for each player" (Attack on Dol Guldur's Standard Game Mode, 50931): `codes` Dol Guldur, `count` the strength each player adds
   | "gateAmongLocations" // "One of those locations must be Gate of Annúminas": `codes` Gate of Annúminas, one of the locations the players search for
   | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"
   | "addToStartingHand" // "Each player adds 1 copy of Determination to their starting hand"

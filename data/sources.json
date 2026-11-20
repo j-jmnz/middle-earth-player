@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "8cd7b523ba6032f7c5426186f980c0068776717fcc6f95e855175c317aea9718"
+        "value": "efeacf607d27651044868820585c2aac511875d735ea9a5fb838da14b376b5b7"
       },
-      "fetchedAt": "2026-11-20T00:39:36.585Z",
+      "fetchedAt": "2026-11-20T02:57:05.044Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -553,6 +553,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Siege-of-Annúminas",
           "sha256": "e85165f64e9e0f62fb67b9b9aadfd315d04a1465c3e19d9b63eb148de8a7ed15",
           "bytes": 26465
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Attack-on-Dol-Guldur.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Attack-on-Dol-Guldur",
+          "sha256": "73ea6eacca4ad42221ecd0af2f1f8c31785c036fa586912ac5dea3f0f2a40b70",
+          "bytes": 20303
         }
       ]
     },

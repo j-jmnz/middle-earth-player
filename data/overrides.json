@@ -2122,6 +2122,12 @@
   ],
   "productCodes": [
     {
+      "set": "Attack on Dol Guldur",
+      "prefix": "509",
+      "reason": "Hall of Beorn numbers Attack on Dol Guldur's cards 00001 to 00032 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of AoDG. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 509 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 9 for the pack's position in it (50901 Assault on the Golden Wood, 50932 Epic Multiplayer Mode).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet Attack on Dol Guldur, Number, RingsDbCardId); ringsdb.com packs (AoDG, cycle 50, position 9; no cards listed)"
+    },
+    {
       "set": "The Siege of Annúminas",
       "prefix": "508",
       "reason": "Hall of Beorn numbers The Siege of Annúminas's cards 00001 to 00032 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019, and RingsDB lists no card of TSoA. A code must name one card, so the earlier standalone packs keep their codes and the Siege's are 508 and the two-digit collector number: 50 for RingsDB's cycle 50 (the Standalone scenarios) and 8 for the pack's position in it (50801 Standard Game Mode, 50832 Weary Warriors). Boromir (02095) and Faramir (06081), which Hall of Beorn tags with the product, are RingsDB's own cards and keep their codes.",
@@ -2447,6 +2453,18 @@
     }
   ],
   "scenarioExcluded": [
+    {
+      "scenario": "attack-on-dol-guldur",
+      "code": "50931",
+      "reason": "Standard Game Mode is the mode card, not a card a pile deals: its Setup (Dol Guldur to the staging area with a threat dial for the city strength) and its back's lines run from beside the quest deck, as the Hard Mode card of Dream-chaser does. DragnCards loads it as a Campaign row and Hall of Beorn's scenario list counts it once, so the count check skips it.",
+      "source": "hallofbeorn.com/Export/Scenarios/Attack-on-Dol-Guldur (ScenarioCards); dragncards preBuiltDecks.json (Q99.10); scan 50931.A and 50931.B"
+    },
+    {
+      "scenario": "attack-on-dol-guldur",
+      "code": "50932",
+      "reason": "Epic Multiplayer Mode is the mode card of the Epic Multiplayer Mode of Attack on Dol Guldur, which the app does not play: it divides the players into three teams, each with its own staging area, quest deck and encounter deck. The app plays one table of one or two seats, so the Standard Game Mode is the scenario's mode. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/Attack-on-Dol-Guldur (ScenarioCards); dragncards preBuiltDecks.json (Q99.10); scan 50932.A and 50932.B"
+    },
     {
       "scenario": "the-siege-of-annuminas",
       "code": "50801",
