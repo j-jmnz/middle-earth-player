@@ -6,6 +6,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const icon = z.enum(["leadership", "tactics", "spirit", "lore"]);
 // The sphere a spent resource may be: an icon, or Fellowship ("Spend 1 Fellowship resource to travel here", 144020:A:3).
@@ -53,7 +54,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SpendResources"), amount: z.number().int().positive(), target: z.enum(["picked", "subject", "host", "self"]).optional(), sphere: spendIcon.optional(), group: z.boolean().optional(), paid: z.array(z.string()).optional(), ...when }),
   // Each hero the actor (or the picked player) controls gains `amount` resources; with `unspent`, only each one that did not
   // spend a resource this round.
-  z.strictObject({ verb: z.literal("HeroesGainResources"), amount: positiveAmountSchema, who: z.enum(["actor", "picked"]).optional(), unspent: z.boolean().optional(), ...when }),
+  // Setup, in a top-level ForEachPlayer: "Each player adds 1 resource to each of his heroes' resource pools" (51201:A:1).
+  verbFlags(z.strictObject({ verb: z.literal("HeroesGainResources"), amount: positiveAmountSchema, who: z.enum(["actor", "picked"]).optional(), unspent: z.boolean().optional(), ...when }), { setupRuns: "inForEachPlayer" }),
   // The actor plays a card from their hand now, as part of the effect (a play: it is paid for and announced as played). The
   // card matches `pick` and can be played under these terms: `free` costs nothing; `reduce` lowers the cost, not below `min`;
   // `noMatch` needs no resource match; `onSelf` plays an attachment on the source. `picked`: each card the effect has picked

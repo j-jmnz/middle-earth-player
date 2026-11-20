@@ -7,6 +7,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
+import { arrangeTopByChallenge, hideUnderQuest } from "./hidden.ts";
 import { holdPickedUnder, releaseHeld, titleHeld } from "./held.ts";
 import { buildQuickDeck, chooseQuestStage } from "./quick.ts";
 import { searchTopReveal } from "./top.ts";
@@ -20,7 +21,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SearchTopReveal":
       return searchTopReveal(state, instruction, focus, ctx, steps);
     case "HoldPickedUnder":
-      return holdPickedUnder(state, focus, ctx, steps);
+      return holdPickedUnder(state, instruction, focus, ctx, steps);
+    case "HideUnderQuest":
+      return hideUnderQuest(state, instruction, ctx);
+    case "ArrangeTopByChallenge":
+      return arrangeTopByChallenge(state, ctx);
     // A constant marker: the bar on the held titles is the play hook below.
     case "BarHeldTitles":
       return state;
@@ -31,8 +36,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "wizards-quest",
-  verbs: ["BuildQuickDeck", "ChooseQuestStage", "SearchTopReveal", "HoldPickedUnder", "BarHeldTitles"],
+  verbs: ["BuildQuickDeck", "ChooseQuestStage", "SearchTopReveal", "HoldPickedUnder", "BarHeldTitles", "HideUnderQuest", "ArrangeTopByChallenge"],
   run,
   settle: { sweep: (state) => releaseHeld(state) },
-  play: (state, cardId, ctx, how) => how?.putting !== true && titleHeld(state, cardId, ctx),
+  play: (state, cardId, ctx, how) => titleHeld(state, cardId, ctx, how?.putting === true),
 };

@@ -24,7 +24,14 @@ const VERBS = [
   ),
   // "places them faceup under this stage as guarded objectives" (51004:B:1) and "place faceup under Necromancer's Pass as a guarded objective" (51013:A:1): the last picked card, an ally in play or a card of a hand, lies faceup under the source card, still its owner's, out of play (docs/brief.md, The Wizard's Quest, readings 9 and 3).
   // An ally in play loses its tokens and its attachments are discarded as it leaves play. The source gives them back (ReturnFacedownToHands) and, while they lie there, no copy of their title can be played (src/rules/families/wizards-quest/held.ts).
-  z.strictObject({ verb: z.literal("HoldPickedUnder"), ...when }),
+  // With `barsPutting` (Narrow Paths: "Players cannot play or put into play any attachment that shares a title with an attachment guarded by this stage", 51205:B:1): the title cannot be put into play by an effect either, and the held card is an attachment taken out of play from its host.
+  z.strictObject({ verb: z.literal("HoldPickedUnder"), barsPutting: z.literal(true).optional(), ...when }),
+  // "The opposing team searches the top 5 cards of the encounter deck for a card with cost X or less, where X is the stage number of the main quest, and places that card facedown under the main quest. After the next time the players quest successfully, reveal that card." (51241:A:1; docs/brief.md, The Mines of Moria, reading 11):
+  // the card nearest the top that qualifies lies facedown under the main quest, the encounter deck is shuffled (reading 14), and the card is revealed in full after the next successful quest, each hidden card in the order placed (src/rules/families/wizards-quest/hidden.ts). With none, only the shuffle.
+  z.strictObject({ verb: z.literal("HideUnderQuest"), top: z.number().int().positive(), maxCostStage: z.literal(true), ...when }),
+  // "The opposing team looks at the top 2 cards of the encounter deck, puts 1 on the bottom, and puts the other back on top." (51203:B:1; reading 9): the weaker of the top two cards goes to the bottom and the stronger stays on top, no one is asked.
+  // An enemy is stronger than a treachery and a treachery than a location; of two enemies or two locations the one with the higher Threat (an enemy: then the higher Attack) is; level, the top card stays on top. A deck of one card changes nothing.
+  z.strictObject({ verb: z.literal("ArrangeTopByChallenge"), ...when }),
   // A constant marker of the card that holds player cards under it (51004:B:2, 51013:A:1): "copies of that card cannot be played" while it lies there. The bar is the engine's (a card held by HoldPickedUnder bars its title, families/wizards-quest/held.ts), so run alone it does nothing.
   z.strictObject({ verb: z.literal("BarHeldTitles") }),
 ] as const;

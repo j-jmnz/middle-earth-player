@@ -341,7 +341,9 @@ export function pickCandidates(
   if (spec.challenge !== true || counting) return found;
   // "the highest Threat, then the highest Attack" (docs/brief.md, The Woodland Realm, reading 3): level on Threat, the enemy with the highest Attack.
   const level = spec.highestThreat === true && found.length > 1 ? tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "attack", ctx.cards) : 0), "highest") : found;
-  return level.slice(0, 1);
+  // "the highest Attack, then the highest Threat" (docs/brief.md, The Mines of Moria, reading 3: Denizen of the Deep): level on Attack, the enemy with the highest Threat.
+  const levelAttack = spec.highestAttack === true && level.length > 1 ? tiedExtreme(level, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "threat", ctx.cards) : 0), "highest") : level;
+  return levelAttack.slice(0, 1);
 }
 
 function candidatesOf(

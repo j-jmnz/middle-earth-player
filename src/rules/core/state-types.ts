@@ -127,6 +127,10 @@ export type CardInstance = {
   guardedHero?: true;
   // A player card an encounter card holds faceup under it as a guarded objective (Carried Away's allies, a card under Necromancer's Pass, families/wizards-quest/held.ts): no copy of its title can be played or put into play while it lies there.
   heldTitle?: true;
+  // With `heldTitle`: the title cannot be put into play either (Narrow Paths' guarded attachments, 51205:B:1: "cannot play or put into play").
+  heldPutting?: true;
+  // A card the encounter deck found and Hidden Threat placed facedown under the main quest (families/wizards-quest/hidden.ts, 51241:A:1): it is revealed after the next time the players quest successfully. The number is the order it was placed in.
+  hiddenAt?: number;
   // A Captive of The Uruk-hai (families/captives): a hero faceup in the captive zone under To Isengard! or an enemy, in play, controlled by nobody. `owner` is the seat it belongs to, `heroSlot` its place among that seat's heroes.
   captive?: true;
   // A player card an enemy holds, faceup: under it (Hobgoblin, 18050:A:2) or attached to it (a boon Shagrat guards, 146069:B:1). It returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set by GuardWithDeckTop and GuardWithSetAside.

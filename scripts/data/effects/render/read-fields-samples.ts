@@ -37,6 +37,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "UncancelableWhenRevealed", cardType: "treachery" },
     { verb: "UncancelableWhenRevealed", firstRevealedEachRound: true },
     { verb: "UncancelableWhenRevealed", firstRevealedEachRound: true, doomed: 1 },
+    { verb: "UncancelableWhenRevealed", firstRevealedEachRound: true, surge: true },
   ],
   DamageOncePerRound: [{ verb: "DamageOncePerRound", amount: 1, target: "picked" }],
   AddResources: [{ verb: "AddResources", amount: 2, to: "self" }],

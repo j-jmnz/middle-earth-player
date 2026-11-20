@@ -8,6 +8,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats } from "../../core/state.ts";
+import { revealHidden } from "../wizards-quest/hidden.ts";
 import { queueHeard } from "./events.ts";
 
 type Result = "success" | "failure" | "tie";
@@ -51,6 +52,8 @@ export function afterQuestOutcome(state: ScenarioState, outcome: QuestOutcome, c
     const own = outcome.bySeat && card.controller != null ? outcome.bySeat[card.controller] : outcome.result;
     if (own === "success") next = queueHeard(next, ctx, { trigger: "questedSuccessfully", seat: card.controller, subject: id });
   }
+  // The cards Hidden Threat hid under the main quest are revealed after a successful quest (51241:A:1).
+  if (outcome.result === "success") next = revealHidden(next, ctx, steps);
   // And those waiting for the players to quest unsuccessfully (900307:A:1).
   const waiting = next.delayed.filter((entry) => entry.until === "questSucceeded" || entry.until === "questFailed");
   if (waiting.length === 0) return next;

@@ -1,5 +1,6 @@
 // Rules: rr.guarded, rr.in-play-and-out-of-play, rr.attachment-cards, rr.cannot (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/brief.md, The Wizard's Quest, readings 3 and 9).
 // A player card an encounter card holds faceup under it as a guarded objective: an ally under the stage Carried Away, a card of the first player's hand under Necromancer's Pass. It stays its owner's, out of play, and no copy of its title can be played while it lies there (an effect may still put one into play).
+import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { releaseAttachments } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
@@ -9,21 +10,22 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { Focus } from "../index.ts";
 
-/** HoldPickedUnder: the last picked card lies faceup under the source, its owner's still. A card in play (an ally) loses its tokens and its attachments are discarded as it leaves play. */
-export function holdPickedUnder(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+/** HoldPickedUnder: the last picked card lies faceup under the source, its owner's still. A card in play (an ally, an attachment taken from its host) loses its tokens and its attachments are discarded as it leaves play; with `barsPutting` no copy of its title can be put into play either. */
+export function holdPickedUnder(state: ScenarioState, instruction: Extract<Instruction, { verb: "HoldPickedUnder" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = lastPicked(state);
   const card = state.cards[id];
   const host = focus.sourceId ? state.cards[focus.sourceId] : undefined;
   if (!card || !host || id === host.id || card.zone === "under") return state;
   const owner = card.owner ?? card.controller ?? focus.seat;
   const bare = inPlay(card.zone) ? releaseAttachments(state, id, ctx.cards, steps) : state;
-  return updateCard(moveCard({ ...bare, heldCards: true }, id, { zone: "under", locationId: host.id }), id, { face: "up", owner, controller: null, heldTitle: true, committed: false, damage: 0, resources: 0, progress: 0 });
+  return updateCard(moveCard({ ...bare, heldCards: true }, id, { zone: "under", locationId: host.id }), id, { face: "up", owner, controller: null, heldTitle: true, heldPutting: instruction.barsPutting === true ? true : undefined, committed: false, damage: 0, resources: 0, progress: 0 });
 }
 
 /** Whether a card shares its title with one that lies held under an encounter card: it cannot be played ("copies of that card cannot be played", 51013:A:1; an effect may still put it into play). */
-export function titleHeld(state: ScenarioState, cardId: string, ctx: ReduceContext): boolean {
+export function titleHeld(state: ScenarioState, cardId: string, ctx: ReduceContext, putting = false): boolean {
   const instance = state.cards[cardId];
-  const held = instance ? Object.values(state.cards).filter((card) => card.heldTitle === true && card.zone === "under") : [];
+  // A card put into play is barred only by the cards that say so (`heldPutting`, 51205:B:1).
+  const held = instance ? Object.values(state.cards).filter((card) => card.heldTitle === true && card.zone === "under" && (!putting || card.heldPutting === true)) : [];
   if (!instance || held.length === 0) return false;
   const name = printedOf(ctx.cards, instance.code).name;
   return held.some((card) => printedOf(ctx.cards, card.code).name === name);
@@ -42,7 +44,7 @@ export function releaseHeld(state: ScenarioState): ScenarioState {
     if (host && (inPlay(host.zone) || host.zone === "questStage")) continue;
     const seat = card.owner;
     if (seat == null) continue;
-    next = updateCard(moveCard(next, card.id, { zone: state.seats[seat]?.eliminated ? "discard" : "hand", seat }), card.id, { face: "up", owner: undefined, heldTitle: undefined, host: null });
+    next = updateCard(moveCard(next, card.id, { zone: state.seats[seat]?.eliminated ? "discard" : "hand", seat }), card.id, { face: "up", owner: undefined, heldTitle: undefined, heldPutting: undefined, host: null });
   }
   return next;
 }
