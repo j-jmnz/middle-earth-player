@@ -6974,6 +6974,981 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "51201",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/To-the-West-door-1A.jpg",
+        "sha256": "eedaa0bf3b5603d8e07a19b976a22c83c5637abea243b21ebc838d5930f9b17d"
+      },
+      "lines": [
+        "Setup: Each player adds 1 resource to each of his heroes' resource pools. Add The Watcher to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51201",
+      "side": "B",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/To-the-West-door-1B.jpg",
+        "sha256": "9f90b53ceece74aaee74724ed1439eb0e10cbc659132a3615be6e7c93abe4f2c"
+      },
+      "lines": [
+        "While this stage has at least 5 progress on it, The Watcher is considered to be engaged with each player and attacks each player in turn order during the combat phase. (Deal and resolve a shadow card for each attack.)",
+        "Forced: When The Watcher is defeated, flip it over and add Chamber of Mazarbul to the staging area.",
+        "This stage cannot be defeated while The Watcher is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51203",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Journey-in-the-Black-Pit-A-Presence-in-the-Dark-2A.jpg",
+        "sha256": "0187e7b41842d5cbbbed66d341cacf517daf6e548cea9d377fa4a5856a8f99fa"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (2 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51203",
+      "side": "B",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Journey-in-the-Black-Pit-A-Presence-in-the-Dark-2B.jpg",
+        "sha256": "e16622b96163d56bec849cfb152a9ea4f40411312adecad72087411622c498d7"
+      },
+      "lines": [
+        "Forced: At the beginning of the staging step, the opposing team looks at the top 2 cards of the encounter deck, puts 1 on the bottom, and puts the other back on top."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51204",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Journey-in-the-Black-Pit-The-Long-Dark-of-Moria-2A.jpg",
+        "sha256": "0187e7b41842d5cbbbed66d341cacf517daf6e548cea9d377fa4a5856a8f99fa"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (2 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51204",
+      "side": "B",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Journey-in-the-Black-Pit-The-Long-Dark-of-Moria-2B.jpg",
+        "sha256": "beffb4c09975d82fab6288f5ea70edb0262862cf6091d4db07296e10458a0377"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for one different 0 cost location per player and adds them to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51205",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Journey-in-the-Black-Pit-Narrow-Paths-2A.jpg",
+        "sha256": "0187e7b41842d5cbbbed66d341cacf517daf6e548cea9d377fa4a5856a8f99fa"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses an attachment controlled by each player and places them faceup under this stage as guarded objectives with blank text boxes. Players cannot play or put into play any attachment that shares a title with an attachment guarded by this stage. When this stage is defeated, return each guarded attachment to its owner's hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51205",
+      "side": "B",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Journey-in-the-Black-Pit-Narrow-Paths-2B.jpg",
+        "sha256": "e5fb8cb330bd3491770c6a20b4901a3ef2e134d3f019c3ee5879aad9a0bfee22"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for one different 0 cost location per player and adds them to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51207",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Search-for-the-Chamber-Drums-in-the-Deep-3A.jpg",
+        "sha256": "5d3bbd5141f43ea3dd7a122142145dfd122b927a653105e8a2e7a95e815e4891"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (cost 3 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51207",
+      "side": "B",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Search-for-the-Chamber-Drums-in-the-Deep-3B.jpg",
+        "sha256": "efb10c06f998259b46131100480d085bb9fd245268a152550e32eba1b40eedb5"
+      },
+      "lines": [
+        "Enemies cannot take damage while Chamber of Mazarbul is in the staging area.",
+        "When Revealed: The opposing team searches the encounter deck and discard pile for an enemy and adds it to the staging area.",
+        "This stage cannot be defeated while an enemy is in play. When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51208",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Search-for-the-Chamber-The-Fate-of-Balin-3A.jpg",
+        "sha256": "5d3bbd5141f43ea3dd7a122142145dfd122b927a653105e8a2e7a95e815e4891"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (cost 3 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51208",
+      "side": "B",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Search-for-the-Chamber-The-Fate-of-Balin-3B.jpg",
+        "sha256": "2336816d46a3e071aaa7ae87fb7bdbca17598ef1bbb553a6500a6d5c29d25640"
+      },
+      "lines": [
+        "Forced: At the beginning of the staging step, the first player must choose: either reveal an additional encounter card this phase, or no more than 5 progress can be placed here this phase.",
+        "This stage cannot be defeated while Chamber of Mazarbul is in play. When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51209",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Search-for-the-Chamber-Continuing-Eastward-3A.jpg",
+        "sha256": "5d3bbd5141f43ea3dd7a122142145dfd122b927a653105e8a2e7a95e815e4891"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (cost 3 or less instead if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51209",
+      "side": "B",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Search-for-the-Chamber-Continuing-Eastward-3B.jpg",
+        "sha256": "7e85aef8b28df085155a7e2852da58f0cb58e5c1088cf2788b1c86719a7cd9ac"
+      },
+      "lines": [
+        "Each location in the staging area gets +1 Threat and +3 quest points.",
+        "Forced: When the active location is explored, reveal the top card of the encounter deck.",
+        "This stage cannot be defeated while Chamber of Mazarbul is in play. When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51210",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/The-Watcher.jpg",
+        "sha256": "a3cd51ad709c6f08c378348ea77b6324ea29e42c450092409f19094c3968ce92"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Cannot be optionally engaged.",
+        "The Watcher gets +2 Threat and +4 hit points per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51211",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Chamber-of-Mazarbul.jpg",
+        "sha256": "5c2ae00440aebab1fe18be3a92de9e194879e21e0ea97326c4c003c19606fbc7"
+      },
+      "lines": [
+        "X is 1 more than the stage number of the main quest.",
+        "Immune to player card effects.",
+        "The players cannot travel here unless they are at stage 3B.",
+        "Travel: Each player discards 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51212",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Savage-Werewolf.jpg",
+        "sha256": "64f6f09d3ea8512d38924f9f9722adc69251c5b07be58021db57a2446f986cff"
+      },
+      "lines": [
+        "Forced: After Savage Werewolf is dealt a shadow card with no shadow effect, it makes an additional attack after this one. (Do not deal it a shadow card.)",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51213",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Many-pillared-Hall.jpg",
+        "sha256": "a80d56c6afb4e3e6d3fcc6854f30df8d5c78f0708c2d48fa2983a336abea8918"
+      },
+      "lines": [
+        "Many-pillared Hall gets +1 Threat for each copy of Many-pillared Hall in the staging area.",
+        "Shadow: Discard an attachment from the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51214",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Shadow-of-Fear.jpg",
+        "sha256": "00a7402fcbec4961f59539e42b1af858336002a8ec85dbd42087b6bd0bc13d3b"
+      },
+      "lines": [
+        "When Revealed: The opposing team attaches Shadow of Fear to a hero. (Counts as a Condition attachment with the text: 'Treat attached hero's text box as if it were blank, except for Traits.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51215",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Deep-dweller.jpg",
+        "sha256": "77a77811108bcd132e1c60cb12c867569d7abbab9ce0b1e50a272e6c8bddfaee"
+      },
+      "lines": [
+        "When Revealed: Return each engaged Spider enemy to the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it is a Spider)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51216",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Darkened-Stairway.jpg",
+        "sha256": "15db6921879123fba0296fcc5625115061c2cabca1a4142f3ee2c2eefadcfd00"
+      },
+      "lines": [
+        "While Darkened Stairway is in the staging area, it gains: 'Forced: After a 'when revealed' effect is canceled, reveal the top card of the encounter deck.'",
+        "Travel: Discard the top card of the encounter deck. If that card is a treachery, resolve its 'when revealed' effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51217",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/We-Cannot-Get-Out.jpg",
+        "sha256": "de2cec526c128afb5a085d1bf36052a03bdbacb2bcc9148a03db84e190dce47d"
+      },
+      "lines": [
+        "When Revealed: Until the end of the phase, add X Threat to the staging area, where X is the number of characters controlled by the player with the most characters.",
+        "Shadow: Assign X damage among characters you control, where X is the number of enemies engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51218",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Spider-Broodling.jpg",
+        "sha256": "63981a0e6ebfa01e6165e11a6aeb4fdfce6dcc64d9cf39a9eea8ce5f4a6c052e"
+      },
+      "lines": [
+        "Forced: After Spider Broodling engages you, remove 2 progress from the main quest.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 2 progress from the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51219",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Spider-Burrow.jpg",
+        "sha256": "b0eadac20e5d70c80c2f44abed72ea03b2a2a226182aa5c816465fafa58c7c94"
+      },
+      "lines": [
+        "While Spider Burrow is in the staging area, each Spider enemy gets +1 Defense.",
+        "Forced: When Spider Burrow is explored, the opposing team searches the encounter deck and discard pile for a Spider enemy with cost 1 or less and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51220",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Grabbed-by-Spiders.jpg",
+        "sha256": "d6ebff61ce378ba148a38d146c0f378270414eb07575e33c10aa7055cf3a54cc"
+      },
+      "lines": [
+        "When Revealed: Remove X characters from the quest, where X is the number of Spider enemies in play. If there are no Spider enemies in play, Grabbed by Spiders gains surge.",
+        "Shadow: Defending character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51221",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Moria-Bats.jpg",
+        "sha256": "56dfd1603318ea9b48d8c49bf19d57c27b9e8c47a8e4c5c536ca77500713fa01"
+      },
+      "lines": [
+        "Surge.",
+        "Shadow: Shuffle Moria Bats into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51222",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Ancient-Guardroom.jpg",
+        "sha256": "f36e34af5c8cbd9f1042c74a21afa34f74adce0328063885346eb1ed07d1b1a4"
+      },
+      "lines": [
+        "Ancient Guardroom gets +1 Threat for each resource on it.",
+        "Forced: After an event is played, place 1 resource here.",
+        "Travel: Assign X damage among characters in play, where X is Ancient Guardroom's Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51223",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Denizen-of-the-Deep.jpg",
+        "sha256": "55a4b4f9601b06712edfdbea18b2e5c0cbab02434b269283b62df8cb440ae711"
+      },
+      "lines": [
+        "When Revealed: The opposing team attaches Denizen of the Deep to a non-unique enemy and returns it to the staging area. If there are no non-unique enemies in play, Denizen of the Deep gains surge. (Counts as a Condition attachment with the text: 'Attached enemy gets +1 Threat, +1 Attack, +1 Defense and is immune to player card effects.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51224",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Werewolf.jpg",
+        "sha256": "488093ba92ac76bf1041432d2b177f0a7cb879e01fc398c9b8cb1aecdb1969c4"
+      },
+      "lines": [
+        "Werewolf gets -10 engagement cost while there is an active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51225",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Fouled-Well.jpg",
+        "sha256": "d7061575493a3cd0e040af5f5f026b0b59bf394d470a88000af235fc37a95063"
+      },
+      "lines": [
+        "While Fouled Well is in the staging area, characters cannot be readied by player card effects.",
+        "Travel: Each player exhausts a character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51226",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Cave-In.jpg",
+        "sha256": "0233a832922c82f084b133c2f79f6ea9b15fb89c8dbcca50742ed853adcb7d82"
+      },
+      "lines": [
+        "When Revealed: Return the active location to the staging area. Each player assigns X damage among characters he controls, where X is the Threat of that location. If no location is returned to the staging area this way, Cave In gains surge.",
+        "Shadow: If this attack destroys a character, return the active location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51227",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Hive-Guardian.jpg",
+        "sha256": "2d625f974e24a8a4b7a8760dace4a2a6e136d54535d9ce3a49ed68b901537314"
+      },
+      "lines": [
+        "Forced: After Hive Guardian attacks and destroys an ally, return Hive Guardian to the staging area.",
+        "Shadow: Return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51228",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Abandoned-Mines.jpg",
+        "sha256": "b0de936d9add0b11228520bceb30b15eb00746412def2c8bf8689cd2bdefabe0"
+      },
+      "lines": [
+        "While Abandoned Mines is in the staging area, progress cannot be placed here.",
+        "Shadow: If attacking enemy was engaged this round, it cannot take damage this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51229",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Sudden-Pitfall.jpg",
+        "sha256": "1fa0f610ca6c0e9432006dc83dd58cd987d7a649b0d27c685b48b947d0b2f70a"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses and discards an ally. If no ally was discarded this way, Sudden Pitfall gains surge.",
+        "Shadow: Either discard an ally you control, or attacking enemy cannot take damage this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51230",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Web-spinner.jpg",
+        "sha256": "1ec3b209c9a8789f5508ea365b342892778f4dff028538def3046ec0dbddfaf6"
+      },
+      "lines": [
+        "When Revealed: Either no more than 4 progress can be placed on the current quest this phase, or Web-spinner gains surge.",
+        "Shadow: If this attack destroys a character, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51231",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Cobwebbed-Cavern.jpg",
+        "sha256": "8877b124baaee15c5a8b74bed773d9c62e2ed979743d4f688fa546bed9eb049c"
+      },
+      "lines": [
+        "Travel: Remove 2 progress from the main quest.",
+        "Shadow: Remove 2 progress from the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51232",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Foul-Air.jpg",
+        "sha256": "1870f243c1c55a19ba560e864a0684d7bca329b582a780041a03fb85d0d7fd53"
+      },
+      "lines": [
+        "When Revealed: The first player must choose: either deal 1 damage to each character committed to the quest, or raise each player's threat by 1 and end the quest phase without resolving the quest.",
+        "Shadow: Deal 1 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51233",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Brood-Mother.jpg",
+        "sha256": "d23e3cf403dcd1bbd734729c1692228af2205cd7e40da7e5892349b525f78f61"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments or take non-combat damage.",
+        "While Brood Mother is in the staging area, no more than 5 progress can be placed on the main quest each round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51234",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Lightless-Passage.jpg",
+        "sha256": "9fb87d01b2b1e45c449b15ca8beac264985afc77071070756cb1df2afea99e11"
+      },
+      "lines": [
+        "While Lightless Passage is in the staging area, no more than 1 progress can be placed on each location in the staging area each round.",
+        "Travel: Each player discards 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51235",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Lurking-Malice.jpg",
+        "sha256": "bce0dcbc9331591b12c60ce21f5249693b3f5c868ea7dce4b76c4b144153a091"
+      },
+      "lines": [
+        "When Revealed: Discard each resource from each hero's resource pool. Add 1 to the total Threat in the staging area for each resource discarded this way. If no resources were discarded this way, Lurking Malice gains surge.",
+        "Shadow: Discard a resource from the resource pool of a hero you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51236",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Great-Cave-troll.jpg",
+        "sha256": "2948550295b5859534a63dabd07a63e807991da9380074a4824346bcd65b7303"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments.",
+        "While Great Cave-troll is in the staging area, it gains: 'Forced: At the end of the encounter phase, raise each player's threat by 2.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51237",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Zigil-Mineshaft.jpg",
+        "sha256": "0d5bb150aec511969870bc9588c4bbf89d23d4f2773e69fb08eeb839dbfaf856"
+      },
+      "lines": [
+        "Quest Action: Raise each player's threat by 1 to reduce the total Threat of Zigil Mineshaft by 1 until the end of the phase. The first player may trigger this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51238",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Dark-and-Dreadful.jpg",
+        "sha256": "31a3f15b50dbd0de381bab924d750804dbf24f936d883407b2f10c6fc809f911"
+      },
+      "lines": [
+        "When Revealed: Each player discards 1 random card from his hand. Until the end of the phase, add X Threat to the staging area, where X is the total cost of the discarded cards.",
+        "Shadow: Discard 1 random card from your hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51239",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Goblin-Follower.jpg",
+        "sha256": "6114bc55e63fabf573b67eebab4d079808304c77e59a0ae07c6a17ba8de86c2a"
+      },
+      "lines": [
+        "Goblin Follower cannot be optionally engaged.",
+        "While Goblin Follower is in the staging area, it gains: 'Forced: After an enemy engages a player, Goblin Follower engages that player.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51240",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Stairs-of-Náin.jpg",
+        "sha256": "381a54d03779a644f757db67df0cc37c2ac3f7be39bd63e331218c81213f2907"
+      },
+      "lines": [
+        "While Stairs of Náin is in the staging area, the first treachery revealed each round gains surge and its 'when revealed' effects cannot be canceled.",
+        "Forced: When Stairs of Náin is explored, raise each player's threat by 4."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51241",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Hidden-Threat.jpg",
+        "sha256": "9a8ee4c81f98f6f0aeda1ee45482f499ba6253d7322b81dd93c3d6baab0d70a0"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost X or less, where X is the stage number of the main quest, and places that card facedown under the main quest. After the next time the players quest successfully, reveal that card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51242",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Goblin-Warlord.jpg",
+        "sha256": "0869d76017a3a0b9da738558e1b353bc84598aafdaa027e96c527520982b5c77"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments or take non-combat damage.",
+        "Forced: After Goblin Warlord enters play, the opposing team searches the encounter deck and discard pile for a 0-cost Goblin enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51243",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Dwarven-Forge.jpg",
+        "sha256": "50a1715c95f12e5a1f9450cc9cc5839e32f5adcd9f88592f6b3765d93f476623"
+      },
+      "lines": [
+        "While Dwarven Forge is the active location, it gains: 'Response: After Dwarven Forge is explored, each player draws 1 card.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51244",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Signs-of-Conflict.jpg",
+        "sha256": "b271f8cb3b9159bc1bcdc28789015c5d42e551487f99a03a103a41c39a27fdef"
+      },
+      "lines": [
+        "When Revealed: Each enemy and location in the staging area gets +1 Threat until the end of the phase.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you are engaged with another enemy)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51245",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Goblin-Archer.jpg",
+        "sha256": "3e9b6312e03f735a882f2d58c9e239b8dc5f200365b0d39d1029924fdb88afbe"
+      },
+      "lines": [
+        "While Goblin Archer is in the staging area, it gains: 'Forced: At the end of the encounter phase, assign X damage among characters in play, where X is the number of enemies in play.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51246",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Narrow-Fissure.jpg",
+        "sha256": "1d74a2b4527853b536795048a88faed3fe05cbc4eaa4514e1dce7fc348238b27"
+      },
+      "lines": [
+        "While Narrow Fissure is in the staging area, characters cannot be healed by player card effects.",
+        "Travel: Each player deals 1 damage to a hero he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51247",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Crumbling-Ruin.jpg",
+        "sha256": "3734ca7de5c8abef923141378061e9f101fb2d20345b9f51d17611983d71d12c"
+      },
+      "lines": [
+        "When Revealed: Each player assigns X damage among characters he controls, where X is the number of characters he controls.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51248",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Goblin-Sneak.jpg",
+        "sha256": "01edf862ca0e083780adaa3aa5083bef31880d992ad09834fcca68e763eb53c0"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a Goblin enemy with cost 1 or less and adds it to the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51249",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Plundered-Armoury.jpg",
+        "sha256": "d396de447bdb61a0bc4b3b5c05073ebe14b8419c1f9a82e9b4897688ad790183"
+      },
+      "lines": [
+        "When Revealed: Discard the top card of the encounter deck. If that card is an enemy, add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51250",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/They-Are-Coming.jpg",
+        "sha256": "20501eb5665fd8d6b86502434e43367589ebf236b064bd2d0a6e1dfe5524e82b"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for a different 0-cost enemy per player and adds them to the staging area. Shuffle the encounter deck.",
+        "Shadow: The opposing team shuffles an enemy from the encounter discard pile into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51251",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Swarming-Goblins.jpg",
+        "sha256": "c6dad11aae2f7a3615ce8d0bfa6e20b22259d3a90c96bc0c92ea4134142429f6"
+      },
+      "lines": [
+        "When Revealed: Return each copy of Swarming Goblins in the encounter discard pile to the staging area.",
+        "Shadow: If the attacking enemy is a Goblin, put Swarming Goblins into play engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51252",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Goblin-Tunnels.jpg",
+        "sha256": "37171bd85db4b4f7f64d5fac43a107fedc281d39b49ae296f1de0fe5ea4501d8"
+      },
+      "lines": [
+        "While Goblin Tunnels is in the staging area, each Goblin enemy gets +1 Attack.",
+        "Forced: When Goblin Tunnels is explored, the opposing team searches the encounter deck and discard pile for a Goblin enemy with cost 1 or less and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51253",
+      "side": "A",
+      "printing": "TMoM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mines-of-Moria/Massing-in-the-Deep.jpg",
+        "sha256": "8cfcb8f53531df36a8f504db33b11e755bbc87f48b1fcbd5ad6a69463278bd94"
+      },
+      "lines": [
+        "When Revealed: Each engaged enemy makes an attack. If no attacks were made this way, Massing in the Deep gains surge.",
+        "Shadow: Each enemy engaged with you gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

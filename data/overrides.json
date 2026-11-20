@@ -2485,9 +2485,10 @@
         "code": "51212"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 1"
+        "encounterSet": "The Mines of Moria 1",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2495,9 +2496,10 @@
         "code": "51213"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 1"
+        "encounterSet": "The Mines of Moria 1",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2505,9 +2507,10 @@
         "code": "51214"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 1"
+        "encounterSet": "The Mines of Moria 1",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2515,9 +2518,10 @@
         "code": "51215"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 2"
+        "encounterSet": "The Mines of Moria 2",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2525,9 +2529,10 @@
         "code": "51216"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 2"
+        "encounterSet": "The Mines of Moria 2",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2535,9 +2540,10 @@
         "code": "51217"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 2"
+        "encounterSet": "The Mines of Moria 2",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2545,9 +2551,10 @@
         "code": "51218"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 3"
+        "encounterSet": "The Mines of Moria 3",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2555,9 +2562,10 @@
         "code": "51219"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 3"
+        "encounterSet": "The Mines of Moria 3",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2565,9 +2573,10 @@
         "code": "51220"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 3"
+        "encounterSet": "The Mines of Moria 3",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2575,9 +2584,10 @@
         "code": "51221"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 4"
+        "encounterSet": "The Mines of Moria 4",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2585,9 +2595,10 @@
         "code": "51222"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 4"
+        "encounterSet": "The Mines of Moria 4",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2595,9 +2606,10 @@
         "code": "51223"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 4"
+        "encounterSet": "The Mines of Moria 4",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2605,9 +2617,10 @@
         "code": "51224"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 5"
+        "encounterSet": "The Mines of Moria 5",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2615,9 +2628,10 @@
         "code": "51225"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 5"
+        "encounterSet": "The Mines of Moria 5",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2625,9 +2639,10 @@
         "code": "51226"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 5"
+        "encounterSet": "The Mines of Moria 5",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2635,9 +2650,10 @@
         "code": "51227"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 6"
+        "encounterSet": "The Mines of Moria 6",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2645,9 +2661,10 @@
         "code": "51228"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 6"
+        "encounterSet": "The Mines of Moria 6",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2655,9 +2672,10 @@
         "code": "51229"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 6"
+        "encounterSet": "The Mines of Moria 6",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2665,9 +2683,10 @@
         "code": "51230"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 7"
+        "encounterSet": "The Mines of Moria 7",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2675,9 +2694,10 @@
         "code": "51231"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 7"
+        "encounterSet": "The Mines of Moria 7",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2685,9 +2705,10 @@
         "code": "51232"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 7"
+        "encounterSet": "The Mines of Moria 7",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2695,9 +2716,10 @@
         "code": "51233"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 8"
+        "encounterSet": "The Mines of Moria 8",
+        "cost": 3
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2705,9 +2727,10 @@
         "code": "51234"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 8"
+        "encounterSet": "The Mines of Moria 8",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2715,9 +2738,10 @@
         "code": "51235"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 8"
+        "encounterSet": "The Mines of Moria 8",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2725,9 +2749,10 @@
         "code": "51236"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 9"
+        "encounterSet": "The Mines of Moria 9",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2735,9 +2760,10 @@
         "code": "51237"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 9"
+        "encounterSet": "The Mines of Moria 9",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2745,9 +2771,10 @@
         "code": "51238"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 9"
+        "encounterSet": "The Mines of Moria 9",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2755,9 +2782,10 @@
         "code": "51239"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 10"
+        "encounterSet": "The Mines of Moria 10",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2765,9 +2793,10 @@
         "code": "51240"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 10"
+        "encounterSet": "The Mines of Moria 10",
+        "cost": 3
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2775,9 +2804,10 @@
         "code": "51241"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 10"
+        "encounterSet": "The Mines of Moria 10",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2785,9 +2815,10 @@
         "code": "51242"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 11"
+        "encounterSet": "The Mines of Moria 11",
+        "cost": 3
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2795,9 +2826,10 @@
         "code": "51243"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 11"
+        "encounterSet": "The Mines of Moria 11",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2805,9 +2837,10 @@
         "code": "51244"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 11"
+        "encounterSet": "The Mines of Moria 11",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2815,9 +2848,10 @@
         "code": "51245"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 12"
+        "encounterSet": "The Mines of Moria 12",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2825,9 +2859,10 @@
         "code": "51246"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 12"
+        "encounterSet": "The Mines of Moria 12",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2835,9 +2870,10 @@
         "code": "51247"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 12"
+        "encounterSet": "The Mines of Moria 12",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2845,9 +2881,10 @@
         "code": "51248"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 13"
+        "encounterSet": "The Mines of Moria 13",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2855,9 +2892,10 @@
         "code": "51249"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 13"
+        "encounterSet": "The Mines of Moria 13",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2865,9 +2903,10 @@
         "code": "51250"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 13"
+        "encounterSet": "The Mines of Moria 13",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2875,9 +2914,10 @@
         "code": "51251"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 14"
+        "encounterSet": "The Mines of Moria 14",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2885,9 +2925,10 @@
         "code": "51252"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 14"
+        "encounterSet": "The Mines of Moria 14",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     },
     {
@@ -2895,9 +2936,10 @@
         "code": "51253"
       },
       "set": {
-        "encounterSet": "The Mines of Moria 14"
+        "encounterSet": "The Mines of Moria 14",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/5, one for each copy of the set) and DragnCards numbers the sets by card order, three cards each (Hall of Beorn swaps the numbers of Lurking Malice and Dark and Dreadful, which print 38 and 35, so the set grouping is unchanged); the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     }
   ],
