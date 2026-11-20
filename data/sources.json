@@ -5479,9 +5479,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "cc271eba8da702d2d54bcb2ab6646c41871a5a8796a603fc6a8abf52c9210f08"
+        "value": "a1572afb0ce5e80590926916322d5f2896d3d257fb3bf1b2b056c7a26c0cea63"
       },
-      "fetchedAt": "2026-11-20T03:44:27.281Z",
+      "fetchedAt": "2026-11-20T06:32:21.334Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -27376,6 +27376,282 @@
           "url": "https://images.cardgame.tools/lotr/OP050-032-back-Campaign-Epic_Multiplayer_Mode-Epic_Multiplayer_Mode-A-Attack_on_Dol_Guldur.jpg",
           "sha256": "5fecab5ea05d78c87a09eeb69d2911f6e4ac9269c20a88d361778d582090a908",
           "bytes": 818981
+        },
+        {
+          "path": "pictures/51001.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-1-front-Quest-Radagasts_Request-A-The_Wizards_Quest.jpg",
+          "sha256": "284209db677dc001b0182dec2cbf1e34f35dea4c8f6fad28ec3e337c6221c90d",
+          "bytes": 888633
+        },
+        {
+          "path": "pictures/51001.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-1-back-Quest-Radagasts_Request-A-The_Wizards_Quest.jpg",
+          "sha256": "760324b0944fd828071cd7cc0a3c2decacc575a5974fda742146876458c5e5f4",
+          "bytes": 738510
+        },
+        {
+          "path": "pictures/51010.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-10-front-Location-Rhosgobel-The_Wizards_Quest.jpg",
+          "sha256": "d8a17d2a345eb415bdb98a04c7f0d6ea3832cebc01b48c1262076d6c3e8fe9ff",
+          "bytes": 880429
+        },
+        {
+          "path": "pictures/51012.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-12-front-Enemy-Nazgul_of_Dol_Guldur.jpg",
+          "sha256": "259f3d77a2542dd3b68c744b72e94d8192c88c7e68cf85ba039b14b2dee9e7fc",
+          "bytes": 848145
+        },
+        {
+          "path": "pictures/51013.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-13-front-Location-Necromancers_Pass.jpg",
+          "sha256": "d6ee62f0463eac8a90b98666f43d7faa263e293bee0df92b09740bfab3ae8a0c",
+          "bytes": 837957
+        },
+        {
+          "path": "pictures/51014.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-14-front-Treachery-Pursued_by_Shadow.jpg",
+          "sha256": "247c7fda45e308cbb491c6c8a49a19919b3558de0ccc50068f2eba0dc4f4856a",
+          "bytes": 831513
+        },
+        {
+          "path": "pictures/51015.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-15-front-Enemy-Bane_of_Amon_Lanc.jpg",
+          "sha256": "fc29a601674c7a73f02e61f67d208e4c8c006381f920bad5ed143f931059dd26",
+          "bytes": 867180
+        },
+        {
+          "path": "pictures/51016.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-16-front-Location-Oak_wood_Grove.jpg",
+          "sha256": "230e67be89e3f03901d093e97350bf497113c7f52d16683d19fb99e45c70e829",
+          "bytes": 810417
+        },
+        {
+          "path": "pictures/51017.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-17-front-Treachery-Smoking_Blood.jpg",
+          "sha256": "a3c6c44c60a21df5bedb0eb1fcc08b577d0be143e17e3b6ff70e4d75e3e3163b",
+          "bytes": 801019
+        },
+        {
+          "path": "pictures/51018.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-18-front-Enemy-Forest_Flies.jpg",
+          "sha256": "e8b66af3d085e1fc5cc48df2a61d80a1fc2da4bd6d0cbd39d32004a20f598199",
+          "bytes": 795904
+        },
+        {
+          "path": "pictures/51019.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-19-front-Location-Twilight_Hall.jpg",
+          "sha256": "6df0a9712d2c55daa9752b925b706ef39e0b81558c40dc030de4411fd6fc2466",
+          "bytes": 899038
+        },
+        {
+          "path": "pictures/51020.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-20-front-Treachery-Swarming_Mosquitoes.jpg",
+          "sha256": "460e6680016718b8e349a6a7ddba386b5fc172670e2a205bd0e2feb33e7c7fdf",
+          "bytes": 852045
+        },
+        {
+          "path": "pictures/51021.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-21-front-Enemy-Goblin_Sniper.jpg",
+          "sha256": "8c5aa6fb02ab99f38e9e00f2c0d852e3c6de83aa8cbd3a09b6326e7632a0a627",
+          "bytes": 859653
+        },
+        {
+          "path": "pictures/51022.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-22-front-Location-Pine_Slopes.jpg",
+          "sha256": "110a66accf7370636e4e721b8afd3b35d6bae72c5db0afd3aef75eae962a8695",
+          "bytes": 836665
+        },
+        {
+          "path": "pictures/51023.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-23-front-Treachery-Under_the_Shadow.jpg",
+          "sha256": "91aea8c3b950ae234ed39b063cde4e358531f81af3dbe612db1eb772c958bfe2",
+          "bytes": 825102
+        },
+        {
+          "path": "pictures/51024.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-24-front-Enemy-Necromancers_Warg.jpg",
+          "sha256": "7a4240f2282a0fecdf359827cdea22b83af29c641d72efc1b803054fb143811d",
+          "bytes": 756264
+        },
+        {
+          "path": "pictures/51025.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-25-front-Enemy-Dol_Guldur_Beastmaster.jpg",
+          "sha256": "e842549a8e842c27da649746ec49d0c903b2f429eb8c0b1f4eccd6651a12c595",
+          "bytes": 819474
+        },
+        {
+          "path": "pictures/51026.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-26-front-Location-Watched_Path.jpg",
+          "sha256": "0d1b6ea89b71914134a3d6ce111ebbda773bf6f9f4e34ea9db46316c24e5d82e",
+          "bytes": 797405
+        },
+        {
+          "path": "pictures/51027.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-27-front-Treachery-Evil_Storm.jpg",
+          "sha256": "4f7cf891795fa050198e803e5f67d6c2bdb2a0e4fdaf9f6b73e5237788c93e2b",
+          "bytes": 783733
+        },
+        {
+          "path": "pictures/51028.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-28-front-Enemy-Spider_of_Dol_Guldur.jpg",
+          "sha256": "2ed812c7e7c07d3fd3248763a9eec0aaf7cd15a61b56491d62c4b613ef7f295b",
+          "bytes": 729417
+        },
+        {
+          "path": "pictures/51029.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-29-front-Location-Patch_of_Midnight.jpg",
+          "sha256": "72f45b783bd44b2c348dd909ed43b8fe45c10b17d96cc43d0b317f3fbae6dc0f",
+          "bytes": 817656
+        },
+        {
+          "path": "pictures/51030.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-30-front-Treachery-Eyes_in_the_Dark.jpg",
+          "sha256": "2fc3eb67bfd7180ccd06e0fc8ac20ae316efe4c444ac63fc085801a4bd9f4174",
+          "bytes": 714597
+        },
+        {
+          "path": "pictures/51031.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-31-front-Enemy-Eastern_Crows.jpg",
+          "sha256": "ac2bf3911efeabac658e2b384a442721097840fc0dc36c192e657a561d920404",
+          "bytes": 870375
+        },
+        {
+          "path": "pictures/51032.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-32-front-Location-The_Sorcerers_Tower.jpg",
+          "sha256": "b015d4d453796efe9976de33b9e392f6fdf0d9b1602cca17f019d8bfd7e6fd54",
+          "bytes": 833941
+        },
+        {
+          "path": "pictures/51033.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-33-front-Treachery-Power_Sevenfold.jpg",
+          "sha256": "8a22a7387a65244725217b977b6e618cbb6b15be37ba63272ec93743b703c6fa",
+          "bytes": 867864
+        },
+        {
+          "path": "pictures/51034.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-34-front-Enemy-Hill_Troll.jpg",
+          "sha256": "7ba486fb980fa8794189157db169f92b841b7612c5c9eb6c59f686150dbe2597",
+          "bytes": 736537
+        },
+        {
+          "path": "pictures/51035.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-35-front-Location-Troll_Cave.jpg",
+          "sha256": "ee8917050fe7c2a83138c4ee03c7aef12dbd777a28ca7700d8a5c762eec21376",
+          "bytes": 749989
+        },
+        {
+          "path": "pictures/51036.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-36-front-Treachery-Befouled_Equipment.jpg",
+          "sha256": "5566e26a0fed488e19252224adb6378d9f8dd56dc70d3386e85df3bf426713d1",
+          "bytes": 780354
+        },
+        {
+          "path": "pictures/51037.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-37-front-Enemy-Hunting_Warg.jpg",
+          "sha256": "d30e13f55d2483ed4d62173130df6f449d327d0be1bc64a84f056dbfb9b17930",
+          "bytes": 747546
+        },
+        {
+          "path": "pictures/51038.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-38-front-Location-Hunters_Lookout.jpg",
+          "sha256": "373473aff8f0b2150b7977656ca356e8b9a9f91efe955447bec8d0f0f2fb0965",
+          "bytes": 806738
+        },
+        {
+          "path": "pictures/51039.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-39-front-Treachery-Restless_Hunters.jpg",
+          "sha256": "6caec712b5823ddffa87ddde14e7aef807f7f6ada57a3cf81083e255af460e31",
+          "bytes": 770627
+        },
+        {
+          "path": "pictures/51040.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-40-front-Enemy-Dol_Guldur_Orcs.jpg",
+          "sha256": "269ff84141a13997d61e8ff8a24ace8df92787cd191ac4bfc10f7be37a810da3",
+          "bytes": 775864
+        },
+        {
+          "path": "pictures/51041.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-41-front-Location-The_Shadow_Road.jpg",
+          "sha256": "30c25809ea9a8201bca66634386db78b0d1863b7a4c2fa15ae1b1d3f0e57583b",
+          "bytes": 816604
+        },
+        {
+          "path": "pictures/51042.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-42-front-Treachery-The_Necromancers_Reach.jpg",
+          "sha256": "a3cd0c0a5c093be89b7094414c956cfc45d491aa785acbf4fa43b249eb512d67",
+          "bytes": 770585
+        },
+        {
+          "path": "pictures/51043.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-43-front-Enemy-Ravenous_Spider.jpg",
+          "sha256": "bb51ba6816b8ea8d2a129e938712c8a8aabe4d9e37c0af6c418183520b7076ba",
+          "bytes": 773234
+        },
+        {
+          "path": "pictures/51044.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-44-front-Location-Forest_Gate.jpg",
+          "sha256": "40e20113702da4e10e023b3c0b2c2a86c3cfe541b9e292f53c5ca62d25b57612",
+          "bytes": 791098
+        },
+        {
+          "path": "pictures/51045.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-45-front-Treachery-Nightfall.jpg",
+          "sha256": "68880032ad045ce8e5e8c6f6243785abad64234aed7393666b29a0931081b5d7",
+          "bytes": 740435
+        },
+        {
+          "path": "pictures/51046.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-46-front-Enemy-Venomous_Spider.jpg",
+          "sha256": "40a787f99542955ffee13b53eefb9200617d6828dc24f3615b1f4c561c485397",
+          "bytes": 747704
+        },
+        {
+          "path": "pictures/51047.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-47-front-Location-Pitch_dark_Thicket.jpg",
+          "sha256": "f6d285b6160874102729e43c12a88ee94d5318c1db915b0faa0ef8bcec57f272",
+          "bytes": 761154
+        },
+        {
+          "path": "pictures/51048.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-48-front-Treachery-Fastness_of_Mirkwood.jpg",
+          "sha256": "2d04be1036949397bdfe96ddcfe5be129f1bdbe4d30c5ea4aa12ac821734cf11",
+          "bytes": 814594
+        },
+        {
+          "path": "pictures/51049.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-49-front-Enemy-Dark_Bats.jpg",
+          "sha256": "448da4237b73ba3970f5101e93c6ab97ebf2c55e85feef8ba32f4ec637450f04",
+          "bytes": 758839
+        },
+        {
+          "path": "pictures/51050.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-50-front-Location-Forest_Stream.jpg",
+          "sha256": "36e5f6bd45890c8037eaed62c7d37dc0f09461cd07f5c327db61109167782b95",
+          "bytes": 766805
+        },
+        {
+          "path": "pictures/51051.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-51-front-Treachery-Treacherous_Fog.jpg",
+          "sha256": "bd3376d7008191cac51dcd867b6922ffe52d6d6107442f174bcc075414bea92f",
+          "bytes": 844614
+        },
+        {
+          "path": "pictures/51052.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-52-front-Enemy-Howling_Warg.jpg",
+          "sha256": "966ea2ecb0972c111508310b6371eb66fdfde82ead12940b8873feaabf53f3f7",
+          "bytes": 758394
+        },
+        {
+          "path": "pictures/51053.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-53-front-Location-The_Wargs_Glade.jpg",
+          "sha256": "26b0445f94e49f9df65850fe1540d70fd58121ca0584f5bc40e0f89d38eb491e",
+          "bytes": 717241
+        },
+        {
+          "path": "pictures/51054.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC75-54-front-Treachery-Weighed_Down.jpg",
+          "sha256": "7c7c6edc167038ddc7f20b4734b00be76601a07b6307a2f763443b08e9a04747",
+          "bytes": 772041
         },
         {
           "path": "pictures/9901014.A.jpg",
