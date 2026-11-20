@@ -49,11 +49,11 @@ Read the sections your task touches.
     - 318–368 Settings worth knowing (~460)
     - 369–401 Decks and cards (~240)
     - 402–452 Campaigns, saves and updates (~530)
-  - 453–486 Roadmap (~1.2K)
-  - 487–497 Get involved (~210)
-  - 498–501 Support (~90)
-  - 502–517 Attribution (~410)
-  - 518–521 License (~50)
+  - 453–485 Roadmap (~1.1K)
+  - 486–496 Get involved (~210)
+  - 497–500 Support (~90)
+  - 501–516 Attribution (~410)
+  - 517–520 License (~50)
 - `docs/architecture.md` — Architecture (~28.6K tok)
   - 7–41 Stack (~1.2K)
   - 42–77 Processes (~690)
@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~316.5K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~319.0K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -152,7 +152,7 @@ Read the sections your task touches.
     - 2017–2044 The Long Dark (~4.8K) ← 4
     - 2045–2076 Foundations of Stone (~4.3K) ← 3
     - 2077–2107 Shadow and Flame (~4.1K) ← 4
-  - 2108–2538 Standalone scenarios (~57.7K) ← 1
+  - 2108–2550 Standalone scenarios (~60.2K) ← 1
     - 2112–2135 The Massing at Osgiliath (~2.5K) ← 1
     - 2136–2158 The Battle of Lake-town (~4.0K) ← 36
     - 2159–2175 The Stone of Erech (~2.2K) ← 20
@@ -166,18 +166,19 @@ Read the sections your task touches.
     - 2413–2448 The Woodland Realm (~4.7K) ← 15
     - 2449–2488 The Mines of Moria (~4.9K) ← 12
     - 2489–2538 Escape from Khazad-dûm (~6.9K) ← 14
-  - 2539–2547 Nightmare (~410) ← 22
-  - 2548–2590 Deckbuilding (~2.5K) ← 1
-  - 2591–2670 Effects (~4.1K)
-    - 2593–2651 Three layers (~2.4K) ← 10
-    - 2652–2662 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 2663–2666 Window stack (~100)
-    - 2667–2670 Coverage test (~270)
-  - 2671–2694 Data sources (~750) ← 3
-  - 2695–2713 Card images (~1.4K) ← 9
-  - 2714–2741 Persistence and shipping (~3.2K) ← 10
-  - 2742–2784 Screens (~5.9K) ← 2
-    - 2769–2784 Table screen (~1.8K) ← 3
+    - 2539–2550 The Hunt for the Dreadnaught (~2.5K) ← 2
+  - 2551–2559 Nightmare (~410) ← 22
+  - 2560–2602 Deckbuilding (~2.5K) ← 1
+  - 2603–2682 Effects (~4.1K)
+    - 2605–2663 Three layers (~2.4K) ← 10
+    - 2664–2674 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 2675–2678 Window stack (~100)
+    - 2679–2682 Coverage test (~270)
+  - 2683–2706 Data sources (~750) ← 3
+  - 2707–2725 Card images (~1.4K) ← 9
+  - 2726–2753 Persistence and shipping (~3.2K) ← 10
+  - 2754–2796 Screens (~5.9K) ← 2
+    - 2781–2796 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~68.4K tok)
   - 5–8 Overview (~170) ← 1
   - 9–34 Top bar (~6.4K) ← 10
@@ -361,8 +362,8 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Attack on Dol Guldur (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Old Forest (1); brief.md, The Siege of Annúminas (1); releasing.md, Add the desktop app to a release (1); releasing.md, Jobs (1)
-- `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Escape from Khazad-dûm (1); brief.md, Foundations of Stone (1); brief.md, The Two Towers (1)
+- `scripts/checks`: architecture.md, Screens (4); brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); brief.md, Attack on Dol Guldur (1); brief.md, Fog on the Barrow-downs (1); brief.md, The Hunt for the Dreadnaught (1); brief.md, The Old Forest (1); brief.md, The Siege of Annúminas (1); releasing.md, Add the desktop app to a release (1); releasing.md, Jobs (1)
+- `scripts/data`: brief.md, Nightmare (6); brief.md, Data sources (3); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, Dwarrowdelf (1); brief.md, Escape from Khazad-dûm (1); brief.md, Foundations of Stone (1); brief.md, The Hunt for the Dreadnaught (1); brief.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
