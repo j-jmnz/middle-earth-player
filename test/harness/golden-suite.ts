@@ -127,8 +127,18 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
   const game = (golden: G): P => games.get(golden.name)!;
   const worldOf = (golden: G): SuiteWorld => worlds.get(golden.decks)!;
 
-  // The opening: the game started and the Setup played, every question answered.
+  // The opening: the game started and the Setup played, every question answered. Played once per golden: the opening check
+  // and a scenario's checks read it many times, and a state is never changed after the reducer returns it.
+  const openings = new Map<string, ScenarioState>();
   function opened(golden: G): ScenarioState {
+    const known = openings.get(golden.name);
+    if (known) return known;
+    const state = playOpening(golden);
+    openings.set(golden.name, state);
+    return state;
+  }
+
+  function playOpening(golden: G): ScenarioState {
     const { ctx } = worldOf(golden);
     let state = startScenario(game(golden).start, ctx);
     while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;

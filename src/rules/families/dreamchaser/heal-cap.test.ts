@@ -62,9 +62,9 @@ describe("healCap (145033:A:1)", () => {
     expect(second.state).toBe(first.state);
   });
 
-  it("limits HealQuietly and offers HealAmong no character with no room left", () => {
+  it("limits Heal and offers HealAmong no character with no room left", () => {
     const { state, hero } = held();
-    const quiet = run(state, [{ verb: "Pick", pick: { type: "hero", control: "any" } }, { verb: "HealQuietly", amount: 3, target: "picked" }], hero);
+    const quiet = run(state, [{ verb: "Pick", pick: { type: "hero", control: "any" } }, { verb: "Heal", amount: 3, target: "picked" }], hero);
     expect(quiet.cards[hero]?.damage).toBe(3);
     expect(quiet.roundHealed).toEqual({ [hero]: 1 });
     const full = noteHealed(state, hero, 1, ctx);

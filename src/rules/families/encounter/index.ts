@@ -8,13 +8,14 @@ import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { startReveal } from "../../windows/frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { lowerThreat, playerCardEffectCanChoose } from "../../core/keywords.ts";
+import { lowerThreat, playerCardEffectCanChoose, raiseThreat } from "../../core/keywords.ts";
 import { isPlayerType, printedOf } from "../../core/printed.ts";
 import { placeEffectProgress } from "../quest/effect-progress.ts";
+import { immuneBuffer } from "../../interpret/immune-targets.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
-import { inPlay, withThreat } from "../../core/state.ts";
+import { inPlay } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import type { Focus } from "../index.ts";
@@ -118,7 +119,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "ProgressQuest": {
       const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
-      if (amount <= 0) return state;
+      // An active location immune to the effect ignores it, and the quest takes none (faq.legolas-immune-location; Longbeard Elder, Ravens of the Mountain).
+      if (amount <= 0 || immuneBuffer(state, focus.sourceId, ctx)) return state;
       const before = steps.length;
       const placed = placeEffectProgress(state, amount, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
       return afterProgress(placed, before, ctx, steps);
@@ -127,8 +129,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
       const threat = state.seats[focus.seat]?.threat ?? 0;
       if (state.seats[focus.seat]?.eliminated || amount <= threat) return state;
-      steps.push({ kind: "threat", seat: focus.seat, amount: amount - threat, cause: currentCause(steps, UNATTRIBUTED) });
-      return withThreat(state, focus.seat, amount);
+      // A raise like any other: the cards that hear a threat raise hear it (Sam Gamgee, 12035:A:2), and a threat of 50 eliminates the player.
+      return raiseThreat(state, focus.seat, amount - threat, steps, currentCause(steps, UNATTRIBUTED));
     }
     case "LowerThreatByRaise": {
       const amount = answeredRaise(state);

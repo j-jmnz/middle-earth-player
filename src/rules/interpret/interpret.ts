@@ -7,6 +7,7 @@ import { placeDamage, playerCardEffectCanChoose, sourcePrinted } from "../core/k
 import { isPlayerType, printedOf, type PrintedCard } from "../core/printed.ts";
 import { modifyStat } from "../combat/attack-verbs.ts";
 import { frameScope, refCard } from "./amounts.ts";
+import { namedTargetImmune } from "./immune-targets.ts";
 import { collectAllyResources } from "../families/costs/pay.ts";
 import { runFamilyVerb } from "../families/index.ts";
 import { commitCard } from "../families/attack/index.ts";
@@ -107,6 +108,8 @@ export function runInstruction(
 
 // runInstruction with a code already read as its Nightmare twin (families/nightmare/guards.ts).
 function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // A card the instruction names without a pick, immune to its source, ignores it (rr.immune, immune-targets.ts).
+  if (namedTargetImmune(state, instruction, focus, ctx)) return state;
   const family = runFamilyVerb(state, instruction, focus, ctx, steps);
   if (family) return family;
   const player = runPlayerVerb(state, instruction, focus, ctx, steps);

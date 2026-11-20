@@ -120,6 +120,29 @@ describe("pack scans", () => {
     expect(map).not.toContain("99999");
   });
 
+  it("reads a pin the cache misses from the mirror before its URL, and fetches the URL on a mirror miss", async () => {
+    const staged = stage();
+    const fetched: string[] = [];
+    const asked: string[] = [];
+    await packScans(
+      {
+        ...staged.options,
+        mirror: (hash) => {
+          asked.push(hash);
+          return Promise.resolve(hash === sha256(jpeg(560)) ? new Uint8Array(jpeg(560)) : null);
+        },
+        fetch: (url) => {
+          fetched.push(url);
+          return Promise.resolve(new Uint8Array(jpeg(560)));
+        },
+      },
+      log,
+    );
+    expect(asked).toEqual([sha256(jpeg(560))]);
+    expect(fetched).toEqual([]);
+    expect(readFileSync(path.join(staged.cache, "141022.A.jpg"))).toEqual(jpeg(560));
+  });
+
   it("keeps a picture packed from the same pin, and packs one again when its pin moves", async () => {
     const staged = stage();
     const fetch = () => Promise.resolve(new Uint8Array(jpeg(560)));

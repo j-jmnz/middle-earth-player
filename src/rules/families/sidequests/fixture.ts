@@ -48,7 +48,7 @@ export const SIDE_CARDS: ReadonlyMap<string, PrintedCard> = new Map([
     hero("scout", "Scout", "tactics", ["Ranger"], { willpower: 1, attack: 3 }),
     hero("12001", "Denethor", "leadership", ["Gondor", "Noble", "Steward"], { threat: 8, willpower: 1, attack: 1, defense: 3, health: 3 }),
     hero("145002", "Éowyn", "tactics", ["Rohan", "Noble"], { threat: 9, willpower: 4, attack: 1, defense: 1, health: 3 }),
-    hero("17028", "Thurindir", "lore", ["Dunedain", "Ranger"], { threat: 8, willpower: 2, attack: 2, defense: 0, health: 4 }),
+    hero("17028", "Thurindir", "lore", ["Dúnedain", "Ranger"], { threat: 8, willpower: 2, attack: 2, defense: 0, health: 4 }),
     definePrinted({ code: "142015", name: "Phial of Galadriel", type: "attachment", sphere: "neutral", cost: 0, victory: 3, isUnique: true, traits: ["Item", "Gift"] }),
     definePrinted({ code: "142016", name: "Three Golden Hairs", type: "attachment", sphere: "neutral", cost: 0, victory: 3, isUnique: true, traits: ["Item", "Gift"] }),
     definePrinted({ code: "142017", name: "Lórien Rope", type: "attachment", sphere: "neutral", cost: 0, victory: 3, isUnique: true, traits: ["Item", "Gift"] }),

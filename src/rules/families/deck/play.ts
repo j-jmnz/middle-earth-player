@@ -80,7 +80,7 @@ function playableFrom(state: ScenarioState, id: string, instruction: PlayFrom, s
   // An ally is played only for free too ("draw it or play it at no cost", 11211:A:2); a unique one with a copy in play stays where it is.
   if (printed.type === "ally") return instruction.free === true && !uniqueBlocked(state, printed, ctx.cards);
   if (printed.type !== "event" || (printed.costX && !instruction.free)) return false;
-  if (eventPlayReason(state, id, seat, ctx) || eventActionsNow(state, id, seat, ctx).length === 0) return false;
+  if (eventPlayReason(state, id, seat, ctx, instruction.free) || eventActionsNow(state, id, seat, ctx).length === 0) return false;
   if (instruction.free) return true;
   const cost = playCost(state, id, seat, ctx);
   return cost != null && payable(state, seat, id, ctx) >= cost;

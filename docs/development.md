@@ -99,7 +99,8 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm browser serve` | Serves the web export on `127.0.0.1` until stopped and prints its address. |
 | `pnpm lint` | Runs Oxlint (`.oxlintrc.json`). |
 | `pnpm typecheck` | Type-checks with tsrs. |
-| `pnpm data sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. It is the only command that uses the network. `scans` and `pictures` run only when you name them, after `data build`. |
+| `pnpm data sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/` from the sources. It is the only command that reads the sources for new data. `scans` and `pictures` run only when you name them, after `data build`. |
+| `pnpm data mirror push\|pull [source...]` | `push` uploads every pinned file in `.cache/` that the asset mirror does not hold (`--fetch` downloads the ones `.cache/` lacks from their URLs first); `pull` fills `.cache/` from it (Asset mirror). |
 | `pnpm data build` | Builds `data/`, `src/effects/generated/` and the game icons from `data/raw/`, offline and deterministically. |
 | `pnpm data check` | Rebuilds into a temporary directory and fails on any difference. |
 | `pnpm data ledger-seed <scenario-id> [--nightmare]` | Writes the scenario's missing printed-text ledger entries from the source text, `readBy` empty and the pinned scan named. Each is read against its scan before the scenario is playable. `--nightmare` seeds its Nightmare deck into `data/printed/nightmare.json` (the proxy pictures `pnpm data sync nightmare` pins). |
@@ -130,3 +131,13 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm move <old> <new>` | Moves files and rewrites every reference to them. Try `--dry-run` first. |
 
 Scripts log to stderr. Pass `--verbose` or `--quiet`, or set `LOG_LEVEL` to `debug`, `info`, `warn`, `error` or `silent`.
+
+## Asset mirror
+
+The asset mirror is a private Cloudflare R2 bucket that holds every file `data/sources.json` pins in `.cache/` (the card scans, the pictures and the PDFs), each at `sha256/<hash>` (`scripts/data/mirror/client.ts`). It is a cache in front of the sources, not a source: the pins keep the original URLs, and `data sync` still reads the sources.
+
+- `pnpm assets scans` and `pnpm assets booklets` read a file that `.cache/` misses from the mirror first, then from its URL. Every body is checked against its pin either way. After the first error (no network, a refused key) the run reads the sources and warns once.
+- `pnpm data mirror pull [source...]` fills `.cache/` from the mirror, so a fresh clone has the scans and PDFs without a sync. `pnpm data mirror push [source...]` uploads what the mirror lacks, with the write key. A pack reads only the files it bundles, so a scan that a picture stands in for reaches `.cache/` only through `data sync scans`; `push --fetch` downloads such files from their URLs first. A page rendered from a PDF is pushed only when a local render matches its pin.
+- The release and showcase workflows' pack (`.github/actions/pack-assets`) reads the mirror and pushes what it had to fetch (`docs/releasing.md`, Asset mirror secrets).
+
+It needs four variables: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and `R2_BUCKET`. Set them in your shell profile, never in a file in the repository. A read-only token is enough for builds and `pull`; `push` needs a token with Object Read & Write. Without all four, or with `ASSET_MIRROR=off`, every command reads the sources as before. The app never reads the mirror: its pictures and books are bundled.

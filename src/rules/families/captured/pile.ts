@@ -6,6 +6,8 @@
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard, withSeat } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
+import { announceAllyLeft } from "../../core/ally-left.ts";
+import type { PrintedCard } from "../../core/printed.ts";
 
 // The cards captured underneath the host, in id order.
 export function capturedUnder(state: ScenarioState, hostId: string): string[] {
@@ -28,6 +30,13 @@ export function captureCard(state: ScenarioState, id: string, hostId: string): S
   const owner = card.owner ?? card.controller;
   const hero = card.zone === "heroes" && owner != null ? { heroSlot: state.seats[owner]?.heroes.indexOf(id) ?? 0 } : {};
   return updateCard(moveCard(state, id, { zone: "captured", hostId, ...(owner != null ? { seat: owner } : {}) }), id, hero);
+}
+
+// An ally in play captured underneath a host leaves play, and is announced (core/ally-left.ts).
+export function captureAlly(state: ScenarioState, id: string, hostId: string, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
+  const card = state.cards[id];
+  const captured = captureCard(state, id, hostId);
+  return card && captured !== state ? announceAllyLeft(captured, card, cards) : captured;
 }
 
 // The seat's captured deck in the order given.

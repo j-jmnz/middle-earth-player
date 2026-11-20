@@ -60,6 +60,26 @@ describe("pack booklets", () => {
     expect(map).toContain(`"fellowship-of-the-ring": { moduleId: require("./fellowship-of-the-ring.pdf") as number, filename: "${mec109}", bytes: ${body(mec109).length}, sha256: "${sha256(body(mec109))}" },`);
   });
 
+  it("reads a PDF the cache misses from the mirror before its URL, and keeps it in the cache", async () => {
+    const staged = stage({});
+    const mec109 = BOOKLET_SOURCES["fellowship-of-the-ring"];
+    const fetched: string[] = [];
+    await packBooklets(
+      {
+        ...staged,
+        mirror: (hash) => Promise.resolve(hash === sha256(body(mec109)) ? body(mec109) : null),
+        fetch: async (url) => {
+          fetched.push(path.basename(url));
+          return body(path.basename(url));
+        },
+      },
+      log,
+    );
+    expect(fetched).not.toContain(mec109);
+    expect(fetched).toHaveLength(Object.keys(BOOKLET_SOURCES).length - 1);
+    expect(readFileSync(path.join(staged.pdfCacheDir, mec109))).toEqual(Buffer.from(body(mec109)));
+  });
+
   it("fails when the fetched bytes do not match the pin", async () => {
     const staged = stage({});
     await expect(packBooklets({ ...staged, fetch: async () => body("changed") }, log)).rejects.toThrow(/pinned/);

@@ -22,6 +22,7 @@ import { unownedCodes } from "../../catalog/collection";
 import { collectionPacks, collectionSets } from "../collection/sets";
 import { useNotOwned } from "../collection/store";
 import { PoolFilterSheet, typeChoices } from "./filter-sheet";
+import { FilterFold, useFilterFold } from "./filter-fold";
 import { ToastView } from "../kit/toast-view";
 import { gutter } from "../../ui/size-class";
 import { GameIcon } from "../../ui/game-icon";
@@ -34,6 +35,7 @@ import { touch, useUiScale } from "../../ui/ui-scale";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
 import { announce } from "../../ui/announce";
+import { useScreenReader } from "../../ui/screen-reader";
 
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
@@ -179,17 +181,18 @@ export function CardPoolBody({
   // The grid's cards share the list's measured width: three across to browse, two while adding so each card's stepper fits under it
   // (a phone's exact counts), and more where a tablet's list has the room (pool/grid.ts).
   const [listWidth, setListWidth] = useState(0);
-  const [listHeight, setListHeight] = useState(0);
   const scale = useUiScale();
-  const { size } = useSizeClass();
+  const { size, height: windowHeight } = useSizeClass();
   const columns = poolColumns(listWidth, adding, scale);
   const cellWidth = gridCardWidth(listWidth, columns, scale);
   // FlashList keeps every cell it has ever mounted in its recycle pool unless told otherwise: a screen's worth (and two rows each
   // way) for reuse, and the rest unmounted as they scroll off. A phone's grid is about twenty cells, so it keeps the 24 it always had.
+  // The window's height stands for the list's: the list is never taller, and it does not change while the filters fold, so a fold
+  // does not render the pool on each of its frames.
   const grid = view === "Grid";
   // The list view's rows are a reading column outside compact; the grid fills the width.
   const inset = grid ? 0 : gutter(listWidth, size, "readable", scale);
-  const recycle = grid ? recyclePool(columns, listHeight, poolCellHeight(cellWidth, adding, scale)) : recyclePool(1, listHeight, LIST_ROW_HEIGHT * scale);
+  const recycle = grid ? recyclePool(columns, windowHeight, poolCellHeight(cellWidth, adding, scale)) : recyclePool(1, windowHeight, LIST_ROW_HEIGHT * scale);
   // The sorted pool, its packs and the cards with a line the app does not apply: read once per catalog (pool/cache.ts), shared with the
   // Cards tab, the pool route, the deck editor's cards pane and the import screen.
   const { rows, packs: packRows, notApplied: inactiveCodes, byCode, motk: motkRows, motkNotes } = poolOf(catalog);
@@ -225,6 +228,11 @@ export function CardPoolBody({
     () => (motkOn ? filterPool(motkRows, query, motkFilter(applied), groups, NONE, NONE) : filterPool(rows, query, applied, groups, inactiveCodes, unowned)),
     [motkOn, motkRows, rows, query, applied, groups, inactiveCodes, unowned],
   );
+  // Browsing, in portrait and landscape alike, the sphere toggles, the type chips and the count fold away as the pool scrolls down
+  // and come back as it scrolls up or the list changes; the search row stays. Not with a screen reader on: it would hide them with no
+  // way back it can find.
+  const screenReader = useScreenReader();
+  const fold = useFilterFold(!adding && !screenReader, visible);
   const allyNotes = motkOn ? motkNotes : null;
   const unownedShown = useMemo(() => (applied.owned || !collectionSet ? 0 : visible.filter((card) => unowned.has(card.code)).length), [applied.owned, collectionSet, visible, unowned]);
   const types = useMemo(() => (!adding && motkRows.length > 0 ? [...typeChoices(rows), MOTK_CHOICE] : typeChoices(rows)), [adding, motkRows, rows]);
@@ -290,17 +298,9 @@ export function CardPoolBody({
     setOpen(false);
   }
 
-  return (
-    <View className="min-h-0 flex-1">
-      {adding ? (
-        <View className="mt-3">
-          <Segmented options={PILE_WORDS} value={pileWord(target)} onChange={(word) => setDraftTarget(word === "Side deck" ? "side" : "deck")} testIDPrefix="pool-pile" stretch accessibilityLabel="Add cards to" />
-        </View>
-      ) : null}
-      <View className="mt-3 flex-row items-center gap-2">
-        <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search name, trait or text" accessibilityLabel="Search cards" accessibilityHint="Searches card name, traits, type, sphere and text" />
-        <FilterButton count={filters} onPress={openSheet} />
-      </View>
+  // The sphere toggles, the type chips and the count with Grid / List: in the page's flow, or over the top of the list while they fold.
+  const filterRows = (
+    <>
       <SphereToggles value={applied.sphere} onChange={(sphere) => setApplied({ ...applied, sphere })} />
       <TypeChips
         types={types}
@@ -312,15 +312,34 @@ export function CardPoolBody({
         <Text testID="pool-shown" className="text-label text-muted">{motkOn ? `${cardsWord(visible.length)} · Browse only` : poolCountLine(visible.length, applied.owned, collectionSet, unownedShown)}</Text>
         <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact accessibilityLabel="Card view" />
       </View>
+    </>
+  );
+
+  return (
+    <View className="min-h-0 flex-1">
+      {adding ? (
+        <View className="mt-3">
+          <Segmented options={PILE_WORDS} value={pileWord(target)} onChange={(word) => setDraftTarget(word === "Side deck" ? "side" : "deck")} testIDPrefix="pool-pile" stretch accessibilityLabel="Add cards to" />
+        </View>
+      ) : null}
+      <View className="mt-3 flex-row items-center gap-2">
+        <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search name, trait or text" accessibilityLabel="Search cards" accessibilityHint="Searches card name, traits, type, sphere and text" />
+        <FilterButton count={filters} onPress={openSheet} />
+      </View>
+      {fold.enabled ? null : filterRows}
       <View
-        className="mt-2 min-h-0 flex-1"
+        className={`${fold.enabled ? "" : "mt-2 "}min-h-0 flex-1`}
         onLayout={(event) => {
           const next = Math.floor(event.nativeEvent.layout.width);
           setListWidth((current) => (current === next ? current : next));
-          const nextHeight = Math.floor(event.nativeEvent.layout.height);
-          setListHeight((current) => (current === nextHeight ? current : nextHeight));
         }}
       >
+        {/* Before the list, so a keyboard reaches the filters first; drawn over it by its zIndex. */}
+        {fold.enabled ? (
+          <FilterFold fold={fold} column={size === "expanded"}>
+            {filterRows}
+          </FilterFold>
+        ) : null}
         {/* Mounted once the width is measured, never before: a grid cell drawn at no width is no height, and FlashList then lays
             out every card of the pool as on screen and mounts all of them (852 at once), which it never gives back. */}
         {cellWidth > 0 ? (
@@ -331,9 +350,11 @@ export function CardPoolBody({
             keyExtractor={poolKey}
             numColumns={grid ? columns : 1}
             style={{ flex: 1 }}
-            contentContainerStyle={inset > 0 ? { paddingHorizontal: inset } : undefined}
+            contentContainerStyle={{ paddingHorizontal: inset, paddingTop: fold.enabled ? fold.height : 0 }}
             extraData={{ draft, selected }}
             keyboardShouldPersistTaps="handled"
+            onScroll={fold.onScroll}
+            scrollEventThrottle={16}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
             ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} />}

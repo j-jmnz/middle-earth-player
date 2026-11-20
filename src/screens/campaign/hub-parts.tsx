@@ -68,12 +68,10 @@ export function RunHero({ title, detail, seats, testID }: { title: string; detai
           {rows.map((row, index) => (
             <View key={index} className="flex-row">
               {/* Each painting laps a little over the right edge of the one before it, so no hero's name (on its left) is covered, and
-                  casts a shadow on it, so the row reads as cards laid one on another. */}
+                  casts a shadow on it, so the row reads as cards laid one on another. The lapping edge draws no line. */}
               {row.map((hero, at) => (
                 <View key={`${hero.code}:${at}`} className="flex-1 flex-row" style={{ marginLeft: at === 0 ? 0 : -OVERLAP * s }}>
                   <HeroTile hero={hero} height={tile} crop={COVER} dense={two} shadow={at === 0 ? dropShadowOf(t, 10, 22, 0.8) : lapShadowOf(t)} />
-                  {/* The lapping edge is lit, the way a panel's top is, so the stack reads apart over two dark paintings. */}
-                  {at === 0 ? null : <View pointerEvents="none" className="absolute bottom-0 left-0 top-0 rounded-l-item" style={{ width: 1.5 * s, backgroundColor: withAlphaHex(t.lit, 0.55) }} />}
                 </View>
               ))}
               {/* A short row keeps its tiles the width of a full one. */}

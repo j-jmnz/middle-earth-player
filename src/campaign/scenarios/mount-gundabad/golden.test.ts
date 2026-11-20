@@ -116,7 +116,10 @@ describe("Mount Gundabad golden", () => {
       });
 
       it("plays the seven stage 2s in several orders", () => {
-        const orders = new Set(GUNDABAD_GOLDENS.map((golden) => opened(golden).questDeck.map((id) => opened(golden).cards[id]?.code).join(",")));
+        const orders = new Set(GUNDABAD_GOLDENS.map((golden) => {
+          const state = opened(golden);
+          return state.questDeck.map((id) => state.cards[id]?.code).join(",");
+        }));
         expect(orders.size).toBeGreaterThanOrEqual(12);
       });
 

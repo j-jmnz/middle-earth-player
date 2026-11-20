@@ -373,9 +373,9 @@ describe("900608:A:2 Noxious Supplies and the heals", () => {
   };
   const attached = (state: ScenarioState) => idsOf(state, "900608").filter((id) => state.cards[id]?.zone === "attached");
 
-  it("900608:A:2 reduces a quiet heal (Elrond's Response) to 1 and discards a copy", () => {
+  it("900608:A:2 reduces a heal to 1 and discards a copy", () => {
     const { made, state } = poisoned(2, {});
-    const done = healWith(made, state, [{ verb: "Pick", pick: { type: "character", control: "any", names: ["Wilyador"] } }, { verb: "HealQuietly", amount: 3, target: "picked" }]);
+    const done = healWith(made, state, [{ verb: "Pick", pick: { type: "character", control: "any", names: ["Wilyador"] } }, { verb: "Heal", amount: 3, target: "picked" }]);
     expect(done.cards[first(done, WILYADOR)]?.damage).toBe(7);
     expect(attached(done)).toHaveLength(1);
   });

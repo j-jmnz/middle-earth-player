@@ -41,6 +41,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
   },
   data: {
     sync: { steps: [{ script: "data/sync.ts" }], about: "refreshes data/raw and .cache (the only networked command)" },
+    mirror: { steps: [{ script: "data/mirror/run.ts" }], about: "push uploads .cache's pinned files to the R2 asset mirror (--fetch downloads the ones .cache lacks first), pull fills .cache from it ([source...]; needs the R2_* variables)" },
     build: { steps: [{ script: "data/build.ts" }], about: "builds data/ and the generated code from data/raw, offline" },
     check: { steps: [{ script: "data/check.ts" }], about: "rebuilds into a temporary directory and fails on any difference" },
     "ledger-seed": { steps: [{ script: "data/ledger-seed.ts" }], about: "writes a scenario's missing ledger entries from the source text, readBy empty (<scenario-id> [--nightmare] for its Nightmare deck)" },

@@ -18,6 +18,7 @@ import { patchTop, topFrame } from "../windows/windows.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { engageEnemy, engageWith, stagingEnemies } from "../quest/quest.ts";
 import { placeEffectProgress } from "../families/quest/effect-progress.ts";
+import { immuneBuffer } from "./immune-targets.ts";
 import { restricted } from "./restrictions.ts";
 import { nextUint, shuffleIds } from "../core/seed.ts";
 import { afterProgress } from "../quest/stage-reveal.ts";
@@ -119,6 +120,8 @@ export function runExtraVerb(
     case "RemoveQuestProgress":
       return removeQuestProgress(state, questProgressMoved(state, instruction), steps);
     case "PlaceQuestProgress": {
+      // An active location immune to the effect ignores it, and the quest takes none (faq.legolas-immune-location).
+      if (immuneBuffer(state, focus.sourceId, ctx)) return state;
       const before = steps.length;
       const placed = placeEffectProgress(state, questProgressMoved(state, instruction), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
       return afterProgress(placed, before, ctx, steps);

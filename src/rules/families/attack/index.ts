@@ -8,10 +8,8 @@ import { continueStrike } from "../../combat/combat.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
-import { hasQuestPoints, isCharacterType, printedOf } from "../../core/printed.ts";
-import { isPlayerCardEffect, playerCardEffectCanChoose, sourcePrinted } from "../../core/keywords.ts";
-import { immuneToSource } from "../misc/guards.ts";
-import { activeLocations, progressRoom } from "../south/locations.ts";
+import { isCharacterType, printedOf } from "../../core/printed.ts";
+import { immuneBuffer } from "../../interpret/immune-targets.ts";
 import { currentSideQuest } from "../wilderland/night-quest.ts";
 import { placeOnMainQuest } from "../../quest/quest.ts";
 import { placeEffectProgress } from "../quest/effect-progress.ts";
@@ -97,16 +95,6 @@ export function openStrike(state: ScenarioState, seat: number, enemyId: string, 
   next = discardPlayedEvent(pickAttacker(next, attackerIds.at(-1) ?? "", frameId), frameId);
   // 6.8.1: an action window comes before its strength; the Responses to the declaration resolve first either way.
   return playerAttackWindow(next, ctx, "strike") ?? awaitStrike(next, ctx) ?? continueStrike(next, ctx, steps);
-}
-
-// The active location that would take a card's progress on the current quest first (placeOnActive, families/south/locations.ts) is
-// immune to that card's effects: a player card effect cannot affect it (mec109.immune-to-player-card-effects, families/misc/guards.ts).
-function immuneBuffer(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): boolean {
-  if (!sourceId || !isPlayerCardEffect(state, ctx.cards, sourceId)) return false;
-  const id = activeLocations(state).find((candidate) => hasQuestPoints(printedOf(ctx.cards, state.cards[candidate]?.code ?? "")) && progressRoom(state, candidate, ctx.cards) > 0);
-  const location = id ? state.cards[id] : undefined;
-  if (!id || !location) return false;
-  return !playerCardEffectCanChoose(printedOf(ctx.cards, location.code), state, id, sourcePrinted(state, ctx.cards, sourceId)) || immuneToSource(state, id, sourceId, ctx);
 }
 
 // "Declared as the only attacker" (143015:A:3): the attack in progress was declared with exactly one attacker (rr.step-6-8b: the attackers of an attack are declared together).

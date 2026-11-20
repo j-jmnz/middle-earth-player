@@ -27,6 +27,8 @@ No phase is open.
 - Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
 - A claimed treasure is not an attachment for card effects (`recommended`, docs/brief.md, Ered Mithrin).
 - A played player side quest goes to the staging area: The Lost Realm text read from a transcription; no official PDF is pinned in data/sources.json (docs/brief.md).
+- A card played from the hand or the deck "at no cost" (Host of Galadhrim, Send for Help, Scavenge for Supplies) needs no resource match (community-sourced, docs/brief.md, Core round).
+- A resource moved to a hero's pool (Errand-rider) is gained, not added: Heir of Mardil answers it, Harbor Master does not (community-sourced, docs/brief.md, Core round).
 - East Road Ranger 10008:A:1: "committed to a side quest" means committed while a side quest is the current quest (`recommended`).
 
 ### Engine code

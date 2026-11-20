@@ -2,9 +2,9 @@
 // BarAttack, PlaceProgressOnLocation. The candidates are found, one is chosen (a player chooses only among different cards), and the verb applies.
 import { announceLooked } from "../families/encounter/looked.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
-import { immuneToSource } from "../families/misc/guards.ts";
 import { characters } from "../combat/combat.ts";
 import { frameScope, hostOf, refCard } from "./amounts.ts";
+import { immuneTo } from "./immune-targets.ts";
 import { askTarget } from "../windows/choices.ts";
 import { hasTrait } from "./conditions.ts";
 import { greatestChallenge, outOfPlayChoices, searchable } from "./search.ts";
@@ -47,16 +47,17 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         // The acting seat's own active location once stages are separate.
         const active = activeOf(state, item.seat);
         // An active location immune to card effects stays where it is (East-gate, 03016:A:1; dwd.immune-to-card-effects).
-        return active && active !== sourceId && !immuneToSource(state, active, sourceId, ctx) ? [active] : [];
+        return active && active !== sourceId && !immuneTo(state, active, sourceId, ctx) ? [active] : [];
       }
+      // An enemy immune to the effect stays where it is (Revenant and Fastred, 17081:A:1; rr.immune).
       if (target.kind === "picked" || target.kind === "previous" || target.kind === "subject" || target.kind === "attacker" || target.kind === "other") {
         const id = refCard(state, target.kind, frameScope(state, item.seat, sourceId));
-        return id && hasEnemyType(state, id, ctx) && state.cards[id]?.zone === "engaged" ? [id] : [];
+        return id && hasEnemyType(state, id, ctx) && state.cards[id]?.zone === "engaged" && !immuneTo(state, id, sourceId, ctx) ? [id] : [];
       }
       const seats = target.who === "actor" ? [item.seat] : livingSeats(state);
       return seats
         .flatMap((seat) => state.seats[seat]?.engaged ?? [])
-        .filter((id) => hasEnemyType(state, id, ctx))
+        .filter((id) => hasEnemyType(state, id, ctx) && !immuneTo(state, id, sourceId, ctx))
         .filter((id) => !target.trait || hasTrait(state, id, target.trait, ctx))
         .filter((id) => !target.keyword || hasKeyword(state, id, target.keyword, ctx.cards));
     }

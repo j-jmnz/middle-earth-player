@@ -11,6 +11,7 @@ import { declareAttack } from "../families/attack/index.ts";
 import { enforceRestricted } from "../player/attach.ts";
 import { placeProgress, progressPlacer } from "./effect-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { announceAllyLeft } from "../core/ally-left.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
 import { shuffleIds } from "../core/seed.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -33,6 +34,7 @@ import { addToVictory } from "../families/sidequests/victory.ts";
 import { placeSideQuest } from "../families/sidequests/play.ts";
 import { isQuestSource } from "../families/wilderland/night-quest.ts";
 import { announceCanceled } from "../families/nightmare/index.ts";
+import { immuneTo } from "./immune-targets.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -93,11 +95,12 @@ export function runPlayerVerb(
       }
       if (instruction.target === "host") {
         const hostId = refCard(state, "host", frameScope(state, focus.seat, focus.sourceId));
-        return hostId && state.cards[hostId] && !readyBarred(state, hostId, byPlayerCards(state, focus.sourceId, ctx)) ? updateCard(state, hostId, readyPatch(state, hostId)) : state;
+        // Every ready is heard ("After Wellinghall Preserver readies", 10061:A:3; Weighed Down, 18027:A:1).
+        return hostId && state.cards[hostId] ? readyCard(state, hostId, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
       }
       if (instruction.target !== "allCharacters") return null;
       let next = state;
-      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) if (!readyBarred(state, id, byPlayerCards(state, focus.sourceId, ctx))) next = updateCard(next, id, readyPatch(next, id));
+      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) next = readyCard(next, id, playerSource(state, focus.sourceId, ctx), ctx.cards);
       return next;
     }
     case "Exhaust": {
@@ -116,8 +119,8 @@ export function runPlayerVerb(
       if (healed.healed <= 0) return state;
       // The step records the damage removed as a negative amount, the way a progress removal is recorded (the table's log).
       steps.push({ kind: "damage", targetId: id, amount: -healed.healed, cause: currentCause(steps, UNATTRIBUTED) });
-      // The card whose effect healed is the event's other card (Radagast's Request removes it from the game, 02061:B:2); an attachment that reduced the heal is discarded after it (900608:A:2).
-      const announced = queueEvent(healed.state, { trigger: "healed", seat: card.controller, cardId: id, ...(focus.sourceId && focus.sourceId !== id ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+      // The card whose effect healed is the event's other card, the healed card itself when it healed itself (Radagast's Request removes it from the game, 02061:B:2; Elrond answers a heal whose card is not Elrond, 04128:A:2); an attachment that reduced the heal is discarded after it (900608:A:2).
+      const announced = queueEvent(healed.state, { trigger: "healed", seat: card.controller, cardId: id, ...(focus.sourceId ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
       return healed.reducer ? destroyCard(announced, healed.reducer, ctx.cards, steps) : announced;
     }
     case "PutOnDeck": {
@@ -133,7 +136,8 @@ export function runPlayerVerb(
       if (!from || !to || from.id === to.id || !mayGainResources(state, to.id, focus.sourceId, ctx)) return state;
       const amount = instruction.all ? from.resources : Math.min(from.resources, resolveAmount(state, instruction.amount ?? 1, frameScope(state, focus.seat, focus.sourceId), ctx));
       if (amount <= 0) return state;
-      return updateCard(updateCard(state, from.id, { resources: from.resources - amount }), to.id, { resources: to.resources + amount });
+      const moved = updateCard(updateCard(state, from.id, { resources: from.resources - amount }), to.id, { resources: to.resources + amount });
+      return to.zone === "heroes" ? queueEvent(moved, { trigger: "resourcesMoved", seat: to.controller, cardId: to.id }) : moved;
     }
     case "AddToVictory": {
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
@@ -177,7 +181,7 @@ export function runPlayerVerb(
       const scope = frameScope(state, focus.seat, focus.sourceId);
       const targets =
         instruction.target === "eachStagingLocation"
-          ? stagingLocations(state, ctx.cards)
+          ? stagingLocations(state, ctx.cards).filter((id) => !immuneTo(state, id, focus.sourceId, ctx))
           : [refCard(state, instruction.target === "self" ? "self" : instruction.target, scope) ?? ""];
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
       let next = state;
@@ -264,7 +268,7 @@ export function runPlayerVerb(
       if (!card || !inPlay(card.zone) || card.controller == null) return state;
       // The scenario owns an encounter card (an objective-ally: Wilyador, Iârion), so it has no hand to return to: it leaves play into the encounter discard pile, the area the scenario owns (rr.ownership-and-control).
       const returned = scenarioOwned(printedOf(ctx.cards, card.code)) ? toEncounterDiscard(state, card) : moveCard(state, id, { zone: "hand", seat: card.owner ?? card.controller });
-      return queueEvent(returned, { trigger: "allyLeftPlay", seat: card.controller, subject: id });
+      return announceAllyLeft(returned, card, ctx.cards);
     }
     case "ShuffleSelfIntoDeck": {
       // Only a card still in play is shuffled back: once Beorn has left play (returned to the hand by Sneak Attack, or
@@ -278,7 +282,7 @@ export function runPlayerVerb(
       if (!pile) return moved;
       const shuffled = shuffleIds(pile.deck, moved.seed, moved.seedCursor);
       const done = { ...withSeat(moved, seat, { ...pile, deck: shuffled.ids }), seedCursor: shuffled.cursor };
-      return queueEvent(done, { trigger: "allyLeftPlay", seat: card.controller, subject: card.id });
+      return announceAllyLeft(done, card, ctx.cards);
     }
     case "AttachPicked": {
       const list = pickedList(state);
@@ -331,11 +335,6 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
 function uncancelableDamage(state: ScenarioState, from: number): ScenarioState {
   const events = state.pendingEvents ?? [];
   return events.length > from ? { ...state, pendingEvents: events.map((event, index) => (index >= from && event.trigger === "damageDealt" ? { ...event, uncancelable: true as const } : event)) } : state;
-}
-
-// The printed cards when a player card is the source of the effect (the bar on player card effects reads them), else nothing.
-export function byPlayerCards(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): ReadonlyMap<string, PrintedCard> | undefined {
-  return playerSource(state, sourceId, ctx) ? ctx.cards : undefined;
 }
 
 // A card readies or exhausts, and the Responses that hear it are told ("After ~ readies", "After ~ exhausts").

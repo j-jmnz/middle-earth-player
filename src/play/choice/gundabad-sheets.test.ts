@@ -65,9 +65,10 @@ function advanceTo(t: Table, run: Run, stop: (state: ScenarioState) => boolean):
 }
 
 // The location is explored the way the engine explores it: progress on the active location, and the table settles.
+// The progress comes from the quest card: The First Forge is immune to player card effects, so a hero's effect places none on it.
 function explore(t: Table): Run {
   const steps: never[] = [];
-  const pushed = pushEffectFrame(t.state, { frame: "ResolveEffect", sourceId: t.hero, actor: 0, peril: false, effectId: "test", instructions: [{ verb: "PlaceProgressOn", amount: 99, target: "activeLocation" }], cancel: null, blockCancel: null }, steps);
+  const pushed = pushEffectFrame(t.state, { frame: "ResolveEffect", sourceId: t.state.questStage ?? t.hero, actor: 0, peril: false, effectId: "test", instructions: [{ verb: "PlaceProgressOn", amount: 99, target: "activeLocation" }], cancel: null, blockCancel: null }, steps);
   return { state: settle({ ...pushed, window: null }, t.ctx, steps), steps: [] };
 }
 

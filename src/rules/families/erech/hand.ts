@@ -2,7 +2,7 @@
 // A player alone in the game discards his hand instead ("discard your hand instead if you are the only player in the game"). A card passed stays its owner's, so it goes to its owner's discard pile.
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
+import { discardFromHand, moveCard } from "../../core/zones.ts";
 
 /** PassHand: the hands move one seat on, in seat order; the only seat discards its hand. */
 export function passHand(state: ScenarioState): ScenarioState {
@@ -11,7 +11,8 @@ export function passHand(state: ScenarioState): ScenarioState {
   if (seats.length === 1) {
     const seat = seats[0]!;
     let alone = state;
-    for (const id of state.seats[seat]?.hand ?? []) alone = moveCard(alone, id, { zone: "discard", seat: alone.cards[id]?.owner ?? alone.cards[id]?.controller ?? seat });
+    // A discard from the hand like any other: the cards that hear one hear it (Galdor of the Havens, 10091:A:1).
+    for (const id of state.seats[seat]?.hand ?? []) alone = discardFromHand(alone, id, alone.cards[id]?.owner ?? alone.cards[id]?.controller ?? seat, seat);
     return alone;
   }
   const hands = seats.map((seat) => ({ seat, ids: [...(state.seats[seat]?.hand ?? [])] }));

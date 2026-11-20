@@ -47,9 +47,24 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 30, scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship", "raid-on-the-grey-havens", "the-thing-in-the-depths", "journey-up-the-anduin", "the-kings-quest", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland", "the-weather-hills", "the-wastes-of-eriador", "escape-from-mount-gram", "the-road-to-isengard", "journey-to-the-cross-roads", "shelobs-lair", "the-passing-of-the-grey-company", "the-battle-of-the-pelennor-fields", "the-tower-of-cirith-ungol", "the-black-gate-opens", "mount-doom", "conflict-at-the-carrock"], note: "Legolas, Blade of Gondolin and The Steadfast place no progress while the active location is immune to player card effects: not on the location and not on the quest." },
   { version: 31, scenarios: "all", note: "A shadow card is turned face up before you choose a Response that cancels its effect, like Hasty Stroke, so you can read the effect first." },
   { version: 32, scenarios: "all", note: "A card that exhausts to quest, attack, defend or pay a cost now triggers its \"after it exhausts\" effects, like Turayn, Arwen Undómiel, Tiny and Grievous Wound." },
+  { version: 33, scenarios: "all", note: "A card played from your hand at no cost, like the Silvan allies Host of Galadhrim plays again, needs no hero of its sphere." },
+  { version: 33, scenarios: ["across-the-ettenmoors", "a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "An event played at no cost, like one Send for Help finds or one Scavenge for Supplies lets you play, needs no hero of its sphere." },
+  { version: 34, scenarios: "all", note: "An attacker that leaves play before the attack deals its damage adds no Attack to it: Beechbone destroyed by his own damage deals none, by his Response or by the attack." },
+  { version: 34, scenarios: "all", note: "A player card effect leaves a card immune to player card effects as it is, also when it names that card without choosing it: Lórien Guide, Northern Tracker and Longbeard Elder place no progress on such a location, and Fastred returns no such enemy." },
+  { version: 34, scenarios: "all", note: "Every way a card readies, like Unexpected Courage and Grim Resolve, is heard by the cards that answer a ready." },
+  { version: 34, scenarios: "all", note: "Elrond's own heal is heard by the cards that answer a heal; he still does not answer it himself." },
+  { version: 34, scenarios: "all", note: "A resource moved to a hero's pool, as Errand-rider moves one, is gained: Heir of Mardil answers it." },
+  { version: 34, scenarios: "all", note: "An encounter location or enemy that leaves play without being explored or destroyed, like a location Distant Stars discards, is heard by the cards that answer it leaving play." },
+  { version: 34, scenarios: "all", note: "In a game of two players, the Responses of an encounter card in the staging area are the first player's, whoever revealed it." },
+  { version: 34, scenarios: ["the-stone-of-erech"], note: "Groping Horror's discard of the only player's hand is heard by the cards that answer a discard from the hand." },
+  { version: 34, scenarios: "all", note: "A raise of a threat to a set value, like Southern Gate's or A Elbereth! Gilthoniel!'s, is heard by the cards that answer a threat raise." },
+  { version: 34, scenarios: ["the-battle-of-carn-dum"], note: "The copies The Sky Darkens discards from your deck are heard by the cards that answer a discard from the deck." },
+  { version: 34, scenarios: ["a-journey-to-rhosgobel", "escape-from-mount-gram"], note: "An ally removed from the game or captured leaves play, and the cards that answer an ally leaving play hear it." },
+  { version: 34, scenarios: ["return-to-mirkwood", "road-to-rivendell", "the-redhorn-gate", "lost-in-mirkwood", "roam-across-rhovanion", "shelobs-lair"], note: "A set-aside card the players take control of, like Gollum or an objective ally, enters play, and the cards that answer a card entering play hear it." },
+  { version: 34, scenarios: ["temple-of-the-deceived"], note: "An ally turned up from under the active location enters play, and the cards that answer an ally entering play hear it." },
 ];
 
-export const ENGINE_VERSION = 32;
+export const ENGINE_VERSION = 34;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

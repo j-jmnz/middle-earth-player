@@ -20,18 +20,10 @@ import { queueEvent } from "../windows/queue.ts";
 import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
 import { currentCause, effectCause, UNATTRIBUTED } from "../core/cause.ts";
-import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
 import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
 // Costs and limits on an Action or a Response. A cost is paid when the effect is triggered, before
 // it resolves. A limit is spent by the use, whether or not the effect then does anything.
-
-export function controllerSeat(state: ScenarioState, source: CardInstance): number {
-  if (source.controller != null) return source.controller;
-  // Isolated areas: the first player of the card's own staging area answers for an encounter card while the areas are separate (mec108.create-staging-area).
-  const head = isolatedAreas(state) ? areaHeadOf(state, source.id) : null;
-  return head == null ? state.firstPlayer : firstOfArea(state, head);
-}
 
 type LimitRule = { times: number; per: "phase" | "round" | "attack" | "game"; eachPlayer?: boolean; group?: boolean; campaign?: boolean };
 
