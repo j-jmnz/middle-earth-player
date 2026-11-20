@@ -2,12 +2,14 @@
 //
 // The Siege value an Attack on Dol Guldur card prints is added to a tally for the round when an enemy is destroyed or a location explored (TallySiege); Dol Guldur's Forced effect reads it at the end of the round (the amount `siegeTally`). The tally belongs to
 // one round: it is read as 0 in any other. SelectRandomStage notes one of the other stage 3s as an option taken by the running effect, so the penalty records that follow it (`optionTaken`) apply it.
-import type { Amount, Instruction } from "../../../catalog/boundary.ts";
+import type { Amount, Instruction, ModifierStat } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { shuffleIds } from "../../core/seed.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { heldAmountByClass } from "../../core/holder-classes.ts";
+import type { PrintedCard } from "../../core/printed.ts";
 import { destroyCard } from "../../core/keywords.ts";
 import { moveCard } from "../../core/zones.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
@@ -73,4 +75,13 @@ export function discardCopiesOfDiscarded(state: ScenarioState, ctx: ReduceContex
     next = destroyCard(next, card.id, ctx.cards, steps);
   }
   return next;
+}
+
+const AT_FIVE_PROGRESS: Readonly<Partial<Record<ModifierStat, ModifierStat>>> = { attack: "attackAtFiveProgress", defense: "defenseAtFiveProgress" };
+
+/** The Attack or Defense a card holds from effects that wait for 5 progress on the quest ("+2 instead if there are at least 5 progress tokens on the quest", 50930:A:2): read now, so it follows the progress while the effect lasts (faq.lasting-effects). */
+export function questProgressBonus(state: ScenarioState, instance: CardInstance, printed: PrintedCard, stat: ModifierStat): number {
+  const held = AT_FIVE_PROGRESS[stat];
+  const stage = state.questStage ? state.cards[state.questStage] : undefined;
+  return held != null && stage != null && stage.progress >= 5 ? heldAmountByClass(state, instance, printed, held) : 0;
 }

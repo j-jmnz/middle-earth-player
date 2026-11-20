@@ -275,7 +275,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 50907 Dol Guldur. The Siege values of the enemies destroyed and the locations explored go into the round's tally whenever it happens (reading 4); at stage 3 its Forced effect takes the tally off the city strength at the end of the round, after the
   // stage's own (reading 5).
-  { id: "50907:forced:1", cardCode: DOL_GULDUR, lines: ["50907:A:1"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any" }, instructions: [{ verb: "TallySiege" }] },
+  { id: "50907:forced:1", cardCode: DOL_GULDUR, lines: ["50907:A:1"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any", staging: true }, instructions: [{ verb: "TallySiege" }] },
   { id: "50907:forced:2", cardCode: DOL_GULDUR, lines: ["50907:A:1"], timing: "forced", trigger: "locationExplored", subject: { type: "location", control: "any" }, instructions: [{ verb: "TallySiege" }] },
   { id: "50907:forced:3", cardCode: DOL_GULDUR, lines: ["50907:A:1"], timing: "forced", trigger: "endOfRound", condition: AT_STAGE_3, instructions: [{ verb: "RemoveResourceTokens", amount: { siegeTally: true }, code: DOL_GULDUR }] },
 
@@ -288,7 +288,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "encounterRevealed",
     byEncounterDeck: true,
     cost: { kind: "addSelfToVictory" },
-    condition: { kind: "sourceIn", zone: "play" },
+    // "While you control Power of Lórien": in a play area (taken at stage 2B), not in the staging area.
+    condition: { kind: "not", condition: { kind: "sourceIn", zone: "staging" } },
     instructions: [{ verb: "CancelEffect" }, { verb: "MoveEncounterCard", card: "subject", to: "discard" }],
   },
 
@@ -307,7 +308,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "DiscardRandomFromHand", remember: true }, { verb: "ModifyStat", stat: "attack", amount: { stat: "cost", of: "picked", printed: true }, until: "endOfAttack", target: "self" }],
   },
   { id: "50911:forced:1", cardCode: "50911", lines: ["50911:A:2"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "DiscardFromDeck", amount: 1 }, { verb: "DiscardCopiesOfDiscarded" }] },
-  { id: "50912:forced:1", cardCode: "50912", lines: ["50912:A:2"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "DiscardUntil", type: "enemy" }, { verb: "MoveEncounterCard", to: "engaged" }] },
+  { id: "50912:forced:1", cardCode: "50912", lines: ["50912:A:2"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "DiscardUntil", type: "enemy" }, { verb: "MoveEncounterCard", to: "engaged", when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false } }] },
   { id: "50913:forced:1", cardCode: "50913", lines: ["50913:A:2"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "Pick", pick: ALLY_YOU }, { verb: "Discard", target: { kind: "picked" } }] },
 
   // 50914 Host of Dol Guldur: Archery X with X the number of players; at the end of the encounter phase in the staging area, X progress comes off the main quest.
@@ -359,7 +360,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "50924:forced:1", cardCode: "50924", lines: ["50924:A:2"], timing: "forced", trigger: "locationExplored", subject: "self", instructions: [EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Orc", to: "staging" }]), { verb: "ShuffleEncounterDeck" }] },
 
   // 50925 Blackened Woods: when explored, discard the top card of the encounter deck and raise each player's threat by its printed Threat; Shadow: +1 Attack, and 3 progress off the main quest if the attack destroys a character.
-  { id: "50925:forced:1", cardCode: "50925", lines: ["50925:A:1"], timing: "forced", trigger: "locationExplored", subject: "self", instructions: [{ verb: "DiscardEncounterTop", count: 1 }, { verb: "RaiseThreat", amount: { stat: "threat", of: "discardTop", printed: true }, who: "eachSeat" }] },
+  { id: "50925:forced:1", cardCode: "50925", lines: ["50925:A:1"], timing: "forced", trigger: "locationExplored", subject: "self", instructions: [{ verb: "DiscardEncounterTop", count: 1 }, { verb: "RaiseThreat", amount: { discardedThreat: true }, who: "eachSeat" }] },
   {
     id: "50925:shadow:1",
     cardCode: "50925",
@@ -441,8 +442,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfPhase", target: "attacker" },
       { verb: "ModifyStat", stat: "defense", amount: 1, until: "endOfPhase", target: "attacker" },
-      { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfPhase", target: "attacker", when: FIVE_PROGRESS },
-      { verb: "ModifyStat", stat: "defense", amount: 1, until: "endOfPhase", target: "attacker", when: FIVE_PROGRESS },
+      { verb: "ModifyStat", stat: "attackAtFiveProgress", amount: 1, until: "endOfPhase", target: "attacker" },
+      { verb: "ModifyStat", stat: "defenseAtFiveProgress", amount: 1, until: "endOfPhase", target: "attacker" },
     ],
   },
 

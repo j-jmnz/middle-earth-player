@@ -372,6 +372,9 @@ const FLAGS = [
   "losesIndestructible",
   // On an enemy: no Response cancels a Shadow effect the enemy attacks with ("its shadow cards cannot be canceled", 50916:A:1). Read by cancelBarred (rules/families/encounter/cancel.ts).
   "shadowsUncancelable",
+  // On an enemy (target `attacker`): it gets this much Attack (`attackAtFiveProgress`) or Defense (`defenseAtFiveProgress`) while the current quest stage holds 5 progress or more, read each time the stat is read ("+2 instead if there are at least 5 progress tokens on the quest", 50930:A:2: an encounter card's lasting effect, recalculated until the end of the phase, faq.lasting-effects). Read by questProgressBonus (rules/families/wilderland/dolguldur.ts).
+  "attackAtFiveProgress",
+  "defenseAtFiveProgress",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
