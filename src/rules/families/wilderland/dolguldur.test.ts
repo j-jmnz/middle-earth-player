@@ -16,7 +16,7 @@ import { CARDS, ctxOf, record, table } from "./fixture.ts";
 
 const inFrame = (state: ScenarioState, subject?: string): ScenarioState =>
   pushEffectFrame(state, { frame: "ResolveEffect", sourceId: null, actor: 0, peril: false, effectId: "x:forced:1", instructions: [], picked: [], ...(subject ? { subject } : {}), cancel: null, blockCancel: null }, []);
-const scope = { actor: 0, sourceId: null } as const;
+const scope = { actor: 0, sourceId: null, returned: 0 } as const;
 const focus = { seat: 0, sourceId: null } as const;
 const tally = (state: ScenarioState): number => resolveAmount(state, { siegeTally: true }, scope, ctxOf([]));
 
