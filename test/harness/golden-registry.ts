@@ -75,7 +75,7 @@ import * as annuminas from "../scenarios/the-siege-of-annuminas/game.ts";
 import * as guldur from "../scenarios/attack-on-dol-guldur/game.ts";
 import * as quest from "../scenarios/the-wizards-quest/game.ts";
 import * as woodland from "../scenarios/the-woodland-realm/game.ts";
-// import * as mines from "../scenarios/the-mines-of-moria/game.ts";
+import * as mines from "../scenarios/the-mines-of-moria/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -177,5 +177,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("attack-on-dol-guldur", "Attack on Dol Guldur", guldur.GULDUR_GOLDENS, guldur.guldurWorld, guldur.playGolden),
   entry("the-wizards-quest", "The Wizard's Quest", quest.QUEST_GOLDENS, quest.questWorld, quest.playGolden),
   entry("the-woodland-realm", "The Woodland Realm", woodland.WOODLAND_GOLDENS, woodland.woodlandWorld, woodland.playGolden),
-  // entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
+  entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
 ];
