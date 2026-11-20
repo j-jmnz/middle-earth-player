@@ -76,9 +76,19 @@ export async function pushPins(
   absent.sort();
   log.info(`pushed ${pushed} file${pushed === 1 ? "" : "s"} (${bytes(sent)}) to ${mirror.name}; ${pins.length - todo.length} already there`);
   if (absent.length > 0) {
-    const hint = options.fetchSource ? "their URL failed or answered other bytes; pnpm data sync moves a changed pin" : "pnpm data mirror push --fetch downloads them from their URLs first";
-    log.info(`${absent.length} pinned file${absent.length === 1 ? " is" : "s are"} not in .cache at their pin, so not pushed (${hint})`);
-    log.debug(absent.join(", "));
+    // A page rendered from a PDF has no URL: it is pushed only from a render at its pin, and another poppler renders other bytes.
+    const pages = new Set(pins.filter((pin) => pin.file.url.includes("#page=")).map((pin) => pin.file.path));
+    const rendered = absent.filter((name) => pages.has(name));
+    const fetchable = absent.filter((name) => !pages.has(name));
+    if (rendered.length > 0) {
+      log.info(`${rendered.length} PDF page${rendered.length === 1 ? "" : "s"} not pushed: this machine's render is not at the pin (another poppler version); a pack renders ${rendered.length === 1 ? "it" : "them"} from the mirrored PDF`);
+      log.debug(rendered.join(", "));
+    }
+    if (fetchable.length > 0) {
+      const hint = options.fetchSource ? "its URL failed or answered other bytes, as the warnings above say; pnpm data sync moves a changed pin" : "pnpm data mirror push --fetch downloads them from their URLs first";
+      log.info(`${fetchable.length} pinned file${fetchable.length === 1 ? " is" : "s are"} not in .cache at their pin, so not pushed (${hint})`);
+      log.debug(fetchable.join(", "));
+    }
   }
   return { pushed, held: pins.length - todo.length, absent };
 }
