@@ -68,7 +68,7 @@ describe("asset mirror commands", () => {
     writeFileSync(path.join(at.pictures, "1.A.jpg"), "picture one");
     const held = file("pictures/1.A.jpg", "picture one").sha256;
     const mirror = memoryMirror(new Map([[held, bytesOf("picture one")]]));
-    const pushed = await pushPins(mirror, cachedPins(SOURCES, [], at), log, []);
+    const pushed = await pushPins(mirror, cachedPins(SOURCES, [], at), log, { waits: [] });
     expect(pushed).toEqual({ pushed: 1, held: 1, absent: ["pdf/campaign.pdf", "scans/2.A.jpg"] });
     expect(mirror.objects.get(file("scans/1.A.jpg", "scan one").sha256)).toEqual(bytesOf("scan one"));
 
@@ -77,5 +77,15 @@ describe("asset mirror commands", () => {
     expect(pulled).toEqual({ pulled: 2, missing: ["pdf/campaign.pdf", "scans/2.A.jpg"] });
     expect(readFileSync(path.join(fresh.scans, "1.A.jpg"), "utf8")).toBe("scan one");
     expect(readFileSync(path.join(fresh.pictures, "1.A.jpg"), "utf8")).toBe("picture one");
+  });
+
+  it("with --fetch, downloads a pin the cache misses from its URL, keeps it and pushes it, and skips bytes that are not the pin", async () => {
+    const at = dirs();
+    const mirror = memoryMirror();
+    const served: Record<string, string> = { "https://example.test/scans/1.A.jpg": "scan one", "https://example.test/scans/2.A.jpg": "changed upstream" };
+    const fetchSource = (url: string) => (served[url] ? Promise.resolve(bytesOf(served[url])) : Promise.reject(new Error(`GET ${url} answered 404`)));
+    const pushed = await pushPins(mirror, cachedPins(SOURCES, ["scans"], at), log, { waits: [], fetchSource });
+    expect(pushed).toEqual({ pushed: 1, held: 0, absent: ["scans/2.A.jpg"] });
+    expect(readFileSync(path.join(at.scans, "1.A.jpg"), "utf8")).toBe("scan one");
   });
 });

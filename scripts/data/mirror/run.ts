@@ -4,11 +4,11 @@ import { fileURLToPath } from "node:url";
 
 import { bytes, describeError, runScript, type Log } from "../../log.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../paths.ts";
-import { RETRY_WAITS_MS, sha256, type SourceFile, type SourceRecord } from "../sources/fetch.ts";
+import { fetchBytesRetrying, RETRY_WAITS_MS, sha256, type SourceFile, type SourceRecord } from "../sources/fetch.ts";
 import { MIRROR_ENV, mirrorFromEnv, type Mirror } from "./client.ts";
 
-// `pnpm data mirror push|pull [source...]` (docs/development.md, Asset mirror). push uploads every pinned file in .cache
-// the bucket does not hold; pull fills .cache with every pinned file it lacks. Only the cached sources take part: data/raw
+// `pnpm data mirror push [--fetch]|pull [source...]` (docs/development.md, Asset mirror). push uploads every pinned file in
+// .cache the bucket does not hold (--fetch downloads one .cache misses from its URL first); pull fills .cache with every pinned file it lacks. Only the cached sources take part: data/raw
 // is committed.
 
 export type CacheDirs = { scans: string; pictures: string; pdf: string };
@@ -43,7 +43,18 @@ const atPin = (cached: string, hash: string): Uint8Array | null => {
   return sha256(body) === hash ? body : null;
 };
 
-export async function pushPins(mirror: Mirror, pins: readonly { file: SourceFile; cached: string }[], log: Log, waits: readonly number[] = RETRY_WAITS_MS): Promise<{ pushed: number; held: number; absent: string[] }> {
+/**
+ * Uploads every pin the bucket lacks from the cache at its pin. With `fetchSource` (`push --fetch`), a pin the cache misses is
+ * fetched from its URL into the cache first, so the mirror gets the files no pack reads (a scan a picture stands in for). A
+ * page rendered from a PDF has no URL to fetch: only a cached render at its pin is pushed.
+ */
+export async function pushPins(
+  mirror: Mirror,
+  pins: readonly { file: SourceFile; cached: string }[],
+  log: Log,
+  options: { waits?: readonly number[]; fetchSource?: (url: string) => Promise<Uint8Array> } = {},
+): Promise<{ pushed: number; held: number; absent: string[] }> {
+  const waits = options.waits ?? RETRY_WAITS_MS;
   const held = await mirror.list();
   const todo = pins.filter((pin) => !held.has(pin.file.sha256));
   const absent: string[] = [];
@@ -51,7 +62,7 @@ export async function pushPins(mirror: Mirror, pins: readonly { file: SourceFile
   let sent = 0;
   const tick = log.progress(todo.length, "upload");
   await eachAtOnce(todo, async ({ file, cached }) => {
-    const body = atPin(cached, file.sha256);
+    const body = atPin(cached, file.sha256) ?? (await fromSource(file, cached, options.fetchSource, log));
     if (!body) {
       absent.push(file.path);
       tick(`${file.path} not in the cache at its pin`);
@@ -65,7 +76,8 @@ export async function pushPins(mirror: Mirror, pins: readonly { file: SourceFile
   absent.sort();
   log.info(`pushed ${pushed} file${pushed === 1 ? "" : "s"} (${bytes(sent)}) to ${mirror.name}; ${pins.length - todo.length} already there`);
   if (absent.length > 0) {
-    log.info(`${absent.length} pinned file${absent.length === 1 ? " is" : "s are"} not in .cache at their pin, so not pushed (pnpm data sync, then pnpm assets scans, fills it)`);
+    const hint = options.fetchSource ? "their URL failed or answered other bytes; pnpm data sync moves a changed pin" : "pnpm data mirror push --fetch downloads them from their URLs first";
+    log.info(`${absent.length} pinned file${absent.length === 1 ? " is" : "s are"} not in .cache at their pin, so not pushed (${hint})`);
     log.debug(absent.join(", "));
   }
   return { pushed, held: pins.length - todo.length, absent };
@@ -97,6 +109,24 @@ export async function pullPins(mirror: Mirror, pins: readonly { file: SourceFile
     log.debug(missing.join(", "));
   }
   return { pulled, missing };
+}
+
+// The pin fetched from its URL and kept in the cache, or null for a rendered PDF page, a failed fetch or other bytes.
+async function fromSource(file: SourceFile, cached: string, fetchSource: ((url: string) => Promise<Uint8Array>) | undefined, log: Log): Promise<Uint8Array | null> {
+  if (!fetchSource || file.url.includes("#page=")) return null;
+  try {
+    const body = await fetchSource(file.url);
+    if (sha256(body) !== file.sha256) {
+      log.warn(`${file.path}: ${file.url} has sha256 ${sha256(body)}, pinned ${file.sha256}; not pushed`);
+      return null;
+    }
+    mkdirSync(path.dirname(cached), { recursive: true });
+    writeFileSync(cached, body);
+    return body;
+  } catch (error) {
+    log.warn(`${file.path}: ${describeError(error)}; not pushed`);
+    return null;
+  }
 }
 
 async function eachAtOnce<T>(items: readonly T[], work: (item: T) => Promise<void>): Promise<void> {
@@ -132,12 +162,13 @@ function isDirectRun(): boolean {
 if (isDirectRun()) {
   void runScript("data:mirror", async (log) => {
     const [command, ...wanted] = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
-    if (command !== "push" && command !== "pull") throw new Error("Usage: pnpm data mirror push|pull [source...]");
+    if (command !== "push" && command !== "pull") throw new Error("Usage: pnpm data mirror push [--fetch] | pull [source...]");
     const mirror = mirrorFromEnv();
     if (!mirror) throw new Error(`No asset mirror: set ${MIRROR_ENV.join(", ")} (docs/development.md, Asset mirror)`);
     const { sources } = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
     const pins = cachedPins(sources, wanted, HERE);
-    if (command === "push") await pushPins(mirror, pins, log);
+    const fetchSource = process.argv.includes("--fetch") ? (url: string) => fetchBytesRetrying(url, 120_000, log) : undefined;
+    if (command === "push") await pushPins(mirror, pins, log, { fetchSource });
     else await pullPins(mirror, pins, log);
   });
 }
