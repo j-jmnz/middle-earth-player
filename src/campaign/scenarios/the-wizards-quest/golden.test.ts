@@ -1,5 +1,7 @@
-// Rules: TODO name the rule ids the scenario implements (data/rules/entries.json).
+// Rules: rr.setup, rr.search, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.guarded, ltp.scoring, docs/brief.md (The Wizard's Quest) (data/rules/entries.json).
 import { describe, expect } from "vitest";
+
+import type { ScenarioState } from "../../../rules/core/state.ts";
 
 import { QUEST_GOLDENS, playGolden, questWorld, type QuestDecks, type QuestGolden } from "../../../../test/scenarios/the-wizards-quest/game.ts";
 import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
@@ -7,13 +9,13 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 
 const cycle = loadCampaign("standalone-scenarios");
 const quest = loadAnyScenario("the-wizards-quest");
+const codesOf = (state: ScenarioState, ids: readonly string[]) => ids.map((id) => state.cards[id]?.code);
 
 // A permanent golden: whole standalone games of The Wizard's Quest played by the auto-player (test/scenarios/the-wizards-quest/game.ts) on fixed seeds, through a win and through each way to lose.
-// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. TODO: say what the games cover. Update the snapshot only when the change is meant.
-//
-// Open until the goldens are chosen: the suite is skipped, so it writes no golden.json. To finish it, fill QUEST_GOLDENS, change `describe.skip` to `describe`, fill the TODOs below, run this file
-// (it writes golden.json) and uncomment this scenario's two lines in test/harness/golden-registry.ts (its test fails on a golden.json that is not listed).
-describe.skip("The Wizard's Quest golden (open: scaffold)", () => {
+// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed with the three pairs of stage cards the policy picks (A Fork in the Road and The Necromancer's Tower,
+// Carried Away and Dungeons of the Necromancer, A New Terror Abroad and Return to Rhosgobel): the players explore Rhosgobel, fight Rider of Mirkwood and win at stage 3. The losses are every player's threat at 50 (heroes too
+// small to quest) and every hero destroyed. Update the snapshot only when the change is meant.
+describe("The Wizard's Quest golden", () => {
   goldenSuite<QuestGolden, QuestDecks>({
     title: "The Wizard's Quest",
     file: new URL("./golden.json", import.meta.url).pathname,
@@ -24,16 +26,29 @@ describe.skip("The Wizard's Quest golden (open: scaffold)", () => {
     world: questWorld,
     play: playGolden,
     opening: {
-      title: "TODO: starts with (the staging area, the cards set aside, the encounter deck, the quest stage)",
+      title: "opens on Radagast's Request with Rhosgobel in the staging area, the encounter deck built from 7 of the 14 sets (35 cards) and the 3 stage cards of the first player's choice the only ones in the quest deck",
       check(state, golden) {
-        // TODO: the opening the Setup leaves.
-        expect(state.questStage, golden.name).toBeTruthy();
+        expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("51001");
+        expect(codesOf(state, state.staging), golden.name).toContain("51010");
+        // The first player has chosen one stage 2 and one stage 3 card; the other four wait out of the game.
+        expect(state.stages.map((stage) => stage.code), golden.name).toHaveLength(3);
+        expect(state.stages[0]?.code, golden.name).toBe("51001");
+        const sets = new Set(state.encounterDeck.map((id) => state.cards[id]?.encounterSet).filter((set) => set != null));
+        expect(sets.size, golden.name).toBeLessThanOrEqual(7);
       },
     },
-    wins: "TODO: wins when ..., settles with a score and earns nothing",
-    won(state) {
-      // TODO: the stage the game ended on.
-      expect(state.stageCleared).toBe(true);
+    wins: "wins when the stage 3 card of the first player's choice is defeated, settles at once with a score and earns nothing",
+    won(state, golden) {
+      expect(["51007", "51008", "51009"], golden.name).toContain(state.cards[state.questStage ?? ""]?.code);
+      expect(state.seats.slice(0, golden.seatCount).some((seat) => !seat.eliminated), golden.name).toBe(true);
+      // Rhosgobel flipped into Rider of Mirkwood, so Rhosgobel is no longer in play as a location.
+      expect(Object.values(state.cards).some((card) => card.code === "51010" && card.zone === "activeLocation"), golden.name).toBe(false);
+    },
+    lost(state, golden) {
+      const seats = state.seats.slice(0, golden.seatCount);
+      expect(seats.every((seat) => seat.eliminated), golden.name).toBe(true);
+      // Two ways to be eliminated: the threat reached 50, or no hero is left.
+      expect(golden.decks === "weak" ? seats.every((seat) => seat.threat >= 50) : seats.every((seat) => seat.heroes.length === 0), golden.name).toBe(true);
     },
   });
 });
