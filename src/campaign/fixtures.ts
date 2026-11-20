@@ -80,6 +80,7 @@ import guldurFixtures from "./fixtures/attack-on-dol-guldur.json";
 import questFixtures from "./fixtures/the-wizards-quest.json";
 import woodlandFixtures from "./fixtures/the-woodland-realm.json";
 import minesFixtures from "./fixtures/the-mines-of-moria.json";
+import khazadFixtures from "./fixtures/escape-from-khazad-dum.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -178,6 +179,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-wizards-quest": questFixtures,
   "the-woodland-realm": woodlandFixtures,
   "the-mines-of-moria": minesFixtures,
+  "escape-from-khazad-dum": khazadFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
