@@ -1,12 +1,138 @@
-// Rules: TODO name the rule ids the rows exercise (data/rules/entries.json).
+// Rules: rr.search, rr.reveal, rr.forced, rr.travel, rr.explored, rr.shadow-effects, rr.staging, rr.damage, rr.surge, rr.engaged, rr.lasting-effects, rr.blank, docs/brief.md (Escape from Khazad-dûm) (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { cardSpecs, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, defender, exhausted, flag, handCount, progressOn, quest, resolve, resourcesOn, respond, reveal, stagingThreat, stat, threat, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Escape from Khazad-dûm (standalone-scenarios part 13): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
-// TODO: the rows; the todo below stands in until there is one.
-const ROWS: readonly Row[] = [];
+// Each layout holds the quest cards a Quick-build game keeps (1A, one stage 2, one stage 3), so a stage number is the printed one. What a row cannot express (an attack whose damage lands on the stage, a lost game, a card that waits out of play) is in lines.test.ts.
+const F0 = ["f0", "f0", "f0", "f0", "f0", "f0"];
+const ADVANCING = { phase: "Quest", deck: ["f0"] } as const;
+const ALL_STAGES = ["51301", "51303", "51304", "51305", "51307", "51308", "51309"];
+// One card of each of the 14 sets: the Setup keeps 7 of the sets.
+const ONE_PER_SET = ["51312", "51316", "51319", "51321", "51324", "51329", "51331", "51334", "51337", "51341", "51343", "51345", "51349", "51352"];
+const STAGES_3 = ["51307", "51308", "51309"];
+const withStages = (row: Row): Row => {
+  const stage = row.layout?.stage ?? "51301";
+  return { ...row, layout: { stages: STAGES_3.includes(stage) ? ["51301", "51303", stage] : ["51301", stage === "51301" ? "51303" : stage, "51307"], ...row.layout } };
+};
+const ROWS: readonly Row[] = [
+  // 51301 Out of the Depths and Dark Pit / Durin's Bane.
+  { line: "51301:A:1", name: "Setup: 7 of the 14 sets stay in the deck and the opposing team adds a 0 cost enemy or location to the staging area", layout: { stage: "51301", stages: ALL_STAGES, deck: ONE_PER_SET }, act: resolve("51301", "setup"), expect: [deckCount(6)] },
+  { line: "51301:B:1", name: "Forced: when Dark Pit is explored it flips over, Durin's Bane lies set aside, and each player takes a card of his top 5 into his hand", layout: { stage: "51301", staging: ["51310"], deckOf: ["filler", "filler", "filler", "filler", "filler", "filler"] }, act: announce("locationExplored", "51310"), expect: [zone("51311", "setAside"), count("51310", "setAside", 0), handCount(1)] },
+  { line: "51301:B:2", name: "the stage cannot be defeated while Dark Pit is in play", layout: { stage: "51301", progress: 10, staging: ["51310"], ...ADVANCING }, act: quest("success"), expect: [zone("51301", "questStage")] },
+  // The stage 2 cards.
+  { line: "51303:A:1", name: "When Revealed: the top 5 cards are searched for a card with cost 1 or less, which is revealed", layout: { stage: "51303", deck: ["51322", "51319", "f0", "f0", "f0"] }, act: resolve("51303", "whenRevealed"), expect: [zone("51319", "staging"), zone("51322", "encounterDeck")] },
+  { line: "51303:B:1", name: "When Revealed: the opposing team adds an enemy of cost 2 or less to the staging area with 1 resource on it", layout: { stage: "51303", deck: ["51315", "51321", "f0"] }, act: resolve("51303", "whenRevealed"), expect: [zone("51321", "staging"), resourcesOn("51321", 1)] },
+  { line: "51303:B:2", name: "an enemy with a resource is immune to player card effects and no progress is placed on the stage while it is in play", layout: { stage: "51303", staging: [{ code: "51318", resources: 1 }] }, act: [], expect: [flag("51318", "immuneToPlayerCards"), flag("51303", "noProgressPlaced")] },
+  { line: "51304:A:1", name: "with two or more players a card of cost 2 or less is found", layout: { stage: "51304", seats: 2, deck: ["51336", "51327", "f0", "f0", "f0"] }, act: resolve("51304", "whenRevealed"), expect: [zone("51327", "staging"), zone("51336", "encounterDeck")] },
+  { line: "51304:B:1", name: "When Revealed: each player keeps 1 card of his hand and shuffles the rest into his deck", layout: { stage: "51304", hand: ["c1", "c1", "c1"] }, act: resolve("51304", "whenRevealed"), expect: [handCount(1)] },
+  { line: "51305:A:1", name: "When Revealed: the top 5 cards are searched for a card with cost 1 or less, which is revealed", layout: { stage: "51305", deck: ["51322", "51319", "f0", "f0", "f0"] }, act: resolve("51305", "whenRevealed"), expect: [zone("51319", "staging")] },
+  { line: "51305:B:1", name: "the active location's Threat counts in the staging area", layout: { stage: "51305", active: "51313", staging: ["f3"] }, act: [], expect: [stagingThreat(6)] },
+  { line: "51305:B:2", name: "the players must travel to a location during the travel phase", layout: { stage: "51305", staging: ["place"] }, act: [], expect: [flag("table", "mustTravel")] },
+  // The stage 3 cards: A:1 of each.
+  { line: "51307:A:1", name: "When Revealed: Durin's Bane joins the staging area and cannot take damage this round", layout: { stage: "51307", setAside: ["51311"] }, act: resolve("51307", "whenRevealed"), expect: [zone("51311", "staging"), flag("51311", "cannotTakeDamage")] },
+  { line: "51307:A:1", name: "with two players it attacks the first player at once", layout: { stage: "51307", seats: 2, setAside: ["51311"], deck: F0 }, act: resolve("51307", "whenRevealed"), expect: [window("defense")] },
+  { line: "51307:B:1", name: "no more than 5 progress can be placed on the main quest each round", layout: { stage: "51307" }, act: [], expect: [flag("table", "questProgressCap")] },
+  { line: "51308:A:1", name: "When Revealed: Durin's Bane joins the staging area, is flagged, and then engages the first player", layout: { stage: "51308", setAside: ["51311"] }, act: resolve("51308", "whenRevealed"), expect: [zone("51311", "engaged"), flag("51311", "cannotTakeDamage")] },
+  { line: "51308:B:1", name: "Forced: Durin's Bane engages the first player when it returns to the staging area", layout: { stage: "51308", staging: ["51311"] }, act: announce("returnedToStaging", "51311"), expect: [zone("51311", "engaged")] },
+  { line: "51308:B:2", name: "with no progress on the stage it takes no damage", layout: { stage: "51308", staging: ["51311"] }, act: [], expect: [flag("51311", "cannotTakeDamage")] },
+  { line: "51308:B:3", name: "the stage cannot be defeated while Durin's Bane is in play", layout: { stage: "51308", progress: 15, staging: ["51311"], ...ADVANCING }, act: quest("success"), expect: [zone("51308", "questStage")] },
+  { line: "51308:B:3", name: "the players win the game when the stage is defeated", layout: { stage: "51308" }, act: resolve("51308", "questResolution"), expect: [won] },
+  { line: "51307:B:3", name: "the players win the game when the stage is defeated", layout: { stage: "51307" }, act: resolve("51307", "questResolution"), expect: [won] },
+  { line: "51309:A:1", name: "When Revealed: Durin's Bane joins the staging area and cannot take damage this round", layout: { stage: "51309", setAside: ["51311"] }, act: resolve("51309", "whenRevealed"), expect: [zone("51311", "staging"), flag("51311", "cannotTakeDamage")] },
+  { line: "51309:B:2", name: "Durin's Bane is considered engaged with each player, adds no Threat and cannot leave the staging area", layout: { stage: "51309", staging: ["51311"] }, act: [], expect: [flag("51311", "engagedWithAll"), flag("51311", "noThreatContribution"), flag("51311", "attackableByAny"), flag("51311", "cannotLeaveStaging")] },
+  { line: "51309:B:3", name: "the players win the game when the stage is defeated", layout: { stage: "51309" }, act: resolve("51309", "questResolution"), expect: [won] },
+  // Dark Pit and Durin's Bane.
+  { line: "51310:A:2", name: "Travel: the top 5 cards are searched for a card with cost 1 or less, which is revealed", layout: { staging: ["51310"], deck: ["51322", "51315", "f0", "f0", "f0"] }, act: resolve("51310", "travel"), expect: [zone("51315", "staging")] },
+  { line: "51311:A:2", name: "Durin's Bane cannot be optionally engaged", layout: { staging: ["51311"] }, act: [], expect: [flag("51311", "cannotBeOptionallyEngaged")] },
+  { line: "51311:A:3", name: "Forced: after it destroys a character its controller raises his threat by 2 and it heals 2 damage", layout: { stage: "51307", engaged: [{ code: "51311", damage: 5 }], play: ["ally"], threat: [30, 30], deck: F0 }, act: [attack("51311"), defend("ally")], expect: [threat(32), damageOn("51311", 3)] },
+  // The encounter cards, in order.
+  { line: "51312:A:1", name: "the first player's first option raises each threat by 2", layout: { threat: [30, 30] }, act: [resolve("51312", "whenRevealed"), answer("threat")], expect: [threat(32)] },
+  { line: "51312:A:1", name: "or reveals an additional encounter card", layout: { deck: ["f3", "f0"] }, act: [resolve("51312", "whenRevealed"), answer("reveal")], expect: [zone("f3", "staging")] },
+  { line: "51312:A:2", name: "Shadow: the defending player raises his threat by 2", layout: { engaged: ["f3"], threat: [30, 30], deck: F0 }, act: [attack("f3", { shadow: "51312" }), defend("dh1"), answer("threat")], expect: [threat(32)] },
+  { line: "51312:A:2", name: "or the attack is considered undefended", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51312" }), defend("dh1"), answer("undefended")], expect: [damageOn("dh1", 1)] },
+  { line: "51313:A:1", name: "while in the staging area each Creature enemy gets +1 Threat", layout: { staging: ["51313", "51312"] }, act: [], expect: [stat("51312", "threat", 2)] },
+  { line: "51313:A:2", name: "Forced: when Nest of Vermin is explored a Creature enemy of cost 1 or less is added to the staging area", layout: { staging: ["51313"], deck: ["f0", "51312", "f0"] }, act: announce("locationExplored", "51313"), expect: [zone("51312", "staging")] },
+  { line: "51314:A:1", name: "When Revealed: each character gets -1 Willpower until the end of the phase", layout: {}, act: resolve("51314", "whenRevealed"), expect: [stat("dh1", "willpower", 1)] },
+  { line: "51314:A:2", name: "Shadow: each character you control gets -1 Attack and -1 Defense until the end of the phase", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51314" }), defend("dh1")], expect: [stat("dh1", "attack", 1)] },
+  { line: "51315:A:1", name: "Forced: when it attacks the defending player's first option removes 2 progress from the main quest", layout: { stage: "51303", progress: 5, engaged: ["51315"], deck: F0 }, act: [attack("51315", { undefended: true }), answer("progress")], expect: [progressOn("51303", 3)] },
+  { line: "51315:A:1", name: "or gives it +2 Attack for this attack", layout: { stage: "51303", progress: 5, engaged: ["51315"], deck: F0 }, act: [attack("51315", { undefended: true }), answer("attack")], expect: [progressOn("51303", 5), damageOn("dh1", 5)] },
+  { line: "51315:A:2", name: "Shadow: the defending player removes 2 progress from the main quest", layout: { stage: "51303", progress: 5, engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51315", undefended: true }), answer("progress")], expect: [progressOn("51303", 3)] },
+  { line: "51315:A:2", name: "or the attacker gets +2 Attack", layout: { stage: "51303", progress: 5, engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51315", undefended: true }), answer("attack")], expect: [damageOn("dh1", 3)] },
+  { line: "51316:A:1", name: "X is 1 more than the stage number of the main quest: its Threat at stage 2", layout: { stage: "51303", staging: ["51316"] }, act: [], expect: [stat("51316", "threat", 3)] },
+  { line: "51316:A:1", name: "and at stage 3", layout: { stage: "51307", staging: ["51316"] }, act: [], expect: [stat("51316", "threat", 4)] },
+  { line: "51316:A:2", name: "Travel: each player discards the top X cards of his deck", layout: { stage: "51303", staging: ["51316"], deckOf: ["c0", "c1", "c2", "c3", "filler"] }, act: resolve("51316", "travel"), expect: [zone("c1", "discard"), zone("c2", "discard"), zone("c3", "deck")] },
+  { line: "51317:A:1", name: "When Revealed: it attaches to the hero with the highest Willpower as a Condition", layout: {}, act: resolve("51317", "whenRevealed"), expect: [zone("51317", "attached")] },
+  { line: "51318:A:2", name: "allies cannot attack it", layout: { engaged: ["51318"], play: ["ally"] }, act: [], expect: [flag("51318", "alliesCannotAttack")] },
+  { line: "51319:A:1", name: "When Revealed: the top card is discarded and a location is added to the staging area", layout: { deck: ["51313", "f0"] }, act: resolve("51319", "whenRevealed"), expect: [zone("51313", "staging")] },
+  { line: "51319:A:1", name: "an enemy discarded this way stays in the discard pile", layout: { deck: ["f3", "f0"] }, act: resolve("51319", "whenRevealed"), expect: [zone("f3", "encounterDiscard")] },
+  { line: "51320:A:2", name: "When Revealed: it attaches to the main quest as a Condition", layout: { stage: "51303" }, act: resolve("51320", "whenRevealed"), expect: [zone("51320", "attached")] },
+  { line: "51321:A:2", name: "Forced: after it destroys a character its controller raises his threat by 1 for each excess damage", layout: { engaged: ["51321"], play: ["ally"], threat: [30, 30], deck: F0 }, act: [attack("51321"), defend("ally")], expect: [threat(33)] },
+  { line: "51322:A:1", name: "while in the staging area each Troll enemy gets -10 engagement cost", layout: { staging: ["51322", "51318"] }, act: [], expect: [stat("51318", "engagementCost", 26)] },
+  { line: "51322:A:2", name: "Forced: when Frightful Den is explored a Troll enemy of cost 1 or less is added to the staging area", layout: { staging: ["51322"], deck: ["f0", "51318", "f0"] }, act: announce("locationExplored", "51322"), expect: [zone("51318", "staging")] },
+  { line: "51323:A:1", name: "When Revealed: each player's first option raises his threat by 1 for each character he controls", layout: { play: ["ally"], threat: [30, 30] }, act: [resolve("51323", "whenRevealed"), answer("threat")], expect: [threat(33)] },
+  { line: "51323:A:1", name: "or discards a character he controls", layout: { play: ["ally"] }, act: [resolve("51323", "whenRevealed"), answer("discard"), answer("ally")], expect: [zone("ally", "discard")] },
+  { line: "51323:A:2", name: "Shadow: raise your threat by 1 for each enemy engaged with you", layout: { engaged: ["f3", "f0"], threat: [30, 30], deck: F0 }, act: [attack("f3", { shadow: "51323" }), defend("dh1")], expect: [threat(32)] },
+  { line: "51324:A:2", name: "Shadow: +2 Attack when the attack is undefended", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51324", undefended: true }), expect: [damageOn("dh1", 3)] },
+  { line: "51325:A:2", name: "Shadow: +2 Defense until the end of the phase", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51325" }), defend("dh1")], expect: [stat("f3", "defense", 3)] },
+  { line: "51326:A:1", name: "When Revealed: the questing character with the highest Willpower of each player is removed from the quest", layout: { play: ["ally"], committed: ["dh1", "ally"] }, act: resolve("51326", "whenRevealed"), expect: [committed("dh1", false)] },
+  { line: "51326:A:2", name: "Shadow: the defending character cannot ready until the end of the round", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51326" }), defend("dh1")], expect: [flag("dh1", "cannotReady")] },
+  { line: "51327:A:1", name: "Forced: after it engages a player it cannot take damage until the end of the round", layout: { engaged: ["51327"] }, act: announce("engaged", "51327", { seat: 0 }), expect: [flag("51327", "cannotTakeDamage")] },
+  { line: "51327:A:2", name: "Shadow: the attacking enemy cannot take damage this phase", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51327" }), defend("dh1")], expect: [flag("f3", "cannotTakeDamage")] },
+  { line: "51328:A:1", name: "Travel: the top card is discarded and each player raises his threat by its printed Threat", layout: { staging: ["51328"], threat: [30, 30], deck: ["51330", "f0"] }, act: resolve("51328", "travel"), expect: [zone("51330", "encounterDiscard"), threat(32)] },
+  { line: "51328:A:2", name: "Shadow: if the attack destroys a character the top card of the encounter deck is revealed", layout: { engaged: ["51321"], play: ["ally"], deck: ["f3", "f0", "f0"] }, act: [attack("51321", { shadow: "51328" }), defend("ally")], expect: [zone("f3", "staging")] },
+  { line: "51329:A:2", name: "Shadow: the defending character's text box is blank until the end of the phase", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51329" }), defend("dh1")], expect: [flag("dh1", "blankText")] },
+  { line: "51330:A:1", name: "Forced: when it attacks you the top card of your deck is discarded and it gets +X Attack, X the printed cost", layout: { engaged: ["51330"], deckOf: ["c3", "filler"], deck: F0 }, act: [attack("51330", { undefended: true })], expect: [damageOn("dh1", 5)] },
+  { line: "51330:A:2", name: "Shadow: +1 Attack", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51330", undefended: true }), expect: [damageOn("dh1", 2)] },
+  { line: "51331:A:1", name: "while in the staging area non-unique enemies there cannot take damage", layout: { staging: ["51331", "f3", "51336"] }, act: [], expect: [flag("f3", "cannotTakeDamage"), flag("51336", "cannotTakeDamage", false)] },
+  { line: "51331:A:2", name: "Travel: the first player engages an enemy in the staging area", layout: { staging: ["51331", "f3"] }, act: [resolve("51331", "travel")], expect: [zone("f3", "engaged")] },
+  { line: "51332:A:1", name: "When Revealed: the opposing team finds a different 0 cost location for each player", layout: { deck: ["f0", "51331", "f0"] }, act: resolve("51332", "whenRevealed"), expect: [zone("51331", "staging")] },
+  { line: "51332:A:2", name: "Shadow: the location of highest Threat in the encounter discard pile is shuffled into the encounter deck", layout: { engaged: ["f3"], discard: ["51313", "51331"], deck: F0 }, act: [attack("f3", { shadow: "51332" }), defend("dh1")], expect: [zone("51313", "encounterDeck"), zone("51331", "encounterDiscard")] },
+  { line: "51333:A:1", name: "Shadow Dweller cannot have non-objective attachments or take non-combat damage", layout: { staging: ["51333"] }, act: [], expect: [flag("51333", "cannotTakeNonCombatDamage")] },
+  { line: "51333:A:2", name: "Forced: when it attacks you the top card of your deck is discarded and you assign X damage, X its printed cost", layout: { engaged: ["51333"], deckOf: ["c3", "filler"], deck: F0 }, act: [attack("51333", { undefended: true })], expect: [damageOn("dh1", 8)] },
+  { line: "51334:A:1", name: "it gets +1 Threat for each location in the staging area, itself included", layout: { staging: ["51334", "place"] }, act: [], expect: [stat("51334", "threat", 2)] },
+  { line: "51334:A:1", name: "at most +3", layout: { staging: ["51334", "place", "place", "place", "place", "place"] }, act: [], expect: [stat("51334", "threat", 3)] },
+  { line: "51334:A:2", name: "Shadow: +1 Attack", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51334", undefended: true }), expect: [damageOn("dh1", 2)] },
+  { line: "51335:A:2", name: "Shadow: the defending character leaves the attack", layout: { engaged: ["f3"], play: ["ally"], deck: F0 }, act: [attack("f3", { shadow: "51335" }), defend("dh1")], expect: [defender("dh1", false)] },
+  { line: "51336:A:1", name: "Elder Nameless Thing cannot be optionally engaged", layout: { staging: ["51336"] }, act: [], expect: [flag("51336", "cannotBeOptionallyEngaged")] },
+  { line: "51336:A:2", name: "Forced: while in the staging area it attacks the first player at the beginning of the staging step", layout: { staging: ["51336"], deck: F0 }, act: announce("stagingStepBegins"), expect: [window("defense")] },
+  { line: "51337:A:2", name: "Travel: each player raises his threat by 2", layout: { staging: ["51337"], threat: [30, 30] }, act: resolve("51337", "travel"), expect: [threat(32)] },
+  { line: "51338:A:1", name: "When Revealed: each player raises his threat by the Threat of the active location", layout: { active: "51313", threat: [30, 30] }, act: resolve("51338", "whenRevealed"), expect: [threat(33)] },
+  { line: "51338:A:1", name: "with no active location it gains surge", layout: { deck: F0 }, act: reveal("51338"), expect: [count("f0", "staging", 1)] },
+  { line: "51338:A:2", name: "Shadow: +X Attack, X the stage number of the main quest", layout: { stage: "51307", engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51338", undefended: true }), expect: [damageOn("dh1", 4)] },
+  { line: "51339:A:1", name: "Forced: at the beginning of the combat phase each engaged enemy is dealt a shadow card", layout: { phase: "Combat", engaged: ["51339"], deck: F0 }, act: announce("beginningOfPhase"), expect: [count("f0", "shadow", 1)] },
+  { line: "51339:A:2", name: "Shadow: the attacking enemy is dealt 2 additional shadow cards", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51339", undefended: true })], expect: [count("f0", "shadow", 2)] },
+  { line: "51340:A:1", name: "When Revealed: the ally of the highest printed cost lies under it", layout: { play: ["ally"] }, act: resolve("51340", "whenRevealed"), expect: [zone("ally", "under")] },
+  { line: "51341:A:1", name: "When Revealed: each player deals 1 damage to a questing character he controls and removes it from the quest", layout: { committed: ["dh1"] }, act: resolve("51341", "whenRevealed"), expect: [damageOn("dh1", 1), committed("dh1", false)] },
+  { line: "51341:A:2", name: "Shadow: 1 damage to a character you control", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51341" }), defend("dh1")], expect: [damageOn("dh1", 1)] },
+  { line: "51342:A:1", name: "while it attacks it gets +1 Attack for each shadow card dealt for the attack", layout: { engaged: ["51342"], deck: F0 }, act: attack("51342", { undefended: true }), expect: [damageOn("dh1", 4)] },
+  { line: "51342:A:2", name: "Shadow: a card of the top 5 of the encounter deck is dealt to the attacker as a shadow card", layout: { engaged: ["f3"], deck: ["51342", "51321", "f0", "f0", "f0", "f0"] }, act: [attack("f3", { shadow: "51342", undefended: true })], expect: [count("51321", "shadow", 1)] },
+  { line: "51343:A:1", name: "while in the staging area no progress can be placed on the other locations there", layout: { staging: ["51343", "place"] }, act: [], expect: [flag("place", "noProgressPlaced"), flag("51343", "noProgressPlaced", false)] },
+  { line: "51343:A:2", name: "Travel: the card of highest Threat in the encounter discard pile is shuffled into the encounter deck", layout: { staging: ["51343"], discard: ["f0", "51313"] }, act: resolve("51343", "travel"), expect: [zone("51313", "encounterDeck")] },
+  { line: "51344:A:1", name: "When Revealed: the first player exhausts a ready character for each Uruk enemy in play", layout: { staging: ["51339"] }, act: resolve("51344", "whenRevealed"), expect: [exhausted("dh1")] },
+  { line: "51344:A:1", name: "with no Uruk in play it gains surge", layout: { deck: F0 }, act: reveal("51344"), expect: [count("f0", "staging", 1)] },
+  { line: "51344:A:2", name: "Shadow: +1 Attack", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51344", undefended: true }), expect: [damageOn("dh1", 2)] },
+  { line: "51344:A:2", name: "+2 Attack for an Uruk attacker", layout: { engaged: ["51345"], deck: F0 }, act: attack("51345", { shadow: "51344", undefended: true }), expect: [damageOn("dh1", 4)] },
+  { line: "51345:A:1", name: "Forced: after it engages a player it is dealt a shadow card", layout: { engaged: ["51345"], deck: F0 }, act: announce("engaged", "51345", { seat: 0 }), expect: [count("f0", "shadow", 1)] },
+  { line: "51345:A:2", name: "Shadow: +1 Attack and an additional shadow card for the attacker", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51345", undefended: true }), expect: [damageOn("dh1", 2), count("f0", "shadow", 1)] },
+  { line: "51346:A:1", name: "while in the staging area no more than 1 attacker can be declared against each enemy", layout: { staging: ["51346"], engaged: ["f3"] }, act: [], expect: [flag("f3", "singleAttacker")] },
+  { line: "51346:A:2", name: "Forced: when The Great Bridge is explored each player reveals 1 encounter card", layout: { staging: ["51346"], deck: ["f3", "f0"] }, act: announce("locationExplored", "51346"), expect: [zone("f3", "staging")] },
+  { line: "51347:A:1", name: "When Revealed: it attaches to the non-unique location of highest Threat in the staging area: +2 Threat and immune to player cards", layout: { staging: ["51328", "51331"] }, act: resolve("51347", "whenRevealed"), expect: [zone("51347", "attached"), stat("51328", "threat", 5), flag("51328", "immuneToPlayerCards")] },
+  { line: "51347:A:1", name: "with no such location it gains surge", layout: { deck: F0 }, act: reveal("51347"), expect: [count("f0", "staging", 1)] },
+  { line: "51348:A:1", name: "Chieftain of the Pit cannot have non-objective attachments or take non-combat damage", layout: { staging: ["51348"] }, act: [], expect: [flag("51348", "cannotTakeNonCombatDamage")] },
+  { line: "51348:A:2", name: "no shadow effect can be canceled while it is in play", layout: { staging: ["51348"] }, act: [], expect: [flag("table", "allShadowsUncancelable")] },
+  { line: "51348:A:3", name: "Forced: when it attacks it is dealt an additional shadow card", layout: { engaged: ["51348"], deck: F0 }, act: [attack("51348", { undefended: true })], expect: [count("f0", "shadow", 2)] },
+  { line: "51349:A:1", name: "Forced: while in the staging area each player raises his threat by 1 at the end of the refresh phase", layout: { staging: ["51349"], phase: "Refresh", threat: [30, 30] }, act: resolve("51349", "forced"), expect: [threat(31)] },
+  { line: "51349:A:2", name: "Travel: each player raises his threat by 1", layout: { staging: ["51349"], threat: [30, 30] }, act: resolve("51349", "travel"), expect: [threat(31)] },
+  { line: "51350:A:1", name: "When Revealed: the staged enemy of highest Attack attacks the first player", layout: { staging: ["51318", "f3"], deck: F0 }, act: resolve("51350", "whenRevealed"), expect: [window("defense")] },
+  { line: "51350:A:1", name: "with no enemy in the staging area it gains surge", layout: { deck: F0 }, act: reveal("51350"), expect: [count("f0", "staging", 1)] },
+  { line: "51350:A:2", name: "Shadow: a unique attacker makes an additional attack against you", layout: { engaged: ["51336"], deck: F0 }, act: [attack("51336", { shadow: "51350", undefended: true })], expect: [damageOn("dh1", 10)] },
+  { line: "51352:A:1", name: "Response: when it is explored as the active location each player adds 1 resource to a hero", layout: { active: "51352", play: ["ally"], committed: ["ally"] }, act: [quest("success"), respond("51352")], expect: [resourcesOn("dh1", 1)] },
+  { line: "51353:A:1", name: "When Revealed: the attachment of highest printed cost a player controls is discarded", layout: { attached: [{ code: "attachment", to: "dh1" }] }, act: resolve("51353", "whenRevealed"), expect: [zone("attachment", "discard")] },
+  { line: "51353:A:1", name: "with no attachment it gains surge", layout: { deck: F0 }, act: reveal("51353"), expect: [count("f0", "staging", 1)] },
+  { line: "51353:A:2", name: "Shadow: the defending player discards an attachment he controls", layout: { engaged: ["f3"], attached: [{ code: "attachment", to: "dh1" }], deck: F0 }, act: [attack("f3", { shadow: "51353" }), defend("dh1")], expect: [zone("attachment", "discard")] },
+];
 
-if (ROWS.length > 0) cardSpecs("escape-from-khazad-dum", ROWS);
+if (ROWS.length > 0) cardSpecs("escape-from-khazad-dum", ROWS.map(withStages));
 else describe("escape-from-khazad-dum card specs", () => it.todo("a row for each record whose behaviour needs a game moment"));

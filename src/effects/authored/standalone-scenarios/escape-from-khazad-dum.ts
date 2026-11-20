@@ -88,7 +88,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51305 A Way Up (stage 2): the active location's Threat counts in the staging area; in the travel phase the players must travel to a location, if able (reading 10).
   topSearch("51305", "51305:A:1", "whenRevealed", 1),
-  { id: "51305:constant:1", cardCode: "51305", lines: ["51305:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "activeThreat", amount: 1, until: "whileSourceInPlay" }] },
+  { id: "51305:constant:1", cardCode: "51305", lines: ["51305:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "activeThreat", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", active: true } }] },
   { id: "51305:constant:2", cardCode: "51305", lines: ["51305:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "mustTravel", amount: 1, until: "whileSourceInPlay", target: "table" }] },
 
   // 51307 The Bridge of Khazad-dûm (stage 3). A:1 (the three stage 3 cards): the set-aside Durin's Bane joins the staging area, cannot take damage this round, and with more than 1 player attacks the first player at once (reading 12). Side B: no more than 5 progress a round;
@@ -118,8 +118,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51307:constant:2", cardCode: "51307", lines: ["51307:B:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "loseAtDamage", amount: { stat: "questPoints", of: "self" }, until: "whileSourceInPlay", target: "self" }] },
   wins("51307", "51307:B:3"),
 
-  // 51308 Last Lord of Moria (stage 3): Durin's Bane engages the first player, as soon as it is in the staging area (reading 15); it takes no more damage each round than the progress tokens here (none with no progress); the stage cannot be defeated while it is in play.
-  { id: "51308:whenRevealed:1", cardCode: "51308", lines: ["51308:A:1"], timing: "whenRevealed", instructions: [{ verb: "EnterSetAsideStaging", code: BANE }, { verb: "Pick", pick: THE_BANE_STAGED }, { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "picked" }, { verb: "AttackFromStaging", who: "firstPlayer", orEngaged: true, when: { kind: "less", left: 1, right: { players: true } } }] },
+  // 51308 Last Lord of Moria (stage 3): Durin's Bane engages the first player, as soon as it is in the staging area (reading 15), so the 3A steps that follow it find it staged or engaged; it takes no more damage each round than the progress tokens here (none with no progress); the stage cannot be defeated while it is in play.
+  { id: "51308:whenRevealed:1", cardCode: "51308", lines: ["51308:A:1"], timing: "whenRevealed", instructions: [{ verb: "EnterSetAsideStaging", code: BANE }, { verb: "Pick", pick: THE_BANE }, { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "picked" }, { verb: "AttackFromStaging", who: "firstPlayer", orEngaged: true, when: { kind: "less", left: 1, right: { players: true } } }] },
   { id: "51308:forced:1", cardCode: "51308", lines: ["51308:B:1"], timing: "forced", trigger: "addedToStaging", subject: THE_BANE, instructions: [{ verb: "EngageFirstPlayer", target: "subject" }] },
   { id: "51308:forced:2", cardCode: "51308", lines: ["51308:B:1"], timing: "forced", trigger: "returnedToStaging", subject: THE_BANE, instructions: [{ verb: "EngageFirstPlayer", target: "subject" }] },
   { id: "51308:constant:1", cardCode: "51308", lines: ["51308:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "damageCap", amount: { stat: "progress", of: "self" }, until: "whileSourceInPlay", holders: THE_BANE }] },
