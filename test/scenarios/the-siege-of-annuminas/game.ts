@@ -35,7 +35,7 @@ const rankOf = (state: ScenarioState, enemyId: string): number => {
   return code === "50813" ? 0 : code === "50817" ? 1 : 2;
 };
 
-export function annuminasIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: AnnuminasPolicy = DEFAULT_POLICY): PlayerIntent {
+export function annuminasIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: AnnuminasPolicy = DEFAULT_POLICY, options: PolicyOptions = ANNUMINAS_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
   if (state.window?.kind === "optionalEngage") return engageOneEach(state, ctx) ?? { type: "DeclineEngage" };
   if (state.window?.kind === "playerAttack") {
@@ -60,7 +60,7 @@ export function annuminasIntent(state: ScenarioState, ctx: ReduceContext, memory
     const least = [...legalTargets(state, { type: "Undefended" }, ctx)].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
     if (least) return { type: "Undefended", heroId: least };
   }
-  return nextIntent(state, ctx, ANNUMINAS_POLICY, memory, legalIntents(state, ctx));
+  return nextIntent(state, ctx, options, memory, legalIntents(state, ctx));
 }
 
 export type AnnuminasGame = PlayedGame;

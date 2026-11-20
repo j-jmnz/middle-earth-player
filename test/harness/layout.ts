@@ -64,6 +64,8 @@ export type Layout = {
   heroResources?: number;
   // The campaign card is on the table (a campaign game).
   campaign?: boolean;
+  // The scenario's mode card lies beside the quest deck on its back, as a finished Setup leaves it (The Siege of Annúminas' Standard Game Mode, 50801:B:1).
+  modeCard?: true;
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
   attached?: readonly { code: string; to: string }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
@@ -188,6 +190,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   if (layout.nightmare) put(entry(layout.nightmare).code, { zone: "nightmare" }, layout.nightmare, "up");
   if (layout.night) put(entry(layout.night).code, { zone: "nightObjective" }, layout.night, "up");
   if (layout.campaign && world.dealt.campaignCard !== undefined) put(world.dealt.campaignCard, { zone: "campaign" });
+  if (layout.modeCard && "modeCard" in world.data && world.data.modeCard !== undefined) {
+    const spawned = spawn(state, world.data.modeCard, { zone: "modeCard" });
+    state = updateCard(spawned.state, spawned.id, { face: "B" });
+  }
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);
