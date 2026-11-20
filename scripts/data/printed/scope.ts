@@ -198,6 +198,18 @@ function dragnOtherSide(card: Card): string | null {
   return other ? `${prefix}${other.imageUrl}` : null;
 }
 
+// Hall of Beorn's pictures of some Attack on Dol Guldur encounter cards are 209 to 220 px wide, too small to read. The pack's cards carry no
+// DragnCards guid, so the row of the pack and collector number that bears the card's name (423 x 600) is the last URL of each side.
+const DRAGN_NUMBER_PACKS: ReadonlySet<string> = new Set(["AoDG"]);
+function dragnByNumber(card: Card, side: "A" | "B"): string | null {
+  const printing = card.printings.find((item) => DRAGN_NUMBER_PACKS.has(item.pack));
+  const product = PRODUCTS.find((item) => item.packs.some((pack) => pack === printing?.pack));
+  if (!printing || !product) return null;
+  const { prefix, rows } = dragnRows();
+  const row = rows.find((item) => item.packName === product.name && item.numberInPack === String(printing.number) && titleKey(item.name ?? "") === titleKey(card.name) && item.imageUrl && item.imageUrl.endsWith(".B.jpg") === (side === "B"));
+  return row?.imageUrl ? `${prefix}${row.imageUrl}` : null;
+}
+
 const CORE_ORDER = ["Revised Core Set", "Core Set"];
 
 // The Nightmare proxies' picture of each side (sources/nightmare.ts), from the listing `pnpm data sync nightmare` keeps. A deck's
@@ -267,8 +279,8 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
     if (!front) throw new Error(`No scan for ${code}`);
     const guid = card.printings.map((printing) => printing.octgnGuid).find((value) => value !== undefined);
     const fromDragn = guid ? dragn.get(guid) : undefined;
-    out.push({ code, side: "A", printing: first.printing, urls: [...(SCAN_URL_FIXES[code] ?? []), front, ...sources.slice(1).flatMap((source) => source.urls.slice(0, 1)), ...(fromDragn ? [fromDragn] : [])] });
-    if (back) out.push({ code, side: "B", printing: first.printing, urls: [...(SCAN_URL_FIXES[`${code}.B`] ?? []), back] });
+    out.push({ code, side: "A", printing: first.printing, urls: [...(SCAN_URL_FIXES[code] ?? []), front, ...sources.slice(1).flatMap((source) => source.urls.slice(0, 1)), ...(fromDragn ? [fromDragn] : []), ...(dragnByNumber(card, "A") ? [dragnByNumber(card, "A") as string] : [])] });
+    if (back) out.push({ code, side: "B", printing: first.printing, urls: [...(SCAN_URL_FIXES[`${code}.B`] ?? []), back, ...(dragnByNumber(card, "B") ? [dragnByNumber(card, "B") as string] : [])] });
   }
   return out;
 }

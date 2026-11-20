@@ -28528,9 +28528,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "fc114dee2a4c0788faca6be6741a73f20f2ed7e54cb6734214ce5dd3b4de01c9"
+        "value": "09753a452fea125d85cfee9329c15a9999efeb8abfede85e53df8c7c960f380c"
       },
-      "fetchedAt": "2026-11-20T00:55:07.556Z",
+      "fetchedAt": "2026-11-20T03:32:35.966Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -41077,6 +41077,246 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Siege-of-Annuminas/Weary-Warriors.jpg",
           "sha256": "3e3d15adedafc49b36d1810c926e867439920a1c719e17d0e54d4f8fb1d568b0",
           "bytes": 998075
+        },
+        {
+          "path": "scans/50901.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Assault-on-the-Golden-Wood-1A.jpg",
+          "sha256": "b1abd1261971541f95539f116b4792b9ed836f26e16765d5c79c711d728ca627",
+          "bytes": 381066
+        },
+        {
+          "path": "scans/50901.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Assault-on-the-Golden-Wood-1B.jpg",
+          "sha256": "43fee7ab74d8178285c408b5028a7f0d61db7ef74c3d769b141a77f66606cf9b",
+          "bytes": 382811
+        },
+        {
+          "path": "scans/50902.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Crossing-the-Anduin-2A.jpg",
+          "sha256": "a10e735f0567f983a837beaeee59055664a69cc8b2fdaa566e2b68e8f95949c8",
+          "bytes": 394715
+        },
+        {
+          "path": "scans/50902.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Crossing-the-Anduin-2B.jpg",
+          "sha256": "449557dd1ededd6ebedb39d0fafbd4f87804ae2f5d1ce1919750994bb239a2fb",
+          "bytes": 405598
+        },
+        {
+          "path": "scans/50903.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Siege-of-Dol-Guldur-3A.jpg",
+          "sha256": "4db201d5d8f01c0357ced16a3d4869b8ad0d1a85a1f553029526b9203da301f5",
+          "bytes": 81967
+        },
+        {
+          "path": "scans/50903.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Siege-of-Dol-Guldur-3B.jpg",
+          "sha256": "e6dd5bffad7d64915302dc15f02402c0440e590055f459621b9c2dc9a6d0a2ed",
+          "bytes": 384350
+        },
+        {
+          "path": "scans/50904.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Tower-of-Sorcery-C-3C.jpg",
+          "sha256": "0f9b6f5002a9869224d147893973977f4f19cf6dbe0cf64cef2b1e50f2f7d937",
+          "bytes": 406046
+        },
+        {
+          "path": "scans/50904.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Tower-of-Sorcery-C-3D.jpg",
+          "sha256": "ed0ceffa640a804ebf01fd2e743c9ca8ded6b8691fad03e1fc641e23fea6e314",
+          "bytes": 397044
+        },
+        {
+          "path": "scans/50905.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Battle-Under-the-Trees-E-3E.jpg",
+          "sha256": "8f4c1265bb4a585076134e6c5ad17fbfef82b849f5c41db6d5c88e55096f7008",
+          "bytes": 412494
+        },
+        {
+          "path": "scans/50905.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Battle-Under-the-Trees-E-3F.jpg",
+          "sha256": "e4ffb14e32ce979d9b9712d6579f2306b7ebd06b6af9ed9c7267575d634e8ec5",
+          "bytes": 428725
+        },
+        {
+          "path": "scans/50906.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Dungeons-of-the-Necromancer-G-3G.jpg",
+          "sha256": "f155f022b1d090ce1390653630f3bd660bcd6c49b4fe6550bd1127ddaadbd33c",
+          "bytes": 396683
+        },
+        {
+          "path": "scans/50906.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Dungeons-of-the-Necromancer-G-3H.jpg",
+          "sha256": "e1172ceb25102d8a4bf967554ad237c8498f3de7bf4dfbd73422e20131816e49",
+          "bytes": 383500
+        },
+        {
+          "path": "scans/50907.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/2b56edac-f289-4b76-ae90-f6f3e5fc9b58.jpg",
+          "sha256": "2ca5ee85be377f0ad5c84ee11b8d3b1a9f62cad8a0ce899bb5247730ef2c3b71",
+          "bytes": 143300
+        },
+        {
+          "path": "scans/50908.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/fe580179-8f51-463e-a235-bde0f7b783d7.jpg",
+          "sha256": "4e89d4121d8943b141b54a4555a0499ec7a236ea7f8ef0e288fac42e017d9b8e",
+          "bytes": 135955
+        },
+        {
+          "path": "scans/50909.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/d8694dea-3406-4199-96d5-cd8d0a97f152.jpg",
+          "sha256": "c789c9c2bc2929882799802f89e8f86663299c4b1f92b6be5d028de01195ba72",
+          "bytes": 132385
+        },
+        {
+          "path": "scans/50910.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/47186728-67bf-40b2-9b8d-d5012f0fd1a6.jpg",
+          "sha256": "a44a003d1a5e70921d910b24b0f4a14e49849c0d8949ff4f2f7879c5ccbb5663",
+          "bytes": 145211
+        },
+        {
+          "path": "scans/50911.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/49c77ce2-7305-4209-ad6a-f1ed983a556e.jpg",
+          "sha256": "b1d040ddf31d068e414dae9596fec53462ab3545bc4a89c608bf4a1f35b564b3",
+          "bytes": 140628
+        },
+        {
+          "path": "scans/50912.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/cefe5af1-a3d3-43fb-8b82-7ea9b4d2c861.jpg",
+          "sha256": "1fd0d2137a80462396244f09fabdcb2d6cce72ad6b0f665eed3da09b447ded68",
+          "bytes": 144664
+        },
+        {
+          "path": "scans/50913.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/9fa12306-d6ed-4fb8-89ce-8145bb81a58a.jpg",
+          "sha256": "35b7e3435dd1fa7fdb8f37dacf910d00dbee8f3cd733f4898e98bcebb945afa6",
+          "bytes": 152342
+        },
+        {
+          "path": "scans/50914.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/9944cbab-1c77-4cb4-87cc-36709f3143b5.jpg",
+          "sha256": "0d6eb4bc8421321f1f862b90993b5bed21cd7dbcbb07122f00a42494e3cf70c2",
+          "bytes": 139934
+        },
+        {
+          "path": "scans/50915.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Mirkwood-Olog-hai.jpg",
+          "sha256": "8ea777515719b274da3fcc70721a476e777a13bc7384c792df74838ae12a6a4c",
+          "bytes": 222264
+        },
+        {
+          "path": "scans/50916.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Beast-of-Taur-nu-Fuin.jpg",
+          "sha256": "68b1adf6311532f19bdfffe22ca54d7f3042e93793c92f8743e1c6b5dd4d6ef1",
+          "bytes": 227719
+        },
+        {
+          "path": "scans/50917.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Amon-Lanc-Archer.jpg",
+          "sha256": "e0ec428cd911751100dcc6f0269841b57eae7f45ba034bd4364c793acfd8ffb5",
+          "bytes": 210479
+        },
+        {
+          "path": "scans/50918.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Dol-Guldur-Marauder.jpg",
+          "sha256": "88c9d969f84ea3ccafda85c36b446d2e3b3c6fe90d1fa1967a78ce6e7a6f3b0e",
+          "bytes": 223705
+        },
+        {
+          "path": "scans/50919.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Battle-Warg.jpg",
+          "sha256": "ea4a90188a53a3d770fdf35238773c2c44f6a0a5f6bbf2f6df333a591691910f",
+          "bytes": 227066
+        },
+        {
+          "path": "scans/50920.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Gate-of-Dol-Guldur.jpg",
+          "sha256": "60b5bc7f238961ed6f31c4374fd228066a204ef497509e36a521ac3e6409286e",
+          "bytes": 226867
+        },
+        {
+          "path": "scans/50921.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Sorcerer's-Tower.jpg",
+          "sha256": "7c6cc34b56f4e24cd74f9212651ae4c065f5dfcb4c3b0f7b697ed6411bd80aa6",
+          "bytes": 236136
+        },
+        {
+          "path": "scans/50922.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Shadow-Road.jpg",
+          "sha256": "7fbe22639b4893cc8adea61b4ab619e9f1ddd0bf1d64c5913e309672765c01e0",
+          "bytes": 232259
+        },
+        {
+          "path": "scans/50923.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Dungeon-Door.jpg",
+          "sha256": "44535728551e05cfe802f45a5493b2ff129af90d6b880a466772057b1a5cbfcb",
+          "bytes": 219742
+        },
+        {
+          "path": "scans/50924.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Forest-Battleground.jpg",
+          "sha256": "746a3914f14ef63a24c2067c06eaff0e7e859a3aef5670c39268a326f48d7a2c",
+          "bytes": 228324
+        },
+        {
+          "path": "scans/50925.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Blackened-Woods.jpg",
+          "sha256": "7f34ba91f4c1da37ee8eaf13c0e996f08355599c74fa96618cf308eb9b98d63f",
+          "bytes": 227007
+        },
+        {
+          "path": "scans/50926.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ebbb49f0-4466-44e5-b157-968cd5e80b06.jpg",
+          "sha256": "cf60859df836d5f7761d546ca1d62175c266cf5f68a66e417791aacf1fba4cbe",
+          "bytes": 142800
+        },
+        {
+          "path": "scans/50927.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/c472af20-d956-4aec-af6e-319cdea35230.jpg",
+          "sha256": "c74c1f59742f18a9b23e345a9feb69619459c74f57e1c7fd146d3aa897955f64",
+          "bytes": 150421
+        },
+        {
+          "path": "scans/50928.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/6a24bcba-e069-4951-9cb1-59b48d291c74.jpg",
+          "sha256": "bfeb3e8244c94f88b72af6de8ed00b568355e97246b285f8259f9b5a76858285",
+          "bytes": 137773
+        },
+        {
+          "path": "scans/50929.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/0fd5a1d7-0791-4ab4-a50b-c5b2634ed94b.jpg",
+          "sha256": "8ffa0cc13d39e8dd77b9213743c1ee77fc70be89d32ddb41358c095127e9a248",
+          "bytes": 127832
+        },
+        {
+          "path": "scans/50930.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/807175bd-1d09-41ff-a3ab-560a935eb259.jpg",
+          "sha256": "1ec6428dd6b0863035b6ecf6119d296acca2d5f5642c2081d909348ab93c8285",
+          "bytes": 136613
+        },
+        {
+          "path": "scans/50931.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/bdbf8bed-f63f-4797-abb4-79054a9dbcad.jpg",
+          "sha256": "7f2822ea438ce4511d9f4b559f7eb2c56c97ee7346fbb197a5bdb872a927cdf1",
+          "bytes": 140894
+        },
+        {
+          "path": "scans/50931.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/bdbf8bed-f63f-4797-abb4-79054a9dbcad.B.jpg",
+          "sha256": "dbdc389dc392c7037589358418eeed6955627ea17d291fbb69393784eaae4b05",
+          "bytes": 147431
+        },
+        {
+          "path": "scans/50932.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ac5a17df-dcd0-4bfb-91fe-a444910f30ec.jpg",
+          "sha256": "371851f76ff8f2589c96be6b9bd9e594b21555df60f0db68b66e32a0edec3295",
+          "bytes": 154523
+        },
+        {
+          "path": "scans/50932.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ac5a17df-dcd0-4bfb-91fe-a444910f30ec.B.jpg",
+          "sha256": "fe3c68d5d0de441937a4f59c5a95900dd2a5d30ed65fee5c9973d60e79e63927",
+          "bytes": 159131
         },
         {
           "path": "scans/900101.A.jpg",
