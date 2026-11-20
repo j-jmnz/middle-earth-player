@@ -11,7 +11,7 @@ import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../d
 import { fetchBytesRetrying, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
 import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { renderPdfPage } from "../data/sources/pictures.ts";
-import { bytes, runScript, type Log } from "../log.ts";
+import { bytes, duration, runScript, type Log } from "../log.ts";
 
 // A bundled picture is at most this many pixels on its long side: about twice the 600 of a Hall of Beorn scan, which is
 // sharp on a phone's inspect screen. The 600 DPI pictures are about 2100.
@@ -63,6 +63,7 @@ type Pin = SourceFile & { cacheDir: string };
  * A picture larger than MAX_SIDE is scaled down to it. A card with neither is drawn as its text.
  */
 export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
+  const begin = performance.now();
   const { sources } = JSON.parse(readFileSync(options.sourcesPath, "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
   const scanPins = sidePins(sources.scans, "scans", options.scanCacheDir);
   // The Nightmare decks' pictures are pinned by their own source, cached beside the others (sources/nightmare.ts).
@@ -92,7 +93,10 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   const stamp: Stamp = { version: PACK_VERSION, entries: {} };
   const packed: PackedScan[] = [];
   const missing: string[] = [];
-  let fetched = 0;
+  // Where each loaded pin came from, and the time the workers spent loading and on the image work, summed over them
+  // (PACK_CONCURRENCY at once), for the summary line a release log keeps.
+  const from: Record<LoadedFrom, number> = { cache: 0, mirror: 0, source: 0, render: 0 };
+  const spent = { load: 0, images: 0 };
   let kept = 0;
   let total = 0;
   const tick = log.progress(jobs.length, "picture");
@@ -128,19 +132,22 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
         continue;
       }
       let body: Uint8Array | null = null;
-      let from: Pin | null = null;
+      let used: Pin | null = null;
+      const loading = performance.now();
       for (const pin of [picture, scan]) {
         if (!pin || body) continue;
         const loaded = await loadPin(pin, context, log);
-        if (loaded?.fetched) fetched += 1;
+        if (loaded) from[loaded.from] += 1;
         body = loaded?.body ?? null;
-        if (body) from = pin;
+        if (body) used = pin;
       }
-      if (!body || !from) {
+      spent.load += performance.now() - loading;
+      if (!body || !used) {
         missing.push(`${key} ${card.name}`);
         tick(`${key} has no picture`);
         continue;
       }
+      const working = performance.now();
       const shown = await shrink(body, card.type_code, key.endsWith(".B") ? "B" : "A");
       total += shown.byteLength;
       const scans = [writeScan(key, shown, options.scansDir)];
@@ -149,7 +156,8 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
         total += scene.byteLength;
         scans.push(writeScan(`${key}.scene`, scene, options.scansDir));
       }
-      stamp.entries[key] = { pin: from.sha256, scans };
+      spent.images += performance.now() - working;
+      stamp.entries[key] = { pin: used.sha256, scans };
       packed.push(...scans);
       tick(`${key} ${bytes(shown.byteLength)}`);
     }
@@ -175,7 +183,10 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
     log.info(`${missing.length} card${missing.length === 1 ? "" : "s"} have no pinned picture or scan and show as text`);
     log.debug(missing.join(", "));
   }
-  log.info(`bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} (${kept} cards kept from the last pack; ${bytes(total)} written, ${fetched} fetched) into ${options.scansDir}; map ${options.mapPath}`);
+  log.notice(
+    `bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} in ${duration(performance.now() - begin)}: ${kept} kept from the last pack, ${from.cache} from .cache, ${from.mirror} from the mirror, ${from.source} from their sources, ${from.render} rendered from a PDF; ${bytes(total)} written; worker time ${duration(spent.load)} loading, ${duration(spent.images)} on the images`,
+  );
+  log.info(`wrote ${options.scansDir}; map ${options.mapPath}`);
   return packed;
 }
 
@@ -219,14 +230,17 @@ type LoadContext = PackScansOptions & { fetchScan: (url: string) => Promise<Uint
 
 // The pinned bytes: the cache at the pin, else the mirror, else the URL, else the PDF page rendered again. A rendered page that hashes
 // differently (another poppler) is used with a warning; a page that cannot be rendered (no pdftoppm) returns null.
-async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body: Uint8Array; fetched: boolean } | null> {
+// Where a loaded pin came from: the cache, the asset mirror, its URL, or a page rendered from its PDF.
+type LoadedFrom = "cache" | "mirror" | "source" | "render";
+
+async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body: Uint8Array; from: LoadedFrom } | null> {
   const cached = path.join(pin.cacheDir, path.basename(pin.path));
-  if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) return { body: new Uint8Array(readFileSync(cached)), fetched: false };
+  if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) return { body: new Uint8Array(readFileSync(cached)), from: "cache" };
   const mirrored = await context.mirror?.(pin.sha256);
   if (mirrored) {
     mkdirSync(pin.cacheDir, { recursive: true });
     writeFileSync(cached, mirrored);
-    return { body: mirrored, fetched: true };
+    return { body: mirrored, from: "mirror" };
   }
   const page = pageOf(pin.url);
   if (page) {
@@ -250,7 +264,7 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
     if (sha256(body) !== pin.sha256) context.notes.rehashed.push(codeOf(pin.path));
     mkdirSync(pin.cacheDir, { recursive: true });
     writeFileSync(cached, body);
-    return { body, fetched: true };
+    return { body, from: "render" };
   }
   log.debug(`${pin.path} not in the cache at its pin, fetching ${pin.url}`);
   const body = await context.fetchScan(pin.url);
@@ -258,7 +272,7 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
   if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data sync scans pictures and check the change.`);
   mkdirSync(pin.cacheDir, { recursive: true });
   writeFileSync(cached, body);
-  return { body, fetched: true };
+  return { body, from: "source" };
 }
 
 // A quest card and a side quest are printed sideways, and the app shows them so. JvZijp files them upright, a quest turned

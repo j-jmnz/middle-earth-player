@@ -50,6 +50,7 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
   const fetchPdf = options.fetch ?? ((url: string) => fetchBytes(url, 300_000, log));
   mkdirSync(options.outDir, { recursive: true });
   const packed: PackedBooklet[] = [];
+  const from = { cache: 0, mirror: 0, source: 0 };
   for (const { id } of BOOKLETS) {
     const file = BOOKLET_SOURCES[id];
     const pin = files.find((entry) => entry.path === `pdf/${file}`);
@@ -59,11 +60,13 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
     const cached = path.join(options.pdfCacheDir, file);
     if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) {
       copyFileSync(cached, target);
+      from.cache += 1;
       log.debug(`${id}: ${file} from the cache`);
     } else {
       const mirrored = await options.mirror?.(pin.sha256);
       if (!mirrored) log.info(`${id}: ${file} not in the cache at its pin, fetching ${pin.url}`);
       const body = mirrored ?? (await fetchPdf(pin.url));
+      from[mirrored ? "mirror" : "source"] += 1;
       const hash = sha256(body);
       if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data sync rules and check the change.`);
       writeFileSync(target, body);
@@ -73,7 +76,8 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
     packed.push({ id, filename, bytes: pin.bytes, sha256: pin.sha256 });
   }
   writeBookletMap(path.join(options.outDir, "bundled-map.ts"), packed);
-  log.info(`packed ${packed.length} booklets (${bytes(packed.reduce((sum, book) => sum + book.bytes, 0))}) into ${options.outDir}; the next Metro bundle carries them`);
+  log.notice(`packed ${packed.length} booklets (${bytes(packed.reduce((sum, book) => sum + book.bytes, 0))}): ${from.cache} from .cache, ${from.mirror} from the mirror, ${from.source} from their sources`);
+  log.info(`wrote ${options.outDir}; the next Metro bundle carries them`);
   return packed;
 }
 

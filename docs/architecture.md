@@ -24,6 +24,7 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 | Files and list images | `expo-file-system`, `expo-image` | bundled pictures, lists, inspect, booklets |
 | Screen state | Zustand | subscribers of reducer output |
 | Haptics | `expo-haptics` (user request, 2026-10-25) | the table's dock: arm, send, undo, refusal; a card landing; a combat spotlight's strike |
+| Clipboard | `expo-clipboard` | Copy game state on a phone (`src/screens/table/clipboard.native.ts`); it only writes |
 | Keep awake | `expo-keep-awake` (user request, 2026-10-28) | the table, while Keep screen awake is on (`src/play/chrome/use-keep-awake.ts`) |
 | Backup exclusion | local Expo module `modules/image-backup-exclusion` | the image directory (`src/screens/images/queue.native.ts`) |
 | Local PDF reader | `modules/booklet-pdf`, a local Expo module: PDFKit on iOS, `PdfRenderer` on Android; on the web `pdfjs-dist`, which `metro.config.js` serves for `booklet-pdf` (`src/screens/booklets/web`) | `src/screens/booklets` |
@@ -31,7 +32,7 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 | Dev build | `expo-dev-client` (the local module is not in Expo Go) | device builds |
 | Engine tests | Vitest | `src/rules`, `src/campaign` |
 
-Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, `expo-file-system` and `expo-haptics` with `pnpm expo install`. Worklets is the Reanimated 4 peer. NativeWind 5 is out. `package.json` pins Skia (2.14.0), FlashList (2.3.2), NativeWind (4.2.7), Reanimated (4.7.1), worklets (0.13.0) and Zustand (5.0.15) exactly; keep the versions `pnpm expo install` selected. The table decodes cached files. It does not call Skia's `makeImageFromView`. Only the deck import list uses FlashList sticky headers.
+Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, `expo-file-system`, `expo-haptics` and `expo-clipboard` with `pnpm expo install`. Worklets is the Reanimated 4 peer. NativeWind 5 is out. `package.json` pins Skia (2.14.0), FlashList (2.3.2), NativeWind (4.2.7), Reanimated (4.7.1), worklets (0.13.0) and Zustand (5.0.15) exactly; keep the versions `pnpm expo install` selected. The table decodes cached files. It does not call Skia's `makeImageFromView`. Only the deck import list uses FlashList sticky headers.
 
 The catalog is one `drizzle-orm/sqlite-core` schema. The script opens it with `better-sqlite3`. The phone opens those tables with `expo-sqlite`, read-only. `user.db` is a separate schema. Its migrations stay in `drizzle/`.
 

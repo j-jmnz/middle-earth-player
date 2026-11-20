@@ -1,6 +1,6 @@
 // The table's one way to put text on the clipboard, for Copy game state (copy-state.ts): the browser's clipboard on the web and the desktop build (the
-// desktop policy allows the write and nothing else, desktop/policy.ts). The phone build holds no clipboard module, so there it answers false and the
-// caller says so. Writing only: the app never reads the clipboard (PRIVACY.md).
+// desktop policy allows the write and nothing else, desktop/policy.ts). The phone build writes through expo-clipboard (clipboard.native.ts). Where
+// there is no clipboard it answers false and the caller says so. Writing only: the app never reads the clipboard (PRIVACY.md).
 
 type WebClipboard = { writeText?: (text: string) => Promise<void> };
 
