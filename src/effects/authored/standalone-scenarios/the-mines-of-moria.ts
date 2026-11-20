@@ -131,7 +131,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "ModifyStat", stat: "questPoints", amount: 3, until: "whileSourceInPlay", holders: STAGED_LOCATIONS },
     ],
   },
-  { id: "51209:forced:1", cardCode: "51209", lines: ["51209:B:2"], timing: "forced", trigger: "activeExplored", instructions: [{ verb: "RevealEncounter" }] },
+  { id: "51209:forced:1", cardCode: "51209", lines: ["51209:B:2"], timing: "forced", trigger: "activeExplored", subject: { type: "location", control: "any" }, instructions: [{ verb: "RevealEncounter" }] },
   chamberBars("51209", "51209:B:3"),
   wins("51209", "51209:B:3"),
 

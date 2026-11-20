@@ -133,7 +133,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - each location (any player controls) in the staging area only: stat questPoints 3, while this card is in play
 
 51209:B:2 (back): Forced: When the active location is explored, reveal the top card of the encounter deck.
-  51209:forced:1: Forced on the event activeExplored
+  51209:forced:1: Forced on the event activeExplored (heard about location (any player controls))
     - the acting player reveals an encounter card
 
 51209:B:3 (back): This stage cannot be defeated while Chamber of Mazarbul is in play. When this stage is defeated, the players win the game.
@@ -727,4 +727,4 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the phase
 
-(rendered pieces: 426 by template, 13 as JSON)
+(rendered pieces: 427 by template, 13 as JSON)
