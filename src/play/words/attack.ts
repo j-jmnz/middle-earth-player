@@ -14,7 +14,9 @@ export function attackWords(instruction: Instruction): string | null {
       return instruction.target === "host" ? "make the attached enemy attack from the staging area" : "make an immediate attack against you from the staging area";
     // An AfterAttack inside a Choose option (145021:A:3, Haunted Path's shadow): the enemy that attacked returns to the staging area once the attack has ended.
     case "AfterAttack":
-      return instruction.instructions.length > 0 && instruction.instructions.every((inner) => inner.verb === "ReturnToStaging") ? "return the attacking enemy to the staging area after this attack" : null;
+      if (instruction.instructions.length > 0 && instruction.instructions.every((inner) => inner.verb === "ReturnToStaging")) return "return the attacking enemy to the staging area after this attack";
+      // Body Count (50728:A:2): the threat raise that waits for the attack to end and counts only a destroyed character.
+      return instruction.instructions.length === 1 && instruction.instructions[0]?.verb === "RaiseThreat" && typeof instruction.instructions[0].amount === "number" ? `raise your threat by ${instruction.instructions[0].amount} after this attack if it destroyed a character` : null;
     case "QuestProgress":
       return `place ${typeof instruction.amount === "number" ? instruction.amount : "X"} progress on the current quest`;
     case "ExcessDamageTo":
