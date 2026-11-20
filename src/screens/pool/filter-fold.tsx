@@ -1,4 +1,4 @@
-// The pool's filters that fold away under the search while the Cards tab scrolls down in portrait, and come back as it scrolls up
+// The pool's filters that fold away under the search while the Cards tab scrolls down, and come back as it scrolls up
 // (docs/design-system.md, Card pool (the Cards tab)). The turn of the scroll is scroll-fold.ts; this feeds it the list's offsets and
 // draws the fold.
 import { useRef, useState, type ReactNode } from "react";
@@ -37,7 +37,7 @@ export function useFilterFold(enabled: boolean, shown: unknown): FilterFoldState
   const [height, setHeight] = useState(0);
   const [round, setRound] = useState(0);
   const scrolled = useSharedValue(0);
-  // Turned off (a rotation to landscape, a screen reader turned on) or a new list, the filters show.
+  // Turned off (a screen reader turned on) or a new list, the filters show.
   const [seen, setSeen] = useState({ enabled, shown });
   if (enabled !== seen.enabled || shown !== seen.shown) {
     setSeen({ enabled, shown });
@@ -69,10 +69,11 @@ export function useFilterFold(enabled: boolean, shown: unknown): FilterFoldState
  * list's top, so they slide away under the search row. A night shade behind them, solid under the rows and falling to nothing below
  * them, hides the cards that scroll under them; it shows once the list has left its top. It rises with the rows and stops 16 pt under
  * the search row, so folded the cards still pass under a short band and never touch the search. It runs as far past the screen's inset
- * as the type chips' row does, so the row reaches the edges. Folded, the filters are hidden from a screen reader and take no touch; a
+ * as the type chips' row does, so the row reaches the edges; the shade does too where the pool runs to the screen's sides, and keeps to
+ * the pool's column (`column`) where a pane stands beside it, so it ends on the cards' edge and not in the gap. Folded, the filters are hidden from a screen reader and take no touch; a
  * keyboard's focus landing in them shows them.
  */
-export function FilterFold({ fold, children }: { fold: FilterFoldState; children: ReactNode }) {
+export function FilterFold({ fold, column = false, children }: { fold: FilterFoldState; column?: boolean; children: ReactNode }) {
   const palette = usePalette();
   const s = useUiScale();
   const { progress } = useOpenMotion(!fold.folded, MOTION.filtersUnfold, MOTION.filtersFold);
@@ -101,10 +102,9 @@ export function FilterFold({ fold, children }: { fold: FilterFoldState; children
       pointerEvents={fold.folded ? "none" : "box-none"}
       onFocus={fold.folded ? fold.reveal : undefined}
     >
-      <Animated.View
-        pointerEvents="none"
-        style={[{ position: "absolute", left: 0, right: 0, top: 0, height, backgroundImage: `linear-gradient(180deg, ${night} ${solid}%, ${clear} 100%)` }, shade]}
-      />
+      <View pointerEvents="none" className={`absolute top-0 ${column ? "left-6 right-6" : "left-0 right-0"}`} style={{ height }}>
+        <Animated.View style={[{ position: "absolute", left: 0, right: 0, top: 0, height, backgroundImage: `linear-gradient(180deg, ${night} ${solid}%, ${clear} 100%)` }, shade]} />
+      </View>
       <Animated.View style={rows} aria-hidden={fold.folded} importantForAccessibility={fold.folded ? "no-hide-descendants" : "auto"}>
         <View className="px-6 pb-2" onLayout={(event) => fold.onMeasure(Math.ceil(event.nativeEvent.layout.height))}>
           {children}

@@ -220,7 +220,7 @@ Read the sections your task touches.
   - 236–250 Icons (~480) ← 7
   - 251–269 Card art (~780) ← 2
   - 270–285 Tablets (~630) ← 15
-  - 286–506 Screens (~22.1K)
+  - 286–506 Screens (~22.2K)
     - 290–295 Splash (~210) ← 3
     - 296–299 App icon (~80)
     - 300–315 Campaigns (campaign list) (~1.5K) ← 6
