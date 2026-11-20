@@ -214,6 +214,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.notCardType && printed.type === spec.notCardType) return false;
   if (spec.committed != null && instance.committed !== spec.committed) return false;
   if (spec.participating && !(at.participants ?? []).includes(id)) return false;
+  // No card is at another stage in a game with one stage (50805:B:2).
+  if (spec.atOtherStage) return false;
   if (spec.nonUnique && printed.isUnique) return false;
   if (spec.unique && !printed.isUnique) return false;
   if (spec.hasShadow && !instance.shadowId) return false;

@@ -103,6 +103,11 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ReleaseGuardedHero"), ...when }),
   // Carried Away (18074:B:3): "When the players advance from this stage, discard each guarded hero." Each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated (rr.player-elimination).
   z.strictObject({ verb: z.literal("DiscardGuardedHeroes"), ...when }),
+  // Enemy Camp (50815:A:2, "discard 1 random facedown hero from under each stage 3"): of the heroes lying facedown under the current quest stage when it is stage number `stage`, one chosen with the game's seed goes to its owner's discard pile (a player left with no hero is eliminated).
+  // Nothing happens at another stage or with no hero under it (docs/brief.md, The Siege of Annúminas, reading 18: Standard Game Mode puts no hero there).
+  z.strictObject({ verb: z.literal("DiscardHeldHero"), stage: z.number().int().positive(), ...when }),
+  // Enemy Camp (50815:A:2, "return each hero under each stage 3 to its owner's control"): each hero lying facedown under the current quest stage, when it is stage number `stage`, returns among its owner's heroes, faceup and exhausted.
+  z.strictObject({ verb: z.literal("ReturnHeldHeroes"), stage: z.number().int().positive(), ...when }),
   // Truly Lost (18075:A:1): "Each player places his hand of cards facedown under a different location in the staging area." The actor chooses a location in the staging area (an Objective-Location is one) that no player has put a hand under yet, and every card of their hand goes facedown under it, still theirs.
   // With an empty hand nothing is chosen.
   z.strictObject({ verb: z.literal("PlaceHandUnderLocation"), ...when }),

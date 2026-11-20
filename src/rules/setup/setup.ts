@@ -218,9 +218,6 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   // The Nightmare setup card's own Setup lines (families/nightmare/setup.ts).
   next = nightmareSetup(next, ctx, steps);
   if (next.failure || next.lost) return next;
-  // The scenario's mode card with a Setup of its own comes before the quest card's (setup/mode-card.ts).
-  next = modeCardSetup(next, ctx, steps);
-  if (next.failure || next.lost) return next;
   for (const instruction of next.setup) {
     next = runInstruction(
       next,
@@ -231,6 +228,9 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     );
     if (next.failure || next.lost) return next;
   }
+  // The scenario's mode card with a Setup of its own comes before the quest card's, once the piles have put Annúminas in the staging area (setup/mode-card.ts).
+  next = modeCardSetup(next, ctx, steps);
+  if (next.failure || next.lost) return next;
   // The quest card's Setup can deal a card that reads progress on a side quest (Lie Low, shuffled in by Into the Ettenmoors, 10064:A:1): the game notes it now.
   next = markProgressNoted(next, ctx);
   if (next.questStage) next = timeOnReveal(updateCard(next, next.questStage, { face: "B" }), next.questStage, ctx);

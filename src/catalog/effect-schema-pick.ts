@@ -31,6 +31,10 @@ export const pickSchema = z.strictObject({
   // The cards "at this stage" (Breaking of the Fellowship, mec109.multiple-staging-areas): once stages are separate the chooser's own staging area, the enemies
   // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/interpret/pick.ts.
   atStage: z.literal(true).optional(),
+  // The cards "at another stage" than the chooser's (The Siege of Annúminas' stage 3B, 50805:B:2; docs/brief.md, The Siege of Annúminas, reading 9): a game with one stage, as the Standard Game Mode is, has no card at another stage, so the filter matches nothing. Read by src/rules/interpret/pick.ts.
+  atOtherStage: z.literal(true).optional(),
+  // With `type: player`: only a player who controls heroes holding this many resources in all, so that he can pay them ("Any player may spend 1 resource to take control of Dúnedain of Annúminas", 50818:A:2). Read by src/rules/families/wilderland/seat-pick.ts.
+  canSpendResources: z.number().int().positive().optional(),
   // With `type: player`: only a player whose staging area is a different one from the chooser's, once stages are separate ("a different player's staging area", 901703:A:2); with one staging area every other player. Read by src/rules/interpret/pick.ts.
   otherArea: z.literal(true).optional(),
   // A character whose printed hit points are fewer than those of the enemy making the attack in progress ("if the defending character has fewer printed hit
