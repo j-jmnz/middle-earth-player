@@ -8,7 +8,7 @@ import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { characters } from "../combat/combat.ts";
 import { declareAttack } from "../families/attack/index.ts";
-import { enforceRestricted } from "../player/attach.ts";
+import { enforceRestricted, hostTakesControl } from "../player/attach.ts";
 import { placeProgress, progressPlacer } from "./effect-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { announceAllyLeft } from "../core/ally-left.ts";
@@ -290,7 +290,7 @@ export function runPlayerVerb(
       const host = list.at(-1) ?? "";
       if (!state.cards[attachment] || !state.cards[host]) return state;
       const placed = updateCard(moveCard(state, attachment, { zone: "play", seat: focus.seat }), attachment, { exhausted: false });
-      const attached = queueEvent(attachTo(placed, attachment, host), { trigger: "enteredPlay", seat: focus.seat, cardId: attachment });
+      const attached = queueEvent(hostTakesControl(attachTo(placed, attachment, host), attachment, ctx), { trigger: "enteredPlay", seat: focus.seat, cardId: attachment });
       return enforceRestricted(attached, host, ctx, steps);
     }
     // The attack resolves with the steps of a player attack: its declaration is announced and "for this attack" ends with it

@@ -7,7 +7,7 @@ import { announceLooked } from "./looked.ts";
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
-import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
+import { attachmentHostIds, enforceRestricted, hostTakesControl } from "../../player/attach.ts";
 import { effectCause, ruleCause } from "../../core/cause.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { hasTrait, holds } from "../../interpret/conditions.ts";
@@ -202,7 +202,7 @@ function playRevealedFree(state: ScenarioState, item: QueueItem, ctx: ReduceCont
     const host = item.chosen && hosts.includes(item.chosen) ? item.chosen : hosts[0];
     if (!host) return bottom;
     const placed = updateCard(moveCard(played(state, id, seat, ctx, steps), id, { zone: "play", seat }), id, { exhausted: entersExhausted(ctx, card.code) });
-    return enforceRestricted(queueEvent(attachTo(placed, id, host), { trigger: "played", seat, cardId: id }), host, ctx, steps);
+    return enforceRestricted(queueEvent(hostTakesControl(attachTo(placed, id, host), id, ctx), { trigger: "played", seat, cardId: id }), host, ctx, steps);
   }
   const running = playableActions(state, id, seat, ctx);
   const first = running[0];
