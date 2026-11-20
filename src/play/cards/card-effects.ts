@@ -19,6 +19,7 @@ import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
+import { guardedMark } from "../readouts/standalone-scenarios/khazad.ts";
 import { hiddenMark, keptMark } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
@@ -336,6 +337,9 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   // The cards Hidden Threat lays facedown under the main quest.
   const hidden = hiddenMark(game, cardId);
   if (hidden) return hidden;
+  // The card Nameless Thing guards faceup under it (readouts/standalone-scenarios/khazad.ts).
+  const guarded = guardedMark(game, ctx, cardId);
+  if (guarded) return guarded;
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);

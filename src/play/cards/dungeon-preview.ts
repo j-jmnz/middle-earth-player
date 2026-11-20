@@ -122,7 +122,7 @@ function lostInMirkwoodDetail(game: ScenarioState, ctx: ReduceContext, card: Sce
 // The King's Quest's cards (ledger lines 18050:A:2, 18043:A:3, 12172:A:2): the card Hobgoblin holds faceup under it, an Artifact guarded in the staging area, and The Threat to Wilderland's resources. The engine decided each; this only says it.
 function kingsQuestDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
   const held = cardsUnder(game, card.id).map((id) => game.cards[id]).find((other) => other?.held === true);
-  if (held) return `Holds ${name(held.id)}, ${held.owner != null ? ownerWords(game.seatCount, held.owner) : "a player's"} card, faceup. It returns to its owner's hand when ${name(card.id)} leaves play.`;
+  if (held) return `Holds ${name(held.id)}, ${held.owner != null ? ownerWords(game.seatCount, held.owner) : "a player's"} card, faceup. It ${held.heldDiscard === true ? "is discarded" : "returns to its owner's hand"} when ${name(card.id)} leaves play.`;
   if (card.zone !== "staging") return null;
   // The Artifact Dragon Hoard set up (GuardPickedAttachment remembers the record on it), not any attachment that lies in the staging area.
   if (ctx.cards.get(card.code)?.type === "attachment" && card.setUpBy != null) {

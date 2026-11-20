@@ -27,7 +27,7 @@ export function keptMark(game: ScenarioState, ctx: ReduceContext, cardId: string
 export function keptDetail(game: ScenarioState, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
   if (game.heldCards !== true || card?.zone !== "under" || card.heldTitle !== true || card.host == null) return null;
-  return keptCardWords(name(card.host), ownerWords(game.seatCount, card.owner ?? card.controller));
+  return keptCardWords(name(card.host), ownerWords(game.seatCount, card.owner ?? card.controller), card.heldExhausted === true);
 }
 
 /** The pill of the main quest that holds the cards Hidden Threat laid facedown under it ("2 hidden"), or null when it holds none. */
