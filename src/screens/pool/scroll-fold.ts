@@ -1,5 +1,6 @@
 // When the pool's filters fold away under the search (docs/design-system.md, Card pool (the Cards tab)): a scroll down past the filters'
 // own height folds them, a scroll back up or a return to the top shows them again. Pure, so the hook in filter-fold.tsx only feeds it.
+import { withAlphaHex } from "../../ui/tokens";
 
 /** The fold and the offset the next turn is measured from: the lowest offset since the last fold, or the highest while folded. */
 export type FoldScroll = { folded: boolean; anchor: number };
@@ -32,4 +33,22 @@ export function foldOnScroll(state: FoldScroll, offset: number, end: number, roo
   if (y >= last - 1) return y === state.anchor ? state : { ...state, anchor: y };
   if (state.anchor - y > FOLD_SLOP) return openAt(y);
   return y > state.anchor ? { ...state, anchor: y } : state;
+}
+
+// The shade's darkest, under the rows.
+const SHADE_ALPHA = 0.94;
+// The steps of its fall, from the rows' foot (0) to its end (1).
+const FALL_STEPS = [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1];
+
+/**
+ * The shade behind the filters as a CSS gradient: solid night down to `solid` (a share of its height), then easing to nothing on a
+ * smoothstep, so neither end of the fall shows as a line.
+ */
+export function shadeOf(night: string, solid: number): string {
+  const from = Math.min(1, Math.max(0, solid)) * 100;
+  const stops = FALL_STEPS.map((t) => {
+    const eased = t * t * (3 - 2 * t);
+    return `${withAlphaHex(night, SHADE_ALPHA * (1 - eased))} ${(from + t * (100 - from)).toFixed(1)}%`;
+  });
+  return `linear-gradient(180deg, ${withAlphaHex(night, SHADE_ALPHA)} 0%, ${stops.join(", ")})`;
 }

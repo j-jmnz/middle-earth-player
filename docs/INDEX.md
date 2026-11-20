@@ -160,16 +160,16 @@ Read the sections your task touches.
     - 2212–2247 Fog on the Barrow-downs (~5.0K) ← 9
   - 2248–2256 Nightmare (~410) ← 22
   - 2257–2299 Deckbuilding (~2.5K) ← 1
-  - 2300–2379 Effects (~4.1K)
-    - 2302–2360 Three layers (~2.4K) ← 10
-    - 2361–2371 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 2372–2375 Window stack (~100)
-    - 2376–2379 Coverage test (~270)
-  - 2380–2403 Data sources (~750) ← 3
-  - 2404–2422 Card images (~1.4K) ← 9
-  - 2423–2450 Persistence and shipping (~3.2K) ← 10
-  - 2451–2493 Screens (~5.9K) ← 2
-    - 2478–2493 Table screen (~1.8K) ← 3
+  - 2300–2381 Effects (~4.2K)
+    - 2302–2362 Three layers (~2.5K) ← 10
+    - 2363–2373 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 2374–2377 Window stack (~100)
+    - 2378–2381 Coverage test (~270)
+  - 2382–2405 Data sources (~750) ← 3
+  - 2406–2424 Card images (~1.4K) ← 9
+  - 2425–2452 Persistence and shipping (~3.2K) ← 10
+  - 2453–2495 Screens (~5.9K) ← 2
+    - 2480–2495 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~66.6K tok)
   - 5–8 Overview (~170) ← 1
   - 9–27 Top bar (~4.7K) ← 5
@@ -204,7 +204,7 @@ Read the sections your task touches.
   - 390–401 Banner (~750) ← 5
   - 402–421 Screen reader (~3.0K) ← 19
   - 422–425 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~36.1K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~36.2K tok)
   - 7–20 Direction (~670)
   - 21–34 Standards (~750) ← 1
   - 35–45 Performance (~720) ← 4
@@ -220,7 +220,7 @@ Read the sections your task touches.
   - 236–250 Icons (~480) ← 7
   - 251–269 Card art (~780) ← 2
   - 270–285 Tablets (~630) ← 15
-  - 286–506 Screens (~22.1K)
+  - 286–506 Screens (~22.2K)
     - 290–295 Splash (~210) ← 3
     - 296–299 App icon (~80)
     - 300–315 Campaigns (campaign list) (~1.5K) ← 6
@@ -236,7 +236,7 @@ Read the sections your task touches.
     - 390–403 Resolution and standalone outcome (~1.9K) ← 2
     - 404–413 Decks (~920) ← 2
     - 414–423 Deck builder (deck editor) (~1.1K) ← 3
-    - 424–435 Card pool (the Cards tab) (~1.5K) ← 5
+    - 424–435 Card pool (the Cards tab) (~1.6K) ← 5
     - 436–447 Card groups (the Cards tab's Encounter cards view) (~1.3K) ← 9
     - 448–453 Card (~490) ← 2
     - 454–465 Collection (~530) ← 3

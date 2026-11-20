@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { FOLD_SLOP, OPEN_FOLD, foldOnScroll, openAt, type FoldScroll } from "./scroll-fold";
+import { FOLD_SLOP, OPEN_FOLD, foldOnScroll, openAt, shadeOf, type FoldScroll } from "./scroll-fold";
 
 const ROOM = 120;
 const END = 5000;
@@ -59,5 +59,26 @@ describe("the pool's filters fold on scroll", () => {
 
   it("keep the filters open on a scroll up after the list changes in the middle", () => {
     expect(run([480, 460, 440], openAt(500)).folded).toBe(false);
+  });
+});
+
+describe("the shade behind the pool's filters", () => {
+  const gradient = shadeOf("#0b0f14", 0.7);
+  // Each stop is "rgba(r,g,b,alpha) at%".
+  const stops = [...gradient.matchAll(/rgba\(\d+,\d+,\d+,([\d.]+)\) ([\d.]+)%/g)].map((m) => ({ alpha: Number(m[1]), at: Number(m[2]) }));
+
+  it("is solid down to the rows' foot and clear at its end", () => {
+    expect(stops[0]!.at).toBe(0);
+    expect(stops[1]!.at).toBe(70);
+    expect(stops[1]!.alpha).toBe(stops[0]!.alpha);
+    expect(stops.at(-1)!).toEqual({ alpha: 0, at: 100 });
+  });
+
+  it("falls a little at a time, never rising", () => {
+    expect(stops.length).toBeGreaterThan(6);
+    for (let i = 1; i < stops.length; i++) {
+      expect(stops[i]!.alpha).toBeLessThanOrEqual(stops[i - 1]!.alpha);
+      expect(stops[i]!.at).toBeGreaterThanOrEqual(stops[i - 1]!.at);
+    }
   });
 });

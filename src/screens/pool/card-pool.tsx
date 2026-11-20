@@ -182,7 +182,7 @@ export function CardPoolBody({
   // (a phone's exact counts), and more where a tablet's list has the room (pool/grid.ts).
   const [listWidth, setListWidth] = useState(0);
   const scale = useUiScale();
-  const { size, width: windowWidth, height: windowHeight } = useSizeClass();
+  const { size, height: windowHeight } = useSizeClass();
   const columns = poolColumns(listWidth, adding, scale);
   const cellWidth = gridCardWidth(listWidth, columns, scale);
   // FlashList keeps every cell it has ever mounted in its recycle pool unless told otherwise: a screen's worth (and two rows each
@@ -228,10 +228,11 @@ export function CardPoolBody({
     () => (motkOn ? filterPool(motkRows, query, motkFilter(applied), groups, NONE, NONE) : filterPool(rows, query, applied, groups, inactiveCodes, unowned)),
     [motkOn, motkRows, rows, query, applied, groups, inactiveCodes, unowned],
   );
-  // Browsing in portrait, the sphere toggles, the type chips and the count fold away as the pool scrolls down and come back as it
-  // scrolls up or the list changes; the search row stays. Not with a screen reader on: it would hide them with no way back it can find.
+  // Browsing, in portrait and landscape alike, the sphere toggles, the type chips and the count fold away as the pool scrolls down
+  // and come back as it scrolls up or the list changes; the search row stays. Not with a screen reader on: it would hide them with no
+  // way back it can find.
   const screenReader = useScreenReader();
-  const fold = useFilterFold(!adding && !screenReader && windowHeight > windowWidth, visible);
+  const fold = useFilterFold(!adding && !screenReader, visible);
   const allyNotes = motkOn ? motkNotes : null;
   const unownedShown = useMemo(() => (applied.owned || !collectionSet ? 0 : visible.filter((card) => unowned.has(card.code)).length), [applied.owned, collectionSet, visible, unowned]);
   const types = useMemo(() => (!adding && motkRows.length > 0 ? [...typeChoices(rows), MOTK_CHOICE] : typeChoices(rows)), [adding, motkRows, rows]);
@@ -334,7 +335,11 @@ export function CardPoolBody({
         }}
       >
         {/* Before the list, so a keyboard reaches the filters first; drawn over it by its zIndex. */}
-        {fold.enabled ? <FilterFold fold={fold}>{filterRows}</FilterFold> : null}
+        {fold.enabled ? (
+          <FilterFold fold={fold} column={size === "expanded"}>
+            {filterRows}
+          </FilterFold>
+        ) : null}
         {/* Mounted once the width is measured, never before: a grid cell drawn at no width is no height, and FlashList then lays
             out every card of the pool as on screen and mounts all of them (852 at once), which it never gives back. */}
         {cellWidth > 0 ? (
