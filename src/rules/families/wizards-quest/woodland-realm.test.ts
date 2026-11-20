@@ -6,6 +6,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { cardMap, hero, idleScenario } from "../../core/test-fixture.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { cancelBarred } from "../encounter/cancel.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
@@ -21,6 +22,7 @@ const CARDS = cardMap([
   definePrinted({ code: "stage", name: "Stage", type: "quest", questPoints: 5 }),
   definePrinted({ code: "stage2", name: "Stage 2", type: "quest", questPoints: 5 }),
   definePrinted({ code: "orc", name: "Orc", type: "enemy", threat: 2, attack: 3, engagementCost: 20, defense: 1, health: 2, cost: 1 }),
+  definePrinted({ code: "twin", name: "Twin", type: "enemy", threat: 2, attack: 5, engagementCost: 20, defense: 1, health: 2, cost: 1 }),
   definePrinted({ code: "giant", name: "Giant", type: "enemy", threat: 4, attack: 4, engagementCost: 30, defense: 1, health: 6, cost: 2 }),
   definePrinted({ code: "mist", name: "Mist", type: "treachery", cost: 0 }),
   definePrinted({ code: "den", name: "Spider Den", type: "location", threat: 1, questPoints: 1 }),
@@ -91,5 +93,51 @@ describe("the condition questProgressNoted `min` (51108:B:3, reading 14)", () =>
     expect(questProgressNoted({ ...state, modifiers: [note(6), note(3)] }, 10)).toBe(false);
     expect(questProgressNoted({ ...state, modifiers: [note(6), note(4)] }, 10)).toBe(true);
     expect(questProgressNoted({ ...state, modifiers: [note(2)] })).toBe(true);
+  });
+});
+
+describe("the pick fields `from: encounterDiscard` and `challenge` with `highestThreat` (51116:A:1, 51107:B:1, reading 3)", () => {
+  it("lists the encounter discard pile, the card discarded last first", () => {
+    let state = table(1, []);
+    const first = spawn(state, "mist", { zone: "encounterDiscard" });
+    const second = spawn(first.state, "orc", { zone: "encounterDiscard" });
+    state = second.state;
+    expect(pickCandidates(state, { type: "card", control: "any", from: "encounterDiscard" }, 0, [], null, ctx)).toEqual([second.id, first.id]);
+  });
+
+  it("takes the enemy or location with the highest Threat, then the one discarded last when none has any", () => {
+    let state = table(1, []);
+    const mist = spawn(state, "mist", { zone: "encounterDiscard" });
+    const orc = spawn(mist.state, "orc", { zone: "encounterDiscard" });
+    const den = spawn(orc.state, "den", { zone: "encounterDiscard" });
+    state = den.state;
+    const spec = { type: "card", control: "any", from: "encounterDiscard", highestThreat: true, challenge: true } as const;
+    expect(pickCandidates(state, spec, 0, [], null, ctx)).toEqual([orc.id]);
+    const treacheries = spawn(spawn(table(1, []), "mist", { zone: "encounterDiscard" }).state, "mist", { zone: "encounterDiscard" });
+    expect(pickCandidates(treacheries.state, spec, 0, [], null, ctx)).toEqual([treacheries.id]);
+  });
+
+  it("breaks a tie on Threat among enemies by the highest Attack", () => {
+    let state = table(1, []);
+    const weak = spawn(state, "orc", { zone: "staging" });
+    const strong = spawn(weak.state, "twin", { zone: "staging" });
+    state = strong.state;
+    const spec = { type: "enemy", control: "any", staging: true, highestThreat: true, challenge: true } as const;
+    expect(pickCandidates(state, spec, 0, [], null, ctx)).toEqual([strong.id]);
+    expect(pickCandidates(state, { ...spec, challenge: undefined }, 0, [], null, ctx)).toEqual([weak.id, strong.id]);
+  });
+});
+
+describe("a Travel effect that made another location active (51146:A:2 reveals Giant Web, 51131:A:1; reading 20)", () => {
+  it("the travel does not take place and the game goes on, with no failure", () => {
+    const base = table(1, []);
+    const active = spawn(base, "den", { zone: "activeLocation" });
+    const staged = spawn(active.state, "den", { zone: "staging" });
+    const frame = { frame: "ResolveEffect" as const, sourceId: staged.id, actor: 0, peril: false, effectId: "x:travel:1", instructions: [{ verb: "Travel" as const, to: "self" as const }], picked: [], cancel: null, blockCancel: null };
+    const steps: EngineStep[] = [];
+    const done = settle(pushEffectFrame(staged.state, frame, []), ctx, steps);
+    expect(done.failure ?? null).toBeNull();
+    expect(done.activeLocation).toBe(active.id);
+    expect(done.cards[staged.id]?.zone).toBe("staging");
   });
 });

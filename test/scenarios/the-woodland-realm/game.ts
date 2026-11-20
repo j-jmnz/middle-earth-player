@@ -46,7 +46,7 @@ const game = standaloneGame<WoodlandDecks, WoodlandPolicy>({
   scenario: woodland,
   stats: HERO_STATS,
   // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
-  codes: [...woodland.cards.map((card) => card.code)],
+  codes: woodland.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])),
   intent: woodlandIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
