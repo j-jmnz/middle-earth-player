@@ -52,7 +52,7 @@ describe("effects render read fields, conditions", () => {
     safeActive: [{ kind: "safeActive", is: true }, { kind: "safeActive", is: false }],
     setAsideHas: [{ kind: "setAsideHas", code: "10183" }],
     searchable: [{ kind: "searchable", trait: "Troll", type: "enemy", code: "10074", deckOnly: true, victory: true }],
-    stageProgress: [{ kind: "stageProgress", min: 5 }],
+    stageProgress: [{ kind: "stageProgress", min: 5 }, { kind: "stageProgress", min: 5, perStartedPlayer: true }],
     victoryPoints: [{ kind: "victoryPoints", min: 20 }],
     firstTreachery: [{ kind: "firstTreachery" }],
     hitPointsLeft: [{ kind: "hitPointsLeft", code: "09033" }],
