@@ -112,7 +112,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       { verb: "Pick", pick: { ...ENEMY_IN_STAGING, highestAttack: true, who: "firstPlayer" }, when: { kind: "canPick", pick: ENEMY_IN_STAGING } },
       EACH_PLAYER([{ verb: "AttackFromStaging" }]),
-      { verb: "RevealEncounter", when: { kind: "count", pick: ENEMY_IN_STAGING, max: 0 } },
+      { verb: "RevealEncounter", when: { kind: "noneReturned" } },
     ],
   },
   {
@@ -139,7 +139,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: STAGE_3,
     lines: ["50805:B:1"],
     timing: "constant",
-    condition: { kind: "count", pick: { type: "enemy", control: "any", staging: true, names: ["Battering Ram"] }, min: 1 },
+    condition: { kind: "inPlay", code: BATTERING_RAM, is: true },
     instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", target: "self" }],
   },
   {
@@ -181,7 +181,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "50813:forced:1", cardCode: LIEUTENANT, lines: ["50813:A:3"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }, { verb: "AttackFirstPlayer" }] },
 
   // 50814 Battering Ram. X is the resources on it plus 1; each round it gets a resource first, then deals X damage to Annúminas (reading 13).
-  { id: "50814:constant:1", cardCode: BATTERING_RAM, lines: ["50814:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { stat: "resources", of: "self", plus: 1 }, until: "whileSourceInPlay", target: "self" }] },
+  { id: "50814:constant:1", cardCode: BATTERING_RAM, lines: ["50814:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { stat: "resources", of: "self", plus: 1 }, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: "50814:forced:1", cardCode: BATTERING_RAM, lines: ["50814:A:2"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }, hurtCity({ stat: "resources", of: "self", plus: 1 })] },
   travelReveals(BATTERING_RAM),
 
@@ -228,7 +228,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["50820:A:2"],
     timing: "forced",
     trigger: "endOfRound",
-    instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }, { verb: "Discard", target: { kind: "self" }, when: THREE_ON_SELF }, hurtCity(4, THREE_ON_SELF), { verb: "RevealEncounter", when: THREE_ON_SELF }],
+    // The damage and the reveal come before the discard so the 3-resource check reads City Wall in play (rr.then).
+    instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }, hurtCity(4, THREE_ON_SELF), { verb: "RevealEncounter", when: THREE_ON_SELF }, { verb: "Discard", target: { kind: "self" }, when: THREE_ON_SELF }],
   },
 
   // 50821 Arnor Battlefield, 50822 Hills of Evendim, 50823 Shores of Lake Nenuial.

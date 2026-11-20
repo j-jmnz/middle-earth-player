@@ -62,7 +62,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
     - if there is a enemy (any player controls) in the staging area only to choose: choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
     - for each player, first player first:
       - the picked enemy attacks the acting player now, from the staging area
-    - then, if the number of enemy (any player controls) in the staging area only is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
 
 50804:B:3 (back): Response: At the end of the round, choose a stage. Each player at that stage heals 1 damage from a character he controls.
   50804:response:1: Response at the end of the round
@@ -85,7 +85,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50805:B:1 (back): Progress cannot be placed here while Battering Ram is in play.
   50805:constant:1: Constant
-    only if the number of enemy (any player controls) or in the staging area, named "Battering Ram" is at least 1
+    only if the card with code 50814 is in play
     - this card: stat noProgressPlaced 1, while this card is in play
 
 50805:B:2 (back): Response: At the end of the round, raise each player's threat by 1 and reveal an encounter card to choose a non-unique enemy worth no victory points at another stage. Discard the chosen enemy.
@@ -136,7 +136,9 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50814:A:1 (front): X is 1 more than the number of resources on Battering Ram. Immune to player card effects.
   50814:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat threat resources of this card + 1, while this card is in play
+    - this card: stat immuneToPlayerCards 1, while this card is in play
 
 50814:A:2 (front): Forced: At the end of the round, place 1 resource on Battering Ram. Then, deal X damage to Annúminas.
   50814:forced:1: Forced at the end of the round
@@ -244,9 +246,9 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
   50820:forced:1: Forced at the end of the round
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
-    - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
     - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): up to 4 resource token(s) come off the card with code 50812 in play
     - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
+    - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
 
 50820:A:3 (front): Travel: Reveal the top card of the encounter deck to travel here.
   50820:travel:1: Travel
@@ -456,4 +458,4 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
-(rendered pieces: 296 by template, 8 as JSON)
+(rendered pieces: 295 by template, 8 as JSON)
