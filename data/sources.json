@@ -5503,9 +5503,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "d87097616719cb3cd9052e055ded9589e643de9d43780e8e9192668c190d1896"
+        "value": "5df241e1031cc7a52fac3efdfde4177de2a04ac73a0806db057b1de607819f4e"
       },
-      "fetchedAt": "2026-11-20T14:19:09.483Z",
+      "fetchedAt": "2026-11-20T16:38:00.838Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -25534,6 +25534,24 @@
           "url": "https://images.cardgame.tools/lotr/MEC83-164-front-EncounterSideQuest-Storm_the_Castle-Stronghold_of_Mordor-The_Fortress_of_Nurn.jpg",
           "sha256": "278fa38902570a126d29c4f53c096254f183ccb37879b93d5a0d681f28765358",
           "bytes": 933565
+        },
+        {
+          "path": "pictures/40001.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1OFUI51QXlclcKcKzCExi2ZNCjPEH-gIl&export=download&confirm=t",
+          "sha256": "df3ae58c0054d180e47b0777edb129b0d5ff9e429842c155feb606a401288d99",
+          "bytes": 3390141
+        },
+        {
+          "path": "pictures/40002.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1PIM-_EyJsPBPxzmVD458qY3TnTVSMs8S&export=download&confirm=t",
+          "sha256": "66033a25d32150ff3cce516026bc39025f6dd626196f48ff98dd3fa9032a1ace",
+          "bytes": 3363745
+        },
+        {
+          "path": "pictures/40003.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Pz8kd6-y07d7CKijNTQ9_scnN0fGQws8&export=download&confirm=t",
+          "sha256": "2edeb2348a2a878ead5ceab0636d462933bf06498508ebf07bd742ca32a354e3",
+          "bytes": 3385221
         },
         {
           "path": "pictures/40004.A.jpg",
