@@ -23,7 +23,7 @@ import { playCard } from "../../player/planning.ts";
 import { printedOf } from "../../core/printed.ts";
 import { finishMulliganChoice } from "../../setup/setup.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { distinctChoices, inPlay, updateCard } from "../../core/state.ts";
 import { limitSpent, payUsage, usable } from "../../player/usage.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { moveCard } from "../../core/zones.ts";
@@ -34,16 +34,6 @@ import type { Focus } from "../index.ts";
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 type PlayIntent = Extract<PlayerIntent, { type: "PlayCard" }>;
 type PlayFrom = Extract<Instruction, { verb: "PlayFrom" }>;
-
-function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] {
-  const seen = new Set<string>();
-  return ids.filter((id) => {
-    const code = state.cards[id]?.code ?? id;
-    if (seen.has(code)) return false;
-    seen.add(code);
-    return true;
-  });
-}
 
 /** A Pick that does not keep an event from being played when it finds nothing: one that depends on an earlier pick, a search
  * of a deck or of the cards the effect looked at (rr.search: a search is not a target, and finding nothing still resolves),
@@ -126,7 +116,7 @@ export function playFrom(state: ScenarioState, instruction: PlayFrom, focus: Foc
   const data = topFrame(state)?.data;
   const frame = data?.kind === "effect" ? data : undefined;
   const found = pickCandidates(state, instruction.pick, seat, frame?.picked ?? [], focus.sourceId, ctx, frame?.x, frame?.participants).filter((id) => playableFrom(state, id, instruction, seat, ctx));
-  const options = distinctByCode(state, found);
+  const options = distinctChoices(state, found);
   const chosen = focus.chosen && found.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
   if (!chosen) return options.length > 1 ? askTarget(state, { instruction, seat, chosen: null }, options) : state;
   const printed = printedOf(ctx.cards, state.cards[chosen]?.code ?? "");

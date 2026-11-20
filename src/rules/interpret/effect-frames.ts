@@ -9,7 +9,7 @@ import { dealForAttack } from "../families/south/watcher.ts";
 import { askTarget, openBranch } from "../windows/choices.ts";
 import { holds, shadowBlankOf } from "./conditions.ts";
 import { addModifier } from "../core/keywords.ts";
-import { distinctByCode, targeted } from "./effect-targeted.ts";
+import { targeted } from "./effect-targeted.ts";
 import { pushHide } from "../quest/hide.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
@@ -19,7 +19,7 @@ import { lookedDeckSeat } from "../families/deck/rules.ts";
 import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
-import { livingSeats, withSeat } from "../core/state.ts";
+import { distinctChoices, livingSeats, withSeat } from "../core/state.ts";
 import { isolatedAreas, sharing } from "../families/breaking/areas.ts";
 import { guardianSeats, otherThanGuardian } from "../families/guardian/seats.ts";
 import { offerResponses } from "../windows/responses.ts";
@@ -376,7 +376,7 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   // The actor chooses, unless the card says the first player does.
   const chooser = instruction.pick.who === "firstPlayer" ? state.firstPlayer : item.seat;
   const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked" });
-  const options = (instruction.pick.from ?? "play") === "play" ? found : distinctByCode(state, found);
+  const options = (instruction.pick.from ?? "play") === "play" ? found : distinctChoices(state, found);
   let chosen = item.chosen;
   if (!chosen) {
     if (options.length > 1) return askTarget(state, { ...item, seat: chooser }, options);
@@ -398,8 +398,8 @@ function arrangeTop(state: ScenarioState, item: QueueItem): ScenarioState {
   const offset = item.offset ?? 0;
   const count = (data.looked ?? []).filter((id) => seat.deck.includes(id)).length;
   const rest = seat.deck.slice(offset, count);
-  if (rest.length <= 1 || distinctByCode(state, rest).length <= 1) return state;
-  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctByCode(state, rest));
+  if (rest.length <= 1 || distinctChoices(state, rest).length <= 1) return state;
+  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctChoices(state, rest));
   const from = seat.deck.indexOf(item.chosen);
   if (from < offset) return state;
   const deck = [...seat.deck];
