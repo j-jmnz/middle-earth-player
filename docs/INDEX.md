@@ -195,7 +195,7 @@ Read the sections your task touches.
   - 322–325 One answer, one tap (~240)
   - 326–329 Stops and Always use (~250)
   - 330–333 Guide (~120)
-  - 334–350 Choice tray (~5.6K) ← 71
+  - 334–350 Choice tray (~5.7K) ← 71
   - 351–365 Reading panels (~1.6K) ← 5
   - 366–375 Phase carousel (~680)
   - 376–381 Quest advance (~530) ← 1
