@@ -4322,6 +4322,683 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "50901",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Assault-on-the-Golden-Wood-1A.jpg",
+        "sha256": "b1abd1261971541f95539f116b4792b9ed836f26e16765d5c79c711d728ca627"
+      },
+      "lines": [
+        "Setup: Set Host of Lórien and all 4 Lieutenant enemies aside, out of play. Add Power of Lórien and 1 copy of Dol Guldur Marauder per player to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50901",
+      "side": "B",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Assault-on-the-Golden-Wood-1B.jpg",
+        "sha256": "43fee7ab74d8178285c408b5028a7f0d61db7ef74c3d769b141a77f66606cf9b"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 resource here and move all progress from this stage to Power of Lórien. If there are 3 resources here, advance to stage 2A.",
+        "Response: At the end of the round, raise each player's threat by 1 to choose a stage. Each player at that stage draws 1 card and adds 1 resource to a hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50902",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Crossing-the-Anduin-2A.jpg",
+        "sha256": "a10e735f0567f983a837beaeee59055664a69cc8b2fdaa566e2b68e8f95949c8"
+      },
+      "lines": [
+        "When Revealed: The first player may remove 10 progress from Power of Lórien to take control of the set-aside Host of Lórien. Then, he may remove an additional 20 progress from Power of Lórien to place it in his play area under his control, otherwise discard it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50902",
+      "side": "B",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Crossing-the-Anduin-2B.jpg",
+        "sha256": "449557dd1ededd6ebedb39d0fafbd4f87804ae2f5d1ce1919750994bb239a2fb"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck and discard pile for a Dol Guldur location and adds it to the staging area. Shuffle the encounter deck. Advance to a stage 3 of your choice. If you are playing epic multiplayer mode, each team must choose a different stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50903",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Siege-of-Dol-Guldur-3A.jpg",
+        "sha256": "4db201d5d8f01c0357ced16a3d4869b8ad0d1a85a1f553029526b9203da301f5"
+      },
+      "lines": [
+        "When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Bane of Amon Lanc to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Bane of Amon Lanc makes an immediate attack against each player in turn order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50903",
+      "side": "B",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Siege-of-Dol-Guldur-3B.jpg",
+        "sha256": "e6dd5bffad7d64915302dc15f02402c0440e590055f459621b9c2dc9a6d0a2ed"
+      },
+      "lines": [
+        "Bane of Amon Lanc gets -1 engagement cost for each progress token on this stage.",
+        "Forced: At the end of the round, remove 5 progress from this stage or increase Dol Guldur's city strength by 3. The first player may remove an additional 5 progress to reduce Dol Guldur's city strength by 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50904",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Tower-of-Sorcery-C-3C.jpg",
+        "sha256": "0f9b6f5002a9869224d147893973977f4f19cf6dbe0cf64cef2b1e50f2f7d937"
+      },
+      "lines": [
+        "When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Sorcerer of Dol Guldur to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Sorcerer of Dol Guldur makes an immediate attack against each player in turn order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50904",
+      "side": "B",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Tower-of-Sorcery-C-3D.jpg",
+        "sha256": "ed0ceffa640a804ebf01fd2e743c9ca8ded6b8691fad03e1fc641e23fea6e314"
+      },
+      "lines": [
+        "Sorcerer of Dol Guldur gets -1 engagement cost for each progress token on this stage.",
+        "Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards all but 1 card from his hand. The first player may remove an additional 5 progress from this stage to choose a player at any stage. That player searches his deck for a card, adds it to his hand, and shuffles his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50905",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Battle-Under-the-Trees-E-3E.jpg",
+        "sha256": "8f4c1265bb4a585076134e6c5ad17fbfef82b849f5c41db6d5c88e55096f7008"
+      },
+      "lines": [
+        "When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Chieftain Morlug to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Chieftain Morlug makes an immediate attack against each player in turn order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50905",
+      "side": "B",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Battle-Under-the-Trees-E-3F.jpg",
+        "sha256": "e4ffb14e32ce979d9b9712d6579f2306b7ebd06b6af9ed9c7267575d634e8ec5"
+      },
+      "lines": [
+        "Chieftain Morlug gets -1 engagement cost for each progress token on this stage.",
+        "Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards cards from the top of the encounter deck until an enemy is discarded and puts it into play engaged with him. (If the last card of the encounter deck is discarded resolving this effect, shuffle the discard pile back into the encounter deck.) The first player may remove an additional 5 progress from this stage to choose a non-unique enemy at any stage and destroy it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50906",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Dungeons-of-the-Necromancer-G-3G.jpg",
+        "sha256": "f155f022b1d090ce1390653630f3bd660bcd6c49b4fe6550bd1127ddaadbd33c"
+      },
+      "lines": [
+        "When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Dungeon Dweller to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Dungeon Dweller makes an immediate attack against each player in turn order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50906",
+      "side": "B",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Dungeons-of-the-Necromancer-G-3H.jpg",
+        "sha256": "e1172ceb25102d8a4bf967554ad237c8498f3de7bf4dfbd73422e20131816e49"
+      },
+      "lines": [
+        "Dungeon Dweller gets -1 engagement cost for each progress token on this stage.",
+        "Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards an ally he controls. The first player may remove an additional 5 progress from this stage to choose a player at any stage. That player searches the top 10 cards of his deck for an ally and puts it into play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50907",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/2b56edac-f289-4b76-ae90-f6f3e5fc9b58.jpg",
+        "sha256": "2ca5ee85be377f0ad5c84ee11b8d3b1a9f62cad8a0ce899bb5247730ef2c3b71"
+      },
+      "lines": [
+        "While the players are at stage 3, Dol Guldur gains: 'Forced: At the end of the round, after resolving the Forced effect on each stage 3 in play, reduce Dol Guldur's city strength by X, where X is the total siege value of each location explored and each enemy destroyed at each stage this round.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50908",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/fe580179-8f51-463e-a235-bde0f7b783d7.jpg",
+        "sha256": "4e89d4121d8943b141b54a4555a0499ec7a236ea7f8ef0e288fac42e017d9b8e"
+      },
+      "lines": [
+        "While you control Power of Lórien, it gains: 'Response: Add Power of Lórien to the victory display to cancel and discard an encounter card just revealed from the encounter deck.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50909",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/d8694dea-3406-4199-96d5-cd8d0a97f152.jpg",
+        "sha256": "c789c9c2bc2929882799802f89e8f86663299c4b1f92b6be5d028de01195ba72"
+      },
+      "lines": [
+        "Ranged. Sentinel.",
+        "Immune to player card effects.",
+        "Does not exhaust to quest.",
+        "If Host of Lórien leaves play, remove it from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50910",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/47186728-67bf-40b2-9b8d-d5012f0fd1a6.jpg",
+        "sha256": "a44a003d1a5e70921d910b24b0f4a14e49849c0d8949ff4f2f7879c5ccbb5663"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects.",
+        "Forced: When Bane of Amon Lanc attacks you, discard a random card from your hand. Bane of Amon Lanc gets +X Attack for this attack, where X is that card's printed cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50911",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/49c77ce2-7305-4209-ad6a-f1ed983a556e.jpg",
+        "sha256": "b1d040ddf31d068e414dae9596fec53462ab3545bc4a89c608bf4a1f35b564b3"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects.",
+        "Forced: When Sorcerer of Dol Guldur attacks you, discard the top card of your deck. Then, discard each copy of that card from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50912",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/cefe5af1-a3d3-43fb-8b82-7ea9b4d2c861.jpg",
+        "sha256": "1fd0d2137a80462396244f09fabdcb2d6cce72ad6b0f665eed3da09b447ded68"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects.",
+        "Forced: When Chieftain Morlug attacks you, discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50913",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/9fa12306-d6ed-4fb8-89ce-8145bb81a58a.jpg",
+        "sha256": "35b7e3435dd1fa7fdb8f37dacf910d00dbee8f3cd733f4898e98bcebb945afa6"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects.",
+        "Forced: When Dungeon Dweller attacks you, discard an ally you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50914",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/9944cbab-1c77-4cb4-87cc-36709f3143b5.jpg",
+        "sha256": "0d6eb4bc8421321f1f862b90993b5bed21cd7dbcbb07122f00a42494e3cf70c2"
+      },
+      "lines": [
+        "Archery X.",
+        "X is the number of players.",
+        "Cannot have attachments.",
+        "Forced: At the end of the encounter phase, if Host of Dol Guldur is in the staging area, remove X progress from the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50915",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Mirkwood-Olog-hai.jpg",
+        "sha256": "8ea777515719b274da3fcc70721a476e777a13bc7384c792df74838ae12a6a4c"
+      },
+      "lines": [
+        "Forced: After Mirkwood Olog-hai attacks and destroys a character, remove 1 progress from the main quest for each excess point of damage.",
+        "Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50916",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Beast-of-Taur-nu-Fuin.jpg",
+        "sha256": "68b1adf6311532f19bdfffe22ca54d7f3042e93793c92f8743e1c6b5dd4d6ef1"
+      },
+      "lines": [
+        "Beast of Taur-nu-Fuin cannot have attachments and its shadow cards cannot be canceled.",
+        "Forced: When Beast of Taur-nu-Fuin attacks, either remove 2 progress from the main quest or deal it an additional shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50917",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Amon-Lanc-Archer.jpg",
+        "sha256": "e0ec428cd911751100dcc6f0269841b57eae7f45ba034bd4364c793acfd8ffb5"
+      },
+      "lines": [
+        "Archery 2.",
+        "Forced: After Amon Lanc Archer engages you, either remove 2 progress from the main quest, or deal 2 damage to an ally you control.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50918",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Dol-Guldur-Marauder.jpg",
+        "sha256": "88c9d969f84ea3ccafda85c36b446d2e3b3c6fe90d1fa1967a78ce6e7a6f3b0e"
+      },
+      "lines": [
+        "Dol Guldur Marauder gets +1 Attack and +1 Defense for each resource on it.",
+        "Forced: When Dol Guldur Marauder attacks, either remove 1 progress from the main quest or place 1 resource on Dol Guldur Marauder."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50919",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Battle-Warg.jpg",
+        "sha256": "ea4a90188a53a3d770fdf35238773c2c44f6a0a5f6bbf2f6df333a591691910f"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Battle Warg engages you, either remove 1 progress from the main quest or discard an attachment you control.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50920",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Gate-of-Dol-Guldur.jpg",
+        "sha256": "60b5bc7f238961ed6f31c4374fd228066a204ef497509e36a521ac3e6409286e"
+      },
+      "lines": [
+        "While Gate of Dol Guldur is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3B. Each player's threat cannot be reduced by more than 1 each round by player card effects.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50921",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Sorcerer's-Tower.jpg",
+        "sha256": "7c6cc34b56f4e24cd74f9212651ae4c065f5dfcb4c3b0f7b697ed6411bd80aa6"
+      },
+      "lines": [
+        "While The Sorcerer's Tower is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3D. Forced: After a 'when revealed' effect is canceled, reveal the top card of the encounter deck.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50922",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/The-Shadow-Road.jpg",
+        "sha256": "7fbe22639b4893cc8adea61b4ab619e9f1ddd0bf1d64c5913e309672765c01e0"
+      },
+      "lines": [
+        "The Shadow Road gets +2 Threat for each facedown card attached to it.",
+        "While The Shadow Road is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3F. Forced: After an event is played during the quest phase, attach it facedown to The Shadow Road.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50923",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Dungeon-Door.jpg",
+        "sha256": "44535728551e05cfe802f45a5493b2ff129af90d6b880a466772057b1a5cbfcb"
+      },
+      "lines": [
+        "While Dungeon Door is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3H. No more than 1 damage can be healed from each character each round.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50924",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Forest-Battleground.jpg",
+        "sha256": "746a3914f14ef63a24c2067c06eaff0e7e859a3aef5670c39268a326f48d7a2c"
+      },
+      "lines": [
+        "Forest Battleground gets +1 Threat for each ally controlled by the player with the most allies.",
+        "Forced: When Forest Battleground is explored, each player searches the encounter deck and discard pile for an Orc enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50925",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Attack-on-Dol-Guldur/Blackened-Woods.jpg",
+        "sha256": "7f34ba91f4c1da37ee8eaf13c0e996f08355599c74fa96618cf308eb9b98d63f"
+      },
+      "lines": [
+        "Forced: When Blackened Woods is explored, discard the top card of the encounter deck and raise each player's threat by X, where X is that card's printed Threat.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 3 progress from the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50926",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ebbb49f0-4466-44e5-b157-968cd5e80b06.jpg",
+        "sha256": "cf60859df836d5f7761d546ca1d62175c266cf5f68a66e417791aacf1fba4cbe"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: The enemy in the staging area with the highest engagement cost makes an immediate attack against the first player.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50927",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/c472af20-d956-4aec-af6e-319cdea35230.jpg",
+        "sha256": "c74c1f59742f18a9b23e345a9feb69619459c74f57e1c7fd146d3aa897955f64"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player must choose: either search the encounter deck and discard pile for a Dol Guldur location and add it to the staging area, or search the encounter deck and discard pile for an Orc enemy and put it into play engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50928",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/6a24bcba-e069-4951-9cb1-59b48d291c74.jpg",
+        "sha256": "bfeb3e8244c94f88b72af6de8ed00b568355e97246b285f8259f9b5a76858285"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each exhausted character. Until the end of the phase, each damaged character gets -1 Willpower.",
+        "Shadow: Deal 1 damage to the defending character. Until the end of the phase, the defending character gets -1 Defense for each damage on it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50929",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/0fd5a1d7-0791-4ab4-a50b-c5b2634ed94b.jpg",
+        "sha256": "8ffa0cc13d39e8dd77b9213743c1ee77fc70be89d32ddb41358c095127e9a248"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player exhausts a character he controls. Until the end of the round, characters cannot be readied by player card effects.",
+        "Shadow: Defending character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50930",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/807175bd-1d09-41ff-a3ab-560a935eb259.jpg",
+        "sha256": "1ec6428dd6b0863035b6ecf6119d296acca2d5f5642c2081d909348ab93c8285"
+      },
+      "lines": [
+        "When Revealed: No more than 5 progress can be placed on the current quest this round. If Dol Guldur's city strength is 5 or lower, Fastness of Mirkwood gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack and +1 Defense until the end of the phase (+2 Attack and +2 Defense instead if at least 5 progress is on the quest)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50931",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/bdbf8bed-f63f-4797-abb4-79054a9dbcad.jpg",
+        "sha256": "7f2822ea438ce4511d9f4b559f7eb2c56c97ee7346fbb197a5bdb872a927cdf1"
+      },
+      "lines": [
+        "Setup: Add Dol Guldur to the staging area, attach a threat dial to it, and set its value to 5. Then, increase its value by 5 for each player. For the rest of the game, that threat dial is the siege tracker and it displays the city strength of Dol Guldur. Flip this card over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50931",
+      "side": "B",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/bdbf8bed-f63f-4797-abb4-79054a9dbcad.B.jpg",
+        "sha256": "dbdc389dc392c7037589358418eeed6955627ea17d291fbb69393784eaae4b05"
+      },
+      "lines": [
+        "While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible.",
+        "While the players are at stage 3, this card gains: 'Forced: After resolving the Forced effect on Dol Guldur, randomly select a stage 3 that was not in play this round and resolve its Forced effect. Then, discard all progress from the current stage 3 and advance to a new stage 3 of your choice.'",
+        "At the end of the round, if Dol Guldur's city strength is 0 and there are no Lieutenant enemies in play, Dol Guldur is captured and the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50932",
+      "side": "A",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ac5a17df-dcd0-4bfb-91fe-a444910f30ec.jpg",
+        "sha256": "371851f76ff8f2589c96be6b9bd9e594b21555df60f0db68b66e32a0edec3295"
+      },
+      "lines": [
+        "Setup: Create 3 separate staging areas, each with its own quest deck and encounter deck. Divide the players into 3 teams, one for each staging area. One team puts Dol Guldur into play in their staging area, attaches a threat dial to it, and sets its value to 5. Then, increase its value by 5 for each player at each stage. For the rest of the game, that threat dial is the siege tracker and it displays the city strength of Dol Guldur. Each other team removes their copy of Dol Guldur from the game. Flip this card over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "50932",
+      "side": "B",
+      "printing": "AoDG",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ac5a17df-dcd0-4bfb-91fe-a444910f30ec.B.jpg",
+        "sha256": "fe3c68d5d0de441937a4f59c5a95900dd2a5d30ed65fee5c9973d60e79e63927"
+      },
+      "lines": [
+        "While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible.",
+        "While the players are at stage 3, this card gains: \"Forced: After resolving the Forced effect on Dol Guldur, the team with Dol Guldur in their staging area resolves the Forced effect on the stage 3 that was not in play at any stage this round. Then, each team discards all progress from their stage 3 and advances to a new stage 3 of their choice. Each team must choose a different stage.\"",
+        "Response: At the end of the round, a player who controls Host of Lórien or Power of Lórien may give control of that card to another player at any stage.",
+        "If the last player at a stage is eliminated, the siege fails and the entire group loses the game. At the end of the round, if Dol Guldur's city strength is 0 and there are no Lieutenant enemies in play at each stage, Dol Guldur is captured and the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }
