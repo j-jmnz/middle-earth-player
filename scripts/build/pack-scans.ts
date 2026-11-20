@@ -20,7 +20,7 @@ const KEEP_BYTES = 400_000;
 
 // What a picture in assets/scans was packed from, so a later pack keeps it while its pin is the same: the pinned file's sha256 and the
 // map entries it gave (the card, and its scene). Raise PACK_VERSION when shrinkToMaxSide or sceneOf changes what a pin packs to.
-const PACK_VERSION = 2;
+const PACK_VERSION = 1;
 const STAMP_FILE = ".packed.json";
 type Stamp = { version: number; entries: Record<string, { pin: string; scans: PackedScan[] }> };
 
@@ -124,7 +124,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
       // Packed before from the same pin (and with its scene when one is wanted): kept as it is, with nothing loaded.
       const earlier = before.entries[key];
       const first = picture ?? scan;
-      if (first && earlier?.pin === first.sha256 && earlier.scans.length === (wantsScene ? 2 : 1) && earlier.scans.every((entry) => existsSync(path.join(options.scansDir, entry.filename)))) {
+      if (first && earlier?.pin === stampPin(first.sha256, card.code) && earlier.scans.length === (wantsScene ? 2 : 1) && earlier.scans.every((entry) => existsSync(path.join(options.scansDir, entry.filename)))) {
         stamp.entries[key] = earlier;
         packed.push(...earlier.scans);
         kept += 1;
@@ -157,7 +157,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
         scans.push(writeScan(`${key}.scene`, scene, options.scansDir));
       }
       spent.images += performance.now() - working;
-      stamp.entries[key] = { pin: used.sha256, scans };
+      stamp.entries[key] = { pin: stampPin(used.sha256, card.code), scans };
       packed.push(...scans);
       tick(`${key} ${bytes(shown.byteLength)}`);
     }
@@ -285,6 +285,12 @@ const UPRIGHT_TURN: Readonly<Record<string, number>> = { quest: 90, "player-side
 // top): The Hunt for the Dreadnaught's two quest stages (user report, 2026-11-20: shown upside down, and the scenario's scene cut
 // from the text box). They take the opposite turn.
 const TURNED_THE_OTHER_WAY: ReadonlySet<string> = new Set(["40004", "40005"]);
+
+// The pin a stamp records for a card: a card turned the other way is marked, so a pack stamped before it was turned packs that card
+// again while every other card keeps its earlier copy (no full repack, PACK_VERSION unchanged).
+function stampPin(sha: string, code: string): string {
+  return TURNED_THE_OTHER_WAY.has(code) ? `${sha} turned` : sha;
+}
 
 // The clockwise turn that lays a picture of `media`'s size down: none for a picture already wider than tall.
 function layDownTurn(media: { width: number; height: number }, typeCode: string, code: string): number {
