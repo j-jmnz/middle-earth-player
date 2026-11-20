@@ -8,6 +8,7 @@ import { eliminateEmpties } from "../../core/eliminate.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { fallenBase, FALLEN_SUFFIX } from "../../core/printed.ts";
+import { announceAllyLeft } from "../../core/ally-left.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { raiseFor } from "../../interpret/verbs.ts";
@@ -36,9 +37,14 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
       return fallIntoEvil(state, focus.sourceId, steps);
     case "ReturnFallenHero":
       return returnFallen(state);
-    case "RemoveFromGame":
-      if (instruction.card) return removeCard(state, refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)), steps);
-      return instruction.self ? (focus.sourceId ? moveCard(state, focus.sourceId, { zone: "removed" }) : state) : removeFromGame(state, lastPicked(state));
+    case "RemoveFromGame": {
+      const id = instruction.card ? refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)) : instruction.self ? focus.sourceId : lastPicked(state);
+      const card = id ? state.cards[id] : undefined;
+      if (!id || !card) return state;
+      const removed = instruction.card ? removeCard(state, id, steps) : instruction.self ? moveCard(state, id, { zone: "removed" }) : removeFromGame(state, id);
+      // An ally in play removed from the game leaves play (Radagast's Request removes the ally that healed Wilyador, 02061:B:2; core/ally-left.ts).
+      return removed === state ? removed : announceAllyLeft(removed, card, ctx.cards);
+    }
     case "LockFirstPlayer":
       return focus.sourceId ? addTableModifier(state, { stat: "firstPlayerLocked", amount: 1, until: "endOfGame" }, focus) : state;
     case "TakeRingBearer":

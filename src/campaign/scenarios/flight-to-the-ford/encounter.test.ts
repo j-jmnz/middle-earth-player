@@ -80,7 +80,8 @@ describe("The Last Bridge, the quest stages and the locations", () => {
   it("Ford of Bruinen, explored, discards all the engaged enemies and no others (141059:A:2)", () => {
     const { state, ctx, frodo } = make({ seats: 2, stage: "141029", active: FORD_OF_BRUINEN, engaged: [{ code: "grunt", seat: 0 }, { code: "grunt", seat: 1 }, { code: WITCH_KING, seat: 1 }], staging: ["f0"] });
     const steps: EngineStep[] = [];
-    const explored = run(state, { verb: "PlaceProgressOn", amount: 6, target: "activeLocation" }, frodo, ctx, steps);
+    // The quest card places the progress: the location is immune to player card effects, so a hero's effect would place none (rr.immune).
+    const explored = run(state, { verb: "PlaceProgressOn", amount: 6, target: "activeLocation" }, state.questStage ?? frodo, ctx, steps);
     expect(explored.window).toEqual({ kind: "response", seat: 0 });
     const ford = first(state, FORD_OF_BRUINEN);
     expect(legalIntents(explored, ctx)).toContainEqual({ type: "Trigger", cardId: ford, effectId: "141059:response:1" });

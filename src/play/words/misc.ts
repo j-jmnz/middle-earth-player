@@ -16,8 +16,6 @@ export function miscWords(instruction: Instruction): string | null {
       const amount = instruction.amount == null ? "1" : typeof instruction.amount === "number" ? String(instruction.amount) : "X";
       return `each player draws ${amount === "1" ? "1 card" : `${amount} cards`}`;
     }
-    case "HealQuietly":
-      return "heal it";
     case "MoveDamage":
       return instruction.all ? "move all its damage to the other enemy" : "move damage from one enemy to the other";
     case "SwapHero":

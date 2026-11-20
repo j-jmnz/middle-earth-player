@@ -7,6 +7,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { currentCause, effectCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { advanceToStage } from "../breaking/index.ts";
@@ -49,7 +50,8 @@ export function advanceToLetterStage(state: ScenarioState, instruction: Verb<"Ad
 export function takeControlOfSetAside(state: ScenarioState, instruction: Verb<"TakeControlOfSetAside">, focus: Focus): ScenarioState {
   const id = state.setAside.find((candidate) => state.cards[candidate]?.code === instruction.code);
   if (!id) return state;
-  return updateCard(moveCard(state, id, { zone: "play", seat: focus.seat }), id, { face: "up", exhausted: false });
+  // The card comes from out of play, so it enters play (rr.enters-play), and the cards that hear that hear it.
+  return queueEvent(updateCard(moveCard(state, id, { zone: "play", seat: focus.seat }), id, { face: "up", exhausted: false }), { trigger: "enteredPlay", seat: focus.seat, cardId: id });
 }
 
 /** SearchGuardForTreasure: when a copy of the card is in the encounter deck or its discard pile, the first player chooses to search for it; the copy is added to the staging area, remembered, and AttachRandomTreasure guards a treasure with it. */

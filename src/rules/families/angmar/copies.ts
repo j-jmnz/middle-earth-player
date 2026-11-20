@@ -6,6 +6,7 @@ import { printedOf } from "../../core/printed.ts";
 import { type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { topFrame } from "../../windows/windows.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { shuffleSeatDeck } from "../deck/moves.ts";
@@ -33,7 +34,8 @@ export function discardCopiesFromDeck(state: ScenarioState, instruction: Verb<"D
     return card != null && printedOf(ctx.cards, card.code).name === printed.name;
   });
   let next = state;
-  for (const deckId of instruction.all === true ? found : found.slice(0, 1)) next = moveCard(next, deckId, { zone: "discard", seat: focus.seat });
+  // Each copy is discarded from the deck, and the cards that hear such a discard hear it (Hidden Cache, 06143:A:1; Ered Luin Miner, 12066:A:1).
+  for (const deckId of instruction.all === true ? found : found.slice(0, 1)) next = queueEvent(moveCard(next, deckId, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: deckId });
   return instruction.shuffle === true ? shuffleSeatDeck(next, focus.seat) : next;
 }
 

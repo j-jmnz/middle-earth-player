@@ -13,9 +13,9 @@ import { livingSeats, modifierActive } from "../../core/state.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 
 // Whether an effect's trigger hears an event: its own trigger, either half of "enters or leaves play" (Gwaihir, 22108:A:3), the exploring of the active location as "a location is explored" (12092:B:2), or a location
-// leaving play as the Wizardry line's trigger (mec112.wizardry; the record's own condition asks that it left explored).
+// leaving play as the Wizardry line's trigger (mec112.wizardry; the record's own condition asks that it left explored), and resources added to or moved to a pool as a gain.
 export function triggerHears(trigger: Trigger | undefined, heard: Trigger): boolean {
-  return trigger === heard || (trigger === "enteredOrLeftPlay" && (heard === "enteredPlay" || heard === "leftPlay")) || (trigger === "locationExplored" && heard === "activeExplored") || (trigger === "wizardry" && heard === "leftPlay");
+  return trigger === heard || (trigger === "enteredOrLeftPlay" && (heard === "enteredPlay" || heard === "leftPlay")) || (trigger === "locationExplored" && heard === "activeExplored") || (trigger === "wizardry" && heard === "leftPlay") || (trigger === "resourcesGained" && (heard === "resourcesAdded" || heard === "resourcesMoved"));
 }
 
 // The threat a seat is treated as having: its dial, or less while a `threatCeiling` it holds is lower ("Until the end of the

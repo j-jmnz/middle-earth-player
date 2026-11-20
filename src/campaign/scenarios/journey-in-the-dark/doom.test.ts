@@ -163,7 +163,8 @@ describe("The Great Bridge (142050:A:2)", () => {
   const TRIGGER = "142050:response:1";
   function explored(layout: MoriaLayout) {
     const table = make({ stage: "142042", active: BRIDGE, heroes: ["strong"], ...layout });
-    return { table, state: runOne(table, table.state, { verb: "PlaceProgressOn", amount: 5, target: "activeLocation" }, table.frodo) };
+    // The quest card places the progress: the location is immune to player card effects, so a hero's effect would place none (rr.immune).
+    return { table, state: runOne(table, table.state, { verb: "PlaceProgressOn", amount: 5, target: "activeLocation" }, table.state.questStage ?? table.frodo) };
   }
   const offered = (table: MoriaTable, state: ScenarioState) => legalIntents(state, table.ctx).some((intent) => intent.type === "Trigger" && "effectId" in intent && intent.effectId === TRIGGER);
 

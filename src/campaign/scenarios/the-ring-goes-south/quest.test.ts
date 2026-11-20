@@ -207,11 +207,12 @@ describe("stage 4A: the Gates of Moria (142023:A:1)", () => {
   });
 });
 
+// The quest card places the progress: Doors of Durin is immune to player card effects, so a hero's effect would place none on it.
 describe("stage 4B: Doors of Durin explored wins (142023:B:3)", () => {
   it("wins when Doors of Durin is explored", () => {
     const table = make({ stage: "142023", active: DOORS });
     const steps: EngineStep[] = [];
-    const state = settle(syncConstants(runInstruction({ ...table.state, window: null }, { verb: "ProgressQuest", amount: 9 }, { seat: 0, sourceId: table.frodo }, table.ctx, steps), table.ctx), table.ctx, steps);
+    const state = settle(syncConstants(runInstruction({ ...table.state, window: null }, { verb: "ProgressQuest", amount: 9 }, { seat: 0, sourceId: table.state.questStage }, table.ctx, steps), table.ctx), table.ctx, steps);
     expect(state.stageCleared).toBe(true);
     expect(state.lost).toBe(false);
   });
@@ -219,7 +220,7 @@ describe("stage 4B: Doors of Durin explored wins (142023:B:3)", () => {
   it("does not win when another location is explored", () => {
     const table = make({ stage: "142023", active: DOORS, second: "place" });
     const steps: EngineStep[] = [];
-    const state = settle(syncConstants(runInstruction({ ...table.state, window: null }, { verb: "ProgressQuest", amount: 4 }, { seat: 0, sourceId: table.frodo }, table.ctx, steps), table.ctx), table.ctx, steps);
+    const state = settle(syncConstants(runInstruction({ ...table.state, window: null }, { verb: "ProgressQuest", amount: 4 }, { seat: 0, sourceId: table.state.questStage }, table.ctx, steps), table.ctx), table.ctx, steps);
     expect(state.stageCleared).toBe(false);
   });
 });

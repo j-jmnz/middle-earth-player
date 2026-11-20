@@ -265,7 +265,8 @@ function frame(state: ScenarioState, instructions: readonly Instruction[], sourc
   const pushed = pushEffectFrame(state, { frame: "ResolveEffect", sourceId, actor: 0, peril: false, effectId: "test", instructions, cancel: null, blockCancel: null }, steps);
   return settle({ ...pushed, window: null }, ctx, steps);
 }
-const explore = (t: Table): ScenarioState => frame(t.state, [{ verb: "PlaceProgressOn", amount: 99, target: "activeLocation" }], t.hero, t.ctx);
+// The quest card places the progress: the location is immune to player card effects, so a hero's effect would place none (rr.immune).
+const explore = (t: Table): ScenarioState => frame(t.state, [{ verb: "PlaceProgressOn", amount: 99, target: "activeLocation" }], t.state.questStage ?? t.hero, t.ctx);
 const offerOf = (state: ScenarioState, t: Table, cardId: string) => legalIntents(state, t.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === cardId);
 const answerAll = (run: ReturnType<typeof start>, t: Table, pick?: (state: ScenarioState) => string) => finish(run, t.ctx, pick);
 

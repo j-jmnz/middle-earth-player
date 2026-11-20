@@ -45,7 +45,7 @@ export function healAmong(state: ScenarioState, instruction: Extract<Instruction
   const card = state.cards[chosen];
   if (!card) return state;
   const healedBy = healDamage(state, chosen, 1, ctx, { sourceId: focus.sourceId });
-  const healedOne = queueEvent(healedBy.state, { trigger: "healed", seat: card.controller, cardId: chosen, ...(focus.sourceId && focus.sourceId !== chosen ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+  const healedOne = queueEvent(healedBy.state, { trigger: "healed", seat: card.controller, cardId: chosen, ...(focus.sourceId ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
   // An attachment that cut the heal to 1 (Noxious Supplies) is discarded after it, and this effect heals that card no more: "the amount of damage healed is reduced to 1" holds for the whole effect.
   const reduced = healedBy.reducer ? destroyCard(healedOne, healedBy.reducer, ctx.cards, steps) : healedOne;
   return again(reduced, { ...instruction, healed: healed + 1, ...(healedBy.reducer ? { capped: [...capped, chosen] } : {}) }, focus.seat);

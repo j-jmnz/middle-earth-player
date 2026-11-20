@@ -62,7 +62,8 @@ function fire(table: Table, state: ScenarioState, cardId: string, effectId: stri
 function explore(table: Table, state: ScenarioState, code: string, damage: number): ScenarioState {
   const id = first(state, code);
   const hurt = { ...state, cards: { ...state.cards, [id]: { ...state.cards[id]!, damage } } };
-  return run(table, hurt, { verb: "PlaceProgressOn", amount: 6, target: "activeLocation" }, table.frodo);
+  // The quest card places the progress: the location is immune to player card effects, so a hero's effect would place none (rr.immune).
+  return run(table, hurt, { verb: "PlaceProgressOn", amount: 6, target: "activeLocation" }, hurt.questStage ?? table.frodo);
 }
 
 describe("the boons (142011 to 142014)", () => {

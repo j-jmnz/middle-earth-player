@@ -71,30 +71,32 @@ describe("two active locations (mec109.stage-4)", () => {
     expect(legalIntents(state, ctx).map((intent) => intent.type)).toEqual(["DeclineTravel"]);
   });
 
+  // The quest card places the progress in these tests: Doors of Durin is immune to player card effects, so a hero's effect would place none while it
+  // takes the progress (rr.immune, faq.legolas-immune-location).
   it("places progress on the other active location before Doors of Durin, and on the quest after both", () => {
-    const { state, ctx, frodo } = make({ stage: "142023", active: DOORS, second: "place" });
-    const placed = run(state, { verb: "ProgressQuest", amount: 6 }, frodo, ctx);
+    const { state, ctx } = make({ stage: "142023", active: DOORS, second: "place" });
+    const placed = run(state, { verb: "ProgressQuest", amount: 6 }, state.questStage, ctx);
     // 4 fill the other location (explored); 2 go on Doors.
     expect(placed.cards[first(state, DOORS)]?.progress).toBe(2);
     expect(placed.secondActiveLocation).toBeNull();
     expect(codesOf(placed, placed.encounterDiscard)).toContain("place");
     // Doors takes the 7 it still needs and is explored: the players win.
-    const more = run(placed, { verb: "ProgressQuest", amount: 20 }, frodo, ctx);
+    const more = run(placed, { verb: "ProgressQuest", amount: 20 }, placed.questStage, ctx);
     expect(more.stageCleared).toBe(true);
     expect(codesOf(more, more.victory)).toContain(DOORS);
   });
 
   it("Doors of Durin takes no progress unless the first player controls the Ring-bearer; the progress goes on the quest instead", () => {
     const hidden = make({ stage: "142023", active: DOORS, captive: true });
-    const blocked = run(hidden.state, { verb: "ProgressQuest", amount: 3 }, hidden.frodo, hidden.ctx);
+    const blocked = run(hidden.state, { verb: "ProgressQuest", amount: 3 }, hidden.state.questStage, hidden.ctx);
     expect(blocked.cards[first(hidden.state, DOORS)]?.progress).toBe(0);
     expect(blocked.cards[blocked.questStage ?? ""]?.progress).toBe(3);
     const held = make({ stage: "142023", active: DOORS });
-    const taken = run(held.state, { verb: "ProgressQuest", amount: 3 }, held.frodo, held.ctx);
+    const taken = run(held.state, { verb: "ProgressQuest", amount: 3 }, held.state.questStage, held.ctx);
     expect(taken.cards[first(held.state, DOORS)]?.progress).toBe(3);
     // Two players: Frodo is controlled by seat 0. When seat 1 holds the first player token, Doors takes none.
     const other = make({ stage: "142023", active: DOORS, seats: 2 });
-    const second = run({ ...other.state, firstPlayer: 1 }, { verb: "ProgressQuest", amount: 3 }, other.frodo, other.ctx);
+    const second = run({ ...other.state, firstPlayer: 1 }, { verb: "ProgressQuest", amount: 3 }, other.state.questStage, other.ctx);
     expect(second.cards[first(other.state, DOORS)]?.progress).toBe(0);
   });
 
@@ -109,11 +111,12 @@ describe("two active locations (mec109.stage-4)", () => {
   });
 
   it("an explored second active location hears its own Forced effect (Redhorn Pass: each player assigns X damage)", () => {
-    const { state, ctx, frodo } = make({ stage: "142023", active: DOORS, second: REDHORN_PASS });
+    const { state, ctx } = make({ stage: "142023", active: DOORS, second: REDHORN_PASS });
     const pass = first(state, REDHORN_PASS);
     const hurt = { ...state, cards: { ...state.cards, [pass]: { ...state.cards[pass]!, damage: 1 } } };
     // 6 progress explores it; Frodo (his wound turns the damage into life) and Sam are the options: the player assigns the 1 damage.
-    const explored = run(hurt, { verb: "PlaceProgressOn", amount: 6, target: "activeLocation" }, frodo, ctx);
+    // The quest card places the progress: Redhorn Pass is immune to player card effects.
+    const explored = run(hurt, { verb: "PlaceProgressOn", amount: 6, target: "activeLocation" }, hurt.questStage, ctx);
     expect(explored.secondActiveLocation).toBeNull();
     expect(codesOf(explored, explored.victory)).toContain(REDHORN_PASS);
     expect(explored.window?.kind).toBe("choose");

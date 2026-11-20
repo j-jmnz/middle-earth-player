@@ -117,6 +117,11 @@ const TRIGGERS = [
   // About a card that left play with attachments on it, which left with it (the event's attachments): "When a character
   // leaves play, return each attachment attached to that character".
   "leftPlayWithAttachments",
+  // About a hero: a card effect moved resources to its pool from another card. The hero gains them, but none are added: the total does not grow
+  // (Harbor Master, which hears resourcesAdded, does not hear it).
+  "resourcesMoved",
+  // Heard on either event: resources were added to a hero's pool, or moved to it ("After attached hero gains any number of resources", Heir of Mardil, 08113:A:2).
+  "resourcesGained",
 ] as const;
 
 // `heroType`: the holder loses the ally card type and gains the hero card type (Sword-thain): it is among its controller's

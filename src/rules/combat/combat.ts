@@ -375,17 +375,20 @@ export function strikeEnemy(
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
   const next = state;
-  const attack = attackStrength(next, attackerIds, enemyId, ctx.cards);
+  // 6.8.2: the characters currently attacking. One that left play after it was declared (Beechbone pays his own last damage,
+  // 10118:A:2) adds nothing and takes no part in the attack's damage or its events.
+  const attacking = attackerIds.filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));
+  const attack = attackStrength(next, attacking, enemyId, ctx.cards);
   // An attacker may say the enemy does not count its Defense (families/attack/strike.ts).
-  const defense = countsDefense(next, attackerIds) ? modifiedStat(next, enemy, "defense", ctx.cards) : 0;
-  steps.push({ kind: "attack", side: "player", seat, enemyId, attackerIds: [...attackerIds] });
+  const defense = countsDefense(next, attacking) ? modifiedStat(next, enemy, "defense", ctx.cards) : 0;
+  steps.push({ kind: "attack", side: "player", seat, enemyId, attackerIds: [...attacking] });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
   const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack damaged or destroyed the enemy ("After Merry participates in an attack that destroys
   // an enemy"), and excess damage goes where a card sends it (families/attack/strike.ts).
-  return struck(next, damaged, seat, enemyId, attackerIds, Math.max(0, attack - defense), ctx, steps);
+  return struck(next, damaged, seat, enemyId, attacking, Math.max(0, attack - defense), ctx, steps);
 }
 
 // The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.
