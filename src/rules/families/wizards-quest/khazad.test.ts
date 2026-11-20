@@ -47,9 +47,21 @@ describe("Dark Pit and stage 1B (reading 7)", () => {
     expect(restricted(table({ stage: "51301" }).state, made.ctx, "advance")).toHaveLength(0);
   });
 
-  it("51301:B:2 the explored Dark Pit, still in the encounter discard pile, holds the stage until its Forced effect has flipped it", () => {
+  it("51301:B:2 the explored Dark Pit, whose explored event waits for its Forced effect, holds the stage until the flip", () => {
     const made = table({ stage: "51301", discard: ["51310"] });
-    expect(restricted(made.state, made.ctx, "advance")).toHaveLength(1);
+    const id = idOf(made.state, "51310");
+    const waiting = { ...made.state, pendingEvents: [{ trigger: "locationExplored" as const, seat: null, subject: id }] };
+    expect(restricted(waiting, made.ctx, "advance")).toHaveLength(1);
+    // Once the event is heard and Dark Pit flipped, nothing holds the stage.
+    const { run } = explored();
+    expect(restricted(run.state, made.ctx, "advance")).toHaveLength(0);
+  });
+
+  it("51301:B:2 a Dark Pit that left play without a flip pending does not hold the stage for good", () => {
+    const made = table({ stage: "51301", discard: ["51310"] });
+    expect(restricted(made.state, made.ctx, "advance")).toHaveLength(0);
+    const away = table({ stage: "51301", setAside: ["51310"] });
+    expect(restricted(away.state, away.ctx, "advance")).toHaveLength(0);
   });
 });
 

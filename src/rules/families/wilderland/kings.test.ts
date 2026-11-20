@@ -121,6 +121,20 @@ describe("GuardWithDeckTop and its sweep (18050:A:2)", () => {
     expect(gone.seats[0]?.hand).toContain(under[0]);
   });
 
+  it("with `discards` the held card goes to its owner's discard pile, not the hand, once the source is out of play (51351:A:1)", () => {
+    const withDeck = deal(table(), ["ally2", "ally2"], { zone: "deck", seat: 0 });
+    const enemy = spawn(withDeck.state, "ec1", { zone: "staging" });
+    const held = guardWithDeckTop(enemy.state, focus(enemy.id), true);
+    const under = cardsUnder(held, enemy.id)[0] ?? "";
+    expect(held.cards[under]).toMatchObject({ held: true, heldDiscard: true });
+    expect(returnHeld(held, ctx).cards[under]?.zone).toBe("under");
+    const gone = returnHeld(moveCard(held, enemy.id, { zone: "encounterDiscard" }), ctx);
+    expect(gone.cards[under]).toMatchObject({ zone: "discard" });
+    expect(gone.cards[under]?.held).toBeUndefined();
+    expect(gone.seats[0]?.discard).toContain(under);
+    expect(gone.seats[0]?.hand).not.toContain(under);
+  });
+
   it("an empty deck holds nothing, and a game with no such record does not look", () => {
     const enemy = spawn(table(), "ec1", { zone: "staging" });
     expect(guardWithDeckTop(enemy.state, focus(enemy.id))).toBe(enemy.state);

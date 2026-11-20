@@ -24,7 +24,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51301:B:2 (back): This stage cannot be defeated while Dark Pit is in play.
   51301:constant:1: Constant
-    only if any of: (the card with code 51310 is in play) or ([json condition {"kind":"outOfPlay","code":"51310"}])
+    only if any of: (the card with code 51310 is in play) or ([json condition {"kind":"exploredPending","code":"51310"}])
     - the players cannot defeat this stage while this holds
 
 ## 51303 Search for an Exit
@@ -418,7 +418,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
   51328:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
-    - raise threat by printed threat of the top card of the encounter discard pile (each player)
+    - raise threat by printed threat of the picked card (each player)
 
 51328:A:2 (shadow): Shadow: If this attack destroys a character, reveal the top card of the encounter deck.
   51328:shadow:1: Shadow
@@ -430,7 +430,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51329:A:1 (front): When Revealed: Until the end of the round, treat each character's text box as if it were blank, except for Traits.
   51329:whenRevealed:1: When revealed
-    - each character (any player controls): stat blankText (its text box is blank) 1, until the end of the round
+    - every character in play, now and entering later: stat blankText (its text box is blank) 1, until the end of the round
 
 51329:A:2 (shadow): Shadow: Until the end of the phase, treat the defending character's text box as blank, except for Traits.
   51329:shadow:1: Shadow
@@ -731,9 +731,9 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51351:A:1 (front): Forced: After Nameless Thing enters play, the first player attaches the top card of his deck to it faceup as a guarded attachment. Nameless Thing gets +X Threat, +X Attack, and +X Defense, where X is that card's printed cost. When Nameless Thing leaves play, discard that card.
   51351:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
-    - [json GuardWithDeckTop {"verb":"GuardWithDeckTop"}]
+    - [json GuardWithDeckTop {"verb":"GuardWithDeckTop","discards":true}]
   51351:forced:2: Forced after a card leaves play (heard about this card)
-    - [json ReturnGuardedToHand {"verb":"ReturnGuardedToHand"}]
+    - [json DiscardGuarded {"verb":"DiscardGuarded"}]
   51351:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat threat [json amount {"guardedCost":true}], while this card is in play
@@ -765,4 +765,4 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 448 by template, 24 as JSON)
+(rendered pieces: 447 by template, 24 as JSON)
