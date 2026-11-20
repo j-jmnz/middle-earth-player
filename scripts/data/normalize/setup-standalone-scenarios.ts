@@ -116,6 +116,15 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
   // The Wizard's Quest (51001): "The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area": a search with no card
   // named, so it moves no pile card (Escape from Khazad-dûm's 51301 prints "0-cost enemy or location", the same search); the encounter deck keeps the cards until the Setup record finds them.
   if (/^The opposing team searches the encounter deck for one different 0[ -]cost enemy or (?:0[ -]cost )?location per player and adds them to the staging area$/.test(sentence)) return [{ kind: "step", step: "searchZeroCostPerPlayer", codes: [] }];
+  // The Hunt for the Dreadnaught's Standard Mode (40002): "Set the following enemies aside: all 7 unique enemies (including the Dreadnaught)": the unique enemies of the box, the Dreadnaught (a ship-enemy) among them.
+  if ((match = /^Set the following enemies aside: all (\d+) unique enemies \(including the Dreadnaught\)$/.exec(sentence))) {
+    const codes = names.cards.filter((card) => card.isUnique && (card.type === "enemy" || card.type === "ship-enemy") && card.printings.some((printing) => printing.pack === "THftD")).map((card) => card.code);
+    return codes.length === Number(match[1]) ? [{ kind: "aside", codes, allCopies: false }] : null;
+  }
+  // "Shuffle the encounter deck and discard cards from the top until 2 locations are discarded (3 locations instead if there are 3 or more players)": the locations go to the staging area (the next sentence).
+  if ((match = /^Shuffle the encounter deck and discard cards from the top until (\d+) locations are discarded \((\d+) locations instead if there are (\d+) or more players\)$/.exec(sentence))) {
+    return [{ kind: "discardToStaging", types: ["location"], amount: { count: Number(match[1]), manyCount: Number(match[2]), from: Number(match[3]) }, eachPlayer: false, shuffleFirst: true }];
+  }
   // The Mines of Moria (51201): "Each player adds 1 resource to each of his heroes' resource pools": the Setup record gives each hero the resources.
   if ((match = /^Each player adds (\d+) resources? to each of (?:his|their) heroes['’] resource pools$/.exec(sentence))) return [{ kind: "step", step: "eachHeroResources", codes: [], resources: Number(match[1]) }];
   // "Shuffle any unused Scoutcards back into the encounter deck" (the card prints "Scoutcards"): the copies not staged stay in the encounter deck.

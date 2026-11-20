@@ -58,7 +58,7 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     name: "Standalone scenarios",
     kind: "cycle",
     released: "2011-09-21",
-    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm"],
+    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
     scenarios: [
       // DragnCards' deck Q99.01 has no Easy twin: Hall of Beorn's Easy counts equal the Normal ones, so Easy loads the same deck.
       { id: "the-massing-at-osgiliath", product: "The Massing at Osgiliath", deck: { normal: "Q99.01", easy: "Q99.01" } },
@@ -86,9 +86,11 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       { id: "the-mines-of-moria", product: "The Mines of Moria", deck: { normal: "Q99.13", easy: "Q99.13" }, encounterSets: ["The Mines of Moria", "The Mines of Moria 1", "The Mines of Moria 2", "The Mines of Moria 3", "The Mines of Moria 4", "The Mines of Moria 5", "The Mines of Moria 6", "The Mines of Moria 7", "The Mines of Moria 8", "The Mines of Moria 9", "The Mines of Moria 10", "The Mines of Moria 11", "The Mines of Moria 12", "The Mines of Moria 13", "The Mines of Moria 14"] },
       // DragnCards' deck Q99.14 has no Easy twin. Hall of Beorn lists the kit's quest card under one set and gives its other encounter cards none; they are printed with set numbers 15 to 28. DragnCards loads the encounter cards in its sharedQuestDeck group (`groups`) and omits Durin's Bane (overrides.scenarioAdded).
       { id: "escape-from-khazad-dum", product: "Escape from Khazad-dûm", deck: { normal: "Q99.14", easy: "Q99.14" }, groups: { sharedQuestDeck: "encounter" }, encounterSets: ["Escape from Khazad-dûm", "Escape from Khazad-dûm 15", "Escape from Khazad-dûm 16", "Escape from Khazad-dûm 17", "Escape from Khazad-dûm 18", "Escape from Khazad-dûm 19", "Escape from Khazad-dûm 20", "Escape from Khazad-dûm 21", "Escape from Khazad-dûm 22", "Escape from Khazad-dûm 23", "Escape from Khazad-dûm 24", "Escape from Khazad-dûm 25", "Escape from Khazad-dûm 26", "Escape from Khazad-dûm 27", "Escape from Khazad-dûm 28"] },
+      // DragnCards' deck Q99.15 has no Easy twin: the Easy Mode card (not the deck) sets two Black Sails and a Corsair Warship aside. Its sharedEncounterDeck2 is the Corsair deck; Standard Mode is the mode card the scenario deals.
+      { id: "the-hunt-for-the-dreadnaught", product: "The Hunt for the Dreadnaught", deck: { normal: "Q99.15", easy: "Q99.15" }, modeCard: "Standard Mode", groups: { sharedEncounterDeck2: "corsairDeck" } },
     ],
     // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
-    later: ["The Hunt for the Dreadnaught"],
+    later: [],
     saga: false,
     ledger: "standalone-scenarios",
   },

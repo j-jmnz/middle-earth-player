@@ -4,6 +4,12 @@ import type { Effect } from "../../catalog/boundary.ts";
 // scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.
 export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"147021:shadow:1","cardCode":"147021","lines":["147021:A:3"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
+  {"id":"40026:constant:1","cardCode":"40026","lines":["40026:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"40027:constant:1","cardCode":"40027","lines":["40027:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"40029:constant:1","cardCode":"40029","lines":["40029:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"40030:constant:1","cardCode":"40030","lines":["40030:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"40031:constant:1","cardCode":"40031","lines":["40031:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"40032:constant:1","cardCode":"40032","lines":["40032:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"50304:triggered:1","cardCode":"50304","lines":["50304:A:4"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
   {"id":"50305:constant:1","cardCode":"50305","lines":["50305:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"50602:whenRevealed:1","cardCode":"50602","lines":["50602:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AddSetAsideToStaging","code":"50616"}]},

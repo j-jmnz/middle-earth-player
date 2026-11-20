@@ -51,7 +51,7 @@ export type SetupClause =
   // "Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each
   // discarded location to the staging area." (`amount` "playersLessOne": "X is 1 less than the number of players in the game";
   // `eachPlayer`: "Each player discards cards from the top of the encounter deck until he discards an enemy or location and adds that card to the staging area".)
-  | { kind: "discardToStaging"; types: ("enemy" | "location")[]; amount: "players" | "playersLessOne"; eachPlayer: boolean; shuffleFirst: boolean }
+  | { kind: "discardToStaging"; types: ("enemy" | "location")[]; amount: "players" | "playersLessOne" | { count: number; manyCount: number; from: number }; eachPlayer: boolean; shuffleFirst: boolean }
   // "If \"Turayn has taken an oath of vigilance,\" search the encounter deck for 3 treacheries and remove them from the game" (`ifLogged` null: no condition):
   // `from` is the deck, `nonUnique` the "non-unique" qualifier, `except` "not named Grey Mountain Giant", `alsoCaves` "and the Caves deck for 1 location".
   | { kind: "removeCards"; ifLogged: string | null; count: number; what: "treachery" | "location" | "enemy"; nonUnique: boolean; except: string | null; alsoCaves: number | null }

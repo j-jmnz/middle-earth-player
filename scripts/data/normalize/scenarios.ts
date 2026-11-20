@@ -159,7 +159,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const campaignSetup = campaignLines.setup;
     // A mode card's Setup (the Siege's Standard Game Mode: Annúminas to the staging area) runs before the quest card's: its sentences are read with the quest card's.
     const modeCard = def.modeCard === undefined ? undefined : cards.find((card) => card.type === "campaign" && card.name === def.modeCard && card.printings.some((p) => cardPacks.includes(p.pack)));
-    const modeSetup = setupOf(modeCard?.text, false).setup;
+    // The Hunt for the Dreadnaught's mode cards print the Setup as bulleted lines, which continue the "Setup:" line: the bullets are dropped, each line is one sentence.
+    const modeSetup = setupOf(modeCard?.text, true).setup?.replaceAll("• ", "") ?? null;
     const modeParsed: ParsedSetup = modeSetup ? parseSetup(modeSetup, names) : { clauses: [], unread: [] };
     const questParsed: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
     const quest: ParsedSetup = { clauses: [...modeParsed.clauses, ...questParsed.clauses], unread: [...modeParsed.unread, ...questParsed.unread] };
@@ -240,7 +241,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       }
       // "Players prepare their fleet" deals all six ship-objectives of The Dream-chaser's Fleet (dcce.prepare-your-fleet), set aside until
       // the players choose; the load list holds the four of the original box, so each ship it lacks (by name) is added, in both decks.
-      if (clausesOf(quest, "step").some((clause) => clause.step === "prepareFleet")) {
+      // (The Hunt for the Dreadnaught's fleet is its own six ship-objectives, which the load list holds.)
+      if (product.home === "dream-chaser" && clausesOf(quest, "step").some((clause) => clause.step === "prepareFleet")) {
         const dealt = new Set([...normal.placements.keys()].map((key) => byCode.get(key.split("\u0000")[0] ?? "")?.name));
         for (const ship of cards.filter((card) => card.type === "ship-objective" && canon(card.encounterSet ?? "") === canon("The Dream-chaser's Fleet") && !dealt.has(card.name))) {
           normal.placements.set(keyOf(ship.code, "setAside"), 1);

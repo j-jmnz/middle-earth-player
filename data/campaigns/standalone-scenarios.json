@@ -14,12 +14,10 @@
     "the-wizards-quest",
     "the-woodland-realm",
     "the-mines-of-moria",
-    "escape-from-khazad-dum"
+    "escape-from-khazad-dum",
+    "the-hunt-for-the-dreadnaught"
   ],
   "kind": "cycle",
-  "later": [
-    "The Hunt for the Dreadnaught"
-  ],
   "starterDecks": [],
   "saga": false
 }

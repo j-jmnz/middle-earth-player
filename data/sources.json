@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "e3cb0663b2eeb3206ef98f155c890e0221ccc83e0751377321cb155c6a33b8c3"
+        "value": "92dce2cf8af6584a836be2c8243d276a086a0ffdba95e81920fa5a3a968b4a21"
       },
-      "fetchedAt": "2026-11-20T13:47:34.979Z",
+      "fetchedAt": "2026-11-20T16:18:43.860Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -583,6 +583,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/Escape-from-Khazad-dûm",
           "sha256": "76df4372ff5d5a310ac122526c4936abc3817dbd6a4c1340cdde6a0a1ad27c0c",
           "bytes": 18163
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Hunt-for-the-Dreadnaught.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Hunt-for-the-Dreadnaught",
+          "sha256": "1a236006f608d688dc9d0b683dc1c0e83c749d571ce78ebf54df0bc65910187a",
+          "bytes": 16108
         }
       ]
     },
@@ -30166,9 +30172,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "f17c6953c63a05aa7a8368eb4b657e6880a8353be520685d1dbfceba60841256"
+        "value": "c38656877dfa45077f002ceb4cc4c29d9b758be4798ffcdb2d7601a1f8012f16"
       },
-      "fetchedAt": "2026-11-20T14:01:04.976Z",
+      "fetchedAt": "2026-11-20T16:31:05.546Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -41341,6 +41347,354 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fate-of-Wilderland/The-Final-Push-3B.jpg",
           "sha256": "2301823b9e81ef77c99882b3ea50f6a54568690b77ddf931ce7537d888a15b66",
           "bytes": 1001346
+        },
+        {
+          "path": "scans/40001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Easy-Mode-SetupA.jpg",
+          "sha256": "b43a190c02e19cdcf4d2b903038198c3c2368e01136b42c2ff77488a1d5f4f2e",
+          "bytes": 2163744
+        },
+        {
+          "path": "scans/40001.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Easy-Mode-SetupB.jpg",
+          "sha256": "33476069190b6d9bada2c2edad191c4692ea269db9e98b5593bcb4c2e413b95e",
+          "bytes": 2106752
+        },
+        {
+          "path": "scans/40002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Standard-Mode-SetupA.jpg",
+          "sha256": "71d359920356b25c9c3e2e0347e9006a548c658fdf4d3930a0283b4443a13000",
+          "bytes": 2171847
+        },
+        {
+          "path": "scans/40002.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Standard-Mode-SetupB.jpg",
+          "sha256": "ad62a2849ce80a0602aabe6ec964f51fea835b95d9de80cb5c1a1fc15815349b",
+          "bytes": 2100152
+        },
+        {
+          "path": "scans/40003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Hard-Mode-SetupA.jpg",
+          "sha256": "afca1de63f653e2be4d4802632d01fc4e3dca943fa4db95c46ab15a092aeb27e",
+          "bytes": 2166869
+        },
+        {
+          "path": "scans/40003.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Hard-Mode-SetupB.jpg",
+          "sha256": "1a51a1235a7db5adaca47c67aab5627096292e5fdad61e59570f5441298cebf0",
+          "bytes": 2108608
+        },
+        {
+          "path": "scans/40004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Searching-the-High-Seas-1A.jpg",
+          "sha256": "155bfd3e5338d709753409d57049fc20529af30c0c25a89ba1d9e36f14f89e11",
+          "bytes": 2080975
+        },
+        {
+          "path": "scans/40004.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Searching-the-High-Seas-1B.jpg",
+          "sha256": "dbf738dbe3e4c447a566e0261e6208d8056e1606c21b8d359773b7ea0f3d5587",
+          "bytes": 2158929
+        },
+        {
+          "path": "scans/40005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Destroy-the-Dreadnaught-2A.jpg",
+          "sha256": "2bdaeaf68217f1907da4ed94ab19e1dbaadca4a77da4f11a5106c9fa3483639e",
+          "bytes": 2311304
+        },
+        {
+          "path": "scans/40005.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Destroy-the-Dreadnaught-2B.jpg",
+          "sha256": "6cff72c6388951c486bbc131afc5480d1b78f1940cdeb3cc8a966f194426ee9b",
+          "bytes": 2325029
+        },
+        {
+          "path": "scans/40006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Eithiliant.jpg",
+          "sha256": "f8753ad39c8e60ce2fc396d2c4e50d28896b326c9682f4f65398f5dd7491a994",
+          "bytes": 1971831
+        },
+        {
+          "path": "scans/40006.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/78d40f21-ce85-4600-8f5e-5159d83c50cb.B.jpg",
+          "sha256": "ceb1fe931f1e3090ee0067ff60ff010bf029261f5c5420dee00fa29ee5342248",
+          "bytes": 141737
+        },
+        {
+          "path": "scans/40007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Golden-Wing.jpg",
+          "sha256": "0e0bf7eed0baebfd710e3d915fef1bca58bad62f459215f8b3f2aae3b49bbebe",
+          "bytes": 2027105
+        },
+        {
+          "path": "scans/40007.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/244873ca-427f-4358-804d-16bec79fca36.B.jpg",
+          "sha256": "9f4d65ff6c66bc652b78566b0d0bb190ef5b0a8fc1d04f697e5ac4bc2d91a5c2",
+          "bytes": 141745
+        },
+        {
+          "path": "scans/40008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Pride-of-Lebennin.jpg",
+          "sha256": "2a932b564ce179a4a2fe0adbeaffc85149806e3ab8f245f3d04efab6dafed761",
+          "bytes": 1953214
+        },
+        {
+          "path": "scans/40008.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/eb2b84b4-40b3-4dda-bf87-4f59a78aa6b1.B.jpg",
+          "sha256": "fd62dd2fc178a710e68ae61d0338efe34f9315ec8fa19814c798a96c6eae076e",
+          "bytes": 143545
+        },
+        {
+          "path": "scans/40009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Silent-Mist.jpg",
+          "sha256": "6dcc9e8709ecd5734ccd0277fd2c9922fcc1de50145fdb5b1d4f122dda26f404",
+          "bytes": 1930520
+        },
+        {
+          "path": "scans/40009.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/5bca670f-054d-41cd-93d7-0e318dc8c0e1.B.jpg",
+          "sha256": "5396c57d54a4b0fac009d00be98cccd379e351c4bfc3e373dca63f4460886e08",
+          "bytes": 140961
+        },
+        {
+          "path": "scans/40010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Swan-Ship-of-Dol-Amroth.jpg",
+          "sha256": "20da0f2fa31e01d954c7a8d8918460d1d2b41018a785de3a28d538e00304674a",
+          "bytes": 1955975
+        },
+        {
+          "path": "scans/40010.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/9022960a-30cc-4453-9e5e-00b17ac03efc.B.jpg",
+          "sha256": "e9c177e276d23d36236e4298be6957d89659c486e078c23bf19320857fbd4531",
+          "bytes": 145649
+        },
+        {
+          "path": "scans/40011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Twilight's-Call.jpg",
+          "sha256": "ce4b612b3c21ec30a7cc628837ea6dc84d89835a2849b4dad9f399ea2d568f81",
+          "bytes": 1985972
+        },
+        {
+          "path": "scans/40011.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/6c4bf737-20cf-4fc5-b473-8f1540430c45.B.jpg",
+          "sha256": "b30b9716d1a72ccd791f1899e57eb56ae89b9417340492747ac17353417a8884",
+          "bytes": 144792
+        },
+        {
+          "path": "scans/40012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Gondorian-Warship.jpg",
+          "sha256": "8bdf7c4258272ed20122cc79c5bb950ecf7e6a72147d94e402c8e7d47c07940d",
+          "bytes": 1965255
+        },
+        {
+          "path": "scans/40013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Dreadnaught.jpg",
+          "sha256": "ca8fc768a94f20adf69d7366db3c1b10c0867fe6f8cae3085d6c54e79503ede9",
+          "bytes": 4499484
+        },
+        {
+          "path": "scans/40013.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/16fc9e92-cbc9-46ff-8312-a9c6491ca70b.B.jpg",
+          "sha256": "4842d95e63ff2c57b6030282289eafbc0d00cd3c3bdf330fc727e9f7262fadc0",
+          "bytes": 137874
+        },
+        {
+          "path": "scans/40014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Captain-of-the-Haven.jpg",
+          "sha256": "830d8e4d46fda14291f6b2d92a4d6bc13d997b5512f839229b5ac6577ef6486c",
+          "bytes": 2090901
+        },
+        {
+          "path": "scans/40015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Commander-of-the-Dreadnaught.jpg",
+          "sha256": "2651f1fb611d4a8e76e14c3841962a23559f4f9747ffd010c77fa4817e7e5944",
+          "bytes": 2048185
+        },
+        {
+          "path": "scans/40016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Descendant-of-Castamir.jpg",
+          "sha256": "0e0ce69b7a370fbd14ced7d7f8d5530627b756302ebdef9ea069e30b0b694b8e",
+          "bytes": 1941260
+        },
+        {
+          "path": "scans/40017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Hydraken.jpg",
+          "sha256": "aa37d1df548adcbd48bc2bf1d9aaa990dfc2d3ba3e96461eb14d1672c5ce49c4",
+          "bytes": 2105753
+        },
+        {
+          "path": "scans/40018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Ophidian.jpg",
+          "sha256": "5eeb1a46cc8bf66649614e46472b6c51170491d43fb9471b3df56135c3cf9bb7",
+          "bytes": 2020224
+        },
+        {
+          "path": "scans/40019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Varjax.jpg",
+          "sha256": "9f75cf4396d0dea7bfc1f1833611e6835f5fb24791cc26bd456daa882057780a",
+          "bytes": 2115933
+        },
+        {
+          "path": "scans/40020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Brash-Corsair.jpg",
+          "sha256": "6b3a42aaa4fab10383a85277e1d58f7adab57dd28557f6d141f4b10e01e9ccdd",
+          "bytes": 2029240
+        },
+        {
+          "path": "scans/40021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Corsair-Plunderer.jpg",
+          "sha256": "f3dd2d49630831c571333ecfb4909366df6518a22f59df1d5f661d0e4fe7a776",
+          "bytes": 2113676
+        },
+        {
+          "path": "scans/40022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Daring-Buccaneer.jpg",
+          "sha256": "a1a97a16ff25d57813bf67ba9108618d384d1ecc83f0e32cb3db349df67d43ed",
+          "bytes": 2091850
+        },
+        {
+          "path": "scans/40023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Fierce-Marauder.jpg",
+          "sha256": "234ca83b09e09fd46eb5cd2cd8d7e53aa0a7822b6c542c3af97023ca9d4275b3",
+          "bytes": 2052933
+        },
+        {
+          "path": "scans/40024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Southron-Sailor.jpg",
+          "sha256": "60eb690267c41355139b84b3f200f1dbcb32dbaddfe05add468c6412909802de",
+          "bytes": 1949706
+        },
+        {
+          "path": "scans/40025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Umbar-Captain.jpg",
+          "sha256": "b7845950ea732ebe89ffe442b24884ff52cfb778b15a30b9b39d4b26598462ec",
+          "bytes": 2025551
+        },
+        {
+          "path": "scans/40026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Black-Sails.jpg",
+          "sha256": "0ee19b83ceebf055a4a8fe80e57d7c705da971e35c1afe29a48398a242973c0d",
+          "bytes": 2134930
+        },
+        {
+          "path": "scans/40027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Corsair-Skiff.jpg",
+          "sha256": "40ae058702a69e884c7126849eefebfb31e7e11ae9aeddfbfacd8b8146f7948c",
+          "bytes": 2142708
+        },
+        {
+          "path": "scans/40028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Corsair-Skirmisher.jpg",
+          "sha256": "901f4e5ae81988255a8cd380e0983fcde3f518a116c5511cf4a4050c9b293c86",
+          "bytes": 2181939
+        },
+        {
+          "path": "scans/40029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Corsair-Warship.jpg",
+          "sha256": "4db2108de114aa12f9ad8a23b7297706ca920886618ef014cab6ec798d576657",
+          "bytes": 2149065
+        },
+        {
+          "path": "scans/40030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Ramming-Ship.jpg",
+          "sha256": "efda300034e2d9a63e188688ce6419269dd2a4d611f6381cdc7a16a75543229b",
+          "bytes": 2195526
+        },
+        {
+          "path": "scans/40031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Slave-Ship.jpg",
+          "sha256": "d36ab15181befd3f92fadab80c12dbc3aa1c1721c22a7ede6e6d74928bc8a9c7",
+          "bytes": 2236865
+        },
+        {
+          "path": "scans/40032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/War-Galley.jpg",
+          "sha256": "b9770038cad67cdad2f42db84f7865852daf7847ce3a4ed6066e1b8cdcd226d6",
+          "bytes": 2157228
+        },
+        {
+          "path": "scans/40033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Sea-Monster.jpg",
+          "sha256": "6494acac0eb0abc9ae2cbd1c0ff4b3ae2ef3da4bafec9b4c8d38a548730cfb9c",
+          "bytes": 2208927
+        },
+        {
+          "path": "scans/40034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Belfalas-Shipyard.jpg",
+          "sha256": "5eca0de30f628c71fd9f6299c24ee17b9f1ebe6a5b6dc47931cf12f09201a7fa",
+          "bytes": 2117672
+        },
+        {
+          "path": "scans/40035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Cobas-Haven.jpg",
+          "sha256": "74b3b4e941713611143e6c46adfdff60b4930e3ca9b87244a3fe2c000167ef51",
+          "bytes": 2063082
+        },
+        {
+          "path": "scans/40036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Isle-of-Fortune.jpg",
+          "sha256": "b5164df5f9b8a2471fad3877a84a5554c8f263e15aed115c4b08269d83630ff6",
+          "bytes": 2076051
+        },
+        {
+          "path": "scans/40037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Mouths-of-Anduin.jpg",
+          "sha256": "85101569565951010b6c19c92bbf8ac38d743e4673d453334da89da3564e453e",
+          "bytes": 2181054
+        },
+        {
+          "path": "scans/40038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Tolfalas-Landing.jpg",
+          "sha256": "86b9ea0420c3f5d1d425584893b616557c6200698c1397bb3e2a8715025a84cf",
+          "bytes": 2111100
+        },
+        {
+          "path": "scans/40039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Wicked-Cove.jpg",
+          "sha256": "c22afd4c3996b7f17f38eacb0f8aec54ceee3d471e6b3d1e241a68c9feec5869",
+          "bytes": 1996231
+        },
+        {
+          "path": "scans/40040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Ballista-Barrage.jpg",
+          "sha256": "d771856c3ad3d409a5f57ea4edebe4662f3c12bf11a3319d13ae4086e1b74d34",
+          "bytes": 2224752
+        },
+        {
+          "path": "scans/40041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Boarding-Party.jpg",
+          "sha256": "a3425f6a13511abda6b39ced561382b95bab9429f5086ec4e0f62ee624f4cadc",
+          "bytes": 2105184
+        },
+        {
+          "path": "scans/40042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Grappled.jpg",
+          "sha256": "93ccd5392e9dc659030ad9f296cbe7a4c2f8b27d7b0d23d4817b019889f2f5ec",
+          "bytes": 2169742
+        },
+        {
+          "path": "scans/40043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Out-of-the-Mist.jpg",
+          "sha256": "9e11f5572207cd17c0fd420ad25dcd1fdeb4ad127c8fd0c0d923ca3f81bcac05",
+          "bytes": 2141268
+        },
+        {
+          "path": "scans/40044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Overworked.jpg",
+          "sha256": "5158044ba19fcc1b3b50a3f6003005f524b57cd5287addb96f9d86f1e0f3c0e2",
+          "bytes": 2183637
+        },
+        {
+          "path": "scans/40045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Taking-on-Water.jpg",
+          "sha256": "a0188f3afdbdc421661f5159dc71db927597413828eed30dcc9feb50f0b21698",
+          "bytes": 2065620
+        },
+        {
+          "path": "scans/40046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hunt-for-the-Dreadnaught/Violent-Tempest.jpg",
+          "sha256": "2f243f42357b156b97b555edb443f84b488960e0b9f07e104e342e40ae086734",
+          "bytes": 2035247
         },
         {
           "path": "scans/41001.A.jpg",

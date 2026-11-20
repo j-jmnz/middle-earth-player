@@ -3403,6 +3403,16 @@
       },
       "reason": "Hall of Beorn gives the 42 encounter cards of Escape from Khazad-dûm numbered 12 to 53 no encounter set. Each is printed with its set's number (15 to 28, in the orange circle; the set's cards are numbered x/5, one for each copy of the set) and DragnCards names the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51312.A to 51353.A; dragncards cardDb.tsv (Escape from Khazad-dum, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "40033"
+      },
+      "set": {
+        "type": "enemy"
+      },
+      "reason": "Hall of Beorn files The Hunt for the Dreadnaught's Sea Monster as a Ship-enemy. The scan prints the type line ENEMY (Creature., 26 engagement cost, Threat 2, Attack 4, Defense 0, 11 hit points) and DragnCards types it Enemy: it is not a Ship, so heroes can defend it and its text lets Ship objectives attack and defend against it.",
+      "source": "scan 40033.A; dragncards.net cardDb (Enemy)"
     }
   ],
   "scenarioPiles": [
@@ -4880,6 +4890,24 @@
       "code": "146082",
       "reason": "The card belongs to epic multiplayer mode (mec113.epic-multiplayer-mode): the scenario's Hall of Beorn list counts it, but the DragnCards load list of the scenario holds none, and the Epic Multiplayer Mode campaign card's Setup (146080) deals it: \"Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area\".",
       "source": "hallofbeorn.com/Export/Scenarios (Mount-Doom); dragncards preBuiltDecks.json (Q0C.17, Q0C.18); scan 146080.A; scan 146082.A"
+    },
+    {
+      "scenario": "the-hunt-for-the-dreadnaught",
+      "code": "40002",
+      "reason": "Standard Mode is the mode card, not a card a pile deals: its Setup (prepare the fleet and the Corsair deck, set the unique enemies aside, two locations to the staging area) and its back (the 10-damage Quest Action, the elimination of a player with no ship-objective) run from beside the quest deck, as the Hard Mode card of Dream-chaser does. DragnCards loads it as a Campaign row in the set-aside group and Hall of Beorn's scenario list counts it once, so the count check skips it.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Hunt-for-the-Dreadnaught (ScenarioCards); dragncards preBuiltDecks.json (Q99.15); scan 40002.A and 40002.B"
+    },
+    {
+      "scenario": "the-hunt-for-the-dreadnaught",
+      "code": "40001",
+      "reason": "Easy Mode is the mode card of the easy difficulty of The Hunt for the Dreadnaught, which the app does not deal: the app deals the Standard Mode, the cooperative game of one or two seats on one table. Easy Mode removes two Black Sails and a Corsair Warship, makes Cobas Haven the active location and adds a card draw and the 10-damage Quest Action. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Hunt-for-the-Dreadnaught (ScenarioCards); dragncards preBuiltDecks.json (Q99.15); scan 40001.A and 40001.B"
+    },
+    {
+      "scenario": "the-hunt-for-the-dreadnaught",
+      "code": "40003",
+      "reason": "Hard Mode is the mode card of the hard difficulty of The Hunt for the Dreadnaught, which the app does not deal (the app deals the Standard Mode): it stages three Tolfalas Landing locations, limits threat reduction to 1 each round and raises a player's threat when a character is healed or readied by a player card effect. The card stays in the catalog and its printed lines are read from the scan.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Hunt-for-the-Dreadnaught (ScenarioCards); dragncards preBuiltDecks.json (Q99.15); scan 40003.A and 40003.B"
     }
   ],
   "hobRingsDbCodes": [
