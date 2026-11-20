@@ -299,7 +299,7 @@ describe("Citadel Plate (01040) and Dwarven Axe (01041), from the templates", ()
 });
 
 describe("An attacker that leaves play before the damage (rr.step-6-8-2)", () => {
-  it("adds no Attack: Beechbone destroyed by his own cost deals only his X (10118:A:2)", () => {
+  it("adds no Attack: Beechbone destroyed by his own cost leaves the enemy undamaged, X being 0 once he left play (10118:A:2)", () => {
     const tab = table({ heroes: [{ code: GIMLI, seat: 0 }], allies: [{ code: BEECHBONE, seat: 0 }], engaged: [{ code: ORC, seat: 0 }] });
     const beechbone = idsOf(tab, BEECHBONE);
     const orc = idsOf(tab, ORC);
@@ -313,6 +313,6 @@ describe("An attacker that leaves play before the damage (rr.step-6-8-2)", () =>
     state = step(state, { type: "Trigger", cardId: beechbone, effectId: "10118:response:1" });
     while (legalIntents(state, tab.ctx).some((intent) => intent.type === "Pass") && state.pendingStrike) state = step(state, { type: "Pass" });
     expect(state.cards[beechbone]?.zone).toBe("discard");
-    expect(state.cards[orc]?.damage).toBe(4);
+    expect(state.cards[orc]?.damage).toBe(0);
   });
 });

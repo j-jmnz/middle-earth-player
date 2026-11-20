@@ -6,7 +6,7 @@ import { triggerHears } from "../families/play/hooks.ts";
 import { cancelBarred } from "../families/encounter/cancel.ts";
 import { whenRevealedUncancelable } from "../families/wilderland/heath.ts";
 import { cancelNotAllowed } from "../families/nightmare/index.ts";
-import { aboutCard, effectById, hears, hearsFromAnywhere } from "./listen.ts";
+import { aboutCard, answeringController, effectById, hears, hearsFromAnywhere } from "./listen.ts";
 import { effectsOfCard } from "../families/misc/text.ts";
 import { playableFromDeck } from "../player/deck-play.ts";
 import { effectCause } from "../core/cause.ts";
@@ -42,7 +42,8 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
     // A card nobody controls (a quest or encounter card) is answered by the first player, or, while a Peril card's
     // staging resolves, by the revealing player: the other players are the ones Peril keeps out (mec109.peril).
     const locked = perilLock(state);
-    const seat = instance.controller == null && locked != null ? locked : controllerSeat(state, instance);
+    const answering = answeringController(instance, ctx);
+    const seat = answering == null && locked != null ? locked : controllerSeat(state, answering === instance.controller ? instance : { ...instance, controller: null });
     // Peril: the other seats cannot trigger Responses while the card resolves.
     if (!order.includes(seat) || (locked != null && seat !== locked)) continue;
     for (const effect of records) {

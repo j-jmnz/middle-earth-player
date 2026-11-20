@@ -19,7 +19,7 @@ import { travelBlocked } from "../../interpret/restrictions.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import type { EffectData, ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { heldHero, inPlay, updateCard } from "../../core/state.ts";
 import { travelNow } from "../../quest/travel.ts";
 import { shuffleEncounterDeck, shuffleIntoEncounterDeck } from "../../interpret/verbs.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
@@ -67,7 +67,11 @@ export function encounterCard(state: ScenarioState, card: MoveInstruction["card"
 export function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[id];
   if (!card || !inPlay(card.zone)) return state;
-  return updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false });
+  const left = updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false });
+  // The card is announced to the abilities that hear it leave play ("After this location leaves play", 141049:A:2). moveCard announces a card that leaves a
+  // player's area, and an enemy that guards a hero; an explored location is announced where it is explored (quest/stage-reveal.ts).
+  const announcedElsewhere = card.zone === "play" || card.zone === "heroes" || Object.values(state.cards).some((other) => heldHero(other) && other.host === id);
+  return announcedElsewhere ? left : queueEvent(left, { trigger: "leftPlay", seat: null, cardId: id });
 }
 
 /** A card in play goes facedown underneath a host, out of play (rr.in-play-and-out-of-play): what it had in play is lost, `placedUnder` is queued about it and the table is told it is destroyed. */

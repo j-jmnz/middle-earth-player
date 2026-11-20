@@ -64,7 +64,7 @@ describe("healing responses", () => {
     expect(triggers(state, ctx, "04128:response:1")).toHaveLength(1);
     state = trigger(state, table.heroes[0] ?? "", "04128:response:1", ctx);
     expect(state.cards[rohan]?.damage).toBe(1);
-    // His own heal announces nothing: he is not offered it again.
+    // His own heal is announced to other cards, but it is not another card effect: he is not offered it again.
     expect(triggers(run(state, ctx), ctx, "04128:response:1")).toEqual([]);
   });
 

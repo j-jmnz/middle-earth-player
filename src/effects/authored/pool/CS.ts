@@ -10,6 +10,8 @@ export const RECORDS: readonly Effect[] = [
   {"id":"08112:action:1","cardCode":"08112","lines":["08112:A:2"],"timing":"action","limit":"oncePerRound","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Pick","pick":{"type":"player","control":"any"}},{"verb":"LowerThreat","amount":1,"who":"picked"},{"verb":"Draw","amount":1,"who":"picked"}]},
   // 08113 Heir of Mardil
   {"id":"08113:response:1","cardCode":"08113","lines":["08113:A:2"],"timing":"response","trigger":"resourcesAdded","subject":"host","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Ready","target":"host"}]},
+  // A resource moved to the hero's pool (Errand-rider) is gained, not added (community reading of a designer's answer; docs/brief.md, Core round).
+  {"id":"08113:response:2","cardCode":"08113","lines":["08113:A:2"],"timing":"response","trigger":"resourcesMoved","subject":"host","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Ready","target":"host"}]},
   // 08114 Orophin (line 1 is Ranged)
   {"id":"08114:response:1","cardCode":"08114","lines":["08114:A:2"],"timing":"response","trigger":"enteredPlay","subject":"self","instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"discard","cardType":"ally","trait":"Silvan"}},{"verb":"MovePicked","to":"hand"}]},
   // 08116 Charge of the Rohirrim

@@ -111,7 +111,8 @@ describe("the campaign across scenarios 3 and 4", () => {
         const spawned = spawn(state, LUST, { zone: "attached" });
         state = attachTo(spawned.state, spawned.id, strong);
       }
-      const won = settle(syncConstants(runInstruction({ ...state, window: null }, { verb: "ProgressQuest", amount: 9 }, { seat: 0, sourceId: table.frodo }, table.ctx, []), table.ctx), table.ctx, []);
+      // The quest card explores Doors of Durin: it is immune to player card effects, so a hero's effect would place no progress on it.
+      const won = settle(syncConstants(runInstruction({ ...state, window: null }, { verb: "ProgressQuest", amount: 9 }, { seat: 0, sourceId: state.questStage }, table.ctx, []), table.ctx), table.ctx, []);
       expect(won.stageCleared, String(attached)).toBe(true);
       expect(won.resolutionLog.earned.map((item) => item.code), String(attached)).toEqual(attached ? [LUST] : []);
       const log = applyResolution(emptyLog(1), won.scenarioId, won, ctx.cards, NO_COPY_LIMITS);

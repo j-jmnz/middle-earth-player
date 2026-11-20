@@ -7,6 +7,7 @@ import type { ReduceContext } from "../interpret/interpret.ts";
 import { matchesPick } from "../interpret/pick.ts";
 import type { CardInstance, GameEvent, ScenarioState } from "../core/state.ts";
 import { flagged } from "../core/state.ts";
+import { isPlayerType, printedOf } from "../core/printed.ts";
 
 // Effect records by card code, built once per effect list: the triggers, constants and Actions look a card's records up
 // many times a step, and the list holds every card's.
@@ -43,12 +44,20 @@ export function aboutCard(event: GameEvent): string | undefined {
   return event.cardId ?? event.subject;
 }
 
+// The seat a card's abilities answer for. An encounter card in the staging area is the scenario's (rr.ownership-and-control), whoever revealed it: the
+// revealing seat it notes there (windows/frames.ts) is read only for its staging area, so its abilities are the first player's (rr.first-player; Signs of
+// Gollum, 02014:A:1). Null: the first player, or the head of the card's own staging area while the areas are separate (player/usage.ts, controllerSeat).
+export function answeringController(listener: CardInstance, ctx: ReduceContext): number | null {
+  if (listener.controller == null) return null;
+  return listener.zone === "staging" && !isPlayerType(printedOf(ctx.cards, listener.code)) ? null : listener.controller;
+}
+
 // Whether a card matches an effect's subject filter, from the listener's side: the filter's predicates, and whose card it
 // is (`control`, an enemy's `engaged`). Its zone is not read, so a card that just left play still matches.
 export function subjectMatches(state: ScenarioState, id: string, spec: PickSpec, listener: CardInstance, ctx: ReduceContext): boolean {
   const card = state.cards[id];
   if (!card) return false;
-  const seat = listener.controller ?? state.firstPlayer;
+  const seat = answeringController(listener, ctx) ?? state.firstPlayer;
   if (spec.type === "enemy") {
     if (spec.engaged === "you" && !(card.zone === "engaged" && card.controller === seat)) return false;
     if (spec.engaged === "other" && !(card.zone === "engaged" && card.controller !== seat)) return false;
@@ -73,7 +82,7 @@ export function hears(state: ScenarioState, effect: Effect, listener: CardInstan
   // An event stamped with the clock is heard only by cards that were in play when it occurred (rr.forced: a Forced effect must be in play and active at the time its trigger occurs).
   if (event.at != null && listener.enteredPlay > event.at) return false;
   if (effect.eventSeat) {
-    const mine = listener.controller ?? state.firstPlayer;
+    const mine = answeringController(listener, ctx) ?? state.firstPlayer;
     if (event.seat == null || (effect.eventSeat === "you") !== (event.seat === mine)) return false;
   }
   const about = aboutCard(event);

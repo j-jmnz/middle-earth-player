@@ -7,7 +7,8 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
-import { fallenBase, FALLEN_SUFFIX } from "../../core/printed.ts";
+import { fallenBase, FALLEN_SUFFIX, printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { raiseFor } from "../../interpret/verbs.ts";
@@ -36,9 +37,11 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
       return fallIntoEvil(state, focus.sourceId, steps);
     case "ReturnFallenHero":
       return returnFallen(state);
-    case "RemoveFromGame":
-      if (instruction.card) return removeCard(state, refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)), steps);
-      return instruction.self ? (focus.sourceId ? moveCard(state, focus.sourceId, { zone: "removed" }) : state) : removeFromGame(state, lastPicked(state));
+    case "RemoveFromGame": {
+      const id = instruction.card ? refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)) : instruction.self ? focus.sourceId : lastPicked(state);
+      const removed = instruction.card ? removeCard(state, id, steps) : instruction.self ? (focus.sourceId ? moveCard(state, focus.sourceId, { zone: "removed" }) : state) : removeFromGame(state, lastPicked(state));
+      return allyRemoved(state, removed, id, ctx);
+    }
     case "LockFirstPlayer":
       return focus.sourceId ? addTableModifier(state, { stat: "firstPlayerLocked", amount: 1, until: "endOfGame" }, focus) : state;
     case "TakeRingBearer":
@@ -144,6 +147,14 @@ function removeCard(state: ScenarioState, id: string | null, steps: EngineStep[]
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.zone === "removed") return state;
   return eliminateEmpties(moveCard(state, id, { zone: "removed" }), steps);
+}
+
+// An ally in play removed from the game leaves play, and the cards that hear an ally leave play hear it (Valiant Sacrifice, 01024:A:1, after Radagast's
+// Request removes the ally that healed Wilyador, 02061:B:2; rr.in-play-and-out-of-play).
+function allyRemoved(before: ScenarioState, after: ScenarioState, id: string | null, ctx: ReduceContext): ScenarioState {
+  const card = id ? before.cards[id] : undefined;
+  if (!id || !card || card.zone !== "play" || after.cards[id]?.zone !== "removed" || printedOf(ctx.cards, card.code).type !== "ally") return after;
+  return queueEvent(after, { trigger: "allyLeftPlay", seat: card.controller, subject: id });
 }
 
 function removeFromGame(state: ScenarioState, id: string): ScenarioState {

@@ -19,7 +19,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { attachHeroBoons } from "./rescue.ts";
-import { captureCard } from "./pile.ts";
+import { captureAlly, captureCard } from "./pile.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -31,7 +31,7 @@ export function capturePicked(state: ScenarioState, focus: Focus): ScenarioState
   const card = ally ? state.cards[ally] : undefined;
   // The ally is the acting player's own: a player with no ally picked none, and the picks of the player before are not theirs to capture.
   if (!host || !ally || host === ally || !card || card.zone !== "play" || card.controller !== focus.seat || !inPlay(state.cards[host]?.zone ?? "removed")) return state;
-  return captureCard(state, ally, host);
+  return captureAlly(state, ally, host);
 }
 
 // CaptureAttachments (a Shadow effect): each attachment on the defending character goes underneath the attacking enemy, an encounter attachment too (the card says "each attachment"; it is rescued to the encounter discard pile).

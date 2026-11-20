@@ -74,6 +74,9 @@ export const triggerSchema = z.enum([
   "beginningOfPhase",
   // About a hero: a card effect added resources to its pool.
   "resourcesAdded",
+  // About a hero: a card effect moved resources to its pool from another card. The hero gains them, but none are added: the total does not grow
+  // (Heir of Mardil hears it, Harbor Master does not).
+  "resourcesMoved",
   // About an enemy: damage destroyed it (any player's attack or effect).
   "enemyDestroyed",
   // About a character: damage was just dealt to it, before it can be destroyed by it. The window for "cancel X damage just

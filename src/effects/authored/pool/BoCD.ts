@@ -7,9 +7,10 @@ export const RECORDS: readonly Effect[] = [
   {"id":"10115:constant:2","cardCode":"10115","lines":["10115:A:2"],"timing":"constant","condition":{"kind":"count","pick":{"type":"enemy","control":"any","engaged":"you"},"min":2},"instructions":[{"verb":"ModifyStat","stat":"extraResource","amount":1,"until":"whileSourceInPlay"}]},
   // 10116 Guardian of Arnor (line 1 is the Sentinel keyword)
   {"id":"10116:constant:1","cardCode":"10116","lines":["10116:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":{"count":{"type":"enemy","control":"any","engaged":"you"}},"until":"whileSourceInPlay"}]},
-  // 10118 Beechbone. X is read after the cost's damage is on him.
+  // 10118 Beechbone. X is read after the cost's damage is on him. A Beechbone that cost destroyed has left play with no damage on him: X is 0, and the
+  // enemy takes none (docs/brief.md, Core round).
   {"id":"10118:constant:1","cardCode":"10118","lines":["10118:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveRestricted","amount":1,"until":"whileSourceInPlay"},{"verb":"EntersPlayExhausted"}]},
-  {"id":"10118:response:1","cardCode":"10118","lines":["10118:A:2"],"timing":"response","trigger":"declaredAttacker","cost":{"kind":"damageSelf","amount":1},"instructions":[{"verb":"DamageCard","amount":{"stat":"damage","of":"self"},"target":"other"}]},
+  {"id":"10118:response:1","cardCode":"10118","lines":["10118:A:2"],"timing":"response","trigger":"declaredAttacker","cost":{"kind":"damageSelf","amount":1},"instructions":[{"verb":"DamageCard","amount":{"stat":"damage","of":"self"},"target":"other","when":{"kind":"matches","card":"self","inPlay":true}}]},
   // 10119 Hold Your Ground!
   {"id":"10119:action:1","cardCode":"10119","lines":["10119:A:1"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","keyword":"sentinel","state":"exhausted"}},{"verb":"Ready","target":"picked"}]},
   {"id":"10119:action:2","cardCode":"10119","lines":["10119:A:2"],"timing":"action","condition":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"Each","pick":{"type":"character","control":"any","keyword":"sentinel"},"instructions":[{"verb":"Ready","target":"picked"}]}]},
