@@ -191,6 +191,8 @@ const FLAGS = [
   "shipFightable",
   // On an enemy: for each point of excess combat damage it deals, the defending player deals 1 damage to a Ship objective they control (40019:A:3; families/defense/excess.ts).
   "excessDamagesShip",
+  // On an enemy in the staging area that is engaged with every player (engagedWithAll): each player declares attackers against it in the combat phase with their own characters, and ranged characters of the others may join (Massive, 40013:A:1; rr.ranged).
+  "attackableEngagedWithAll",
 ] as const;
 
 export const manifest = { name: "sea", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

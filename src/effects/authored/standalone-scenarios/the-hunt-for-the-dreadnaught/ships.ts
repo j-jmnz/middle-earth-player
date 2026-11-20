@@ -83,6 +83,7 @@ export const SHIPS: readonly (Effect | Copy)[] = [
     instructions: [
       { verb: "ModifyStat", stat: "archery", amount: STARTED, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "engagedWithAll", amount: 1, until: "whileSourceInPlay", target: "self" },
+      { verb: "ModifyStat", stat: "attackableEngagedWithAll", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "leavesStagingWhenDefeated", amount: 1, until: "whileSourceInPlay", target: "self" },
@@ -106,6 +107,7 @@ export const SHIPS: readonly (Effect | Copy)[] = [
     timing: "constant",
     instructions: [
       { verb: "ModifyStat", stat: "engagedWithAll", amount: 1, until: "whileSourceInPlay", target: "self" },
+      { verb: "ModifyStat", stat: "attackableEngagedWithAll", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "leavesStagingWhenDefeated", amount: 1, until: "whileSourceInPlay", target: "self" },

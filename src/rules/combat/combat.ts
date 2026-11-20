@@ -272,6 +272,11 @@ export function canAttack(
     if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
     return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
+  // The Dreadnaught (Massive): in the staging area but engaged with every player, so each player attacks it with their own characters, and ranged characters of the others join (rr.ranged).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "attackableEngagedWithAll")) {
+    if (flagged(state, attackerId, "cannotAttack") || state.phase !== "Combat") return false;
+    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
+  }
   // An enemy in the staging area that is considered engaged with each player whose threat is 1 or greater (Durin's Bane, 04150:A:2): such a player declares attackers against it, with their own characters and ranged characters of the others (rr.ranged).
   if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithThreatening")) {
     if (flagged(state, attackerId, "cannotAttack") || !engagedWithThreatening(state, enemyId, seat)) return false;

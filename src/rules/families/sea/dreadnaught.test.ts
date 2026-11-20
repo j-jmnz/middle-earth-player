@@ -2,6 +2,7 @@
 // The verbs and flags The Hunt for the Dreadnaught added to the sea family, each on a table of the scenario's real cards.
 import { describe, expect, it } from "vitest";
 
+import { legalAttackEnemies } from "../../combat/combat.ts";
 import { flagged } from "../../core/state.ts";
 import { codesIn, fightEnemy, idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { eliminateWithoutShip } from "./dreadnaught.ts";
@@ -24,6 +25,18 @@ describe("40013:A:1 the Dreadnaught's constants", () => {
       expect(mine.find((modifier) => modifier.stat === "damageCap")?.amount).toBe(5 * seats);
       expect(mine.find((modifier) => modifier.stat === "hitPoints")?.amount).toBe(15 * seats);
     }
+  });
+});
+
+describe("40013:A:1 attackableEngagedWithAll", () => {
+  it("40013:A:1 every player declares attackers against the Dreadnaught in the staging area, in the combat phase only, and an engaged unique Corsair bars that player's characters", () => {
+    const made = table({ seats: 2, phase: "Combat", staging: ["40013"], engaged: [{ code: "40014", seat: 1 }] });
+    const id = idOf(made.state, "40013");
+    expect(legalAttackEnemies(made.state, 0, made.hero, made.cards)).toContain(id);
+    // The second seat is engaged with Captain of the Haven (40014:A:2): its characters cannot attack the Dreadnaught.
+    expect(legalAttackEnemies(made.state, 1, made.seat1Hero ?? "", made.cards)).not.toContain(id);
+    const quest = table({ seats: 1, phase: "Quest", staging: ["40013"] });
+    expect(legalAttackEnemies(quest.state, 0, quest.hero, quest.cards)).not.toContain(idOf(quest.state, "40013"));
   });
 });
 
