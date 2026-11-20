@@ -22,5 +22,5 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"50828:constant:1","cardCode":"50828","lines":["50828:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"51015:constant:1","cardCode":"51015","lines":["51015:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]},
   {"id":"51019:constant:1","cardCode":"51019","lines":["51019:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
-  {"id":"51034:constant:1","cardCode":"51034","lines":["51034:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective palyer card"}]},
+  {"id":"51034:constant:1","cardCode":"51034","lines":["51034:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]},
 ];

@@ -4999,6 +4999,998 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "51001",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Radagast's-Request-1A.jpg",
+        "sha256": "4cd49d4cb68c5ef19976cf5c5b66de653fcda14ddd36307af4f928b0c03bab9a"
+      },
+      "lines": [
+        "Setup: Add Rhosgobel to the staging area. The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51001",
+      "side": "B",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Radagast's-Request-1B.jpg",
+        "sha256": "832b8c9c72740cc76488822402f8bdc6e6c87ef6ef641889e5b7c506963c31cc"
+      },
+      "lines": [
+        "Forced: When Rhosgobel is explored, flip it over and add Rider of Mirkwood to the staging area.",
+        "This stage cannot be defeated while Rhosgobel is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51003",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-A-Fork-in-the-Road-2A.jpg",
+        "sha256": "a49ef120dcd2fd7497b83e13ca380084991b3c0d7628f94179347a7bb924cfeb"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51003",
+      "side": "B",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-A-Fork-in-the-Road-2B.jpg",
+        "sha256": "6fd2be52a15f9042c5bd03c86701f70462ceeafdb6aa3b569a3f4d71adac0016"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for a location with cost 2 or less, adds it to the staging area, and places a resource on it. Shuffle the encounter deck.",
+        "The location with a resource on it is immune to player card effects and the players cannot travel to it while this stage has any quest points remaining. This stage cannot be defeated while the location with a resource on it is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51004",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-Carried-Away-2A.jpg",
+        "sha256": "a49ef120dcd2fd7497b83e13ca380084991b3c0d7628f94179347a7bb924cfeb"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51004",
+      "side": "B",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-Carried-Away-2B.jpg",
+        "sha256": "2cb39821e24f8c3a3b807e99ffd376191df1fc402867ded524ee0ac4d7506866"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses an ally controlled by each player and places them faceup under this stage as guarded objectives with blank text boxes.",
+        "Players cannot play or put into play any ally that shares a title with an ally guarded by this stage. When this stage is defeated, return each guarded ally to its owner's hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51005",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-A-New-Terror-Abroad-2A.jpg",
+        "sha256": "a49ef120dcd2fd7497b83e13ca380084991b3c0d7628f94179347a7bb924cfeb"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51005",
+      "side": "B",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Mirkwood-Forest-A-New-Terror-Abroad-2B.jpg",
+        "sha256": "d468212052e893da0cd74ef6c4901d7065558a59230c7a28587393adf9a8a85d"
+      },
+      "lines": [
+        "This stage gets +5 quest points per player.",
+        "Forced: At the beginning of the quest phase, Rider of Mirkwood makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51007",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-The-Tower-of-Sorcery-3A.jpg",
+        "sha256": "3eeb1662e0d5b210b2bc9c002dd03fb737af3a69e80d0737c38768eaf13ce076"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51007",
+      "side": "B",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-The-Tower-of-Sorcery-3B.jpg",
+        "sha256": "4a92b3ccab8ae01143efd7c22ff2f1ccdfee9c90299e2daaced16d45349a2089"
+      },
+      "lines": [
+        "Forced: After the players have committed characters to the quest, discard cards from the top of the encounter deck until a treachery is discarded. Reveal that treachery.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51008",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-Dungeons-of-the-Necromancer-3A.jpg",
+        "sha256": "3eeb1662e0d5b210b2bc9c002dd03fb737af3a69e80d0737c38768eaf13ce076"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51008",
+      "side": "B",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-Dungeons-of-the-Necromancer-3B.jpg",
+        "sha256": "ff8ac0de22b1af430ff222b1664bc5e287b1a909cdd09b5f539795be32f5664b"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck. Each player discards cards from the top of the encounter deck until he discards an enemy, adds that enemy to the staging area, and attaches a hero he controls to it as a guarded objective (discard all tokens from the chosen hero).",
+        "If there is an unguarded hero in the staging area, return it to its owner's control, exhausted. This stage cannot be defeated while there is a guarded objective in play. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51009",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-Return-to-Rhosgobel-3A.jpg",
+        "sha256": "3eeb1662e0d5b210b2bc9c002dd03fb737af3a69e80d0737c38768eaf13ce076"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51009",
+      "side": "B",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Tower-Return-to-Rhosgobel-3B.jpg",
+        "sha256": "733e7b36d8011d2d6b02d318575f00b69e2505930013dd385d7dbcecf79da6ac"
+      },
+      "lines": [
+        "Rider of Mirkwood's engagement cost is considered to be 0.",
+        "The number of damage tokens on Rider of Mirkwood cannot exceed the number of progress tokens on this stage.",
+        "Players cannot defeat this stage while Rider of Mirkwood is in play. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51010",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Rhosgobel.jpg",
+        "sha256": "f887859e717f78d7a967a8645540b79d9187e2dd6c83d19be35d6e81ea22d242"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Response: After the players travel to Rhosgobel, add 1 resource to each hero's pool and each player draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51011",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Rider-of-Mirkwood.jpg",
+        "sha256": "536f0f3872e7f636d90fa74f23b62b16631ad7b52e07409e2f884da3302aaca6"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "X is 1 more than the stage number of the main quest.",
+        "Cannot leave the staging area unless the players are at stage 3B."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51012",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Nazgûl-of-Dol-Guldur.jpg",
+        "sha256": "4bc3cc801440206595788c9e42f18fc1bfe3881ba5e0637a8a458050a388267f"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments or take non-combat damage.",
+        "Forced: After Nazgûl of Dol Guldur attacks you, either return it to the staging area or raise your threat by 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51013",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Necromancer's-Pass.jpg",
+        "sha256": "d507dc25404c9f6363c2c6bf2aaf27103e7b1bc9da7a306e33723c95525f4fb3"
+      },
+      "lines": [
+        "When Revealed: The first player chooses a card in his hand. The opposing team looks at the first player's hand and chooses a different card to place faceup under Necromancer's Pass as a guarded objective. While Necromancer's Pass is guarding a card, copies of that card cannot be played. When Necromancer's Pass is explored, return the guarded card to its owner's hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51014",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Pursued-by-Shadow.jpg",
+        "sha256": "8cec6ace97ac995dd43e136d191f99db61f49e23cbfbab5a638df13e3fce129a"
+      },
+      "lines": [
+        "When Revealed: The highest Attack enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, Pursued by Shadow gains surge.",
+        "Shadow: If attacking enemy is unique, it makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51015",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Bane-of-Amon-Lanc.jpg",
+        "sha256": "53cc2d0238d590ec38279ab3ce5280f22b805258e9b98dc92d67988c91aaec02"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments.",
+        "Forced: After Bane of Amon Lanc attacks and destroys an ally, the defending player discards 1 card from his hand for each excess point of damage dealt by this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51016",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Oak-wood-Grove.jpg",
+        "sha256": "958c3f4ca141b9a59256181da9eb606a7ae64aef9597483f598fab4365c78ebe"
+      },
+      "lines": [
+        "While Oak-wood Grove is in the staging area, progress cannot be placed on other locations in the staging area.",
+        "Travel: Each player exhausts a character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51017",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Smoking-Blood.jpg",
+        "sha256": "c725e9bc67bf4ceca94d0f11821f46e980682e59092449c90995cc5c6203f771"
+      },
+      "lines": [
+        "When Revealed: The opposing team attaches Smoking Blood to a Troll enemy. If they cannot, Smoking Blood gains surge. (Counts as a Condition attachment with the text: 'Limit 1 per enemy. Forced: When attached enemy is dealt enough damage to destroy it, cancel the damage and discard Smoking Blood instead.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51018",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Forest-Flies.jpg",
+        "sha256": "6e752bc53917d52b5f7e51c018bee43f451a229e0775a45de5603388e21a9a3e"
+      },
+      "lines": [
+        "Forced: When Forest Flies attacks, raise the defending player's threat by 1.",
+        "Shadow: Raise your threat by 1 for each enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51019",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Twilight-Hall.jpg",
+        "sha256": "8bf11ab1133b96658b259546a5dad113cf8edc0cdceb3365e31c0385e03378ca"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Twilight Hall gets +1 Threat for each character controlled by the first player.",
+        "Forced: When Twilight Hall is explored, reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51020",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Swarming-Mosquitoes.jpg",
+        "sha256": "3f5334f6b4b1782ad2787578e01e2685e975c953eebd33a2aa3dce1defb1a704"
+      },
+      "lines": [
+        "When Revealed: Each player deals X damage to a character he controls, where X is 1 more than the stage number of the main quest.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has an attachment)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51021",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Goblin-Sniper.jpg",
+        "sha256": "80945f773ef1fbe43ea01f9e0dc6ec81ec241189d35317e3a1fb679ae6d700b7"
+      },
+      "lines": [
+        "Cannot be optionally engaged.",
+        "Forced: At the end of the combat phase, each player deals 1 damage to a hero he controls.",
+        "Shadow: Defending character does not count its Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51022",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Pine-Slopes.jpg",
+        "sha256": "055462eaac59b2e718161cdf22da34d640096232628eef193297a8b94cf3d062"
+      },
+      "lines": [
+        "When Revealed: Each Pine Slopes gets +2 Threat until the end of the phase.",
+        "Travel: Raise your threat by 1 for each Pine Slopes in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51023",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Under-the-Shadow.jpg",
+        "sha256": "eae0838dacbebd3483accefd0c29c1fe1105bbc20de51bcadda7f226cd6bf0ea"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Attach to the main quest. (Counts as a condition attachment with the text: 'Each player cannot play more than 1 card each phase.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51024",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Necromancer's-Warg.jpg",
+        "sha256": "bc40675fa003aef7b51413652f8a7c84a8b716c809c99f00af29d84a022bdd7e"
+      },
+      "lines": [
+        "Forced: After Necromancer's Warg engages you, deal 1 damage to a character you control.",
+        "Shadow: If you are engaged with an Orc enemy and a Warg enemy, discard a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51025",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Dol-Guldur-Beastmaster.jpg",
+        "sha256": "699fff0471bf4319cb10667470bb4c7c25d66d7f65e316ed8e97fc5ec842ec70"
+      },
+      "lines": [
+        "Forced: After Dol Guldur Beastmaster engages you, the opposing team searches the encounter deck and discard pile for a Necromancer's Warg and puts it into play engaged with you. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51026",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Watched-Path.jpg",
+        "sha256": "67f961c380a8be3214a444cce71308640d68d46128a40890572c0f65d804075f"
+      },
+      "lines": [
+        "Forced: When Watched Path is explored, discard the top card of the encounter deck. If the discarded card is an enemy, add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51027",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Evil-Storm.jpg",
+        "sha256": "089ffb04952f51c2a36950b0ef751da0e54fd396e1ef565a68723ea5a2f28942"
+      },
+      "lines": [
+        "When Revealed: Each player deals 1 damage to a questing character he controls. Until the end of the phase, each damaged character gets -1 Willpower and cannot be healed.",
+        "Shadow: Deal 1 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51028",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Spider-of-Dol-Guldur.jpg",
+        "sha256": "21083b203d929d135f15125d60d093d1ee5cc38f76acae485004887affa5086b"
+      },
+      "lines": [
+        "Forced: After Spider of Dol Guldur attacks and destroys an ally, return it to the staging area.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51029",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Patch-of-Midnight.jpg",
+        "sha256": "5d7eb59d31a18cc368d914dfeab5a3b1adec1236db5f64eeaa2e1bd5847138e0"
+      },
+      "lines": [
+        "Forced: At the beginning of the staging step, discard Patch of Midnight and reveal the top card of the encounter deck.",
+        "Shadow: If this attack destroys a character, reveal the top card of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51030",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Eyes-in-the-Dark.jpg",
+        "sha256": "175c28642f7fca1768d08f78eff758487707706550f50920c654ce0bcf227b2c"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses a questing character controlled by each player. Ready each chosen character and remove them from the quest.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51031",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Eastern-Crows.jpg",
+        "sha256": "14ac01dc863a2a5e97de5e1a0526dd5ab5a897e942829c26762248fe80de399a"
+      },
+      "lines": [
+        "While there is a copy of Eastern Crows in the discard pile, Eastern Crows gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51032",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Sorcerer's-Tower.jpg",
+        "sha256": "dd40b660e208383bb762cf459b8d710c7bf1c686b5b44d89c056d6c41758ebdc"
+      },
+      "lines": [
+        "While The Sorcerer's Tower is in the staging area, each treachery gains Doomed 1.",
+        "Forced: When the Sorcerer's Tower is explored, shuffle the encounter discard pile into the encounter deck and discard cards from the top until a treachery is discarded. Resolve the 'when revealed' effects on that treachery."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51033",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Power-Sevenfold.jpg",
+        "sha256": "f0ef32c3c238625f83bf677674c0061eea356ea88644e9f568ac5ff680361132"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses any number of non-unique encounter cards in play. Discard the chosen cards and reveal an equal number of cards from the top of the encounter deck.",
+        "Shadow: Either reveal an encounter card, or treat this attack as undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51034",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Hill-Troll.jpg",
+        "sha256": "0ca840e704fb5c2f1254cf8b01dfe8bbf06a2b07b26627d0a3ed3ee0a82531bd"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51035",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Troll-Cave.jpg",
+        "sha256": "b84d597ea2b79ee5d1d8aa6ceb32d17e2dcc3fe027f95d4e306a8dd658d2ed03"
+      },
+      "lines": [
+        "Response: After the players travel to Troll Cave, each player draws 1 card.",
+        "Travel: The opposing team searches the top 5 cards of the encounter deck for a Hill Troll and adds it to the staging area, if able. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51036",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Befouled-Equipment.jpg",
+        "sha256": "819b123ab87cd654942d508fd0b60d8dd34643b93095187284a00570c1f5e6ab"
+      },
+      "lines": [
+        "When Revealed: Attach to the character with the most attachments without Befouled Equipment attached. (Counts as a Condition attachment with the text: 'Forced: At the end of the round, discard an attachment from attached character. Befouled Equipment cannot be discarded this way unless it is the only attachment on attached character.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51037",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Hunting-Warg.jpg",
+        "sha256": "c05e1ce2ab914ee7754997da367f99cf5fde7b0930ebfe57101619ea8b1dd5ac"
+      },
+      "lines": [
+        "Forced: After Hunting Warg engages a player, it makes an immediate attack. If Hunting Warg is dealt a shadow card with no shadow effect for this attack, it gets +2 Attack until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51038",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Hunter's-Lookout.jpg",
+        "sha256": "a8846cd122e0783989734fcc654ce5d0aafbccc8528e47076555614a53d623ae"
+      },
+      "lines": [
+        "While Hunter's Lookout is in the staging area, it gains: 'Forced: At the end of the round, raise each player's threat by 1 for each enemy in the staging area.'",
+        "Travel: The highest Attack enemy in the staging area makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51039",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Restless-Hunters.jpg",
+        "sha256": "43eec168ff50dfc198c8fdaea9ab0ce96341ca2e0b5627caf37eca98ce5119ac"
+      },
+      "lines": [
+        "When Revealed: Return each engaged enemy to the staging area. If no enemies were returned this way, Restless Hunters gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51040",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Dol-Guldur-Orcs.jpg",
+        "sha256": "1f2cbafa4c3c43a498ebd6d4a093235d1f957e053a313959f2bf778a5da32023"
+      },
+      "lines": [
+        "When Revealed: Each player deals 1 damage to a character he controls.",
+        "Shadow: Defending character gets -1 Defense for each damage on it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51041",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Shadow-Road.jpg",
+        "sha256": "35fbbf3056c5e12ded1847d5fbe7c50d20e7161a7e58ceaeca990a094ba072c3"
+      },
+      "lines": [
+        "While The Shadow Road is in the staging area, it gains: 'Forced: After a player optionally engages an enemy, he deals 1 damage to a character he controls.'",
+        "Travel: Each player deals 1 damage to a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51042",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Necromancer's-Reach.jpg",
+        "sha256": "619d217d88ced8c145c44e3962ed1c86991938997c79a0a4fef762c1f3ad7682"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each exhausted character.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51043",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Ravenous-Spider.jpg",
+        "sha256": "5fd8bbcdb6cd664b0d7cc761c387a082b8ca609873909ae847e986453f11679d"
+      },
+      "lines": [
+        "Forced: After Ravenous Spider attacks and destroys a character, the defending player exhausts a character he controls.",
+        "Shadow: If this attack destroys a character, exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51044",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Forest-Gate.jpg",
+        "sha256": "2f3426406a0dc03bca1a07a9cfe3920d3b82024bdb29dcf08f2f86720ba1ce14"
+      },
+      "lines": [
+        "Forest Gate gets +1 Threat for each enemy in the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack for each enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51045",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Nightfall.jpg",
+        "sha256": "96c6dfd26e44fef84fc7b53ad91908719bd66cea053fcb337c01c50556c5f431"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Attach to the first player's threat dial. (Counts as a Condition attachment with the text: 'Forced: Raise your threat by an additional point during the refresh phase.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51046",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Venomous-Spider.jpg",
+        "sha256": "aeed90c40614ced1a783e850fe530f234fafbc0b28310092a19a02c28acef3f5"
+      },
+      "lines": [
+        "Forced: After Venomous Spider attacks and damages a character, that character cannot ready until the end of the round.",
+        "Shadow: Defending character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51047",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Pitch-dark-Thicket.jpg",
+        "sha256": "0cafb8741f5e7aaa99cad483147fbae5ce1fd40881315c4ba0cc84aefb726edb"
+      },
+      "lines": [
+        "While Pitch-dark Thicket is in the staging area, enemies in the staging area cannot take damage.",
+        "Shadow: If attacking enemy was engaged this round, it cannot take damage until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51048",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Fastness-of-Mirkwood.jpg",
+        "sha256": "dea89da50052c453ef67e9a930f9563f76a407505311572c95385fbc31427850"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for one different 0 cost location per player (limit 2) and adds them to the staging area. Shuffle the encounter deck.",
+        "Shadow: If this attack destroys a character, return the active location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51049",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Dark-Bats.jpg",
+        "sha256": "d61b1e4b7e909b363b4645599ca4cb2e99f0741f55c83f7b10231bdc1f974ab2"
+      },
+      "lines": [
+        "Forced: After Dark Bats attacks and damages a character, reveal the top card of the encounter deck. Then, discard Dark Bats.",
+        "Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51050",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Forest-Stream.jpg",
+        "sha256": "01b0147f9758efc870a51622f77a6fb16e02c94e6fa15730e1d87f7ec4c76a11"
+      },
+      "lines": [
+        "While Forest Stream is in the staging area, it gains: 'Forced: At the end of the round, remove 2 progress from the main quest.'",
+        "Travel: Raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51051",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Treacherous-Fog.jpg",
+        "sha256": "a65cb215efce28ef1cc2e1fc60edd584849d135257856f4b652c224cdb2500fa"
+      },
+      "lines": [
+        "When Revealed: Until the end of the phase, each enemy and location in the staging area gets +2 Threat.",
+        "Shadow: Each enemy engaged with you gets +1 Attack and +1 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51052",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Howling-Warg.jpg",
+        "sha256": "f8502f6cafd03aefc306dbca36ca6a652239aeec72fe3d8875386989fec7cf53"
+      },
+      "lines": [
+        "When Revealed: Discard the top card of the encounter deck. If that card has the Warg trait, reveal it and add it to the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Warg trait)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51053",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/The-Wargs'-Glade.jpg",
+        "sha256": "5e8d79c347935fa7f8e22190cbdc8af67fe7518c5769a5a2b611c325bfd53e20"
+      },
+      "lines": [
+        "While The Wargs' Glade is in the staging area, the first Warg enemy revealed each round gains surge.",
+        "Forced: When The Wargs' Glade is explored, the opposing team searches the encounter deck and discard pile for a non-unique Warg enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51054",
+      "side": "A",
+      "printing": "TWQ",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wizard's-Quest/Weighed-Down.jpg",
+        "sha256": "30a2ee91ed2c05e17ed5c735d579afbdc59f232309bb961b10477fe247f4159c"
+      },
+      "lines": [
+        "When Revealed: Exhaust each character with an attachment. If no character is exhausted this way, Weighed Down gains surge.",
+        "Shadow: Discard an attachment from the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }
