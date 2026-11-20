@@ -7082,7 +7082,7 @@
         "sha256": "0187e7b41842d5cbbbed66d341cacf517daf6e548cea9d377fa4a5856a8f99fa"
       },
       "lines": [
-        "When Revealed: The opposing team chooses an attachment controlled by each player and places them faceup under this stage as guarded objectives with blank text boxes. Players cannot play or put into play any attachment that shares a title with an attachment guarded by this stage. When this stage is defeated, return each guarded attachment to its owner's hand."
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
       ],
       "inert": [],
       "misprints": [],
@@ -7098,7 +7098,7 @@
         "sha256": "e5fb8cb330bd3491770c6a20b4901a3ef2e134d3f019c3ee5879aad9a0bfee22"
       },
       "lines": [
-        "When Revealed: The opposing team searches the encounter deck and discard pile for one different 0 cost location per player and adds them to the staging area. Shuffle the encounter deck."
+        "When Revealed: The opposing team chooses an attachment controlled by each player and places them faceup under this stage as guarded objectives with blank text boxes. Players cannot play or put into play any attachment that shares a title with an attachment guarded by this stage. When this stage is defeated, return each guarded attachment to its owner's hand."
       ],
       "inert": [],
       "misprints": [],

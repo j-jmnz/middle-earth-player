@@ -71,6 +71,7 @@ import { annuminasFixtures } from "./standalone-scenarios/the-siege-of-annuminas
 import { guldurFixtures } from "./standalone-scenarios/attack-on-dol-guldur.ts";
 import { questFixtures } from "./standalone-scenarios/the-wizards-quest.ts";
 import { woodlandFixtures } from "./standalone-scenarios/the-woodland-realm.ts";
+import { minesFixtures } from "./standalone-scenarios/the-mines-of-moria.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -151,4 +152,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "attack-on-dol-guldur": () => guldurFixtures(),
   "the-wizards-quest": () => questFixtures(),
   "the-woodland-realm": () => woodlandFixtures(),
+  "the-mines-of-moria": () => minesFixtures(),
 };

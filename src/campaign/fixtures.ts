@@ -79,6 +79,7 @@ import annuminasFixtures from "./fixtures/the-siege-of-annuminas.json";
 import guldurFixtures from "./fixtures/attack-on-dol-guldur.json";
 import questFixtures from "./fixtures/the-wizards-quest.json";
 import woodlandFixtures from "./fixtures/the-woodland-realm.json";
+import minesFixtures from "./fixtures/the-mines-of-moria.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -176,6 +177,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "attack-on-dol-guldur": guldurFixtures,
   "the-wizards-quest": questFixtures,
   "the-woodland-realm": woodlandFixtures,
+  "the-mines-of-moria": minesFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
