@@ -18,6 +18,7 @@ const BEAST = "50916";
 const ARCHER = "50917";
 const MARAUDER = "50918";
 const WARG = "50919";
+const ADVANCING = { phase: "Quest", deck: ["f0"] } as const;
 const END_OF_ROUND = announce("endOfRound", undefined, { seat: null, phase: "End of round" });
 
 // The four stage 3s: the quest card, the Lieutenant it brings, the Lieutenant of another stage that is in play when it is revealed.
@@ -60,6 +61,69 @@ const ROWS: readonly Row[] = [
   // 50907 Dol Guldur: the Siege values of what is destroyed or explored this round come off the city strength at the end of the round, at stage 3.
   { line: "50907:A:1", name: "an enemy destroyed in the staging area adds its Siege value (4) and the tally comes off at the end of the round", layout: { threat: [0, 0], stage: "50906", staging: [DG(10), HOST], deck: PLACES }, act: [announce("enemyDestroyed", HOST, { seat: 0 }), END_OF_ROUND], expect: [resourcesOn("50907", 6)] },
   { line: "50907:A:1", name: "an engaged enemy and an explored location count too", layout: { threat: [0, 0], stage: "50906", staging: [DG(10), "50920"], engaged: [OLOG], deck: PLACES }, act: [announce("enemyDestroyed", OLOG, { seat: 0 }), announce("locationExplored", "50920", { seat: 0 }), END_OF_ROUND], expect: [resourcesOn("50907", 5)] },
+  // 50909 Host of Lórien.
+  { line: "50909:A:3", name: "it does not exhaust to quest", layout: { stage: "50903", play: [HOST_L] }, act: [], expect: [flag(HOST_L, "noExhaustQuest")] },
+  { line: "50909:A:4", name: "when it leaves play it is removed from the game", layout: { stage: "50903", play: [HOST_L] }, act: announce("leftPlay", HOST_L), expect: [zone(HOST_L, "removed")] },
+  // 50910 to 50913 the Lieutenants.
+  { line: "50910:A:2", name: "Forced: when it attacks, a random card is discarded from the player's hand and its printed cost is added to the Attack", layout: { stage: "50903", engaged: [BANE], hand: ["ally"] }, act: attack(BANE, { undefended: true }), expect: [handCount(0), zone("ally", "discard")] },
+  { line: "50911:A:2", name: "Forced: when it attacks, the top card of the player's deck is discarded and each copy in play is discarded too", layout: { stage: "50903", engaged: [SORCERER], play: ["ally"], deckOf: ["ally", "filler"] }, act: attack(SORCERER, { undefended: true }), expect: [count("ally", "play", 0)] },
+  { line: "50912:A:2", name: "Forced: when it attacks, cards are discarded from the encounter deck to the first enemy and it engages the player", layout: { stage: "50903", engaged: [MORLUG], deck: ["f0", "place", "f3", "f0"] }, act: attack(MORLUG, { undefended: true }), expect: [count("f3", "engaged", 1), zone("place", "encounterDiscard")] },
+  { line: "50912:A:2", name: "with no enemy in the deck nothing is put into play", layout: { stage: "50903", engaged: [MORLUG], deck: ["f0", "place", "place", "place"] }, act: attack(MORLUG, { undefended: true }), expect: [count("place", "encounterDiscard", 3), count("place", "engaged", 0)] },
+  { line: "50913:A:2", name: "Forced: when it attacks, the player discards an ally he controls", layout: { stage: "50903", engaged: [DWELLER], play: ["ally"] }, act: attack(DWELLER, { undefended: true }), expect: [count("ally", "play", 0)] },
+  // 50914 Host of Dol Guldur.
+  { line: "50914:A:1", name: "Archery equal to the number of players", layout: { stage: "50903", seats: 2, staging: [HOST] }, act: [], expect: [stat(HOST, "archeryPlayers", 1)] },
+  { line: "50914:A:3", name: "it cannot have attachments", layout: { stage: "50903", staging: [HOST] }, act: [], expect: [flag(HOST, "cannotHaveAttachments")] },
+  { line: "50914:A:4", name: "Forced: at the end of the encounter phase in the staging area, 1 progress for each player comes off the main quest", layout: { stage: "50903", progress: 5, seats: 2, staging: [HOST] }, act: announce("endOfPhase", undefined, { seat: null, phase: "Encounter" }), expect: [progressOn("50903", 3)] },
+  // 50915 Mirkwood Olog-hai.
+  { line: "50915:A:1", name: "Forced: after it destroys a character, 1 progress comes off the quest for each point of excess damage", layout: { stage: "50903", progress: 6, engaged: [OLOG], play: ["ally"] }, act: [attack(OLOG), defend("ally")], expect: [progressOn("50903", 3)] },
+  { line: "50915:A:2", name: "Shadow: the defending player removes 2 progress from the quest", layout: { stage: "50903", progress: 5, engaged: [WARG] }, act: [attack(WARG, { shadow: OLOG }), answer("progress")], expect: [progressOn("50903", 3)] },
+  { line: "50915:A:2", name: "or the enemy is returned to the staging area after the attack", layout: { stage: "50903", progress: 5, engaged: [WARG] }, act: [attack(WARG, { shadow: OLOG }), answer("staging")], expect: [zone(WARG, "staging"), progressOn("50903", 5)] },
+  // 50916 Beast of Taur-nu-Fuin.
+  { line: "50916:A:1", name: "it cannot have attachments and its shadow cards cannot be canceled", layout: { stage: "50903", staging: [BEAST] }, act: [], expect: [flag(BEAST, "cannotHaveAttachments"), flag(BEAST, "shadowsUncancelable")] },
+  { line: "50916:A:2", name: "Forced: when it attacks, the first player removes 2 progress", layout: { stage: "50903", progress: 5, engaged: [BEAST], deck: ["f0", "f0", "f0", "f0"] }, act: [attack(BEAST, { undefended: true }), answer("progress")], expect: [progressOn("50903", 3)] },
+  { line: "50916:A:2", name: "or it is dealt another shadow card", layout: { stage: "50903", progress: 5, engaged: [BEAST], deck: ["f0", "f0", "f0", "f0"] }, act: [attack(BEAST, { undefended: true }), answer("shadow")], expect: [progressOn("50903", 5), deckCount(2)] },
+  // 50917 Amon Lanc Archer.
+  { line: "50917:A:2", name: "Forced: after it engages the player, 2 progress come off the quest", layout: { stage: "50903", progress: 5, staging: [ARCHER] }, act: announce("engaged", ARCHER, { seat: 0 }), expect: [progressOn("50903", 3)] },
+  { line: "50917:A:2", name: "or 2 damage is dealt to an ally he controls", layout: { stage: "50903", progress: 5, staging: [ARCHER], play: ["ally"] }, act: [announce("engaged", ARCHER, { seat: 0 }), answer("damage")], expect: [progressOn("50903", 5), damageOn("ally", 2)] },
+  { line: "50917:A:3", name: "Shadow: a ready character is exhausted", layout: { stage: "50903", engaged: [WARG] }, act: [attack(WARG, { shadow: ARCHER, undefended: true })], expect: [exhausted("dh1")] },
+  // 50918 Dol Guldur Marauder.
+  { line: "50918:A:1", name: "+1 Attack and Defense for each resource on it", layout: { stage: "50903", staging: [{ code: MARAUDER, resources: 2 }] }, act: [], expect: [stat(MARAUDER, "attack", 5), stat(MARAUDER, "defense", 3)] },
+  { line: "50918:A:2", name: "Forced: when it attacks, the first player removes 1 progress", layout: { stage: "50903", progress: 5, engaged: [MARAUDER] }, act: [attack(MARAUDER, { undefended: true }), answer("progress")], expect: [progressOn("50903", 4)] },
+  { line: "50918:A:2", name: "or places a resource on it", layout: { stage: "50903", progress: 5, engaged: [MARAUDER] }, act: [attack(MARAUDER, { undefended: true }), answer("resource")], expect: [progressOn("50903", 5), resourcesOn(MARAUDER, 1)] },
+  // 50919 Battle Warg.
+  { line: "50919:A:2", name: "Forced: after it engages the player, 1 progress comes off the quest", layout: { stage: "50903", progress: 5, staging: [WARG] }, act: announce("engaged", WARG, { seat: 0 }), expect: [progressOn("50903", 4)] },
+  { line: "50919:A:2", name: "or an attachment he controls is discarded", layout: { stage: "50903", progress: 5, staging: [WARG], attached: [{ code: "attachment", to: "dh1" }] }, act: [announce("engaged", WARG, { seat: 0 }), answer("attachment")], expect: [progressOn("50903", 5), zone("attachment", "discard")] },
+  { line: "50919:A:3", name: "Shadow: an attachment the defending player controls is discarded", layout: { stage: "50903", engaged: [MARAUDER], attached: [{ code: "attachment", to: "dh1" }] }, act: [attack(MARAUDER, { shadow: WARG, undefended: true })], expect: [zone("attachment", "discard")] },
+  // 50920 to 50923: each location gains its lines only in the staging area (the travel bar here, the stage 3 it waits for is not in play).
+  { line: "50920:A:1", name: "the players cannot travel to it unless they are at stage 3B", layout: { phase: "Travel", stage: "50902", staging: ["50920"] }, act: [], expect: offers("Travel", undefined, false) },
+  { line: "50921:A:1", name: "the players cannot travel to it unless they are at stage 3D", layout: { phase: "Travel", stage: "50902", staging: ["50921"] }, act: [], expect: offers("Travel", undefined, false) },
+  { line: "50921:A:1", name: "Forced: after the When Revealed effects of an encounter card are canceled, 1 encounter card is revealed", layout: { stage: "50902", staging: ["50921", "f0"], deck: ["place", "f0"] }, act: announce("whenRevealedCanceled"), expect: [zone("place", "staging")] },
+  { line: "50922:A:1", name: "+2 Threat for each facedown card attached to it", layout: { stage: "50902", staging: ["50922"], under: [{ code: "f0", to: "50922" }, { code: "f0", to: "50922" }] }, act: [], expect: [stat("50922", "threat", 6)] },
+  { line: "50922:A:2", name: "the players cannot travel to it unless they are at stage 3F", layout: { phase: "Travel", stage: "50902", staging: ["50922"] }, act: [], expect: offers("Travel", undefined, false) },
+  { line: "50923:A:1", name: "the players cannot travel to it unless they are at stage 3H", layout: { phase: "Travel", stage: "50902", staging: ["50923"] }, act: [], expect: offers("Travel", undefined, false) },
+  // 50924 Forest Battleground and 50925 Blackened Woods.
+  { line: "50924:A:1", name: "+1 Threat for each ally of the player with the most", layout: { stage: "50902", staging: ["50924"], play: ["ally", "ally"] }, act: [], expect: [stat("50924", "threat", 3)] },
+  { line: "50924:A:2", name: "Forced: when explored, each player searches the encounter deck for an Orc enemy and adds it to the staging area", layout: { stage: "50902", staging: ["50924"], deck: ["f0", ARCHER, "f0"] }, act: announce("locationExplored", "50924", { seat: 0 }), expect: [zone(ARCHER, "staging")] },
+  { line: "50925:A:1", name: "Forced: when explored, the top card of the encounter deck is discarded and each player raises his threat by its printed Threat", layout: { stage: "50902", staging: ["50925"], deck: ["f3", "f0"] }, act: announce("locationExplored", "50925", { seat: 0 }), expect: [zone("f3", "encounterDiscard"), threat(31)] },
+  { line: "50925:A:2", name: "Shadow: +1 Attack, and 3 progress come off the quest if the attack destroys a character", layout: { stage: "50902", progress: 5, engaged: [WARG], play: ["ally"] }, act: [attack(WARG, { shadow: "50925" }), defend("ally")], expect: [progressOn("50902", 2)] },
+  // 50926 to 50930 the treacheries.
+  { line: "50926:A:2", name: "When Revealed: the enemy in the staging area with the highest engagement cost attacks the first player", layout: { stage: "50902", staging: [HOST, ARCHER], deck: ["f0", "f0"] }, act: reveal("50926"), expect: [window("defense")] },
+  { line: "50926:A:3", name: "Shadow: an additional attack is made against the player with a new shadow card", layout: { stage: "50902", engaged: [WARG], deck: ["f0", "f0", "f0", "f0"] }, act: attack(WARG, { shadow: "50926", undefended: true }), expect: [deckCount(3)] },
+  { line: "50927:A:2", name: "When Revealed: each player searches for a Dol Guldur location and adds it to the staging area", layout: { stage: "50902", deck: ["f0", "50920", ARCHER, "f0"] }, act: [reveal("50927"), answer("location")], expect: [zone("50920", "staging")] },
+  { line: "50927:A:2", name: "or for an Orc enemy that engages him", layout: { stage: "50902", deck: ["f0", "50920", ARCHER, "f0"] }, act: [reveal("50927"), answer("enemy")], expect: [count(ARCHER, "engaged", 1)] },
+  { line: "50928:A:1", name: "When Revealed: 1 damage to each exhausted character and -1 Willpower for each damaged character", layout: { stage: "50902", ...ADVANCING }, act: [quest("success"), reveal("50928")], expect: [damageOn("dh1", 1), damageOn("dh2", 1)] },
+  { line: "50928:A:2", name: "Shadow: 1 damage to the defending character and -1 Defense for each damage on it", layout: { stage: "50902", engaged: [MARAUDER] }, act: [attack(MARAUDER, { shadow: "50928" }), defend("dh1")], expect: [damageOn("dh1", 4)] },
+  { line: "50929:A:2", name: "When Revealed: each player exhausts a character and no character readies by a player card effect this round", layout: { stage: "50902" }, act: reveal("50929"), expect: [exhausted("dh1")] },
+  { line: "50929:A:3", name: "Shadow: the defending character cannot ready this round", layout: { stage: "50902", engaged: [MARAUDER] }, act: [attack(MARAUDER, { shadow: "50929" }), defend("dh1")], expect: [flag("dh1", "cannotReady")] },
+  { line: "50930:A:1", name: "When Revealed: no more than 5 progress can be placed on the quest this round", layout: { stage: "50903", staging: [DG(10)] }, act: resolve("50930", "whenRevealed"), expect: [flag("table", "questProgressCap", true)] },
+  { line: "50930:A:1", name: "with city strength 5 or less it has surge", layout: { phase: "Quest", stage: "50903", staging: [DG(5)], deck: ["place"] }, act: reveal("50930"), expect: [zone("place", "staging")] },
+  { line: "50930:A:2", name: "Shadow: +1 Attack and Defense", layout: { stage: "50902", progress: 4, engaged: [WARG] }, act: attack(WARG, { shadow: "50930", undefended: true }), expect: [damageOn("dh1", 4)] },
+  { line: "50930:A:2", name: "+2 instead with at least 5 progress on the quest", layout: { stage: "50902", progress: 5, engaged: [WARG] }, act: attack(WARG, { shadow: "50930", undefended: true }), expect: [damageOn("dh1", 5)] },
+  // 50931 Standard Game Mode.
+  { line: "50931:A:1", name: "Setup: city strength is 5 plus 5 for each player", layout: { stage: "50901", seats: 2, staging: [DG(0)] }, act: resolve("50931", "setup"), expect: [resourcesOn("50907", 15)] },
+  { line: "50931:B:1", name: "at city strength 0 each Lieutenant loses Indestructible", layout: { modeCard: true, stage: "50903", staging: [DG(0), BANE] }, act: [], expect: [flag(BANE, "losesIndestructible")] },
+  { line: "50931:B:3", name: "Forced: at the end of the round with city strength 0 and no Lieutenant in play the players win", layout: { threat: [0, 0], modeCard: true, stage: "50906", victory: [BANE], staging: [DG(0)], deck: PLACES }, act: END_OF_ROUND, expect: [won] },
+  { line: "50931:B:2", name: "Forced: at the end of the round all progress comes off the stage and the first player advances to another stage 3", layout: { threat: [0, 0], modeCard: true, stage: "50903", progress: 3, staging: [DG(10)], deck: PLACES }, act: [END_OF_ROUND, answer("50906")], expect: [progressOn("50903", 0), zone("50906", "questStage")] },
 ];
 
 if (ROWS.length > 0) cardSpecs("attack-on-dol-guldur", ROWS);
