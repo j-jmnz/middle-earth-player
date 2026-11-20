@@ -1,5 +1,5 @@
 // Rules: rr.guarded, rr.in-play-and-out-of-play, rr.attachment-cards, rr.cannot (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/brief.md, The Wizard's Quest, readings 3 and 9).
-// A player card an encounter card holds faceup under it as a guarded objective: an ally under the stage Carried Away, a card of the first player's hand under Necromancer's Pass. It stays its owner's, out of play, and no copy of its title can be played or put into play while it lies there.
+// A player card an encounter card holds faceup under it as a guarded objective: an ally under the stage Carried Away, a card of the first player's hand under Necromancer's Pass. It stays its owner's, out of play, and no copy of its title can be played while it lies there (an effect may still put one into play).
 import type { EngineStep } from "../../core/intents.ts";
 import { releaseAttachments } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
@@ -20,7 +20,7 @@ export function holdPickedUnder(state: ScenarioState, focus: Focus, ctx: ReduceC
   return updateCard(moveCard({ ...bare, heldCards: true }, id, { zone: "under", locationId: host.id }), id, { face: "up", owner, controller: null, heldTitle: true, committed: false, damage: 0, resources: 0, progress: 0 });
 }
 
-/** Whether a card shares its title with one that lies held under an encounter card: it cannot be played or put into play. */
+/** Whether a card shares its title with one that lies held under an encounter card: it cannot be played ("copies of that card cannot be played", 51013:A:1; an effect may still put it into play). */
 export function titleHeld(state: ScenarioState, cardId: string, ctx: ReduceContext): boolean {
   const instance = state.cards[cardId];
   const held = instance ? Object.values(state.cards).filter((card) => card.heldTitle === true && card.zone === "under") : [];

@@ -34,5 +34,5 @@ export const manifest: RulesFamily = {
   verbs: ["BuildQuickDeck", "ChooseQuestStage", "SearchTopReveal", "HoldPickedUnder", "BarHeldTitles"],
   run,
   settle: { sweep: (state) => releaseHeld(state) },
-  play: (state, cardId, ctx) => titleHeld(state, cardId, ctx),
+  play: (state, cardId, ctx, how) => how?.putting !== true && titleHeld(state, cardId, ctx),
 };

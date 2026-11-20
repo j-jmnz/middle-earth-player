@@ -195,13 +195,13 @@ describe("HoldPickedUnder and the held title (51004:B:1, 51004:B:2, 51013:A:1, r
     expect(done.seats[0]?.hand).not.toContain(elf);
   });
 
-  it("bars playing and putting into play a card with the held card's title, and no other", () => {
+  it("bars playing, not putting into play, a card with the held card's title, and no other (\"copies of that card cannot be played\", 51013:A:1)", () => {
     const { state, stage, ent } = table();
     const done = manifest.run?.(inFrame(state, [ent]), { verb: "HoldPickedUnder" }, { seat: 0, sourceId: stage }, ctx, []) as ScenarioState;
     const copy = spawn(done, "ent", { zone: "hand", seat: 0 });
     const other = spawn(copy.state, "elf", { zone: "hand", seat: 0 });
     expect(manifest.play?.(other.state, copy.id, ctx, {})).toBe(true);
-    expect(manifest.play?.(other.state, copy.id, ctx, { putting: true })).toBe(true);
+    expect(manifest.play?.(other.state, copy.id, ctx, { putting: true })).toBe(false);
     expect(manifest.play?.(other.state, other.id, ctx, {})).toBe(false);
   });
 });

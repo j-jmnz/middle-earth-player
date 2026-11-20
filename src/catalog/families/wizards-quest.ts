@@ -18,7 +18,7 @@ const VERBS = [
   // Its 'when revealed' effects cannot be canceled." The card nearest the top that qualifies is the one (reading 3: no measure ranks the types); it is set aside, the deck is shuffled, and it is revealed as an encounter card, its When Revealed effects uncancelable. With none, only the shuffle (reading 5).
   z.strictObject({ verb: z.literal("SearchTopReveal"), top: z.number().int().positive(), maxCost: z.number().int().min(0), maxCostMulti: z.number().int().min(0), ...when }),
   // "places them faceup under this stage as guarded objectives" (51004:B:1) and "place faceup under Necromancer's Pass as a guarded objective" (51013:A:1): the last picked card, an ally in play or a card of a hand, lies faceup under the source card, still its owner's, out of play (docs/brief.md, The Wizard's Quest, readings 9 and 3).
-  // An ally in play loses its tokens and its attachments are discarded as it leaves play. The source gives them back (ReturnFacedownToHands) and, while they lie there, no copy of their title can be played or put into play (src/rules/families/wizards-quest/held.ts).
+  // An ally in play loses its tokens and its attachments are discarded as it leaves play. The source gives them back (ReturnFacedownToHands) and, while they lie there, no copy of their title can be played (src/rules/families/wizards-quest/held.ts).
   z.strictObject({ verb: z.literal("HoldPickedUnder"), ...when }),
   // A constant marker of the card that holds player cards under it (51004:B:2, 51013:A:1): "copies of that card cannot be played" while it lies there. The bar is the engine's (a card held by HoldPickedUnder bars its title, families/wizards-quest/held.ts), so run alone it does nothing.
   z.strictObject({ verb: z.literal("BarHeldTitles") }),
