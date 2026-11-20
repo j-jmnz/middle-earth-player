@@ -58,7 +58,7 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     name: "Standalone scenarios",
     kind: "cycle",
     released: "2011-09-21",
-    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest"],
+    products: ["The Massing at Osgiliath", "The Battle of Lake-town", "The Stone of Erech", "The Old Forest", "Fog on the Barrow-downs", "The Ruins of Belegost", "Murder at the Prancing Pony", "The Siege of Annúminas", "Attack on Dol Guldur", "The Wizard's Quest", "The Woodland Realm"],
     scenarios: [
       // DragnCards' deck Q99.01 has no Easy twin: Hall of Beorn's Easy counts equal the Normal ones, so Easy loads the same deck.
       { id: "the-massing-at-osgiliath", product: "The Massing at Osgiliath", deck: { normal: "Q99.01", easy: "Q99.01" } },
@@ -80,9 +80,11 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       { id: "attack-on-dol-guldur", product: "Attack on Dol Guldur", deck: { normal: "Q99.10", easy: "Q99.10" }, modeCard: "Standard Game Mode" },
       // DragnCards' deck Q99.11 has no Easy twin. Hall of Beorn lists the kit's quest card under one set and gives its 43 encounter cards none; they are printed with set numbers 15 to 28.
       { id: "the-wizards-quest", product: "The Wizard's Quest", deck: { normal: "Q99.11", easy: "Q99.11" }, encounterSets: ["The Wizard's Quest", "The Wizard's Quest 15", "The Wizard's Quest 16", "The Wizard's Quest 17", "The Wizard's Quest 18", "The Wizard's Quest 19", "The Wizard's Quest 20", "The Wizard's Quest 21", "The Wizard's Quest 22", "The Wizard's Quest 23", "The Wizard's Quest 24", "The Wizard's Quest 25", "The Wizard's Quest 26", "The Wizard's Quest 27", "The Wizard's Quest 28"] },
+      // DragnCards' deck Q99.12 has no Easy twin. Hall of Beorn lists the kit's quest card under one set and gives its 42 other encounter cards none; they are printed with set numbers 1 to 14.
+      { id: "the-woodland-realm", product: "The Woodland Realm", deck: { normal: "Q99.12", easy: "Q99.12" }, encounterSets: ["The Woodland Realm", "The Woodland Realm 1", "The Woodland Realm 2", "The Woodland Realm 3", "The Woodland Realm 4", "The Woodland Realm 5", "The Woodland Realm 6", "The Woodland Realm 7", "The Woodland Realm 8", "The Woodland Realm 9", "The Woodland Realm 10", "The Woodland Realm 11", "The Woodland Realm 12", "The Woodland Realm 13", "The Woodland Realm 14"] },
     ],
     // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
-    later: ["The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
+    later: ["The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"],
     saga: false,
     ledger: "standalone-scenarios",
   },

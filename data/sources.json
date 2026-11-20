@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "933457179004561d0a7bad11332739229470c8d89d488464016268a1aa77a9d2"
+        "value": "b1f2ca25d76d26ceff0ba3a9a2bbfc1db39859b36331e87ab9040591c90622f4"
       },
-      "fetchedAt": "2026-11-20T05:58:12.153Z",
+      "fetchedAt": "2026-11-20T09:12:29.639Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -565,6 +565,12 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Wizard's-Quest",
           "sha256": "21741213151329c1ed0545475928d00ea3596ff447cc823ee18a2cab57c703ee",
           "bytes": 17094
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Woodland-Realm.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Woodland-Realm",
+          "sha256": "bf4e29ce8915302c74000b97853ab105895e25bf27b5422c1f59e8028ae95238",
+          "bytes": 16557
         }
       ]
     },

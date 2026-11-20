@@ -11,11 +11,11 @@
     "murder-at-the-prancing-pony",
     "the-siege-of-annuminas",
     "attack-on-dol-guldur",
-    "the-wizards-quest"
+    "the-wizards-quest",
+    "the-woodland-realm"
   ],
   "kind": "cycle",
   "later": [
-    "The Woodland Realm",
     "The Mines of Moria",
     "Escape from Khazad-dûm",
     "The Hunt for the Dreadnaught"
