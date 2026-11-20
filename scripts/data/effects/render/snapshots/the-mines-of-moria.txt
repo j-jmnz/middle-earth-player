@@ -5,6 +5,10 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51201:A:1 (front): Setup: Each player adds 1 resource to each of his heroes' resource pools. Add The Watcher to the staging area.
   51201:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the Quick-build: of the 14 encounter sets named (The Mines of Moria 1, The Mines of Moria 2, The Mines of Moria 3, The Mines of Moria 4, The Mines of Moria 5, The Mines of Moria 6, The Mines of Moria 7, The Mines of Moria 8, The Mines of Moria 9, The Mines of Moria 10, The Mines of Moria 11, The Mines of Moria 12, The Mines of Moria 13 and The Mines of Moria 14) that the encounter deck holds, 7 are picked with the game's seed and stay in the deck; the cards of the others lie set aside, out of play, all game
+    - the first player chooses one of the quest cards with codes 51203, 51204 and 51205 in the quest deck; the others lie set aside, out of play, and leave the quest's order
+    - the first player chooses one of the quest cards with codes 51207, 51208 and 51209 in the quest deck; the others lie set aside, out of play, and leave the quest's order
     - for each player, first player first:
       - each hero the acting player controls gains 1 resource(s)
 
@@ -167,7 +171,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51211:A:3 (front): The players cannot travel here unless they are at stage 3B.
   51211:constant:2: Constant
     only if not (the players are on stage 3)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to the location with code 51211 while this holds
 
 51211:A:4 (front): Travel: Each player discards 1 random card from his hand.
   51211:travel:1: Travel
@@ -406,9 +410,9 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51229:A:1 (front): When Revealed: The opposing team chooses and discards an ally. If no ally was discarded this way, Sudden Pitfall gains surge.
   51229:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a ally (any player controls) to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
     - choose ally (any player controls) (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
     - then, if there is a ally (any player controls) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
-    - then, if not (there is a ally (any player controls) to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51229:A:2 (shadow): Shadow: Either discard an ally you control, or attacking enemy cannot take damage this phase.
   51229:shadow:1: Shadow
@@ -608,8 +612,8 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51244:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you are engaged with another enemy).
   51244:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (there is a enemy (any player controls) engaged with you, other than this card to choose): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if there is a enemy (any player controls) engaged with you, other than this card to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 51245 Goblin Archer
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -721,6 +725,6 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51253:A:2 (shadow): Shadow: Each enemy engaged with you gets +1 Attack.
   51253:shadow:1: Shadow
     - for each enemy (any player controls) engaged with you:
-      - the picked card: stat attack 1, until the end of the attack
+      - the picked card: stat attack 1, until the end of the phase
 
-(rendered pieces: 425 by template, 11 as JSON)
+(rendered pieces: 426 by template, 13 as JSON)
