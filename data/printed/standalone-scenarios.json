@@ -5991,6 +5991,989 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "51101",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Captured-by-Spiders-1A.jpg",
+        "sha256": "07a464b8bd888562bc21a88f99805d5aee791393e8a44d2a694615bf3fc0d9e5"
+      },
+      "lines": [
+        "Setup: Add Spider Den to the staging area. The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51101",
+      "side": "B",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Captured-by-Spiders-1B.jpg",
+        "sha256": "3edb9b1a5fa2978cc3464591509408db3997920470e768c79d0fe617267dabc9"
+      },
+      "lines": [
+        "Forced: When Spider Den is explored, flip it over and put Mendor into play under the first player's control, ready.",
+        "This stage cannot be defeated unless the first player controls Mendor."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51103",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/A-Chosen-Path-Lost-in-the-Dark-2A.jpg",
+        "sha256": "2fef395743a260ffba10ab8fa594a768fb853bb8cb35ec8a0ea6562041971e92"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51103",
+      "side": "B",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/A-Chosen-Path-Lost-in-the-Dark-2B.jpg",
+        "sha256": "03d7bcdd08f9ef4fb0a345059937b6a2d3a879426589d2142ea8b7511f2311a8"
+      },
+      "lines": [
+        "The first treachery revealed each round gains Doomed 1 and its 'when revealed' effects cannot be canceled.",
+        "Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if Mendor is committed to the quest)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51104",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/A-Chosen-Path-Don't-Leave-the-Path-2A.jpg",
+        "sha256": "2fef395743a260ffba10ab8fa594a768fb853bb8cb35ec8a0ea6562041971e92"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51104",
+      "side": "B",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/A-Chosen-Path-Don't-Leave-the-Path-2B.jpg",
+        "sha256": "fd0b2efb9069ada803a009d98f92f0e0f9015867e4906617eff461ba44d63302"
+      },
+      "lines": [
+        "Progress cannot be placed on locations in the staging area.",
+        "During the travel phase, the players must travel to a location, if able.",
+        "Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if Mendor is committed to the quest)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51105",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/A-Chosen-Path-Ambushed-at-Night-2A.jpg",
+        "sha256": "2fef395743a260ffba10ab8fa594a768fb853bb8cb35ec8a0ea6562041971e92"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 1 or less (cost 2 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51105",
+      "side": "B",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/A-Chosen-Path-Ambushed-at-Night-2B.jpg",
+        "sha256": "35c49857230721353661df27731fe11d9ea801ae8139c8998ee8c41b10268118"
+      },
+      "lines": [
+        "Each enemy in the staging area gets -10 engagement cost, cannot be optionally engaged and cannot take damage.",
+        "Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if Mendor is committed to the quest)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51107",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/On-the-Trail-The-Forest-of-Great-Fear-3A.jpg",
+        "sha256": "3708f30d6d17ae84a6b82ad8a7909641d5b53a43081cdc7fb2139be7e69dede5"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (cost 3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51107",
+      "side": "B",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/On-the-Trail-The-Forest-of-Great-Fear-3B.jpg",
+        "sha256": "d67bc8b6092c5f19288f741d840570b856756d7c0441d8a33b0de49a327277ac"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for an enemy, adds it to the staging area, then places a resource on an enemy in play with cost 2 or higher. While this stage is in play, the enemy with a resource gets +2 Attack, +2 Defense, and is immune to player card effects.",
+        "This stage cannot be defeated while the enemy with a resource is in play. When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51108",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/On-the-Trail-To-the-Elvenking's-Halls-3A.jpg",
+        "sha256": "3708f30d6d17ae84a6b82ad8a7909641d5b53a43081cdc7fb2139be7e69dede5"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (cost 3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51108",
+      "side": "B",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/On-the-Trail-To-the-Elvenking's-Halls-3B.jpg",
+        "sha256": "26829faba60165a64c6da4005c6a35221a335eb80b3ebe3d7d457328fe14eeba"
+      },
+      "lines": [
+        "X is equal to the threat level of the player with the highest threat level.",
+        "Each player's threat cannot be reduced by more than 1 each round.",
+        "Forced: After the players quest successfully, if 10 or more progress was placed here this phase, reveal the top card of the encounter deck.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51109",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/On-the-Trail-Escape-from-Taur-nu-Fuin-3A.jpg",
+        "sha256": "3708f30d6d17ae84a6b82ad8a7909641d5b53a43081cdc7fb2139be7e69dede5"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost 2 or less (cost 3 or less if there are two or more players), sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51109",
+      "side": "B",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/On-the-Trail-Escape-from-Taur-nu-Fuin-3B.jpg",
+        "sha256": "0683db4b7f6154224e46d0ae88677436fb9ee9026705b48fd6cc41d1e77b3e3f"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, discard cards from the top of the encounter deck until a location is discarded. Add that location to the staging area.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51110",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Spider-Den.jpg",
+        "sha256": "8c67f315b1a7258d37a8f753ebb211958698d722d10aa02446d016a8889ed59b"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: The opposing team searches the encounter deck and discard pile for a 0 cost enemy and adds it to the staging area, if able (1 cost or less instead if there are two or more players). Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51111",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Mendor.jpg",
+        "sha256": "159ef77ffa45a71e0364a9543c9238c0d0d3e07f169f6b01eb00d242c1e9002f"
+      },
+      "lines": [
+        "Ranged. Sentinel.",
+        "The first player gains control of Mendor.",
+        "If Mendor leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51112",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Ungoliant's-Spawn.jpg",
+        "sha256": "1e19fede42fa26399ba7e83d9d41df18e8cd7c50e70a8f5895614e101503580e"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments or take non-combat damage.",
+        "While Ungoliant's Spawn is in the staging area, characters cannot be readied by player card effects."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51113",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Forest-Grove.jpg",
+        "sha256": "e4e8b1463bd43b5e46b181a47d4021a02e5ebc2237c27ea055b36188c2e72780"
+      },
+      "lines": [
+        "X is 1 more than the stage number of the main quest.",
+        "Travel: Each player deals X damage to a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51114",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Despair.jpg",
+        "sha256": "da67c756a92d0d299fa8cc9360b0b8e0d29607e36200873d8e48573634ece802"
+      },
+      "lines": [
+        "When Revealed: Until the end of the round, treat each character's printed text box as if it were blank (except for Traits).",
+        "Shadow: Treat the defending character's text box as if it were blank until the end of the phase (except for Traits)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51115",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Chieftain-Ufthak.jpg",
+        "sha256": "82af36a824e0a7734f66ef0d7facbf7e01e07988e3274428db4d9168316dce65"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments or take non-combat damage.",
+        "Forced: After Chieftain Ufthak engages you, the opposing team searches the encounter deck and discard pile for an Orc enemy of cost 1 or less and puts it into play engaged with you. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51116",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Abandoned-Camp.jpg",
+        "sha256": "1db5c2c8dc7f39b23a6a27276f3625ff1f412a94e7e876cff0c465aec5a5765b"
+      },
+      "lines": [
+        "Forced: When Abandoned Camp leaves play as an explored location, the opposing team chooses a card in the encounter discard pile and shuffles it into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51117",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Gathering-Gloom.jpg",
+        "sha256": "94382e75144cae5a3b9d329fc526083b2fe8623880c2f02f931be02beac115d4"
+      },
+      "lines": [
+        "When Revealed: Each player raises his threat by X, where X is 1 more than the stage number of the main quest.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if your threat is 35 or higher)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51118",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Black-Forest-Bats.jpg",
+        "sha256": "cb01cbedc8f1c344e9a81b495e3d7d697586bfd49a59d5e4a9840241873de643"
+      },
+      "lines": [
+        "When Revealed: The opposing team chooses a questing character. Remove that character from the quest.",
+        "Shadow: Shuffle Black Forest Bats into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51119",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Enchanted-Stream.jpg",
+        "sha256": "e7738413351495395d22513d5a2c2d560b4240cd7fed5421a7601b6ab6e211f9"
+      },
+      "lines": [
+        "While Enchanted Stream is in the staging area, progress cannot be placed on the main quest.",
+        "Travel: Each player exhausts a hero he controls. Those heroes cannot ready while Enchanted Stream is the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51120",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Exhaustion.jpg",
+        "sha256": "e2ee9b72ca9f6ff23ba73da18c47bd9f4693b7469a03ac23f8c1684a4467f8f5"
+      },
+      "lines": [
+        "When Revealed: Each player exhausts a character he controls. Until the end of the round, characters cannot be readied by player card effects.",
+        "Shadow: Defending character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51121",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Spiders-of-Mirkwood.jpg",
+        "sha256": "d3dae695794cd4fc38b3ea4f3a82e62a1fda26294a8d1d74e31129d98387eb75"
+      },
+      "lines": [
+        "Forced: After Spiders of Mirkwood engages you, exhaust a character you control.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Spider trait)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51122",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/The-Spiders'-Ring.jpg",
+        "sha256": "0cdfcc5d5178c5a8a54b43dd05ed11691f2d33c5dce0ea7afc977f6e9c17c081"
+      },
+      "lines": [
+        "While The Spiders' Ring is in the staging area, each Spider enemy gets +1 Threat.",
+        "Forced: When The Spiders' Ring is explored, the opposing team searches the encounter deck and discard pile for a non-unique Spider enemy and adds it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 2,
+          "printed": "Forced: When The Spider's Ring is explored, the opposing team searches the encounter deck and discard pile for a non-unique Spider enemy and adds it to the staging area."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51123",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Caught-in-a-Web.jpg",
+        "sha256": "8e138e5a5b367ccd0c9ec3cfe980cb39e8ddeca52c1f74a71d95ba851108f49e"
+      },
+      "lines": [
+        "When Revealed: The opposing team attaches Caught in a Web to a hero and exhausts that hero. (Counts as a Condition attachment with the text: 'Limit 1 per hero. Attached hero cannot ready unless its controller first spends 2 resources from its pool.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51124",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Wolf-Rider.jpg",
+        "sha256": "817e37fabf64e6626e5f28c5e791bbaecdab37dc27bd7a72a8a757d0ec3eaaba"
+      },
+      "lines": [
+        "When Revealed: If there is another Orc enemy in the staging area, Wolf Rider gains surge.",
+        "Shadow: If attacking enemy is an Orc, put Wolf Rider into play engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51125",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/The-Goblins'-Caves.jpg",
+        "sha256": "0f3642f4f66369ad9995c38cea317bdd6ce5df28c312d8d08fbac38cf2e1fa6a"
+      },
+      "lines": [
+        "While The Goblins' Caves is in the staging area, each Orc enemy gets +1 Attack.",
+        "Forced: When The Goblins' Caves is explored, the opposing team searches the encounter deck and discard pile for a non-unique Orc enemy and adds it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51126",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Driven-by-Shadow.jpg",
+        "sha256": "1d68adb945078058f643e44d6bd9b6d3a03fee77d4cb58b503a8b89dc2672f4e"
+      },
+      "lines": [
+        "When Revealed: The opposing team attaches Driven by Shadow to an enemy and returns it to the staging area. (Counts as a Condition attachment with the text: 'Limit 1 per enemy. Attached enemy gets +2 Threat, +2 Attack, +2 Defense and is immune to player card effects.') If there is no enemy in play, Driven by Shadow gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51127",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Beast-of-Taur-nu-Fuin.jpg",
+        "sha256": "8721cecfccf99c989dcb612533ad74fbb7b55190291876bb3930e7f61b3916b8"
+      },
+      "lines": [
+        "Beast of Taur-nu-Fuin gets +1 Attack for each damage on it.",
+        "Forced: When Beast of Taur-nu-Fuin is dealt a shadow card with no shadow effect, deal 1 damage to it and the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51128",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Dark-Black-Woods.jpg",
+        "sha256": "1bf7c8ae68e924a81ccb571f44acc1d07c873a7a9f63e1353f5ad9faadd8321a"
+      },
+      "lines": [
+        "Dark Black Woods gets +1 Threat for each Dark Black Woods in the staging area.",
+        "Travel: Each player must discard 1 card from his hand for each Dark Black Woods in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51129",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Wind-whipped-Rain.jpg",
+        "sha256": "7dea2f8bf6157a8e5c6fb1655c929f54d024baf9334fe90d1a5fe9956773d010"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either choose 1 card from his hand and discard the rest, or assign X damage among characters he controls, where X is the number of cards in his hand.",
+        "Shadow: Discard 1 random card from your hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51130",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Giant-Spider.jpg",
+        "sha256": "4999d6f60a8bbcce4c4a6da40fbc875aa43c35a90bf780d0b08886cd4e206b84"
+      },
+      "lines": [
+        "When Revealed: Each player exhausts a character he controls.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51131",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Giant-Web.jpg",
+        "sha256": "d722c723c672bd1948cd6a8452f1ecfd4b837096fa9a1af4dffb87711a20e763"
+      },
+      "lines": [
+        "When Revealed: Make Giant Web the active location. Return any previous active location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51132",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Eyes-of-the-Forest.jpg",
+        "sha256": "4ad48d5d41b55e308f12850e5cdbe46a7c71e1cfb581d7c1d26af2bda1fd12c4"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: The opposing team looks at each player's hand and discards 1 card from each.",
+        "Shadow: Attacking enemy gets +X Attack, where X is the stage number of the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51133",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Mirkwood-Patrol.jpg",
+        "sha256": "f9070602e834c18f19a7b7c731d3cc74cd229bd4bbe3ecb8012695e7369591b9"
+      },
+      "lines": [
+        "While Mirkwood Patrol is in the staging area, enemies cannot be optionally engaged.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it was engaged this round)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51134",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Mountains-of-Mirkwood.jpg",
+        "sha256": "8d10ea6be3e0c9a207bbc5a02bd74d944a82a3d1c0a6ce60d3043f7cc82c7642"
+      },
+      "lines": [
+        "While Mountains of Mirkwood is in the staging area, it gains: 'Forced: At the end of the round, raise each player's threat by 2.'",
+        "Shadow: Either raise your threat by 2, or the attacking enemy gets +2 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51135",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Hatred-Rekindled.jpg",
+        "sha256": "0209c4e8946d1673a4076a1eebead3b5b2d61c80868750cd8ab9946462d371a7"
+      },
+      "lines": [
+        "When Revealed: Each engaged enemy makes an immediate attack. If no attacks were made this way, Hatred Rekindled gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card. That card's shadow effects cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51136",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Wild-Bear.jpg",
+        "sha256": "a4a3c2f432fa50b6a00edf44996d1ebc4b5e3e36b9c13105b36a4cb2f04330e1"
+      },
+      "lines": [
+        "X is 1 more than the stage number of the main quest.",
+        "Shadow: Attacking enemy gets +X Defense until the end of the phase, where X is the stage number of the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51137",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Labyrinthine-Woods.jpg",
+        "sha256": "775f9fb8c67e60b73ae5844973435af74b1ed7c885176959aa6d6b7e203e8946"
+      },
+      "lines": [
+        "When Revealed: Until the end of the phase, each location in the staging area gets +1 Threat.",
+        "Shadow: Each enemy engaged with you gets +1 Attack until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51138",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Vastness-of-Mirkwood.jpg",
+        "sha256": "38e6564860a9449b8b00b495a32601805201cc9e7f16b3a3acd6c6795edc7939"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the top 5 cards of the encounter deck for a card with cost equal to or less than the stage number of the main quest, sets it aside and shuffles the encounter deck. Then, reveal the set aside card.",
+        "Shadow: If this attack destroys a character, reveal the top card of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51139",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Mirkwood-Flock.jpg",
+        "sha256": "08d30842691c3586fe13050ae33ea359707991d184c3dd6acc5e61680907bf39"
+      },
+      "lines": [
+        "Surge.",
+        "Shadow: Add Mirkwood Flock to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51140",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/The-Eaves-of-Mirkwood.jpg",
+        "sha256": "fe33b6e7382ad0f271e96c5ad5b40b9dbbd36e30211599f9d192d0ee6de76291"
+      },
+      "lines": [
+        "While The Eaves of Mirkwood is in the staging area, no more than 1 progress can be placed on each location in the staging area each round.",
+        "Travel: Each player discards 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51141",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Massing-at-Night.jpg",
+        "sha256": "f9efd5afa626b914550576197845e9e75a391172c1ce53d64e0aa1776f704393"
+      },
+      "lines": [
+        "When Revealed: The opposing team searches the encounter deck and discard pile for one different 0 cost enemy per player (limit 2) and adds them to the staging area.",
+        "Shadow: If this attack destroys a character, attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51142",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Wild-Wargs.jpg",
+        "sha256": "2342f059d5f72239f875009d39bf421cfb590be188e8c15b63a55c384cf37cef"
+      },
+      "lines": [
+        "Forced: After Wild Wargs is dealt a shadow card with no shadow effect, return it to the staging area.",
+        "Shadow: Return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51143",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Dry-Watercourse.jpg",
+        "sha256": "828bf5ffd242add27c490e128ad4a5248cd22f7c70978041156c14038b1a930b"
+      },
+      "lines": [
+        "While Dry Watercourse is in the staging area, each player cannot reduce his threat by more than 1 each round.",
+        "Travel: Raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51144",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Turned-Around.jpg",
+        "sha256": "f9c482338f09eaa62b9fb3c3c448fe8655bced42bd2db7263e21dd48e276ace5"
+      },
+      "lines": [
+        "When Revealed: Remove 5 progress tokens from the main quest and attach Turned Around to it. (Counts as a Condition attachment with the text: 'Attached quest gets +5 quest points.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51145",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Pack-of-Wargs.jpg",
+        "sha256": "9f48dd34f0218bba2db8dc7e76a45e535568b8c92f617e9f8f46cc633a0c1bdb"
+      },
+      "lines": [
+        "Cannot have non-objective player card attachments or take non-combat damage.",
+        "Forced: After Pack of Wargs is dealt a shadow card with no shadow effect, it makes an additional attack after this one. Do not deal it a shadow card for this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51146",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Dark-wood-Grove.jpg",
+        "sha256": "8331bf0c00149c09aa930b0da8bafa53115c948c0dc12e8d829a033975924ca6"
+      },
+      "lines": [
+        "While Dark-wood Grove is in the staging area, it gains: 'Forced: After a 'when revealed' effect is canceled, raise each player's threat by 3.'",
+        "Travel: Reveal the top card of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51147",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Lost-and-Witless.jpg",
+        "sha256": "c9f6a23e6e0df21c1ac92e6d1b1172b252a777ffe0050569fc2c0d22c7b6e980"
+      },
+      "lines": [
+        "When Revealed: Each player reveals his hand and discards each ally card revealed this way.",
+        "Shadow: If this attack is undefended, discard an ally you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51148",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Wicked-Spider.jpg",
+        "sha256": "4f7225f47a824202401205a954831f086e667e7da5b18c86b02677d59c1ca40c"
+      },
+      "lines": [
+        "Forced: After Wicked Spider engages you, discard an exhausted character you control.",
+        "Shadow: Attacking enemy cannot take damage this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51149",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Old-Forest-Road.jpg",
+        "sha256": "bb996ec9a780fd14001dcb0cbb6c4ad6d42c96a1ee6587e09f202705492269d0"
+      },
+      "lines": [
+        "Response: After the players travel to Old Forest Road, the first player discards the top card of his deck. If that card is an ally, he puts it into play.",
+        "Travel: Discard the top card of the encounter deck, if that card is an enemy, add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51150",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/A-Frightened-Beast.jpg",
+        "sha256": "2cff0868d81d70cd746db7b52e105316848c7c5d42201663b9b1de57ad5e8085"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either raise your threat by 1 for each questing character you control, or discard a questing character you control.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51151",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Ambushing-Orcs.jpg",
+        "sha256": "f5cd8ebb55835149ba6478e3bb6ac86841d8d1d69b3c5b2b2cd510fa967579ba"
+      },
+      "lines": [
+        "When Revealed: Ambushing Orcs makes an immediate attack against the first player.",
+        "Shadow: Engage the lowest engagement cost enemy in the staging area and deal it a shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51152",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Mirkwood-Path.jpg",
+        "sha256": "9fb8281ccd6b0b1b1dc2f398e9261d65f4b7af186b8908882d787b35877254ab"
+      },
+      "lines": [
+        "Forced: When Mirkwood Path is explored, discard the top card of the encounter deck. If that card is a location, add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "51153",
+      "side": "A",
+      "printing": "TWR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Woodland-Realm/Wasted-Provisions.jpg",
+        "sha256": "3d547dced56a40ff1173eb71be1ba1c6ec88b2bc3db2a314ae13c2aba3de9172"
+      },
+      "lines": [
+        "When Revealed: Each player discards each resource from each of his heroes' resource pools and raises his threat by 1 for each resource he discarded this way. If no resources were discarded this way, Wasted Provisions gains surge.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

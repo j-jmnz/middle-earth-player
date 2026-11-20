@@ -2011,9 +2011,10 @@
         "code": "51112"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 1"
+        "encounterSet": "The Woodland Realm 1",
+        "cost": 3
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2021,9 +2022,10 @@
         "code": "51113"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 1"
+        "encounterSet": "The Woodland Realm 1",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2031,9 +2033,10 @@
         "code": "51114"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 1"
+        "encounterSet": "The Woodland Realm 1",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2041,9 +2044,10 @@
         "code": "51115"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 2"
+        "encounterSet": "The Woodland Realm 2",
+        "cost": 3
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2051,9 +2055,10 @@
         "code": "51116"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 2"
+        "encounterSet": "The Woodland Realm 2",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2061,9 +2066,10 @@
         "code": "51117"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 2"
+        "encounterSet": "The Woodland Realm 2",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2071,9 +2077,10 @@
         "code": "51118"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 3"
+        "encounterSet": "The Woodland Realm 3",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2081,9 +2088,10 @@
         "code": "51119"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 3"
+        "encounterSet": "The Woodland Realm 3",
+        "cost": 3
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 3), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2091,9 +2099,10 @@
         "code": "51120"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 3"
+        "encounterSet": "The Woodland Realm 3",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2101,9 +2110,10 @@
         "code": "51121"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 4"
+        "encounterSet": "The Woodland Realm 4",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2111,9 +2121,10 @@
         "code": "51122"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 4"
+        "encounterSet": "The Woodland Realm 4",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2121,9 +2132,10 @@
         "code": "51123"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 4"
+        "encounterSet": "The Woodland Realm 4",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2131,9 +2143,10 @@
         "code": "51124"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 5"
+        "encounterSet": "The Woodland Realm 5",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2141,9 +2154,10 @@
         "code": "51125"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 5"
+        "encounterSet": "The Woodland Realm 5",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2151,9 +2165,10 @@
         "code": "51126"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 5"
+        "encounterSet": "The Woodland Realm 5",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2161,9 +2176,10 @@
         "code": "51127"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 6"
+        "encounterSet": "The Woodland Realm 6",
+        "cost": 2
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 2), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2171,9 +2187,10 @@
         "code": "51128"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 6"
+        "encounterSet": "The Woodland Realm 6",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2181,9 +2198,10 @@
         "code": "51129"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 6"
+        "encounterSet": "The Woodland Realm 6",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2191,9 +2209,10 @@
         "code": "51130"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 7"
+        "encounterSet": "The Woodland Realm 7",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2201,9 +2220,10 @@
         "code": "51131"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 7"
+        "encounterSet": "The Woodland Realm 7",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2211,9 +2231,10 @@
         "code": "51132"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 7"
+        "encounterSet": "The Woodland Realm 7",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2221,9 +2242,10 @@
         "code": "51133"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 8"
+        "encounterSet": "The Woodland Realm 8",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2231,9 +2253,10 @@
         "code": "51134"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 8"
+        "encounterSet": "The Woodland Realm 8",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2241,9 +2264,10 @@
         "code": "51135"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 8"
+        "encounterSet": "The Woodland Realm 8",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2251,9 +2275,10 @@
         "code": "51136"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 9"
+        "encounterSet": "The Woodland Realm 9",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2261,9 +2286,10 @@
         "code": "51137"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 9"
+        "encounterSet": "The Woodland Realm 9",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2271,9 +2297,10 @@
         "code": "51138"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 9"
+        "encounterSet": "The Woodland Realm 9",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2281,9 +2308,10 @@
         "code": "51139"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 10"
+        "encounterSet": "The Woodland Realm 10",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2291,9 +2319,10 @@
         "code": "51140"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 10"
+        "encounterSet": "The Woodland Realm 10",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2301,9 +2330,10 @@
         "code": "51141"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 10"
+        "encounterSet": "The Woodland Realm 10",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2311,9 +2341,10 @@
         "code": "51142"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 11"
+        "encounterSet": "The Woodland Realm 11",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2321,9 +2352,10 @@
         "code": "51143"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 11"
+        "encounterSet": "The Woodland Realm 11",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2331,9 +2363,10 @@
         "code": "51144"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 11"
+        "encounterSet": "The Woodland Realm 11",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2341,9 +2374,10 @@
         "code": "51145"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 12"
+        "encounterSet": "The Woodland Realm 12",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2351,9 +2385,10 @@
         "code": "51146"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 12"
+        "encounterSet": "The Woodland Realm 12",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2361,9 +2396,10 @@
         "code": "51147"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 12"
+        "encounterSet": "The Woodland Realm 12",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2371,9 +2407,10 @@
         "code": "51148"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 13"
+        "encounterSet": "The Woodland Realm 13",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2381,9 +2418,10 @@
         "code": "51149"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 13"
+        "encounterSet": "The Woodland Realm 13",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2391,9 +2429,10 @@
         "code": "51150"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 13"
+        "encounterSet": "The Woodland Realm 13",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2401,9 +2440,10 @@
         "code": "51151"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 14"
+        "encounterSet": "The Woodland Realm 14",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2411,9 +2451,10 @@
         "code": "51152"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 14"
+        "encounterSet": "The Woodland Realm 14",
+        "cost": 0
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 0), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     },
     {
@@ -2421,9 +2462,10 @@
         "code": "51153"
       },
       "set": {
-        "encounterSet": "The Woodland Realm 14"
+        "encounterSet": "The Woodland Realm 14",
+        "cost": 1
       },
-      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
     }
   ],
