@@ -263,6 +263,8 @@ export type PendingAttack = {
   heroId?: string;
   // A shadow effect made the attack count as undefended.
   undefended?: boolean;
+  // Characters a shadow effect removed from this attack as its defender (RemoveDefender, 51335:A:2): none of them can be declared as a defender again for it.
+  removedDefenders?: readonly string[];
   // A shadow effect made the attack capture an ally it would damage instead (CaptureInsteadOfDamage, families/captured/).
   captures?: true;
   shadowResolved?: boolean;

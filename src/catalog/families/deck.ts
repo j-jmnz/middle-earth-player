@@ -39,7 +39,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ShuffleDiscardIntoDeck"), who: z.enum(["actor", "picked"]).optional(), ...when }),
   // The actor's hand (but the source card) is shuffled into their deck. The effect's X becomes how many cards that was ("Count
   // the number of cards in your hand and shuffle your hand into your deck. Then, draw an equal number of cards").
-  z.strictObject({ verb: z.literal("ShuffleHandIntoDeck"), ...when }),
+  // `keepPicked`: the picked card stays in the hand and the rest is shuffled in ("Each player chooses 1 card in his hand and shuffles the rest into his deck", 51304:B:1); with no picked card in the hand, all of it goes.
+  z.strictObject({ verb: z.literal("ShuffleHandIntoDeck"), keepPicked: z.literal(true).optional(), ...when }),
   // "Shuffles the card in his hand with the highest printed cost back into his deck" (901703:A:1): the actor's hand card with the highest printed cost (a card with no printed cost or an X cost counting 0) goes into the deck, which is shuffled; the actor chooses among cards tied for
   // the highest. An empty hand does nothing.
   z.strictObject({ verb: z.literal("ShuffleHighestCostIntoDeck"), ...when }),

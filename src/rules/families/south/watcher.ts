@@ -113,7 +113,7 @@ export function attackFromStaging(state: ScenarioState, instruction: Extract<Ins
   const seat = instruction.who === "firstPlayer" ? state.firstPlayer : instruction.who === "eventSeat" ? seatsFor(state, "eventSeat", focus.seat)[0] : focus.seat;
   if (seat == null) return state;
   // "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the main quest card takes it.
-  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}), ...(instruction.raiseThreatIfDestroys ? { raiseIfDestroys: instruction.raiseThreatIfDestroys } : {}) });
+  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.excessToStage ? { excessToStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}), ...(instruction.raiseThreatIfDestroys ? { raiseIfDestroys: instruction.raiseThreatIfDestroys } : {}) });
 }
 
 // The enemy `id` in the staging area attacks `seat` outside the combat phase, now, and the running effect counts the attack (its frames wait for it). `shadow: false`: no shadow card is dealt. `toStage` and `excessToStage` mark the attack

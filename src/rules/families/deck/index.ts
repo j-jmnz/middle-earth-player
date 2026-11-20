@@ -25,7 +25,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ShuffleDiscardIntoDeck":
       return shuffleDiscardIn(state, instruction, focus, ctx);
     case "ShuffleHandIntoDeck":
-      return shuffleHandIn(state, focus);
+      return shuffleHandIn(state, focus, instruction.keepPicked === true);
     case "ShuffleHighestCostIntoDeck":
       return shuffleHighestIntoDeck(state, instruction, focus, ctx, steps);
     case "ShuffleHeroIntoDeck":

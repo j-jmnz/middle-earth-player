@@ -7,6 +7,7 @@ import { printedOf } from "../../core/printed.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { Focus } from "../index.ts";
 
@@ -18,7 +19,7 @@ export function holdPickedUnder(state: ScenarioState, instruction: Extract<Instr
   if (!card || !host || id === host.id || card.zone === "under") return state;
   const owner = card.owner ?? card.controller ?? focus.seat;
   const bare = inPlay(card.zone) ? releaseAttachments(state, id, ctx.cards, steps) : state;
-  return updateCard(moveCard({ ...bare, heldCards: true }, id, { zone: "under", locationId: host.id }), id, { face: "up", owner, controller: null, heldTitle: true, heldPutting: instruction.barsPutting === true ? true : undefined, committed: false, damage: 0, resources: 0, progress: 0 });
+  return updateCard(moveCard({ ...bare, heldCards: true }, id, { zone: "under", locationId: host.id }), id, { face: "up", owner, controller: null, heldTitle: true, heldPutting: instruction.barsPutting === true ? true : undefined, heldExhausted: instruction.returnsExhausted === true ? true : undefined, committed: false, damage: 0, resources: 0, progress: 0 });
 }
 
 /** Whether a card shares its title with one that lies held under an encounter card: it cannot be played ("copies of that card cannot be played", 51013:A:1; an effect may still put it into play). */
@@ -44,7 +45,11 @@ export function releaseHeld(state: ScenarioState): ScenarioState {
     if (host && (inPlay(host.zone) || host.zone === "questStage")) continue;
     const seat = card.owner;
     if (seat == null) continue;
-    next = updateCard(moveCard(next, card.id, { zone: state.seats[seat]?.eliminated ? "discard" : "hand", seat }), card.id, { face: "up", owner: undefined, heldTitle: undefined, heldPutting: undefined, host: null });
+    const gone = state.seats[seat]?.eliminated === true;
+    const back = card.heldExhausted === true && !gone;
+    const released = updateCard(moveCard(next, card.id, { zone: gone ? "discard" : back ? "play" : "hand", seat }), card.id, { face: "up", owner: undefined, heldTitle: undefined, heldPutting: undefined, heldExhausted: undefined, host: null, ...(back ? { controller: seat, exhausted: true } : {}) });
+    // An ally back in play enters play for its owner (rr.in-play-and-out-of-play).
+    next = back ? queueEvent(released, { trigger: "enteredPlay", seat, cardId: card.id }) : released;
   }
   return next;
 }

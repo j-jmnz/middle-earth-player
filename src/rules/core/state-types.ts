@@ -129,6 +129,8 @@ export type CardInstance = {
   heldTitle?: true;
   // With `heldTitle`: the title cannot be put into play either (Narrow Paths' guarded attachments, 51205:B:1: "cannot play or put into play").
   heldPutting?: true;
+  // With `heldTitle`: the card returns to its owner's control in play, exhausted, when its holder leaves play (Goblin Dungeon's ally, 51340:A:1), not to the hand.
+  heldExhausted?: true;
   // A card the encounter deck found and Hidden Threat placed facedown under the main quest (families/wizards-quest/hidden.ts, 51241:A:1): it is revealed after the next time the players quest successfully. The number is the order it was placed in.
   hiddenAt?: number;
   // A Captive of The Uruk-hai (families/captives): a hero faceup in the captive zone under To Isengard! or an enemy, in play, controlled by nobody. `owner` is the seat it belongs to, `heroSlot` its place among that seat's heroes.

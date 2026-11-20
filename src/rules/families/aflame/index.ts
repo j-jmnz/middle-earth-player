@@ -3,6 +3,7 @@
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
+import { frameScope } from "../../interpret/amounts.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -17,7 +18,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SearchAflame":
       return searchAflame(state, instruction, focus, ctx, steps);
     case "EngageFirstPlayer":
-      return engageFirstPlayer(state, focus, steps, instruction.moves === true);
+      return engageFirstPlayer(state, focus, steps, instruction.moves === true, instruction.target === "subject" ? frameScope(state, focus.seat, focus.sourceId).subject ?? "" : undefined);
     case "EngageLowestThreat":
       return engageLowestThreat(state, focus, steps);
     case "StageSetAside":

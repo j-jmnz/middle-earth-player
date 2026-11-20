@@ -141,9 +141,10 @@ export function removeDiscardFromGame(state: ScenarioState, focus: Focus): Scena
   return next;
 }
 
-// ShuffleHandIntoDeck: the actor's hand (but the card resolving) goes into their deck, which is shuffled; X is how many.
-export function shuffleHandIn(state: ScenarioState, focus: Focus): ScenarioState {
-  const hand = (state.seats[focus.seat]?.hand ?? []).filter((id) => id !== focus.sourceId);
+// ShuffleHandIntoDeck: the actor's hand (but the card resolving, and with `keepPicked` the picked card) goes into their deck, which is shuffled; X is how many.
+export function shuffleHandIn(state: ScenarioState, focus: Focus, keepPicked = false): ScenarioState {
+  const kept = keepPicked ? lastPicked(state) : "";
+  const hand = (state.seats[focus.seat]?.hand ?? []).filter((id) => id !== focus.sourceId && id !== kept);
   let next = state;
   for (const id of hand) next = moveCard(next, id, { zone: "deck", seat: focus.seat });
   return patchData(shuffleSeatDeck(next, focus.seat), { x: hand.length });

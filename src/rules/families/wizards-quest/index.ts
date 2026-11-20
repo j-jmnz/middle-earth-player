@@ -10,6 +10,7 @@ import type { Focus } from "../index.ts";
 import { arrangeTopByChallenge, hideUnderQuest } from "./hidden.ts";
 import { holdPickedUnder, releaseHeld, titleHeld } from "./held.ts";
 import { buildQuickDeck, chooseQuestStage } from "./quick.ts";
+import { removeDefender, searchTopShadow } from "./khazad.ts";
 import { searchTopReveal } from "./top.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -26,8 +27,14 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return hideUnderQuest(state, instruction, ctx);
     case "ArrangeTopByChallenge":
       return arrangeTopByChallenge(state, ctx);
+    case "RemoveDefender":
+      return removeDefender(state);
+    case "SearchTopShadow":
+      return searchTopShadow(state, instruction, ctx);
     // A constant marker: the bar on the held titles is the play hook below.
     case "BarHeldTitles":
+    // A constant marker: the cancel's replacement is read by CancelEffect (khazad.ts, bonesCancel).
+    case "ReplacesRevealCancel":
       return state;
     default:
       return null;
@@ -36,7 +43,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "wizards-quest",
-  verbs: ["BuildQuickDeck", "ChooseQuestStage", "SearchTopReveal", "HoldPickedUnder", "BarHeldTitles", "HideUnderQuest", "ArrangeTopByChallenge"],
+  verbs: ["BuildQuickDeck", "ChooseQuestStage", "SearchTopReveal", "HoldPickedUnder", "BarHeldTitles", "HideUnderQuest", "ArrangeTopByChallenge", "RemoveDefender", "SearchTopShadow", "ReplacesRevealCancel"],
   run,
   settle: { sweep: (state) => releaseHeld(state) },
   play: (state, cardId, ctx, how) => titleHeld(state, cardId, ctx, how?.putting === true),

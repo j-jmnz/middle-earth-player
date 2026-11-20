@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 406–411 Catalog build (~410)
   - 412–428 Tests (~1.9K) ← 5
   - 429–444 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~315.9K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~316.1K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
@@ -152,7 +152,7 @@ Read the sections your task touches.
     - 2017–2044 The Long Dark (~4.8K) ← 4
     - 2045–2076 Foundations of Stone (~4.3K) ← 3
     - 2077–2107 Shadow and Flame (~4.1K) ← 4
-  - 2108–2532 Standalone scenarios (~57.0K) ← 1
+  - 2108–2536 Standalone scenarios (~57.3K) ← 1
     - 2112–2135 The Massing at Osgiliath (~2.5K) ← 1
     - 2136–2158 The Battle of Lake-town (~4.0K) ← 36
     - 2159–2175 The Stone of Erech (~2.2K) ← 20
@@ -160,24 +160,24 @@ Read the sections your task touches.
     - 2211–2246 Fog on the Barrow-downs (~5.0K) ← 9
     - 2247–2281 The Ruins of Belegost (~6.1K) ← 8
     - 2282–2316 Murder at the Prancing Pony (~4.7K) ← 17
-    - 2317–2381 The Siege of Annúminas (~8.3K) ← 13
-    - 2382–2412 Attack on Dol Guldur (~4.1K) ← 18
-    - 2413–2444 The Wizard's Quest (~4.1K) ← 22
-    - 2445–2480 The Woodland Realm (~4.7K) ← 15
-    - 2481–2520 The Mines of Moria (~4.9K) ← 12
-    - 2521–2532 Escape from Khazad-dûm (~2.0K) ← 1
-  - 2533–2541 Nightmare (~410) ← 22
-  - 2542–2584 Deckbuilding (~2.5K) ← 1
-  - 2585–2664 Effects (~4.1K)
-    - 2587–2645 Three layers (~2.4K) ← 10
-    - 2646–2656 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 2657–2660 Window stack (~100)
-    - 2661–2664 Coverage test (~270)
-  - 2665–2688 Data sources (~750) ← 3
-  - 2689–2707 Card images (~1.4K) ← 9
-  - 2708–2735 Persistence and shipping (~3.2K) ← 10
-  - 2736–2778 Screens (~5.9K) ← 2
-    - 2763–2778 Table screen (~1.8K) ← 3
+    - 2317–2349 The Siege of Annúminas (~4.1K) ← 13
+    - 2350–2380 Attack on Dol Guldur (~4.1K) ← 18
+    - 2381–2412 The Wizard's Quest (~4.1K) ← 22
+    - 2413–2448 The Woodland Realm (~4.7K) ← 15
+    - 2449–2488 The Mines of Moria (~4.9K) ← 12
+    - 2489–2536 Escape from Khazad-dûm (~6.4K) ← 5
+  - 2537–2545 Nightmare (~410) ← 22
+  - 2546–2588 Deckbuilding (~2.5K) ← 1
+  - 2589–2668 Effects (~4.1K)
+    - 2591–2649 Three layers (~2.4K) ← 10
+    - 2650–2660 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 2661–2664 Window stack (~100)
+    - 2665–2668 Coverage test (~270)
+  - 2669–2692 Data sources (~750) ← 3
+  - 2693–2711 Card images (~1.4K) ← 9
+  - 2712–2739 Persistence and shipping (~3.2K) ← 10
+  - 2740–2782 Screens (~5.9K) ← 2
+    - 2767–2782 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~68.1K tok)
   - 5–8 Overview (~170) ← 1
   - 9–33 Top bar (~6.1K) ← 8
@@ -372,10 +372,10 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/showcase`: design-system.md, Color (1)
 - `scripts/tools`: .claude/rules/code-standards.md, Test cost (4); agents/agent-brief.md, Scenario procedure (4); architecture.md, Modules (1); design-system-table.md, Choice tray (1); development.md, Commands (1)
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (48); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (5); brief.md, Attack on Dol Guldur (4); brief.md, Murder at the Prancing Pony (4); brief.md, The Mines of Moria (4); brief.md, The Siege of Annúminas (4); brief.md, The Wizard's Quest (4); brief.md, The Woodland Realm (4); brief.md, The Battle of Lake-town (3); brief.md, The Old Forest (3); brief.md, The Ruins of Belegost (3); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); brief.md, Fog on the Barrow-downs (2); brief.md, The Stone of Erech (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)
-- `src/catalog`: brief.md, Attack on Dol Guldur (4); brief.md, The Battle of Lake-town (4); brief.md, The Stone of Erech (4); brief.md, The Wizard's Quest (4); architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Mines of Moria (2); brief.md, The Return of the King (2); brief.md, The Siege of Annúminas (2); brief.md, The Two Towers (2); brief.md, The Woodland Realm (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Deckbuilding (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight from Moria (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Murder at the Prancing Pony (1); brief.md, The Seventh Level (1); brief.md, Three layers (1)
-- `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Flight from Moria (2); brief.md, Into the Pit (2); brief.md, Return to Mirkwood (2); brief.md, Road to Rivendell (2); brief.md, Shadow and Flame (2); brief.md, The Dead Marshes (2); brief.md, The Long Dark (2); brief.md, The Redhorn Gate (2); brief.md, The Seventh Level (2); brief.md, The Watcher in the Water (2); agents/agent-brief.md, Scenario procedure (1); brief.md, A Journey to Rhosgobel (1); brief.md, Angmar Awakened (1); brief.md, Attack on Dol Guldur (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Conflict at the Carrock (1); brief.md, Ered Mithrin (1); brief.md, Fog on the Barrow-downs (1); brief.md, Foundations of Stone (1); brief.md, Murder at the Prancing Pony (1); brief.md, Nightmare (1); brief.md, The Battle of Lake-town (1); brief.md, The Hills of Emyn Muil (1); brief.md, The Hunt for Gollum (1); brief.md, The Mines of Moria (1); brief.md, The Old Forest (1); brief.md, The Ruins of Belegost (1); brief.md, The Siege of Annúminas (1); brief.md, The Stone of Erech (1); brief.md, The Wizard's Quest (1); brief.md, The Woodland Realm (1)
+- `src/catalog`: brief.md, Attack on Dol Guldur (4); brief.md, The Battle of Lake-town (4); brief.md, The Stone of Erech (4); brief.md, The Wizard's Quest (4); architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Mines of Moria (2); brief.md, The Return of the King (2); brief.md, The Siege of Annúminas (2); brief.md, The Two Towers (2); brief.md, The Woodland Realm (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Deckbuilding (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Escape from Khazad-dûm (1); brief.md, Flight from Moria (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Murder at the Prancing Pony (1); brief.md, The Seventh Level (1); brief.md, Three layers (1)
+- `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Flight from Moria (2); brief.md, Into the Pit (2); brief.md, Return to Mirkwood (2); brief.md, Road to Rivendell (2); brief.md, Shadow and Flame (2); brief.md, The Dead Marshes (2); brief.md, The Long Dark (2); brief.md, The Redhorn Gate (2); brief.md, The Seventh Level (2); brief.md, The Watcher in the Water (2); agents/agent-brief.md, Scenario procedure (1); brief.md, A Journey to Rhosgobel (1); brief.md, Angmar Awakened (1); brief.md, Attack on Dol Guldur (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Conflict at the Carrock (1); brief.md, Ered Mithrin (1); brief.md, Escape from Khazad-dûm (1); brief.md, Fog on the Barrow-downs (1); brief.md, Foundations of Stone (1); brief.md, Murder at the Prancing Pony (1); brief.md, Nightmare (1); brief.md, The Battle of Lake-town (1); brief.md, The Hills of Emyn Muil (1); brief.md, The Hunt for Gollum (1); brief.md, The Mines of Moria (1); brief.md, The Old Forest (1); brief.md, The Ruins of Belegost (1); brief.md, The Siege of Annúminas (1); brief.md, The Stone of Erech (1); brief.md, The Wizard's Quest (1); brief.md, The Woodland Realm (1)
 - `src/play`: design-system-table.md, Choice tray (72); design-system-table.md, Spotlight (32); design-system-table.md, Cards (31); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); brief.md, The Battle of Lake-town (8); design-system-table.md, The Island Map (8); design-system-table.md, Top bar (7); architecture.md, Images (6); architecture.md, State (6); design-system-table.md, Piles (6); design-system.md, Type (6); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); architecture.md, Performance (4); brief.md, Murder at the Prancing Pony (4); brief.md, The Stone of Erech (4); brief.md, The Wizard's Quest (4); brief.md, The Woodland Realm (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); design-system-table.md, Pointer and keys (4); design-system-table.md, Two taps (4); brief.md, Attack on Dol Guldur (3); brief.md, Fog on the Barrow-downs (3); brief.md, Table screen (3); brief.md, The Old Forest (3); brief.md, The Ruins of Belegost (3); brief.md, The Siege of Annúminas (3); design-system-table.md, Table menu (3); design-system.md, Settings (3); architecture.md, Tests (2); brief.md, The Mines of Moria (2); design-system-table.md, Quest scale (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
-- `src/rules`: brief.md, The Battle of Lake-town (19); brief.md, The Wizard's Quest (8); brief.md, The Stone of Erech (7); brief.md, Into the Pit (6); brief.md, Murder at the Prancing Pony (6); brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, Attack on Dol Guldur (3); brief.md, The engine plays the game (3); brief.md, The Mines of Moria (3); brief.md, The Woodland Realm (3); architecture.md, State (2); brief.md, Angmar Awakened (2); brief.md, Return to Mirkwood (2); brief.md, Conflict at the Carrock (1); brief.md, Ered Mithrin (1); brief.md, Escape from Mount Gram (1); brief.md, Player side quests, contracts and saga cards (1); brief.md, Shadow and Flame (1); brief.md, The Black Gate Opens (1); brief.md, The Long Dark (1); brief.md, The Redhorn Gate (1); brief.md, The Return of the King (1); brief.md, The Seventh Level (1); brief.md, The Siege of Annúminas (1)
+- `src/rules`: brief.md, The Battle of Lake-town (19); brief.md, The Wizard's Quest (8); brief.md, The Stone of Erech (7); brief.md, Into the Pit (6); brief.md, Murder at the Prancing Pony (6); brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, Attack on Dol Guldur (3); brief.md, The engine plays the game (3); brief.md, The Mines of Moria (3); brief.md, The Woodland Realm (3); architecture.md, State (2); brief.md, Angmar Awakened (2); brief.md, Escape from Khazad-dûm (2); brief.md, Return to Mirkwood (2); brief.md, Conflict at the Carrock (1); brief.md, Ered Mithrin (1); brief.md, Escape from Mount Gram (1); brief.md, Player side quests, contracts and saga cards (1); brief.md, Shadow and Flame (1); brief.md, The Black Gate Opens (1); brief.md, The Long Dark (1); brief.md, The Redhorn Gate (1); brief.md, The Return of the King (1); brief.md, The Seventh Level (1); brief.md, The Siege of Annúminas (1)
 - `src/screens`: design-system.md, Tablets (10); design-system.md, Card groups (the Cards tab's Encounter cards view) (9); design-system.md, Campaign setup (8); design-system.md, Briefing (7); brief.md, Persistence and shipping (6); design-system.md, Campaigns (campaign list) (6); design-system.md, Settings (6); brief.md, Three layers (5); design-system.md, Components (5); design-system.md, Navigation (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system-table.md, Table menu (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Collection (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Performance (3); design-system.md, Screen reader (3); architecture.md, Desktop (2); architecture.md, Update check (2); brief.md, Screens (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); design-system.md, Update ribbon (2); .claude/rules/code-standards.md, Saving (1); architecture.md, Images (1); architecture.md, Persistence (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Dwarrowdelf (1); brief.md, Nightmare (1); brief.md, Shadows of Mirkwood (1); brief.md, Standalone scenarios (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system-table.md, Two taps (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Splash (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
 - `src/ui`: design-system-table.md, Screen reader (4); design-system.md, Settings (4); design-system.md, Type (4); design-system-table.md, Two taps (3); design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); architecture.md, Update check (1); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Splash (1); design-system.md, Standards (1); design-system.md, Surfaces (1); design-system.md, Update ribbon (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

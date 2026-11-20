@@ -23,6 +23,7 @@ import { reduceLife, takesLifeInstead } from "../families/burden/life.ts";
 import { placedLimit } from "../families/uncharted/limit.ts";
 import { grappleThreat } from "../families/grapple/values.ts";
 import { perDamage, threatPerHostWillpower } from "../families/cirith-ungol/values.ts";
+import { perShadow } from "../families/wizards-quest/khazad.ts";
 import { questProgressBonus } from "../families/wilderland/dolguldur.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
 import { wallRoom } from "../families/pelennor/wall.ts";
@@ -89,7 +90,7 @@ export function modifiedStat(
     if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
   }
   // Effects that count the damage on the card or the Willpower of its host (146023:A:1, 146022:A:3, 146014:A:2), recalculated as they change (faq.lasting-effects).
-  total += perDamage(state, instance, printed, stat) + questProgressBonus(state, instance, printed, stat);
+  total += perDamage(state, instance, printed, stat) + questProgressBonus(state, instance, printed, stat) + perShadow(state, instance, printed, stat);
   if (stat === "threat") total += threatPerHostWillpower(state, instance, printed, cards);
   const lowered = set ?? total;
   const value = lowered < floor && ((stat === "willpower" && flagged(state, instance.id, "cannotReduceWillpower")) || (stat === "defense" && flagged(state, instance.id, "cannotReduceDefense"))) ? floor : lowered;

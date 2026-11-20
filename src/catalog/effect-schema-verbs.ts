@@ -303,7 +303,7 @@ export const simpleVerbs = [
     allies: z.boolean().optional(),
     // With "defend": only the allies whose printed hit points are fewer than the source's cannot defend ("Allies with fewer printed hit points than Uruk-hai
     // Captain cannot defend against Uruk-hai Captain", 142069:A:2).
-    belowSourceHitPoints: z.boolean().optional(),
+    belowSourceHitPoints: z.boolean().optional(), anyDefender: z.literal(true).optional(), // `anyDefender`: no character can defend against the source ("Players cannot declare defenders against Rock Adder", 51324:A:1).
     // With "travel" on a card that is not the location: the players cannot travel to any location but the source ("players cannot travel to other locations", 50217:A:2).
     exceptSelf: z.boolean().optional(),
     // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
