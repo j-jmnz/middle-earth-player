@@ -187,7 +187,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   }
   if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
   // The sea family's routes for the cards that do not go to the encounter discard pile (families/sea/routes.ts): only in a game with ships.
-  state = stampRoutes(state, ctx.cards, corsairTrait(ctx.effects));
+  state = stampRoutes(state, ctx.cards, corsairTrait(ctx.effects, input.definition.modeCard?.code));
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
   // The raises of Setup step 7 come after the initial threat level is recorded.

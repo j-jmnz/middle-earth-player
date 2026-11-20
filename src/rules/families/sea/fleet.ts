@@ -8,15 +8,15 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { askTarget } from "../../windows/choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { currentCause, ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import type { ReduceContext } from "../../interpret/interpret.ts";
+import { drawMany, type ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { recordsOfFace } from "../dreamchaser/faces.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { heldAmount, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard, turnedUp } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
@@ -91,8 +91,19 @@ function fleetSetups(state: ScenarioState, ctx: ReduceContext, steps: EngineStep
   for (const id of ordered) {
     const ship = next.cards[id];
     if (!ship || ship.controller == null) continue;
-    const records = recordsOfFace(ship, effectsOf(ctx, ship.code)).filter((effect) => effect.timing === "setup");
+    // The Setup lines, and a Forced line on the starting hand ("When you draw your starting hand", Pride of Lebennin): the box's ships are taken after the opening hands, so it resolves here (docs/brief.md, The Hunt for the Dreadnaught, reading 3).
+    const records = recordsOfFace(ship, effectsOf(ctx, ship.code)).filter((effect) => effect.timing === "setup" || (effect.timing === "forced" && effect.trigger === "setupHandDrawn"));
     if (records.length > 0) next = pushCardEffects(next, "setup", id, ship.controller, false, records, ctx, steps);
+  }
+  return next;
+}
+
+// "Your starting hand size is 8 cards" (Silent Mist, 40009:A:2): a ship that holds the flag `startingHand` (the cards more than the usual 6) lets its controller draw them once the fleet is taken; the hands were drawn before (reading 3).
+function startingHands(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  for (const seat of livingSeats(state)) {
+    const more = state.modifiers.length > 0 ? heldAmount(state, `seat:${seat}`, "startingHand") : 0;
+    if (more > 0) next = drawMany(next, seat, more, steps, ruleCause("rr.setup"), ctx, false, false, true);
   }
   return next;
 }
@@ -108,7 +119,7 @@ export function prepareFleet(state: ScenarioState, instruction: Extract<Instruct
     const choice = fleetChoice(next, ctx, own);
     if (!choice) {
       // The box's own fleet keeps its unused ships set aside and has no Heading card.
-      if (own) return fleetSetups({ ...next, sea: { ...(next.sea ?? { heading: null, headingCard: null, routes: {} }), fleet: true } }, ctx, steps, true);
+      if (own) return fleetSetups(startingHands({ ...next, sea: { ...(next.sea ?? { heading: null, headingCard: null, routes: {} }), fleet: true } }, ctx, steps), ctx, steps, true);
       for (const id of ships(next, ctx).free) next = moveCard(next, id, { zone: "removed" });
       return fleetSetups(attachHeading(next, ctx), ctx, steps);
     }

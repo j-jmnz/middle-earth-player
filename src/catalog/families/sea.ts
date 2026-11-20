@@ -177,6 +177,8 @@ const FLAGS = [
   "shipAttackersOnly",
   // On an enemy: it is immune to player events, not to the other player cards ("Each Raider enemy with at least 1 resource on it is immune to player events", 12159:A:1; families/sea/immune.ts).
   "immuneToPlayerEvents",
+  // On "seat:N": the cards the seat draws once the box's fleet is taken, beyond the 6 of the opening hand ("Your starting hand size is 8 cards", 40009:A:2; families/sea/fleet.ts).
+  "startingHand",
   // On an enemy: the Pillage it gains ("gains Pillage 3", 40034:A:2), added to its printed Pillage X (families/sea/pillage.ts).
   "pillage",
   // On a character: it cannot be declared as an attacker against the Dreadnaught ("Engaged player cannot attack the Dreadnaught", 40014:A:2).

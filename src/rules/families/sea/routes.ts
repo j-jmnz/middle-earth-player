@@ -19,9 +19,13 @@ export function isElite(printed: PrintedCard): boolean {
   return printed.encounterSet === ELITE_SET;
 }
 
-/** The trait a game's "Prepare the Corsair deck" asks of the enemies it takes (`PrepareCorsairDeck` `trait`: The Hunt for the Dreadnaught, whose Sea Monster is a Creature enemy), or undefined where it takes every non-ship enemy. */
-export function corsairTrait(effects: readonly Effect[]): string | undefined {
-  for (const effect of effects) for (const instruction of effect.instructions) if (instruction.verb === "PrepareCorsairDeck" && instruction.trait != null) return instruction.trait;
+/** The trait the "Prepare the Corsair deck" of the game's mode card asks of the enemies it takes (`PrepareCorsairDeck` `trait`: The Hunt for the Dreadnaught, whose Sea Monster is a Creature enemy), or undefined where it takes every non-ship enemy (every game without such a mode card). */
+export function corsairTrait(effects: readonly Effect[], modeCode: string | undefined): string | undefined {
+  if (modeCode == null) return undefined;
+  for (const effect of effects) {
+    if (effect.cardCode !== modeCode) continue;
+    for (const instruction of effect.instructions) if (instruction.verb === "PrepareCorsairDeck" && instruction.trait != null) return instruction.trait;
+  }
   return undefined;
 }
 
