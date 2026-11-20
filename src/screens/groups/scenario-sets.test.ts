@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
+import { printedSetName } from "../../campaign/printed-name.ts";
 import { campaignIds, campaignOf, scenarioOf } from "../data/campaign-data.ts";
 import { groupDataOf } from "./cache.ts";
 import { dealtCodes, setKeyFor } from "./scenario-sets.ts";
@@ -40,13 +41,24 @@ describe("every scenario's Encounter sets", () => {
         const scenario = scenarioOf(scenarioId);
         if (!scenario) continue;
         const codes = dealtCodes(scenario);
-        for (const set of scenario.encounterSets) {
-          const key = setKeyFor(scenarioTree, set.name, codes);
+        // The briefing names a numbered packet by its printed set (printedSetName).
+        const listed = new Set(scenario.encounterSets.map((set) => set.name));
+        for (const name of new Set(scenario.encounterSets.map((set) => printedSetName(set.name, listed)))) {
+          const key = setKeyFor(scenarioTree, name, codes);
           const held = key ? scenarioTree.byKey.get(key)!.set.groups.some((group) => group.cards.some((c) => codes.has(c.code))) : false;
-          if (!held) missing.push(`${scenarioId}: ${set.name} -> ${key}`);
+          if (!held) missing.push(`${scenarioId}: ${name} -> ${key}`);
         }
       }
     }
     expect(missing).toEqual([]);
+  });
+});
+
+describe("a Fellowship event kit's set", () => {
+  const data = groupDataOf(drizzle(new Database(temporaryCatalog(), { readonly: true })));
+  it.each(["The Wizard's Quest", "The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm"])("lists %s as one set that holds its numbered packets", (name) => {
+    const sets = [...data.scenario().byKey.values()].map((found) => found.set).filter((set) => set.name.startsWith(name));
+    expect(sets.map((set) => set.name)).toEqual([name]);
+    expect(sets[0]!.count).toBeGreaterThan(40);
   });
 });

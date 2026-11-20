@@ -2,6 +2,7 @@
 // boxes), each pack's encounter sets, and each set's cards under their type's heading. A set carries its scenario's quest cards, which print
 // the set's name, and a Nightmare deck is its own product at the end (the decks are sold apart from the boxes), one set to a deck with its setup
 // card. A pack with no encounter card is left out, and so is a product with no pack left. Pure; groups/cache.ts reads the rows once per catalog.
+import { printedSetName } from "../../campaign/printed-name";
 import { copiesOf, SCENARIO_TYPES, typeGroups, type Decorate, type EasyCopies, type GroupRow, type TypeGroup } from "./group-types";
 
 /** The packs the Nightmare decks are printed in: none of the catalog's (the pack code is the cards' own). */
@@ -49,8 +50,13 @@ function setNode(pack: string, name: string, rows: readonly GroupRow[], decorate
 
 // The sets of one pack in print order: by the number of their first card.
 function packSets(pack: string, rows: readonly GroupRow[], decorate: Decorate): SetNode[] {
+  // A numbered packet of a Fellowship event kit joins its printed set (printedSetName).
+  const listed = new Set(rows.map(setName));
   const byName = new Map<string, GroupRow[]>();
-  for (const row of rows) byName.set(setName(row), [...(byName.get(setName(row)) ?? []), row]);
+  for (const row of rows) {
+    const name = printedSetName(setName(row), listed);
+    byName.set(name, [...(byName.get(name) ?? []), row]);
+  }
   const first = (members: readonly GroupRow[]) => Math.min(...members.map((row) => row.position));
   return [...byName.entries()].sort(([leftName, left], [rightName, right]) => first(left) - first(right) || leftName.localeCompare(rightName)).map(([name, members]) => setNode(pack, name, members, decorate));
 }
