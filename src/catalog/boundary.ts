@@ -61,6 +61,8 @@ export const printedKeywordsSchema = z.strictObject({
   // Battle / Siege on a quest card: committed characters count Attack / Defense instead of Willpower (hon.battle, hon.siege).
   battle: z.boolean().optional(),
   siege: z.boolean().optional(),
+  // The Siege value box an Attack on Dol Guldur card prints at its bottom right (docs/brief.md, Attack on Dol Guldur, reading 2): what a destroyed enemy or an explored location adds to the round's tally. A printed mark, not a quest-card flag.
+  siegeValue: z.number().int().positive().optional(),
   // Secrecy X: the card costs X less to play while its player's threat is 20 or less.
   secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).

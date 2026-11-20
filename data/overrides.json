@@ -1412,6 +1412,126 @@
       },
       "reason": "Hall of Beorn spells the stage 3 quest card 'The Wiched Willow' in its title and slug and in the scan addresses, which answer 403. The card prints 'The Wicked Willow' (DragnCards' deck Q99.04 and RulesPal's transcription name it so), and the spelled-right addresses serve both sides.",
       "source": "hallofbeorn.com/Export/EncounterCards (Slug The-Wiched-Willow-TOF); s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Old-Forest/The-Wicked-Willow-3A.jpg; dragncards Q99.04"
+    },
+    {
+      "match": {
+        "code": "50914"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 4
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50915"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 3
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50916"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50917"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 1
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50918"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 1
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50919"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 1
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50920"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50921"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50922"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
+    },
+    {
+      "match": {
+        "code": "50923"
+      },
+      "set": {
+        "keywords": {
+          "siegeValue": 2
+        }
+      },
+      "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
+      "source": "Attack on Dol Guldur box, card scan (docs/brief.md, Attack on Dol Guldur, reading 2)"
     }
   ],
   "scenarioPiles": [
