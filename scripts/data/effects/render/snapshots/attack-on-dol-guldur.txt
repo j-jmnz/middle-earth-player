@@ -219,7 +219,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 (the scenario deals it into the staging pile; the piles place it, no record does)
 
 50908:A:1 (front): While you control Power of Lórien, it gains: 'Response: Add Power of Lórien to the victory display to cancel and discard an encounter card just revealed from the encounter deck.'
-  50908:response:1: Response on the event encounterRevealed (cost: [json cost {"kind":"addSelfToVictory"}]; only when the encounter deck revealed it)
+  50908:response:1: Response on the event encounterRevealed (cost: [json cost {"kind":"addSelfToVictory"}])
     only if not (this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the effect being resolved is canceled: nothing after this resolves
