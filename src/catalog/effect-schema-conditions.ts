@@ -187,6 +187,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("canAttachToDial"), code: z.string().min(1) }),
   // The quest deck holds at least `min` stages (1 by default): the stage 2s Mount Gundabad's current quest can be bypassed in favor of (19135:B:3; emce.bypassing). Read by the wilderland family.
   z.strictObject({ kind: z.literal("questDeck"), min: z.number().int().positive().optional() }),
+  // The running effect took this option: a Choose with `different` (or SelectRandomStage, which notes the code of the stage it picked) records the ids of the options it took on the effect frame, so what follows reads them ("remove 5 progress from this stage or each player discards ...", 50903:B:2). Read by the wilderland family.
+  z.strictObject({ kind: z.literal("optionTaken"), id: z.string().min(1) }),
   // The enemy with this title has resolved an attack in the combat phase now under way ("unless he has resolved an attack this phase", 19155:A:1): false in any other phase. Read by the wilderland family.
   z.strictObject({ kind: z.literal("attackedThisPhase"), name: z.string().min(1) }),
   // The card in play with this title holds this flag, a modifier of that stat in force now: "resources cannot be placed on The Heroes' Defense" (19161:A:2) read by the Watchtower's option (19163:A:2). Read by the wilderland family.

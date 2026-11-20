@@ -226,9 +226,9 @@ export function isPlayerCardEffect(state: ScenarioState, cards: ReadonlyMap<stri
   return isPlayerType(printed) && printed.backType !== "encounter";
 }
 
-// An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2).
+// An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2), or only its Indestructible (`losesIndestructible`, 50931:B:1).
 export function indestructible(state: ScenarioState, id: string, printed: PrintedCard): boolean {
-  return printed.type === "enemy" && (printed.keywords.indestructible || flagged(state, id, "indestructible")) && !flagged(state, id, "losesKeywords");
+  return printed.type === "enemy" && (printed.keywords.indestructible || flagged(state, id, "indestructible")) && !flagged(state, id, "losesKeywords") && !flagged(state, id, "losesIndestructible");
 }
 
 export function placeDamage(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause, sourceId?: string | null): ScenarioState {

@@ -33,6 +33,7 @@ import { advanceToLetterStage, grantSurge, freeTreasures, searchGuardForTreasure
 import { carryAwayHero, discardGuardedHeroes, discardHeldHero, releaseGuardedHero, returnHeldHeroes } from "./carried.ts";
 import { discardFacedownUnder, placeHandUnderLocation, returnFacedownToHands } from "./lost.ts";
 import { clearNemesis, nemesisAttacks, searchNemesis } from "./nemesis.ts";
+import { optionTaken, selectRandomStage, tallySiege } from "./dolguldur.ts";
 import { topFrame } from "../../windows/windows.ts";
 import { NAMED_PILES, pileOf } from "../../core/piles.ts";
 
@@ -89,6 +90,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return releaseGuardedHero(state, eventSubject(state));
     case "DiscardGuardedHeroes":
       return discardGuardedHeroes(state, steps);
+    case "TallySiege":
+      return tallySiege(state, eventSubject(state), ctx);
+    case "SelectRandomStage":
+      return selectRandomStage(state, instruction);
     case "DiscardHeldHero":
       return discardHeldHero(state, instruction.stage, steps);
     case "ReturnHeldHeroes":
@@ -233,6 +238,7 @@ function condition(state: ScenarioState, found: Condition, scope: { actor: numbe
   }
   if (found.kind === "questDeck") return state.questDeck.length >= (found.min ?? 1);
   if (found.kind === "attackedThisPhase") return attackedThisPhase(state, found.name, ctx);
+  if (found.kind === "optionTaken") return optionTaken(state, found.id);
   if (found.kind === "namedFlag") return namedFlagHeld(state, found.name, found.stat, ctx);
   return logCondition(found, logFacts(state));
 }
@@ -250,6 +256,6 @@ export const manifest: RulesFamily = {
   travel: { unpayable: pileTravelUnpayable },
   // The Evil Creatures deck runs out: its own discard pile is shuffled back into it at once (emce.evil-creatures-deck).
   settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => defeatFullSideQuests(claimFreed(victoryWhenFree(returnHeld(clearNemesis(freeTreasures(controlFreedObjectives(state, ctx), ctx, steps), ctx), ctx), ctx, steps), ctx, steps), ctx, steps) },
-  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "DiscardHeldHero", "ReturnHeldHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike", "ShuffleSetAsideIntoPile", "RemoveSetAsideDamage", "AttachGuardedFromPile", "VictoryWhenFree", "UncancelableWhenRevealed", "DiscardOtherLooked", "ArrangeLookedDeck", "ImmediateAttackBy", "ExhaustOrDamageEachReady", "SearchBoonAllyToHand", "RemoveFromCavesIfLogged", "ChooseRandomTreasure", "AdvanceToRandomStage", "FlipToEnemySide", "PutTrust", "ClaimWhenFree", "GuardReturnedBy", "ChooseStagedLocationForPool", "RevealSideQuest", "AttackStage", "ExcessToStage", "MakeCurrentQuest", "MarkBeldisUse", "ResolveDiscover", "AttachLootFromDiscard", "HideRandomLoot", "ChooseHazardForPool", "FlipAtQuestPhase", "FlipCurrentQuest", "RevealNewStage", "ChooseStageToFlip", "ShuffleStageFromVictory", "DiscardTopEliminating", "AddShadowToVictory", "BypassStage", "SearchQuestDeck", "FlipInPlace", "LimitPlaysPerPhase", "LimitPlaysPerRound", "LimitHandPlaysPerRound", "ActivateFromCaves", "StageRandomDiscarded", "AttachTreasuresToHost", "SearchBoonOrTreasureToHand", "SearchStageCard", "StageDiscarded", "RemoveProgressFrom"],
+  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "DiscardHeldHero", "ReturnHeldHeroes", "TallySiege", "SelectRandomStage", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike", "ShuffleSetAsideIntoPile", "RemoveSetAsideDamage", "AttachGuardedFromPile", "VictoryWhenFree", "UncancelableWhenRevealed", "DiscardOtherLooked", "ArrangeLookedDeck", "ImmediateAttackBy", "ExhaustOrDamageEachReady", "SearchBoonAllyToHand", "RemoveFromCavesIfLogged", "ChooseRandomTreasure", "AdvanceToRandomStage", "FlipToEnemySide", "PutTrust", "ClaimWhenFree", "GuardReturnedBy", "ChooseStagedLocationForPool", "RevealSideQuest", "AttackStage", "ExcessToStage", "MakeCurrentQuest", "MarkBeldisUse", "ResolveDiscover", "AttachLootFromDiscard", "HideRandomLoot", "ChooseHazardForPool", "FlipAtQuestPhase", "FlipCurrentQuest", "RevealNewStage", "ChooseStageToFlip", "ShuffleStageFromVictory", "DiscardTopEliminating", "AddShadowToVictory", "BypassStage", "SearchQuestDeck", "FlipInPlace", "LimitPlaysPerPhase", "LimitPlaysPerRound", "LimitHandPlaysPerRound", "ActivateFromCaves", "StageRandomDiscarded", "AttachTreasuresToHost", "SearchBoonOrTreasureToHand", "SearchStageCard", "StageDiscarded", "RemoveProgressFrom"],
   run,
 };

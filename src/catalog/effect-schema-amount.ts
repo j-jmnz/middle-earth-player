@@ -90,6 +90,8 @@ export const amountExprSchema = z.strictObject({
   discardedMatching: pickSchema.optional(),
   // The printed cost of the card the source guards: the player cards under it, and the card it is attached to as a guard ("X is that card's cost", 18050:A:1). Read by the wilderland family.
   guardedCost: z.literal(true).optional(),
+  // The Siege values added up for this round (docs/brief.md, Attack on Dol Guldur, reading 4): each destroyed enemy and each explored location adds its printed Siege value (TallySiege), "X is the total siege value of each location explored and each enemy destroyed this round" (50907:A:1). 0 once the round is over. Read by the wilderland family.
+  siegeTally: z.literal(true).optional(),
   // The damage on the card the answered event is about beyond its printed hit points: "for each excess point of damage dealt" (18049:A:2). Read by the wilderland family.
   excessOf: z.literal("subject").optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).

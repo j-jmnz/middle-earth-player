@@ -21,6 +21,7 @@ describe("effects render read fields, amounts", () => {
     { highestThreat: true },
     { playersAtThreat: 35 },
     { pursuit: true },
+    { siegeTally: true },
     { lakeTownDamage: true },
     { victoryDisplay: true },
     { questCards: true },

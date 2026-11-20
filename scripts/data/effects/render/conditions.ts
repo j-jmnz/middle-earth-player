@@ -52,6 +52,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   namedFlag: (c) => ({ text: `the card in play titled "${str(c.name)}" holds the flag ${str(c.stat)}`, read: ["name", "stat"] }),
   flag: (c) => ({ text: `${c.holder === "seat" ? "the actor's seat" : c.holder === "table" ? "the table" : "this card"} ${c.is === false ? "does not hold" : "holds"} the flag ${str(c.stat)}`, read: ["stat", "holder", "is"] }),
   canPick: (c, ctx) => ({ text: `there is a ${renderPick(c.pick, ctx)} to choose`, read: ["pick"] }),
+  optionTaken: (c) => ({ text: `the running effect took the option "${str(c.id)}" (a choice made earlier in it, or the stage picked at random)`, read: ["id"] }),
   attackedThisPhase: (c) => ({ text: `"${str(c.name)}" has resolved an attack this phase`, read: ["name"] }),
   lastFortitudeFailed: () => ({ text: "the last Fortitude test the running effect made was failed (false before it has made one)", read: [] }),
   lastFortitudePassed: () => ({ text: "the last Fortitude test the running effect made was passed (false before it has made one)", read: [] }),

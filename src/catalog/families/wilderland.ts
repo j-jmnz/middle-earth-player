@@ -108,6 +108,11 @@ const VERBS = [
   z.strictObject({ verb: z.literal("DiscardHeldHero"), stage: z.number().int().positive(), ...when }),
   // Enemy Camp (50815:A:2, "return each hero under each stage 3 to its owner's control"): each hero lying facedown under the current quest stage, when it is stage number `stage`, returns among its owner's heroes, faceup and exhausted.
   z.strictObject({ verb: z.literal("ReturnHeldHeroes"), stage: z.number().int().positive(), ...when }),
+  // Attack on Dol Guldur (standalone-scenarios part 9; ledger lines 50907:A:1, 50931:B:2; docs/brief.md, Attack on Dol Guldur, readings 4 and 6).
+  // On the event of an enemy destroyed or a location explored: the Siege value printed on that card (`siegeValue`, 0 when it prints none) joins the round's tally, which the amount `siegeTally` reads. Dol Guldur's Forced effect empties it by reading it at the end of the round.
+  z.strictObject({ verb: z.literal("TallySiege"), ...when }),
+  // "randomly select a stage 3 that was not in play this round" (50931:B:2): of the stages in `codes`, those but the current one, the game's seed picks one and the running effect notes its code as an option taken (the condition `optionTaken`), for the penalty records that follow.
+  z.strictObject({ verb: z.literal("SelectRandomStage"), codes: z.array(code).min(2), ...when }),
   // Truly Lost (18075:A:1): "Each player places his hand of cards facedown under a different location in the staging area." The actor chooses a location in the staging area (an Objective-Location is one) that no player has put a hand under yet, and every card of their hand goes facedown under it, still theirs.
   // With an empty hand nothing is chosen.
   z.strictObject({ verb: z.literal("PlaceHandUnderLocation"), ...when }),
@@ -359,6 +364,8 @@ const FLAGS = [
   // On the table: the Refresh Action of Abandoned Tools can be used once each round while Escape from Darkness is the current quest (901201:A:3), and the use made this round (engine use).
   "refreshOnce",
   "refreshUsed",
+  // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/brief.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keywords.ts).
+  "losesIndestructible",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

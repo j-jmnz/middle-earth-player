@@ -32,6 +32,11 @@ export const CARDS = cardMap([
   definePrinted({ code: "relic", name: "Cursed Relic", type: "objective", health: 2, keywords: { indestructible: true } }),
   definePrinted({ code: "pit", name: "Bottomless Pit", type: "location", threat: 1, questPoints: 2, health: 2, keywords: { indestructible: true } }),
   definePrinted({ code: "camp", name: "Campaign", type: "campaign" }),
+  // Attack on Dol Guldur's Siege values (dolguldur.test.ts) and a stage 3 to come back to.
+  definePrinted({ code: "siegeEnemy", name: "Host", type: "enemy", threat: 1, engagementCost: 40, attack: 3, defense: 2, health: 4, keywords: { siegeValue: 4 } }),
+  definePrinted({ code: "siegePlace", name: "Gate", type: "location", threat: 2, questPoints: 4, keywords: { siegeValue: 2 } }),
+  definePrinted({ code: "stage3a", name: "Stage 3A", type: "quest" }),
+  definePrinted({ code: "stage3c", name: "Stage 3C", type: "quest" }),
 ]);
 
 export function record(id: string, cardCode: string, timing: Effect["timing"], instructions: Instruction[], extra: Partial<Effect> = {}): Effect {

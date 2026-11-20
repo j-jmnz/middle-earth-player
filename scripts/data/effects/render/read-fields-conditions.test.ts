@@ -14,6 +14,7 @@ describe("effects render read fields, conditions", () => {
     namedFlag: [{ kind: "namedFlag", name: "A Card", stat: "blankText" }],
     flag: [{ kind: "flag", stat: "blankText", holder: "seat", is: false }, { kind: "flag", stat: "refreshOnce", holder: "table" }],
     canPick: [{ kind: "canPick", pick: { type: "hero", control: "you" } }],
+    optionTaken: [{ kind: "optionTaken", id: "penalty" }],
     attackedThisPhase: [{ kind: "attackedThisPhase", name: "A Card" }],
     phase: [{ kind: "phase", is: "combat" }],
     hasEngaged: [{ kind: "hasEngaged", trait: "Orc" }],
