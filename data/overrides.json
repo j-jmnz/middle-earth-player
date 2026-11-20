@@ -2479,6 +2479,426 @@
       },
       "reason": "Hall of Beorn gives the 42 encounter cards of The Woodland Realm numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets. The scan prints the card's cost in the box at the bottom right (COST 1), which Hall of Beorn leaves empty.",
       "source": "scans 51112.A to 51153.A; dragncards cardDb.tsv (The Woodland Realm, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51212"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 1"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51213"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 1"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51214"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 1"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51215"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 2"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51216"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 2"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51217"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 2"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51218"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 3"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51219"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 3"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51220"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 3"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51221"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 4"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51222"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 4"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51223"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 4"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51224"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 5"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51225"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 5"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51226"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 5"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51227"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 6"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51228"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 6"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51229"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 6"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51230"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 7"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51231"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 7"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51232"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 7"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51233"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 8"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51234"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 8"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51235"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 8"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51236"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 9"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51237"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 9"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51238"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 9"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51239"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 10"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51240"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 10"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51241"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 10"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51242"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 11"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51243"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 11"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51244"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 11"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51245"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 12"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51246"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 12"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51247"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 12"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51248"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 13"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51249"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 13"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51250"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 13"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51251"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 14"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51252"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 14"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
+    },
+    {
+      "match": {
+        "code": "51253"
+      },
+      "set": {
+        "encounterSet": "The Mines of Moria 14"
+      },
+      "reason": "Hall of Beorn gives the 42 encounter cards of The Mines of Moria numbered 12 to 53 no encounter set. Each is printed with its set's number (1 to 14, the set's cards numbered x/3) and DragnCards numbers the sets by card order, three cards each; the quick-build rules deal 7 of the 14 sets.",
+      "source": "scans 51212.A to 51253.A; dragncards cardDb.tsv (The Mines of Moria, numberInPack)"
     }
   ],
   "scenarioPiles": [
@@ -2927,6 +3347,70 @@
       "pile": "staging",
       "reason": "DragnCards loads Spider Den set aside (Q99.12). The quest card Captured by Spiders (51101) prints \"Setup: Add Spider Den to the staging area.\", so it starts in the staging area.",
       "source": "scan 51101.A; dragncards preBuiltDecks.json (Q99.12)"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51201",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: To the West-door (stage 1) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51203",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Journey in the Black Pit (stage 2, A Presence in the Dark) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51204",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Journey in the Black Pit (stage 2, The Long Dark of Moria) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51205",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Journey in the Black Pit (stage 2, Narrow Paths) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51207",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Search for the Chamber (stage 3, Drums in the Deep) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51208",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Search for the Chamber (stage 3, The Fate of Balin) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51209",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads all seven quest cards of Q99.13 in the set-aside group, since the players choose their stage 2 and stage 3 card. The scenario's quest pile is the stages, as in The Wizard's Quest: Search for the Chamber (stage 3, Continuing Eastward) is a quest card of the quest deck.",
+      "source": "dragncards preBuiltDecks.json (Q99.13); scan of the quest card"
+    },
+    {
+      "scenario": "the-mines-of-moria",
+      "code": "51210",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads The Watcher set aside (Q99.13). The quest card To the West-door (51201) prints \"Setup: ... Add The Watcher to the staging area.\", so it starts in the staging area.",
+      "source": "scan 51201.A; dragncards preBuiltDecks.json (Q99.13)"
     }
   ],
   "scenarioRemovals": [
@@ -3317,6 +3801,12 @@
   ],
   "productCodes": [
     {
+      "set": "The Mines of Moria",
+      "prefix": "512",
+      "reason": "Hall of Beorn numbers The Mines of Moria's cards 00001 to 00053 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and of the core set's, and RingsDB lists no card of TMoM. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 512 and the two-digit collector number: 5 and 12 for the pack's position (12) in RingsDB's cycle 50, the Standalone scenarios, with the field's three-digit limit (51201 To the West-door, 51253 Massing in the Deep).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards (CardSet The Mines of Moria, Number, RingsDbCardId); ringsdb.com packs (TMoM, cycle 50, position 12; no cards listed)"
+    },
+    {
       "set": "The Woodland Realm",
       "prefix": "511",
       "reason": "Hall of Beorn numbers The Woodland Realm's cards 00001 to 00053 (RingsDbCardId), which are the codes of The Massing at Osgiliath's 00001 to 00019 and of the core set's, and RingsDB lists no card of TWR. A code must name one card, so the earlier standalone packs keep their codes and this pack's are 511 and the two-digit collector number: 5 and 11 for the pack's position (11) in RingsDB's cycle 50, the Standalone scenarios, with the field's three-digit limit (51101 Captured by Spiders, 51153 Wasted Provisions).",
@@ -3613,6 +4103,22 @@
       "code": "51111",
       "reason": "The second name of the DragnCards card number 10 is Mendor, which Hall of Beorn numbers 11. See the side A entry.",
       "source": "dragncards cardDb.tsv (The Woodland Realm 10); hallofbeorn.com/Export/EncounterCards (Mendor-TWR)"
+    },
+    {
+      "dragncards": "The Mines of Moria",
+      "number": 10,
+      "side": "a",
+      "code": "51210",
+      "reason": "DragnCards files The Watcher and Chamber of Mazarbul as one two-named card, collector number 10 (The Watcher, then Chamber of Mazarbul). Hall of Beorn files them as two cards, #10 The Watcher and #11 Chamber of Mazarbul. Side A is The Watcher.",
+      "source": "dragncards cardDb.tsv (The Mines of Moria 10); hallofbeorn.com/Export/EncounterCards (The-Watcher-TMoM, Chamber-of-Mazarbul-TMoM); scan 51210.A"
+    },
+    {
+      "dragncards": "The Mines of Moria",
+      "number": 10,
+      "side": "b",
+      "code": "51211",
+      "reason": "The second name of the DragnCards card number 10 is Chamber of Mazarbul, which Hall of Beorn numbers 11. See the side A entry.",
+      "source": "dragncards cardDb.tsv (The Mines of Moria 10); hallofbeorn.com/Export/EncounterCards (Chamber-of-Mazarbul-TMoM)"
     }
   ],
   "encounterSetAliases": [

@@ -32,6 +32,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 142041 Drums in the Deep. With no enemy in the staging area when the quest phase begins the first player reveals one more card (the Balrog, though
   // it is considered engaged, is in the staging area); the stage cannot be defeated without 3 resource tokens for each player on it, one placed for
   // each enemy defeated.
+  // 142041:A:1 names Chamber of Mazarbul, a title The Mines of Moria (51211) prints too, so the template cannot pick a card by name: the record is written here.
+  {"id":"142041:whenRevealed:1","cardCode":"142041","lines":["142041:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AddSetAsideToStaging","code":"142051"}]},
   {"id":"142041:forced:1","cardCode":"142041","lines":["142041:B:1"],"timing":"forced","trigger":"beginningOfPhase","condition":{"kind":"all","conditions":[PHASE_QUEST,{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true},"max":0}]},"instructions":[{"verb":"RevealMore","amount":1}]},
   {"id":"142041:constant:1","cardCode":"142041","lines":["142041:B:2"],"timing":"constant","condition":{"kind":"not","condition":{"kind":"tokens","code":"142041","min":3,"perPlayer":true}},"instructions":[{"verb":"Restrict","what":"advance"}]},
   {"id":"142041:forced:2","cardCode":"142041","lines":["142041:B:3"],"timing":"forced","trigger":"enemyDestroyed","instructions":[{"verb":"PlaceToken","amount":1}]},

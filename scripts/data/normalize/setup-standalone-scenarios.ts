@@ -116,6 +116,8 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
   // The Wizard's Quest (51001): "The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area": a search with no card
   // named, so it moves no pile card; the encounter deck keeps the cards until the Setup record finds them.
   if (/^The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area$/.test(sentence)) return [{ kind: "step", step: "searchZeroCostPerPlayer", codes: [] }];
+  // The Mines of Moria (51201): "Each player adds 1 resource to each of his heroes' resource pools": the Setup record gives each hero the resources.
+  if ((match = /^Each player adds (\d+) resources? to each of (?:his|their) heroes['’] resource pools$/.exec(sentence))) return [{ kind: "step", step: "eachHeroResources", codes: [], resources: Number(match[1]) }];
   // "Shuffle any unused Scoutcards back into the encounter deck" (the card prints "Scoutcards"): the copies not staged stay in the encounter deck.
   if (/^Shuffle any unused Scout ?cards back into the encounter deck$/.test(sentence)) return [{ kind: "shuffleEncounterDeck" }];
   return null;

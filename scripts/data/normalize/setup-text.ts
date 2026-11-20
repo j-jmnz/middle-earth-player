@@ -143,6 +143,7 @@ export type SetupStep =
   | "setCityStrength" // "set its city strength to 20": `codes` Annúminas, `count` the strength
   | "flipModeCard" // "Flip this card over and place it next to the quest deck": the mode card's back (its Forced lines) is in play all game
   | "raiseCityStrengthPerPlayer" // "Then, increase its value by 5 for each player" (Attack on Dol Guldur's Standard Game Mode, 50931): `codes` Dol Guldur, `count` the strength each player adds
+  | "eachHeroResources" // "Each player adds 1 resource to each of his heroes' resource pools": `resources` the resources for each hero (The Mines of Moria, 51201)
   | "searchZeroCostPerPlayer" // "The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area" (The Wizard's Quest, 51001)
   | "gateAmongLocations" // "One of those locations must be Gate of Annúminas": `codes` Gate of Annúminas, one of the locations the players search for
   | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"

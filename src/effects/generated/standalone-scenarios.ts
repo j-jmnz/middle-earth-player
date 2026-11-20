@@ -25,4 +25,7 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"51034:constant:1","cardCode":"51034","lines":["51034:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]},
   {"id":"51111:triggered:1","cardCode":"51111","lines":["51111:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
   {"id":"51142:shadow:1","cardCode":"51142","lines":["51142:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
+  {"id":"51227:shadow:1","cardCode":"51227","lines":["51227:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
+  {"id":"51236:constant:1","cardCode":"51236","lines":["51236:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]},
+  {"id":"51248:shadow:1","cardCode":"51248","lines":["51248:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"}]},
 ];
