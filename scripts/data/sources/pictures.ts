@@ -85,12 +85,13 @@ const PRODUCT_OF_PACK: Readonly<Record<string, string>> = { OHaUH: "MEC16", OtD:
 
 // cardgame.tools files Mount Gundabad's seven Exploring Gundabad stage 2s under one number (135, fronts 135a to 135g) and their backs under the
 // numbers 136 to 142; the printings number the stage 2s 135 and 137 to 142. A printing filed under another number names it here. The Wizard's Quest's
-// three stage 2 cards are filed under number 2 (fronts 2a to 2c) and its three stage 3 cards under 6 (6a to 6c); the printings number them 3 to 5 and 7 to 9. The Woodland Realm's and The Mines of Moria's are filed the same way, their three stage 2 cards under 2 (2a to 2c) and their three stage 3 cards under 6 (6a to 6c).
+// three stage 2 cards are filed under number 2 (fronts 2a to 2c) and its three stage 3 cards under 6 (6a to 6c); the printings number them 3 to 5 and 7 to 9. The Woodland Realm's, The Mines of Moria's and Escape from Khazad-dûm's are filed the same way, their three stage 2 cards under 2 (2a to 2c) and their three stage 3 cards under 6 (6a to 6c).
 const FILED_UNDER: Readonly<Record<string, string>> = {
   "MG 135": "135a", "MG 137": "135b", "MG 138": "135c", "MG 139": "135d", "MG 140": "135e", "MG 141": "135f", "MG 142": "135g",
   "TWQ 3": "2b", "TWQ 4": "2a", "TWQ 5": "2c", "TWQ 7": "6a", "TWQ 8": "6b", "TWQ 9": "6c",
   "TWR 3": "2a", "TWR 4": "2b", "TWR 5": "2c", "TWR 7": "6a", "TWR 8": "6b", "TWR 9": "6c",
   "TMoM 3": "2a", "TMoM 4": "2b", "TMoM 5": "2c", "TMoM 7": "6a", "TMoM 8": "6b", "TMoM 9": "6c",
+  "EfKD 3": "2a", "EfKD 4": "2b", "EfKD 5": "2c", "EfKD 7": "6a", "EfKD 8": "6b", "EfKD 9": "6c",
 };
 
 export type Product = { code: string; name: string; type: string };
