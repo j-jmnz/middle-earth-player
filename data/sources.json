@@ -5485,9 +5485,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "5203c416121140e10a32634b3dcc271893d26272bebacbb6fff459b95db51820"
+        "value": "a63a387addd164e4fa7bc67dec4b1e09416967223d20c44e38fd6990162f22a7"
       },
-      "fetchedAt": "2026-11-20T06:40:24.442Z",
+      "fetchedAt": "2026-11-20T09:35:37.927Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -27730,6 +27730,348 @@
           "url": "https://images.cardgame.tools/lotr/MEC75-54-front-Treachery-Weighed_Down.jpg",
           "sha256": "7c7c6edc167038ddc7f20b4734b00be76601a07b6307a2f763443b08e9a04747",
           "bytes": 772041
+        },
+        {
+          "path": "pictures/51101.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-1-front-Quest-Captured_by_Spiders-A-The_Woodland_Realm.jpg",
+          "sha256": "07a464b8bd888562bc21a88f99805d5aee791393e8a44d2a694615bf3fc0d9e5",
+          "bytes": 821798
+        },
+        {
+          "path": "pictures/51101.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-1-back-Quest-Captured_by_Spiders-A-The_Woodland_Realm.jpg",
+          "sha256": "3edb9b1a5fa2978cc3464591509408db3997920470e768c79d0fe617267dabc9",
+          "bytes": 815323
+        },
+        {
+          "path": "pictures/51103.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-2a-front-Quest-A_Chosen_Path-Lost_in_the_Dark-A-The_Woodland_Realm.jpg",
+          "sha256": "2fef395743a260ffba10ab8fa594a768fb853bb8cb35ec8a0ea6562041971e92",
+          "bytes": 821766
+        },
+        {
+          "path": "pictures/51103.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-3-back-Quest-A_Chosen_Path-Lost_in_the_Dark-A-The_Woodland_Realm.jpg",
+          "sha256": "03d7bcdd08f9ef4fb0a345059937b6a2d3a879426589d2142ea8b7511f2311a8",
+          "bytes": 875457
+        },
+        {
+          "path": "pictures/51104.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-2b-front-Quest-A_Chosen_Path-Dont_Leave_the_Path-A-The_Woodland_Realm.jpg",
+          "sha256": "2fef395743a260ffba10ab8fa594a768fb853bb8cb35ec8a0ea6562041971e92",
+          "bytes": 821766
+        },
+        {
+          "path": "pictures/51104.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-4-back-Quest-A_Chosen_Path-Dont_Leave_the_Path-A-The_Woodland_Realm.jpg",
+          "sha256": "fd0b2efb9069ada803a009d98f92f0e0f9015867e4906617eff461ba44d63302",
+          "bytes": 862667
+        },
+        {
+          "path": "pictures/51105.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-2c-front-Quest-A_Chosen_Path-Ambushed_at_Night-A-The_Woodland_Realm.jpg",
+          "sha256": "2fef395743a260ffba10ab8fa594a768fb853bb8cb35ec8a0ea6562041971e92",
+          "bytes": 821766
+        },
+        {
+          "path": "pictures/51105.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-5-back-Quest-A_Chosen_Path-Ambushed_at_Night-A-The_Woodland_Realm.jpg",
+          "sha256": "35c49857230721353661df27731fe11d9ea801ae8139c8998ee8c41b10268118",
+          "bytes": 825169
+        },
+        {
+          "path": "pictures/51107.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-6a-front-Quest-On_the_Trail-The_Forest_of_Great_Fear-A-The_Woodland_Realm.jpg",
+          "sha256": "3708f30d6d17ae84a6b82ad8a7909641d5b53a43081cdc7fb2139be7e69dede5",
+          "bytes": 903059
+        },
+        {
+          "path": "pictures/51107.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-7-back-Quest-On_the_Trail-The_Forest_of_Great_Fear-A-The_Woodland_Realm.jpg",
+          "sha256": "d67bc8b6092c5f19288f741d840570b856756d7c0441d8a33b0de49a327277ac",
+          "bytes": 871145
+        },
+        {
+          "path": "pictures/51108.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-6b-front-Quest-On_the_Trail-To_the_Elvenkings_Halls-A-The_Woodland_Realm.jpg",
+          "sha256": "3708f30d6d17ae84a6b82ad8a7909641d5b53a43081cdc7fb2139be7e69dede5",
+          "bytes": 903059
+        },
+        {
+          "path": "pictures/51108.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-8-back-Quest-On_the_Trail-To_the_Elvenkings_Halls-A-The_Woodland_Realm.jpg",
+          "sha256": "26829faba60165a64c6da4005c6a35221a335eb80b3ebe3d7d457328fe14eeba",
+          "bytes": 837062
+        },
+        {
+          "path": "pictures/51109.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-6c-front-Quest-On_the_Trail-Escape_from_Taur_nu_Fuin-A-The_Woodland_Realm.jpg",
+          "sha256": "3708f30d6d17ae84a6b82ad8a7909641d5b53a43081cdc7fb2139be7e69dede5",
+          "bytes": 903059
+        },
+        {
+          "path": "pictures/51109.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-9-back-Quest-On_the_Trail-Escape_from_Taur_nu_Fuin-A-The_Woodland_Realm.jpg",
+          "sha256": "0683db4b7f6154224e46d0ae88677436fb9ee9026705b48fd6cc41d1e77b3e3f",
+          "bytes": 807194
+        },
+        {
+          "path": "pictures/51110.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-10-front-Location-Spider_Den-The_Woodland_Realm.jpg",
+          "sha256": "8c67f315b1a7258d37a8f753ebb211958698d722d10aa02446d016a8889ed59b",
+          "bytes": 855386
+        },
+        {
+          "path": "pictures/51112.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-12-front-Enemy-Ungoliants_Spawn.jpg",
+          "sha256": "1e19fede42fa26399ba7e83d9d41df18e8cd7c50e70a8f5895614e101503580e",
+          "bytes": 792582
+        },
+        {
+          "path": "pictures/51113.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-13-front-Location-Forest_Grove.jpg",
+          "sha256": "e4e8b1463bd43b5e46b181a47d4021a02e5ebc2237c27ea055b36188c2e72780",
+          "bytes": 824101
+        },
+        {
+          "path": "pictures/51114.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-14-front-Treachery-Despair.jpg",
+          "sha256": "da67c756a92d0d299fa8cc9360b0b8e0d29607e36200873d8e48573634ece802",
+          "bytes": 758764
+        },
+        {
+          "path": "pictures/51115.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-15-front-Enemy-Chieftain_Ufthak.jpg",
+          "sha256": "82af36a824e0a7734f66ef0d7facbf7e01e07988e3274428db4d9168316dce65",
+          "bytes": 766005
+        },
+        {
+          "path": "pictures/51116.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-16-front-Location-Abandoned_Camp.jpg",
+          "sha256": "1db5c2c8dc7f39b23a6a27276f3625ff1f412a94e7e876cff0c465aec5a5765b",
+          "bytes": 785954
+        },
+        {
+          "path": "pictures/51117.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-17-front-Treachery-Gathering_Gloom.jpg",
+          "sha256": "94382e75144cae5a3b9d329fc526083b2fe8623880c2f02f931be02beac115d4",
+          "bytes": 754289
+        },
+        {
+          "path": "pictures/51118.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-18-front-Enemy-Black_Forest_Bats.jpg",
+          "sha256": "cb01cbedc8f1c344e9a81b495e3d7d697586bfd49a59d5e4a9840241873de643",
+          "bytes": 792752
+        },
+        {
+          "path": "pictures/51119.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-19-front-Location-Enchanted_Stream.jpg",
+          "sha256": "e7738413351495395d22513d5a2c2d560b4240cd7fed5421a7601b6ab6e211f9",
+          "bytes": 818895
+        },
+        {
+          "path": "pictures/51120.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-20-front-Treachery-Exhaustion.jpg",
+          "sha256": "e2ee9b72ca9f6ff23ba73da18c47bd9f4693b7469a03ac23f8c1684a4467f8f5",
+          "bytes": 795761
+        },
+        {
+          "path": "pictures/51121.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-21-front-Enemy-Spiders_of_Mirkwood.jpg",
+          "sha256": "d3dae695794cd4fc38b3ea4f3a82e62a1fda26294a8d1d74e31129d98387eb75",
+          "bytes": 786390
+        },
+        {
+          "path": "pictures/51122.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-22-front-Location-The_Spiders_Ring.jpg",
+          "sha256": "0cdfcc5d5178c5a8a54b43dd05ed11691f2d33c5dce0ea7afc977f6e9c17c081",
+          "bytes": 813169
+        },
+        {
+          "path": "pictures/51123.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-23-front-Treachery-Caught_in_a_Web.jpg",
+          "sha256": "8e138e5a5b367ccd0c9ec3cfe980cb39e8ddeca52c1f74a71d95ba851108f49e",
+          "bytes": 844459
+        },
+        {
+          "path": "pictures/51124.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-24-front-Enemy-Wolf_Rider.jpg",
+          "sha256": "817e37fabf64e6626e5f28c5e791bbaecdab37dc27bd7a72a8a757d0ec3eaaba",
+          "bytes": 821418
+        },
+        {
+          "path": "pictures/51125.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-25-front-Location-The_Goblins_Caves.jpg",
+          "sha256": "0f3642f4f66369ad9995c38cea317bdd6ce5df28c312d8d08fbac38cf2e1fa6a",
+          "bytes": 826478
+        },
+        {
+          "path": "pictures/51126.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-26-front-Treachery-Driven_by_Shadow.jpg",
+          "sha256": "1d68adb945078058f643e44d6bd9b6d3a03fee77d4cb58b503a8b89dc2672f4e",
+          "bytes": 810895
+        },
+        {
+          "path": "pictures/51127.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-27-front-Enemy-Beast_of_Taur_nu_Fuin.jpg",
+          "sha256": "8721cecfccf99c989dcb612533ad74fbb7b55190291876bb3930e7f61b3916b8",
+          "bytes": 820153
+        },
+        {
+          "path": "pictures/51128.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-28-front-Location-Dark_Black_Woods.jpg",
+          "sha256": "1bf7c8ae68e924a81ccb571f44acc1d07c873a7a9f63e1353f5ad9faadd8321a",
+          "bytes": 798731
+        },
+        {
+          "path": "pictures/51129.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-29-front-Treachery-Wind_whipped_Rain.jpg",
+          "sha256": "7dea2f8bf6157a8e5c6fb1655c929f54d024baf9334fe90d1a5fe9956773d010",
+          "bytes": 795721
+        },
+        {
+          "path": "pictures/51130.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-30-front-Enemy-Giant_Spider.jpg",
+          "sha256": "4999d6f60a8bbcce4c4a6da40fbc875aa43c35a90bf780d0b08886cd4e206b84",
+          "bytes": 742549
+        },
+        {
+          "path": "pictures/51131.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-31-front-Location-Giant_Web.jpg",
+          "sha256": "d722c723c672bd1948cd6a8452f1ecfd4b837096fa9a1af4dffb87711a20e763",
+          "bytes": 850012
+        },
+        {
+          "path": "pictures/51132.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-32-front-Treachery-Eyes_of_the_Forest.jpg",
+          "sha256": "4ad48d5d41b55e308f12850e5cdbe46a7c71e1cfb581d7c1d26af2bda1fd12c4",
+          "bytes": 760027
+        },
+        {
+          "path": "pictures/51133.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-33-front-Enemy-Mirkwood_Patrol.jpg",
+          "sha256": "f9070602e834c18f19a7b7c731d3cc74cd229bd4bbe3ecb8012695e7369591b9",
+          "bytes": 787433
+        },
+        {
+          "path": "pictures/51134.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-34-front-Location-Mountains_of_Mirkwood.jpg",
+          "sha256": "8d10ea6be3e0c9a207bbc5a02bd74d944a82a3d1c0a6ce60d3043f7cc82c7642",
+          "bytes": 825851
+        },
+        {
+          "path": "pictures/51135.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-35-front-Treachery-Hatred_Rekindled.jpg",
+          "sha256": "0209c4e8946d1673a4076a1eebead3b5b2d61c80868750cd8ab9946462d371a7",
+          "bytes": 826871
+        },
+        {
+          "path": "pictures/51136.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-36-front-Enemy-Wild_Bear.jpg",
+          "sha256": "a4a3c2f432fa50b6a00edf44996d1ebc4b5e3e36b9c13105b36a4cb2f04330e1",
+          "bytes": 772354
+        },
+        {
+          "path": "pictures/51137.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-37-front-Location-Labyrinthine_Woods.jpg",
+          "sha256": "775f9fb8c67e60b73ae5844973435af74b1ed7c885176959aa6d6b7e203e8946",
+          "bytes": 771689
+        },
+        {
+          "path": "pictures/51138.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-38-front-Treachery-Vastness_of_Mirkwood.jpg",
+          "sha256": "38e6564860a9449b8b00b495a32601805201cc9e7f16b3a3acd6c6795edc7939",
+          "bytes": 877046
+        },
+        {
+          "path": "pictures/51139.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-39-front-Enemy-Mirkwood_Flock.jpg",
+          "sha256": "08d30842691c3586fe13050ae33ea359707991d184c3dd6acc5e61680907bf39",
+          "bytes": 774417
+        },
+        {
+          "path": "pictures/51140.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-40-front-Location-The_Eaves_of_Mirkwood.jpg",
+          "sha256": "fe33b6e7382ad0f271e96c5ad5b40b9dbbd36e30211599f9d192d0ee6de76291",
+          "bytes": 826720
+        },
+        {
+          "path": "pictures/51141.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-41-front-Treachery-Massing_at_Night.jpg",
+          "sha256": "f9efd5afa626b914550576197845e9e75a391172c1ce53d64e0aa1776f704393",
+          "bytes": 814093
+        },
+        {
+          "path": "pictures/51142.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-42-front-Enemy-Wild_Wargs.jpg",
+          "sha256": "2342f059d5f72239f875009d39bf421cfb590be188e8c15b63a55c384cf37cef",
+          "bytes": 801602
+        },
+        {
+          "path": "pictures/51143.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-43-front-Location-Dry_Watercourse.jpg",
+          "sha256": "828bf5ffd242add27c490e128ad4a5248cd22f7c70978041156c14038b1a930b",
+          "bytes": 841617
+        },
+        {
+          "path": "pictures/51144.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-44-front-Treachery-Turned_Around.jpg",
+          "sha256": "f9c482338f09eaa62b9fb3c3c448fe8655bced42bd2db7263e21dd48e276ace5",
+          "bytes": 859656
+        },
+        {
+          "path": "pictures/51145.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-45-front-Enemy-Pack_of_Wargs.jpg",
+          "sha256": "9f48dd34f0218bba2db8dc7e76a45e535568b8c92f617e9f8f46cc633a0c1bdb",
+          "bytes": 836898
+        },
+        {
+          "path": "pictures/51146.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-46-front-Location-Dark_wood_Grove.jpg",
+          "sha256": "8331bf0c00149c09aa930b0da8bafa53115c948c0dc12e8d829a033975924ca6",
+          "bytes": 803453
+        },
+        {
+          "path": "pictures/51147.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-47-front-Treachery-Lost_and_Witless.jpg",
+          "sha256": "c9f6a23e6e0df21c1ac92e6d1b1172b252a777ffe0050569fc2c0d22c7b6e980",
+          "bytes": 828926
+        },
+        {
+          "path": "pictures/51148.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-48-front-Enemy-Wicked_Spider.jpg",
+          "sha256": "4f7225f47a824202401205a954831f086e667e7da5b18c86b02677d59c1ca40c",
+          "bytes": 801897
+        },
+        {
+          "path": "pictures/51149.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-49-front-Location-Old_Forest_Road.jpg",
+          "sha256": "bb996ec9a780fd14001dcb0cbb6c4ad6d42c96a1ee6587e09f202705492269d0",
+          "bytes": 820601
+        },
+        {
+          "path": "pictures/51150.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-50-front-Treachery-A_Frightened_Beast.jpg",
+          "sha256": "2cff0868d81d70cd746db7b52e105316848c7c5d42201663b9b1de57ad5e8085",
+          "bytes": 827445
+        },
+        {
+          "path": "pictures/51151.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-51-front-Enemy-Ambushing_Orcs.jpg",
+          "sha256": "f5cd8ebb55835149ba6478e3bb6ac86841d8d1d69b3c5b2b2cd510fa967579ba",
+          "bytes": 820515
+        },
+        {
+          "path": "pictures/51152.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-52-front-Location-Mirkwood_Path.jpg",
+          "sha256": "9fb8281ccd6b0b1b1dc2f398e9261d65f4b7af186b8908882d787b35877254ab",
+          "bytes": 755494
+        },
+        {
+          "path": "pictures/51153.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/OP077-53-front-Treachery-Wasted_Provisions.jpg",
+          "sha256": "3d547dced56a40ff1173eb71be1ba1c6ec88b2bc3db2a314ae13c2aba3de9172",
+          "bytes": 886616
         },
         {
           "path": "pictures/9901014.A.jpg",
