@@ -15,6 +15,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { spawn } from "../../core/zones.ts";
 import { flipOver } from "../wilderland/flip.ts";
 import { questProgressNoted } from "../wizardry/progress.ts";
+import { discardEach } from "../south/damage.ts";
 import { manifest } from "./index.ts";
 
 const CARDS = cardMap([
@@ -139,5 +140,28 @@ describe("a Travel effect that made another location active (51146:A:2 reveals G
     expect(done.failure ?? null).toBeNull();
     expect(done.activeLocation).toBe(active.id);
     expect(done.cards[staged.id]?.zone).toBe("staging");
+  });
+});
+
+describe("the pick field `lowestEngagementCost` (51151:A:2, reading 18)", () => {
+  it("keeps the enemies with the lowest engagement cost, every one when tied", () => {
+    const high = spawn(table(1, []), "giant", { zone: "staging" });
+    const low = spawn(high.state, "orc", { zone: "staging" });
+    const spec = { type: "enemy", control: "any", stagingOnly: true, lowestEngagementCost: true } as const;
+    expect(pickCandidates(low.state, spec, 0, [], null, ctx)).toEqual([low.id]);
+    const tied = spawn(low.state, "twin", { zone: "staging" });
+    expect(pickCandidates(tied.state, spec, 0, [], null, ctx).sort()).toEqual([low.id, tied.id].sort());
+  });
+});
+
+describe("DiscardEach with `different` (51129:A:1)", () => {
+  it("discards each card that matches except the ones the effect has picked", () => {
+    let state = table(1, []);
+    const kept = spawn(state, "orc", { zone: "hand", seat: 0 });
+    const gone = spawn(kept.state, "mist", { zone: "hand", seat: 0 });
+    state = pushEffectFrame(gone.state, { frame: "ResolveEffect", sourceId: null, actor: 0, peril: false, effectId: "x:whenRevealed:1", instructions: [], picked: [kept.id], cancel: null, blockCancel: null }, []);
+    const done = discardEach(state, { verb: "DiscardEach", pick: { type: "card", control: "you", from: "hand", different: true } }, { seat: 0, sourceId: null }, ctx);
+    expect(done.cards[kept.id]?.zone).toBe("hand");
+    expect(done.cards[gone.id]?.zone).toBe("discard");
   });
 });

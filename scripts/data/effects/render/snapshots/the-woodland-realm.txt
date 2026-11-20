@@ -728,7 +728,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51151:A:2 (shadow): Shadow: Engage the lowest engagement cost enemy in the staging area and deal it a shadow card.
   51151:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PickLowestEngagement {"verb":"PickLowestEngagement","when":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true}}}]
+    - choose enemy (any player controls) in the staging area only, with the lowest current engagement cost of those (ties: the chooser decides)
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is dealt a shadow card
 
@@ -759,4 +759,4 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 463 by template, 14 as JSON)
+(rendered pieces: 465 by template, 13 as JSON)

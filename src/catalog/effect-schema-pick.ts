@@ -345,6 +345,8 @@ export const pickSchema = z.strictObject({
   highestWillpower: z.literal(true).optional(),
   // Of the cards that match, only those with the highest current engagement cost ("The enemy in the staging area with the highest engagement cost", 50926:A:2); every one of them when tied, and then the chooser decides.
   highestEngagementCost: z.literal(true).optional(),
+  // Of the cards that match, only those with the lowest current engagement cost ("the lowest engagement cost enemy in the staging area", 51151:A:2); every one of them when tied, and then the chooser decides.
+  lowestEngagementCost: z.literal(true).optional(),
   // With `type: card`: only an enemy or a location, among the encounter cards in play ("a non-unique enemy or location in play", 51033:A:1, docs/brief.md, The Wizard's Quest, reading 3). Read by src/rules/interpret/pick.ts.
   enemyOrLocation: z.literal(true).optional(),
   // "The opposing team chooses" (51004:B:1, 51013:A:1, 51017:A:1, 51030:A:1, 51033:A:1): the choice is the engine's, in the manner that gives the players the greatest challenge (docs/brief.md, The Wizard's Quest, reading 3). Of the cards that match (the fields above rank them) only the first stays, the order of seats and then of play breaking a tie, so nobody is asked.

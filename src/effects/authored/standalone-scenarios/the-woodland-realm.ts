@@ -402,7 +402,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "51151",
     lines: ["51151:A:2"],
     timing: "shadow",
-    instructions: [{ verb: "PickLowestEngagement", when: { kind: "canPick", pick: ENEMY_IN_STAGING } }, { verb: "Engage", target: "picked", when: { kind: "canPick", pick: ENEMY_IN_STAGING } }, { verb: "DealShadowTo", target: "picked", when: { kind: "canPick", pick: ENEMY_IN_STAGING } }],
+    instructions: [{ verb: "Pick", pick: { ...ENEMY_IN_STAGING, lowestEngagementCost: true } }, { verb: "Engage", target: "picked", when: { kind: "canPick", pick: ENEMY_IN_STAGING } }, { verb: "DealShadowTo", target: "picked", when: { kind: "canPick", pick: ENEMY_IN_STAGING } }],
   },
 
   // 51152 Mirkwood Path: explored, the top card of the encounter deck is discarded; a location so discarded is added to the staging area.
