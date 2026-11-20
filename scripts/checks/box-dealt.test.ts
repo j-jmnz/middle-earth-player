@@ -17,7 +17,6 @@ const EXCEPTIONS: Readonly<Record<string, string>> = {
   "147024": "Old Bogey-stories, the boon the Old Forest campaign card attaches and its Resolution earns: Campaign Mode only, never dealt by the standalone game (docs/brief.md, The Old Forest).",
   "148020": "Fog on the Barrow-downs's campaign card (The Lord of the Rings Part 1.2): Campaign Mode only; the Standalone scenarios cycle has no campaign log, so the standalone game deals no campaign card (docs/brief.md, Fog on the Barrow-downs).",
   "148021": "Ho! Tom Bombadil!, the boon the Fog campaign card's Resolution earns: a player card of Campaign Mode, never dealt by the standalone game (docs/brief.md, Fog on the Barrow-downs).",
-  "50801": "Standard Game Mode, the mode card of The Siege of Annúminas: its Setup is read with the quest card's (`modeCard` in the cycle definition) and its back is in play beside the quest deck, so no pile deals it (docs/brief.md, The Siege of Annúminas).",
   "50802": "Epic Multiplayer Mode, the mode card of The Siege of Annúminas' 3-team mode; epic multiplayer mode is not built (docs/brief.md, The Siege of Annúminas).",
   "50806": "Raise the Levee (stage 1C/1D), a quest card of The Siege of Annúminas' epic multiplayer mode only; the Standard Game Mode's Setup removes the 1C-3C deck from the game, and epic multiplayer mode is not built.",
   "50807": "Guard the Gate (stage 2C/2D), a quest card of The Siege of Annúminas' epic multiplayer mode only; epic multiplayer mode is not built.",

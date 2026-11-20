@@ -16,6 +16,7 @@ import { drawOpeningHand, runInstruction, type ReduceContext } from "../interpre
 import type { PileZone } from "../core/piles.ts";
 import { printedOf } from "../core/printed.ts";
 import { shuffleIds } from "../core/seed.ts";
+import { modeCardSetup, placeModeCard } from "./mode-card.ts";
 import { handSetup, searchSetup } from "./search.ts";
 import { attachPending } from "../families/angmar/burdens.ts";
 import { nightmareDuringSetup, nightmareSetup } from "../families/nightmare/setup.ts";
@@ -217,6 +218,9 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   // The Nightmare setup card's own Setup lines (families/nightmare/setup.ts).
   next = nightmareSetup(next, ctx, steps);
   if (next.failure || next.lost) return next;
+  // The scenario's mode card with a Setup of its own comes before the quest card's (setup/mode-card.ts).
+  next = modeCardSetup(next, ctx, steps);
+  if (next.failure || next.lost) return next;
   for (const instruction of next.setup) {
     next = runInstruction(
       next,
@@ -238,7 +242,7 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   // The Nightmare setup card's Forced effects "During setup" (families/nightmare/setup.ts), on top: they resolve first.
   next = nightmareDuringSetup(next, ctx, steps);
   // The Hard/Expert Mode card is put next to the quest deck at the end of setup, faceup on the side the players chose, and stays all game (dcce.hard-expert).
-  if (next.modeCard) next = spawn(next, next.modeCard.code, { zone: "modeCard" }, next.modeCard.side).state;
+  next = placeModeCard(next);
   return withMode(next, "beginRound");
 }
 

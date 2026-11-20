@@ -94,6 +94,9 @@ export const scenarioDataSchema = z
     source: z.strictObject({ dragnNormal: z.string().nullable(), dragnEasy: z.string().nullable(), hobSlug: z.string() }),
     // The Nightmare deck played with this scenario, where one is printed.
     nightmare: nightmareSchema.optional(),
+    // The code of the scenario's own mode card (The Siege of Annúminas' Standard Game Mode): its Setup runs before the quest card's, then it is flipped and kept beside the quest deck all game
+    // (`ScenarioDefinition.modeCard`). The Dream-chaser Hard/Expert Mode card is not this: a campaign with XP adds it (MODE_CARD_CODE).
+    modeCard: z.string().min(1).optional(),
   })
   .superRefine((data, context) => {
     const quest = data.cards.filter((card) => card.pile === "quest").map((card) => card.code);
@@ -377,8 +380,8 @@ export const MODE_CARD_CODE = "11217";
 // The cards a campaign game deals beyond the scenario's own piles, the one list every reader of "what a game deals" shares (the world the
 // briefing loads, the effect tooling, the coverage tests): the Campaign Expansion's reprint of each card (ScenarioData.reprints) and, in a
 // campaign with XP, the Hard/Expert Mode card.
-export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: Pick<ScenarioData, "reprints">): string[] {
-  return [...Object.values(scenario.reprints ?? {}), ...(campaign.xp ? [MODE_CARD_CODE] : [])];
+export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: Pick<ScenarioData, "reprints" | "modeCard">): string[] {
+  return [...Object.values(scenario.reprints ?? {}), ...(scenario.modeCard != null ? [scenario.modeCard] : []), ...(campaign.xp ? [MODE_CARD_CODE] : [])];
 }
 
 // What a campaign game deals of a scenario that has reprints: the Campaign Expansion's reprint of each card in place of the original, in every
@@ -459,6 +462,7 @@ export function scenarioDefinition(data: AnyScenarioData, campaign: CampaignData
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(data.life != null ? { life: data.life } : {}),
     ...(data.campaignCard !== undefined ? { campaignCard: data.campaignCard } : {}),
+    ...(data.modeCard != null ? { modeCard: { code: data.modeCard, side: "B" as const } } : {}),
     // The part of the campaign (the campaign card's "part number", dcce.gaining-xp): the scenario's place in the campaign, not its number in its product (Hall of Beorn numbers each Adventure Pack's scenario within the pack).
     // Ered Mithrin has no XP, but the burdens The King's Quest (part 3) adds to the pool read it too ("X is the campaign card's part number", 12172:A:1, 12173:A:1: emce.campaign-pool-encounter), so
     // its games from that part on hold it; the first two parts have no card that reads it, and their state is as it was.

@@ -479,6 +479,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         widgets,
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },
         ...(nightmare.data ? { nightmare: nightmare.data } : {}),
+        ...(modeCard ? { modeCard: modeCard.code } : {}),
       }),
     );
   }
