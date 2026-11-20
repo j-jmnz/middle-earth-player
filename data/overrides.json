@@ -3409,10 +3409,271 @@
         "code": "40033"
       },
       "set": {
-        "type": "enemy"
+        "type": "enemy",
+        "engagementCost": 26,
+        "threat": 2,
+        "attack": 4,
+        "defense": 0,
+        "health": 11
       },
-      "reason": "Hall of Beorn files The Hunt for the Dreadnaught's Sea Monster as a Ship-enemy. The scan prints the type line ENEMY (Creature., 26 engagement cost, Threat 2, Attack 4, Defense 0, 11 hit points) and DragnCards types it Enemy: it is not a Ship, so heroes can defend it and its text lets Ship objectives attack and defend against it.",
-      "source": "scan 40033.A; dragncards.net cardDb (Enemy)"
+      "reason": "Hall of Beorn files The Hunt for the Dreadnaught's Sea Monster as a Ship-enemy and gives it no stat fields. The scan prints the type line ENEMY (Creature.) and DragnCards types it Enemy, so it is not a Ship: heroes can defend it, and its text lets Ship objectives attack and defend against it. The scan prints engagement cost 26, Threat 2, Attack 4, Defense 0 and 11 hit points (the ledger notes record the reading), so the engine needs them.",
+      "source": "scan 40033.A, dragncards cardDb (Enemy), data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40006"
+      },
+      "set": {
+        "willpower": 5,
+        "attack": 3,
+        "defense": 3,
+        "health": 13,
+        "back": {
+          "willpower": 6,
+          "attack": 4,
+          "defense": 4,
+          "health": 15
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 5, Attack 3, Defense 3 and 13 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40006.A and 40006.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40007"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 5,
+        "defense": 3,
+        "health": 15,
+        "back": {
+          "willpower": 3,
+          "attack": 6,
+          "defense": 4,
+          "health": 18
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 5, Defense 3 and 15 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40007.A and 40007.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40008"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 2,
+        "defense": 5,
+        "health": 16,
+        "back": {
+          "willpower": 4,
+          "attack": 3,
+          "defense": 6,
+          "health": 19
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 2, Defense 5 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40008.A and 40008.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40009"
+      },
+      "set": {
+        "willpower": 4,
+        "attack": 3,
+        "defense": 4,
+        "health": 14,
+        "back": {
+          "willpower": 5,
+          "attack": 4,
+          "defense": 5,
+          "health": 17
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 4, Attack 3, Defense 4 and 14 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40009.A and 40009.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40010"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 4,
+        "defense": 3,
+        "health": 17,
+        "back": {
+          "willpower": 4,
+          "attack": 5,
+          "defense": 4,
+          "health": 20
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 4, Defense 3 and 17 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40010.A and 40010.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40011"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 4,
+        "defense": 4,
+        "health": 18,
+        "back": {
+          "willpower": 4,
+          "attack": 5,
+          "defense": 5,
+          "health": 22
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 4, Defense 4 and 18 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 40011.A and 40011.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40012"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 5,
+        "defense": 4,
+        "health": 10
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 5, Defense 4 and 10 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them.",
+      "source": "scan 40012.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40026"
+      },
+      "set": {
+        "engagementCost": 37,
+        "threat": 4,
+        "attack": 6,
+        "defense": 2,
+        "health": 10
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 37, Threat 4, Attack 6, Defense 2 and 10 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40026.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40027"
+      },
+      "set": {
+        "engagementCost": 24,
+        "threat": 1,
+        "attack": 2,
+        "defense": 2,
+        "health": 5
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 24, Threat 1, Attack 2, Defense 2 and 5 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40027.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40028"
+      },
+      "set": {
+        "engagementCost": 28,
+        "threat": 3,
+        "attack": 4,
+        "defense": 4,
+        "health": 6
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 28, Threat 3, Attack 4, Defense 4 and 6 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40028.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40029"
+      },
+      "set": {
+        "engagementCost": 44,
+        "threat": 3,
+        "attack": 8,
+        "defense": 4,
+        "health": 9
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 44, Threat 3, Attack 8, Defense 4 and 9 hit points and Victory 6 (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40029.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40030"
+      },
+      "set": {
+        "engagementCost": 28,
+        "threat": 4,
+        "attack": 4,
+        "defense": 3,
+        "health": 8
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 28, Threat 4, Attack 4, Defense 3 and 8 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40030.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40031"
+      },
+      "set": {
+        "engagementCost": 32,
+        "threat": 3,
+        "attack": 7,
+        "defense": 5,
+        "health": 5
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 32, Threat 3, Attack 7, Defense 5 and 5 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40031.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40032"
+      },
+      "set": {
+        "engagementCost": 33,
+        "threat": 3,
+        "attack": 5,
+        "defense": 2,
+        "health": 7
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 33, Threat 3, Attack 5, Defense 2 and 7 hit points (the ledger notes record the reading); a ship-enemy fights as an enemy does (dcce.ship-enemies), so the engine needs them.",
+      "source": "scan 40032.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40013"
+      },
+      "set": {
+        "engagementCost": 0,
+        "threat": 4,
+        "attack": 7,
+        "defense": 4,
+        "back": {
+          "threat": 3,
+          "attack": 5,
+          "defense": 3,
+          "victory": 99
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the Dreadnaught has none. The scan of the Elite side prints engagement cost 0, Threat 4, Attack 7, Defense 4; the Damaged side (the `back` stats, read from DragnCards' picture of side B) Threat 3, Attack 5, Defense 3 and Victory 99. Neither side prints a hit point number: both print the global value `15 per player among all groups` in their text, so health stays unset and a record reads it.",
+      "source": "scan 40013.A, picture 40013.B (dragncards), data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40004"
+      },
+      "set": {
+        "keywords": {
+          "questPointsX": true
+        }
+      },
+      "reason": "Stage 1B prints `*` for its quest points (\"This stage has a global quest point value of 8 per player among all groups\"): the number is set by a record, as the X quest points of the Journey Up the Anduin's Hills of Wilderland are.",
+      "source": "scan 40004.B, data/printed/standalone-scenarios.json"
     }
   ],
   "scenarioPiles": [

@@ -116,8 +116,8 @@ export function readStandaloneScenarios(sentence: string, names: NameIndex): Set
   // The Wizard's Quest (51001): "The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area": a search with no card
   // named, so it moves no pile card (Escape from Khazad-dûm's 51301 prints "0-cost enemy or location", the same search); the encounter deck keeps the cards until the Setup record finds them.
   if (/^The opposing team searches the encounter deck for one different 0[ -]cost enemy or (?:0[ -]cost )?location per player and adds them to the staging area$/.test(sentence)) return [{ kind: "step", step: "searchZeroCostPerPlayer", codes: [] }];
-  // The Hunt for the Dreadnaught's Standard Mode (40002): "Set the following enemies aside: all 7 unique enemies (including the Dreadnaught)": the unique enemies of the box, the Dreadnaught (a ship-enemy) among them.
-  if ((match = /^Set the following enemies aside: all (\d+) unique enemies \(including the Dreadnaught\)$/.exec(sentence))) {
+  // The Hunt for the Dreadnaught's Standard Mode (40002): "Set aside all 7 unique enemies (including the Dreadnaught)" (Easy Mode prints "Set the following enemies aside: ..."): the unique enemies of the box, the Dreadnaught (a ship-enemy) among them.
+  if ((match = /^Set (?:the following enemies aside: |aside )all (\d+) unique enemies \(including the Dreadnaught\)$/.exec(sentence))) {
     const codes = names.cards.filter((card) => card.isUnique && (card.type === "enemy" || card.type === "ship-enemy") && card.printings.some((printing) => printing.pack === "THftD")).map((card) => card.code);
     return codes.length === Number(match[1]) ? [{ kind: "aside", codes, allCopies: false }] : null;
   }
