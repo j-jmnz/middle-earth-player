@@ -1,5 +1,5 @@
 // Rules: none (The Massing at Osgiliath, The Battle of Lake-town and The Stone of Erech have no rulesheet; their rules are the quest cards').
-// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur and The Wizard's Quest: their codes, its scenario file, the piles the load list and the printed Setup leave, the
+// The Standalone scenarios cycle as built so far, The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest and The Woodland Realm: their codes, its scenario file, the piles the load list and the printed Setup leave, the
 // ledger read from the scans, and the one thing that makes it a cycle: no campaign card, prelude or booklet.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -25,19 +25,20 @@ const murder = loadAnyScenario("murder-at-the-prancing-pony");
 const siege = loadAnyScenario("the-siege-of-annuminas");
 const guldur = loadAnyScenario("attack-on-dol-guldur");
 const wizard = loadAnyScenario("the-wizards-quest");
+const woodland = loadAnyScenario("the-woodland-realm");
 const SCOUTS = ["00002", "00003", "00004"];
 
 describe("The Standalone scenarios cycle", () => {
   it("is a cycle with no campaign card, prelude, booklet or starter deck, listing the scenarios built so far", () => {
-    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas", "attack-on-dol-guldur", "the-wizards-quest"]);
+    expect(cycle.scenarios).toEqual(["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas", "attack-on-dol-guldur", "the-wizards-quest", "the-woodland-realm"]);
     // The scenarios not built yet are the file's `later` (Hall of Beorn's titles under the cycle's later products, release order; the Coming later rows of the Scenarios tab).
-    expect(cycle.later).toEqual(["The Woodland Realm", "The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
+    expect(cycle.later).toEqual(["The Mines of Moria", "Escape from Khazad-dûm", "The Hunt for the Dreadnaught"]);
     expect(cycle).toMatchObject({ kind: "cycle", saga: false, campaignCards: {}, prelude: [], starterDecks: [] });
     expect(cycle.bookletId).toBeUndefined();
     const raw = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "standalone-scenarios.json"), "utf8")) as Record<string, unknown>;
     expect(Object.keys(raw)).not.toContain("campaignCards");
     const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; scenarioCount: number; playable: boolean; box: string | null }[];
-    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 10, playable: true, box: null })]);
+    expect(index.filter((entry) => entry.id === "standalone-scenarios")).toEqual([expect.objectContaining({ scenarioCount: 11, playable: true, box: null })]);
   });
 });
 
@@ -399,5 +400,37 @@ describe("The Wizard's Quest", () => {
     expect(ledger.byKey.get(keyOf("51009", "A"))?.lines).toHaveLength(1);
     expect(ledger.byKey.get(keyOf("51009", "B"))?.lines).toHaveLength(3);
     expect(ledger.byKey.get(keyOf("51052", "A"))?.lines[1]).toMatch(/if it has the Warg trait/);
+  });
+});
+
+describe("The Woodland Realm", () => {
+  it("has codes 511 and the collector number, which Hall of Beorn's 00001 to 00053 would share with earlier packs (overrides.productCodes), the seven quest cards as stages and the double-sided Spider Den / Mendor", () => {
+    expect(woodland).toMatchObject({ id: "the-woodland-realm", name: "The Woodland Realm", stages: ["51101", "51103", "51104", "51105", "51107", "51108", "51109"] });
+    expect(woodland.campaignCard).toBeUndefined();
+    expect(woodland.campaignPlaced).toEqual([]);
+    expect(woodland.source).toMatchObject({ dragnNormal: "Q99.12", dragnEasy: "Q99.12" });
+    const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "TWR"));
+    expect(own.map((card) => card.code)).toEqual(["51101", "51103", "51104", "51105", "51107", "51108", "51109", ...Array.from({ length: 44 }, (_, at) => `511${String(at + 10)}`)]);
+    expect(woodland.cards.find((card) => card.code === "51110")).toMatchObject({ pile: "staging", back: "51111" });
+  });
+
+  it("deals the 14 encounter sets of the kit, 5 cards each, on Normal and Easy alike, and gives every encounter card its printed cost", () => {
+    expect(woodland.encounterSets).toHaveLength(15);
+    expect(woodland.encounterSets.slice(1).every((set) => set.count === 5)).toBe(true);
+    for (const difficulty of ["Normal", "Easy"] as const) expect(encounterCodes(woodland, difficulty, 1), difficulty).toHaveLength(70);
+    for (let number = 12; number <= 53; number += 1) expect(byCode.get(`511${number}`)?.cost, `511${number}`).not.toBeNull();
+    expect([byCode.get("51112")?.cost, byCode.get("51119")?.cost, byCode.get("51122")?.cost, byCode.get("51153")?.cost]).toEqual(["3", "3", "2", "1"]);
+  });
+
+  it("has every printed side read from its scan, with the places Hall of Beorn's text differs fixed", () => {
+    const ledger = loadLedger();
+    const sides = [...byCode.values()].filter((card) => card.code.startsWith("511")).flatMap((card) => (card.type === "quest" ? ["A", "B"] : ["A"]).map((side) => keyOf(card.code, side as "A" | "B")));
+    expect(sides).toHaveLength(58);
+    for (const key of sides) expect(ledger.byKey.get(key)?.readBy, key).toBe("Claude Code, read from the scan image");
+    expect(ledger.byKey.get(keyOf("51101", "A"))?.lines[0]).toMatch(/and adds them to the staging area/);
+    expect(ledger.byKey.get(keyOf("51103", "A"))?.lines[0]).toMatch(/The opposing team searches .* with cost 1 or less \(cost 2 or less/);
+    expect(ledger.byKey.get(keyOf("51110", "A"))?.lines[1]).toMatch(/\(1 cost or less instead if there are two or more players\)/);
+    expect(ledger.byKey.get(keyOf("51151", "A"))?.lines[1]).toMatch(/^Shadow: Engage the lowest engagement cost enemy/);
+    expect(ledger.byKey.get(keyOf("51122", "A"))?.misprints).toHaveLength(1);
   });
 });
