@@ -28,12 +28,12 @@ export const DREAM_CHASER = "Dream-chaser";
 
 type Ships = { free: string[]; taken: string[] };
 
-// The fleet's ship-objectives: those still set aside, and those a player already controls.
-function ships(state: ScenarioState, ctx: ReduceContext): Ships {
+// The fleet's ship-objectives: those still set aside, and those a player already controls. `own`: the unique ship-objectives of the box (The Hunt for the Dreadnaught's six ships; the Gondorian Warship is no unique card).
+function ships(state: ScenarioState, ctx: ReduceContext, own = false): Ships {
   const found: Ships = { free: [], taken: [] };
   for (const card of Object.values(state.cards)) {
     const printed = printedOf(ctx.cards, card.code);
-    if (printed.ship !== "objective" || printed.encounterSet !== FLEET_SET) continue;
+    if (printed.ship !== "objective" || (own ? !printed.isUnique : printed.encounterSet !== FLEET_SET)) continue;
     if (card.zone === "setAside") found.free.push(card.id);
     else if (card.controller != null && inPlay(card.zone)) found.taken.push(card.id);
   }
@@ -44,18 +44,19 @@ function ships(state: ScenarioState, ctx: ReduceContext): Ships {
 const isDreamChaser = (state: ScenarioState, ctx: ReduceContext, id: string): boolean => printedOf(ctx.cards, state.cards[id]?.code ?? "").name === DREAM_CHASER;
 
 // The seats that take a ship, in the order they choose: each living seat from the first player, and a lone player twice.
-function slots(state: ScenarioState): number[] {
+function slots(state: ScenarioState, own = false): number[] {
   const seats = livingSeats(state);
-  return seats.length === 1 ? [seats[0] ?? 0, seats[0] ?? 0] : seats;
+  return seats.length === 1 && !own ? [seats[0] ?? 0, seats[0] ?? 0] : seats;
 }
 
 /** The fleet of this game, ready to be prepared: the ships a seat could still choose and the seat that chooses next (null when every seat has its
  * ship). Exported for the table's choice and the tests. */
-export function fleetChoice(state: ScenarioState, ctx: ReduceContext): { seat: number; options: string[] } | null {
-  const order = slots(state);
-  const { free, taken } = ships(state, ctx);
+export function fleetChoice(state: ScenarioState, ctx: ReduceContext, own = false): { seat: number; options: string[] } | null {
+  const order = slots(state, own);
+  const { free, taken } = ships(state, ctx, own);
   const seat = order[taken.length];
   if (seat == null) return null;
+  if (own) return { seat, options: free };
   const dreamChaserTaken = taken.some((id) => isDreamChaser(state, ctx, id));
   // The Dream-chaser is forced on the choice that would otherwise leave nobody with it: the last of several players, a lone player's first.
   const last = livingSeats(state).length === 1 ? taken.length === 0 : taken.length === order.length - 1;
@@ -82,9 +83,12 @@ function attachHeading(state: ScenarioState, ctx: ReduceContext): ScenarioState 
 
 // A ship's Setup lines ("Raise your starting threat by 3", "Reduce your starting threat by 6") resolve for the player who took it, on the side it shows, once the
 // whole fleet is prepared.
-function fleetSetups(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+function fleetSetups(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], own = false): ScenarioState {
   let next = state;
-  for (const id of ships(state, ctx).taken) {
+  const taken = ships(state, ctx, own).taken;
+  // The box's own ships resolve their Setup lines in player order (reading 4).
+  const ordered = own ? [...taken].sort((left, right) => (state.cards[left]?.controller ?? 0) - (state.cards[right]?.controller ?? 0)) : taken;
+  for (const id of ordered) {
     const ship = next.cards[id];
     if (!ship || ship.controller == null) continue;
     const records = recordsOfFace(ship, effectsOf(ctx, ship.code)).filter((effect) => effect.timing === "setup");
@@ -99,9 +103,12 @@ export function prepareFleet(state: ScenarioState, instruction: Extract<Instruct
   const cause = currentCause(steps, UNATTRIBUTED);
   let next = state;
   let answer = focus.chosen;
+  const own = instruction.own === true;
   for (;;) {
-    const choice = fleetChoice(next, ctx);
+    const choice = fleetChoice(next, ctx, own);
     if (!choice) {
+      // The box's own fleet keeps its unused ships set aside and has no Heading card.
+      if (own) return fleetSetups({ ...next, sea: { ...(next.sea ?? { heading: null, headingCard: null, routes: {} }), fleet: true } }, ctx, steps, true);
       for (const id of ships(next, ctx).free) next = moveCard(next, id, { zone: "removed" });
       return fleetSetups(attachHeading(next, ctx), ctx, steps);
     }

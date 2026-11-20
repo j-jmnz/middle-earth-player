@@ -3658,9 +3658,13 @@
           "attack": 5,
           "defense": 3,
           "victory": 99
+        },
+        "keywords": {
+          "immune": true,
+          "statsX": true
         }
       },
-      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the Dreadnaught has none. The scan of the Elite side prints engagement cost 0, Threat 4, Attack 7, Defense 4; the Damaged side (the `back` stats, read from DragnCards' picture of side B) Threat 3, Attack 5, Defense 3 and Victory 99. Neither side prints a hit point number: both print the global value `15 per player among all groups` in their text, so health stays unset and a record reads it.",
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the Dreadnaught has none. The scan of the Elite side prints engagement cost 0, Threat 4, Attack 7, Defense 4; the Damaged side (the `back` stats, read from DragnCards' picture of side B) Threat 3, Attack 5, Defense 3 and Victory 99. Neither side prints a hit point number: both print the global value `15 per player among all groups` in their text, so health stays unset and a record reads it. The Elite side's \"Archery 1 PerPlayer\" and \"Massive\" are records (`archeryPlayers`, `engagedWithAll`); the sources' keyword lists miss the Immune keyword of that line, so it is set here, and `statsX` marks the hit points a record sets (the printed card holds only the global value).",
       "source": "scan 40013.A, picture 40013.B (dragncards), data/printed/standalone-scenarios.json"
     },
     {
@@ -3674,6 +3678,54 @@
       },
       "reason": "Stage 1B prints `*` for its quest points (\"This stage has a global quest point value of 8 per player among all groups\"): the number is set by a record, as the X quest points of the Journey Up the Anduin's Hills of Wilderland are.",
       "source": "scan 40004.B, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40014"
+      },
+      "set": {
+        "keywords": {
+          "pillage": 8
+        }
+      },
+      "reason": "Captain of the Haven's line 1 prints \"Pillage 8.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/brief.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "source": "scan 40014.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40021"
+      },
+      "set": {
+        "keywords": {
+          "pillage": 2
+        }
+      },
+      "reason": "Corsair Plunderer's line 1 prints \"Pillage 2.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/brief.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "source": "scan 40021.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40022"
+      },
+      "set": {
+        "keywords": {
+          "pillage": 3
+        }
+      },
+      "reason": "Daring Buccaneer's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/brief.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "source": "scan 40022.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "40023"
+      },
+      "set": {
+        "keywords": {
+          "pillage": 3
+        }
+      },
+      "reason": "Fierce Marauder's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/brief.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "source": "scan 40023.A, data/printed/standalone-scenarios.json"
     }
   ],
   "scenarioPiles": [

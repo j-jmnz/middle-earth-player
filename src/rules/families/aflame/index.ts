@@ -1,5 +1,6 @@
 // Rules: dcce.aflame, dcce.stormcaller-elite, dcce.scalable-upgradable (data/rules/entries.json). The verbs src/catalog/families/aflame.ts adds. The cards they move are in aflame/cards.ts, Aflame X itself
 // (the end of the round and the sweep that places a burnt location underneath The Havens Burn) in aflame/sweep.ts, what a record reads in aflame/values.ts, aflame/pick.ts and aflame/attack.ts.
+import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -18,7 +19,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SearchAflame":
       return searchAflame(state, instruction, focus, ctx, steps);
     case "EngageFirstPlayer":
-      return engageFirstPlayer(state, focus, steps, instruction.moves === true, instruction.target === "subject" ? frameScope(state, focus.seat, focus.sourceId).subject ?? "" : undefined);
+      return engageFirstPlayer(state, focus, steps, instruction.moves === true, instruction.target === "subject" ? frameScope(state, focus.seat, focus.sourceId).subject ?? "" : instruction.target === "picked" ? lastPicked(state) : undefined);
     case "EngageLowestThreat":
       return engageLowestThreat(state, focus, steps);
     case "StageSetAside":

@@ -21,6 +21,9 @@ function attackerOf(state: ScenarioState, cards: Cards): PrintedCard | null {
 export function shipMayDefend(state: ScenarioState, defender: PrintedCard, cards: Cards): boolean {
   const attacker = attackerOf(state, cards);
   if (!attacker) return true;
+  // "Ship objectives may attack and defend against Sea Monster" (40033:A:1): a ship-objective defends against it as against a ship-enemy, and anyone else defends it as ever.
+  const attackerId = state.pendingAttack?.enemyId;
+  if (attackerId && attacker.ship !== "enemy" && defender.ship === "objective" && flagged(state, attackerId, "shipFightable")) return true;
   return (attacker.ship === "enemy") === (defender.ship === "objective");
 }
 

@@ -97,6 +97,8 @@ export const scenarioDataSchema = z
     // The code of the scenario's own mode card (The Siege of Annúminas' Standard Game Mode): its Setup runs before the quest card's, then it is flipped and kept beside the quest deck all game
     // (`ScenarioDefinition.modeCard`). The Dream-chaser Hard/Expert Mode card is not this: a campaign with XP adds it (MODE_CARD_CODE).
     modeCard: z.string().min(1).optional(),
+    // The mode card the app's Easy difficulty deals in its place (The Hunt for the Dreadnaught's Easy Mode, docs/brief.md, The Hunt for the Dreadnaught, reading 1): the Setup, the back and the game are as with `modeCard`.
+    easyModeCard: z.string().min(1).optional(),
   })
   .superRefine((data, context) => {
     const quest = data.cards.filter((card) => card.pile === "quest").map((card) => card.code);
@@ -380,8 +382,8 @@ export const MODE_CARD_CODE = "11217";
 // The cards a campaign game deals beyond the scenario's own piles, the one list every reader of "what a game deals" shares (the world the
 // briefing loads, the effect tooling, the coverage tests): the Campaign Expansion's reprint of each card (ScenarioData.reprints) and, in a
 // campaign with XP, the Hard/Expert Mode card.
-export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: Pick<ScenarioData, "reprints" | "modeCard">): string[] {
-  return [...Object.values(scenario.reprints ?? {}), ...(scenario.modeCard != null ? [scenario.modeCard] : []), ...(campaign.xp ? [MODE_CARD_CODE] : [])];
+export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: Pick<ScenarioData, "reprints" | "modeCard" | "easyModeCard">): string[] {
+  return [...Object.values(scenario.reprints ?? {}), ...(scenario.modeCard != null ? [scenario.modeCard] : []), ...(scenario.easyModeCard != null ? [scenario.easyModeCard] : []), ...(campaign.xp ? [MODE_CARD_CODE] : [])];
 }
 
 // What a campaign game deals of a scenario that has reprints: the Campaign Expansion's reprint of each card in place of the original, in every

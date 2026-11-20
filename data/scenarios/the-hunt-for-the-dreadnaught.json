@@ -283,5 +283,6 @@
     "dragnEasy": "Q99.15",
     "hobSlug": "The-Hunt-for-the-Dreadnaught"
   },
-  "modeCard": "40002"
+  "modeCard": "40002",
+  "easyModeCard": "40001"
 }

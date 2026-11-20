@@ -91,7 +91,7 @@ export function combatDamage(
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   const toShip = flagged(state, enemyId, "excessToShip");
   // Cave-troll (03020:A:1): each point of excess is damage the defending player assigns to another character once the attack ends (excessDamageAfter).
-  const toDamage = flagged(state, enemyId, "excessToDamage");
+  const toDamage = flagged(state, enemyId, "excessToDamage") || flagged(state, enemyId, "excessDamagesShip");
   // "Excess damage must be dealt to Hrogar's Hill" (19083:B:1, 19080:A:3): an attack that the quest card or a Shadow effect marked sends the damage beyond the defender's remaining hit points to the main quest card.
   const toStage = state.pendingAttack?.excessToStage === true && state.questStage != null && state.questStage !== targetId;
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play.
@@ -134,7 +134,13 @@ export function combatDamage(
 export function excessDamageAfter(state: ScenarioState, attack: NonNullable<ScenarioState["pendingAttack"]>, ctx: ReduceContext): { instructions: readonly Instruction[]; cause: Cause | undefined } | null {
   const excess = attack.defense?.excess ?? 0;
   const enemy = state.cards[attack.enemyId];
-  if (excess <= 0 || !enemy || !flagged(state, attack.enemyId, "excessToDamage")) return null;
+  if (excess <= 0 || !enemy) return null;
+  // Varjax (40019:A:3): for each excess point the defending player deals 1 damage to a Ship objective they control (the player chooses; none, none).
+  if (flagged(state, attack.enemyId, "excessDamagesShip")) {
+    const varjax = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "excessDamagesShip"));
+    return { instructions: [{ verb: "Repeat", times: excess, instructions: [{ verb: "Pick", pick: { type: "character", control: "you", trait: "Ship" } }, { verb: "DamageShip", amount: 1 }] }], cause: varjax ? effectCause(varjax) : ruleCause("rr.damage") };
+  }
+  if (!flagged(state, attack.enemyId, "excessToDamage")) return null;
   const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "excessToDamage"));
   return {
     // `excessExhausts` (Terrible Strength, 901802:A:1): each character so damaged is exhausted.

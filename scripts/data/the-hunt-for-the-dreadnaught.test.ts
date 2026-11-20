@@ -17,7 +17,7 @@ const copies = (name: string) => pile(name).reduce((sum, card) => sum + card.nor
 
 describe("The Hunt for the Dreadnaught", () => {
   it("keeps RingsDB's codes 40001 to 40047, deals Standard Mode as its mode card and two quest stages, and excludes the other two mode cards", () => {
-    expect(hunt).toMatchObject({ id: "the-hunt-for-the-dreadnaught", name: "The Hunt for the Dreadnaught", stages: ["40004", "40005"], modeCard: "40002" });
+    expect(hunt).toMatchObject({ id: "the-hunt-for-the-dreadnaught", name: "The Hunt for the Dreadnaught", stages: ["40004", "40005"], modeCard: "40002", easyModeCard: "40001" });
     expect(hunt.campaignCard).toBeUndefined();
     expect(hunt.source).toMatchObject({ dragnNormal: "Q99.15", dragnEasy: "Q99.15" });
     const own = [...byCode.values()].filter((card) => card.printings.some((printing) => printing.pack === "THftD"));

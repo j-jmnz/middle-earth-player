@@ -159,6 +159,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const campaignSetup = campaignLines.setup;
     // A mode card's Setup (the Siege's Standard Game Mode: Annúminas to the staging area) runs before the quest card's: its sentences are read with the quest card's.
     const modeCard = def.modeCard === undefined ? undefined : cards.find((card) => card.type === "campaign" && card.name === def.modeCard && card.printings.some((p) => cardPacks.includes(p.pack)));
+    const easyModeCard = def.easyModeCard === undefined ? undefined : cards.find((card) => card.type === "campaign" && card.name === def.easyModeCard && card.printings.some((p) => cardPacks.includes(p.pack)));
+    if (def.easyModeCard !== undefined && !easyModeCard) local.push(`${id}: no Easy mode card ${def.easyModeCard}`);
     // The Hunt for the Dreadnaught's mode cards print the Setup as bulleted lines, which continue the "Setup:" line: the bullets are dropped, each line is one sentence.
     const modeSetup = setupOf(modeCard?.text, true).setup?.replaceAll("• ", "") ?? null;
     const modeParsed: ParsedSetup = modeSetup ? parseSetup(modeSetup, names) : { clauses: [], unread: [] };
@@ -483,6 +485,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },
         ...(nightmare.data ? { nightmare: nightmare.data } : {}),
         ...(modeCard ? { modeCard: modeCard.code } : {}),
+        ...(easyModeCard ? { easyModeCard: easyModeCard.code } : {}),
       }),
     );
   }

@@ -31,6 +31,8 @@ import { shipAttackReason, shipDefenseReason, shipEnemyAttacking, shipObjectives
 import { announceShipsExhausted, noteAttachedToShip } from "./water.ts";
 import { carryToSecondDeck, damageOnMatching, discardAllInPlay, setAsideEncounterDeck } from "./swap.ts";
 import { immuneToEvents } from "./immune.ts";
+import { eliminateWithoutShip, engageRandomSetAside, flipShip, gainHeroTraits, pickFewestHitPoints } from "./dreadnaught.ts";
+import { pillage } from "./pillage.ts";
 import { attackOtherPlayers } from "./attacks.ts";
 import { entriesBarred, entriesRefusal, noteEntries } from "./entries.ts";
 import { mustTravelTitled, travelTax } from "./streets.ts";
@@ -38,7 +40,7 @@ import { mustTravelTitled, travelTax } from "./streets.ts";
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "PrepareCorsairDeck":
-      return prepareCorsairDeck(state, ctx);
+      return prepareCorsairDeck(state, ctx, instruction.trait);
     case "EndCorsairDeck":
       return endCorsairDeck(state);
     case "PrepareFleet":
@@ -50,7 +52,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       if (instruction.who === "anyPlayer") return revealForAnyPlayer(state, instruction, focus, count, ctx, steps);
       const seats = instruction.who === "eachSeat" ? livingSeats(state) : [focus.seat];
       let next = state;
-      for (const seat of seats) next = revealCorsair(next, seat, count, ctx, steps);
+      for (const seat of seats) next = revealCorsair(next, seat, count, ctx, steps, instruction.shadow ?? 0);
       return next;
     }
     case "EngageLastPlayer": {
@@ -106,7 +108,18 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return carryToSecondDeck(state, instruction, ctx);
     case "DiscardAllInPlay":
       return discardAllInPlay(state, instruction, focus, ctx, steps);
+    case "Pillage":
+      return pillage(state, instruction, focus, ctx);
+    case "PickFewestHitPoints":
+      return pickFewestHitPoints(state, focus, ctx, steps);
+    case "EngageRandomSetAside":
+      return engageRandomSetAside(state, instruction, focus, ctx, steps);
+    case "GainHeroTraits":
+      return gainHeroTraits(state, ctx, focus);
+    case "FlipShip":
+      return flipShip(state, ctx);
     // A constant the engine reads when an ally is played or put into play (families/sea/entries.ts).
+    case "EliminateWithoutShip":
     case "LimitEntries":
     case "TravelOrAddResources":
     case "TravelOrRaiseThreat":
@@ -119,7 +132,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 // A ship-objective attacks only ship-enemies, a ship-enemy's attack is defended only by a ship-objective, and its undefended damage goes to a ship-objective (dcce.ship-enemies, dcce.ship-objectives).
 const SHIP_COMBAT: CombatHooks = {
   defense: shipDefenseReason,
-  attack: (state, enemyId, attacker, target) => shipAttackReason(attacker, target) ?? shipsOnlyReason(state, enemyId, attacker),
+  attack: (state, enemyId, attacker, target) => (flagged(state, enemyId, "shipFightable") ? null : shipAttackReason(attacker, target)) ?? shipsOnlyReason(state, enemyId, attacker),
   undefended: (state, candidates, cards) => (shipEnemyAttacking(state, cards) ? shipObjectivesAmong(candidates(), state, cards) : []),
 };
 
@@ -131,4 +144,4 @@ const SEA_TRAVEL: TravelHooks = {
   unpayable: (state, instruction) => instruction.verb === "RevealCorsair" && !corsairHolds(state),
 };
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => noteEntries(announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked", "SetAsideEncounterDeck", "CarryToSecondDeck", "AttackOtherPlayers", "DiscardAllInPlay", "LimitEntries", "TravelOrAddResources", "TravelOrRaiseThreat"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT, travel: SEA_TRAVEL, play: (state, cardId, ctx, how) => entriesBarred(state, cardId, ctx, how.seat), playReason: entriesRefusal, pick: (state, id, _spec, at, ctx) => immuneToEvents(state, id, at, ctx), amount: (state, amount, scope, ctx) => (amount.damageOn ? damageOnMatching(state, amount.damageOn, scope, ctx) : null), condition: (state, condition, scope) => (condition.kind === "lastPlayer" ? scope.actor === lastPlayer(state) : null) };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx, steps) => eliminateWithoutShip(noteEntries(announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx), ctx), ctx, steps) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked", "SetAsideEncounterDeck", "CarryToSecondDeck", "AttackOtherPlayers", "DiscardAllInPlay", "LimitEntries", "TravelOrAddResources", "TravelOrRaiseThreat", "Pillage", "PickFewestHitPoints", "EngageRandomSetAside", "GainHeroTraits", "FlipShip", "EliminateWithoutShip"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT, travel: SEA_TRAVEL, play: (state, cardId, ctx, how) => entriesBarred(state, cardId, ctx, how.seat), playReason: entriesRefusal, pick: (state, id, _spec, at, ctx) => immuneToEvents(state, id, at, ctx), amount: (state, amount, scope, ctx) => (amount.damageOn ? damageOnMatching(state, amount.damageOn, scope, ctx) : null), condition: (state, condition, scope) => (condition.kind === "lastPlayer" ? scope.actor === lastPlayer(state) : null) };

@@ -97,9 +97,11 @@ export function buildStart(start: StartInput): StartScenario {
   const effects = input.effects ?? [];
   const full: ScenarioDefinition = scenarioDefinition(input.scenario, input.campaign, effects);
   let definition = full;
+  // The app's Easy difficulty deals the scenario's Easy mode card in place of its mode card (ScenarioData.easyModeCard).
+  if (input.difficulty === "Easy" && input.scenario.easyModeCard != null) definition = { ...definition, modeCard: { code: input.scenario.easyModeCard, side: "B" } };
   if (standalone) {
     // No campaign card beside the quest deck, so no campaign Setup and no Resolution to follow on a win.
-    const { campaignCard: _unused, ...withoutCard } = full;
+    const { campaignCard: _unused, ...withoutCard } = definition;
     definition = { ...withoutCard, resolution: [] };
   } else if (input.modeCard) {
     // The Hard/Expert Mode card goes next to the quest deck, and "if you win the game, resolve this card's resolution" after the campaign card's own.

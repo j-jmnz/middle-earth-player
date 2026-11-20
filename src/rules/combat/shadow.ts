@@ -32,6 +32,7 @@ import { announceShadowWizardry } from "../families/wizardry/shadow.ts";
 import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../families/burden/attack.ts";
 import { printedOf } from "../core/printed.ts";
 import { attackHere, attackKey, locationDamage } from "../families/south/watcher.ts";
+import { pillageAfter } from "../families/sea/pillage.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -320,7 +321,10 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks, ...noted };
   // A shadow card that attacks the defending player (Wolf Rider) attacks once this attack's own "after" instructions have run, and the
   // shadow cards that follow it once its attack has ended (startShadowAttack carries the rest of the list onto its attack).
-  const after = troll ? [...(attack.after ?? []), ...troll.instructions] : (attack.after ?? []);
+  // Pillage X (The Hunt for the Dreadnaught, families/sea/pillage.ts) is the last thing an attack leaves.
+  const pillage = pillageAfter(state, attack.enemyId, ctx);
+  const base = troll ? [...(attack.after ?? []), ...troll.instructions] : (attack.after ?? []);
+  const after = pillage ? [...base, pillage] : base;
   const waiting = attack.shadowAttackers ?? [];
   if (after.length === 0 && waiting.length > 0) return startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended;
   if (after.length === 0) return ended;

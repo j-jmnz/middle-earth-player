@@ -63,6 +63,8 @@ export const printedKeywordsSchema = z.strictObject({
   siege: z.boolean().optional(),
   // The Siege value box an Attack on Dol Guldur card prints at its bottom right (docs/brief.md, Attack on Dol Guldur, reading 2): what a destroyed enemy or an explored location adds to the round's tally. A printed mark, not a quest-card flag.
   siegeValue: z.number().int().positive().optional(),
+  // Pillage X on an enemy (docs/brief.md, The Hunt for the Dreadnaught, reading 21): after the enemy's attack on a player has resolved, that player discards the top X cards of their deck (src/rules/families/sea/pillage.ts). Not in any source's keyword list for the box: `overrides.cards` sets it from the scan.
+  pillage: z.number().int().positive().optional(),
   // Secrecy X: the card costs X less to play while its player's threat is 20 or less.
   secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).

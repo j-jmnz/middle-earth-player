@@ -16,7 +16,7 @@ import { drawOpeningHand, runInstruction, type ReduceContext } from "../interpre
 import type { PileZone } from "../core/piles.ts";
 import { printedOf } from "../core/printed.ts";
 import { shuffleIds } from "../core/seed.ts";
-import { modeCardSetup, placeModeCard } from "./mode-card.ts";
+import { modeAddsEasyResource, modeCardSetup, placeModeCard } from "./mode-card.ts";
 import { handSetup, searchSetup } from "./search.ts";
 import { attachPending } from "../families/angmar/burdens.ts";
 import { nightmareDuringSetup, nightmareSetup } from "../families/nightmare/setup.ts";
@@ -25,7 +25,7 @@ import type { CampaignFacts } from "../core/campaign-state.ts";
 import { placeCampaignCard } from "../families/burden/campaign.ts";
 import { snapshotOf } from "../engine/undo.ts";
 import { attachTo, moveCard, spawn } from "../core/zones.ts";
-import { stampRoutes } from "../families/sea/routes.ts";
+import { corsairTrait, stampRoutes } from "../families/sea/routes.ts";
 import { markSideQuests } from "../families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../families/angmar/progress.ts";
 import { markProgressHeld } from "../families/long-dark/hold.ts";
@@ -159,7 +159,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
       const placed = spawn(state, code, { zone: "heroes", seat: index });
       // Easy mode: "During step 2 of Setup, 'Place Heroes and Set Initial Threat Levels', add one resource to each hero's
       // resource pool" (easy-mode.easy-mode; ltp.easy-mode step 1, which says only "during setup").
-      const starting = (input.difficulty === "Easy" ? 1 : 0) + (seat.resources ?? 0);
+      const starting = (input.difficulty === "Easy" && !modeAddsEasyResource(input.definition, ctx) ? 1 : 0) + (seat.resources ?? 0);
       state = starting > 0 ? updateCard(placed.state, placed.id, { resources: starting }) : placed.state;
       threat += printedOf(ctx.cards, code).threat ?? 0;
     }
@@ -187,7 +187,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   }
   if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
   // The sea family's routes for the cards that do not go to the encounter discard pile (families/sea/routes.ts): only in a game with ships.
-  state = stampRoutes(state, ctx.cards);
+  state = stampRoutes(state, ctx.cards, corsairTrait(ctx.effects));
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
   // The raises of Setup step 7 come after the initial threat level is recorded.

@@ -70,6 +70,7 @@ export type Keywords = {
   aflame: number | null;
   // The Siege value the card prints (docs/brief.md, Attack on Dol Guldur, reading 2), null when it prints none.
   siegeValue: number | null;
+  pillage: number | null;
   // Burn X (The Battle of Lake-town): the burn damage a location adds to the pool "resolve all burn damage" deals, null when the card prints none.
   burn: number | null;
   // Grapple (dcce.grapple): the location in the staging area the enemy attaches to, facedown, when it is revealed; null when the card prints none.
@@ -154,6 +155,7 @@ const EMPTY_KEYWORDS: Keywords = {
   aflame: null,
   burn: null,
   siegeValue: null,
+  pillage: null,
   grapple: null,
   phantom: false,
   spectral: false,
@@ -448,6 +450,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       aflame: keywords.aflame ?? null,
       burn: keywords.burn ?? null,
       siegeValue: keywords.siegeValue ?? null,
+      pillage: keywords.pillage ?? null,
       grapple: keywords.grapple ?? null,
       phantom: keywords.phantom === true,
       spectral: keywords.spectral === true,
