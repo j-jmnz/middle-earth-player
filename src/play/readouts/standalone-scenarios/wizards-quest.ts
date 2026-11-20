@@ -4,7 +4,7 @@ import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { ownerWords } from "../../words/owner.ts";
-import { keptCardWords, keptPill, type KeptCard } from "../../words/scenarios/wizards-quest-table.ts";
+import { keptCardWords, keptPill, type KeptCard } from "../../words/scenarios/standalone-scenarios/wizards-quest-table.ts";
 
 /** The held cards lying under a card, in the order they were laid there. */
 export function keptUnder(game: ScenarioState, cardId: string): string[] {
