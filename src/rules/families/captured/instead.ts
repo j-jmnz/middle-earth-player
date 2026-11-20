@@ -12,5 +12,5 @@ export function captureInstead(state: ScenarioState, enemyId: string, assigned: 
   if (!ally || ally.zone !== "play" || printedOf(ctx.cards, ally.code).type !== "ally") return null;
   const enemy = state.cards[enemyId];
   if (state.pendingAttack?.captures !== true && !(enemy != null && state.capture.instead.includes(enemy.code))) return null;
-  return captureAlly(state, assigned, enemyId);
+  return captureAlly(state, assigned, enemyId, ctx.cards);
 }

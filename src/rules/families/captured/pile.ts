@@ -6,7 +6,8 @@
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard, withSeat } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
-import { queueEvent } from "../../windows/queue.ts";
+import { announceAllyLeft } from "../../core/ally-left.ts";
+import type { PrintedCard } from "../../core/printed.ts";
 
 // The cards captured underneath the host, in id order.
 export function capturedUnder(state: ScenarioState, hostId: string): string[] {
@@ -31,11 +32,11 @@ export function captureCard(state: ScenarioState, id: string, hostId: string): S
   return updateCard(moveCard(state, id, { zone: "captured", hostId, ...(owner != null ? { seat: owner } : {}) }), id, hero);
 }
 
-// An ally in play captured underneath a host leaves play, and the cards that hear an ally leave play hear it (Valiant Sacrifice, 01024:A:1; rr.in-play-and-out-of-play).
-export function captureAlly(state: ScenarioState, id: string, hostId: string): ScenarioState {
+// An ally in play captured underneath a host leaves play, and is announced (core/ally-left.ts).
+export function captureAlly(state: ScenarioState, id: string, hostId: string, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
   const card = state.cards[id];
   const captured = captureCard(state, id, hostId);
-  return card && captured !== state && card.zone === "play" ? queueEvent(captured, { trigger: "allyLeftPlay", seat: card.controller, subject: id }) : captured;
+  return card && captured !== state ? announceAllyLeft(captured, card, cards) : captured;
 }
 
 // The seat's captured deck in the order given.

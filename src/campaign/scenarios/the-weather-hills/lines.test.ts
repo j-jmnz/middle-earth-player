@@ -141,7 +141,7 @@ describe("Cold from Angmar (09054:A:1)", () => {
   it("09054:A:1 blanks the text box of a damaged character but leaves its keywords and Traits, and an undamaged character is untouched", () => {
     const t = built({});
     const cards = new Map(t.ctx.cards);
-    cards.set("sen", definePrinted({ code: "sen", name: "Sentinel ally", type: "ally", sphere: "neutral", cost: 1, willpower: 1, attack: 1, defense: 1, health: 3, traits: ["Dunedain", "Ranger"], keywords: { sentinel: true } }));
+    cards.set("sen", definePrinted({ code: "sen", name: "Sentinel ally", type: "ally", sphere: "neutral", cost: 1, willpower: 1, attack: 1, defense: 1, health: 3, traits: ["Dúnedain", "Ranger"], keywords: { sentinel: true } }));
     const ctx = { ...t.ctx, cards };
     const run = resolveRecords(t.state, ctx, "09054", "whenRevealed");
     const ally = spawn(run.state, "sen", { zone: "play", seat: 0 });
@@ -149,7 +149,7 @@ describe("Cold from Angmar (09054:A:1)", () => {
     expect(textBlank(state, ally.id, ctx.cards)).toBe(true);
     expect(hasKeyword(state, ally.id, "sentinel", ctx.cards)).toBe(true);
     expect(hasTrait(state, ally.id, "Ranger", ctx)).toBe(true);
-    expect(hasTrait(state, ally.id, "Dunedain", ctx)).toBe(true);
+    expect(hasTrait(state, ally.id, "Dúnedain", ctx)).toBe(true);
     const bare = settle(updateCard(ally.state, ally.id, { damage: 0 }), ctx, []);
     expect(textBlank(bare, ally.id, ctx.cards)).toBe(false);
   });

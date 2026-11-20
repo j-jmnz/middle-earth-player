@@ -12,9 +12,6 @@ const VERBS = [
   // Every living player draws `amount` cards (1 by default), the first player first ("each player draws 1 card"). Unlike
   // ForEachPlayer it can be one branch of a Choose.
   z.strictObject({ verb: z.literal("DrawEach"), amount: positiveAmountSchema.optional(), ...when }),
-  // Heals like Heal but announces no `healed` event: for a card whose Response is "After a character is healed by another card
-  // effect, heal 1 damage on it", so its own healing does not answer itself (04128:A:2).
-  z.strictObject({ verb: z.literal("HealQuietly"), amount: positiveAmountSchema, target: z.enum(["subject", "picked"]).optional(), ...when }),
   // Moves `amount` damage (all of it with `all`) from the card picked before the last to the last picked card. Damage that
   // reaches the card's hit points destroys it ("Move any number of damage from one enemy to another", 02058:A:1).
   z.strictObject({ verb: z.literal("MoveDamage"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), ...when }),

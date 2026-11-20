@@ -17,9 +17,9 @@ type Focus = { seat: number; sourceId: string | null };
 // The refs that name one card with no pick. "self" and "host" name the source's own card or its host, which an effect of the source can always reach.
 const NAMED = new Set(["activeLocation", "subject", "other", "attacker"]);
 
-// Instructions whose target is not the card they affect: a shadow card dealt to or discarded from the attacker is the shadow card's business, not the
+// Instructions whose target is not the card they affect: a shadow card dealt to, looked at or discarded from the attacker is the shadow card's business, not the
 // enemy's (rr.immune: immunity protects only the card itself).
-const PERIPHERAL = new Set(["DealShadowTo", "DiscardShadowOf"]);
+const PERIPHERAL = new Set(["DealShadowTo", "DiscardShadowOf", "LookAtShadow"]);
 
 /** Whether the effect of the source may not affect this card in play: it is immune to player card effects (or to this player card), or to the source. */
 export function immuneTo(state: ScenarioState, id: string, sourceId: string | null, ctx: ReduceContext): boolean {
@@ -39,10 +39,11 @@ export function namedTargetImmune(state: ScenarioState, instruction: Instruction
   return id != null && immuneTo(state, id, focus.sourceId, ctx);
 }
 
-/** The active location that would take a card effect's progress on the current quest first (placeOnActive, families/south/locations.ts) is immune to
- * that effect: the location ignores it, and the quest takes none either (faq.legolas-immune-location). */
+/** The active location that would take a player card effect's progress on the current quest first (placeOnActive, families/south/locations.ts) is
+ * immune to that effect: the location ignores it, and the quest takes none either (faq.legolas-immune-location). */
 export function immuneBuffer(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): boolean {
-  if (!sourceId) return false;
+  // The rulings are about a player card's progress: the progress of an encounter or quest card goes on as rr.active-location says.
+  if (!sourceId || !isPlayerCardEffect(state, ctx.cards, sourceId)) return false;
   const id = activeLocations(state).find((candidate) => hasQuestPoints(printedOf(ctx.cards, state.cards[candidate]?.code ?? "")) && progressRoom(state, candidate, ctx.cards) > 0);
   return id != null && immuneTo(state, id, sourceId, ctx);
 }

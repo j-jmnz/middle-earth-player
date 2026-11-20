@@ -315,4 +315,19 @@ describe("An attacker that leaves play before the damage (rr.step-6-8-2)", () =>
     expect(state.cards[beechbone]?.zone).toBe("discard");
     expect(state.cards[orc]?.damage).toBe(0);
   });
+
+  it("the attackers still in play keep their Attack: Gimli strikes alone once Beechbone has left (10118:A:2)", () => {
+    const tab = table({ heroes: [{ code: GIMLI, seat: 0 }], allies: [{ code: BEECHBONE, seat: 0 }], engaged: [{ code: ORC, seat: 0 }] });
+    const [beechbone, gimli, orc] = [idsOf(tab, BEECHBONE), idsOf(tab, GIMLI), idsOf(tab, ORC)];
+    const step = (state: ScenarioState, intent: Parameters<typeof reduce>[1]): ScenarioState => {
+      const result = reduce(state, intent, tab.ctx);
+      if (!result.ok) throw new Error(result.reason);
+      return result.state;
+    };
+    let state = step(attacking(updateCard(tab.state, beechbone, { damage: 3 })), { type: "DeclareAttackers", enemyId: orc, attackerIds: [beechbone, gimli] });
+    state = step(state, { type: "Trigger", cardId: beechbone, effectId: "10118:response:1" });
+    while (legalIntents(state, tab.ctx).some((intent) => intent.type === "Pass") && state.pendingStrike) state = step(state, { type: "Pass" });
+    // Gimli's 2 Attack against the Orc's 1 Defense.
+    expect(state.cards[orc]?.damage).toBe(1);
+  });
 });

@@ -7,6 +7,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import { doRefresh } from "../../engine/refresh.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
 import { updateCard } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { attach, damage, miscCtx } from "./fixture.ts";
@@ -66,6 +67,20 @@ describe("healing responses", () => {
     expect(state.cards[rohan]?.damage).toBe(1);
     // His own heal is announced to other cards, but it is not another card effect: he is not offered it again.
     expect(triggers(run(state, ctx), ctx, "04128:response:1")).toEqual([]);
+  });
+
+  it("Elrond answers a card that healed itself, and his own heal is announced to other cards (04128:A:2)", () => {
+    const table = seat(1, ["04128", "rohan"]);
+    const healer = put(table.state, "10147", "play");
+    let state = damage(healer.state, healer.id, 2);
+    // The Healer heals itself: another card effect, so Elrond answers it.
+    state = run(runInstruction({ ...state, window: null }, { verb: "Heal", amount: 1, target: "self" }, { seat: 0, sourceId: healer.id }, ctx, []), ctx);
+    expect(triggers(state, ctx, "04128:response:1")).toHaveLength(1);
+    // Elrond's own heal: other cards hear it (the event names Elrond as the healing card), he does not.
+    const elrond = table.heroes[0] ?? "";
+    const own = runInstruction({ ...damage(table.state, elrond, 2), window: null }, { verb: "Heal", amount: 1, target: "self" }, { seat: 0, sourceId: elrond }, ctx, []);
+    expect((own.pendingEvents ?? []).filter((event) => event.trigger === "healed").map((event) => event.other)).toEqual([elrond]);
+    expect(triggers(run(own, ctx), ctx, "04128:response:1")).toEqual([]);
   });
 
   it("Silvan Tracker heals 1 damage from a Silvan character that readies in the refresh phase (02102:A:1)", () => {

@@ -60,6 +60,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 34, scenarios: "all", note: "A raise of a threat to a set value, like Southern Gate's or A Elbereth! Gilthoniel!'s, is heard by the cards that answer a threat raise." },
   { version: 34, scenarios: ["the-battle-of-carn-dum"], note: "The copies The Sky Darkens discards from your deck are heard by the cards that answer a discard from the deck." },
   { version: 34, scenarios: ["a-journey-to-rhosgobel", "escape-from-mount-gram"], note: "An ally removed from the game or captured leaves play, and the cards that answer an ally leaving play hear it." },
+  { version: 34, scenarios: ["return-to-mirkwood", "road-to-rivendell", "the-redhorn-gate", "lost-in-mirkwood", "roam-across-rhovanion", "shelobs-lair"], note: "A set-aside card the players take control of, like Gollum or an objective ally, enters play, and the cards that answer a card entering play hear it." },
   { version: 34, scenarios: ["temple-of-the-deceived"], note: "An ally turned up from under the active location enters play, and the cards that answer an ally entering play hear it." },
 ];
 

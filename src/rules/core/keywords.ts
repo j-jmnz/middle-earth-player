@@ -29,6 +29,7 @@ import { heldBy } from "./holder-classes.ts";
 import { inAreaOf } from "../families/breaking/areas.ts";
 import { versusVictoryTrait } from "../families/captured/values.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
+import { announceAllyLeft } from "./ally-left.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 // `quest`: an effect of a quest card or a side quest (framework damage that a card's "non-quest effects" limit does not count, 19074:A:2).
@@ -456,7 +457,7 @@ export function destroyCard(
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
   next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious, next), { released: instance.attachments, defeated: byDamage });
   steps.push({ kind: "destroy", targetId: id });
-  if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
+  next = announceAllyLeft(next, instance, cards);
   next = discardedFromPlay(next, instance, byDamage);
   // "If attached hero leaves play, the players lose the game" (19143:A:3): the hero holds the flag while Wormsbane is attached to it.
   if (printed.leavesPlayLoses || flagged(state, id, "lossOnLeavingPlay")) next = markLoss(next, `${printed.name} left play`);

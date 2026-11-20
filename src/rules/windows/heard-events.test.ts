@@ -6,12 +6,15 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Instruction } from "../../catalog/boundary.ts";
 import { syncConstants } from "../interpret/constants.ts";
 import { runInstruction } from "../interpret/interpret.ts";
+import { applyTargetVerb } from "../interpret/effect-verbs.ts";
 import { updateCard, type ScenarioState } from "../core/state.ts";
 import { moveCard } from "../core/zones.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { passHand } from "../families/erech/hand.ts";
 import { captureAlly } from "../families/captured/pile.ts";
 import { flipSecret } from "../families/island/cards.ts";
+import { takeControlOfSetAside } from "../families/wilderland/mirkwood.ts";
+import { guardGollum } from "../families/guardian/change.ts";
 import { answeringController } from "./listen.ts";
 import { fund, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
@@ -140,7 +143,7 @@ describe("an ally leaves play", () => {
   it("an ally captured underneath an enemy is announced (Cruel Torturer, 10043:A:2)", () => {
     const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: GUIDE, seat: 0 }], staging: [WEATHER_HILLS] });
     const guide = idsOf(tab, GUIDE);
-    const state = captureAlly(tab.state, guide, idsOf(tab, WEATHER_HILLS));
+    const state = captureAlly(tab.state, guide, idsOf(tab, WEATHER_HILLS), tab.ctx.cards);
     expect(state.cards[guide]?.zone).toBe("captured");
     expect(heard(state, "allyLeftPlay")).toEqual([guide]);
   });
@@ -152,6 +155,35 @@ describe("an ally enters play", () => {
     const guide = idsOf(tab, GUIDE);
     const under = updateCard(moveCard(tab.state, guide, { zone: "under", locationId: idsOf(tab, WEATHER_HILLS) }), guide, { face: "down", controller: null });
     const state = flipSecret(under, { seat: 0, sourceId: null }, tab.ctx, []);
+    expect(state.cards[guide]?.zone).toBe("play");
+    expect(heard(state, "enteredPlay")).toEqual([guide]);
+  });
+});
+
+describe("readied by a hero ready", () => {
+  it("ReadyHero readies the exhausted hero, announced", () => {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }] });
+    const aragorn = idsOf(tab, ARAGORN);
+    const exhausted = updateCard(tab.state, aragorn, { exhausted: true });
+    const state = applyTargetVerb(exhausted, { verb: "ReadyHero" }, aragorn, aragorn, 0, tab.ctx, []);
+    expect(state.cards[aragorn]?.exhausted).toBe(false);
+    expect(heard(state, "readied")).toEqual([aragorn]);
+  });
+});
+
+describe("a set-aside card enters play", () => {
+  it("a set-aside card the first player takes control of enters play, announced (TakeControlOfSetAside)", () => {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }], setAside: [GUIDE] });
+    const guide = idsOf(tab, GUIDE);
+    const state = takeControlOfSetAside(tab.state, { verb: "TakeControlOfSetAside", code: GUIDE }, { seat: 0, sourceId: null });
+    expect(state.cards[guide]?.zone).toBe("play");
+    expect(heard(state, "enteredPlay")).toEqual([guide]);
+  });
+
+  it("the guarded card enters the guardian's play area, announced (GuardGollum, sotm.guarding-gollum)", () => {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }], setAside: [GUIDE] });
+    const guide = idsOf(tab, GUIDE);
+    const state = guardGollum(tab.state, GUIDE, { seat: 0, sourceId: null });
     expect(state.cards[guide]?.zone).toBe("play");
     expect(heard(state, "enteredPlay")).toEqual([guide]);
   });

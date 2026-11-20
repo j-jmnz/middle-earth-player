@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 407–412 Catalog build (~410)
   - 413–429 Tests (~1.9K) ← 5
   - 430–445 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~277.7K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~277.6K tok)
   - 17–42 Sections (~560)
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)

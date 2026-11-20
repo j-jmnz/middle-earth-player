@@ -10,6 +10,7 @@ import { declareAttack } from "../families/attack/index.ts";
 import { enforceRestricted } from "../player/attach.ts";
 import { placeProgress, progressPlacer } from "./effect-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { announceAllyLeft } from "../core/ally-left.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
 import { shuffleIds } from "../core/seed.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -117,8 +118,8 @@ export function runPlayerVerb(
       if (healed.healed <= 0) return state;
       // The step records the damage removed as a negative amount, the way a progress removal is recorded (the table's log).
       steps.push({ kind: "damage", targetId: id, amount: -healed.healed, cause: currentCause(steps, UNATTRIBUTED) });
-      // The card whose effect healed is the event's other card (Radagast's Request removes it from the game, 02061:B:2); an attachment that reduced the heal is discarded after it (900608:A:2).
-      const announced = queueEvent(healed.state, { trigger: "healed", seat: card.controller, cardId: id, ...(focus.sourceId && focus.sourceId !== id ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+      // The card whose effect healed is the event's other card, the healed card itself when it healed itself (Radagast's Request removes it from the game, 02061:B:2; Elrond answers a heal whose card is not Elrond, 04128:A:2); an attachment that reduced the heal is discarded after it (900608:A:2).
+      const announced = queueEvent(healed.state, { trigger: "healed", seat: card.controller, cardId: id, ...(focus.sourceId ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
       return healed.reducer ? destroyCard(announced, healed.reducer, ctx.cards, steps) : announced;
     }
     case "PutOnDeck": {
@@ -266,7 +267,7 @@ export function runPlayerVerb(
       if (!card || !inPlay(card.zone) || card.controller == null) return state;
       // The scenario owns an encounter card (an objective-ally: Wilyador, Iârion), so it has no hand to return to: it leaves play into the encounter discard pile, the area the scenario owns (rr.ownership-and-control).
       const returned = scenarioOwned(printedOf(ctx.cards, card.code)) ? toEncounterDiscard(state, card) : moveCard(state, id, { zone: "hand", seat: card.owner ?? card.controller });
-      return queueEvent(returned, { trigger: "allyLeftPlay", seat: card.controller, subject: id });
+      return announceAllyLeft(returned, card, ctx.cards);
     }
     case "ShuffleSelfIntoDeck": {
       // Only a card still in play is shuffled back: once Beorn has left play (returned to the hand by Sneak Attack, or
@@ -280,7 +281,7 @@ export function runPlayerVerb(
       if (!pile) return moved;
       const shuffled = shuffleIds(pile.deck, moved.seed, moved.seedCursor);
       const done = { ...withSeat(moved, seat, { ...pile, deck: shuffled.ids }), seedCursor: shuffled.cursor };
-      return queueEvent(done, { trigger: "allyLeftPlay", seat: card.controller, subject: card.id });
+      return announceAllyLeft(done, card, ctx.cards);
     }
     case "AttachPicked": {
       const list = pickedList(state);
