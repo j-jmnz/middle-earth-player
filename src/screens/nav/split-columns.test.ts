@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { equalSplit, seedWidth, sideSplit } from "./split-columns";
+import { seedWidth, sideSplit } from "./split-columns";
 
 const RANGE = { min: 360, max: 440 };
 
@@ -22,15 +22,6 @@ describe("sideSplit", () => {
   it("scales the threshold", () => {
     expect(sideSplit(1040, 1.15, RANGE)?.main).toBeGreaterThanOrEqual(460);
     expect(sideSplit(840, 1.15, RANGE)).toBeNull();
-  });
-});
-
-describe("equalSplit", () => {
-  it("needs 360 a column", () => {
-    expect(equalSplit(0, 1)).toBeNull();
-    expect(equalSplit(704, 1)).toBeNull();
-    expect(equalSplit(744, 1)).toEqual({ column: 360, gap: 24 });
-    expect(equalSplit(1040, 1)?.column).toBe(508);
   });
 });
 
