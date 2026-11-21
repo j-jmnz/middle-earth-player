@@ -8,7 +8,6 @@ type FakePlayer = { source: number; volume: number; currentTime: number; duratio
 
 const audio = vi.hoisted(() => ({ players: [] as FakePlayer[], appState: null as ((state: string) => void) | null, other: false, reader: false }));
 vi.mock("react-native", () => ({
-  Platform: { OS: "ios" },
   AppState: {
     currentState: "active",
     addEventListener: (_: string, listener: (state: string) => void) => {

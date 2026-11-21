@@ -5,7 +5,6 @@
 // error the player should see; a development build logs it. Each slot keeps a few players for the app's life, so quick taps each get
 // one that is not still playing: one player a slot is loaded the first time any sound plays, and more only as quick repeats need them.
 import { createAudioPlayer, type AudioPlayer } from "./audio-player";
-import { Platform } from "react-native";
 
 import { accessibility } from "../accessibility.ts";
 import { tableSettings } from "../table-settings.ts";
@@ -32,7 +31,7 @@ let quietUntil = 0;
 const lastPlayed = new Map<SoundSlot, number>();
 
 /** Whether this bundle carries any sound and can play it: the Sound effects row shows only then. Fixed when the bundle loads. */
-export const SOUNDS_BUNDLED = Platform.OS !== "web" && Object.keys(bundledSounds).length > 0;
+export const SOUNDS_BUNDLED = Object.keys(bundledSounds).length > 0;
 
 function poolOf(slot: SoundSlot, source: number): Voice[] {
   const existing = pools.get(slot);

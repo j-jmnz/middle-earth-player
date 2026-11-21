@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { tableSettings } from "../table-settings.ts";
 
 const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], playing: false }));
-vi.mock("react-native", () => ({ Platform: { OS: "ios" } }));
 vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined }));
 // The accessibility store is mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
 vi.mock("../accessibility.ts", () => ({ accessibility: () => ({ screenReader: false }) }));
