@@ -46391,12 +46391,12 @@
     },
     "sounds": {
       "id": "sounds",
-      "site": "Darkest Dungeon II (the player's own install, cut by pnpm assets sounds --from)",
+      "site": "Darkest Dungeon II and Hearthstone (the player's own copies, cut by pnpm assets sounds --from and --hearthstone)",
       "pin": {
         "kind": "sha256",
-        "value": "de3c0bf99b7af71fdb6e36279a867d693f12d0b152bac9f62f5206b682af592e"
+        "value": "141ce74289cba4f91fc14d285d7cbb1cba2f4d65afb5b8cb2e92ecf8559e5267"
       },
-      "fetchedAt": "2026-11-21T02:00:29.897Z",
+      "fetchedAt": "2026-11-21T13:26:40.964Z",
       "files": [
         {
           "path": "sounds/ui.select.m4a",
@@ -46472,9 +46472,9 @@
         },
         {
           "path": "sounds/card.land.m4a",
-          "url": "ui.bank#ui_heroselect_add",
-          "sha256": "b15632e391cff8fe8576b3ef81859321b00d85f1e6f8ec2177459f9acf7911dd",
-          "bytes": 15166
+          "url": "hearthstone#credits_card_enter_1",
+          "sha256": "f7763836a04f99eeabd82dcbb947022e8bb4f7ab2771b7776e953647edbd3ff8",
+          "bytes": 12423
         },
         {
           "path": "sounds/card.shuffle.m4a",

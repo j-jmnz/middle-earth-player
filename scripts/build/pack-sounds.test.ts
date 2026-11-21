@@ -46,8 +46,12 @@ describe("pack sounds", () => {
     mkdirSync(path.join(from, "ui"));
     writeFileSync(path.join(from, "ui", "17-ui_shared_tab.ogg"), "");
     writeFileSync(path.join(from, "ui", "18-ui_shared_tab_v2.ogg"), "");
-    expect(findSource(from, { bank: "ui", event: "ui_shared_tab", lufs: -24, maxSeconds: 1 })).toBe(path.join(from, "ui", "17-ui_shared_tab.ogg"));
-    expect(findSource(from, { bank: "battle", event: "ui_shared_tab", lufs: -24, maxSeconds: 1 })).toBeUndefined();
+    expect(findSource({ dd2: from }, { bank: "ui", event: "ui_shared_tab", lufs: -24, maxSeconds: 1 })).toBe(path.join(from, "ui", "17-ui_shared_tab.ogg"));
+    expect(findSource({ dd2: from }, { bank: "battle", event: "ui_shared_tab", lufs: -24, maxSeconds: 1 })).toBeUndefined();
+    mkdirSync(path.join(from, "hs", "General SFX"), { recursive: true });
+    writeFileSync(path.join(from, "hs", "General SFX", "credits_card_enter_1.ogg"), "");
+    expect(findSource({ dd2: from, hearthstone: path.join(from, "hs") }, { game: "hearthstone", bank: "", event: "credits_card_enter_1", lufs: -22, maxSeconds: 1.4 })).toBe(path.join(from, "hs", "General SFX", "credits_card_enter_1.ogg"));
+    expect(findSource({ dd2: from }, { game: "hearthstone", bank: "", event: "credits_card_enter_1", lufs: -22, maxSeconds: 1.4 })).toBeUndefined();
   });
 
   it("ends a sound where its tail stays under 1% of the peak", () => {

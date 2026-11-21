@@ -8,3 +8,15 @@ export function combatMusic(game: ScenarioState): boolean {
   if (game.pendingAttack != null || game.mode === "enemyAttacks" || game.mode === "playerAttacks") return true;
   return game.phase === "Combat" && game.seats.some((seat) => seat.engaged.length > 0);
 }
+
+/**
+ * Whether an enemy became engaged with a seat between two states: from the staging area, the encounter deck, another seat or an effect,
+ * in any phase. The engagement sound plays then (docs/design-system-table.md, Sound).
+ */
+export function newlyEngaged(before: ScenarioState, after: ScenarioState): boolean {
+  if (before === after || isOver(after)) return false;
+  return after.seats.some((seat, index) => {
+    const was = before.seats[index]?.engaged ?? [];
+    return seat.engaged.some((card) => !was.includes(card));
+  });
+}

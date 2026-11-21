@@ -11,4 +11,4 @@ The sound effects and the music are built (`docs/design-system-table.md`, Sound)
 ## Still open
 
 - The web and the desktop play no sound and no music: `playSound` and the music return there, `bundled.ts` carries no files, and the copies in `scripts/checks/web-copies.test.ts` leave the sound lines and the Sound group out. A desktop branch adds the Sound group to `setting-rows.canvaskit.tsx`, the strikes to `use-spotlight.canvaskit.ts`, the tab sound to `tab-bar.canvaskit.tsx`, a `bundled` map for the web, and starts the audio on the first gesture.
-- Effect slots packed but not played: `combat.engage`, `combat.roar`, `combat.miss`, `card.shuffle`, `card.deal`, `dread.treachery`, `ui.notice`. Each needs a moment the screen shows once (an engage motion, a Nazgûl reveal, a shuffle step, the Setup deal, a treachery's reveal, a banner worth a sound).
+- Effect slots packed but not played: `combat.roar`, `combat.miss`, `card.shuffle`, `card.deal`, `dread.treachery`, `ui.notice`. Each needs a moment the screen shows once (a Nazgûl reveal, a shuffle step, the Setup deal, a treachery's reveal, a banner worth a sound).

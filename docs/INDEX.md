@@ -54,7 +54,7 @@ Read the sections your task touches.
   - 497–500 Support (~90)
   - 501–516 Attribution (~410)
   - 517–520 License (~50)
-- `docs/architecture.md` — Architecture (~29.1K tok)
+- `docs/architecture.md` — Architecture (~29.2K tok)
   - 7–44 Stack (~1.6K)
   - 45–80 Processes (~730)
   - 81–166 Modules (~2.5K) ← 3
@@ -179,7 +179,7 @@ Read the sections your task touches.
   - 2771–2798 Persistence and shipping (~3.2K) ← 10
   - 2799–2841 Screens (~5.9K) ← 2
     - 2826–2841 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~70.5K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~70.6K tok)
   - 5–8 Overview (~170) ← 1
   - 9–35 Top bar (~6.7K) ← 11
   - 36–39 Table menu (~870) ← 9
@@ -210,10 +210,10 @@ Read the sections your task touches.
   - 385–390 Quest advance (~530) ← 1
   - 391–394 Undo (~150)
   - 395–398 Haptics (~340) ← 1
-  - 399–414 Sound (~1.7K) ← 27
-  - 415–426 Banner (~750) ← 5
-  - 427–446 Screen reader (~3.0K) ← 19
-  - 447–450 Android Back (~90)
+  - 399–415 Sound (~1.8K) ← 27
+  - 416–427 Banner (~750) ← 5
+  - 428–447 Screen reader (~3.0K) ← 19
+  - 448–451 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~36.5K tok)
   - 7–20 Direction (~660)
   - 21–34 Standards (~750) ← 1
@@ -372,7 +372,7 @@ Read when a task names the plan.
   - 155–166 After each scenario phase (~220)
   - 167–170 Order (~70)
   - 171–178 Verification (~100)
-- `docs/plans/sound-and-music.md` — Plan: the rest of the sound (~490 tok)
+- `docs/plans/sound-and-music.md` — Plan: the rest of the sound (~480 tok)
 
 ## Handovers
 

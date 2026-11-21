@@ -1,9 +1,10 @@
-// The sound chosen for each slot (docs/design-system-table.md, Sound): a Darkest Dungeon II event, by its bank and
-// its name as vgmstream writes it, unpacked from the player's own install (user decision, 2026-11-21). `lufs` is the loudness the
-// file is levelled to and `maxSeconds` the longest it is kept; each group shares both unless a slot names its own.
+// The sound chosen for each slot (docs/design-system-table.md, Sound): a Darkest Dungeon II event, by its bank and its name as vgmstream
+// writes it, unpacked from the player's own install (user decision, 2026-11-21), or, where `game` says so, a Hearthstone sound by its
+// file name in the player's rip (the card landing; user choice, 2026-11-21). `lufs` is the loudness the file is levelled to and
+// `maxSeconds` the longest it is kept; each group shares both unless a slot names its own.
 import type { SoundSlot } from "../../src/ui/sound/slots.ts";
 
-export type SoundPick = { bank: string; event: string; lufs: number; maxSeconds: number };
+export type SoundPick = { game?: "hearthstone"; bank: string; event: string; lufs: number; maxSeconds: number };
 
 const ui = { lufs: -24, maxSeconds: 0.8 };
 const card = { lufs: -22, maxSeconds: 1.4 };
@@ -24,7 +25,7 @@ export const SOUND_PICKS: Record<SoundSlot, SoundPick> = {
   "ui.notice": { bank: "ui", event: "ui_shr_text_popup", ...ui },
   "card.draw": { bank: "ui", event: "ui_rewards_item_appear", ...card },
   "card.pick": { bank: "ui", event: "ui_heroselect_pickup", ...card },
-  "card.land": { bank: "ui", event: "ui_heroselect_add", ...card },
+  "card.land": { game: "hearthstone", bank: "", event: "credits_card_enter_1", ...card },
   "card.shuffle": { bank: "ui", event: "ui_heroselect_path_gen", ...card },
   "card.deal": { bank: "ui", event: "ui_battle_turnorder_reveal", ...card },
   "card.flip": { bank: "ui", event: "ui_inn_quirk_reveal_neg", ...card },

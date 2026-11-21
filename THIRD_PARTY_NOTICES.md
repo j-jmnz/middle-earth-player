@@ -15,7 +15,7 @@ Game content appears in these places:
 
 ## Sound effects
 
-The phone app's sound effects are cut from Darkest Dungeon II (© Red Hook Studios) by `pnpm assets sounds --from`, from the player's own copy of the game. They are never committed: `data/sources.json` pins them by sha256 and the asset mirror holds them, and the phone builds of each release carry them. No license is granted for them.
+The phone app's sound effects are cut from Darkest Dungeon II (© Red Hook Studios) by `pnpm assets sounds --from`, from the player's own copy of the game, and the card landing from Hearthstone (© Blizzard Entertainment) by `--hearthstone`, from the player's own copy of its sounds. They are never committed: `data/sources.json` pins them by sha256 and the asset mirror holds them, and the phone builds of each release carry them. No license is granted for them.
 
 The phone app's music loops are passages of Howard Shore's score for The Lord of the Rings film trilogy (© New Line Productions and the recordings' owners), cut by `pnpm assets music --from` from the player's own copy. They are kept the same way as the sound effects and carried the same way. No license is granted for them.
 

@@ -1,8 +1,8 @@
-// When the table plays its combat loop: a fight, not the Combat phase alone (docs/design-system-table.md, Sound).
+// When the table plays its combat loop: a fight, not the Combat phase alone; and when an enemy engaging sounds (docs/design-system-table.md, Sound).
 import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../rules/core/state.ts";
-import { combatMusic } from "./combat-music.ts";
+import { combatMusic, newlyEngaged } from "./combat-music.ts";
 
 type Shape = { phase: string; mode: string; pendingAttack: object | null; engaged: readonly string[]; lost?: boolean; stageCleared?: boolean };
 
@@ -27,5 +27,20 @@ describe("combat music", () => {
 
   it("stays calm once the game has ended", () => {
     expect(combatMusic(state({ phase: "Combat", mode: "enemyAttacks", pendingAttack: null, engaged: ["e1"], lost: true }))).toBe(false);
+  });
+});
+
+describe("engagement sound", () => {
+  const engaged = (first: readonly string[], second: readonly string[], lost = false) => ({ lost, stageCleared: false, seats: [{ engaged: first }, { engaged: second }] }) as unknown as ScenarioState;
+
+  it("sounds for an enemy that engages a seat, in any phase or from any effect", () => {
+    expect(newlyEngaged(engaged([], []), engaged(["e1"], []))).toBe(true);
+    expect(newlyEngaged(engaged(["e1"], []), engaged([], ["e1"]))).toBe(true);
+  });
+
+  it("is quiet when no enemy is newly engaged, or once the game has ended", () => {
+    expect(newlyEngaged(engaged(["e1"], []), engaged(["e1"], []))).toBe(false);
+    expect(newlyEngaged(engaged(["e1", "e2"], []), engaged(["e1"], []))).toBe(false);
+    expect(newlyEngaged(engaged([], []), engaged(["e1"], [], true))).toBe(false);
   });
 });
