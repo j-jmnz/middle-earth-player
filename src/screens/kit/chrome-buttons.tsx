@@ -14,6 +14,8 @@ import { useTableTokens } from "../../ui/use-table-tokens";
 import { touch, useUiScale } from "../../ui/ui-scale";
 import { Text, TextInput } from "../../ui/text";
 import { GlassIconButton } from "../../ui/buttons";
+import { withSound } from "../../ui/sound/sound";
+import type { SoundSlot } from "../../ui/sound/slots";
 
 // The night switch row the phase carousel's Stops and the Settings screen share (src/play cannot import screens, so it lives there).
 export { SettingSwitch } from "../../ui/setting-switch";
@@ -63,6 +65,7 @@ export function IconButton({
       testID={testID}
       tone={tone}
       expanded={expanded}
+      sound={chevron ? "ui.back" : undefined}
       slop={4 * s}
       mark={(color) =>
         chevron ? (
@@ -84,7 +87,7 @@ export function PillButton({ label, onPress, testID, accessibilityLabel, accessi
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} accessibilityHint={accessibilityHint} onPress={onPress}>
+    <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} accessibilityHint={accessibilityHint} onPress={withSound(onPress, "ui.confirm")}>
       {({ pressed }) => (
         <View style={{ minHeight: touch(s, 44), minWidth: touch(s, 44), borderRadius: CONTROL_RADIUS, paddingHorizontal: 14 * s, alignItems: "center", justifyContent: "center", ...glassSurface(pressed, t) }}>
           <Text className="text-body" style={{ color: t.muted }}>
@@ -140,6 +143,12 @@ export function SearchField({
   );
 }
 
+// A chip that switches plays the switch's sound for where it goes; one that goes somewhere plays the click.
+function chipSound(selected: boolean | undefined): SoundSlot {
+  if (selected == null) return "ui.confirm";
+  return selected ? "ui.toggle-off" : "ui.toggle-on";
+}
+
 /** A filter that is on or off (All, Ready, a card type): a 36 pt capsule in a 44 pt target, tonal when off and tinted in the accent when on. */
 export function ToggleChip({
   label,
@@ -175,7 +184,7 @@ export function ToggleChip({
       {...(selected == null ? {} : { accessibilityState: asSwitch ? { checked: selected } : { selected } })}
       {...(selected != null && asSwitch ? { "aria-checked": selected } : {})}
       accessibilityLabel={accessibilityLabel ?? label}
-      onPress={onPress}
+      onPress={withSound(onPress, chipSound(selected))}
       onLayout={onLayout}
       className="min-h-touch min-w-touch justify-center"
     >

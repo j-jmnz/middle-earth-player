@@ -16,7 +16,7 @@ import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
 import { themeVars } from "./palette.js";
 import { GameIcon } from "../../ui/game-icon";
-import { playSound } from "../../ui/sound/sound";
+import { playSound, withSound } from "../../ui/sound/sound";
 import { quietMusic } from "../../ui/sound/music";
 import type { IconName } from "../../ui/icon-map";
 import { longPressA11y } from "../../ui/long-press-action";
@@ -232,7 +232,7 @@ export function ListRow({
       accessibilityRole="button"
       accessibilityState={selected == null ? undefined : { selected }}
       {...(onLongPress ? longPressA11y(longPressLabel, onLongPress) : null)}
-      onPress={onPress}
+      onPress={withSound(onPress, "ui.confirm")}
       onLongPress={onLongPress}
       delayLongPress={350}
       className="mb-1.5"

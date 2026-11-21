@@ -19,6 +19,7 @@ import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 import { useOpenSound } from "./sound/use-open-sound.ts";
+import { withSound } from "./sound/sound.ts";
 
 export type PressableRef = ComponentRef<typeof Pressable>;
 // Medium's sizes; the popover draws them times the UI scale (ui-scale.ts), its rows never under 44 pt.
@@ -56,7 +57,7 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
       accessibilityRole="button"
       accessibilityLabel={item.accessibilityLabel ?? item.label}
       accessibilityHint={item.accessibilityHint}
-      onPress={onPress}
+      onPress={withSound(onPress, "ui.confirm")}
       style={{ minHeight: row }}
     >
       {({ pressed }) => (

@@ -111,3 +111,11 @@ export function playUndo(): void {
   playSound("ui.back");
   quietUntil = Date.now() + UNDO_QUIET_MS;
 }
+
+/** A tap's handler that plays its sound first: every button's click (docs/design-system-table.md, Sound). */
+export function withSound(onPress: () => void, slot: SoundSlot): () => void {
+  return () => {
+    playSound(slot);
+    onPress();
+  };
+}
