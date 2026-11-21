@@ -10,10 +10,13 @@ import { setTableMusic } from "../../ui/sound/music.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 import type { TableStore } from "../store/store.ts";
 import { combatMusic } from "./combat-music.ts";
+import { useSkippedStrikes } from "../spotlight/strike-play.ts";
 
 /** The table's music, mounted beside the table view by its routes (src/screens/routes/table, standalone/table); it draws nothing. */
 export function TableMusic({ store }: { store: TableStore }): null {
   useTableMusic(store);
+  // The sounds of the attacks a skipped spotlight did not play (strike-play.ts).
+  useSkippedStrikes(store);
   return null;
 }
 

@@ -11,7 +11,7 @@ import { useStore } from "zustand";
 import type { ScenarioState } from "../../rules/core/state.ts";
 
 import { tickImpact } from "../../ui/haptics.ts";
-import { playSound } from "../../ui/sound/sound.ts";
+import { playStrike } from "./strike-play.ts";
 import { strikeSounds } from "./strike-sounds.ts";
 import type { TableLayout } from "../layout/layout.ts";
 import { easingOf, useMotionScale } from "../../ui/motion-run.ts";
@@ -106,7 +106,7 @@ export function useSpotlight(store: TableStore, layout: TableLayout, area: Stage
   // jumps the clock to its end, past every one of them, and plays none.
   const hits = useMemo(() => Array.from({ length: count }, (_, index) => hitTime(index, count, k)), [count, k]);
   // Each strike's sound at its hit stop (strike-sounds.ts), on the same clock as the impact haptic.
-  const struck = (plan?.clashes ?? []).flatMap((clash, index) => strikeSounds(clash).map((slot) => ({ at: hits[index] ?? 0, slot })));
+  const struck = (plan?.clashes ?? []).flatMap((clash, index) => strikeSounds(clash).map((slot) => ({ at: hits[index] ?? 0, index, slot })));
   const leaveAt = leaveTime(count, k);
   const leave = useCallback(() => store.getState().leaveSpotlight(seq), [store, seq]);
   useAnimatedReaction(
@@ -114,10 +114,10 @@ export function useSpotlight(store: TableStore, layout: TableLayout, area: Stage
     (now, was) => {
       if (was == null || now <= was || now >= total) return;
       for (const at of hits) if (was < at && now >= at) scheduleOnRN(tickImpact);
-      for (const cue of struck) if (was < cue.at && now >= cue.at) scheduleOnRN(playSound, cue.slot);
+      for (const cue of struck) if (was < cue.at && now >= cue.at) scheduleOnRN(playStrike, seq, cue.index, cue.slot);
       if (was < leaveAt && now >= leaveAt) scheduleOnRN(leave);
     },
-    [hits, total, leaveAt, leave, struck],
+    [hits, total, leaveAt, leave, struck, seq],
   );
   // Skipped: the clock goes to the end.
   const skipped = gate.ended === "skipped";

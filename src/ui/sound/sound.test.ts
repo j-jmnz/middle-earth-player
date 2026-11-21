@@ -1,9 +1,10 @@
-// The Sound effects setting and the repeat guard: with the setting off, or a slot this bundle has no file for, nothing reaches the module.
+// The Sound effects setting, the repeat guard and the players a slot keeps: with the setting off, or a slot this bundle has no file
+// for, nothing reaches the module; quick taps each get a player that is not still playing.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { tableSettings } from "../table-settings.ts";
 
-const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[] }));
+const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], playing: false }));
 vi.mock("react-native", () => ({ Platform: { OS: "ios" } }));
 vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined }));
 // The accessibility store is mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
@@ -12,20 +13,29 @@ vi.mock("./bundled", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2, 
 vi.mock("./audio-player", () => ({
   createAudioPlayer: (source: number) => {
     calls.created.push(source);
-    return { seekTo: () => Promise.resolve(), play: () => calls.played.push(source) };
+    // `calls.playing` stands for a sound still sounding: a quick tap then needs another player.
+    const player = { playing: false, duration: 0.3, seekTo: () => Promise.resolve(), pause: () => undefined, play: () => (calls.played.push(source), (player.playing = calls.playing)) };
+    return player;
   },
 }));
 
 const { playSound, playUndo, SOUNDS_BUNDLED } = await import("./sound.ts");
 
+// A replayed player starts once its seek to the start resolves.
+const settled = () => new Promise<void>((resolve) => queueMicrotask(() => queueMicrotask(resolve)));
+
+// Each test starts later than the last ended, so no sound of one counts as a repeat in the next.
+let clock = 10_000;
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(10_000);
+  clock += 100_000;
+  vi.setSystemTime(clock);
 });
 
 afterEach(() => {
   tableSettings.getState().update({ sounds: true });
   calls.played.length = 0;
+  calls.playing = false;
   vi.useRealTimers();
 });
 
@@ -47,13 +57,27 @@ describe("sound effects", () => {
     expect(calls.played).toEqual([]);
   });
 
-  it("plays one sound for the same slot asked for twice at once", () => {
+  it("plays one table sound for the same slot asked for twice at once", async () => {
     vi.advanceTimersByTime(1000);
     playSound("card.land");
     playSound("card.land");
     vi.advanceTimersByTime(100);
     playSound("card.land");
+    await settled();
     expect(calls.played).toEqual([2, 2]);
+  });
+
+  it("plays every quick tap, each on a player that is not still sounding", async () => {
+    vi.advanceTimersByTime(1000);
+    calls.playing = true;
+    const before = calls.created.length;
+    for (let tap = 0; tap < 3; tap += 1) {
+      playSound("ui.confirm");
+      vi.advanceTimersByTime(40);
+    }
+    await settled();
+    expect(calls.played.filter((source) => source === 1)).toHaveLength(3);
+    expect(calls.created.length - before).toBe(2);
   });
 
   it("is silent while Sound effects is off", () => {
@@ -63,14 +87,15 @@ describe("sound effects", () => {
     expect(calls.played).toEqual([]);
   });
 
-  it("keeps the table quiet for a moment after an Undo, but not the interface", () => {
+  it("keeps the table quiet for a moment after an Undo, but not the interface", async () => {
     vi.advanceTimersByTime(1000);
     playUndo();
     playSound("card.land");
     playSound("ui.confirm");
     vi.advanceTimersByTime(900);
     playSound("card.land");
-    expect(calls.played).toEqual([3, 1, 2]);
+    await settled();
+    expect(calls.played.sort()).toEqual([1, 2, 3]);
   });
 
   it("plays nothing at a volume of 0", () => {
