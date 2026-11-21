@@ -1,51 +1,26 @@
 // The web's and the desktop's audio players: expo-audio's web build, an HTML audio element a player (audio-player.native.ts, served in place of
-// the throwing audio-player.ts on the web platform by metro.config.js). It makes no player until a sound or a loop plays, so the static render
-// never touches the browser's audio.
-//
-// The desktop app may play before any click (desktop/main.ts, autoplayPolicy). A browser refuses audio until the page has had a click or a key,
-// and expo-audio then counts the player as stopped, so the menu's loop would never start. Each player asked to play before the first click or key,
-// and not paused since, is asked again on it, so the loop starts where it stands. Only the music can wait: every sound effect follows a tap or a
-// key, which is that first gesture (its listener runs first, in the capture phase).
+// the throwing audio-player.ts on the web platform by metro.config.js), with what a page needs on top (src/ui/web/web-audio.ts): a browser's
+// loop asked again once a gesture lets it play, and the music paused while the window is not in front. It makes no player until a sound or a
+// loop plays, so the static render never touches the browser's audio.
 import { createAudioPlayer as createPlayer, setAudioModeAsync, type AudioPlayer } from "./audio-player.native";
+import { webAudio, type Media, type Page, type Player } from "../web/web-audio.ts";
 
 export { setAudioModeAsync, type AudioPlayer };
 
-let activated = typeof window === "undefined";
-const waiting = new Set<AudioPlayer>();
+const page: Page | null =
+  typeof window === "undefined"
+    ? null
+    : {
+        listen: (type, handler) => window.addEventListener(type, handler, true),
+        unlisten: (type, handler) => window.removeEventListener(type, handler, true),
+        // A browser that cannot say counts as activated: the retry then runs on the first gesture.
+        activated: () => (typeof navigator === "undefined" ? true : (navigator.userActivation?.hasBeenActive ?? true)),
+        later: (run) => setTimeout(run, 0),
+      };
+
+// `media` is private in expo-audio's types; it is the element the player plays.
+const wrap = webAudio(page, process.env.EXPO_PUBLIC_DESKTOP !== "1", (player) => (player as unknown as { media: Media }).media);
 
 export function createAudioPlayer(source: number): AudioPlayer {
-  const player = createPlayer(source);
-  if (activated) return player;
-  const play = player.play.bind(player);
-  const pause = player.pause.bind(player);
-  player.play = () => {
-    if (!activated) waiting.add(player);
-    play();
-  };
-  player.pause = () => {
-    waiting.delete(player);
-    pause();
-  };
-  return player;
-}
-
-function startWaiting(): void {
-  activated = true;
-  for (const player of waiting) {
-    try {
-      player.play();
-    } catch {
-      // A player released since it was asked: nothing to start.
-    }
-  }
-  waiting.clear();
-}
-
-if (!activated) {
-  const gestures = ["pointerdown", "keydown"] as const;
-  const once = () => {
-    for (const gesture of gestures) window.removeEventListener(gesture, once, true);
-    startWaiting();
-  };
-  for (const gesture of gestures) window.addEventListener(gesture, once, true);
+  return wrap(createPlayer(source) as unknown as Player) as unknown as AudioPlayer;
 }

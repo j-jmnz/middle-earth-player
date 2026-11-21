@@ -438,7 +438,7 @@ jobs:
           compression-level: 0
 
   # The web export every desktop installer carries, built once: it is the same on every OS (docs/releasing.md, Jobs). Like the native builds it starts
-  # beside the assets job and waits for them; CanvasKit's wasm and pdf.js are copied from node_modules, so only the pictures, booklets and catalog come from the artifact.
+  # beside the assets job and waits for them; CanvasKit's wasm and pdf.js are copied from node_modules, so only the pictures, booklets, catalog, sounds and music come from the artifact.
   # Its Metro cache is under the runner's temp folder like the native builds' (.github/actions/metro-cache).
   web:
     needs: [plan]

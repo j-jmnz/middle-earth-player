@@ -34,6 +34,16 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
     ],
   },
   {
+    // The keys, the focus, the slider's values and the pointer a page needs (the header of volume-slider.canvaskit.tsx).
+    phone: "src/ui/sound/volume-slider.tsx",
+    web: "src/ui/sound/volume-slider.canvaskit.tsx",
+    edits: [
+      ["import { stepVolume, volumeAt, volumeWords } from \"./volume.ts\";\n", "import { stepVolume, volumeAt, volumeWords } from \"./volume.ts\";\nimport { volumeKey } from \"../web/volume-keys.ts\";\n"],
+      ["            onAccessibilityAction={(event) => onChange(stepVolume(value, event.nativeEvent.actionName === \"increment\"))}\n            style={{ flex: 1, minHeight: touch(s, ROW), justifyContent: \"center\" }}\n", "            onAccessibilityAction={(event) => onChange(stepVolume(value, event.nativeEvent.actionName === \"increment\"))}\n            focusable\n            aria-valuemin={0}\n            aria-valuemax={100}\n            aria-valuenow={Math.round(shown * 100)}\n            aria-valuetext={volumeWords(shown)}\n            onKeyDown={(event) => keyed(event, value, onChange)}\n            style={{ flex: 1, minHeight: touch(s, ROW), justifyContent: \"center\", cursor: \"pointer\" }}\n"],
+      ["// The 44 pt target, as the switch row's.\nconst ROW = 44;\n", "// The 44 pt target, as the switch row's.\nconst ROW = 44;\n\n// A key the row moves the volume for is its own: the page does not scroll on it.\nfunction keyed(event: { nativeEvent: { key: string }; preventDefault: () => void }, value: number, onChange: (next: number) => void): void {\n  const next = volumeKey(event.nativeEvent.key, value);\n  if (next === null) return;\n  event.preventDefault();\n  onChange(next);\n}\n"],
+    ],
+  },
+  {
     phone: "src/ui/text.tsx",
     web: "src/ui/web/text.canvaskit.tsx",
     from: "// Bold Text (the phone's",
