@@ -14,13 +14,35 @@
 export type Media = { paused: boolean; play: () => Promise<void>; pause: () => void };
 export type Player = { play: () => void; pause: () => void; remove: () => void; duration: number };
 
-/** The page: its events, whether it has had an activation, and a way to run something after the current event has gone through the app. */
+/**
+ * The page: its gestures (`listen`, `unlisten`), the window's own blur and focus (`onWindow`), whether it has had an activation, and a way to
+ * run something after the current event has gone through the app.
+ */
 export type Page = {
   listen: (type: string, handler: () => void) => void;
   unlisten: (type: string, handler: () => void) => void;
+  onWindow: (type: "blur" | "focus", handler: () => void) => void;
   activated: () => boolean;
   later: (run: () => void) => void;
 };
+
+type Win = Pick<Window, "addEventListener" | "removeEventListener" | "setTimeout"> & { navigator?: { userActivation?: { hasBeenActive: boolean } } };
+
+/**
+ * The browser's page for `win`. A gesture is heard in the capture phase, before the app's own handlers. The window's blur and focus are heard
+ * only when the window itself is their target: with capture, or by a bubbling `focusin`, every control that takes or loses the focus would
+ * pause the music too.
+ */
+export function browserPage(win: Win): Page {
+  return {
+    listen: (type, handler) => win.addEventListener(type, handler, true),
+    unlisten: (type, handler) => win.removeEventListener(type, handler, true),
+    onWindow: (type, handler) => win.addEventListener(type, (event) => event.target === (win as unknown as EventTarget) && handler()),
+    // A browser that cannot say counts as activated: the retry then runs on the first gesture.
+    activated: () => win.navigator?.userActivation?.hasBeenActive ?? true,
+    later: (run) => void win.setTimeout(run, 0),
+  };
+}
 
 // The gestures that can give a user activation (the HTML standard's activation-triggering events).
 const GESTURES = ["pointerup", "touchend", "click", "keydown", "keyup"] as const;
@@ -51,7 +73,7 @@ export function webAudio(page: Page | null, wait: boolean, mediaOf: (player: Pla
   const onGesture = () => page.later(retry);
   if (waiting) for (const gesture of GESTURES) page.listen(gesture, onGesture);
 
-  page.listen("blur", () => {
+  page.onWindow("blur", () => {
     for (const player of live) {
       const media = mediaOf(player);
       if (media.paused) continue;
@@ -59,7 +81,7 @@ export function webAudio(page: Page | null, wait: boolean, mediaOf: (player: Pla
       blurred.add(media);
     }
   });
-  page.listen("focus", () => {
+  page.onWindow("focus", () => {
     for (const media of blurred) void media.play().catch(() => undefined);
     blurred.clear();
   });

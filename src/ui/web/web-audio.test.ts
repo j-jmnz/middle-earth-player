@@ -2,7 +2,7 @@
 // gesture's own handlers; a sound is not; the desktop waits for nothing; the window's blur pauses what sounds and its focus goes on.
 import { describe, expect, it } from "vitest";
 
-import { webAudio, type Media, type Page, type Player } from "./web-audio.ts";
+import { browserPage, webAudio, type Media, type Page, type Player } from "./web-audio.ts";
 
 function fakePage(): Page & { fire: (type: string) => void; flush: () => void; active: boolean; listening: () => string[] } {
   const handlers = new Map<string, Set<() => void>>();
@@ -11,6 +11,7 @@ function fakePage(): Page & { fire: (type: string) => void; flush: () => void; a
     active: false,
     listen: (type: string, handler: () => void) => void handlers.set(type, (handlers.get(type) ?? new Set()).add(handler)),
     unlisten: (type: string, handler: () => void) => void handlers.get(type)?.delete(handler),
+    onWindow: (type: string, handler: () => void) => void handlers.set(type, (handlers.get(type) ?? new Set()).add(handler)),
     activated: () => page.active,
     later: (run: () => void) => void queued.push(run),
     fire: (type: string) => handlers.get(type)?.forEach((handler) => handler()),
@@ -98,5 +99,18 @@ describe("web audio players", () => {
   it("returns the player as it is for the static render", () => {
     const player = fakePlayer(60);
     expect(webAudio(null, true, mediaOf)(player)).toBe(player);
+  });
+
+  it("hears the window's own blur and focus, not a control's that takes or loses the focus", () => {
+    const listeners: { type: string; handler: (event: { target: unknown }) => void }[] = [];
+    const win = { addEventListener: (type: string, handler: (event: { target: unknown }) => void) => listeners.push({ type, handler }), removeEventListener: () => undefined, setTimeout: () => 0 };
+    const page = browserPage(win as never);
+    let blurs = 0;
+    page.onWindow("blur", () => (blurs += 1));
+    const dispatch = (type: string, target: unknown) => listeners.filter((each) => each.type === type).forEach((each) => each.handler({ target }));
+    dispatch("blur", { tagName: "BUTTON" });
+    expect(blurs).toBe(0);
+    dispatch("blur", win);
+    expect(blurs).toBe(1);
   });
 });

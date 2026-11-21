@@ -3,20 +3,11 @@
 // loop asked again once a gesture lets it play, and the music paused while the window is not in front. It makes no player until a sound or a
 // loop plays, so the static render never touches the browser's audio.
 import { createAudioPlayer as createPlayer, setAudioModeAsync, type AudioPlayer } from "./audio-player.native";
-import { webAudio, type Media, type Page, type Player } from "../web/web-audio.ts";
+import { browserPage, webAudio, type Media, type Player } from "../web/web-audio.ts";
 
 export { setAudioModeAsync, type AudioPlayer };
 
-const page: Page | null =
-  typeof window === "undefined"
-    ? null
-    : {
-        listen: (type, handler) => window.addEventListener(type, handler, true),
-        unlisten: (type, handler) => window.removeEventListener(type, handler, true),
-        // A browser that cannot say counts as activated: the retry then runs on the first gesture.
-        activated: () => (typeof navigator === "undefined" ? true : (navigator.userActivation?.hasBeenActive ?? true)),
-        later: (run) => setTimeout(run, 0),
-      };
+const page = typeof window === "undefined" ? null : browserPage(window);
 
 // `media` is private in expo-audio's types; it is the element the player plays.
 const wrap = webAudio(page, process.env.EXPO_PUBLIC_DESKTOP !== "1", (player) => (player as unknown as { media: Media }).media);
