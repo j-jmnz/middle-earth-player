@@ -11,6 +11,8 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { livingSeats, modifierActive } from "../../core/state.ts";
 import { modifiedStat } from "../../core/keywords.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
 
 // Whether an effect's trigger hears an event: its own trigger, either half of "enters or leaves play" (Gwaihir, 22108:A:3), the exploring of the active location as "a location is explored" (12092:B:2), or a location
 // leaving play as the Wizardry line's trigger (mec112.wizardry; the record's own condition asks that it left explored), and resources added to or moved to a pool as a gain.
@@ -38,14 +40,16 @@ export function highestThreatSeats(state: ScenarioState): number[] {
 
 // The heroes an AttachSelf card to a hero may go to, before the ones that already hold a copy are left out: those of the seats the card names
 // ("the hero with the highest threat cost", 41043:A:2: the printed threat cost is the greatest among every player's heroes, a tie keeps each).
-export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, { verb: "AttachSelf" }>["to"], itemSeat: number, cards: ReadonlyMap<string, PrintedCard>): string[] {
+// A hero with the Trait the card names has it printed or gained ("Attach to a Warrior hero.", 143015:A:2; rr.traits).
+export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, { verb: "AttachSelf" }>["to"], itemSeat: number, ctx: ReduceContext): string[] {
+  const cards = ctx.cards;
   if (to.kind !== "hero") return [];
   // `picked`: the caller passes the picked player as `itemSeat` (effect-frames.ts attachSeat).
   const seats = to.control === "firstPlayer" ? [state.firstPlayer] : to.control === "any" || to.control === "highestThreatCost" || to.control === "mostAttachments" ? livingSeats(state) : to.control === "highestThreat" ? highestThreatSeats(state) : [itemSeat];
   const printed = (id: string): PrintedCard => printedOf(cards, state.cards[id]?.code ?? "");
   const heroes = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []);
   const top = to.control === "highestThreatCost" ? Math.max(...heroes.map((id) => printed(id).threat ?? 0)) : null;
-  return heroes.filter((id) => (top == null || (printed(id).threat ?? 0) === top) && (to.exceptSphere == null || printed(id).sphere !== to.exceptSphere) && (to.trait == null || printed(id).traits.includes(to.trait)) && (to.minWillpower == null || modifiedStat(state, state.cards[id] as CardInstance, "willpower", cards) >= to.minWillpower));
+  return heroes.filter((id) => (top == null || (printed(id).threat ?? 0) === top) && (to.exceptSphere == null || printed(id).sphere !== to.exceptSphere) && (to.trait == null || hasTrait(state, id, to.trait, ctx)) && (to.minWillpower == null || modifiedStat(state, state.cards[id] as CardInstance, "willpower", cards) >= to.minWillpower));
 }
 
 // The seat that chooses the host of an AttachSelf card that goes to a hero: the first player when it may go to any player's hero, the

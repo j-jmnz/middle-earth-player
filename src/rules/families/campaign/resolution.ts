@@ -3,7 +3,7 @@
 // the log's hero lists (`campaignFacts.heroLog`) and returns the Resolution log; src/rules/setup/resolution.ts opens the windows and calls these.
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { Earned, ResolutionLog } from "../../core/campaign-state.ts";
-import { printedOf } from "../../core/printed.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../../core/state.ts";
@@ -29,10 +29,8 @@ export function fallenNow(state: ScenarioState): string[] {
 export function boonHeroes(state: ScenarioState, ctx: ReduceContext, code: string, heroes: readonly string[]): string[] {
   const trait = attachTrait(ctx, code);
   if (trait === undefined) return [...heroes];
-  return heroes.filter((id) => {
-    const card = state.cards[id];
-    return card != null && printedOf(ctx.cards, card.code).traits.includes(trait);
-  });
+  // A Trait the hero gains counts, as it does for any Trait check (rr.traits).
+  return heroes.filter((id) => hasTrait(state, id, trait, ctx));
 }
 
 // The Trait the card's own Setup record names for its host ("Attach to a Warrior hero."), or undefined when it names none.

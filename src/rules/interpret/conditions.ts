@@ -451,7 +451,7 @@ function countsAsRecords(state: ScenarioState, id: string, ctx: ReduceContext): 
 }
 
 // The traits those records give it.
-function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
+export function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
   return countsAsRecords(state, id, ctx).flatMap((record) => (record.trait ? [record.trait] : []));
 }
 

@@ -6,6 +6,7 @@
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
 import { hasTrait } from "../../interpret/conditions.ts";
+import { traitsOf } from "../misc/traits.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -45,7 +46,7 @@ export function attackPickMatches(state: ScenarioState, id: string, spec: PickSp
   }
   if (spec.sharesTrait === "other") {
     const other = at.other ?? frame?.other;
-    const traits = other && state.cards[other] ? printedOf(ctx.cards, state.cards[other]?.code ?? "").traits : [];
+    const traits = other ? traitsOf(state, other, ctx) : [];
     if (!other || other === id || !traits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
   }
   if (spec.onSubject) {

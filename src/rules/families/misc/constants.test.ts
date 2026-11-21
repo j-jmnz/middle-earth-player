@@ -115,6 +115,17 @@ describe("Traits gained", () => {
     expect(hasTrait(state, lothiriel, "Rohan", ctx)).toBe(true);
   });
 
+  it("A Rohan ally shares a Trait with Lothíriel while Éomer is in play (22027:A:1, 22027:A:2)", () => {
+    const table = seat(1, ["22027", "dwarf"]);
+    const lothiriel = table.heroes[0] ?? "";
+    const rider = put(table.state, "rider", "hand");
+    const shares = { type: "card", control: "you", from: "hand", cardType: "ally", sharesTrait: "self" } as const;
+    let state = sync(rider.state);
+    expect(countMatching(state, shares, 0, lothiriel, ctx)).toBe(0);
+    state = sync(put(state, "07001", "heroes").state);
+    expect(countMatching(state, shares, 0, lothiriel, ctx)).toBe(1);
+  });
+
   it("Mutual Accord swaps the Gondor and Rohan traits for the phase (05005:A:1)", () => {
     const table = seat(1, ["gondor", "rohan"]);
     const accord = put(table.state, "05005", "hand");
