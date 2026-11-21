@@ -82,7 +82,7 @@ The Sounds Resource has no rip of the LOTR Adventure Card Game, Gwent or Shadow 
 
 Every sound effect comes from Darkest Dungeon II (user decision, 2026-11-21), taken from the user's own install: the banks named below, unpacked with vgmstream and sent as Opus. `combat.engage`, `combat.miss` and `combat.enemy-death` are slots that set adds. Darkest Dungeon II has no card sounds, so the card slots use its item, skill and hero handling sounds; the Bicycle card set is the fallback if they sound wrong in play.
 
-Each pick is trimmed after its tail, faded out and levelled by kind (UI at -24 LUFS, cards and tokens at -22, stings at -18, combat at -17), then encoded as mono AAC (`.m4a`, which the phone, the web and the desktop all play). The built files and `manifest.json` (each file's sha256, and its source bank, event and sha256) are in `.cache/audio/sfx/`, not committed.
+Each pick is trimmed after its tail, faded out and levelled by kind (UI at -24 LUFS, cards and tokens at -22, stings at -18, combat at -17, except the enemy death at -21), then encoded as mono AAC (`.m4a`, which the phone, the web and the desktop all play). The built files and `manifest.json` (each file's sha256, and its source bank, event and sha256) are in `.cache/audio/sfx/`, not committed.
 
 | Slot | Darkest Dungeon II event | Bank |
 | --- | --- | --- |
@@ -115,7 +115,7 @@ Each pick is trimmed after its tail, faded out and levelled by kind (UI at -24 L
 | `combat.block` | `sfx_hero_maa_rampart_use` | `hero_man_at_arms.bank` |
 | `combat.miss` | `sfx_hero_meleeA_atk_miss` | `shared_hero.bank` |
 | `combat.kill` | `sfx_battle_crit_hero` | `battle.bank` |
-| `combat.enemy-death` | `char_en_vo_brig_1_death_01` | `shared_enemy.bank` |
+| `combat.enemy-death` | `fol_monster_woodsman_deathsdoor` | `shared_enemy.bank` |
 | `dread.threat-up` | `sfx_battle_status_stressup` | `battle.bank` |
 | `dread.threat-down` | `sfx_battle_status_stressdown` | `battle.bank` |
 | `dread.danger` | `sfx_battle_deathsdoor` | `battle.bank` |
