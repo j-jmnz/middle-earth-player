@@ -117,7 +117,7 @@ export default function Scenarios() {
   const tile = ({ id, number }: HubEntry) => {
     const { line, tone } = standing(id);
     return (
-      <CatalogTile key={id} testID={`standalone-${id}`} sceneId={id} number={number} name={scenarioName(id)} line={line} tone={tone} accessibilityLabel={[`Scenario ${number}`, scenarioName(id), line].filter(Boolean).join(", ")} accessibilityHint="Opens its briefing" posters={posters} onPress={() => brief(id)} />
+      <CatalogTile key={id} testID={`standalone-${id}`} sceneId={id} number={number} name={scenarioName(id)} line={line} tone={tone} accessibilityLabel={[`Scenario ${number}`, scenarioName(id), line].filter(Boolean).join(", ")} accessibilityHint="Opens its briefing" posters={posters} listed onPress={() => brief(id)} />
     );
   };
   // Each item's space above it is the gap the folds had in one column: 18 between sections, 8 between a phone's rows and 12 between posters.

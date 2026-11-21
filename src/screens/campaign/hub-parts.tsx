@@ -166,6 +166,9 @@ function NumberBadge({ number }: { number: number }) {
   );
 }
 
+// The night wash over a listed poster's scene (CatalogTile `listed`).
+const LISTED_WASH = 0.2;
+
 /**
  * The catalog's tiles, wrapped. `posters` is how many poster tiles sit across a tablet's row (0 for a phone's rows); posters keep one
  * width on every row (a short last row does not stretch): each cell is a column's share, the gutter its padding.
@@ -181,7 +184,8 @@ export function CatalogGrid({ posters, children }: { posters: number; children: 
 
 /**
  * One catalog entry on its scene: a 64 pt row on a phone (`posters` 0), a poster on a tablet. `number` is the book number in a small
- * capsule on the art. `tone` is the colour of `line`, which is left out when empty.
+ * capsule on the art. `tone` is the colour of `line`, which is left out when empty. `listed` is a tile inside a FlashList row
+ * (docs/design-system.md, Performance): its poster casts no shadow and its scene takes a flat night wash in place of `ART_FILTER`.
  */
 export function CatalogTile({
   testID,
@@ -193,6 +197,7 @@ export function CatalogTile({
   accessibilityLabel,
   accessibilityHint,
   posters,
+  listed,
   onPress,
 }: {
   testID: string;
@@ -204,6 +209,7 @@ export function CatalogTile({
   accessibilityLabel: string;
   accessibilityHint?: string;
   posters: number;
+  listed?: boolean;
   onPress: () => void;
 }) {
   const palette = usePalette();
@@ -225,8 +231,10 @@ export function CatalogTile({
     >
       {({ pressed }) =>
         posters ? (
-          <View className="overflow-hidden rounded-item" style={tileSurface(pressed, t)}>
-            <SceneArt scenarioId={sceneId} height={(size === "expanded" ? 270 : 300) * s} fade={0.55} fadeTo={palette.dusk}>
+          <View className="overflow-hidden rounded-item" style={listed ? rowSurface(pressed, t) : tileSurface(pressed, t)}>
+            <SceneArt scenarioId={sceneId} height={(size === "expanded" ? 270 : 300) * s} fade={0.55} fadeTo={palette.dusk} vivid={listed}>
+              {/* Under the fade's words, the wash darkens the scene about as ART_FILTER's brightness does, with no filter to draw. */}
+              {listed ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, LISTED_WASH) }} /> : null}
               {badge ? (
                 <View className="absolute" style={{ left: 12 * s, top: 12 * s }}>
                   {badge}
