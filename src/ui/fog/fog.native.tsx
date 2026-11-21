@@ -5,7 +5,7 @@ import { Blend, ImageShader, RadialGradient, Rect, Skia, vec, type SkImage } fro
 import { useEffect } from "react";
 import { useDerivedValue, useFrameCallback, useSharedValue, type SharedValue } from "react-native-reanimated";
 
-import { fogMatrix, maskStops, type FogLayer, type FogTexture } from "./fog.ts";
+import { fogMatrix, layerBox, maskStops, type FogLayer, type FogTexture } from "./fog.ts";
 
 /** An ellipse as a radial gradient: a circle of radius rx × width, squashed to ry × height about its centre. */
 export function EllipseGradient({ cx, cy, rx, ry, positions, colors }: { cx: number; cy: number; rx: number; ry: number; positions: number[]; colors: string[] }) {
@@ -78,14 +78,18 @@ export function Tile({ texture, scale, seconds }: { texture: FogTexture; scale: 
   return <ImageShader image={image} tx="repeat" ty="repeat" transform={transform} />;
 }
 
-/** One fog layer, one draw: the tile, cut by its elliptical mask (or its inverse) in the same shader, at its opacity. No offscreen layer, so it is cheap to redraw. */
+/**
+ * One fog layer, one draw: the tile, cut by its elliptical mask (or its inverse) in the same shader, at its opacity. No offscreen layer, so it is cheap to redraw.
+ * A mask that fades out draws only in its ellipse's bounds (`layerBox`), not over the whole box.
+ */
 export function Fog({ layer, width, height, seconds }: { layer: FogLayer; width: number; height: number; seconds: SharedValue<number> }) {
   const { mask } = layer;
   const tile = <Tile texture={layer.texture} scale={layer.texture.bake ?? 1} seconds={seconds} />;
   const stops = maskStops(layer.invert);
   const colors = stops.alphas.map((alpha) => `rgba(0,0,0,${alpha})`);
+  const box = layerBox(layer, width, height);
   return (
-    <Rect x={0} y={0} width={width} height={height} opacity={layer.opacity} blendMode={layer.blend ?? "srcOver"}>
+    <Rect x={box.x} y={box.y} width={box.width} height={box.height} opacity={layer.opacity} blendMode={layer.blend ?? "srcOver"}>
       {mask ? (
         <Blend mode="dstIn">
           {tile}
