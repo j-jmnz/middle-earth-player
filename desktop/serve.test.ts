@@ -69,10 +69,11 @@ describe("answerFor", () => {
 });
 
 describe("contentType", () => {
-  it("types what the page loads: scripts and the pdf.js module worker, wasm and pdf", () => {
+  it("types what the page loads: scripts and the pdf.js module worker, wasm, audio and pdf", () => {
     expect(contentType("a/b.js")).toBe("text/javascript");
     expect(contentType("pdf.worker.min.mjs")).toBe("text/javascript");
     expect(contentType("canvaskit.wasm")).toBe("application/wasm");
+    expect(contentType("sounds/card.land.m4a")).toBe("audio/mp4");
     expect(contentType("learn-to-play.pdf")).toBe("application/pdf");
     expect(contentType("x.HTML")).toBe("text/html; charset=utf-8");
     expect(contentType("scan.jpg")).toBe("image/jpeg");

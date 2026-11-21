@@ -5,7 +5,7 @@
 // A new loop crossfades in over the same time; a loop left mid-piece is paused where it was and goes on from there when it comes back.
 // The fades are equal-power. The music does not start while another app's audio plays (other-audio.native.ts), and pauses while the app is not in
 // front. The Music setting and its volume apply at once; a screen reader halves the volume. A bundle packed without the loops plays
-// none, and so do the web and the desktop for now (bundled.ts).
+// none; the web and the desktop play the same loops (bundled.canvaskit.ts), and the desktop app starts them before a click (desktop/main.ts).
 import { createAudioPlayer, type AudioPlayer } from "./audio-player";
 import { AppState } from "react-native";
 

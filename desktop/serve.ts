@@ -16,6 +16,8 @@ const TYPES: Readonly<Record<string, string>> = {
   ".txt": "text/plain; charset=utf-8",
   ".wasm": "application/wasm",
   ".pdf": "application/pdf",
+  // The sound effects and the music loops (src/ui/sound/bundled.canvaskit.ts).
+  ".m4a": "audio/mp4",
   ".ttf": "font/ttf",
   ".otf": "font/otf",
   ".woff": "font/woff",

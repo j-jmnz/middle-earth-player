@@ -6,13 +6,16 @@ import { View } from "react-native";
 
 import { TextButton } from "../../ui/buttons.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, EFFECTS_VOLUME_LINE, MUSIC_VOLUME_LINE, NONE_YET, SOUNDS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
 import { useReduceMotion } from "../../ui/motion-run.ts";
 import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
 import { useTheme } from "../../ui/theme.ts";
 import { Text } from "../../ui/text.tsx";
 import { ExtraSettingsRows } from "../../ui/web/extra-settings-rows.ts";
+import { MUSIC_BUNDLED } from "../../ui/sound/music.ts";
+import { playSound, SOUNDS_BUNDLED } from "../../ui/sound/sound.ts";
+import { VolumeSlider } from "../../ui/sound/volume-slider.tsx";
 import { ChoiceRow, SettingChoice, SettingGroup, type SettingGroupId } from "./setting-rows";
 
 export { ChoiceRow, SettingChoice, SettingGroup, type SettingGroupId };
@@ -23,9 +26,18 @@ const TABLE_LIST_LINE = "Lists the table's cards and choices as text, in place o
 // A computer has no battery to spare and no vibration motor: the lines drop their battery clauses and the Haptics row is left out (a browser or the desktop app never vibrates).
 const noBattery = (line: string): string => line.replace(/ (Off saves|Uses more) battery\./, "");
 
+// Music, worded for a browser and the desktop app: they cannot hear another app's audio, so the music does not wait for it (other-audio.ts).
+const MUSIC_LINE = "The film score: one piece for the menus, and a calm piece and a fight piece for each scenario.";
+
+// A new effects volume is written, then a sound plays at it, so the player hears what they chose.
+function setVolume(onChange: (change: Partial<TableSettings>) => void, soundVolume: number): void {
+  onChange({ soundVolume });
+  playSound("ui.confirm");
+}
+
 /**
  * The groups: Display (Theme, UI scale, Strong outlines), Performance (Card pictures, Moving fog: the two switches whose only job is to ease
- * a slow phone, under a note that says so), Motion and feel (Animation speed, Reduce motion, Combat spotlight, Haptics) and At the table
+ * a slow phone, under a note that says so), Motion and feel (Animation speed, Reduce motion, Combat spotlight, Haptics), Sound (Sound effects, Music and their volumes, each only in a bundle packed with its files) and At the table
  * (First-game guide, Stops on when `stops`, Table as a list on a phone, Confirm time, Explain timing words, Keep screen awake and the Responses used every time). Every row shows what it does. `groups` picks which to draw, so a wide Settings page can split them across two columns. Every change
  * goes through `onChange`; the stored `uiScale` and `theme` apply at once. The Stops switch is the tab's: the table's rail carries Stops.
  */
@@ -34,7 +46,7 @@ export function SettingsRows({
   onChange,
   always,
   testPrefix,
-  groups = ["display", "performance", "motion", "table"],
+  groups = ["display", "performance", "motion", "sound", "table"],
   stops = false,
   first = false,
 }: {
@@ -79,6 +91,16 @@ export function SettingsRows({
           <ChoiceRow title="Reduce motion" detail={REDUCE_MOTION_LINE} id={id("reduce-motion")} options={REDUCE_MOTION_OPTIONS} words={REDUCE_MOTION_WORDS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} />
           <ChoiceRow title="Banner closes" detail={BANNER_CLOSES_LINE} id={id("banner-closes")} options={BANNER_CLOSES_OPTIONS} words={BANNER_CLOSES_WORDS} value={settings.bannerCloses} onChange={(bannerCloses) => onChange({ bannerCloses })} />
           <SettingSwitch roomy label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={id("spotlight")} />
+        </SettingGroup>
+      ) : null}
+
+      {/* Only a bundle packed with the sounds or the music can play them (src/ui/sound/sound.ts, music.ts). */}
+      {groups.includes("sound") && (SOUNDS_BUNDLED || MUSIC_BUNDLED) ? (
+        <SettingGroup title="Sound" testID={id("sound")} first={first && top === "sound"}>
+          {SOUNDS_BUNDLED ? <SettingSwitch roomy label="Sound effects" detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={id("sounds")} /> : null}
+          {SOUNDS_BUNDLED ? <VolumeSlider label="Effects volume" detail={EFFECTS_VOLUME_LINE} value={settings.soundVolume} dim={!settings.sounds} onChange={(soundVolume) => setVolume(onChange, soundVolume)} testID={id("sound-volume")} /> : null}
+          {MUSIC_BUNDLED ? <SettingSwitch roomy label="Music" detail={MUSIC_LINE} value={settings.music} onChange={(music) => onChange({ music })} testID={id("music")} /> : null}
+          {MUSIC_BUNDLED ? <VolumeSlider label="Music volume" detail={MUSIC_VOLUME_LINE} value={settings.musicVolume} dim={!settings.music} onChange={(musicVolume) => onChange({ musicVolume })} testID={id("music-volume")} /> : null}
         </SettingGroup>
       ) : null}
 

@@ -12,6 +12,7 @@ import { compactItemHeight, COMPACT_PAD } from "./rail-fit";
 import { GearMark } from "../kit/chrome-marks";
 import { usePalette } from "../kit/palette-hook";
 import { RAIL } from "../../ui/size-class";
+import { playSound, withSound } from "../../ui/sound/sound";
 import { Text } from "../../ui/text";
 import { useSizeClass } from "../../ui/use-size-class";
 import { useTableTokens } from "../../ui/use-table-tokens";
@@ -93,7 +94,10 @@ function CompactRail(props: TabBarProps) {
               accessibilityLabel: options.tabBarAccessibilityLabel,
               onPress: () => {
                 const event = emitter.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
-                if (!focused && !event.defaultPrevented) navigateToTab(route.key);
+                if (focused || event.defaultPrevented) return;
+                // The phone's tab sound and Settings' open sound (tab-bar.tsx; docs/design-system-table.md, Sound).
+                playSound("ui.tab");
+                navigateToTab(route.key);
               },
             }}
           />
@@ -105,7 +109,7 @@ function CompactRail(props: TabBarProps) {
           focused={false}
           icon={<GearMark color={palette.faint} size={22} />}
           word="Settings"
-          button={{ testID: "settings-open", collapsable: false, accessibilityRole: "button", accessibilityLabel: "Settings", onPress: () => router.push("/settings") }}
+          button={{ testID: "settings-open", collapsable: false, accessibilityRole: "button", accessibilityLabel: "Settings", onPress: withSound(() => router.push("/settings"), "ui.open") }}
         />
       </View>
     </View>
