@@ -1,5 +1,5 @@
 name: Pack the app's assets
-description: Installs the dependencies and packs the catalog, the booklets and every card picture into assets/, as each native build needs (docs/releasing.md, Jobs).
+description: Installs the dependencies and packs the catalog, the booklets, every card picture and the sound effects into assets/, as each native build needs (docs/releasing.md, Jobs).
 
 outputs:
   caches:
@@ -30,7 +30,7 @@ runs:
         key: ${{ steps.key.outputs.scans }}
         restore-keys: scans-${{ runner.os }}-
     - id: pack
-      name: Catalog, booklets and pictures
+      name: Catalog, booklets, pictures and sounds
       shell: bash
       run: pnpm assets --quiet
     # What the pack fetched from the sources goes to the asset mirror, after a failure too, so the next machine reads it from

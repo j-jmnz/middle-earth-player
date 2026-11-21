@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { bytes, describeError, isDirectRun, runScript, type Log } from "../../log.ts";
-import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../paths.ts";
+import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR, SOUND_CACHE_DIR } from "../paths.ts";
 import { fetchBytesRetrying, RETRY_WAITS_MS, sha256, type SourceFile, type SourceRecord } from "../sources/fetch.ts";
 import { MIRROR_ENV, mirrorFromEnv, type Mirror } from "./client.ts";
 
@@ -10,14 +10,14 @@ import { MIRROR_ENV, mirrorFromEnv, type Mirror } from "./client.ts";
 // .cache the bucket does not hold (--fetch downloads one .cache misses from its URL first); pull fills .cache with every pinned file it lacks. Only the cached sources take part: data/raw
 // is committed.
 
-export type CacheDirs = { scans: string; pictures: string; pdf: string };
+export type CacheDirs = { scans: string; pictures: string; pdf: string; sounds: string };
 
-const HERE: CacheDirs = { scans: SCAN_CACHE_DIR, pictures: PICTURE_CACHE_DIR, pdf: PDF_CACHE_DIR };
+const HERE: CacheDirs = { scans: SCAN_CACHE_DIR, pictures: PICTURE_CACHE_DIR, pdf: PDF_CACHE_DIR, sounds: SOUND_CACHE_DIR };
 const CONCURRENCY = 8;
 
-/** Where a pin is cached: `.cache/<scans|pictures|pdf>/<name>`, or null for a file under data/raw. */
+/** Where a pin is cached: `.cache/<scans|pictures|pdf>/<name>` or `.cache/audio/sfx/<name>` for a sound, or null for a file under data/raw. */
 export function cachePathOf(file: SourceFile, dirs: CacheDirs): string | null {
-  const folder = /^(scans|pictures|pdf)\//.exec(file.path)?.[1] as keyof CacheDirs | undefined;
+  const folder = /^(scans|pictures|pdf|sounds)\//.exec(file.path)?.[1] as keyof CacheDirs | undefined;
   return folder ? path.join(dirs[folder], path.basename(file.path)) : null;
 }
 
@@ -120,9 +120,10 @@ export async function pullPins(mirror: Mirror, pins: readonly { file: SourceFile
   return { pulled, missing };
 }
 
-// The pin fetched from its URL and kept in the cache, or null for a rendered PDF page, a failed fetch or other bytes.
+// The pin fetched from its URL and kept in the cache, or null for a rendered PDF page, a sound (cut from the player's own game, it has
+// no URL), a failed fetch or other bytes.
 async function fromSource(file: SourceFile, cached: string, fetchSource: ((url: string) => Promise<Uint8Array>) | undefined, log: Log): Promise<Uint8Array | null> {
-  if (!fetchSource || file.url.includes("#page=")) return null;
+  if (!fetchSource || file.url.includes("#page=") || !/^https?:/.test(file.url)) return null;
   try {
     const body = await fetchSource(file.url);
     if (sha256(body) !== file.sha256) {

@@ -1,7 +1,7 @@
 // The table's and the screens' sound effects (docs/design-system-table.md, Sound; user request, 2026-11-18). A sound plays at the
 // moment its haptic or its motion does and adds to what the screen shows; it never replaces it. It follows the phone's silent switch
-// and mixes with the player's own music. The Sound effects setting turns them all off. A bundle without the files (every release and
-// CI build: scripts/build/pack-sounds.ts) plays none, and so do the web and the desktop for now (bundled.ts). A failed sound is not an
+// and mixes with the player's own music. The Sound effects setting turns them all off. A bundle packed without the files (no asset
+// mirror and no cache: scripts/build/pack-sounds.ts) plays none, and so do the web and the desktop for now (bundled.ts). A failed sound is not an
 // error the player should see; a development build logs it. One player a slot is made the first time any sound plays and kept for the
 // app's life: the set is small and fixed.
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";

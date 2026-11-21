@@ -15,7 +15,7 @@ Game content appears in these places:
 
 ## Sound effects
 
-A development build can carry sound effects cut from Darkest Dungeon II (© Red Hook Studios) by `pnpm assets sounds --from`, from the player's own copy of the game. They are never committed and no release carries them.
+The phone app's sound effects are cut from Darkest Dungeon II (© Red Hook Studios) by `pnpm assets sounds --from`, from the player's own copy of the game. They are never committed: `data/sources.json` pins them by sha256 and the asset mirror holds them, and the phone builds of each release carry them. No license is granted for them.
 
 ## Data sources
 

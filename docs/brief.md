@@ -104,7 +104,7 @@ Pin these. Do not swap them for a lookalike.
 | User schema | `expo-sqlite`, with committed migrations in `drizzle/` |
 | Validation at the catalog boundary | Zod |
 | Images and files | `expo-file-system`, `expo-image` |
-| Sound effects | `expo-audio`, the SDK 58 `pnpm expo install` version (user request, 2026-11-18), with no microphone and no background playback (`app.json`). Short sounds at the haptics' moments, which add to the screen and never replace it (`docs/design-system-table.md`, Sound). |
+| Sound effects | `expo-audio`, the SDK 58 `pnpm expo install` version (user request, 2026-11-18), with no microphone and no background playback (`app.json`). The release's phone builds carry the sound files, cut from the player's own Darkest Dungeon II and kept in the asset mirror, never in git (user decision, 2026-11-21). Short sounds at the haptics' moments, which add to the screen and never replace it (`docs/design-system-table.md`, Sound). |
 | Haptics | `expo-haptics`, the SDK 58 `pnpm expo install` version (user request, 2026-10-25): a tick when a table button arms, sends or is refused, and on Undo. It adds to what the screen shows and never replaces it. |
 | Screen state | Zustand. The only writer of game state is the reducer in `src/rules` |
 | Tests | Vitest, in Node, on `src/rules` and `src/campaign`. The physical phone still judges fling and drag. |

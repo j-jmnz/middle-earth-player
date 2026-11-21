@@ -4,7 +4,7 @@ The sound effects are built (`docs/design-system-table.md`, Sound): the slots in
 
 ## Decisions
 
-- **Releases carry no audio** (user decision, 2026-11-21): the files stay out of git and out of every release; a development build packs them from `.cache/audio`. Music follows the same rule.
+- **Releases carry the audio** (user decision, 2026-11-21): the files stay out of git, are pinned in `data/sources.json` and kept in the asset mirror (`docs/development.md`, Asset mirror), and the release's phone builds pack them. Music follows the same path.
 - **"VFX".** The first request named VFX, but its points were all audio. If visual effects are also meant (card glows, combat particles, phase transitions), they are a separate plan. Open, for the user.
 - **Hobbit score.** The Hobbit films' score would fit Mirkwood, Ered Mithrin and the dragon scenarios, outside the stated trilogy. Open, for the user.
 

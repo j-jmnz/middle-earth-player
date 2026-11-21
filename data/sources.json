@@ -46185,6 +46185,251 @@
           "bytes": 3711193
         }
       ]
+    },
+    "sounds": {
+      "id": "sounds",
+      "site": "Darkest Dungeon II (the player's own install, cut by pnpm assets sounds --from)",
+      "pin": {
+        "kind": "sha256",
+        "value": "de3c0bf99b7af71fdb6e36279a867d693f12d0b152bac9f62f5206b682af592e"
+      },
+      "fetchedAt": "2026-11-21T02:00:29.897Z",
+      "files": [
+        {
+          "path": "sounds/ui.select.m4a",
+          "url": "ui.bank#ui_shared_mouseover_v2",
+          "sha256": "a0fe3e44529c01f41a7d34a023e6f898dcf3c54e92803f9b369ccb0543054822",
+          "bytes": 9470
+        },
+        {
+          "path": "sounds/ui.confirm.m4a",
+          "url": "ui.bank#ui_shared_mouseclick",
+          "sha256": "a8ef3bd3b9ef03a4345e97db39c300af3f702fcc0c764a03322b4b3d8f2523c2",
+          "bytes": 10035
+        },
+        {
+          "path": "sounds/ui.back.m4a",
+          "url": "ui.bank#ui_shared_back",
+          "sha256": "0d73047effa578435e88fd97c28ce4c41d4a1ba4d258001ea9241988a9abae31",
+          "bytes": 9814
+        },
+        {
+          "path": "sounds/ui.error.m4a",
+          "url": "ui.bank#ui_shared_invalid",
+          "sha256": "9193401d14d1ffda864ea3b68a0f971ae799541110f32617280d56a72d50b911",
+          "bytes": 10987
+        },
+        {
+          "path": "sounds/ui.toggle-on.m4a",
+          "url": "ui.bank#ui_shared_skill_equip_v2",
+          "sha256": "3e1454b33f9947eea770b5c7df7a6a89dc647e95cbcb0f33be06eea47c3892b8",
+          "bytes": 5098
+        },
+        {
+          "path": "sounds/ui.toggle-off.m4a",
+          "url": "ui.bank#ui_shared_skill_unequip_v2",
+          "sha256": "27e023a857d7fafbc26d531066c53b053a1ded259cff5d09400802bf8caf3783",
+          "bytes": 4893
+        },
+        {
+          "path": "sounds/ui.tab.m4a",
+          "url": "ui.bank#ui_shared_tab",
+          "sha256": "b0986fc42ed8d8b835a6949f811f9fbb14423d9221e6ac67166b7e323cdce04c",
+          "bytes": 5247
+        },
+        {
+          "path": "sounds/ui.open.m4a",
+          "url": "ui.bank#ui_shared_menu_open",
+          "sha256": "8fa84c03ae32d26df3a178e544898e65414d4f85d0dcbc98b94f040dd07d5f69",
+          "bytes": 10111
+        },
+        {
+          "path": "sounds/ui.close.m4a",
+          "url": "ui.bank#ui_shared_menu_close",
+          "sha256": "5efd79c748193edc551a4353e7ee93b9e4b65632665153a3899d0e50fa88c73e",
+          "bytes": 10296
+        },
+        {
+          "path": "sounds/ui.notice.m4a",
+          "url": "ui.bank#ui_shr_text_popup",
+          "sha256": "8679e4c160c6504525b34696e8fc74a662db1eab4007540abfb41f349baea52c",
+          "bytes": 7737
+        },
+        {
+          "path": "sounds/card.draw.m4a",
+          "url": "ui.bank#ui_rewards_item_appear",
+          "sha256": "4b77361ee33ee6f27be7c81336a3645cfa40a3047e264e8db4f9ac47fea0fd87",
+          "bytes": 12940
+        },
+        {
+          "path": "sounds/card.pick.m4a",
+          "url": "ui.bank#ui_heroselect_pickup",
+          "sha256": "8f735b1c36f2c5af23d38abb24576d1a7cae5f54e07c5abf1f0e821f514af434",
+          "bytes": 2951
+        },
+        {
+          "path": "sounds/card.land.m4a",
+          "url": "ui.bank#ui_heroselect_add",
+          "sha256": "b15632e391cff8fe8576b3ef81859321b00d85f1e6f8ec2177459f9acf7911dd",
+          "bytes": 15166
+        },
+        {
+          "path": "sounds/card.shuffle.m4a",
+          "url": "ui.bank#ui_heroselect_path_gen",
+          "sha256": "00f213bba2fbdae683241d34e5b1ad0c36ae755d2ed6e4c90aeefad4ef698390",
+          "bytes": 18272
+        },
+        {
+          "path": "sounds/card.deal.m4a",
+          "url": "ui.bank#ui_battle_turnorder_reveal",
+          "sha256": "eaa49ba4a7a02db33330855f8b5cf40baccc3fcb7b58d92dbd01f3a805d85cc7",
+          "bytes": 16366
+        },
+        {
+          "path": "sounds/card.flip.m4a",
+          "url": "ui.bank#ui_inn_quirk_reveal_neg",
+          "sha256": "6a9ca6477b06794be2a3f6b03a8765a19ea31a0493c8f94af3ac1595b9a02925",
+          "bytes": 18393
+        },
+        {
+          "path": "sounds/card.discard.m4a",
+          "url": "ui.bank#ui_shared_discard",
+          "sha256": "ff320cb90a49df7147b83a0324e8d1155b5ee84d154451ef83dfd3f59852cc4d",
+          "bytes": 11188
+        },
+        {
+          "path": "sounds/card.exhaust.m4a",
+          "url": "ui.bank#ui_embark_unhighlight",
+          "sha256": "7cca9c56ec971fd251c66a2b4bde8e5a7a0ffc18ad00688b37f345de6091a4e1",
+          "bytes": 6841
+        },
+        {
+          "path": "sounds/card.ready.m4a",
+          "url": "ui.bank#ui_embark_highlight",
+          "sha256": "65df0cebaf8fcdc874c0b93d354055372d862c6b06ee1f76155d341bba92a391",
+          "bytes": 8618
+        },
+        {
+          "path": "sounds/token.resource.m4a",
+          "url": "ui.bank#ui_rewards_take_currency_gold",
+          "sha256": "8ea39d4179143d02571f2d3b47ed5da2a0c1f72b201b91af2efd1090737fa2eb",
+          "bytes": 12487
+        },
+        {
+          "path": "sounds/token.damage.m4a",
+          "url": "battle.bank#sfx_battle_status_bleedDOT",
+          "sha256": "361e8294efea9da56ef55b3cf0d7226467c5adcb612027130bcfb34f3372fb0c",
+          "bytes": 16272
+        },
+        {
+          "path": "sounds/token.progress.m4a",
+          "url": "ui.bank#ui_eor_candle_count",
+          "sha256": "636baa3b152fa58b5a8f6011f61ddccf2a902f893a5924d2b4bcac431ebd4297",
+          "bytes": 9387
+        },
+        {
+          "path": "sounds/token.remove.m4a",
+          "url": "ui.bank#ui_shared_wheel_lose",
+          "sha256": "8e08091d20c3a3d079996c7d1d8911e8679a800610c202994df405ff8984e29d",
+          "bytes": 13468
+        },
+        {
+          "path": "sounds/combat.engage.m4a",
+          "url": "ui.bank#ui_battle_start",
+          "sha256": "730a807483b67bae59cc87a27beb9983f4a7064632c03b5ce8c58ebbd8dec9d0",
+          "bytes": 34247
+        },
+        {
+          "path": "sounds/combat.roar.m4a",
+          "url": "shared_enemy.bank#sfx_monster_ghoul_howl_use",
+          "sha256": "fc129b5f94887dd9425ee52b161858f40fa678b57db797b3cf6f8d818efad9f2",
+          "bytes": 37926
+        },
+        {
+          "path": "sounds/combat.strike.m4a",
+          "url": "shared_enemy.bank#sfx_monster_footsoldier_cut_use",
+          "sha256": "c18aa98e9e13a37f3ef95f386dd3d1d14fb7b3b78b8422c2231fc7c6ba06f9c2",
+          "bytes": 21552
+        },
+        {
+          "path": "sounds/combat.block.m4a",
+          "url": "shared_hero.bank#sfx_hero_meleeA_guard_use",
+          "sha256": "5aa0c13f8f6a2074c79e932ed64fcacfe953ffcdfc22dd98b6b0be608c7847fb",
+          "bytes": 29735
+        },
+        {
+          "path": "sounds/combat.miss.m4a",
+          "url": "shared_hero.bank#sfx_hero_meleeA_atk_miss",
+          "sha256": "21e4c81f512de3479ebbab841024e242c733e23d47387c1668d3fe5aa95ee91e",
+          "bytes": 9448
+        },
+        {
+          "path": "sounds/combat.kill.m4a",
+          "url": "battle.bank#sfx_battle_crit_hero",
+          "sha256": "02ab534cbd674914a5aadd4ccd47f7ef4c75cad458127f4a7e22d8a26cb737e0",
+          "bytes": 26377
+        },
+        {
+          "path": "sounds/combat.enemy-death.m4a",
+          "url": "battle.bank#sfx_battle_execution",
+          "sha256": "c6c039278c74c1810e03b9fc9c4fe34dd9ed9da23046a85e5aea096e5f70d907",
+          "bytes": 37768
+        },
+        {
+          "path": "sounds/dread.threat-up.m4a",
+          "url": "battle.bank#sfx_battle_status_stressup",
+          "sha256": "b3138ffc9b97b3db57d42c3075051a80645d7cd4c7e66d281cf1fd2f9f00754a",
+          "bytes": 20407
+        },
+        {
+          "path": "sounds/dread.threat-down.m4a",
+          "url": "battle.bank#sfx_battle_status_stressdown",
+          "sha256": "1d5649d55846a27c9002314e51fbc8469726fa35a187886caf6891df2fb9c24b",
+          "bytes": 15698
+        },
+        {
+          "path": "sounds/dread.danger.m4a",
+          "url": "battle.bank#sfx_battle_deathsdoor",
+          "sha256": "fe4ceeb01866f63c44c99a91beea33347a0732285e8f2fde77e48f0ac1a25524",
+          "bytes": 50129
+        },
+        {
+          "path": "sounds/dread.shadow.m4a",
+          "url": "battle.bank#sfx_battle_status_horror",
+          "sha256": "04c9bdf27250125c9ea793dc535367697db607022df26d59af9c351fb7798937",
+          "bytes": 36214
+        },
+        {
+          "path": "sounds/dread.treachery.m4a",
+          "url": "battle.bank#sfx_battle_status_debuff",
+          "sha256": "bf5176c8f9aa319cb3da585867b718056ceac9f097db1328633d4812028ead07",
+          "bytes": 31723
+        },
+        {
+          "path": "sounds/dread.phase.m4a",
+          "url": "battle.bank#sfx_battle_switch",
+          "sha256": "83c8ee89b7090c74d3e7fd9ccb4383c09c3f45fed6d775818756d151d788c50b",
+          "bytes": 11448
+        },
+        {
+          "path": "sounds/dread.stage.m4a",
+          "url": "battle.bank#ui_battle_dungeon_next",
+          "sha256": "1c828f4c62aea17f4d78366a16f4f2753d5749af24c56e30e879e37d5e589382",
+          "bytes": 34539
+        },
+        {
+          "path": "sounds/dread.win.m4a",
+          "url": "ui.bank#ui_eor_results",
+          "sha256": "f15fbee912fbbae694701d2a2d380e14521875f02566d8404797f9c786a0cf90",
+          "bytes": 55980
+        },
+        {
+          "path": "sounds/dread.loss.m4a",
+          "url": "ui.bank#ui_driving_torchlight_out",
+          "sha256": "b8f8ba09e7b6f34e2f59c9caf2a0f5a5262feb8ad7a19a7406fbc0f6d9a17ca0",
+          "bytes": 33967
+        }
+      ]
     }
   }
 }

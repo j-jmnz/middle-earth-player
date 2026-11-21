@@ -1,32 +1,29 @@
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { isSoundSlot, SOUND_SLOTS, type SoundSlot } from "../../src/ui/sound/slots.ts";
-import { SOUND_CACHE_DIR, SOUND_PACK_DIR } from "../data/paths.ts";
-import { sha256 } from "../data/sources/fetch.ts";
+import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
+import { DATA_DIR, SOUND_CACHE_DIR, SOUND_PACK_DIR } from "../data/paths.ts";
+import { sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
 import { bytes, isDirectRun, runPack, type Log } from "../log.ts";
 import { SOUND_PICKS, type SoundPick } from "./sound-picks.ts";
 
 // The sound effects are not in git and come from no online source: they are cut from the player's own Darkest Dungeon II install
-// (user decision, 2026-11-21; docs/design-system-table.md, Sound). Two steps:
+// (user decision, 2026-11-21; docs/design-system-table.md, Sound), and every release carries them (user decision, 2026-11-21).
 // `pnpm assets sounds --from <folder>` cuts each slot's pick (sound-picks.ts) from the folder of unpacked banks (one subfolder a bank,
-// `<n>-<event>.ogg` as vgmstream names them) into .cache/audio/sfx, with a manifest of every file's sha256 and its source's;
-// `pnpm assets sounds` copies the cached files into assets/sounds, where the app's require.context finds them (src/ui/sound/bundled.ts).
-// A checkout or a release build without the cache bundles none, and the app plays none.
+// `<n>-<event>.ogg` as vgmstream names them) into .cache/audio/sfx and pins each file by sha256 as the `sounds` source of
+// data/sources.json; `pnpm data mirror push sounds` then puts them in the asset mirror, which is their only copy online.
+// `pnpm assets sounds` copies each pinned file into assets/sounds, where the phone's require.context finds them
+// (src/ui/sound/bundled.native.ts): from .cache when it holds the pin, else from the mirror. A sound found in neither is left out,
+// with a warning, and the app plays none for it.
 
-export type SoundManifestEntry = {
-  slot: SoundSlot;
-  file: string;
-  sha256: string;
-  source: { game: string; bank: string; event: string; sha256: string };
-  seconds: number;
-  lufs: number;
-};
-
-const MANIFEST = "manifest.json";
+export const SOUND_SOURCE = "sounds";
+const SITE = "Darkest Dungeon II (the player's own install, cut by pnpm assets sounds --from)";
 // The tail is kept until the level stays under 1% of the peak, plus this much, then faded out.
 const TAIL_SECONDS = 0.12;
+
+type Sources = { sources: Record<string, SourceRecord> };
 
 /** The pick's source file in the unpacked banks: `<bank>/<n>-<event>.ogg`. */
 export function findSource(from: string, pick: SoundPick): string | undefined {
@@ -57,10 +54,10 @@ export function soundEnd(samples: Int16Array, rate: number): number {
   return ((last < 0 ? 0 : last) + 1) * (window / rate);
 }
 
-/** Cuts, levels and encodes each slot's pick into `cacheDir` and writes the manifest. */
-export function cutSounds(from: string, cacheDir: string, log: Log): SoundManifestEntry[] {
+/** Cuts, levels and encodes each slot's pick into `cacheDir`, and returns the `sounds` source that pins every file. */
+export function cutSounds(from: string, cacheDir: string, log: Log): SourceRecord {
   mkdirSync(cacheDir, { recursive: true });
-  const manifest: SoundManifestEntry[] = [];
+  const files: SourceFile[] = [];
   for (const slot of SOUND_SLOTS) {
     const pick = SOUND_PICKS[slot];
     const source = findSource(from, pick);
@@ -68,41 +65,78 @@ export function cutSounds(from: string, cacheDir: string, log: Log): SoundManife
     const pcm = ffmpeg(["-i", source, "-ac", "1", "-ar", "8000", "-f", "s16le", "-"]);
     const end = Math.min(soundEnd(new Int16Array(pcm.buffer, pcm.byteOffset, Math.floor(pcm.length / 2)), 8000) + TAIL_SECONDS, pick.maxSeconds);
     const fade = Math.min(0.15, end / 3);
-    const file = `${slot}.m4a`;
-    const target = path.join(cacheDir, file);
+    const target = path.join(cacheDir, `${slot}.m4a`);
     const filter = `atrim=0:${end.toFixed(3)},afade=t=out:st=${(end - fade).toFixed(3)}:d=${fade.toFixed(3)},loudnorm=I=${pick.lufs}:TP=-1.5:LRA=11`;
     ffmpeg(["-y", "-i", source, "-ac", "1", "-ar", "44100", "-af", filter, "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", target]);
-    manifest.push({ slot, file, sha256: sha256(readFileSync(target)), source: { game: "Darkest Dungeon II", bank: `${pick.bank}.bank`, event: pick.event, sha256: sha256(readFileSync(source)) }, seconds: Number(end.toFixed(2)), lufs: pick.lufs });
+    const body = readFileSync(target);
+    // No URL can fetch it: the file's "url" names the bank and the event it was cut from.
+    files.push({ path: `sounds/${slot}.m4a`, url: `${pick.bank}.bank#${pick.event}`, sha256: sha256(body), bytes: body.length });
     log.debug(`${slot}: ${pick.event}, ${end.toFixed(2)} s`);
   }
-  writeFileSync(path.join(cacheDir, MANIFEST), `${JSON.stringify(manifest, null, 1)}\n`);
-  log.info(`cut ${manifest.length} sounds into ${cacheDir}`);
-  return manifest;
+  log.info(`cut ${files.length} sounds into ${cacheDir}`);
+  return { id: SOUND_SOURCE, site: SITE, pin: { kind: "sha256", value: sha256(files.map((file) => file.sha256).join("\n")) }, fetchedAt: new Date().toISOString(), files };
 }
+
+/** Writes the `sounds` source into data/sources.json beside the others, in the same order and form `pnpm data sync` writes. */
+export function writeSoundSource(sourcesPath: string, record: SourceRecord): void {
+  const { sources } = JSON.parse(readFileSync(sourcesPath, "utf8")) as Sources;
+  const next = Object.fromEntries(Object.entries({ ...sources, [record.id]: record }).sort(([a], [b]) => a.localeCompare(b)));
+  writeFileSync(sourcesPath, `${JSON.stringify({ sources: next }, null, 2)}\n`);
+}
+
+export type PackSoundsOptions = {
+  sourcesPath: string;
+  cacheDir: string;
+  outDir: string;
+  /** The asset mirror's reader (mirrorReader): a body at the hash, or null. */
+  mirror?: (hash: string) => Promise<Uint8Array | null>;
+};
 
 /**
- * Copies every cached sound at its manifest's sha256 into `outDir` and removes any other file there but `.gitkeep`. With no
- * manifest the folder is emptied and nothing is bundled. A file whose bytes differ from the manifest fails the pack.
+ * Copies every sound the `sounds` source pins into `outDir`, from `cacheDir` at its pin or else from the mirror (kept in `cacheDir`
+ * after), and removes any other file there but `.gitkeep`. A sound in neither is left out with a warning; with no `sounds` source
+ * nothing is bundled.
  */
-export function packSounds(cacheDir: string, outDir: string, log: Log): SoundManifestEntry[] {
+export async function packSounds(options: PackSoundsOptions, log: Log): Promise<SoundSlot[]> {
+  const { sourcesPath, cacheDir, outDir } = options;
   mkdirSync(outDir, { recursive: true });
-  const manifestPath = path.join(cacheDir, MANIFEST);
-  const manifest = existsSync(manifestPath) ? (JSON.parse(readFileSync(manifestPath, "utf8")) as SoundManifestEntry[]) : [];
+  const { sources } = JSON.parse(readFileSync(sourcesPath, "utf8")) as Sources;
+  const pins = sources[SOUND_SOURCE]?.files ?? [];
   const keep = new Set([".gitkeep"]);
-  for (const entry of manifest) {
-    if (!isSoundSlot(entry.slot) || entry.file !== `${entry.slot}.m4a`) throw new Error(`${manifestPath}: ${entry.file} is not a sound slot's file`);
-    const body = readFileSync(path.join(cacheDir, entry.file));
-    if (sha256(body) !== entry.sha256) throw new Error(`${entry.file} in ${cacheDir} does not match its manifest sha256. Cut the sounds again with --from.`);
-    copyFileSync(path.join(cacheDir, entry.file), path.join(outDir, entry.file));
-    keep.add(entry.file);
+  const packed: SoundSlot[] = [];
+  const missing: string[] = [];
+  let fromMirror = 0;
+  let total = 0;
+  for (const pin of pins) {
+    const slot = /^sounds\/(.+)\.m4a$/.exec(pin.path)?.[1] ?? "";
+    if (!isSoundSlot(slot)) throw new Error(`${sourcesPath}: ${pin.path} is not a sound slot's file`);
+    const file = `${slot}.m4a`;
+    const cached = path.join(cacheDir, file);
+    let body: Uint8Array | null = existsSync(cached) ? new Uint8Array(readFileSync(cached)) : null;
+    if (body && sha256(body) !== pin.sha256) body = null;
+    if (!body && options.mirror) {
+      body = await options.mirror(pin.sha256);
+      if (body) {
+        mkdirSync(cacheDir, { recursive: true });
+        writeFileSync(cached, body);
+        fromMirror += 1;
+      }
+    }
+    if (!body) {
+      missing.push(slot);
+      continue;
+    }
+    writeFileSync(path.join(outDir, file), body);
+    keep.add(file);
+    packed.push(slot);
+    total += body.length;
   }
   for (const file of readdirSync(outDir)) if (!keep.has(file)) rmSync(path.join(outDir, file), { recursive: true, force: true });
-  const total = manifest.reduce((sum, entry) => sum + readFileSync(path.join(outDir, entry.file)).length, 0);
-  if (manifest.length === 0) log.warn(`no sounds in ${cacheDir}, so this bundle carries none. Cut them with pnpm assets sounds --from <folder>.`);
-  else log.info(`packed ${manifest.length} sounds (${bytes(total)}) into ${outDir}; restart Metro with --clear to bundle them`);
-  return manifest;
+  if (pins.length === 0) log.warn(`${sourcesPath} pins no sounds, so this bundle carries none. Cut them with pnpm assets sounds --from <folder>.`);
+  if (missing.length > 0) log.warn(`${missing.length} pinned sound${missing.length === 1 ? " is" : "s are"} in neither ${cacheDir} nor the mirror, so this bundle plays none for ${missing.join(", ")}`);
+  if (packed.length > 0) log.notice(`packed ${packed.length} sounds (${bytes(total)}; ${fromMirror} from the mirror) into ${outDir}; restart Metro with --clear to bundle them`);
+  return packed;
 }
-
 function argument(name: string): string | undefined {
   const at = process.argv.indexOf(name);
   return at >= 0 ? process.argv[at + 1] : undefined;
@@ -110,9 +144,13 @@ function argument(name: string): string | undefined {
 
 // --optional (pnpm assets all): a failed pack is a warning, so the other packs still run.
 if (isDirectRun(import.meta.url)) {
-  runPack("pack-sounds", "sounds not packed, so this bundle carries none", (log) => {
+  runPack("pack-sounds", "sounds not packed, so this bundle carries none", async (log) => {
+    const sourcesPath = path.join(DATA_DIR, "sources.json");
     const from = argument("--from");
-    if (from) cutSounds(path.resolve(from), SOUND_CACHE_DIR, log);
-    packSounds(SOUND_CACHE_DIR, SOUND_PACK_DIR, log);
+    if (from) {
+      writeSoundSource(sourcesPath, cutSounds(path.resolve(from), SOUND_CACHE_DIR, log));
+      log.notice(`pinned the sounds in ${sourcesPath}: commit it, then run pnpm data mirror push sounds`);
+    }
+    await packSounds({ sourcesPath, cacheDir: SOUND_CACHE_DIR, outDir: SOUND_PACK_DIR, mirror: mirrorReader(mirrorFromEnv(), log) }, log);
   });
 }

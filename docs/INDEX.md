@@ -82,7 +82,7 @@ Read the sections your task touches.
   - 43–54 Product (~740) ← 2
   - 55–68 Non-goals (~610)
   - 69–90 Decisions (~1.1K)
-  - 91–124 Stack (~1.2K)
+  - 91–124 Stack (~1.3K)
   - 125–142 Performance and feel (~750)
   - 143–161 Repository layout (~490)
   - 162–410 Domain (~11.5K)
@@ -179,7 +179,7 @@ Read the sections your task touches.
   - 2771–2798 Persistence and shipping (~3.2K) ← 10
   - 2799–2841 Screens (~5.9K) ← 2
     - 2826–2841 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~69.7K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~69.8K tok)
   - 5–8 Overview (~170) ← 1
   - 9–35 Top bar (~6.7K) ← 11
   - 36–39 Table menu (~870) ← 9
@@ -210,7 +210,7 @@ Read the sections your task touches.
   - 385–390 Quest advance (~530) ← 1
   - 391–394 Undo (~150)
   - 395–398 Haptics (~340) ← 1
-  - 399–412 Sound (~930) ← 18
+  - 399–412 Sound (~960) ← 18
   - 413–424 Banner (~750) ← 5
   - 425–444 Screen reader (~3.0K) ← 19
   - 445–448 Android Back (~90)
@@ -257,14 +257,14 @@ Read the sections your task touches.
     - 496–503 Booklet (~540) ← 2
     - 504–507 Database (~110)
   - 508–527 States (~620)
-- `docs/development.md` — Development (~4.9K tok)
+- `docs/development.md` — Development (~5.0K tok)
   - 5–14 In a browser (~170)
   - 15–32 Checking a screen in a browser (~700) ← 3
   - 33–52 Reading a game as text (~760) ← 4
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
   - 82–135 Commands (~2.2K) ← 4
-  - 136–146 Asset mirror (~480) ← 5
+  - 136–146 Asset mirror (~550) ← 6
 - `docs/discord-issues.md` — Discord issue bot (~3.7K tok)
   - 5–16 What it does (~290)
   - 17–36 Issue updates (~490) ← 1
@@ -283,17 +283,17 @@ Read the sections your task touches.
   - 170–176 Use it (~80)
   - 177–190 Find a problem (~590)
   - 191–196 Change it (~90)
-- `docs/releasing.md` — Releasing (~5.9K tok)
+- `docs/releasing.md` — Releasing (~6.0K tok)
   - 5–20 Start a release (~340) ← 1
   - 21–36 Jobs (~2.1K) ← 4
   - 37–43 Add the desktop app to a release (~350) ← 1
   - 44–49 Issue comments (~340) ← 4
   - 50–53 Installs count (~180) ← 2
   - 54–78 Caches (~820) ← 1
-  - 79–117 Signing (~1.1K) ← 2
+  - 79–117 Signing (~1.2K) ← 2
     - 83–86 Desktop signing (optional) (~220) ← 1
     - 87–100 Android key (~250) ← 1
-    - 101–104 Asset mirror secrets (~140) ← 1
+    - 101–104 Asset mirror secrets (~180) ← 1
     - 105–117 TestFlight (optional) (~420) ← 1
   - 118–121 Installing (~90)
   - 122–133 Troubleshooting (~450)

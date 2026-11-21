@@ -23,7 +23,7 @@ const record = (id: string, files: SourceFile[]): SourceRecord => ({ id, site: "
 function dirs(): CacheDirs {
   const root = mkdtempSync(path.join(tmpdir(), "mirror-"));
   roots.push(root);
-  const made = { scans: path.join(root, "scans"), pictures: path.join(root, "pictures"), pdf: path.join(root, "pdf") };
+  const made = { scans: path.join(root, "scans"), pictures: path.join(root, "pictures"), pdf: path.join(root, "pdf"), sounds: path.join(root, "sounds") };
   for (const dir of Object.values(made)) mkdirSync(dir);
   return made;
 }
@@ -59,6 +59,17 @@ describe("asset mirror commands", () => {
     ]);
     expect(cachedPins(SOURCES, ["pictures"], at)).toHaveLength(2);
     expect(() => cachedPins(SOURCES, ["nope"], at)).toThrow(/no source nope/);
+  });
+
+  it("caches a sound beside the others, and never fetches one from its URL, which only names the bank it was cut from", async () => {
+    const at = dirs();
+    const sound = { ...file("sounds/ui.tab.m4a", "tab"), url: "ui.bank#ui_shared_tab" };
+    const pins = cachedPins({ sounds: record("sounds", [sound]) }, [], at);
+    expect(pins.map((pin) => pin.cached)).toEqual([path.join(at.sounds, "ui.tab.m4a")]);
+    let fetched = 0;
+    const result = await pushPins(memoryMirror(), pins, log, { waits: [], fetchSource: () => ((fetched += 1), Promise.resolve(bytesOf("tab"))) });
+    expect(fetched).toBe(0);
+    expect(result.absent).toEqual(["sounds/ui.tab.m4a"]);
   });
 
   it("pushes what the bucket lacks from the cache at its pin, and pulls it back into an empty cache", async () => {
