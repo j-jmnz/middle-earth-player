@@ -1,7 +1,7 @@
 // The parts the two hubs share (docs/design-system.md, Campaigns (campaign list) and Scenarios): the hero over the current run's
-// scene, a row for each other run, a tile for each catalog entry, the locked tiles, and the page frame that sets them in order.
-import { Children, useState, type ComponentRef, type ReactNode, type RefObject } from "react";
-import { Pressable, View, type ScrollView } from "react-native";
+// scene, a row for each other run, a tile for each catalog entry and the locked tiles. The page frame that sets them in order is hub-page.tsx.
+import { Children, type ReactNode } from "react";
+import { Pressable, View } from "react-native";
 
 import { dropShadowOf, lapShadowOf, rowSurface, tileSurface } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
@@ -10,14 +10,13 @@ import { useTableTokens } from "../../ui/use-table-tokens";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSizeClass } from "../../ui/use-size-class";
 import { withSound } from "../../ui/sound/sound";
-import { HeroArt, SceneArt } from "../art/art";
+import { SceneArt } from "../art/art";
 import { COVER } from "../art/crop";
-import { Chevron, Eyebrow, HubHeader, RingMark, Screen, ScreenScroll, useTitleShadow } from "../kit/chrome";
+import { Chevron, Eyebrow, RingMark, useTitleShadow } from "../kit/chrome";
 import { FoldSection } from "../kit/fold-section";
 import { HeroTile, type HeroFace } from "../art/hero-tile";
 import { HeroTrio } from "../art/hero-trio";
 import { usePalette } from "../kit/palette-hook";
-import { useSplitColumns } from "../nav/use-split-columns";
 import { Text } from "../../ui/text";
 
 // How far a fellowship painting laps over the one before it.
@@ -167,6 +166,9 @@ function NumberBadge({ number }: { number: number }) {
   );
 }
 
+// The night wash over a listed poster's scene (CatalogTile `listed`).
+const LISTED_WASH = 0.2;
+
 /**
  * The catalog's tiles, wrapped. `posters` is how many poster tiles sit across a tablet's row (0 for a phone's rows); posters keep one
  * width on every row (a short last row does not stretch): each cell is a column's share, the gutter its padding.
@@ -182,7 +184,8 @@ export function CatalogGrid({ posters, children }: { posters: number; children: 
 
 /**
  * One catalog entry on its scene: a 64 pt row on a phone (`posters` 0), a poster on a tablet. `number` is the book number in a small
- * capsule on the art. `tone` is the colour of `line`, which is left out when empty.
+ * capsule on the art. `tone` is the colour of `line`, which is left out when empty. `listed` is a tile inside a FlashList row
+ * (docs/design-system.md, Performance): its poster casts no shadow and its scene takes a flat night wash in place of `ART_FILTER`.
  */
 export function CatalogTile({
   testID,
@@ -194,6 +197,7 @@ export function CatalogTile({
   accessibilityLabel,
   accessibilityHint,
   posters,
+  listed,
   onPress,
 }: {
   testID: string;
@@ -205,6 +209,7 @@ export function CatalogTile({
   accessibilityLabel: string;
   accessibilityHint?: string;
   posters: number;
+  listed?: boolean;
   onPress: () => void;
 }) {
   const palette = usePalette();
@@ -226,8 +231,10 @@ export function CatalogTile({
     >
       {({ pressed }) =>
         posters ? (
-          <View className="overflow-hidden rounded-item" style={tileSurface(pressed, t)}>
-            <SceneArt scenarioId={sceneId} height={(size === "expanded" ? 270 : 300) * s} fade={0.55} fadeTo={palette.dusk}>
+          <View className="overflow-hidden rounded-item" style={listed ? rowSurface(pressed, t) : tileSurface(pressed, t)}>
+            <SceneArt scenarioId={sceneId} height={(size === "expanded" ? 270 : 300) * s} fade={0.55} fadeTo={palette.dusk} vivid={listed}>
+              {/* Under the fade's words, the wash darkens the scene about as ART_FILTER's brightness does, with no filter to draw. */}
+              {listed ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, LISTED_WASH) }} /> : null}
               {badge ? (
                 <View className="absolute" style={{ left: 12 * s, top: 12 * s }}>
                   {badge}
@@ -297,129 +304,5 @@ export function LockedTiles({ tiles, testID }: { tiles: readonly { id: string; n
         </View>
       ))}
     </View>
-  );
-}
-
-// The right column of the two-column hub (docs/design-system.md, Tablets).
-const SIDE_RANGE = { min: 360, max: 440 };
-
-const clamp = (value: number, low: number, high: number) => Math.min(high, Math.max(low, value));
-
-/**
- * The hub's page: the head, then the hero over its scene, the other runs, the catalog and Coming later, in that order. On a tablet in
- * landscape with room for two columns (docs/design-system.md, Tablets) and both a hero and other runs, the hero is on the left over
- * its scene and the other runs on the right; the catalog and Coming later go full width below. Else one column. The hero's scene is
- * `sceneId`; with no hero the page takes the moon backdrop and no art. `hero` is the run's words and fellowship, `heroAction` the
- * primary under them: a tablet keeps the action (and, in one column, the whole hero) to a readable measure. `onCatalogLayout` gives
- * the y of the catalog in the scroll's content, so a screen can scroll it into view.
- */
-export function HubPage({
-  testID,
-  title,
-  actions,
-  hero,
-  heroAction,
-  heroTestID,
-  sceneId,
-  others,
-  catalog,
-  coming,
-  scrollRef,
-  onCatalogLayout,
-}: {
-  testID: string;
-  // The head's title and its own controls (History); the gear follows them.
-  title: string;
-  actions?: ReactNode;
-  hero?: ReactNode;
-  heroAction?: ReactNode;
-  // The block holding the hero and its action.
-  heroTestID?: string;
-  sceneId?: string | null;
-  others?: ReactNode;
-  catalog: ReactNode;
-  coming?: ReactNode;
-  scrollRef?: RefObject<ComponentRef<typeof ScrollView> | null>;
-  onCatalogLayout?: (y: number) => void;
-}) {
-  const s = useUiScale();
-  const { width, height } = useSizeClass();
-  const columns = useSplitColumns(SIDE_RANGE);
-  const { size } = columns;
-  const [pageWidth, setPageWidth] = useState(0);
-  const split = size === "expanded" && hero && others ? columns.side : null;
-  const twoColumns = split != null;
-  // The hero words sit low over the scene: the scene's art fills the top of the page and they start where it begins to fade. A short
-  // or scaled window (its height in points over the UI scale) drops them less, so the hero's primary stays on the first screen.
-  const tall = height / s;
-  const heroDrop = hero ? (size === "compact" ? clamp(tall - 700, 60, 170) : clamp(tall * 0.2, 96, 330)) * s : 0;
-  const header = (
-    <HubHeader title={title}>
-      {actions}
-    </HubHeader>
-  );
-  // On a tablet the hero keeps a readable measure rather than spanning its column.
-  const measure = size === "expanded" ? { maxWidth: 620 * s } : undefined;
-  const action = heroAction ? <View style={measure}>{heroAction}</View> : null;
-  // In two columns the hero spans its column and only its action keeps the measure; in one column the whole hero is capped (below).
-  const heroBlock = hero ? (
-    <View testID={heroTestID} style={{ gap: 18 * s }}>
-      {hero}
-      {action}
-    </View>
-  ) : null;
-  // The catalog and Coming later are the page's last block, a direct child of the scroll's content so its y is the content's.
-  const lower = (
-    <View style={{ gap: 18 * s, paddingTop: hero || others ? 18 * s : 0 }} onLayout={(event) => onCatalogLayout?.(event.nativeEvent.layout.y)}>
-      {catalog}
-      {coming}
-    </View>
-  );
-  const page = twoColumns ? (
-    <>
-      {header}
-      {/* The hero on the left over its scene, the other runs on the right; the catalog and Coming later under both. */}
-      <View className="flex-row items-start" style={{ gap: split.gap }} testID={`${testID}-columns`}>
-        <View className="min-w-0 flex-1" style={{ paddingTop: heroDrop }}>
-          {heroBlock}
-        </View>
-        <View style={{ width: split.side, paddingTop: 24 * s }}>{others}</View>
-      </View>
-      {lower}
-    </>
-  ) : (
-    <>
-      {header}
-      <View style={{ gap: 18 * s, paddingTop: heroDrop, ...measure }}>
-        {heroBlock}
-        {others}
-      </View>
-      {lower}
-    </>
-  );
-
-  // The scene of the hero: wider than a phone and centred on it; on a tablet in landscape with two columns, behind the hero's column.
-  // In two columns the scene stops at the hero column's right edge, so it never runs under the right column. The scroll's content
-  // is centred in the page, so that edge is the page's middle less half the content's width, plus the hero column's width.
-  const art = hero ? (
-    size === "expanded" && twoColumns ? (
-      <>
-        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: 0 }} onLayout={(event) => setPageWidth(event.nativeEvent.layout.width)} />
-        {pageWidth > 0 ? <HeroArt scenarioId={sceneId} width={900 * s} height={760 * s} left={-90 * s} right={pageWidth / 2 - columns.width / 2 + split.main} /> : null}
-      </>
-    ) : (
-      <HeroArt scenarioId={sceneId} width={Math.max(520 * s, width + 120 * s)} height={(size === "compact" ? 540 : 820) * s} />
-    )
-  ) : null;
-
-  return (
-    // Over its scene the page takes the hero backdrop, whose fog stays below the picture (HeroArt draws its own over it).
-    <Screen testID={testID} scene={art ? "hero" : "moon"} art={art}>
-      {/* An expanded window scrolls in a wide column; the measurer (outside the columns) decides whether it splits, else one readable column. */}
-      <ScreenScroll scrollRef={scrollRef} max={size === "expanded" ? "wide" : "readable"}>
-        {size === "expanded" ? <View style={{ height: 0 }} onLayout={columns.measure} /> : null}
-        {page}
-      </ScreenScroll>
-    </Screen>
   );
 }

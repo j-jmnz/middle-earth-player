@@ -2,8 +2,6 @@
 // for, nothing reaches the module; quick taps each get a player that is not still playing.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { tableSettings } from "../table-settings.ts";
-
 const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], playing: false }));
 vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined }));
 // The accessibility store is mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
@@ -18,7 +16,11 @@ vi.mock("./audio-player", () => ({
   },
 }));
 
+// A fresh sound.ts with this file's mocks: sound-players.test.ts loads it with its own, and the module cache is shared (vitest.config.mts,
+// isolate). The settings come from the same fresh load, so the store this file changes is the one sound.ts reads.
+vi.resetModules();
 const { playSound, playUndo, SOUNDS_BUNDLED } = await import("./sound.ts");
+const { tableSettings } = await import("../table-settings.ts");
 
 // A replayed player starts once its seek to the start resolves.
 const settled = () => new Promise<void>((resolve) => queueMicrotask(() => queueMicrotask(resolve)));
