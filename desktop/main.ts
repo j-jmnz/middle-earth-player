@@ -42,6 +42,9 @@ function createWindow(): BrowserWindow {
       webSecurity: true,
       devTools: dev,
       spellcheck: false,
+      // The music starts with the app, before the player has clicked anything (docs/design-system-table.md, Sound). Electron allows it by default; it is
+      // named here so a change of default cannot silence the menu loop. A browser holds it until a click (src/ui/sound/audio-player.canvaskit.ts).
+      autoplayPolicy: "no-user-gesture-required",
     },
   });
   if (maximized) created.maximize();

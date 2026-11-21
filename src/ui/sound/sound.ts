@@ -1,7 +1,7 @@
 // The table's and the screens' sound effects (docs/design-system-table.md, Sound; user request, 2026-11-18). A sound plays at the
 // moment its haptic or its motion does and adds to what the screen shows; it never replaces it. It follows the phone's silent switch
 // and mixes with the player's own music. The Sound effects setting turns them all off. A bundle packed without the files (no asset
-// mirror and no cache: scripts/build/pack-sounds.ts) plays none, and so do the web and the desktop for now (bundled.ts). A failed sound is not an
+// mirror and no cache: scripts/build/pack-sounds.ts) plays none; the web and the desktop play the same files (bundled.canvaskit.ts). A failed sound is not an
 // error the player should see; a development build logs it. Each slot keeps a few players for the app's life, so quick taps each get
 // one that is not still playing: one player a slot is loaded the first time any sound plays, and more only as quick repeats need them.
 import { createAudioPlayer, type AudioPlayer } from "./audio-player";

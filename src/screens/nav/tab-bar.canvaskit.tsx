@@ -7,7 +7,7 @@ import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, type Tabs } from "expo-router";
 
-import { AppTabBar as PhoneTabBar } from "./tab-bar";
+import { AppTabBar as PhoneTabBar, pressSettings, tabItem } from "./tab-bar";
 import { compactItemHeight, COMPACT_PAD } from "./rail-fit";
 import { GearMark } from "../kit/chrome-marks";
 import { usePalette } from "../kit/palette-hook";
@@ -54,7 +54,7 @@ function RailItem({ height, focused, icon, word, button }: { height: number; foc
 }
 
 function CompactRail(props: TabBarProps) {
-  const { state, descriptors, emitter, navigateToTab } = props;
+  const { state } = props;
   const palette = usePalette();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -76,28 +76,9 @@ function CompactRail(props: TabBarProps) {
       }}
     >
       {state.routes.map((route, index) => {
-        const focused = state.index === index;
-        const { options } = descriptors[route.key];
-        return (
-          <RailItem
-            key={route.key}
-            height={each}
-            focused={focused}
-            icon={options.tabBarIcon?.({ focused, color: focused ? palette.bone : palette.faint, size: 22 }) as ReactElement | undefined}
-            word={options.title ?? route.name}
-            button={{
-              testID: options.tabBarButtonTestID,
-              collapsable: false,
-              accessibilityRole: "tab" as const,
-              accessibilityState: { selected: focused },
-              accessibilityLabel: options.tabBarAccessibilityLabel,
-              onPress: () => {
-                const event = emitter.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
-                if (!focused && !event.defaultPrevented) navigateToTab(route.key);
-              },
-            }}
-          />
-        );
+        // The phone's tab press, with its sound (tab-bar.tsx, tabItem).
+        const { focused, options, word, button } = tabItem(props, route, index);
+        return <RailItem key={route.key} height={each} focused={focused} icon={options.tabBarIcon?.({ focused, color: focused ? palette.bone : palette.faint, size: 22 }) as ReactElement | undefined} word={word} button={button} />;
       })}
       <View style={{ marginTop: "auto" }}>
         <RailItem
@@ -105,7 +86,7 @@ function CompactRail(props: TabBarProps) {
           focused={false}
           icon={<GearMark color={palette.faint} size={22} />}
           word="Settings"
-          button={{ testID: "settings-open", collapsable: false, accessibilityRole: "button", accessibilityLabel: "Settings", onPress: () => router.push("/settings") }}
+          button={{ testID: "settings-open", collapsable: false, accessibilityRole: "button", accessibilityLabel: "Settings", onPress: pressSettings(router) }}
         />
       </View>
     </View>
