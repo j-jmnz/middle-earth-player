@@ -51,9 +51,10 @@ export function dockIcon(name: IconName) {
 
 /**
  * What a tab's button shares in the dock and the rail: whether it is the current one, the word that names it, and the props that make
- * it a tab to a screen reader and press it (the tabPress event, then the navigation unless it was prevented).
+ * it a tab to a screen reader and press it (the tabPress event, then the tab's sound and the navigation unless it was prevented). The web's
+ * rail (tab-bar.canvaskit.tsx) presses its tabs through it too.
  */
-function tabItem(props: TabBarProps, route: TabBarProps["state"]["routes"][number], index: number) {
+export function tabItem(props: TabBarProps, route: TabBarProps["state"]["routes"][number], index: number) {
   const { state, descriptors, emitter, navigateToTab } = props;
   const focused = state.index === index;
   const { options } = descriptors[route.key];
@@ -208,12 +209,17 @@ function RailTabBar(props: TabBarProps) {
             collapsable: false,
             accessibilityRole: "button",
             accessibilityLabel: "Settings",
-            onPress: withSound(() => router.push("/settings"), "ui.open"),
+            onPress: pressSettings(router),
           })}
         </View>
       </ScrollView>
     </View>
   );
+}
+
+/** Settings' press, from the rail or the gear: its open sound, then the Settings page. */
+export function pressSettings(router: ReturnType<typeof useRouter>): () => void {
+  return withSound(() => router.push("/settings"), "ui.open");
 }
 
 /** The round gear at the top right of a hub: it pushes Settings. Beside the rail it is not drawn, since the rail holds Settings. */

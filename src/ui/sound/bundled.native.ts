@@ -2,7 +2,8 @@
 // The sound files the phone's bundle carries: every `<slot>.m4a` that `pnpm assets sounds` packed into assets/sounds, and every
 // `<loop>.m4a` that `pnpm assets music` packed into assets/music (both gitignored; each folder stays, with a .gitkeep, so the context
 // always resolves). Metro turns each `require.context` into a map of the files there when it bundles, and a bundle packed without them
-// finds none, so the app plays nothing. The web and the tests read bundled.ts.
+// finds none, so the app plays nothing. The tests read the empty bundled.ts, and so do the web and the desktop unless they have a `.canvaskit`
+// variant of their own (metro.config.js).
 import { isMusicLoop, type MusicLoop } from "./music-map.ts";
 import { isSoundSlot, type SoundSlot } from "./slots.ts";
 
