@@ -13,24 +13,18 @@ Game content appears in these places:
 - `assets/icons/` and `src/ui/icons/` hold game icons built from `data/raw/icons/`.
 - Card images and PDFs are downloaded at build time and never committed.
 
-## Sound effects
-
-The phone app's sound effects are cut from Darkest Dungeon II (© Red Hook Studios) by `pnpm assets sounds --from`, from the player's own copy of the game, and the card landing from Hearthstone (© Blizzard Entertainment) by `--hearthstone`, from the player's own copy of its sounds. They are never committed: `data/sources.json` pins them by sha256 and the asset mirror holds them, and the phone builds of each release carry them. No license is granted for them.
-
-The phone app's music loops are passages of Howard Shore's score for The Lord of the Rings film trilogy (© New Line Productions and the recordings' owners), cut by `pnpm assets music --from` from the player's own copy. They are kept the same way as the sound effects and carried the same way. No license is granted for them.
-
 ## Data sources
 
 None of these sources publishes a license for its data, so the data is used as published.
 
-| Source | Used for | Location |
-| --- | --- | --- |
-| [RingsDB](https://ringsdb.com) | Player cards and packs; the icon font (`ringsdb.svg`, `ringsdb-app.css`) | `data/raw/ringsdb/`, `data/raw/icons/` |
-| [Hall of Beorn](https://hallofbeorn.com) | Encounter and quest cards, scenarios, card scans | `data/raw/hallofbeorn/`, `.cache/` |
-| [DragnCards LotR LCG plugin](https://github.com/seastan/dragncards-lotrlcg-plugin) by seastan | Card database, scenario lists, pre-built decks, game steps, token and card-back images | `data/raw/dragncards/`, `data/raw/icons/dragncards/` |
-| [Fantasy Flight Games](https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/) | Rules PDFs, print-and-play cards, the icon font in the Dream-chaser rulebook (`mec111-icons.ttf`) | `data/raw/icons/`, `.cache/` |
-| JvZijp's enhanced proxies and u/LepcisMagna's scans on [lotr.cardgame.tools](https://lotr.cardgame.tools) | Card pictures | `.cache/` |
-| A community Google Drive folder | Nightmare deck pictures and card lists | `data/raw/nightmare/`, `.cache/` |
+| Source                                                                                                    | Used for                                                                                          | Location                                             |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [RingsDB](https://ringsdb.com)                                                                            | Player cards and packs; the icon font (`ringsdb.svg`, `ringsdb-app.css`)                          | `data/raw/ringsdb/`, `data/raw/icons/`               |
+| [Hall of Beorn](https://hallofbeorn.com)                                                                  | Encounter and quest cards, scenarios, card scans                                                  | `data/raw/hallofbeorn/`, `.cache/`                   |
+| [DragnCards LotR LCG plugin](https://github.com/seastan/dragncards-lotrlcg-plugin) by seastan             | Card database, scenario lists, pre-built decks, game steps, token and card-back images            | `data/raw/dragncards/`, `data/raw/icons/dragncards/` |
+| [Fantasy Flight Games](https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/)        | Rules PDFs, print-and-play cards, the icon font in the Dream-chaser rulebook (`mec111-icons.ttf`) | `data/raw/icons/`, `.cache/`                         |
+| JvZijp's enhanced proxies and u/LepcisMagna's scans on [lotr.cardgame.tools](https://lotr.cardgame.tools) | Card pictures                                                                                     | `.cache/`                                            |
+| A community Google Drive folder                                                                           | Nightmare deck pictures and card lists                                                            | `data/raw/nightmare/`, `.cache/`                     |
 
 Every source is pinned by URL and sha256 in `data/sources.json`.
 

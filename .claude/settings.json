@@ -1,35 +1,40 @@
 {
-  "enabledPlugins": {
-    "expo@claude-plugins-official": true
-  },
-  "permissions": {
-    "allow": [
-      "Bash(pnpm install)",
-      "Bash(pnpm test)",
-      "Bash(pnpm test *)",
-      "Bash(pnpm lint)",
-      "Bash(pnpm lint *)",
-      "Bash(pnpm vitest *)",
-      "Bash(pnpm test fast)",
-      "Bash(pnpm test changed)",
-      "Bash(pnpm typecheck)",
-      "Bash(pnpm exec tsc --noEmit)",
-      "Bash(pnpm assets catalog)",
-      "Bash(pnpm browser shot *)",
-      "Bash(pnpm browser run *)",
-      "Bash(pnpm game *)"
-    ]
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
-          }
+    "attribution": {
+        "commit": "",
+        "pr": "",
+        "sessionUrl": false
+    },
+    "enabledPlugins": {
+        "expo@claude-plugins-official": true
+    },
+    "permissions": {
+        "allow": [
+            "Bash(pnpm install)",
+            "Bash(pnpm test)",
+            "Bash(pnpm test *)",
+            "Bash(pnpm lint)",
+            "Bash(pnpm lint *)",
+            "Bash(pnpm vitest *)",
+            "Bash(pnpm test fast)",
+            "Bash(pnpm test changed)",
+            "Bash(pnpm typecheck)",
+            "Bash(pnpm exec tsc --noEmit)",
+            "Bash(pnpm assets catalog)",
+            "Bash(pnpm browser shot *)",
+            "Bash(pnpm browser run *)",
+            "Bash(pnpm game *)"
         ]
-      }
-    ]
-  }
+    },
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+                    }
+                ]
+            }
+        ]
+    }
 }
