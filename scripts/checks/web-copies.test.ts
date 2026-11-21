@@ -31,6 +31,14 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
         '// The web build lists the table and has no canvas to play a spotlight on.\nconst CANVAS = Platform.OS !== "web";',
         "// A canvas draws the spotlight on every platform (the web's once CanvasKit has loaded, and until then the list table ends each gate: reader-gate.ts).\nconst CANVAS = true;",
       ],
+      // The web and the desktop play no sound yet (src/ui/sound/sound.ts): the strikes' sounds stay on the phone.
+      ['import { tickImpact } from "../../ui/haptics.ts";\nimport { playStrike } from "./strike-play.ts";\nimport { strikeSounds } from "./strike-sounds.ts";\n', 'import { tickImpact } from "../../ui/haptics.ts";\n'],
+      [
+        "  // Each strike's sound at its hit stop (strike-sounds.ts), on the same clock as the impact haptic.\n  const struck = (plan?.clashes ?? []).flatMap((clash, index) => strikeSounds(clash).map((slot) => ({ at: hits[index] ?? 0, index, slot })));\n",
+        "",
+      ],
+      ["      for (const cue of struck) if (was < cue.at && now >= cue.at) scheduleOnRN(playStrike, seq, cue.index, cue.slot);\n", ""],
+      ["    [hits, total, leaveAt, leave, struck, seq],\n", "    [hits, total, leaveAt, leave],\n"],
     ],
   },
   {
@@ -46,6 +54,13 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
       ["detail={fogLine(light, reduced)}", "detail={noBattery(fogLine(light, reduced))}"],
       ["detail={AWAKE_LINE}", "detail={noBattery(AWAKE_LINE)}"],
       ['          <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />\n', ""],
+      // The web and the desktop play no sound yet (src/ui/sound/sound.ts).
+      ["Motion and feel (Animation speed, Reduce motion, Combat spotlight, Haptics), Sound (Sound effects, Music and their volumes, each only in a bundle packed with its files) and At the table", "Motion and feel (Animation speed, Reduce motion, Combat spotlight, Haptics) and At the table"],
+      ['  groups = ["display", "performance", "motion", "sound", "table"],', '  groups = ["display", "performance", "motion", "table"],'],
+      [
+        '      {/* Only a bundle packed with the sounds or the music can play them (src/ui/sound/sound.ts, music.ts). */}\n      {groups.includes("sound") && (SOUNDS_BUNDLED || MUSIC_BUNDLED) ? (\n        <SettingGroup title="Sound" testID={id("sound")} first={first && top === "sound"}>\n          {SOUNDS_BUNDLED ? <SettingSwitch roomy label="Sound effects" detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={id("sounds")} /> : null}\n          {SOUNDS_BUNDLED ? <VolumeSlider label="Effects volume" detail={EFFECTS_VOLUME_LINE} value={settings.soundVolume} dim={!settings.sounds} onChange={(soundVolume) => setVolume(onChange, soundVolume)} testID={id("sound-volume")} /> : null}\n          {MUSIC_BUNDLED ? <SettingSwitch roomy label="Music" detail={MUSIC_LINE} value={settings.music} onChange={(music) => onChange({ music })} testID={id("music")} /> : null}\n          {MUSIC_BUNDLED ? <VolumeSlider label="Music volume" detail={MUSIC_VOLUME_LINE} value={settings.musicVolume} dim={!settings.music} onChange={(musicVolume) => onChange({ musicVolume })} testID={id("music-volume")} /> : null}\n        </SettingGroup>\n      ) : null}\n\n',
+        "",
+      ],
       ["      ) : null}\n    </>\n", '      ) : null}\n\n      {groups.includes("table") ? extra : null}\n    </>\n'],
     ],
   },

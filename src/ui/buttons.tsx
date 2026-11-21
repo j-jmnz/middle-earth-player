@@ -18,6 +18,8 @@ import { withAlphaHex } from "./tokens.ts";
 import { capLines, touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
+import { withSound } from "./sound/sound.ts";
+import type { SoundSlot } from "./sound/slots.ts";
 
 /**
  * The one filled action on a screen: wraith-light silver on Dark, elven green on Light, a capsule 52 pt tall (`compact` 44, `dock` 46:
@@ -73,7 +75,7 @@ export function PrimaryButton({
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled }}
       disabled={disabled}
-      onPress={onPress}
+      onPress={dock ? onPress : withSound(onPress, "ui.confirm")}
     >
       {({ pressed }) => <PrimaryFace label={label} pressed={pressed} disabled={disabled} paper={paper} compact={compact} dock={dock} tone={tone} ring={ring.style} />}
     </Pressable>
@@ -191,7 +193,7 @@ export function SecondaryButton({
       accessibilityHint={accessibilityHint}
       accessibilityState={expanded == null ? { disabled } : { disabled, expanded }}
       disabled={disabled}
-      onPress={onPress}
+      onPress={withSound(onPress, "ui.confirm")}
       hitSlop={tight ? { top: slop, bottom: slop } : undefined}
       style={{ minHeight: row, justifyContent: "center" }}
     >
@@ -292,7 +294,7 @@ export function TextButton({
       accessibilityHint={hint}
       {...(longPress ? { accessibilityActions: longPress.accessibilityActions, onAccessibilityAction: longPress.onAccessibilityAction } : {})}
       disabled={disabled}
-      onPress={onPress}
+      onPress={withSound(onPress, "ui.confirm")}
       onLongPress={onLongPress}
       delayLongPress={350}
       hitSlop={tight ? { top: slop, bottom: slop } : undefined}
@@ -337,6 +339,7 @@ export function GlassIconButton({
   tone = "bone",
   slop,
   pressRef,
+  sound,
 }: {
   label: string;
   onPress: () => void;
@@ -351,6 +354,8 @@ export function GlassIconButton({
   slop?: number;
   // The Pressable, for a popover that moves a screen reader's focus to its first control.
   pressRef?: Ref<ComponentRef<typeof Pressable>>;
+  // The tap's sound: the click, unless the button is a Back or a close.
+  sound?: SoundSlot;
 }) {
   const t = useTableTokens();
   const s = useUiScale();
@@ -366,7 +371,7 @@ export function GlassIconButton({
       accessibilityRole="button"
       accessibilityLabel={label}
       {...(expanded == null ? {} : { accessibilityState: { expanded } })}
-      onPress={onPress}
+      onPress={withSound(onPress, sound ?? "ui.confirm")}
       hitSlop={slop}
     >
       {({ pressed }) => (
@@ -402,5 +407,5 @@ export function CrossMark({ color }: { color: string }) {
 
 /** The round ✕ that closes a reading panel, labelled "Close": on paper for the parchment panels, on night for the settings panel. */
 export function CloseButton({ onPress, testID, paper = false, pressRef }: { onPress: () => void; testID: string; paper?: boolean; pressRef?: Ref<ComponentRef<typeof Pressable>> }) {
-  return <GlassIconButton label="Close" testID={testID} paper={paper} onPress={onPress} pressRef={pressRef} mark={(color) => <CrossMark color={color} />} />;
+  return <GlassIconButton label="Close" testID={testID} paper={paper} onPress={onPress} pressRef={pressRef} sound="ui.close" mark={(color) => <CrossMark color={color} />} />;
 }

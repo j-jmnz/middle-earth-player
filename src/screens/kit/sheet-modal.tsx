@@ -9,6 +9,7 @@ import { usePalette } from "./palette-hook";
 import { SheetCornersContext } from "../../play/choice/sheet-paper";
 import { SHEET_MAX } from "../../ui/size-class";
 import { useIsTablet, useSizeClass } from "../../ui/use-size-class";
+import { useOpenSound } from "../../ui/sound/use-open-sound";
 
 const ALL_ORIENTATIONS = ["portrait", "portrait-upside-down", "landscape", "landscape-left", "landscape-right"] as const;
 const PORTRAIT = ["portrait"] as const;
@@ -32,6 +33,7 @@ export function SheetModal({
   const floating = size !== "compact";
   // A phone stays portrait inside the Modal as it does outside; only a tablet turns.
   const tablet = useIsTablet();
+  useOpenSound(visible);
   return (
     <Modal visible={visible} transparent animationType={animationType} onRequestClose={onRequestClose} supportedOrientations={tablet ? ALL_ORIENTATIONS : PORTRAIT}>
       {/* A reader's escape gesture closes the sheet, as the scrim and Back do. */}

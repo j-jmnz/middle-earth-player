@@ -9,6 +9,7 @@ import { goBack } from "../../nav/go-back";
 import { routeCode } from "../../nav/route-code";
 import { TableLoading } from "../../table/loading";
 import { TableView, type TableNav } from "../../table/view";
+import { TableMusic } from "../../../play/chrome/table-music";
 import { continueTable, restartTable, sessionStore, useTableSessionAfterPaint } from "../../session/table-session";
 import { DROPPED_SAVE, MISSING_GAME, STALE_CLOSED } from "../../session/stale-words";
 import { useStaleChoice } from "../../session/use-stale-choice";
@@ -67,5 +68,10 @@ export default function TableScreen() {
     outcome: { pathname: "/resolution/[saveId]", params: { saveId } },
     booklet: bookletParams(session.save.campaignId, session.save.loadout?.scenarioId),
   };
-  return <TableView session={session} store={table.store} clock={table.clock} nav={nav} intents={() => table.save().active?.intents ?? null} />;
+  return (
+    <>
+      <TableMusic store={table.store} />
+      <TableView session={session} store={table.store} clock={table.clock} nav={nav} intents={() => table.save().active?.intents ?? null} />
+    </>
+  );
 }

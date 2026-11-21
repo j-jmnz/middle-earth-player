@@ -6,6 +6,7 @@ import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { Text } from "./text.tsx";
+import { playSound } from "./sound/sound.ts";
 
 // The 44 pt target; drawn through `touch(s, ROW)`.
 const ROW = 44;
@@ -91,7 +92,11 @@ export function SettingSwitch({
       accessibilityHint={hint ?? detail}
       accessibilityState={{ checked: value }}
       aria-checked={value}
-      onPress={() => onChange(!value)}
+      onPress={() => {
+        // After the change, so turning Sound effects on is heard.
+        onChange(!value);
+        playSound(value ? "ui.toggle-off" : "ui.toggle-on");
+      }}
       style={({ pressed }) => ({
         minHeight: touch(s, ROW),
         flexDirection: "row",

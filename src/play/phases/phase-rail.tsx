@@ -10,6 +10,7 @@ import Animated, { LayoutAnimationConfig, useAnimatedStyle, useSharedValue, with
 import { STOP_AHEAD_WORDS } from "./carousel.ts";
 import { timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
+import { playSound } from "../../ui/sound/sound.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 import { CONTROL_RADIUS } from "../../ui/radius.ts";
 import { usePlainTitles } from "../../ui/display-prefs.ts";
@@ -64,6 +65,9 @@ export function PhaseRail({
   useEffect(() => {
     if (lastPhase.current === rail.phase) return;
     lastPhase.current = rail.phase;
+    // A new round's sound plays with the Resource phase's flash, and under reduced motion too; the other phases are quiet
+    // (docs/design-system-table.md, Sound).
+    if (rail.phase.toLowerCase() === ROUND_PHASES[0]?.toLowerCase()) playSound("dread.phase");
     if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing(MOTION.railFlashOut, scale))));
   }, [rail.phase, scale, flash]);
   const glow = useAnimatedStyle(() => ({ opacity: 0.55 + 0.45 * flash.get() }));

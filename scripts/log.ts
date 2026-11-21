@@ -6,6 +6,9 @@
 // drops everything. Under Vitest the default is silent, so a test that calls
 // build() or buildCatalog() stays quiet unless LOG_LEVEL asks otherwise. NO_COLOR or a non-TTY stderr turns colour off.
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 type Level = "debug" | "info" | "notice" | "warn" | "error" | "silent";
 const RANK: Record<Level, number> = { debug: 10, info: 20, notice: 30, warn: 30, error: 40, silent: 100 };
 
@@ -165,3 +168,25 @@ export async function runScript(tag: string, main: (log: Log) => void | Promise<
     process.exitCode = 1;
   }
 }
+
+/** Whether `moduleUrl` (a script's `import.meta.url`) is the file node was started on: a script runs its main only then, so a test can import it. */
+export function isDirectRun(moduleUrl: string): boolean {
+  const entry = process.argv[1];
+  return entry ? path.resolve(entry) === fileURLToPath(moduleUrl) : false;
+}
+
+/**
+ * A pack's run (`pnpm assets <pack>`): `main` under runScript. With --optional (pnpm start, `pnpm assets all`) a failed pack is a warning,
+ * `fallback` saying what the bundle carries instead, so the other packs still run and Metro still starts offline.
+ */
+export function runPack(tag: string, fallback: string, main: (log: Log) => unknown): void {
+  void runScript(tag, async (log) => {
+    try {
+      await main(log);
+    } catch (error) {
+      if (!process.argv.includes("--optional")) throw error;
+      log.warn(`${fallback}: ${describeError(error)}`);
+    }
+  });
+}
+

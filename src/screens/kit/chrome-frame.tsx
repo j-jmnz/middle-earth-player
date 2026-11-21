@@ -1,6 +1,6 @@
 // The chrome's frame (docs/design-system.md, Components): the page and its scrolling body, the top bar, rows, panels, stat tiles,
 // the pinned action bar, the paper sheet and the outcome word. Re-exported by chrome.tsx.
-import { useContext, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
+import { useContext, useEffect, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { Pressable, ScrollView, View, type DimensionValue, type ViewProps } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { vars } from "nativewind";
@@ -16,6 +16,8 @@ import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
 import { themeVars } from "./palette.js";
 import { GameIcon } from "../../ui/game-icon";
+import { playSound, withSound } from "../../ui/sound/sound";
+import { quietMusic } from "../../ui/sound/music";
 import type { IconName } from "../../ui/icon-map";
 import { longPressA11y } from "../../ui/long-press-action";
 import { useOpenFocus } from "../../ui/use-open-focus";
@@ -28,6 +30,9 @@ import { touch, useUiScale } from "../../ui/ui-scale";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
 import { ThemeContext, useResolvedTheme } from "../../ui/theme";
+
+// The music waits this long under the win or loss sting, then fades back in (docs/design-system-table.md, Sound).
+const STING_MS = 5000;
 
 /**
  * The page: the ground and its fog (the scene), an optional art layer, then the content, inset 24 and starting under the top inset (useTopInset: the status bar is hidden, a notch or cutout is not); in landscape (the card and booklet
@@ -227,7 +232,7 @@ export function ListRow({
       accessibilityRole="button"
       accessibilityState={selected == null ? undefined : { selected }}
       {...(onLongPress ? longPressA11y(longPressLabel, onLongPress) : null)}
-      onPress={onPress}
+      onPress={withSound(onPress, "ui.confirm")}
       onLongPress={onLongPress}
       delayLongPress={350}
       className="mb-1.5"
@@ -408,6 +413,15 @@ export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; s
   const big = size === "compact" ? 50 : 72;
   const ring = (size === "compact" ? 240 : 330) * s;
   const light = t.depth === "light";
+  // The win or loss sting plays once, as the title first shows; an end plays none, and a screen shown again by Activity does not
+  // play it again (docs/design-system-table.md, Sound).
+  const stung = useRef(false);
+  useEffect(() => {
+    if (stung.current || ended === true) return;
+    stung.current = true;
+    quietMusic(STING_MS);
+    playSound(won ? "dread.win" : "dread.loss");
+  }, [won, ended]);
   // An end (The Black Gate Opens) is neither: muted, with no glow or red.
   const tone = ended === true ? palette.muted : won ? (light ? palette.accent : palette.glow) : palette.threat;
   return (

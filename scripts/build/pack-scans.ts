@@ -11,7 +11,7 @@ import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../d
 import { fetchBytesRetrying, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
 import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { renderPdfPage } from "../data/sources/pictures.ts";
-import { bytes, duration, runScript, type Log } from "../log.ts";
+import { bytes, duration, isDirectRun, runPack, type Log } from "../log.ts";
 
 // A bundled picture is at most this many pixels on its long side: about twice the 600 of a Hall of Beorn scan, which is
 // sharp on a phone's inspect screen. The 600 DPI pictures are about 2100.
@@ -370,17 +370,11 @@ function repoRoot(): string {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 }
 
-function isDirectRun(): boolean {
-  const entry = process.argv[1];
-  if (!entry) return false;
-  return path.resolve(entry) === fileURLToPath(import.meta.url);
-}
-
 // --optional (pnpm start): a failed pack is a warning, so Metro still starts offline with the pictures of the last pack.
-if (isDirectRun()) {
-  void runScript("pack-scans", async (log) => {
+if (isDirectRun(import.meta.url)) {
+  runPack("pack-scans", "pictures not packed, so this bundle keeps the last pack's", async (log) => {
     const root = repoRoot();
-    const pack = packScans(
+    await packScans(
       {
         catalogDb: path.join(root, "assets/catalog.db"),
         sourcesPath: path.join(DATA_DIR, "sources.json"),
@@ -394,11 +388,5 @@ if (isDirectRun()) {
       },
       log,
     );
-    try {
-      await pack;
-    } catch (error) {
-      if (!process.argv.includes("--optional")) throw error;
-      log.warn(`pictures not packed, so this bundle keeps the last pack's: ${error instanceof Error ? error.message : String(error)}`);
-    }
   });
 }
