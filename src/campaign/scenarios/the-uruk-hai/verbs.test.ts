@@ -5,6 +5,7 @@ import type { EngineStep } from "../../../rules/core/intents.ts";
 import { questRoom } from "../../../rules/families/caves/progress.ts";
 import { attachBlocked, restricted } from "../../../rules/interpret/restrictions.ts";
 import { attachHeroHosts } from "../../../rules/families/play/hooks.ts";
+import { boonHeroes } from "../../../rules/families/campaign/resolution.ts";
 import { modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
 import { UNATTRIBUTED } from "../../../rules/core/cause.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
@@ -35,9 +36,9 @@ describe("AttachSelf to a hero with a trait", () => {
     const hero = table.seats[0].heroes.map((id) => table.cards[id]).find((card) => card?.code === "q2");
     const cards = new Map(ctx.cards);
     cards.set("q2", { ...printedOf(ctx.cards, "q2"), traits: ["Warrior"] });
-    expect(attachHeroHosts(table, { kind: "hero", control: "any", trait: "Warrior" }, 0, cards)).toEqual([hero?.id]);
-    expect(attachHeroHosts(table, { kind: "hero", control: "any", trait: "Healer" }, 0, cards)).toEqual([]);
-    expect(attachHeroHosts(table, { kind: "hero", control: "any" }, 0, cards)).toHaveLength(table.seats[0].heroes.length);
+    expect(attachHeroHosts(table, { kind: "hero", control: "any", trait: "Warrior" }, 0, { ...ctx, cards })).toEqual([hero?.id]);
+    expect(attachHeroHosts(table, { kind: "hero", control: "any", trait: "Healer" }, 0, { ...ctx, cards })).toEqual([]);
+    expect(attachHeroHosts(table, { kind: "hero", control: "any" }, 0, { ...ctx, cards })).toHaveLength(table.seats[0].heroes.length);
   });
 
   // The Setup of each boon names the trait its host prints: the record's pick offers a hero with it, and not one without.
@@ -49,9 +50,18 @@ describe("AttachSelf to a hero with a trait", () => {
     const hero = table.seats[0].heroes.map((id) => table.cards[id]).find((card) => card?.code === "q2");
     const cards = new Map(ctx.cards);
     cards.set("q2", { ...printedOf(ctx.cards, "q2"), traits: [trait] });
-    expect(attachHeroHosts(table, instruction.to, 0, cards)).toEqual([hero?.id]);
-    expect(attachHeroHosts(table, instruction.to, 0, ctx.cards)).toEqual([]);
+    expect(attachHeroHosts(table, instruction.to, 0, { ...ctx, cards })).toEqual([hero?.id]);
+    expect(attachHeroHosts(table, instruction.to, 0, ctx)).toEqual([]);
   };
+
+  it("143015:A:2 offers a hero that gained the trait, in play and at the Resolution (rr.traits)", () => {
+    const hero = table.seats[0].heroes.map((id) => table.cards[id]).find((card) => card?.code === "q2")?.id ?? "";
+    const to = { kind: "hero", control: "any", trait: "Warrior" } as const;
+    expect(attachHeroHosts(table, to, 0, ctx)).toEqual([]);
+    const gained = { ...table, modifiers: [...table.modifiers, { instanceId: hero, sourceId: hero, stat: "traitGained" as const, amount: 1, until: "endOfGame" as const, trait: "Warrior" }] };
+    expect(attachHeroHosts(gained, to, 0, ctx)).toEqual([hero]);
+    expect(boonHeroes(gained, ctx, "143015", table.seats[0].heroes)).toEqual([hero]);
+  });
 
   it("143016:A:2 attaches to a Healer hero", () => setupHosts("143016", "Healer"));
   it("143017:A:2 attaches to a Ranger hero", () => setupHosts("143017", "Ranger"));

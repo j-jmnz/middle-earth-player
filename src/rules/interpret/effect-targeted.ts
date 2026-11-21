@@ -74,7 +74,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       }
       if (instruction.to.kind === "hero") {
         const seat = attachSeat(state, instruction, item.seat, sourceId);
-        const hosts = seat == null ? [] : attachHeroHosts(state, instruction.to, seat, ctx.cards).filter(free);
+        const hosts = seat == null ? [] : attachHeroHosts(state, instruction.to, seat, ctx).filter(free);
         // "The hero with the most attachments" (18027:A:1): among the heroes the card is not on, those holding the most.
         const most = Math.max(0, ...hosts.map((id) => state.cards[id]?.attachments.length ?? 0));
         return instruction.to.control === "mostAttachments" ? hosts.filter((id) => (state.cards[id]?.attachments.length ?? 0) === most) : hosts;

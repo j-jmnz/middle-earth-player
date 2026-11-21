@@ -64,7 +64,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 34, scenarios: ["temple-of-the-deceived"], note: "An ally turned up from under the active location enters play, and the cards that answer an ally entering play hear it." },
   { version: 35, scenarios: "all", note: "An attachment you play or put into play on another player's character is controlled by that player, who triggers its abilities; it still goes to your discard pile." },
   { version: 35, scenarios: "all", note: "When an effect targets one of several copies of a card in play, you choose the copy: Mr. Underhill bars the Black Rider you pick, and an attachment like Pale Blade goes on the enemy you pick." },
-  { version: 36, scenarios: "all", note: "A Trait a card gains counts when a card asks whether two cards share a Trait: with Éomer in play, Lothíriel can put a Rohan ally from your hand into the quest." },
+  { version: 36, scenarios: "all", note: "A Trait a card gains counts like a printed one: with Éomer in play, Lothíriel can put a Rohan ally from your hand into the quest, a character that gained the Eagle trait can attack and defend against an enemy only Eagles can reach, and a hero that gained a Trait can take the Skill boon for it." },
 ];
 
 export const ENGINE_VERSION = 36;

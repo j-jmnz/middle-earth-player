@@ -38,6 +38,15 @@ describe("02070:A:1 eagleOrRangedOnly", () => {
   });
 });
 
+describe("02070:A:1 with a gained Eagle trait (rr.traits)", () => {
+  it("02070:A:1 counts the Eagle trait a character gained from a modifier, like Come Together's chosen Trait", () => {
+    const t = made("eagleOrRangedOnly");
+    const gained = { instanceId: t.ids.aragorn ?? "", sourceId: t.ids.aragorn ?? "", stat: "traitGained" as const, amount: 1, until: "endOfRound" as const, trait: "Eagle" };
+    const next = { ...t, state: { ...t.state, modifiers: [...t.state.modifiers, gained] } };
+    expect([attacks(next, "aragorn"), defends(next, "aragorn")]).toEqual([true, true]);
+  });
+});
+
 describe("900606:A:2 cannotBeAttackedByRanged", () => {
   it("900606:A:2 bars the character with ranged from attacking the enemy, and only that one", () => {
     const t = made("cannotBeAttackedByRanged");
